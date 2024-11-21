@@ -159,7 +159,7 @@ public class NPCMovementInst : MonoBehaviour
         }
     } 
    
-    Vector3 newPositionY;
+    private Vector3 newPositionY;
     private void HandleMove()
     { 
         if (_verticalVelocity > GRAVITY) //terminal velocity

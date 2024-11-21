@@ -8,7 +8,6 @@ public class BlockPreviewStatic : MonoBehaviour
     
     private float OPACITY = 0.45f;
     
-    private Material _material; 
     private GameObject meshObject;
     private List<Vector3> _vertices;
     private List<int> _triangles;
@@ -18,7 +17,6 @@ public class BlockPreviewStatic : MonoBehaviour
     void Start()
     {
         Instance = this;
-        _material = Resources.Load<Material>("shader/material/custom_lit");
     }
 
     public void DeleteBlock()
@@ -49,7 +47,7 @@ public class BlockPreviewStatic : MonoBehaviour
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshFilter.mesh = mesh;
-        Material meshMaterial = new(_material)
+        Material meshMaterial = new(Game.MeshMaterial)
         {
             mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
         };
