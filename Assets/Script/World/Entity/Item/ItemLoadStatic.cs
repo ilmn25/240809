@@ -24,35 +24,25 @@ public class ItemLoadStatic : MonoBehaviour
     //     SpawnItem(GetItemNameID("brick"), new Vector3(3,5,3));     
     // }
 
-    public EntityAbstract SpawnItem(int id, Vector3 position)
+    public void SpawnItem(EntityData entityData)
     {
-        ItemData itemDataToSpawn = itemList.Find(item => item.ID == id);
-        GameObject itemObject = new GameObject(itemDataToSpawn.ID.ToString());
+        ItemData itemDataToSpawn = itemList.Find(item => item.ID == int.Parse(entityData.ID));
+        GameObject itemObject = Instantiate(Resources.Load<GameObject>($"prefab/item"));
+        itemObject.name = entityData.ID;
         itemObject.transform.parent = transform; 
-
-        itemObject.transform.position = position;
-        // itemObject.transform.rotation = Quaternion.Euler(90, 0, 0);
-        Vector3 scale = itemObject.transform.localScale;
-        scale.y = Mathf.Sqrt(2);
-        itemObject.transform.localScale = scale / 2; 
-
-        SpriteRenderer spriteRenderer = itemObject.AddComponent<SpriteRenderer>();
-        Material material = Resources.Load<Material>("shader/material/sprite_shadow");
-        spriteRenderer.material = material;
-        Sprite sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}");
-        spriteRenderer.sprite = sprite;
-        // spriteRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-        spriteRenderer.receiveShadows = true;
-         
-        itemObject.AddComponent<ItemPhysicInst>().PopItem(); 
-        itemObject.AddComponent<SpriteOrbitInst>();
-        itemObject.AddComponent<SpriteCullInst>();   
-        itemObject.AddComponent<EntityChunkPositionInst>();
-        EntityAbstract entityAbstract = itemObject.AddComponent<EntityAbstract>();
-        entityAbstract.entityData = new EntityData(itemDataToSpawn.ID.ToString(), new SerializableVector3(position), type: EntityType.Item);
-        return entityAbstract;
+        itemObject.transform.position = entityData.Position.ToVector3(); 
+        
+        SpriteRenderer spriteRenderer = itemObject.GetComponent<SpriteRenderer>(); 
+        spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}");
+        EntityAbstract entityAbstract = itemObject.GetComponent<EntityAbstract>();
+        entityAbstract._entityData = entityData;
     }
 
+    public static EntityData GetEntityData(int id, Vector3 position, EntityType entityType)
+    {
+        return new EntityData(id.ToString(), new SerializableVector3(position), type: entityType);
+    }
+    
     public int GetItemNameID(string itemName)
     {
         ItemData itemData = itemList.Find(i => i.Name == itemName);

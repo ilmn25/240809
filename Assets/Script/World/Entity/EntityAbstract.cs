@@ -5,11 +5,11 @@ using UnityEngine.Serialization;
 
 public class EntityAbstract : MonoBehaviour
 {
-    public EntityData entityData;
+    public EntityData _entityData;
 
     public EntityData GetUpdatedEntity()
     {
-        entityData.Position = new SerializableVector3(WorldStatic.GetBlockCoordinate(transform.position));
-        return entityData;
+        _entityData.Position = new SerializableVector3(WorldStatic.GetBlockCoordinate(transform.position));
+        return _entityData;
     }
 }

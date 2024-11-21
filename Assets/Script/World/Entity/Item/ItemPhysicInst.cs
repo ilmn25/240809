@@ -22,6 +22,7 @@ public class ItemPhysicInst : MonoBehaviour
         _playerDataStatic = GameObject.Find("user_system").GetComponent<PlayerDataStatic>();
         _collisionLayer = LayerMask.GetMask("Collision"); 
         transform.position = transform.position + new Vector3(0, 0.1f, 0);
+        PopItem();
     }
 
     public void PopItem() //initial pop velocity 
