@@ -4,18 +4,12 @@ using UnityEngine.Profiling;
 
 public class PlayerChunkEditStatic : MonoBehaviour
 {
+    public static PlayerChunkEditStatic Instance { get; private set; }  
     // private float range = 8f;
     public AudioClip SOUNDDIG;
-    private WorldStatic _worldStatic;
-    private MapEditStatic _mapEditStatic;
-    private MapCullStatic _mapCullStatic;
-    private BlockPreviewStatic _blockPreviewStatic;
-    private PlayerDataStatic _playerDataStatic;
-    private ItemLoadStatic _itemLoadStatic;
     
     BoxCollider _boxCollider;
     private GameObject _block;
-    private GameObject _player;
     private Vector3 _worldPosition;
     private Vector3 _screenPosition;
     private Vector3Int _chunkCoordinate;
@@ -28,17 +22,9 @@ public class PlayerChunkEditStatic : MonoBehaviour
     public int BLOCKOVERLAYSPEED = 10; 
 
     private void Awake()
-    { 
-        _player = GameObject.Find("player");
+    {
+        Instance = this;
         _boxCollider = GetComponent<BoxCollider>();
-        GameObject userSystem = GameObject.Find("user_system");
-        GameObject mapSystem = GameObject.Find("map_system");
-        _worldStatic = GameObject.Find("world_system").GetComponent<WorldStatic>();
-        _itemLoadStatic = GameObject.Find("entity_system").GetComponent<ItemLoadStatic>();
-        _mapEditStatic = mapSystem.GetComponent<MapEditStatic>();
-        _mapCullStatic = mapSystem.GetComponent<MapCullStatic>();
-        _blockPreviewStatic = userSystem.GetComponent<BlockPreviewStatic>(); 
-        _playerDataStatic = userSystem.GetComponent<PlayerDataStatic>(); 
         _chunkSize = WorldStatic.CHUNKSIZE;
         _chunkDepth = WorldStatic.CHUNKDEPTH; 
     }
@@ -48,34 +34,34 @@ public class PlayerChunkEditStatic : MonoBehaviour
         if (Input.GetMouseButtonDown(0)) //break
         {  
             HandleBlockPosition(true);
-            int destroyedBlockID = _worldStatic.MapLoadStatic.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, _worldStatic);
+            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check 
-                _mapEditStatic.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
+                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
                 AudioStatic.PlaySFX(SOUNDDIG);
             }   
         }
         else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockID)) //place
         { 
-            _playerDataStatic.RemoveItem(_itemLoadStatic.GetItemNameID(_blockID)); 
+            PlayerDataStatic.Instance.RemoveItem(ItemLoadStatic.GetItemNameID(_blockID)); 
             ReplaceBlock(BlockStatic.ConvertID(_blockID));
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
         {  
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(_player.transform.position), 0f, 1f, 0f);
+            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0f, 1f, 0f);
             HandleChunkCoordinate(_worldPosition);
-            int destroyedBlockID = _worldStatic.MapLoadStatic.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, _worldStatic);
+            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check
-                _mapEditStatic.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
+                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
                 AudioStatic.PlaySFX(SOUNDDIG);
             }   
         }
         else if (Input.GetKeyDown(KeyCode.C)) //break under
         {  
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(_player.transform.position), 0f, -1f, 0f);
+            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0f, -1f, 0f);
             HandleChunkCoordinate(_worldPosition);
-            int destroyedBlockID = _worldStatic.MapLoadStatic.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, _worldStatic);
+            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check
-                _mapEditStatic.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
+                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
                 AudioStatic.PlaySFX(SOUNDDIG);
             }   
         }
@@ -93,12 +79,12 @@ public class PlayerChunkEditStatic : MonoBehaviour
         {        
             if (_block == null) 
             {
-                _block = _blockPreviewStatic.CreateBlock(_blockID);
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockID);
             }
             else if (_block.name != _blockID)
             {
-                _blockPreviewStatic.DeleteBlock();
-                _block = _blockPreviewStatic.CreateBlock(_blockID);
+                BlockPreviewStatic.Instance.DeleteBlock();
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockID);
             }
             
             HandleBlockPosition();  
@@ -106,7 +92,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         else
         {
             _block = null;
-            _blockPreviewStatic.DeleteBlock();
+            BlockPreviewStatic.Instance.DeleteBlock();
         }
     }
 
@@ -134,7 +120,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
 
     void HandleWorldCoordinate(bool isBreak)
     {
-        float yThreshold = _mapCullStatic._yThreshold + 0.05f;
+        float yThreshold = MapCullStatic.Instance._yThreshold + 0.05f;
 
         _screenPosition = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(_screenPosition);
@@ -143,7 +129,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             _worldPosition = new Vector3Int();
             Vector3 adjustedPoint;
 
-            if (_mapCullStatic._yCheck)
+            if (MapCullStatic.Instance._yCheck)
             {
                 // Calculate the position in the ray's direction where y = yThreshold
                 float distanceToThreshold = (yThreshold - hitInfo.point.y) / ray.direction.y;
@@ -205,7 +191,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             // Define the rectangle bounds at the player's position 
             playerBounds = new Bounds(transform.position + _boxCollider.center, _boxCollider.size);
             blockBounds = new Bounds(Lib.AddToVector(Vector3Int.FloorToInt(_worldPosition), 0.5f, 0.5f, 0.5f), Vector3.one); 
-            bool isEmpty = _worldStatic.GetBoolInBoolMap(Vector3Int.FloorToInt(_worldPosition));
+            bool isEmpty = WorldStatic.Instance.GetBoolInBoolMap(Vector3Int.FloorToInt(_worldPosition));
             if (!isEmpty || Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
                 Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
                 Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE ||
@@ -224,7 +210,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                                 float distance = Vector3.Distance(_worldPosition, currentBlockPosition); //closest check
                                 if (distance < closestDistance || closestDistance == -1)
                                 { 
-                                    if (_worldStatic.GetBoolInBoolMap(currentBlockPosition)) //occupied check
+                                    if (WorldStatic.Instance.GetBoolInBoolMap(currentBlockPosition)) //occupied check
                                     { 
                                         blockBounds = new Bounds(Lib.AddToVector(currentBlockPosition, 0.5f, 0.5f, 0.5f), Vector3.one);
 
@@ -271,7 +257,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         AudioStatic.PlaySFX(SOUNDDIG); 
         HandleBlockPosition();  
         _block.transform.position = _worldPosition;
-        _worldStatic.UpdateMap(_chunkCoordinate, _blockCoordinate, blockID); 
+        WorldStatic.Instance.UpdateMap(_chunkCoordinate, _blockCoordinate, blockID); 
         // Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.red);
     }
  

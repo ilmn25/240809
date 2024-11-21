@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class FoilageStatic : MonoBehaviour
 {
+    public static FoilageStatic Instance { get; private set; }  
     private SpriteRenderer spriteRenderer;
 
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;
         spriteRenderer = GetComponent<SpriteRenderer>(); 
         SetSpriteBasedOnPerlinNoise();
         Destroy(this); 

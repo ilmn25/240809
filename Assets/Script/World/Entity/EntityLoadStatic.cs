@@ -6,8 +6,7 @@ using UnityEngine;
 
 public class EntityLoadStatic : MonoBehaviour
 {
-    private WorldStatic _worldStatic;
-    private ItemLoadStatic _itemLoadStatic;
+    public static EntityLoadStatic Instance { get; private set; }  
     public static event Action UpdateEntityParent; 
     int _chunkSize;
 
@@ -16,8 +15,7 @@ public class EntityLoadStatic : MonoBehaviour
 
     void Awake()
     {
-        _worldStatic = GameObject.Find("world_system").GetComponent<WorldStatic>();
-        _itemLoadStatic = GetComponent<ItemLoadStatic>();
+        Instance = this;
         WorldStatic.PlayerChunkPositionUpdate += HandleChunkEntityTraverse; 
         _chunkSize = WorldStatic.CHUNKSIZE;
     }
@@ -91,7 +89,7 @@ public class EntityLoadStatic : MonoBehaviour
 
         void HandleLoad()
         {
-            _worldStatic.HandleLoadWorldFile(0); 
+            WorldStatic.Instance.HandleLoadWorldFile(0); 
 
             for (int x = -ENTITY_DISTANCE * _chunkSize; x <= ENTITY_DISTANCE * _chunkSize; x += _chunkSize)
             {
@@ -105,7 +103,7 @@ public class EntityLoadStatic : MonoBehaviour
 
                     if (!_entityList.ContainsKey(chunkCoordinates))
                     {
-                        _currentChunkData = _worldStatic.GetChunk(chunkCoordinates); 
+                        _currentChunkData = WorldStatic.Instance.GetChunk(chunkCoordinates); 
                         if  (_currentChunkData != null)
                         {
                             _entityChunk = _currentChunkData.Entity;  
@@ -138,7 +136,7 @@ public class EntityLoadStatic : MonoBehaviour
             {
                 case EntityType.Item:
                     entity.Position = new SerializableVector3(Lib.CombineVector(chunkCoordinates, entity.Position.ToVector3()));
-                    _itemLoadStatic.SpawnItem(entity);
+                    ItemLoadStatic.Instance.SpawnItem(entity);
                     break;
 
                 case EntityType.Static:

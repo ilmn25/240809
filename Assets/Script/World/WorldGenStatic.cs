@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WorldGenStatic : MonoBehaviour
 {
+    public static WorldGenStatic Instance { get; private set; }  
+    
     private int _chunkSize;
     private int _chunkDepth; 
     public bool SPAWN_ENTITY; 
@@ -17,6 +19,7 @@ public class WorldGenStatic : MonoBehaviour
     float caveOffsetZ;
 
     private void Awake() {
+        Instance = this;
         terrainOffsetX = Random.Range(0f, 1000f);
         terrainOffsetZ = Random.Range(0f, 1000f);
         marbleOffsetX = Random.Range(0f, 1000f);

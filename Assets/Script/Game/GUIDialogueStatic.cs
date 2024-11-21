@@ -8,15 +8,12 @@ using UnityEngine.UI;
 
 public class GUIDialogueStatic : MonoBehaviour
 {  
+    public static GUIDialogueStatic Instance { get; private set; }  
     // C_gamestate
     public event Action OnShowDialog;
     public event Action OnHideDialog;
-    public static GUIDialogueStatic Instance { get; private set; }  
  
     private AudioSource _audioSource;
-    private GameObject _dialogueBox; 
-    private GameObject _player; 
-    private TextMeshProUGUI _dialogueText;
     
     private Vector3 _position;
     private Dialogue _currentDialogue;
@@ -34,12 +31,9 @@ public class GUIDialogueStatic : MonoBehaviour
     [SerializeField] private float HIDE_DURATION = 0.2f; // Duration for hiding animation 
      
 
-    private void Start()
+    private void Awake()
     {
-        Instance = this;  
-        _dialogueBox = GameObject.Find("gui").transform.Find("dialogue_box").gameObject;
-        _dialogueText = _dialogueBox.transform.Find("dialogue_text").GetComponent<TextMeshProUGUI>(); 
-        _player = GameObject.Find("player"); 
+        Instance = this;
     }
 
     // Dialogue Dialogue; 
@@ -47,7 +41,7 @@ public class GUIDialogueStatic : MonoBehaviour
     {
         if (!_isInputBlocked){
                 
-            if (Vector3.Distance(_player.transform.position, _position) > 3) { //walk away from npc
+            if (Vector3.Distance(Game.Player.transform.position, _position) > 3) { //walk away from npc
                 StartCoroutine(HideDialogueBox());
             }
 
@@ -81,11 +75,11 @@ public class GUIDialogueStatic : MonoBehaviour
     //! called by player script to fetch dialogue and play it
     public IEnumerator TransmitDialogue(Dialogue dialogue, Vector3 position)
     {    
-        if (!_dialogueBox.activeSelf) 
+        if (!Game.DialogueBox.activeSelf) 
         {
             OnShowDialog?.Invoke(); //-> c gamestate
             _currentDialogue = dialogue;
-            _dialogueText.text = "";
+            Game.DialogueText.text = "";
             _current_line = 0; 
             showDialogueCoroutine = StartCoroutine(ShowDialogue(_currentDialogue.Lines[_current_line]));
             StartCoroutine(ScaleDialogueBox(true, SHOW_DURATION)); // show/hide box  
@@ -100,7 +94,7 @@ public class GUIDialogueStatic : MonoBehaviour
     public IEnumerator ShowDialogue(string line)
     {
         _isTyping = true;
-        _dialogueText.text = "";
+        Game.DialogueText.text = "";
         
          AudioStatic.StopSFX(_audioSource);
         _audioSource = AudioStatic.PlaySFX(TEXT, 0.2f, true);
@@ -110,11 +104,11 @@ public class GUIDialogueStatic : MonoBehaviour
             if (_skip == 0)
             {
                 _skip = 1;
-                _dialogueText.text = line;
+                Game.DialogueText.text = line;
                 AudioStatic.StopSFX(_audioSource);
                 break;
             }
-            _dialogueText.text += letter;
+            Game.DialogueText.text += letter;
             yield return new WaitForSeconds(1f / TEXT_SPEED);
         }
         _isTyping = false;
@@ -125,7 +119,7 @@ public class GUIDialogueStatic : MonoBehaviour
     { 
         OnHideDialog?.Invoke(); //-> c gamestate
         yield return StartCoroutine(ScaleDialogueBox(false, HIDE_DURATION)); 
-        _dialogueText.text = "";
+        Game.DialogueText.text = "";
         _skip = 1; 
     }
 
@@ -144,8 +138,8 @@ public class GUIDialogueStatic : MonoBehaviour
     {
         Vector3 targetScale = show ? Vector3.one : Vector3.zero;
         Vector3 initialScale = show ? Vector3.zero : Vector3.one;
-        _dialogueBox.transform.localScale = initialScale;
-        _dialogueBox.SetActive(true);
+        Game.DialogueBox.transform.localScale = initialScale;
+        Game.DialogueBox.SetActive(true);
 
         float elapsedTime = 0f;
 
@@ -154,7 +148,7 @@ public class GUIDialogueStatic : MonoBehaviour
             float t = elapsedTime / duration;
             if (show)
             {
-                if (_dialogueBox.transform.localScale.x > 0.5f) _isInputBlocked = false;
+                if (Game.DialogueBox.transform.localScale.x > 0.5f) _isInputBlocked = false;
                 t = Mathf.SmoothStep(0f, 1f, Mathf.Pow(t, EASE_SPEED)); // Apply adjustable ease-out effect
             }
             else
@@ -162,16 +156,16 @@ public class GUIDialogueStatic : MonoBehaviour
                 t = Mathf.Lerp(0f, 1f, t); // Linear interpolation for hiding
             }
  
-            _dialogueBox.transform.localScale = Vector3.Lerp(initialScale, targetScale, t);
+            Game.DialogueBox.transform.localScale = Vector3.Lerp(initialScale, targetScale, t);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        _dialogueBox.transform.localScale = targetScale;
+        Game.DialogueBox.transform.localScale = targetScale;
 
         if (!show)
         { 
             StopCoroutine(showDialogueCoroutine);
-            _dialogueBox.SetActive(false);
+            Game.DialogueBox.SetActive(false);
             AudioStatic.StopSFX(_audioSource);
             _isInputBlocked = true;
         } 

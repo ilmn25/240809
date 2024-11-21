@@ -7,8 +7,8 @@ public enum GameState { FreeRoam, Dialogue, Battle }
 
 public class GameStateStatic : MonoBehaviour
 {
-    private GUIDialogueStatic _guiDialogueStatic;
-    private PlayerInteractStatic _playerInteractStatic;
+    public static GameStateStatic Instance { get; private set; }  
+    
 
     [HideInInspector]
     public GameState GAMESTATE = GameState.FreeRoam;
@@ -16,15 +16,15 @@ public class GameStateStatic : MonoBehaviour
     // 
     void Start()
     {
-        _guiDialogueStatic = GameObject.Find("viewport_system").GetComponent<GUIDialogueStatic>();
-        _playerInteractStatic = GameObject.Find("player").GetComponent<PlayerInteractStatic>(); 
+        Instance = this;  
+        
 
         // The event handlers for OnShowDialog and OnHideDialog need to be set up when the game object is first created, so that the game can properly track the dialogue state.
-        _guiDialogueStatic.OnShowDialog += () =>
+        GUIDialogueStatic.Instance.OnShowDialog += () =>
         {
             GAMESTATE = GameState.Dialogue;
         };
-        _guiDialogueStatic.OnHideDialog += () =>
+        GUIDialogueStatic.Instance.OnHideDialog += () =>
         {
             GAMESTATE = GameState.FreeRoam;
         };
@@ -39,7 +39,7 @@ public class GameStateStatic : MonoBehaviour
                 // DialogueSystem.Instance.HandleUpdate(); 
                 break;
             case GameState.FreeRoam:
-                _playerInteractStatic.HandleInteraction();
+                PlayerInteractStatic.Instance.HandleInteraction();
                 break;
         }
     }

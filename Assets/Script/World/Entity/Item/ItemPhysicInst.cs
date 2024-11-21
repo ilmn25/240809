@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ItemPhysicInst : MonoBehaviour
 {
-    private GameObject _player;
-    private PlayerDataStatic _playerDataStatic;
+    public static ItemPhysicInst Instance { get; private set; }  
+    
     private LayerMask _collisionLayer;
     private Vector3 _velocity;
     private float _deltaTime;
@@ -17,9 +17,8 @@ public class ItemPhysicInst : MonoBehaviour
     private float COLLISION_RANGE = 0.3f;  
 
     void Start()
-    { 
-        _player = GameObject.Find("player");
-        _playerDataStatic = GameObject.Find("user_system").GetComponent<PlayerDataStatic>();
+    {
+        Instance = this;
         _collisionLayer = LayerMask.GetMask("Collision"); 
         transform.position = transform.position + new Vector3(0, 0.1f, 0);
         PopItem();
@@ -33,11 +32,11 @@ public class ItemPhysicInst : MonoBehaviour
     void Update()
     {
         // Move towards the player if within detection range 
-        float playerDistance = Vector3.Distance(transform.position, _player.transform.position);
+        float playerDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
         
         if (playerDistance <= PICKUP_RANGE)
         {
-            _playerDataStatic.AddItem(int.Parse(transform.name), 1);
+            PlayerDataStatic.Instance.AddItem(int.Parse(transform.name), 1);
             Destroy(gameObject);
         }
         else if (transform.position.y < -5) 

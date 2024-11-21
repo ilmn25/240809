@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class CameraStatic : MonoBehaviour
 {
-    private GameObject _player; 
+    public static CameraStatic Instance { get; private set; }  
+    
     public static int _orbitRotation = 0;
     public static Quaternion _currentRotation;
     public static event Action OnOrbitRotate;
@@ -15,7 +16,6 @@ public class CameraStatic : MonoBehaviour
     private float _screenHeight; 
     private Quaternion _targetRotation;
     private Vector3 _targetPosition;
-    private GameObject _camera; // Use the new keyword to hide the inherited member 
 
     [SerializeField] private float TILT_DEGREE_X = 0.15f;
     [SerializeField] private float TILT_DEGREE_Y = 0.2f; // Maximum rotation angle
@@ -30,13 +30,13 @@ public class CameraStatic : MonoBehaviour
 
     void Start()
     {  
-        _player = GameObject.Find("player"); 
+        Instance = this;
+        
         _screenWidth = Screen.width;
         _screenHeight = Screen.height;
-        _camera = transform.Find("main_camera").gameObject;
-        _targetRotation = _camera.transform.rotation;
-        _targetPosition = _camera.transform.localPosition;
-        _camera.GetComponent<Camera>().transparencySortMode = TransparencySortMode.CustomAxis; 
+        _targetRotation = Game.Camera.transform.rotation;
+        _targetPosition = Game.Camera.transform.localPosition;
+        Game.Camera.GetComponent<Camera>().transparencySortMode = TransparencySortMode.CustomAxis; 
 
         UpdateOrbit();
     }
@@ -104,7 +104,7 @@ public class CameraStatic : MonoBehaviour
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
         if (!Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
         {
-            Camera cameraComponent = _camera.GetComponent<Camera>();
+            Camera cameraComponent = Game.Camera.GetComponent<Camera>();
             cameraComponent.fieldOfView -= scrollInput * FOV_CHANGE_SPEED;
             cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 20f); // Clamp FOV to reasonable values
         }
@@ -122,7 +122,7 @@ public class CameraStatic : MonoBehaviour
         int xAxis = (_orbitRotation > 0) ? 1 : -1;
 
         // CustomLibrary.Log(_orbitRotation, zAxis, xAxis);
-        _camera.GetComponent<Camera>().transparencySortAxis = new Vector3(xAxis, 0, zAxis);
+        Game.Camera.GetComponent<Camera>().transparencySortAxis = new Vector3(xAxis, 0, zAxis);
     }
 
     void HandleCameraSway()
@@ -135,19 +135,19 @@ public class CameraStatic : MonoBehaviour
 
         float newRotationY =  angleX * TILT_DEGREE_Y;
         float newRotationX =  angleY * TILT_DEGREE_X;
-        // UnityEngine.Debug.Log(_camera.transform.rotation.y); 
+        // UnityEngine.Debug.Log(Game.Camera.transform.rotation.y); 
         _targetRotation = Quaternion.Euler(45 - newRotationX, newRotationY , 0);
         _targetPosition = new Vector3(newRotationY * PAN_DEGREE, 30, -30); 
 
-        _camera.transform.localRotation = Quaternion.Lerp(_camera.transform.localRotation, _targetRotation, Time.deltaTime * TILT_SPEED);
-        _camera.transform.localPosition = Vector3.Lerp(_camera.transform.localPosition, _targetPosition, Time.deltaTime * TILT_SPEED);
+        Game.Camera.transform.localRotation = Quaternion.Lerp(Game.Camera.transform.localRotation, _targetRotation, Time.deltaTime * TILT_SPEED);
+        Game.Camera.transform.localPosition = Vector3.Lerp(Game.Camera.transform.localPosition, _targetPosition, Time.deltaTime * TILT_SPEED);
     } 
 
     void HandlePlayerFollow()
     {
-        if (_player != null)
+        if (Game.Player != null)
         {
-            Vector3 targetPosition = _player.transform.position;
+            Vector3 targetPosition = Game.Player.transform.position;
             transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * FOLLOW_SPEED);
         }
     }

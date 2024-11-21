@@ -4,9 +4,10 @@ using UnityEngine.UIElements;
 
 public class PlayerAnimationStatic : MonoBehaviour
 { 
+    public static PlayerAnimationStatic Instance { get; private set; }  
+    
     private Animator _animator;
     private GameObject _sprite;
-    private PlayerMovementStatic _playerMovementStatic; 
     private int _flipDirection;
     private float _nextTrailTimer = 0f; // Time when the next trail should be created
 
@@ -25,8 +26,8 @@ public class PlayerAnimationStatic : MonoBehaviour
 
     void Awake()
     {
+        Instance = this;
         _sprite = transform.Find("sprite").gameObject;
-        _playerMovementStatic = GetComponent<PlayerMovementStatic>();
         _animator = _sprite.GetComponent<Animator>();
 
         _targetScale = _sprite.transform.localScale; 
@@ -49,12 +50,12 @@ public class PlayerAnimationStatic : MonoBehaviour
     public void HandleAnimationUpdate()
     {
         // facing direction 
-        if (_playerMovementStatic._rawInput != Vector2.zero){
-            _animator.SetFloat("PosX", _playerMovementStatic._rawInput.x);
-            _animator.SetFloat("PosY", _playerMovementStatic._rawInput.y);
+        if (PlayerMovementStatic.Instance._rawInput != Vector2.zero){
+            _animator.SetFloat("PosX", PlayerMovementStatic.Instance._rawInput.x);
+            _animator.SetFloat("PosY", PlayerMovementStatic.Instance._rawInput.y);
         } 
 
-        bool isMoving = _playerMovementStatic._speedCurrent > 0.35 && _playerMovementStatic._isGrounded;
+        bool isMoving = PlayerMovementStatic.Instance._speedCurrent > 0.35 && PlayerMovementStatic.Instance._isGrounded;
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {
@@ -78,7 +79,7 @@ public class PlayerAnimationStatic : MonoBehaviour
 
     void HandleFlipCheck()
     {     
-        if ((int)_playerMovementStatic._rawInput.x != 0) 
+        if ((int)PlayerMovementStatic.Instance._rawInput.x != 0) 
         {
             if (Mathf.Sign((int)_animator.GetFloat("PosX")) != Mathf.Sign(_targetScale.x))
             {

@@ -11,16 +11,15 @@ using UnityEngine;
 
 public class WorldStatic : MonoBehaviour
 { 
+    public static WorldStatic Instance { get; private set; }  
+    
     public static Dictionary<int, List<ChunkData>> _loadedChunks;  
 
     Dictionary<Vector3Int, ChunkData> _chunkCache = new Dictionary<Vector3Int, ChunkData>(); 
     private int MAX_CACHE_SIZE = 20;
 
     private GameObject _player; 
-    private BinaryFormatter _bf = new BinaryFormatter();
-    private MapLoadStatic _mapLoadStatic;
-    private EntityLoadStatic _entityLoadStatic;
-    private WorldGenStatic _worldGenStatic;
+    private BinaryFormatter _bf = new BinaryFormatter(); 
     public static event Action PlayerChunkPositionUpdate;
 
     [HideInInspector] 
@@ -39,18 +38,15 @@ public class WorldStatic : MonoBehaviour
     public int RENDER_DISTANCE = 4; 
     public bool ALWAYS_REGENERATE = false;
 
-    public MapLoadStatic MapLoadStatic
+    private void Awake()
     {
-        set { _mapLoadStatic = value; }
-        get { return _mapLoadStatic; }
+        Instance = this;
     }
 
     void Start()
     {
-        _player = GameObject.Find("player"); 
-        _mapLoadStatic = transform.Find("map_system").GetComponent<MapLoadStatic>();
-        _entityLoadStatic = transform.Find("entity_system").GetComponent<EntityLoadStatic>();
-        _worldGenStatic = GetComponent<WorldGenStatic>();
+        Instance = this;
+        _player = GameObject.Find("player");  
         _loadedChunks = new Dictionary<int, List<ChunkData>>(); 
 
         //TODO 
@@ -93,7 +89,7 @@ public class WorldStatic : MonoBehaviour
  
     public async void HandleSaveWorldFile(List<ChunkData> chunks, int yLevel)
     {
-        _entityLoadStatic.SaveAllEntities();
+        EntityLoadStatic.Instance.SaveAllEntities();
         await Task.Delay(10);
         string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         string filePath = $"{downloadsPath}\\chunks_{yLevel}.dat"; 
@@ -250,40 +246,40 @@ public class WorldStatic : MonoBehaviour
     public void UpdateMap(Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0) 
     { 
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID; 
-        _mapLoadStatic.RefreshExistingChunk(chunkCoordinate); //refresh on screen
+        MapLoadStatic.Instance.RefreshExistingChunk(chunkCoordinate); //refresh on screen
             
         if (blockCoordinate.x == 0) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, 0));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, 0));
         }
         else if (blockCoordinate.x == CHUNKSIZE - 1) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, 0));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, 0));
         }
         if (blockCoordinate.z == 0) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, -CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, -CHUNKSIZE));
         }
         else if (blockCoordinate.z == CHUNKSIZE - 1) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, CHUNKSIZE));
         }
         // corners
         if (blockCoordinate.x == 0 && blockCoordinate.z == 0) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, -CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, -CHUNKSIZE));
         }
         else if (blockCoordinate.x == 0 && blockCoordinate.z == CHUNKSIZE - 1) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNKSIZE, 0, CHUNKSIZE));
         }
         else if (blockCoordinate.x == CHUNKSIZE - 1 && blockCoordinate.z == 0) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, -CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, -CHUNKSIZE));
         }
         else if (blockCoordinate.x == CHUNKSIZE - 1 && blockCoordinate.z == CHUNKSIZE - 1) 
         {
-            _mapLoadStatic.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, CHUNKSIZE));
+            MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, CHUNKSIZE));
         } 
     }
 
@@ -407,7 +403,7 @@ public class WorldStatic : MonoBehaviour
 
         foreach (var coordinates in coordinatesList)
         {
-            ChunkData chunkData = _worldGenStatic.GenerateTestChunk(coordinates.ToVector3Int());
+            ChunkData chunkData = WorldGenStatic.Instance.GenerateTestChunk(coordinates.ToVector3Int());
             if (!chunksByYLevel.ContainsKey(coordinates.y)) //make new list in chunksByYLevel array if new y level
             {
                 chunksByYLevel[coordinates.y] = new List<ChunkData>();

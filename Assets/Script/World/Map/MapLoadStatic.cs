@@ -13,18 +13,17 @@ using UnityEngine.Profiling;
 public class MapLoadStatic : MonoBehaviour
          
 {
-    private WorldStatic _worldStatic; 
+    public static MapLoadStatic Instance { get; private set; }  
     private int _renderDistance; 
   
     
     public void Awake()
     {   
-        
-        _worldStatic = transform.parent.GetComponent<WorldStatic>(); 
+        Instance = this;
         WorldStatic.PlayerChunkPositionUpdate += HandleChunkMapTraverse;
         _chunkSize = WorldStatic.CHUNKSIZE;
         _chunkDepth = WorldStatic.CHUNKDEPTH;
-        _renderDistance = _worldStatic.RENDER_DISTANCE;
+        _renderDistance = WorldStatic.Instance.RENDER_DISTANCE;
 
         _tileSize = 16;
         _tilesPerRow = 12;
@@ -115,7 +114,7 @@ public class MapLoadStatic : MonoBehaviour
             if (replace || !_activeChunks.ContainsKey(chunkCoord))
             {
                 _chunkCoordinate = chunkCoord;
-                (_chunkMap, _frontFace, _backFace, _leftFace, _rightFace, _corner) = _worldStatic.MapLoadStatic.LoadChunkMap(chunkCoord, _worldStatic);
+                (_chunkMap, _frontFace, _backFace, _leftFace, _rightFace, _corner) = LoadChunkMap(chunkCoord, WorldStatic.Instance);
                 if (_chunkMap != null)
                 {
                     await Task.Run(() => LoadMeshMath()); 
@@ -966,7 +965,7 @@ public class MapLoadStatic : MonoBehaviour
             {
                 for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
                 {
-                    _frontFace[y, x] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[x, y, WorldStatic.CHUNKSIZE - 1]);
+                    _frontFace[y, x] = !IsAir(_targetChunkDataTemp.Map[x, y, WorldStatic.CHUNKSIZE - 1]);
                 }
             }
         } 
@@ -979,7 +978,7 @@ public class MapLoadStatic : MonoBehaviour
             {
                 for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
                 {
-                    _backFace[y, x] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[x, y, 0]);
+                    _backFace[y, x] = !IsAir(_targetChunkDataTemp.Map[x, y, 0]);
                 }
             }
         } 
@@ -992,7 +991,7 @@ public class MapLoadStatic : MonoBehaviour
             {
                 for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
                 {
-                    _leftFace[y, z] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, z]);
+                    _leftFace[y, z] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, z]);
                 }
             }   
         }  
@@ -1005,7 +1004,7 @@ public class MapLoadStatic : MonoBehaviour
             {
                 for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
                 {
-                    _rightFace[y, z] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[0, y, z]);
+                    _rightFace[y, z] = !IsAir(_targetChunkDataTemp.Map[0, y, z]);
                 }
             }
         } 
@@ -1015,7 +1014,7 @@ public class MapLoadStatic : MonoBehaviour
         {
             for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
             {
-                _corner[0, y] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, 0]);
+                _corner[0, y] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, 0]);
             }
         }
 
@@ -1024,7 +1023,7 @@ public class MapLoadStatic : MonoBehaviour
         {
             for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
             {
-                _corner[1, y] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[0, y, 0]);
+                _corner[1, y] = !IsAir(_targetChunkDataTemp.Map[0, y, 0]);
             }
         }
 
@@ -1033,7 +1032,7 @@ public class MapLoadStatic : MonoBehaviour
         {
             for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
             {
-                _corner[2, y] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, WorldStatic.CHUNKSIZE - 1]);
+                _corner[2, y] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, WorldStatic.CHUNKSIZE - 1]);
             }
         }
 
@@ -1042,7 +1041,7 @@ public class MapLoadStatic : MonoBehaviour
         {
             for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
             {
-                _corner[3, y] = !worldStatic.MapLoadStatic.IsAir(_targetChunkDataTemp.Map[0, y, WorldStatic.CHUNKSIZE - 1]);
+                _corner[3, y] = !IsAir(_targetChunkDataTemp.Map[0, y, WorldStatic.CHUNKSIZE - 1]);
             } 
         }
 
