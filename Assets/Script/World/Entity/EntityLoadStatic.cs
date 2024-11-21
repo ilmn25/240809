@@ -137,8 +137,8 @@ public class EntityLoadStatic : MonoBehaviour
             switch (entity.Type)
             {
                 case EntityType.Item:
-                    _itemLoadStatic.SpawnItem(int.Parse(entity.ID),
-                    Lib.CombineVector(chunkCoordinates, entity.Position.ToVector3()));
+                    entity.Position = new SerializableVector3(Lib.CombineVector(chunkCoordinates, entity.Position.ToVector3()));
+                    _itemLoadStatic.SpawnItem(entity);
                     break;
 
                 case EntityType.Static:
@@ -158,7 +158,7 @@ public class EntityLoadStatic : MonoBehaviour
         {
             instance = Instantiate(Resources.Load<GameObject>($"prefab/{entity.ID}"));
             entityAbstract = instance.AddComponent<EntityAbstract>();
-            entityAbstract.entityData = entity;
+            entityAbstract._entityData = entity;
             instance.AddComponent<EntityChunkPositionInst>();
             instance.transform.parent = transform;
             // Add the EntityHandler to the local handler list

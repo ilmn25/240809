@@ -59,7 +59,8 @@ public class MapEditStatic : MonoBehaviour
             // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
-                _itemLoadStatic.SpawnItem(_itemLoadStatic.GetItemNameID(blockID), Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f));  
+                _itemLoadStatic.SpawnItem(ItemLoadStatic.GetEntityData(_itemLoadStatic.GetItemNameID(blockID), 
+                    Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f), EntityType.Item));
                 _worldStatic.UpdateMap(chunkCoordinate, blockCoordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }

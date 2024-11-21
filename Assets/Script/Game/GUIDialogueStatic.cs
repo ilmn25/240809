@@ -21,7 +21,7 @@ public class GUIDialogueStatic : MonoBehaviour
     private Vector3 _position;
     private Dialogue _currentDialogue;
     private int _current_line = 0;
-    Coroutine showDialogueCoroutine;
+    private Coroutine showDialogueCoroutine;
     private bool _isTyping = false;
     private bool _isInputBlocked = true;
     private int _skip = 1; 
