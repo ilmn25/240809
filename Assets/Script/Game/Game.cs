@@ -13,10 +13,16 @@ public class Game : MonoBehaviour
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
+    
+    public static Material MeshMaterial;
+    public static Material SpriteMaterial;
 
     void Awake()
     {
-        UserSystem = GameObject.Find("user_system");
+        MeshMaterial = Resources.Load<Material>("shader/material/custom_lit");
+        SpriteMaterial = Resources.Load<Material>("shader/material/custom_lit");
+        
+        UserSystem = GameObject.Find("game_system");
         Player = GameObject.Find("player");
         ViewportSystem = GameObject.Find("viewport_system");
         Camera = GameObject.Find("main_camera");
