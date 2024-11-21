@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class PlayerInteractStatic : MonoBehaviour
 {
+    public static PlayerInteractStatic Instance { get; private set; }  
+    
     private LayerMask _interactLayer;
     private Animator _animator;
 
     void Awake()
     {
+        Instance = this;
         _interactLayer = LayerMask.GetMask("Interact");
         _animator = transform.Find("sprite").GetComponent<Animator>();
     }

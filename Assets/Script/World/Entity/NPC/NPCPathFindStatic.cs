@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class NPCPathFindStatic : MonoBehaviour
 {
-    private WorldStatic _worldStatic;
+    public static NPCPathFindStatic Instance { get; private set; }  
 
     public int MAX_SCAN_COUNT = 9000;
     public int MAX_TASK_COUNT = 1;
@@ -14,8 +14,8 @@ public class NPCPathFindStatic : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
         _semaphore = new SemaphoreSlim(MAX_TASK_COUNT, MAX_TASK_COUNT);
-        _worldStatic = GetComponent<WorldStatic>();
     } 
  
           
@@ -29,8 +29,8 @@ public class NPCPathFindStatic : MonoBehaviour
             if (start != null && end != null)
             {  
                 // (_boolGridOrigin, _boolGrid, _startPosition, _endPosition) = _chunkSystem.PathFindMap(Vector3Int.FloorToInt(start.position), Vector3Int.FloorToInt(end.position));
-                _startPosition = _worldStatic.GetRelativePosition(Vector3Int.FloorToInt(start.position));
-                _endPosition = _worldStatic.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
+                _startPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
+                _endPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
 
                 return await Task.Run(() => FindPathAsync(_agent, WorldStatic._boolGridOrigin, WorldStatic._boolGrid, _startPosition, _endPosition));
             } 

@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 
 public class MapCullStatic : MonoBehaviour
 { 
+    public static MapCullStatic Instance { get; private set; }  
     public static event Action _signalUpdateSpriteYCull;
  
     [HideInInspector] 
@@ -21,11 +22,9 @@ public class MapCullStatic : MonoBehaviour
     private int _visionHeight = 2;
     private bool _forceCull = false;  
     
-    private GameObject _player;
     private GameObject _lightIndoor;
     private GameObject _lightSelf;
 
-    private PlayerMovementStatic _playerMovementStatic;
     private GameObject _camera;
     private LayerMask _collisionLayer;
     private Volume _volume;
@@ -44,6 +43,11 @@ public class MapCullStatic : MonoBehaviour
 
     private float ANGLE_OFFSET = 12; // Angle in degrees 
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         // Calculate the forward and backward directions with a slight angle
@@ -55,8 +59,6 @@ public class MapCullStatic : MonoBehaviour
         _collisionLayer = LayerMask.GetMask("Collision");
         _chunkPositionPrevious = WorldStatic._chunkPosition;
 
-        _player = GameObject.Find("player");
-        _playerMovementStatic = _player.GetComponent<PlayerMovementStatic>();
         _lightIndoor = GameObject.Find("light_indoor"); 
         _lightSelf = GameObject.Find("light_self");   
         
@@ -69,7 +71,7 @@ public class MapCullStatic : MonoBehaviour
     {
         HandleInput();
 
-        if (_playerMovementStatic._verticalVelocity == 0)
+        if (PlayerMovementStatic.Instance._verticalVelocity == 0)
         {
             HandleObstructionCheck();
             HandleCheck(); 
@@ -158,7 +160,7 @@ public class MapCullStatic : MonoBehaviour
 
     void HandleObstructionCheck()
     {
-        playerPosition = _player.transform.position;
+        playerPosition = Game.Player.transform.position;
         if (_forceCull)
         {
             _yCheck = true;

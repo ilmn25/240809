@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SmokeParticleStatic : MonoBehaviour
 {
+    public static SmokeParticleStatic Instance { get; private set; }  
+    
     private static GameObject _smokeParticlePrefab;
     private static Queue<GameObject> _smokeParticlePool = new Queue<GameObject>();
     private static int _poolSize = 10;
@@ -11,6 +13,7 @@ public class SmokeParticleStatic : MonoBehaviour
 
     void Awake()
     {
+        Instance = this;
         _smokeParticlePrefab = Resources.Load<GameObject>("prefab/smoke_particle");
 
         // Initialize the pool

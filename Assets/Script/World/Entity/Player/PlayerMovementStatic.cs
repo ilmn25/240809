@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.AI;
 public class PlayerMovementStatic : MonoBehaviour
 { 
-    private PlayerAnimationStatic _playerAnimationStatic;
+    public static PlayerMovementStatic Instance { get; private set; }  
+
     [HideInInspector] public float _verticalVelocity = 0f; 
     [HideInInspector] public bool _isGrounded = false;  
     [HideInInspector] public Vector2 _rawInput;  
@@ -33,24 +34,16 @@ public class PlayerMovementStatic : MonoBehaviour
     [SerializeField] private float JUMP_GRACE_TIME = 0.1f; // Time allowed to jump before landing
     [SerializeField] private float COYOTE_TIME = 0.1f; // Time allowed to jump after leaving ground
 
-    // Vector3[] _collider;
-    // float _colliderRadius;//TODO 
     BoxCollider boxCollider;
 
     void Awake()
-    { 
-        // CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
-        // Vector3 point1 = capsuleCollider.center + Vector3.up * (capsuleCollider.height / 2 - capsuleCollider.radius);
-        // Vector3 point2 = capsuleCollider.center + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius);
-        // _collider = new Vector3[] { point1, point2};
-        // _colliderRadius = capsuleCollider.radius;
-        // Destroy(capsuleCollider);
+    {
+        Instance = this; 
         boxCollider = GetComponent<BoxCollider>(); 
         boxCollider.enabled = false;
         boxColliderSize = boxCollider.size / 2; // Recalculate halfSize here
 
         _collisionLayer = LayerMask.GetMask("Collision");
-        _playerAnimationStatic = GetComponent<PlayerAnimationStatic>();
     }
 
 
@@ -78,7 +71,7 @@ public class PlayerMovementStatic : MonoBehaviour
     public void Update()
     { 
         HandleMovementUpdate();
-        _playerAnimationStatic.HandleAnimationUpdate(); 
+        PlayerAnimationStatic.Instance.HandleAnimationUpdate(); 
     }
     
     float speedAdjust;

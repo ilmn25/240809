@@ -15,24 +15,20 @@ public class MapCullInst : MonoBehaviour
     public Mesh _meshData;
     public List<Vector3> _verticesShadow;
 
-    private MapCullStatic _mapCullStatic; 
-    private GameObject _player; 
-    MeshCollider _meshCollider;
-    MeshFilter _shadowMeshFilter;
- 
+    private MeshCollider _meshCollider;
+    private MeshFilter _shadowMeshFilter;
     private MeshFilter _meshFilter; 
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;  
+    
     private int HIDE_ALL_Y = 10; 
-    int CULL_DISTANCE = 2;  
+    private int CULL_DISTANCE = 2;  
 
     void Awake()
     {   
         CULL_DISTANCE= WorldStatic.CHUNKSIZE * CULL_DISTANCE;
         _mesh = new Mesh();    
 
-        _player = GameObject.Find("player");
-        _mapCullStatic = transform.parent.GetComponent<MapCullStatic>();  
         _meshFilter = GetComponent<MeshFilter>();  
         _meshRenderer = GetComponent<MeshRenderer>(); 
         _meshCollider = gameObject.AddComponent<MeshCollider>();
@@ -93,7 +89,7 @@ public class MapCullInst : MonoBehaviour
         await _semaphoreSlim.WaitAsync();
         try
         {
-            if (_mapCullStatic._yCheck)
+            if (MapCullStatic.Instance._yCheck)
             {
                 if (HandleRangeCheck()) // cull and is in range
                 {  
@@ -102,7 +98,7 @@ public class MapCullInst : MonoBehaviour
                 }
                 else 
                 {
-                    if ((int)_player.transform.position.y < HIDE_ALL_Y) // cull but out of range and player is low 
+                    if ((int)Game.Player.transform.position.y < HIDE_ALL_Y) // cull but out of range and player is low 
                     {
                         _meshRenderer.enabled = false; 
                         _meshFilter.mesh = _meshData;
@@ -137,9 +133,9 @@ public class MapCullInst : MonoBehaviour
         _mesh.SetUVs(0, _culledUVs);
         _mesh.SetNormals(_culledNormals);   
          
-        while (Time.frameCount < _mapCullStatic._cullSyncFrame) await Task.Yield();
+        while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame) await Task.Yield();
         
-        if (_mapCullStatic._yCheck) _meshFilter.mesh = _mesh; 
+        if (MapCullStatic.Instance._yCheck) _meshFilter.mesh = _mesh; 
         await Task.Yield();   //do not remove
         _meshRenderer.enabled = true;
     } 
@@ -178,7 +174,7 @@ public class MapCullInst : MonoBehaviour
         var job = new HandleCullMathJob
         { 
             chunkSize = WorldStatic.CHUNKSIZE, 
-            yThreshold = _mapCullStatic._yThreshold,
+            yThreshold = MapCullStatic.Instance._yThreshold,
 
             chunkMap = chunkMap,
             vertices = vertices,

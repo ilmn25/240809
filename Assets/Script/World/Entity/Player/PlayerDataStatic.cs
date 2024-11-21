@@ -7,12 +7,14 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public class PlayerDataStatic : MonoBehaviour
 { 
+    public static PlayerDataStatic Instance { get; private set; }  
     public PlayerData _playerData;
     public List<KeyValuePair<int, ItemData>> _playerInventory;
     private BinaryFormatter _bf = new BinaryFormatter();
 
     void Start()
     {
+        Instance = this;
         LoadPlayerData();
         // PrintPlayerData();
         // AddItem(3, 1000);

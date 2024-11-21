@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 public class MapEditStatic : MonoBehaviour
 {
-    private WorldStatic _worldStatic;
-    private ItemLoadStatic _itemLoadStatic;
-    private BlockStatic _blockStatic;
+    public static MapEditStatic Instance { get; private set; }  
     private List<(Vector3 chunkCoordinate, Vector3 blockCoordinate, float breakCost, float breakThreshold)> blockDataList;
     
     void Start()
     {
-        _worldStatic = GameObject.Find("world_system").GetComponent<WorldStatic>();
-        _itemLoadStatic = GameObject.Find("entity_system").GetComponent<ItemLoadStatic>();
-        _blockStatic = GetComponent<BlockStatic>();
+        Instance = this;
         blockDataList = new List<(Vector3, Vector3, float, float)>();
     }
 
@@ -30,12 +26,12 @@ public class MapEditStatic : MonoBehaviour
             // Use existing breakCost and breakThreshold
             breakCost = existingBlockData.breakCost;
             breakThreshold = existingBlockData.breakThreshold;
-            blockID = BlockStatic.ConvertID(_worldStatic.MapLoadStatic.GetBlockInChunk(chunkCoordinate, blockCoordinate, _worldStatic));
+            blockID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
         }
         else
         {
             // Check if the block is occupied
-            blockID = BlockStatic.ConvertID(_worldStatic.MapLoadStatic.GetBlockInChunk(chunkCoordinate, blockCoordinate, _worldStatic));
+            blockID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
             if (blockID == null)
             {
                 return; // Block is not occupied or an error occurred
@@ -59,9 +55,9 @@ public class MapEditStatic : MonoBehaviour
             // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
-                _itemLoadStatic.SpawnItem(ItemLoadStatic.GetEntityData(_itemLoadStatic.GetItemNameID(blockID), 
+                ItemLoadStatic.Instance.SpawnItem(ItemLoadStatic.GetEntityData(ItemLoadStatic.GetItemNameID(blockID), 
                     Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f), EntityType.Item));
-                _worldStatic.UpdateMap(chunkCoordinate, blockCoordinate, 0);
+                WorldStatic.Instance.UpdateMap(chunkCoordinate, blockCoordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }
             else

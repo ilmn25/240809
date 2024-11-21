@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInvetorySystem : MonoBehaviour
+public class PlayerInventoryStatic : MonoBehaviour
 {
-    private PlayerDataStatic _playerDataStatic;
-    private PlayerChunkEditStatic _playerChunkEditStatic;
+    public static PlayerInventoryStatic Instance { get; private set; }  
+    
 
     private int _currentRow = 0;
     private int _currentSlot = 0;
@@ -15,8 +15,7 @@ public class PlayerInvetorySystem : MonoBehaviour
 
     void Start()
     {
-        _playerDataStatic = GetComponent<PlayerDataStatic>(); 
-        _playerChunkEditStatic = GameObject.Find("player").GetComponent<PlayerChunkEditStatic>(); 
+        Instance = this;
     }
 
     void Update()
@@ -66,9 +65,9 @@ public class PlayerInvetorySystem : MonoBehaviour
         ItemData itemData = GetItemAtKey();
         if (itemData != null )
         {
-            _playerChunkEditStatic._blockID = itemData.Name; 
+            PlayerChunkEditStatic.Instance._blockID = itemData.Name; 
         } else {
-            _playerChunkEditStatic._blockID = null;
+            PlayerChunkEditStatic.Instance._blockID = null;
         }
     }
 
@@ -94,7 +93,7 @@ public class PlayerInvetorySystem : MonoBehaviour
     {
         int target_key = key == -1 ? CalculateKey() : key;
     
-        var kvp = _playerDataStatic._playerInventory.Find(kvp => kvp.Key == target_key);
+        var kvp = PlayerDataStatic.Instance._playerInventory.Find(kvp => kvp.Key == target_key);
         return kvp.Value;
     }
 
@@ -117,7 +116,7 @@ public class PlayerInvetorySystem : MonoBehaviour
     {
         int key = CalculateKey(_currentRow, _currentSlot);
 
-        var kvp = _playerDataStatic._playerInventory.Find(kvp => kvp.Key == key);
+        var kvp = PlayerDataStatic.Instance._playerInventory.Find(kvp => kvp.Key == key);
         if (kvp.Value != null)
         {
             Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {kvp.Value.Name} x{kvp.Value.StackSize}");

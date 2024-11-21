@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class BlockStatic : MonoBehaviour
 {
+    public static BlockStatic Instance { get; private set; }  
     private static Dictionary<int, BlockData> _blockDefinitions;
     private static IntStringMap<int, string> _blockIDMap;
     private static int _nextBlockID;
@@ -17,6 +18,7 @@ public class BlockStatic : MonoBehaviour
     
     void Awake()
     {
+        Instance = this;
         _shadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
         _meshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
         _blockDefinitions = new Dictionary<int, BlockData>();

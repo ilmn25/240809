@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class BlockPreviewStatic : MonoBehaviour
 { 
+    public static BlockPreviewStatic Instance { get; private set; }  
+    
     private float OPACITY = 0.45f;
     
     private Material _material; 
-    private GameObject _player;
     private GameObject meshObject;
     private List<Vector3> _vertices;
     private List<int> _triangles;
@@ -16,8 +17,8 @@ public class BlockPreviewStatic : MonoBehaviour
     
     void Start()
     {
+        Instance = this;
         _material = Resources.Load<Material>("shader/material/custom_lit");
-        _player = GameObject.Find("player");
     }
 
     public void DeleteBlock()
@@ -43,7 +44,7 @@ public class BlockPreviewStatic : MonoBehaviour
         };
     
         meshObject.transform.parent = transform; 
-        meshObject.transform.position = _player.transform.position; 
+        meshObject.transform.position = Game.Player.transform.position; 
 
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();

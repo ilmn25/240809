@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class ItemLoadStatic : MonoBehaviour
 {
+    public static ItemLoadStatic Instance { get; private set; }  
     public static List<ItemData> itemList = new List<ItemData>();
 
     void Awake()
     {
+        Instance = this;
         itemList.Add(new ItemData(1, "brick", 1, "Common", 10, 2.5f, 20, "A basic sword.", false, new string[] { "Iron", "Wood" }));
         itemList.Add(new ItemData(2, "marble", 1, "Common", 10, 2.5f, 20, "A basic sword.", false, new string[] { "Iron", "Wood" }));
         itemList.Add(new ItemData(3, "dirt", 1, "Common", 10, 2.5f, 20, "A basic sword.", false, new string[] { "Iron", "Wood" }));
@@ -16,16 +18,8 @@ public class ItemLoadStatic : MonoBehaviour
         itemList.Add(new ItemData(6, "Sword", 1, "Common", 10, 2.5f, 20, "A basic sword.", false, new string[] { "Iron", "Wood" }));
     }
 
-    // private void Start() 
-    // {  
-    //     SpawnItem(GetItemNameID("brick"), new Vector3(0,5,0)); 
-    //     SpawnItem(GetItemNameID("brick"), new Vector3(0,5,1));   
-    //     SpawnItem(GetItemNameID("brick"), new Vector3(0,5,3));     
-    //     SpawnItem(GetItemNameID("brick"), new Vector3(3,5,3));     
-    // }
-
     public void SpawnItem(EntityData entityData)
-    {
+    { 
         ItemData itemDataToSpawn = itemList.Find(item => item.ID == int.Parse(entityData.ID));
         GameObject itemObject = Instantiate(Resources.Load<GameObject>($"prefab/item"));
         itemObject.name = entityData.ID;
@@ -43,7 +37,7 @@ public class ItemLoadStatic : MonoBehaviour
         return new EntityData(id.ToString(), new SerializableVector3(position), type: entityType);
     }
     
-    public int GetItemNameID(string itemName)
+    public static int GetItemNameID(string itemName)
     {
         ItemData itemData = itemList.Find(i => i.Name == itemName);
         return itemData != null ? itemData.ID : -1; // Return -1 if the item is not found
