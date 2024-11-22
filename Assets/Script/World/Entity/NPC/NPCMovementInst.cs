@@ -41,12 +41,7 @@ public class NPCMovementInst : MonoBehaviour
         
         _npcPathFindInst = GetComponent<NPCPathFindInst>();
     }
-     
-    public void HandleMovementUpdateTest()
-    {
-        _deltaTime = GameStatic.GetDeltaTime();
-        transform.position = transform.position + _direction * SPEED_WALK * _deltaTime;;
-    }
+      
 
     public void HandleMovementUpdate()
     { 
