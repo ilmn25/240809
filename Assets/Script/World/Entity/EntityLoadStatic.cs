@@ -10,7 +10,7 @@ public class EntityLoadStatic : MonoBehaviour
     public static event Action UpdateEntityParent; 
     int _chunkSize;
 
-    public static Dictionary<Vector3Int, (List<EntityData>, List<EntityAbstract>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityAbstract>)>();
+    public static Dictionary<Vector3Int, (List<EntityData>, List<EntityDataHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityDataHandler>)>();
     public int ENTITY_DISTANCE = 2;
 
     void Awake()
@@ -68,7 +68,7 @@ public class EntityLoadStatic : MonoBehaviour
                     _entityList[key].Item1.Clear();
 
                     // Loop through each EntityHandler in the second list and add the updated entity to the first list
-                    foreach (EntityAbstract entityHandler in _entityList[key].Item2)
+                    foreach (EntityDataHandler entityHandler in _entityList[key].Item2)
                     { 
                         _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity());
 
@@ -122,12 +122,12 @@ public class EntityLoadStatic : MonoBehaviour
     public void LoadChunkEntities()
     {
         GameObject instance;
-        EntityAbstract entityAbstract;
+        EntityDataHandler entityDataHandler;
 
         // Find the key once
         if (!_entityList.ContainsKey(chunkCoordinates))
         {
-            _entityList[chunkCoordinates] = (_entityChunk, new List<EntityAbstract>());
+            _entityList[chunkCoordinates] = (_entityChunk, new List<EntityDataHandler>());
         }
 
         foreach (EntityData entity in _entityChunk)
@@ -147,7 +147,6 @@ public class EntityLoadStatic : MonoBehaviour
                 case EntityType.Rigid:
                     InstantiatePrefab(entity);
                     instance.transform.position = Lib.AddToVector(Lib.CombineVector(chunkCoordinates, entity.Position.ToVector3()), 0, 0.5f, 0);
-                    // instance.transform.name = instance.transform.position.ToString();
                     break;
             }
         }
@@ -155,12 +154,9 @@ public class EntityLoadStatic : MonoBehaviour
         void InstantiatePrefab(EntityData entity)
         {
             instance = Instantiate(Resources.Load<GameObject>($"prefab/{entity.ID}"));
-            entityAbstract = instance.AddComponent<EntityAbstract>();
-            entityAbstract._entityData = entity;
-            instance.AddComponent<EntityChunkPositionInst>();
+            entityDataHandler = instance.AddComponent<EntityDataHandler>();
+            entityDataHandler._entityData = entity;
             instance.transform.parent = transform;
-            // Add the EntityHandler to the local handler list
-            // _handlerList.Add(entityHandler);
         }
     } 
 }

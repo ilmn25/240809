@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class NPCDialogueInst : MonoBehaviour
+public class CharacterDialogueInst : MonoBehaviour
 {
     [SerializeField] 
     public Dialogue _Dialogue; //! the dialogue input field
