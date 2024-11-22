@@ -29,7 +29,7 @@ public class PlayerInteractStatic : MonoBehaviour
                 Collider[] hitColliders = Physics.OverlapSphere(interactPos, 1, _interactLayer);
                 foreach (var hitCollider in hitColliders)
                 {
-                    NPCDialogueInst interactComponent = hitCollider.GetComponent<NPCDialogueInst>();
+                    CharacterDialogueInst interactComponent = hitCollider.GetComponent<CharacterDialogueInst>();
                     if (interactComponent != null)
                     {
                         interactComponent.interact();

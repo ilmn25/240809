@@ -4,9 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
+using Object = System.Object;
 
 public class NPCPathFindInst : MonoBehaviour
-{ 
+{
+    private Object _target;
+    
     private NPCMovementInst _npcMovementInst;
     public int[] AGENT = new int[5];
     private float _targetReachedInner = 1f;
@@ -16,32 +20,37 @@ public class NPCPathFindInst : MonoBehaviour
     private float _repathInterval = 0.1f; 
     private int _jumpSkipAmount = 1;
     
-    public bool _repathRoutine = false; 
-    private bool _moveOccupied = false;
-    private bool _playerMoved;
+    private bool _repathRoutine = false; 
     private bool _isPathFinding = false; 
-    private bool _playerReached = false;
+    private bool _moveOccupied = false;
+    private bool _targetMoved; 
+    private bool _targetReached = false;
     private List<object[]> _path;
     private List<object[]> _pathQueued; 
     private int _nextPoint = 0;
+    private Vector3 _nextPointPosition;
     private int _nextPointQueued = -1;
-    [HideInInspector] public float _pointDistance; 
-    private float _playerDistance;
+    private float _nextPointDistance; 
+    private float _targetDistance;
     private float _selfMoveDistance;
-    private Vector3 _playerPositionPrevious;
+    private Vector3 _targetPositionPrevious;
     private Vector3 _selfPositionPrevious; 
-    private bool _updatePlayerPosition = false;
-    private bool _updateEntityPosition = false;
-    private Vector3 _targetPoint;
+    private bool _updateTargetPosition = false;
+    private bool _updateEntityPosition = false; 
+    private Vector3 _direction;
 
     private void Start()
     {
         _npcMovementInst = GetComponent<NPCMovementInst>();
     }
 
-    public NPCPathFindInst(NPCMovementInst npcMovementInst, int[] agent, float targetReachedInner, float targetReachedOuter, float pointReachDistance, float pointMissDistance, float repathInterval, int jumpSkipAmount)
+    public void SetTarget(Vector3 target)
     {
-        _npcMovementInst = npcMovementInst;
+        _nextPointPosition = target;
+    }
+    public void SetSettings(int[] agent, float targetReachedInner, float targetReachedOuter, float pointReachDistance, 
+        float pointMissDistance, float repathInterval, int jumpSkipAmount)
+    {
         AGENT = agent;
         _targetReachedInner = targetReachedInner;
         _targetReachedOuter = targetReachedOuter;
@@ -55,54 +64,43 @@ public class NPCPathFindInst : MonoBehaviour
     {  
         if (!_moveOccupied)
         {
-            _moveOccupied = true;
-            // try
-            // { 
-                
-                _playerDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
-                if (!_playerReached)
-                {   
-                    _playerReached = _playerDistance < _targetReachedInner;
-                } else
-                { 
-                    _playerReached = _playerDistance < _targetReachedOuter;
-                }
+            _moveOccupied = true; 
+            _targetDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
+            if (!_targetReached)
+            {   
+                _targetReached = _targetDistance < _targetReachedInner;
+            } else
+            { 
+                _targetReached = _targetDistance < _targetReachedOuter;
+            }
 
-                if (!_playerReached)
+            if (!_targetReached)
+            {
+                if (_path == null || _nextPoint >= _path.Count - 2)
                 {
-                    if (_path == null || _nextPoint >= _path.Count - 2)
+                    if (_nextPointQueued != -1)
                     {
-                        if (_nextPointQueued != -1)
-                        {
-                            _path = _pathQueued; 
-                            _nextPoint = _nextPointQueued;
-                            _nextPointQueued = -1;
-                        } else GetPath();
-                    } 
-                    else if (_path != null)
-                    {  
-                        await Task.Delay((int)(1500 / _npcMovementInst.SPEED_WALK)); // Convert seconds to milliseconds
-                        if (this != null && _nextPoint < _path.Count -2)
-                        {
-                            _nextPoint++;  
-                            transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
-                        } else return;
-                    }   
-                } else _npcMovementInst._direction = Vector3.zero;
+                        _path = _pathQueued; 
+                        _nextPoint = _nextPointQueued;
+                        _nextPointQueued = -1;
+                    } else GetPath();
+                } 
+                else if (_path != null)
+                {  
+                    await Task.Delay((int)(1500 / _npcMovementInst.SPEED_WALK)); // Convert seconds to milliseconds
+                    if (this != null && _nextPoint < _path.Count -2)
+                    {
+                        _nextPoint++;  
+                        transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
+                    } else return;
+                }   
+            } else _npcMovementInst._direction = Vector3.zero;
 
-                _moveOccupied = false;
-            // }
-            // catch (Exception ex)
-            // {
-            //     if (ex is not MissingReferenceException && ex is not NullReferenceException )
-            //     {
-            //         throw new Exception("An exception occurred in HandlePathFindPassive method.", ex);
-            //     }
-            // }
+            _moveOccupied = false; 
         }
     }
 
-    public void HandlePathFindActive()
+    public Vector3 HandlePathFindActive()
     {
         if (!_repathRoutine) RepathRoutine();
  
@@ -111,26 +109,26 @@ public class NPCPathFindInst : MonoBehaviour
             _selfPositionPrevious = transform.position;
             _updateEntityPosition = false; 
         }
-        if (_updatePlayerPosition && PlayerMovementStatic.Instance._isGrounded) 
+        if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
         {
-            _playerPositionPrevious = Game.Player.transform.position;
-            _updatePlayerPosition = false;
+            _targetPositionPrevious = Game.Player.transform.position;
+            _updateTargetPosition = false;
         }
         
-        _npcMovementInst._direction = Vector3.zero; 
+        _direction = Vector3.zero; 
 
-        _playerDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
-        if (!_playerReached)
+        _targetDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
+        if (!_targetReached)
         {   
-            _playerReached = _playerDistance < _targetReachedInner;
+            _targetReached = _targetDistance < _targetReachedInner;
         } else
         { 
             _path = null;
-            _playerReached = _playerDistance < _targetReachedOuter;
+            _targetReached = _targetDistance < _targetReachedOuter;
         }
          
         if (_path != null 
-        && !_playerReached 
+        && !_targetReached 
         && _nextPoint < _path.Count)
         {
             HandleMovePoint(); 
@@ -147,9 +145,9 @@ public class NPCPathFindInst : MonoBehaviour
         { 
             if (_nextPoint != _path.Count - 1)
             { 
-                _targetPoint = (Vector3)_path[_nextPoint][0];  
-                _pointDistance = Vector3.Distance(transform.position, _targetPoint); 
-                if (_npcMovementInst._isGrounded && _pointDistance < _pointReachDistance)
+                _nextPointPosition = (Vector3)_path[_nextPoint][0];  
+                _nextPointDistance = Vector3.Distance(transform.position, _nextPointPosition); 
+                if (_npcMovementInst._isGrounded && _nextPointDistance < _pointReachDistance)
                 {
                     _nextPoint++;
                 } 
@@ -182,11 +180,13 @@ public class NPCPathFindInst : MonoBehaviour
                         _nextPoint++;
                     }
                 } 
-                _npcMovementInst._direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
-            } else _npcMovementInst._direction = (Lib.AddToVector(Game.Player.transform.position, 0, -0.3f, 0) - transform.position).normalized;
+                _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
+            } else _direction = (Lib.AddToVector(Game.Player.transform.position, 0, -0.3f, 0) - transform.position).normalized;
             
              
-        } 
+        }
+
+        return _direction;
     }
 
  
@@ -217,14 +217,14 @@ public class NPCPathFindInst : MonoBehaviour
         _repathRoutine = true;
         await Task.Delay((int)_repathInterval * 1000); 
  
-        if (!_playerReached && !_isPathFinding)
+        if (!_targetReached && !_isPathFinding)
         {
-            _playerMoved = Vector3.Distance(_playerPositionPrevious, Game.Player.transform.position) > 0.8f;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, Game.Player.transform.position) > 0.8f;  //should be less than inner player near
 
-            if (PlayerMovementStatic.Instance._isGrounded && _playerMoved)
+            if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             { 
                 GetPath();  
-                _updatePlayerPosition = true;//! dont move
+                _updateTargetPosition = true;//! dont move
                 // _playerPositionPrevious = Game.Player.transform.position;
             }   
             else if (IsStuck()) 
@@ -242,7 +242,7 @@ public class NPCPathFindInst : MonoBehaviour
     {
         if (_npcMovementInst._isGrounded) 
         { 
-            if (_pointDistance > _pointMissDistance)
+            if (_nextPointDistance > _pointMissDistance)
             {
                 return true;
             }

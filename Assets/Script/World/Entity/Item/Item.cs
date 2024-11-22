@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : EntityAbstract
+public class Item : EntityDataHandler
 { 
     
 }

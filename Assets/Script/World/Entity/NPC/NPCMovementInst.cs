@@ -7,17 +7,19 @@ public class NPCMovementInst : MonoBehaviour
 {
 
     private NPCPathFindInst _npcPathFindInst;
-    [HideInInspector] public bool _isGrounded = false; 
+    [HideInInspector] public bool _isGrounded = false;
     private LayerMask _collisionLayer;
     [HideInInspector] public float _speedCurrent;
     private float _speedTarget;
-    private float  _speedAdjust;
+    private float _speedAdjust;
     [HideInInspector] public Vector3 _newPosition;
     [HideInInspector] public Vector3 _direction = Vector3.zero;
     private Vector3 _directionBuffer = Vector3.zero;
-    private float _verticalVelocity = 0f;   
+    private float _verticalVelocity = 0f;
     private float _deltaTime;
-     
+    Vector3[] _collider;
+    float _colliderRadius;
+
     [SerializeField] public float SPEED_WALK = 6f;
     [SerializeField] private float SPEED_RUN = 8f;
     [SerializeField] private float ACCELERATION_TIME = 0.3f; // time to reach full speed
@@ -25,9 +27,12 @@ public class NPCMovementInst : MonoBehaviour
     [SerializeField] private float SLIDE_DEGREE = 0.3f; //degree of slide against walkk when collide
     [SerializeField] private float GRAVITY = -40f;
     [SerializeField] private float JUMP_VELOCITY = 12f;
+ 
 
-    Vector3[] _collider;
-    float _colliderRadius;
+    public void setDirection(Vector3 dir)
+    {
+        _direction = dir;
+    }
 
     private void Start() {
         _collisionLayer = LayerMask.GetMask("Collision");
@@ -90,11 +95,13 @@ public class NPCMovementInst : MonoBehaviour
 
     private void HandleJump()
     { 
-        if (_isGrounded && _direction.y > 0 && _npcPathFindInst._pointDistance < 2f)
+        // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
+        if (_isGrounded && _direction.y > 0)
         {
             _verticalVelocity = JUMP_VELOCITY; 
             _isGrounded = false;
         } 
+        Lib.Log(_direction.y);
         // _isGrounded = _verticalVelocity == 0;
     }
  
