@@ -1,8 +1,8 @@
 using UnityEngine;
 
-class CharTalk : EntityState {
-    EntityStateMachine _esm;
-    DialogueData _dialogueData; 
+public class CharTalk : EntityState {
+    public EntityStateMachine _esm;
+    public DialogueData _dialogueData; 
 
     public CharTalk(EntityStateMachine esm, DialogueData dialogueData)
     {
@@ -10,17 +10,19 @@ class CharTalk : EntityState {
         _dialogueData = dialogueData;
     }
  
-    public override void OnEnterState() {
-        GUIDialogueStatic.Instance.PlayDialogue(_dialogueData, _esm.transform.position);  
-    }
-
-    public override void StateUpdate()
+    public void OnEndDialogue()
     {
-        if (Vector3.Distance(Game.Player.transform.position, _esm.transform.position) > 3) { //walk away from npc
-            GUIDialogueStatic.Instance.EndDialogue();
-            _esm.SetState(_esm.GetState<NPCChase>());
-        }
+        _esm.SetState(_esm.GetState<NPCChase>());
     }
     
+    public override void OnEnterState() {
+        if (!Game.DialogueBox.activeSelf) 
+            GUIDialogueStatic.Instance.PlayDialogue(this);  
+        else 
+            _esm.SetState(_esm.GetState<NPCChase>());
+    }
+
+    public override void StateUpdate() {}
+ 
     public override void OnExitState() {}
 }
