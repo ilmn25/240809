@@ -56,15 +56,17 @@ public class WorldStatic : MonoBehaviour
         {
             GenerateRandomMapSave(); 
         }
-        _chunkPositionPrevious = GetChunkCoordinate(_player.transform.position); 
+        else
+            HandleLoadWorldFile(0);
+        // _chunkPositionPrevious = GetChunkCoordinate(_player.transform.position);
     }
           
 
     async void FixedUpdate()
     {
         _chunkPosition = GetChunkCoordinate(_player.transform.position);
-        if (_chunkPosition != _chunkPositionPrevious || _boolGrid == null)
-        { 
+        if (_chunkPosition != _chunkPositionPrevious)
+        {  
             PlayerChunkPositionUpdate?.Invoke();
             _chunkPositionPrevious = _chunkPosition;
             await Task.Delay(80);
