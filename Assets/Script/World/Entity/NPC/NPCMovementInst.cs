@@ -202,3 +202,4 @@ public class NPCMovementInst : MonoBehaviour
         return !(collisionCount > 0);
     }
 } 
+

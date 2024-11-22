@@ -89,7 +89,8 @@ public class NPCPathFindInst : MonoBehaviour
             _selfPositionPrevious = transform.position;
             _updateEntityPosition = false; 
         }
-        if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
+        // if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
+        if (_updateTargetPosition) 
         {
             _targetPositionPrevious = _target.transform.position;
             _updateTargetPosition = false;
@@ -201,7 +202,8 @@ public class NPCPathFindInst : MonoBehaviour
         {
             _targetMoved = Vector3.Distance(_targetPositionPrevious, _target.transform.position) > 0.8f;  //should be less than inner player near
 
-            if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
+            // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
+            if (_targetMoved)
             { 
                 GetPath();  
                 _updateTargetPosition = true;//! dont move
