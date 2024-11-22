@@ -18,14 +18,14 @@ public class EntityChunkPositionInst : MonoBehaviour
     
     void OnDestroy() {
         EntityLoadStatic.UpdateEntityParent -= HandleUpdateParent;
-        if (EntityLoadStatic._entityList.ContainsKey(_positionPrevious))
-        EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(_entityAbstract); // if picked up
+        if (EntityLoadStatic._entityList.ContainsKey(_positionPrevious)) 
+            EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(_entityAbstract); // if picked up
     }
 
     public void HandleUpdateParent()
     {
         _position = WorldStatic.GetChunkCoordinate(transform.position);
-        if (_position != _positionPrevious)
+        if (_position != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_position))
         {
             // Remove self's EntityHandler from the old coordinate key
             EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(_entityAbstract);
