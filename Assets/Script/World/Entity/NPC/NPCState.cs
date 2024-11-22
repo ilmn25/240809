@@ -36,7 +36,7 @@ class NPCChase : EntityState {
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            _npcMovementInst.setDirection(_npcPathFindInst.HandlePathFindActive());
+            _npcMovementInst.SetDirection(_npcPathFindInst.HandlePathFindActive());
             // _entityMovementHandler.HandleMovementUpdateTest();
             _npcMovementInst.HandleMovementUpdate();
             _npcAnimationInst.HandleAnimationUpdate();
