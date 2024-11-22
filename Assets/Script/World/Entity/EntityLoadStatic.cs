@@ -19,12 +19,7 @@ public class EntityLoadStatic : MonoBehaviour
         WorldStatic.PlayerChunkPositionUpdate += HandleChunkEntityTraverse; 
         _chunkSize = WorldStatic.CHUNKSIZE;
     }
-
-    async void Start()
-    {
-        await Task.Delay(7000);
-        HandleChunkEntityTraverse();
-    }
+ 
 
     public void SaveAllEntities()
     {
