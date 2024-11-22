@@ -31,8 +31,11 @@ class NPCChase : EntityState {
         _npcPathFindInst = npcPathFindInst;
         _sprite = sprite; 
     }
- 
-    public override void OnEnterState() {}
+
+    public override void OnEnterState()
+    {
+        _npcPathFindInst.SetTarget(Game.Player);
+    }
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {

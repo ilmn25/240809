@@ -1,5 +1,6 @@
  
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class NPCStateMachine : EntityStateMachine
@@ -19,6 +20,9 @@ public class NPCStateMachine : EntityStateMachine
         states = new List<EntityState>();
         states.Add(new NPCIdle(_npcMovementInst, _npcAnimationInst));
         states.Add(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
+        DialogueData _dialogueData = new DialogueData();
+        _dialogueData.Lines.Add("what the fuck");
+        states.Add(new CharTalk(this, _dialogueData));
         
         Initialize<NPCIdle>(states);
     }
@@ -29,5 +33,10 @@ public class NPCStateMachine : EntityStateMachine
         {
             SetState(GetState<NPCChase>());
         }
+    }
+
+    public void interact()
+    {
+        SetState(GetState<CharTalk>());
     }
 } 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class GUIDialogueStatic : MonoBehaviour
     private AudioSource _audioSource;
     
     private Vector3 _position;
-    private Dialogue _currentDialogue;
+    private DialogueData _currentDialogueData;
     private int _current_line = 0;
     private Coroutine showDialogueCoroutine;
     private bool _isTyping = false;
@@ -31,6 +32,21 @@ public class GUIDialogueStatic : MonoBehaviour
     [SerializeField] private float HIDE_DURATION = 0.2f; // Duration for hiding animation 
      
 
+    public void PlayDialogue(DialogueData dialogueData, Vector3 position)
+    {
+        if (dialogueData.Lines.Count() == 0)
+        {
+            Lib.Log("Dialogue is empty");
+            return;
+        }
+        StartCoroutine(Instance.HandleDialogue(dialogueData, transform.position));
+    }
+
+    public void EndDialogue()
+    {
+        StartCoroutine(HideDialogueBox());
+    }
+    
     private void Awake()
     {
         Instance = this;
@@ -40,11 +56,6 @@ public class GUIDialogueStatic : MonoBehaviour
     public void Update()
     {
         if (!_isInputBlocked){
-                
-            if (Vector3.Distance(Game.Player.transform.position, _position) > 3) { //walk away from npc
-                StartCoroutine(HideDialogueBox());
-            }
-
             if (Input.GetKeyDown(KeyCode.F))
             { 
                 if (_isTyping)
@@ -58,30 +69,31 @@ public class GUIDialogueStatic : MonoBehaviour
                     // check if have next line, end speech or play next 
                     AudioStatic.PlaySFX(TEXT, 0.2f); //sound effect click
                     
-                    if (_current_line < _currentDialogue.Lines.Count)
+                    if (_current_line < _currentDialogueData.Lines.Count)
                     {   
                         _skip = 1;
-                        showDialogueCoroutine = StartCoroutine(ShowDialogue(_currentDialogue.Lines[_current_line]));
+                        showDialogueCoroutine = StartCoroutine(ShowDialogue(_currentDialogueData.Lines[_current_line]));
                     }
                     else
                     {   
-                        StartCoroutine(HideDialogueBox());
+                        EndDialogue();
                     } 
                 }
             }
         }
     }
 
+ 
     //! called by player script to fetch dialogue and play it
-    public IEnumerator TransmitDialogue(Dialogue dialogue, Vector3 position)
+    public IEnumerator HandleDialogue(DialogueData dialogueData, Vector3 position)
     {    
         if (!Game.DialogueBox.activeSelf) 
         {
             OnShowDialog?.Invoke(); //-> c gamestate
-            _currentDialogue = dialogue;
+            _currentDialogueData = dialogueData;
             Game.DialogueText.text = "";
             _current_line = 0; 
-            showDialogueCoroutine = StartCoroutine(ShowDialogue(_currentDialogue.Lines[_current_line]));
+            showDialogueCoroutine = StartCoroutine(ShowDialogue(_currentDialogueData.Lines[_current_line]));
             StartCoroutine(ScaleDialogueBox(true, SHOW_DURATION)); // show/hide box  
             // if error, check if have text in npc 
 
@@ -174,15 +186,4 @@ public class GUIDialogueStatic : MonoBehaviour
 }
 
 
-
-
-[System.Serializable]
-public class Dialogue
-{
-    [SerializeField]
-    public List<String> LineData;
-    public List<String> Lines
-    {
-        get { return LineData; }
-    }
-}
+ 

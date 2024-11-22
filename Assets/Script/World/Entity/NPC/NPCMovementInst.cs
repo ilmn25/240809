@@ -55,7 +55,7 @@ public class NPCMovementInst : MonoBehaviour
         Vector3 point2 = capsuleCollider.center + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius);
         _collider = new Vector3[] { point1, point2};
         _colliderRadius = capsuleCollider.radius;
-        Destroy(capsuleCollider);
+        // Destroy(capsuleCollider);
     }
       
 

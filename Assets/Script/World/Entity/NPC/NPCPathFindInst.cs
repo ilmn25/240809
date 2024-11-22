@@ -38,6 +38,7 @@ public class NPCPathFindInst : MonoBehaviour
     private bool _updateTargetPosition = false;
     private bool _updateEntityPosition = false; 
     private Vector3 _direction;
+    private Vector3 _positionWhenPathSearched; 
 
     private void Awake()
     {
@@ -241,9 +242,6 @@ public class NPCPathFindInst : MonoBehaviour
     }
 
 
-
-
-
     private async void GetPath()
     {
         if (_isPathFinding) return;
@@ -254,7 +252,7 @@ public class NPCPathFindInst : MonoBehaviour
             _pathQueued = await NPCPathFindStatic.Instance.FindPath(AGENT, transform, _target.transform);  
             if (this != null)
             {
-                _entityPosition = transform.position;
+                _positionWhenPathSearched = transform.position;
                 await Task.Run(() => {
                     FindNearestPointEntity(ref _pathQueued);
                 });
@@ -274,122 +272,29 @@ public class NPCPathFindInst : MonoBehaviour
         }
     }
 
-     
-    // List<object[]> pathExtended;
-    // List<object[]> toTargetPath;
-    // List<object[]> toPlayerPath;
-    // private async void ExtendPath()
-    // {
-    //     try
-    //     { 
-    //         if (_isPathFinding) return;
-
-    //         _isPathFinding = true;
-    
-    //         Vector3Int target = (_target == Vector3Int.zero) ? Vector3Int.FloorToInt(_target.transform.position) : _target;
-
-    //         pathExtended = _path; 
-
-    //         _entityPosition = transform.position;
-    //         int cutOffStart = Mathf.Min(_nextPoint, pathExtended.Count - 1);
-    //         // int cutOffStart = await Task.Run(() => { return FindNearestPointEntity(ref _path);});
-    //         cutOffStart = Mathf.Clamp(cutOffStart +1, 0, pathExtended.Count - 1);
-    //         int cutOffEnd = await Task.Run(() => { return FindNearestPointTarget(cutOffStart, target, ref pathExtended);});
-
-    //         toTargetPath = await _pathFindSystem.FindPath(AGENT, Vector3Int.FloorToInt((Vector3)pathExtended[cutOffEnd][0]), target);
-    //         // toPlayerPath = await _pathFindSystem.FindPath(AGENT, Vector3Int.FloorToInt(transform.position), Vector3Int.FloorToInt((Vector3)pathExtended[cutOffStart][0]));
-
-    //         pathExtended.RemoveRange(cutOffEnd, pathExtended.Count - cutOffEnd);
-    //         if (toTargetPath != null) pathExtended.AddRange(toTargetPath);
-
-    //         pathExtended.RemoveRange(0, Mathf.Max(cutOffStart - 1, 0));
-    //         // if (toPlayerPath != null) pathExtended.InsertRange(0, toPlayerPath);
-    
-    //         _pathQueued = pathExtended; 
-    //         _entityPosition = transform.position;
-    //         _nextPointQueued = await Task.Run(() => { return FindNearestPointEntity(ref pathExtended);});
-
-
-    //         _isPathFinding = false; 
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         if (ex is not MissingReferenceException && ex is not NullReferenceException )
-    //         {
-    //             throw new Exception("An exception occurred in SeparateMesh method.", ex);
-    //         }
-    //     }
-    // }
-
-    // int FindNearestPointTarget(int cutOffStart, Vector3Int target, ref List<object[]> path)
-    // {
-    //     try
-    //     {   
-    //         int bestPoint = cutOffStart;
-    //         float bestDistance = Vector3.Distance((Vector3)target, (Vector3)path[cutOffStart][0]);
-
-    //         for (int i = cutOffStart; i <= path.Count - 1; i++)
-    //         {
-    //             float currentDistance = Vector3.Distance((Vector3)target, (Vector3)path[i][0]) + i;
-
-    //             if (currentDistance < bestDistance)
-    //             {
-    //                 bestPoint = i;
-    //                 bestDistance = currentDistance;
-    //             }
-    //         }
-    //         return bestPoint;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         if (ex is not MissingReferenceException && ex is not NullReferenceException )
-    //         {
-    //             throw new Exception("An exception occurred in FindNearestPointTarget method.", ex);
-    //         }
-    //         return 0;
-    //     }
-    // }
-
-    int _nearestPoint;
-    Vector3 _entityPosition;
-    float findNearestDistance;
-    float findNearestNearestDistance;
+        
     void FindNearestPointEntity(ref List<object[]> path)
-    {
-        // try
-        // { 
-            if (path != null && path.Count > 0) 
+    { 
+        int nearestPoint;
+        float distance, nearestDistance;
+        if (path != null && path.Count > 0) 
+        {
+            nearestPoint = 0;
+            nearestDistance = Vector3.Distance(_positionWhenPathSearched, (Vector3)path[0][0]);
+            for (int i = 1; i < path.Count; i++)
             {
-                _nearestPoint = 0;
-                findNearestNearestDistance = Vector3.Distance(_entityPosition, (Vector3)path[0][0]);
-                for (int i = 1; i < path.Count; i++)
+                distance = Vector3.Distance(_positionWhenPathSearched, (Vector3)path[i][0]);
+                if (distance < nearestDistance)
                 {
-                    findNearestDistance = Vector3.Distance(_entityPosition, (Vector3)path[i][0]);
-                    if (findNearestDistance < findNearestNearestDistance)
-                    {
-                        _nearestPoint = i;
-                        findNearestNearestDistance = findNearestDistance;
-                    } else break;//TODO 
-                } 
-                if (_nearestPoint == 0) _nearestPoint = Mathf.Min(_nearestPoint + 1, path.Count -1); 
-                _nextPointQueued =  _nearestPoint;
-            }  
-            _isPathFinding = false;
-        // }
-        // catch (Exception ex)
-        // {
-        //     CustomLibrary.Log("FindNearestPointEntity", ex);
-        //     if (ex is not MissingReferenceException && ex is not NullReferenceException )
-        //     {
-        //         throw new Exception("An exception occurred in FindNearestPointEntity method.", ex);
-        //     }
-        //     _isPathFinding = false;
-        // }
+                    nearestPoint = i;
+                    nearestDistance = distance;
+                } else break; 
+            } 
+            if (nearestPoint == 0) nearestPoint = Mathf.Min(nearestPoint + 1, path.Count -1); 
+            _nextPointQueued =  nearestPoint;
+        }  
+        _isPathFinding = false; 
     }
-
-
-
-
 
     private void OnDrawGizmos()
     {

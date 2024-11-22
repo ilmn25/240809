@@ -28,11 +28,11 @@ public class PlayerInteractStatic : MonoBehaviour
                 // dialogue system starts here
                 Collider[] hitColliders = Physics.OverlapSphere(interactPos, 1, _interactLayer);
                 foreach (var hitCollider in hitColliders)
-                {
-                    CharacterDialogueInst interactComponent = hitCollider.GetComponent<CharacterDialogueInst>();
-                    if (interactComponent != null)
+                { 
+                    NPCStateMachine NPCStateMachine = hitCollider.GetComponent<NPCStateMachine>();
+                    if (NPCStateMachine != null)
                     {
-                        interactComponent.interact();
+                        NPCStateMachine.interact();
                         break;
                     }
                 }
