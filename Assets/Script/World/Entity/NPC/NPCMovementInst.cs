@@ -22,6 +22,7 @@ public class NPCMovementInst : MonoBehaviour
     private float _speedTarget;
     private float _speedAdjust;
     private Vector3 _newPosition;
+    private Vector3 _previousPosition;
     private Vector3 _direction = Vector3.zero;
     private Vector3 _directionBuffer = Vector3.zero;
     private float _verticalVelocity = 0f;
@@ -111,7 +112,7 @@ public class NPCMovementInst : MonoBehaviour
         {
             _verticalVelocity = JUMP_VELOCITY; 
             _isGrounded = false;
-        } 
+        }  
         // _isGrounded = _verticalVelocity == 0;
     }
  
@@ -189,6 +190,13 @@ public class NPCMovementInst : MonoBehaviour
         {
             transform.position = newPositionY;
         } 
+        
+        
+        if (_direction != Vector3.zero && _previousPosition == transform.position)
+        {
+            transform.position = Lib.AddToVector(transform.position, 0, 0.2f, 0); 
+        }
+        _previousPosition = transform.position;
     }
 
     Collider[] tempCollisionArray = new Collider[1];

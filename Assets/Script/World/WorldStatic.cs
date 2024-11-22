@@ -56,9 +56,8 @@ public class WorldStatic : MonoBehaviour
         {
             GenerateRandomMapSave(); 
         }
-        else
-            HandleLoadWorldFile(0);
-        // _chunkPositionPrevious = GetChunkCoordinate(_player.transform.position);
+        _chunkPositionPrevious = GetChunkCoordinate(_player.transform.position);
+        
     }
           
 
