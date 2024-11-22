@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,20 +7,6 @@ using UnityEngine;
 public class NPCMovementInst : MonoBehaviour
 {
 
-    private NPCPathFindInst _npcPathFindInst;
-    [HideInInspector] public bool _isGrounded = false;
-    private LayerMask _collisionLayer;
-    [HideInInspector] public float _speedCurrent;
-    private float _speedTarget;
-    private float _speedAdjust;
-    [HideInInspector] public Vector3 _newPosition;
-    [HideInInspector] public Vector3 _direction = Vector3.zero;
-    private Vector3 _directionBuffer = Vector3.zero;
-    private float _verticalVelocity = 0f;
-    private float _deltaTime;
-    Vector3[] _collider;
-    float _colliderRadius;
-
     [SerializeField] public float SPEED_WALK = 6f;
     [SerializeField] private float SPEED_RUN = 8f;
     [SerializeField] private float ACCELERATION_TIME = 0.3f; // time to reach full speed
@@ -27,11 +14,37 @@ public class NPCMovementInst : MonoBehaviour
     [SerializeField] private float SLIDE_DEGREE = 0.3f; //degree of slide against walkk when collide
     [SerializeField] private float GRAVITY = -40f;
     [SerializeField] private float JUMP_VELOCITY = 12f;
- 
 
-    public void setDirection(Vector3 dir)
+
+    private bool _isGrounded = false;
+    private LayerMask _collisionLayer;
+    private float _speedCurrent;
+    private float _speedTarget;
+    private float _speedAdjust;
+    private Vector3 _newPosition;
+    private Vector3 _direction = Vector3.zero;
+    private Vector3 _directionBuffer = Vector3.zero;
+    private float _verticalVelocity = 0f;
+    private float _deltaTime;
+    private Vector3[] _collider;
+    private float _colliderRadius; 
+
+    public void SetDirection(Vector3 dir)
     {
         _direction = dir;
+    }
+    public Vector3 GetDirection()
+    {
+        return _direction;
+    }
+
+    public float GetSpeed()
+    {
+        return _speedCurrent;
+    }
+    public Boolean IsGrounded()
+    {
+        return _isGrounded;
     }
 
     private void Start() {
@@ -43,8 +56,6 @@ public class NPCMovementInst : MonoBehaviour
         _collider = new Vector3[] { point1, point2};
         _colliderRadius = capsuleCollider.radius;
         Destroy(capsuleCollider);
-        
-        _npcPathFindInst = GetComponent<NPCPathFindInst>();
     }
       
 
@@ -101,7 +112,6 @@ public class NPCMovementInst : MonoBehaviour
             _verticalVelocity = JUMP_VELOCITY; 
             _isGrounded = false;
         } 
-        Lib.Log(_direction.y);
         // _isGrounded = _verticalVelocity == 0;
     }
  

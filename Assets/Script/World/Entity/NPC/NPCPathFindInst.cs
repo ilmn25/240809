@@ -9,9 +9,9 @@ using Object = System.Object;
 
 public class NPCPathFindInst : MonoBehaviour
 {
-    private Object _target;
-    
+    private GameObject _target;
     private NPCMovementInst _npcMovementInst;
+     
     public int[] AGENT = new int[5];
     private float _targetReachedInner = 1f;
     private float _targetReachedOuter = 2f;
@@ -39,63 +39,43 @@ public class NPCPathFindInst : MonoBehaviour
     private bool _updateEntityPosition = false; 
     private Vector3 _direction;
 
-    private void Start()
+    private void Awake()
     {
+        _target = Game.Player;
         _npcMovementInst = GetComponent<NPCMovementInst>();
     }
 
-    public void SetTarget(Vector3 target)
+    public void SetTarget(GameObject target)
     {
-        _nextPointPosition = target;
-    }
-    public void SetSettings(int[] agent, float targetReachedInner, float targetReachedOuter, float pointReachDistance, 
-        float pointMissDistance, float repathInterval, int jumpSkipAmount)
-    {
-        AGENT = agent;
-        _targetReachedInner = targetReachedInner;
-        _targetReachedOuter = targetReachedOuter;
-        _pointReachDistance = pointReachDistance;
-        _pointMissDistance = pointMissDistance;
-        _repathInterval = repathInterval;
-        _jumpSkipAmount = jumpSkipAmount;
-    }
+        _target = target;
+    } 
+    
+    
+    
 
     public async void HandlePathFindPassive()
     {  
         if (!_moveOccupied)
         {
-            _moveOccupied = true; 
-            _targetDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
-            if (!_targetReached)
-            {   
-                _targetReached = _targetDistance < _targetReachedInner;
-            } else
-            { 
-                _targetReached = _targetDistance < _targetReachedOuter;
-            }
-
-            if (!_targetReached)
+            _moveOccupied = true;  
+            if (_path == null || _nextPoint >= _path.Count - 2)
             {
-                if (_path == null || _nextPoint >= _path.Count - 2)
+                if (_nextPointQueued != -1)
                 {
-                    if (_nextPointQueued != -1)
-                    {
-                        _path = _pathQueued; 
-                        _nextPoint = _nextPointQueued;
-                        _nextPointQueued = -1;
-                    } else GetPath();
-                } 
-                else if (_path != null)
-                {  
-                    await Task.Delay((int)(1500 / _npcMovementInst.SPEED_WALK)); // Convert seconds to milliseconds
-                    if (this != null && _nextPoint < _path.Count -2)
-                    {
-                        _nextPoint++;  
-                        transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
-                    } else return;
-                }   
-            } else _npcMovementInst._direction = Vector3.zero;
-
+                    _path = _pathQueued; 
+                    _nextPoint = _nextPointQueued;
+                    _nextPointQueued = -1;
+                } else GetPath();
+            } 
+            else if (_path != null)
+            {  
+                await Task.Delay((int)(1500 / _npcMovementInst.SPEED_WALK)); // Convert seconds to milliseconds
+                if (this != null && _nextPoint < _path.Count -2)
+                {
+                    _nextPoint++;  
+                    transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
+                } else return;
+            }   
             _moveOccupied = false; 
         }
     }
@@ -104,20 +84,20 @@ public class NPCPathFindInst : MonoBehaviour
     {
         if (!_repathRoutine) RepathRoutine();
  
-        if (_updateEntityPosition && _npcMovementInst._isGrounded)
+        if (_updateEntityPosition && _npcMovementInst.IsGrounded())
         { 
             _selfPositionPrevious = transform.position;
             _updateEntityPosition = false; 
         }
         if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
         {
-            _targetPositionPrevious = Game.Player.transform.position;
+            _targetPositionPrevious = _target.transform.position;
             _updateTargetPosition = false;
         }
         
         _direction = Vector3.zero; 
 
-        _targetDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
+        _targetDistance = Vector3.Distance(transform.position, _target.transform.position);
         if (!_targetReached)
         {   
             _targetReached = _targetDistance < _targetReachedInner;
@@ -147,7 +127,7 @@ public class NPCPathFindInst : MonoBehaviour
             { 
                 _nextPointPosition = (Vector3)_path[_nextPoint][0];  
                 _nextPointDistance = Vector3.Distance(transform.position, _nextPointPosition); 
-                if (_npcMovementInst._isGrounded && _nextPointDistance < _pointReachDistance)
+                if (_npcMovementInst.IsGrounded() && _nextPointDistance < _pointReachDistance)
                 {
                     _nextPoint++;
                 } 
@@ -181,7 +161,7 @@ public class NPCPathFindInst : MonoBehaviour
                     }
                 } 
                 _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
-            } else _direction = (Lib.AddToVector(Game.Player.transform.position, 0, -0.3f, 0) - transform.position).normalized;
+            } else _direction = (Lib.AddToVector(_target.transform.position, 0, -0.3f, 0) - transform.position).normalized;
             
              
         }
@@ -219,13 +199,13 @@ public class NPCPathFindInst : MonoBehaviour
  
         if (!_targetReached && !_isPathFinding)
         {
-            _targetMoved = Vector3.Distance(_targetPositionPrevious, Game.Player.transform.position) > 0.8f;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, _target.transform.position) > 0.8f;  //should be less than inner player near
 
             if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             { 
                 GetPath();  
                 _updateTargetPosition = true;//! dont move
-                // _playerPositionPrevious = Game.Player.transform.position;
+                // _playerPositionPrevious = _target.transform.position;
             }   
             else if (IsStuck()) 
             {
@@ -240,7 +220,7 @@ public class NPCPathFindInst : MonoBehaviour
 
     bool IsStuck()
     {
-        if (_npcMovementInst._isGrounded) 
+        if (_npcMovementInst.IsGrounded()) 
         { 
             if (_nextPointDistance > _pointMissDistance)
             {
@@ -269,7 +249,7 @@ public class NPCPathFindInst : MonoBehaviour
         try
         {  
             // Vector3Int target = (_target == new Vector3Int()) ? new Vector3Int(0, -1, 0) : _target; 
-            _pathQueued = await NPCPathFindStatic.Instance.FindPath(AGENT, transform, Game.Player.transform);  
+            _pathQueued = await NPCPathFindStatic.Instance.FindPath(AGENT, transform, _target.transform);  
             if (this != null)
             {
                 _entityPosition = transform.position;
@@ -304,7 +284,7 @@ public class NPCPathFindInst : MonoBehaviour
 
     //         _isPathFinding = true;
     
-    //         Vector3Int target = (_target == Vector3Int.zero) ? Vector3Int.FloorToInt(Game.Player.transform.position) : _target;
+    //         Vector3Int target = (_target == Vector3Int.zero) ? Vector3Int.FloorToInt(_target.transform.position) : _target;
 
     //         pathExtended = _path; 
 

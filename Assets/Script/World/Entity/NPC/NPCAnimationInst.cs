@@ -37,7 +37,7 @@ public class NPCAnimationInst : MonoBehaviour
     public void HandleAnimationUpdate()
     {
         // facing _relativeDirection 
-        _relativeDirection = new Vector2(_npcMovementInst._direction.x, _npcMovementInst._direction.z);  
+        _relativeDirection = new Vector2(_npcMovementInst.GetDirection().x, _npcMovementInst.GetDirection().z);  
         _relativeDirection.Normalize(); 
         if (_relativeDirection != Vector2.zero)
         { 
@@ -48,7 +48,7 @@ public class NPCAnimationInst : MonoBehaviour
             _animator.SetFloat("PosY", _relativeDirection.y);
         }
 
-        isMoving = _npcMovementInst._speedCurrent > 0.35 && _npcMovementInst._isGrounded;
+        isMoving = _npcMovementInst.GetSpeed() > 0.35 && _npcMovementInst.IsGrounded();
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {
