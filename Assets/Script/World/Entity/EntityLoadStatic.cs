@@ -8,35 +8,29 @@ public class EntityLoadStatic : MonoBehaviour
 {
     public static EntityLoadStatic Instance { get; private set; }  
     public static event Action UpdateEntityListKey; 
-    private int _chunkSize;
     private Vector3Int _currentChunkCoordinate;
     private List<EntityData> _chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
+    EntityHandler _currentEntityHandler;
 
-    public static Dictionary<Vector3Int, (List<EntityData>, List<EntityDataHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityDataHandler>)>();
+    public static Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)>();
     public int ENTITY_DISTANCE = 2;
 
     void Awake()
     {
         Instance = this;
-        WorldStatic.PlayerChunkPositionUpdate += HandleChunkEntityTraverse; 
-        _chunkSize = WorldStatic.CHUNKSIZE;
+        WorldStatic.PlayerChunkTraverse += OnTraverse; 
     }
 
-
-    public void UpdateEntityList(Vector3Int key)
+    private void OnTraverse()   
     {
-        _entityList[key].Item1.Clear();
-
-        foreach (EntityDataHandler entityHandler in _entityList[key].Item2)
-        { 
-            _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity());
-            Destroy(entityHandler.gameObject);  
-        }
+        //when move to new chunk 
+        HandleUnload();
+        HandleLoad();  
     }
-    
-    public void SaveAllEntities()
+ 
+    public void HandleSave()
     {
         UpdateEntityListKey?.Invoke();
         foreach (var key in _entityList.Keys)
@@ -44,74 +38,74 @@ public class EntityLoadStatic : MonoBehaviour
             UpdateEntityList(key);
         }
     }
-
-    private void HandleChunkEntityTraverse()
+    void HandleUnload()
     {
-        Vector3 currentChunkPosition = WorldStatic._chunkPosition; 
-        HandleUnload();
-        HandleLoad(); 
-        void HandleUnload()
+        var keysToRemove = new List<Vector3Int>();
+        UpdateEntityListKey?.Invoke();
+
+        foreach (var key in _entityList.Keys)
         {
-            var keysToRemove = new List<Vector3Int>();
-            UpdateEntityListKey?.Invoke();
+            // Extract chunk coordinates from the key
+            int chunkX = key.x, chunkZ = key.z;
 
-            foreach (var key in _entityList.Keys)
+            if (chunkX > WorldStatic._chunkPosition.x + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkX < WorldStatic._chunkPosition.x - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
+                || chunkZ > WorldStatic._chunkPosition.z + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkZ < WorldStatic._chunkPosition.z - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE)
             {
-                // Extract chunk coordinates from the key
-                int chunkX = key.x, chunkZ = key.z;
-
-                if (chunkX > currentChunkPosition.x + ENTITY_DISTANCE * _chunkSize 
-                    || chunkX < currentChunkPosition.x - ENTITY_DISTANCE * _chunkSize
-                    || chunkZ > currentChunkPosition.z + ENTITY_DISTANCE * _chunkSize 
-                    || chunkZ < currentChunkPosition.z - ENTITY_DISTANCE * _chunkSize)
-                {
-                    UpdateEntityList(key);
-                    keysToRemove.Add(key);
-                }
+                UpdateEntityList(key);
+                keysToRemove.Add(key);
             }
-            // Remove the marked keys from the dictionary
-            foreach (var key in keysToRemove) _entityList.Remove(key);
         }
+        // Remove the marked keys from the dictionary
+        foreach (var key in keysToRemove) _entityList.Remove(key);
+    }
 
- 
+    void HandleLoad()
+    {
+        WorldStatic.Instance.HandleLoadWorldFile(0); 
 
-        void HandleLoad()
+        for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x += WorldStatic.CHUNKSIZE)
         {
-            WorldStatic.Instance.HandleLoadWorldFile(0); 
-
-            for (int x = -ENTITY_DISTANCE * _chunkSize; x <= ENTITY_DISTANCE * _chunkSize; x += _chunkSize)
+            for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
             {
-                for (int z = -ENTITY_DISTANCE * _chunkSize; z <= ENTITY_DISTANCE * _chunkSize; z += _chunkSize)
-                {
-                    _currentChunkCoordinate = new Vector3Int(
-                        Mathf.FloorToInt(currentChunkPosition.x + x),
-                        0,
-                        Mathf.FloorToInt(currentChunkPosition.z + z)
-                    );
+                _currentChunkCoordinate = new Vector3Int(
+                    Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
+                    0,
+                    Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
+                );
 
-                    if (!_entityList.ContainsKey(_currentChunkCoordinate))
+                if (!_entityList.ContainsKey(_currentChunkCoordinate))
+                {
+                    _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
+                    if  (_currentChunkData != null)
                     {
-                        _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
-                        if  (_currentChunkData != null)
-                        {
-                            _chunkEntityList = _currentChunkData.Entity;  
-                            LoadChunkEntities(); 
-                        }
-                    }  
-                } 
+                        _chunkEntityList = _currentChunkData.Entity;  
+                        LoadChunkEntities(); 
+                    }
+                }  
             } 
+        } 
+    }
+     
+      
+    public void UpdateEntityList(Vector3Int key)
+    {
+        _entityList[key].Item1.Clear();
+
+        foreach (EntityHandler entityHandler in _entityList[key].Item2)
+        { 
+            _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity());
+            Destroy(entityHandler.gameObject);  
         }
     }
-      
-    
-    public void LoadChunkEntities()
-    { 
-        EntityDataHandler entityDataHandler;
 
+    public void LoadChunkEntities()
+    {  
         // Find the key once
         if (!_entityList.ContainsKey(_currentChunkCoordinate))
         {
-            _entityList[_currentChunkCoordinate] = (_chunkEntityList, new List<EntityDataHandler>());
+            _entityList[_currentChunkCoordinate] = (_chunkEntityList, new List<EntityHandler>());
         }
 
         foreach (EntityData entity in _chunkEntityList)
@@ -138,18 +132,10 @@ public class EntityLoadStatic : MonoBehaviour
         void InstantiatePrefab(EntityData entity)
         {
             _currentInstance = Instantiate(Resources.Load<GameObject>($"prefab/{entity.ID}"));
-            entityDataHandler = _currentInstance.AddComponent<EntityDataHandler>();
-            entityDataHandler._entityData = entity;
+            _currentEntityHandler = _currentInstance.AddComponent<EntityHandler>();
+            _currentEntityHandler._entityData = entity;
             _currentInstance.transform.parent = transform;
         }
     } 
 }
-
-[System.Serializable]
-public enum EntityType
-{
-    Item,
-    Static,
-    Rigid
-}
-  
+ 

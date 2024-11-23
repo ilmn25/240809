@@ -18,3 +18,10 @@ public class EntityData
         Type = type;
     }
 }
+[System.Serializable]
+public enum EntityType
+{
+    Item,
+    Static,
+    Rigid
+}

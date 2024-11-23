@@ -20,7 +20,7 @@ public class MapLoadStatic : MonoBehaviour
     public void Awake()
     {   
         Instance = this;
-        WorldStatic.PlayerChunkPositionUpdate += HandleChunkMapTraverse;
+        WorldStatic.PlayerChunkTraverse += HandleChunkMapTraverse;
         _chunkSize = WorldStatic.CHUNKSIZE;
         _chunkDepth = WorldStatic.CHUNKDEPTH;
         _renderDistance = WorldStatic.Instance.RENDER_DISTANCE;

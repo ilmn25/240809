@@ -20,7 +20,7 @@ public class WorldStatic : MonoBehaviour
 
     private GameObject _player; 
     private BinaryFormatter _bf = new BinaryFormatter(); 
-    public static event Action PlayerChunkPositionUpdate;
+    public static event Action PlayerChunkTraverse;
 
     [HideInInspector] 
     public static Vector3Int _chunkPosition;
@@ -66,7 +66,7 @@ public class WorldStatic : MonoBehaviour
         _chunkPosition = GetChunkCoordinate(_player.transform.position);
         if (_chunkPosition != _chunkPositionPrevious)
         {  
-            PlayerChunkPositionUpdate?.Invoke();
+            PlayerChunkTraverse?.Invoke();
             _chunkPositionPrevious = _chunkPosition;
             await Task.Delay(80);
             (_boolGridOrigin, _boolGrid) = await Task.Run(() => 
@@ -90,7 +90,7 @@ public class WorldStatic : MonoBehaviour
  
     public async void HandleSaveWorldFile(List<ChunkData> chunks, int yLevel)
     {
-        EntityLoadStatic.Instance.SaveAllEntities();
+        EntityLoadStatic.Instance.HandleSave();
         await Task.Delay(10);
         string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         string filePath = $"{downloadsPath}\\chunks_{yLevel}.dat"; 
