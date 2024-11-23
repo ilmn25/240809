@@ -22,6 +22,7 @@ class PlayerActive : EntityState {
         PlayerChunkEditStatic.Instance.HandleTerraformUpdate(); 
         PlayerInteractStatic.Instance.HandleInteractionUpdate();
         PlayerInventoryStatic.Instance.HandleInventoryUpdate();
+        PlayerStatusStatic.Instance.HandleStatusUpdate();
     }
     public override void OnExitState() {}
 }

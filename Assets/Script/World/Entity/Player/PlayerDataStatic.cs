@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class PlayerDataStatic : MonoBehaviour
 { 
     public static PlayerDataStatic Instance { get; private set; }  
-    public static PlayerData _playerData;
+    public static PlayerData _playerData = new PlayerData();
     public static Dictionary<int, ItemData> _playerInventory;
     private static BinaryFormatter _binaryFormatter = new BinaryFormatter();
 

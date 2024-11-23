@@ -83,7 +83,17 @@ public class PlayerMovementStatic : MonoBehaviour
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            _speedTarget = Input.GetKey(KeyCode.LeftShift) ? SPEED_RUN : SPEED_WALK;
+            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatusStatic._stamina > 1)
+            {
+                _speedTarget = SPEED_RUN;
+                PlayerStatusStatic._stamina -= 0.1f;
+            }
+            else
+            {
+                _speedTarget = SPEED_WALK;
+                PlayerStatusStatic._stamina += 0.1f;
+            }
+            
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
 
             _speedAdjust = 1f; 
