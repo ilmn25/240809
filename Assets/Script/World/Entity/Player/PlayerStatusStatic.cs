@@ -6,7 +6,7 @@ public class PlayerStatusStatic : MonoBehaviour
 {
     public static PlayerStatusStatic Instance { get; private set; }
     
-    public int maxHealth = 100;
+    private int maxHealth = 100;
     [HideInInspector]   public int currentHealth;
 
     void Awake()

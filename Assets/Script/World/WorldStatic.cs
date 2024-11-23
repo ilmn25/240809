@@ -234,9 +234,16 @@ public class WorldStatic : MonoBehaviour
         );
     }
 
-
-    public void UpdateMap(Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0) 
+    public void SetBoolInMap(Vector3Int _worldPosition, bool value)
     { 
+        _boolGrid[_worldPosition.x - _boolGridOrigin.x, 
+            _worldPosition.y, 
+            _worldPosition.z - _boolGridOrigin.z] = value;
+    }
+
+    public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)
+    {
+        SetBoolInMap(worldCoordinate, blockID == 0);
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID; 
         MapLoadStatic.Instance.RefreshExistingChunk(chunkCoordinate); //refresh on screen
             

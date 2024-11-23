@@ -23,11 +23,11 @@ public class BlockStatic : MonoBehaviour
         _meshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH));
 
         // Add block definitions
-        AddBlockDefinition("brick", 1, 3, "Brick", "A block of brick");
-        AddBlockDefinition("marble", 1, 5, "Marble", "A block of marble");
-        AddBlockDefinition("stone", 1, 5, "Stone", "A block of stone");
-        AddBlockDefinition("dirt", 1, 2, "Dirt", "A block of dirt");
-        AddBlockDefinition("backroom", 1, 3, "Backroom", "A block of backroom");
+        AddBlockDefinition("brick", 1, 2, "Brick", "A block of brick");
+        AddBlockDefinition("marble", 1, 1, "Marble", "A block of marble");
+        AddBlockDefinition("stone", 1, 1, "Stone", "A block of stone");
+        AddBlockDefinition("dirt", 1, 1, "Dirt", "A block of dirt");
+        AddBlockDefinition("backroom", 1, 2, "Backroom", "A block of backroom");
 
         HandleTextureAtlas();
     }

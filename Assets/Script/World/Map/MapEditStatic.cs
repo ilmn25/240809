@@ -12,7 +12,7 @@ public class MapEditStatic : MonoBehaviour
         blockDataList = new List<(Vector3, Vector3, float, float)>();
     }
 
-    public void BreakBlock(Vector3 worldPosition, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, float breakValue)
+    public void BreakBlock(Vector3Int worldPosition, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, float breakValue)
     {
         
         // Check if the coordinates already exist in the list
@@ -56,7 +56,7 @@ public class MapEditStatic : MonoBehaviour
             if (breakCost <= 0)
             {
                 ItemLoadStatic.Instance.SpawnItem(blockNameID, worldPosition);
-                WorldStatic.Instance.UpdateMap(chunkCoordinate, blockCoordinate, 0);
+                WorldStatic.Instance.UpdateMap(worldPosition, chunkCoordinate, blockCoordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }
             else
