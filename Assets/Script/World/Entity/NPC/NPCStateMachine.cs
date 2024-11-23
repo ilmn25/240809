@@ -31,6 +31,7 @@ public class NPCStateMachine : EntityStateMachine
     public override void OnEnable()
     {
         SetState<NPCIdle>();
+        _npcMovementInst.SetDirection(Vector3.zero);
     }
     protected override void LogicUpdate()
     {

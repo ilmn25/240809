@@ -21,7 +21,7 @@ public class MapCullStatic : MonoBehaviour
     public int _yThreshold = 0; 
     private int _visionHeight = 2;
     private enum CullMode { On, Off, Both}
-    private CullMode _currentCullMode = CullMode.On;
+    private CullMode _currentCullMode = CullMode.Both;
     
     private GameObject _lightIndoor;
     private GameObject _lightSelf;

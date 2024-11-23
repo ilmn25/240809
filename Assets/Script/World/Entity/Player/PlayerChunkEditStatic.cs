@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -9,15 +10,16 @@ public class PlayerChunkEditStatic : MonoBehaviour
     // private float range = 8f;
     public AudioClip SOUNDDIG;
     
-    BoxCollider _boxCollider;
+    private BoxCollider _boxCollider;
     private GameObject _block;
+    private Boolean _wasPlace;
     private Vector3Int _worldPosition;
     private Vector3 _screenPosition;
     private Vector3Int _chunkCoordinate;
     private Vector3Int _blockCoordinate;
     private int _chunkSize;
     private int _chunkDepth; 
-    [FormerlySerializedAs("_blockNameID")] [FormerlySerializedAs("_blockID")] [HideInInspector] public string _blockStringID; 
+    [HideInInspector] public string _blockStringID; 
 
     public int RANGE = 4; 
     public int BLOCKOVERLAYSPEED = 10; 
@@ -31,9 +33,10 @@ public class PlayerChunkEditStatic : MonoBehaviour
     }
 
     public void HandleTerraformUpdate()
-    {
+    { 
         if (Input.GetMouseButtonDown(0)) //break
         {  
+            _wasPlace = false;
             HandleBlockPosition(true);
             int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check 
@@ -43,11 +46,13 @@ public class PlayerChunkEditStatic : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
         { 
+            _wasPlace = true;
             PlayerInventoryStatic.RemoveItem(_blockStringID); 
             ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
         {  
+            _wasPlace = false;
             _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
             HandleChunkCoordinate(_worldPosition);
             int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
@@ -57,7 +62,8 @@ public class PlayerChunkEditStatic : MonoBehaviour
             }   
         }
         else if (Input.GetKeyDown(KeyCode.C)) //break under
-        {  
+        {
+            _wasPlace = false;
             _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
             HandleChunkCoordinate(_worldPosition);
             int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
@@ -67,10 +73,10 @@ public class PlayerChunkEditStatic : MonoBehaviour
             }   
         }
 
-        if (_block != null && _worldPosition != new Vector3Int(0, -1, 0))
+        if (_wasPlace && _block != null && _worldPosition != new Vector3Int(0, -1, 0))
         {         
             _block.transform.position = Vector3.Lerp(_block.transform.position, _worldPosition, Time.deltaTime * BLOCKOVERLAYSPEED);
-        } 
+        } else if (_block != null) _block.transform.position = Vector3.zero;
     }
 
 
@@ -95,6 +101,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             _block = null;
             BlockPreviewStatic.Instance.DeleteBlock();
         }
+         
     }
 
 
