@@ -47,7 +47,7 @@ public class BlockPreviewStatic : MonoBehaviour
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshFilter.mesh = mesh;
-        Material meshMaterial = new(Game.MeshMaterial)
+        Material meshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH))
         {
             mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
         };

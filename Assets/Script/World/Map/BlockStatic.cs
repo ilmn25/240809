@@ -19,8 +19,8 @@ public class BlockStatic : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        _shadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
-        _meshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
+        _shadowMeshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH));
+        _meshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH));
 
         // Add block definitions
         AddBlockDefinition("brick", 1, 3, "Brick", "A block of brick");
