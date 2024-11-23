@@ -11,7 +11,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     
     BoxCollider _boxCollider;
     private GameObject _block;
-    private Vector3 _worldPosition;
+    private Vector3Int _worldPosition;
     private Vector3 _screenPosition;
     private Vector3Int _chunkCoordinate;
     private Vector3Int _blockCoordinate;
@@ -48,7 +48,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
         {  
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0f, 1f, 0f);
+            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
             HandleChunkCoordinate(_worldPosition);
             int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check
@@ -58,7 +58,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.C)) //break under
         {  
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0f, -1f, 0f);
+            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
             HandleChunkCoordinate(_worldPosition);
             int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
             if (destroyedBlockID != 0) { //occupied check
@@ -180,7 +180,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
                 Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE)
             {
-                _worldPosition = Vector3.down;
+                _worldPosition = Vector3Int.down;
                 
             }
             HandleChunkCoordinate(_worldPosition);
@@ -258,7 +258,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         AudioStatic.PlaySFX(SOUNDDIG); 
         HandleBlockPosition();  
         _block.transform.position = _worldPosition;
-        WorldStatic.Instance.UpdateMap(_chunkCoordinate, _blockCoordinate, blockID); 
+        WorldStatic.Instance.UpdateMap(_worldPosition, _chunkCoordinate, _blockCoordinate, blockID); 
         // Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.red);
     }
  
