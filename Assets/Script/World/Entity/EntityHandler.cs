@@ -19,8 +19,8 @@ public class EntityHandler : MonoBehaviour
         _positionPrevious = WorldStatic.GetChunkCoordinate(transform.position);
         EntityLoadStatic._entityList[_positionPrevious].Item2.Add(this); 
     }
-    
-    void OnDestroy() {
+     
+    public void OnDestroy() {
         EntityLoadStatic.UpdateEntityListKey -= UpdateEntityListKey;
         
         if (EntityLoadStatic._entityList.ContainsKey(_positionPrevious)) 

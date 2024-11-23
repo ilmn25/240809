@@ -35,15 +35,11 @@ public class ItemLoadStatic : MonoBehaviour
     public void SpawnItem(EntityData entityData)
     { 
         ItemData itemDataToSpawn = GetItem(int.Parse(entityData.ID));
-        GameObject itemObject = Instantiate(Resources.Load<GameObject>($"prefab/item"));
-        itemObject.name = entityData.ID;
-        itemObject.transform.parent = transform;
+        GameObject itemObject = EntityPoolStatic.Instance.GetObject(entityData, "item");
         itemObject.transform.position = entityData.Position.ToVector3(); 
         
         SpriteRenderer spriteRenderer = itemObject.GetComponent<SpriteRenderer>(); 
-        spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}");
-        EntityHandler entityHandler = itemObject.GetComponent<EntityHandler>();
-        entityHandler._entityData = entityData;
+        spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}"); 
     }
 
     public static EntityData GetEntityData(int id, Vector3 position, EntityType entityType)

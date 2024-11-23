@@ -37,9 +37,5 @@ public class ItemStateMachine : EntityStateMachine
             SetState(GetState<NPCChase>());
         }
     }
-
-    public void interact()
-    {
-        SetState(GetState<CharTalk>());
-    }
+ 
 }
