@@ -20,7 +20,8 @@ public class MapCullStatic : MonoBehaviour
     [HideInInspector] 
     public int _yThreshold = 0; 
     private int _visionHeight = 2;
-    private bool _forceCull = false;  
+    private enum CullMode { On, Off, Both}
+    private CullMode _currentCullMode = CullMode.On;
     
     private GameObject _lightIndoor;
     private GameObject _lightSelf;
@@ -81,7 +82,21 @@ public class MapCullStatic : MonoBehaviour
  
     void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.Z)) _forceCull = !_forceCull;
+        if (Input.GetKeyDown(KeyCode.Z)) {
+            switch (_currentCullMode)
+            {
+                case CullMode.On:
+                    _currentCullMode = CullMode.Off;
+                    break;
+                case CullMode.Off:
+                    _currentCullMode = CullMode.Both;
+                    break;
+                case CullMode.Both:
+                    _currentCullMode = CullMode.On;
+                    break;
+            }
+        }
+        
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
         if (Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
         {
@@ -160,13 +175,19 @@ public class MapCullStatic : MonoBehaviour
 
     void HandleObstructionCheck()
     {
+        if (_currentCullMode == CullMode.Off)
+        {
+            _yCheck = false;
+            return;
+        }
+        
         playerPosition = Game.Player.transform.position;
-        if (_forceCull)
+        if (_currentCullMode == CullMode.On)
         {
             _yCheck = true;
             _yThreshold = (int)playerPosition.y + _visionHeight;
             return;
-        }
+        }  
 
         // Check each ray hit and return early if conditions are met
         rayForward = new Ray(playerPosition, forwardDirection);  
