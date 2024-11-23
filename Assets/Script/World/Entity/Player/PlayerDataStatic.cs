@@ -9,15 +9,15 @@ public class PlayerDataStatic : MonoBehaviour
 { 
     public static PlayerDataStatic Instance { get; private set; }  
     public PlayerData _playerData;
-    public List<KeyValuePair<int, ItemData>> _playerInventory;
-    private BinaryFormatter _bf = new BinaryFormatter();
+    public Dictionary<int, ItemData> _playerInventory;
+    private BinaryFormatter _binaryFormatter = new BinaryFormatter();
 
     void Start()
     {
         Instance = this;
         LoadPlayerData();
         // PrintPlayerData();
-        // AddItem(3, 1000);
+        // AddItem("exampleID", 1000);
     }
 
     void OnApplicationQuit()
@@ -25,127 +25,77 @@ public class PlayerDataStatic : MonoBehaviour
         SavePlayerData();
     }
 
-
-
-
-
-
-
-
-
-
-
-    public void AddItem(int numberID, int quantity = 1)
+    public void AddItem(string stringID, int quantity = 1)
     {
-        var kvp = _playerInventory.Find(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
-        if (kvp.Value != null)
+        foreach (var kvp in _playerInventory)
         {
-            kvp.Value.StackSize += quantity;
-        }
-        else
-        {
-            ItemData newItemData = ItemLoadStatic.GetItem(numberID);
-            if (newItemData != null)
+            if (kvp.Value.StringID == stringID)
             {
-                int slotID = GetSmallestAvailableSlotID();
-                _playerInventory.Add(new KeyValuePair<int, ItemData>(
-                    slotID, // Assign smallest non-existing slot ID
-                    new ItemData(
-                        newItemData.StringID,
-                        newItemData.Name,
-                        quantity,
-                        newItemData.Rarity,
-                        newItemData.Description,
-                        newItemData.IsConsumable, 
-                        newItemData.CraftingMaterials,
-                        newItemData.Damage,
-                        newItemData.Knockback,
-                        newItemData.UseTime
-                    )
-                ));
+                kvp.Value.StackSize += quantity;
+                return;
             }
+        }
+
+        ItemData newItemData = ItemLoadStatic.GetItem(stringID);
+        if (newItemData != null)
+        {
+            int slotID = GetSmallestAvailableSlotID();
+            _playerInventory[slotID] = new ItemData(
+                newItemData.StringID,
+                newItemData.Name,
+                quantity,
+                newItemData.Rarity,
+                newItemData.Description,
+                newItemData.IsConsumable,
+                newItemData.CraftingMaterials,
+                newItemData.Damage,
+                newItemData.Knockback,
+                newItemData.UseTime
+            );
         }
         // PrintPlayerData();
     }
 
-
-    public void RemoveItem(int numberID, int quantity = 1)
+    public void RemoveItem(string stringID, int quantity = 1)
     {
-        var kvp = _playerInventory.Find(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
-        if (kvp.Value != null)
+        foreach (var kvp in _playerInventory)
         {
-            kvp.Value.StackSize -= quantity;
-            if (kvp.Value.StackSize <= 0)
+            if (kvp.Value.StringID == stringID)
             {
-                _playerInventory.Remove(kvp);
+                kvp.Value.StackSize -= quantity;
+                if (kvp.Value.StackSize <= 0)
+                {
+                    _playerInventory.Remove(kvp.Key);
+                }
+                SavePlayerData();
+                return;
             }
-            SavePlayerData();
         }
     }
-
-
-
 
     //! UTILITY
     private int GetSmallestAvailableSlotID()
     {
         int slotID = 0;
-        while (_playerInventory.Exists(kvp => kvp.Key == slotID))
+        while (_playerInventory.ContainsKey(slotID))
         {
             slotID++;
         }
         return slotID;
     } 
 
-    public bool HasItem(int numberID)
+    public bool HasItem(string stringID)
     {
-        return _playerInventory.Exists(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
+        foreach (var kvp in _playerInventory)
+        {
+            if (kvp.Value.StringID == stringID)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //! SAVE LOAD
-    // private void SavePlayerData()
-    // {
-    //     string json = JsonUtility.ToJson(_playerInventory);
-    //     string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "PlayerData.json");
-    //     File.WriteAllText(path, json);
-    //     // Debug.Log("PlayerData saved to Downloads.");
-    // }
-
-    // private void LoadPlayerData()
-    // {
-    //     string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "PlayerData.json");
-    //     if (File.Exists(path))
-    //     {
-    //         string json = File.ReadAllText(path);
-    //         _playerData = JsonUtility.FromJson<PlayerData>(json); 
-    //         _playerInventory = _playerData?.inventory ?? new List<KeyValuePair<int, Item>>();
-    //         CustomLibrary.Log(_playerData);
-    //         CustomLibrary.Log(_playerData.inventory);
-    //     }
-    //     else
-    //     {
-    //         Debug.Log("No playerData file found in Downloads.");
-    //         _playerInventory = new List<KeyValuePair<int, Item>>(); // Initialize if file does not exist
-    //     }
-    // }
     //! SAVE LOAD
     private void SavePlayerData()
     {
@@ -154,7 +104,7 @@ public class PlayerDataStatic : MonoBehaviour
         
         using (FileStream file = File.Create(filePath))
         {
-            _bf.Serialize(file, _playerInventory);
+            _binaryFormatter.Serialize(file, _playerInventory);
         }
     }
 
@@ -166,27 +116,15 @@ public class PlayerDataStatic : MonoBehaviour
         {
             using (FileStream file = File.Open(filePath, FileMode.Open))
             {
-                _playerInventory = (List<KeyValuePair<int, ItemData>>)_bf.Deserialize(file);
+                _playerInventory = (Dictionary<int, ItemData>)_binaryFormatter.Deserialize(file);
             }
         }
         else
         {
             Debug.Log("No playerData file found in Downloads.");
-            _playerInventory = new List<KeyValuePair<int, ItemData>>(); // Initialize if file does not exist
+            _playerInventory = new Dictionary<int, ItemData>(); // Initialize if file does not exist
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     //! DEBUG TOOLS
     public void PrintPlayerData()

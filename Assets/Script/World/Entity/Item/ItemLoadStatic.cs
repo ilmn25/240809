@@ -6,9 +6,7 @@ using UnityEngine;
 public class ItemLoadStatic : MonoBehaviour
 {
     public static ItemLoadStatic Instance { get; private set; }  
-    private static Dictionary<int, ItemData> _itemDefinitions  = new Dictionary<int, ItemData>();
-    private static IntStringMap<int, string> _itemIDMap = new IntStringMap<int, string>();
-    private static int _nextItemID = 1;
+    private static Dictionary<string, ItemData> _itemDefinitions  = new Dictionary<string, ItemData>();
     
     // id of item in entitydata is number id
     // id of item in itemdata is name id 
@@ -26,15 +24,13 @@ public class ItemLoadStatic : MonoBehaviour
 
     private static void AddBlockDefinition(string stringID, string name, int stackSize, string rarity, string description, Boolean consumable, string[] materials, int damage, int knockback, int useTime)
     {
-        int id = _nextItemID++;
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, materials, damage, knockback, useTime);
-        _itemDefinitions[id] = itemData;
-        _itemIDMap.Add(id, stringID);
+        _itemDefinitions[stringID] = itemData;
     }
     
     public void SpawnItem(EntityData entityData)
     { 
-        ItemData itemDataToSpawn = GetItem(int.Parse(entityData.ID));
+        ItemData itemDataToSpawn = GetItem(entityData.ID);
         GameObject itemObject = EntityPoolStatic.Instance.GetObject(entityData, "item");
         itemObject.transform.position = entityData.Position.ToVector3(); 
         
@@ -42,40 +38,20 @@ public class ItemLoadStatic : MonoBehaviour
         spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}"); 
     }
 
-    public static EntityData GetEntityData(int id, Vector3 position, EntityType entityType)
+    public static EntityData GetEntityData(string stringID, Vector3 position, EntityType entityType)
     {
-        return new EntityData(id.ToString(), new SerializableVector3(position), type: entityType);
+        return new EntityData(stringID, new SerializableVector3(position), type: entityType);
     } 
     
-
-    public static ItemData GetItem(int id)
-    {
-        if (_itemDefinitions.ContainsKey(id))
-        {
-            return _itemDefinitions[id];
-        }
-        return null;
-    }
+ 
 
     public static ItemData GetItem(string stringID)
     {
-        int id = _itemIDMap.StringtoInt[stringID];
-        if (_itemDefinitions.ContainsKey(id))
+        if (_itemDefinitions.ContainsKey(stringID))
         {
-            return _itemDefinitions[id];
+            return _itemDefinitions[stringID];
         }
         return null;
     }
- 
-    public static int ConvertID(string stringID)
-    {
-        return _itemIDMap.StringtoInt[stringID];
-        //return -1?
-    }
-
-    public static string ConvertID(int id)
-    {
-        if (id == 0) return null;
-        return _itemIDMap.InttoString[id];
-    }
+  
 }
