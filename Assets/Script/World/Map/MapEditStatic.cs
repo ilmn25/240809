@@ -20,25 +20,25 @@ public class MapEditStatic : MonoBehaviour
 
         float breakCost;
         float breakThreshold;
-        string blockID;
+        string blockNameID;
         if (existingBlockData != default)
         {
             // Use existing breakCost and breakThreshold
             breakCost = existingBlockData.breakCost;
             breakThreshold = existingBlockData.breakThreshold;
-            blockID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
+            blockNameID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
         }
         else
         {
             // Check if the block is occupied
-            blockID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
-            if (blockID == null)
+            blockNameID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
+            if (blockNameID == null)
             {
                 return; // Block is not occupied or an error occurred
             }
 
             // Get the block value
-            BlockData targetBlockData = BlockStatic.GetBlock(blockID);
+            BlockData targetBlockData = BlockStatic.GetBlock(blockNameID);
             breakCost = targetBlockData.BreakCost;
             breakThreshold = targetBlockData.BreakThreshold;
             
@@ -55,8 +55,11 @@ public class MapEditStatic : MonoBehaviour
             // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
-                ItemLoadStatic.Instance.SpawnItem(ItemLoadStatic.GetEntityData(ItemLoadStatic.GetItemNameID(blockID), 
-                    Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f), EntityType.Item));
+                ItemLoadStatic.Instance.SpawnItem(ItemLoadStatic.GetEntityData(
+                    ItemLoadStatic.ConvertID(blockNameID)
+                    ,Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f)
+                    , EntityType.Item));
+                
                 WorldStatic.Instance.UpdateMap(chunkCoordinate, blockCoordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }

@@ -4,9 +4,9 @@ using UnityEngine;
 public class BlockStatic : MonoBehaviour
 {
     public static BlockStatic Instance { get; private set; }  
-    private static Dictionary<int, BlockData> _blockDefinitions;
-    private static IntStringMap<int, string> _blockIDMap;
-    private static int _nextBlockID;
+    private static Dictionary<int, BlockData> _blockDefinitions  = new Dictionary<int, BlockData>();
+    private static IntStringMap<int, string> _blockIDMap = new IntStringMap<int, string>();
+    private static int _nextBlockID = 1;
  
     
     public static Dictionary<int, Rect> _textureRectDictionary; // Dictionary to store the ID and corresponding Rect
@@ -21,9 +21,6 @@ public class BlockStatic : MonoBehaviour
         Instance = this;
         _shadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
         _meshMaterial = new(Resources.Load<Material>("shader/material/custom_lit"));
-        _blockDefinitions = new Dictionary<int, BlockData>();
-        _blockIDMap = new IntStringMap<int, string>();
-        _nextBlockID = 1;
 
         // Add block definitions
         AddBlockDefinition("brick", 1, 3, "Brick", "A block of brick");

@@ -65,9 +65,9 @@ public class PlayerInventoryStatic : MonoBehaviour
         ItemData itemData = GetItemAtKey();
         if (itemData != null )
         {
-            PlayerChunkEditStatic.Instance._blockID = itemData.Name; 
+            PlayerChunkEditStatic.Instance._blockNameID = itemData.StringID; 
         } else {
-            PlayerChunkEditStatic.Instance._blockID = null;
+            PlayerChunkEditStatic.Instance._blockNameID = null;
         }
     }
 
