@@ -4,6 +4,9 @@ using System.Collections.Generic;
 public class PlayerData
 {
     public List<KeyValuePair<int, ItemData>> inventory;
+    public int health;
+    public int sanity;
+    public int hunger;
 
     public PlayerData(List<KeyValuePair<int, ItemData>> itemList)
     {

@@ -28,19 +28,26 @@ public class ItemLoadStatic : MonoBehaviour
         _itemDefinitions[stringID] = itemData;
     }
     
-    public void SpawnItem(EntityData entityData)
-    { 
-        ItemData itemDataToSpawn = GetItem(entityData.ID);
-        GameObject itemObject = EntityPoolStatic.Instance.GetObject(entityData, "item");
-        itemObject.transform.position = entityData.Position.ToVector3(); 
+    public void SpawnItem(string blockNameID, Vector3 worldPosition)
+    {
+        EntityData entityData = GetEntityData(
+            blockNameID, Lib.AddToVector(worldPosition, 0.5f, 0.75f, 0.5f));
         
-        SpriteRenderer spriteRenderer = itemObject.GetComponent<SpriteRenderer>(); 
-        spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}"); 
+        GameObject gameObject = EntityPoolStatic.Instance.GetObject("item");
+        gameObject.transform.position = entityData.Position.ToVector3(); 
+        gameObject.GetComponent<SpriteRenderer>().sprite = 
+            Resources.Load<Sprite>($"texture/sprite/{GetItem(entityData.ID).Name}"); 
+        
+        EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
+        Vector3Int currentChunkCoordinate = WorldStatic.GetChunkCoordinate(gameObject.transform.position);
+        EntityLoadStatic._entityList[currentChunkCoordinate].Item2.Add(currentEntityHandler); 
+        currentEntityHandler.Initialize(entityData, currentChunkCoordinate);
+         
     }
 
-    public static EntityData GetEntityData(string stringID, Vector3 position, EntityType entityType)
+    public static EntityData GetEntityData(string stringID, Vector3 position)
     {
-        return new EntityData(stringID, new SerializableVector3(position), type: entityType);
+        return new EntityData(stringID, new SerializableVector3(position), type: EntityType.Item);
     } 
     
  

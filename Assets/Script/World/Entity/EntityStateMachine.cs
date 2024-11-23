@@ -4,15 +4,18 @@ using UnityEngine;
 
 public abstract class EntityStateMachine : MonoBehaviour
 {
-    private List<EntityState> states;
+    private List<EntityState> states = new List<EntityState>();
     private EntityState _entityState;
     private EntityState _entityStatePrevious;
 
-    protected void Initialize<T>(List<EntityState> states) where T : EntityState
+    protected void AddState(EntityState state, Boolean current = false)
     {
-        this.states = states;
-        this._entityState = GetState<T>();
-        _entityStatePrevious = this._entityState;
+        states.Add(state);
+        if (current)
+        {
+            _entityState = state;
+            _entityStatePrevious = state;
+        }
     }
 
     public void Update()
@@ -26,7 +29,8 @@ public abstract class EntityStateMachine : MonoBehaviour
         }
         _entityState.StateUpdate();
     }
-    
+
+    public abstract void OnEnable();
     protected abstract void LogicUpdate();
     public void SetState(EntityState entityState)
     {
