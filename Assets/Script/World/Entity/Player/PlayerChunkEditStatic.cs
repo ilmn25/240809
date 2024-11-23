@@ -43,7 +43,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
         { 
-            PlayerDataStatic.Instance.RemoveItem(_blockStringID); 
+            PlayerInventoryStatic.RemoveItem(_blockStringID); 
             ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
