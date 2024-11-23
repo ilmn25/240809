@@ -21,6 +21,7 @@ public class PlayerMovementStatic : MonoBehaviour
     private float _jumpGraceTimer;
     private float _coyoteTimer; 
     private float _deltaTime;  
+    private float _speedAdjust;
 
     [SerializeField] private float SPEED_WALK = 6.5f;
     [SerializeField] private float SPEED_RUN = 8f;
@@ -67,14 +68,7 @@ public class PlayerMovementStatic : MonoBehaviour
         _input.x = _rawInput.x * cosAngle - _rawInput.y * sinAngle;
         _input.y = _rawInput.x * sinAngle + _rawInput.y * cosAngle; 
     }
-
-    public void Update()
-    { 
-        HandleMovementUpdate();
-        PlayerAnimationStatic.Instance.HandleAnimationUpdate(); 
-    }
-    
-    float speedAdjust;
+  
     public void HandleMovementUpdate()
     {  
         
@@ -92,14 +86,14 @@ public class PlayerMovementStatic : MonoBehaviour
             _speedTarget = Input.GetKey(KeyCode.LeftShift) ? SPEED_RUN : SPEED_WALK;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
 
-            speedAdjust = 1f; 
+            _speedAdjust = 1f; 
             if (_rawInput.x != 0 && _rawInput.y != 0)
             {
-                speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
+                _speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
             }
 
-            _newPosition.x += _input.x * _speedCurrent * _deltaTime * speedAdjust;
-            _newPosition.z += _input.y * _speedCurrent * _deltaTime * speedAdjust;
+            _newPosition.x += _input.x * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.z += _input.y * _speedCurrent * _deltaTime * _speedAdjust;
 
             if (!IsMovable(_newPosition))
             {

@@ -14,7 +14,6 @@ public class MapLoadStatic : MonoBehaviour
          
 {
     public static MapLoadStatic Instance { get; private set; }  
-    private int _renderDistance; 
   
     
     public void Awake()
@@ -23,7 +22,6 @@ public class MapLoadStatic : MonoBehaviour
         WorldStatic.PlayerChunkTraverse += HandleChunkMapTraverse;
         _chunkSize = WorldStatic.CHUNKSIZE;
         _chunkDepth = WorldStatic.CHUNKDEPTH;
-        _renderDistance = WorldStatic.Instance.RENDER_DISTANCE;
 
         _tileSize = 16;
         _tilesPerRow = 12;
@@ -74,8 +72,8 @@ public class MapLoadStatic : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             traverseCheckPosition = kvp.Key;
-            if (traverseCheckPosition.x > WorldStatic._chunkPosition.x + _renderDistance * _chunkSize || traverseCheckPosition.x < WorldStatic._chunkPosition.x - _renderDistance * _chunkSize
-                || traverseCheckPosition.z > WorldStatic._chunkPosition.z + _renderDistance * _chunkSize || traverseCheckPosition.z < WorldStatic._chunkPosition.z - _renderDistance * _chunkSize)
+            if (traverseCheckPosition.x > WorldStatic._chunkPosition.x + WorldStatic.RENDER_DISTANCE * _chunkSize || traverseCheckPosition.x < WorldStatic._chunkPosition.x - WorldStatic.RENDER_DISTANCE * _chunkSize
+                || traverseCheckPosition.z > WorldStatic._chunkPosition.z + WorldStatic.RENDER_DISTANCE * _chunkSize || traverseCheckPosition.z < WorldStatic._chunkPosition.z - WorldStatic.RENDER_DISTANCE * _chunkSize)
             {
                 Destroy(kvp.Value);
                 destroyList.Add(kvp.Key);
@@ -90,9 +88,9 @@ public class MapLoadStatic : MonoBehaviour
         destroyList.Clear();
 
         // Collect chunk coordinates within render distance
-        for (int x = -_renderDistance; x <= _renderDistance; x++)
+        for (int x = -WorldStatic.RENDER_DISTANCE; x <= WorldStatic.RENDER_DISTANCE; x++)
         {
-            for (int z = -_renderDistance; z <= _renderDistance; z++)
+            for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
             {
                 Vector3Int traverseCheckPosition = new Vector3Int(
                     WorldStatic._chunkPosition.x + x * _chunkSize,

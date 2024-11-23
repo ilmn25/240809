@@ -1,17 +1,28 @@
+
 public class PlayerStateMachine : EntityStateMachine
 {
     void Awake()
     {
+        AddState(new PlayerActive(), true);
     }
 
     public override void OnEnable()
-    {
-        throw new System.NotImplementedException();
+    { 
     }
 
     protected override void LogicUpdate()
-    {
+    { 
+    }
+} 
+class PlayerActive : EntityState { 
+    public override void OnEnterState() {}
+    public override void StateUpdate() {
         PlayerMovementStatic.Instance.HandleMovementUpdate();
         PlayerAnimationStatic.Instance.HandleAnimationUpdate(); 
+        PlayerChunkEditStatic.Instance.HandleTerraformUpdate(); 
+        PlayerInteractStatic.Instance.HandleInteractionUpdate();
+        PlayerInventoryStatic.Instance.HandleInventoryUpdate();
     }
+    public override void OnExitState() {}
 }
+

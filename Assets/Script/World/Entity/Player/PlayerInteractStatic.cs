@@ -16,7 +16,7 @@ public class PlayerInteractStatic : MonoBehaviour
         _animator = transform.Find("sprite").GetComponent<Animator>();
     }
     
-    public void HandleInteraction()
+    public void HandleInteractionUpdate()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {   
