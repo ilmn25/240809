@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class EntityDataHandler : MonoBehaviour
+public class EntityHandler : MonoBehaviour
 {
     public EntityData _entityData;
-    private Vector3Int _position;
+    private Vector3Int _positionCurrent;
     private Vector3Int _positionPrevious;  
 
     public EntityData GetUpdatedEntity()
@@ -15,26 +15,28 @@ public class EntityDataHandler : MonoBehaviour
     void Start()
     {
         EntityLoadStatic.UpdateEntityListKey += UpdateEntityListKey;
+        
         _positionPrevious = WorldStatic.GetChunkCoordinate(transform.position);
         EntityLoadStatic._entityList[_positionPrevious].Item2.Add(this); 
     }
     
     void OnDestroy() {
         EntityLoadStatic.UpdateEntityListKey -= UpdateEntityListKey;
+        
         if (EntityLoadStatic._entityList.ContainsKey(_positionPrevious)) 
             EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this); // if picked up
     }
 
     public void UpdateEntityListKey()
     {
-        _position = WorldStatic.GetChunkCoordinate(transform.position);
-        if (_position != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_position))
+        _positionCurrent = WorldStatic.GetChunkCoordinate(transform.position);
+        if (_positionCurrent != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_positionCurrent))
         {
             // Remove self's EntityHandler from the old coordinate key
             EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this);
-            EntityLoadStatic._entityList[_position].Item2.Add(this);
+            EntityLoadStatic._entityList[_positionCurrent].Item2.Add(this);
 
-            _positionPrevious = _position;
+            _positionPrevious = _positionCurrent;
         }
     }
 } 

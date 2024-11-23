@@ -28,8 +28,8 @@ public class ItemLoadStatic : MonoBehaviour
         
         SpriteRenderer spriteRenderer = itemObject.GetComponent<SpriteRenderer>(); 
         spriteRenderer.sprite = Resources.Load<Sprite>($"texture/sprite/{itemDataToSpawn.Name}");
-        EntityDataHandler entityDataHandler = itemObject.GetComponent<EntityDataHandler>();
-        entityDataHandler._entityData = entityData;
+        EntityHandler entityHandler = itemObject.GetComponent<EntityHandler>();
+        entityHandler._entityData = entityData;
     }
 
     public static EntityData GetEntityData(int id, Vector3 position, EntityType entityType)
