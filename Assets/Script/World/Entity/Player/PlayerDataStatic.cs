@@ -35,32 +35,32 @@ public class PlayerDataStatic : MonoBehaviour
 
 
 
-    public void AddItem(int id, int quantity = 1)
+    public void AddItem(int numberID, int quantity = 1)
     {
-        var kvp = _playerInventory.Find(kvp => kvp.Value.ID == id);
+        var kvp = _playerInventory.Find(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
         if (kvp.Value != null)
         {
             kvp.Value.StackSize += quantity;
         }
         else
         {
-            ItemData newItemData = ItemLoadStatic.itemList.Find(item => item.ID == id);
+            ItemData newItemData = ItemLoadStatic.GetItem(numberID);
             if (newItemData != null)
             {
                 int slotID = GetSmallestAvailableSlotID();
                 _playerInventory.Add(new KeyValuePair<int, ItemData>(
                     slotID, // Assign smallest non-existing slot ID
                     new ItemData(
-                        newItemData.ID,
+                        newItemData.StringID,
                         newItemData.Name,
                         quantity,
                         newItemData.Rarity,
+                        newItemData.Description,
+                        newItemData.IsConsumable, 
+                        newItemData.CraftingMaterials,
                         newItemData.Damage,
                         newItemData.Knockback,
-                        newItemData.UseTime,
-                        newItemData.Description,
-                        newItemData.IsConsumable,
-                        newItemData.CraftingMaterials
+                        newItemData.UseTime
                     )
                 ));
             }
@@ -69,9 +69,9 @@ public class PlayerDataStatic : MonoBehaviour
     }
 
 
-    public void RemoveItem(int ID, int quantity = 1)
+    public void RemoveItem(int numberID, int quantity = 1)
     {
-        var kvp = _playerInventory.Find(kvp => kvp.Value.ID == ID);
+        var kvp = _playerInventory.Find(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
         if (kvp.Value != null)
         {
             kvp.Value.StackSize -= quantity;
@@ -97,9 +97,9 @@ public class PlayerDataStatic : MonoBehaviour
         return slotID;
     } 
 
-    public bool HasItem(int ID)
+    public bool HasItem(int numberID)
     {
-        return _playerInventory.Exists(kvp => kvp.Value.ID == ID);
+        return _playerInventory.Exists(kvp => kvp.Value.StringID == ItemLoadStatic.ConvertID(numberID));
     }
 
 

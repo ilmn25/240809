@@ -1,7 +1,7 @@
 [System.Serializable]
 public class ItemData
 {
-    public int ID { get; set; }
+    public string StringID { get; set; }
     public string Name { get; set; }
     public int StackSize { get; set; }
     public string Rarity { get; set; }
@@ -12,9 +12,9 @@ public class ItemData
     public bool IsConsumable { get; set; }
     public string[] CraftingMaterials { get; set; }
 
-    public ItemData(int id, string name, int stackSize, string rarity, int damage, float knockback, int useTime, string description, bool isConsumable, string[] craftingMaterials)
+    public ItemData(string stringID, string name, int stackSize, string rarity, string description, bool isConsumable, string[] craftingMaterials, int damage, float knockback, int useTime )
     {
-        ID = id;
+        StringID = stringID;
         Name = name;
         StackSize = stackSize;
         Rarity = rarity;

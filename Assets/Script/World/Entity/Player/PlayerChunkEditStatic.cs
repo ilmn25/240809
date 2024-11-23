@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 
 public class PlayerChunkEditStatic : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     private Vector3Int _blockCoordinate;
     private int _chunkSize;
     private int _chunkDepth; 
-    [HideInInspector] public string _blockID; 
+    [FormerlySerializedAs("_blockID")] [HideInInspector] public string _blockNameID; 
 
     public int RANGE = 4; 
     public int BLOCKOVERLAYSPEED = 10; 
@@ -40,10 +41,10 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 AudioStatic.PlaySFX(SOUNDDIG);
             }   
         }
-        else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockID)) //place
+        else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockNameID)) //place
         { 
-            PlayerDataStatic.Instance.RemoveItem(ItemLoadStatic.GetItemNameID(_blockID)); 
-            ReplaceBlock(BlockStatic.ConvertID(_blockID));
+            PlayerDataStatic.Instance.RemoveItem(ItemLoadStatic.ConvertID(_blockNameID)); 
+            ReplaceBlock(BlockStatic.ConvertID(_blockNameID));
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
         {  
@@ -75,16 +76,16 @@ public class PlayerChunkEditStatic : MonoBehaviour
 
     void FixedUpdate()
     {    
-        if (_blockID != null)
+        if (_blockNameID != null)
         {        
             if (_block == null) 
             {
-                _block = BlockPreviewStatic.Instance.CreateBlock(_blockID);
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockNameID);
             }
-            else if (_block.name != _blockID)
+            else if (_block.name != _blockNameID)
             {
                 BlockPreviewStatic.Instance.DeleteBlock();
-                _block = BlockPreviewStatic.Instance.CreateBlock(_blockID);
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockNameID);
             }
             
             HandleBlockPosition();  
