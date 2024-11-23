@@ -48,7 +48,7 @@ public class EntityHandler : MonoBehaviour
                 _positionPrevious = _positionCurrent;
             }
         }
-        catch (Exception e)
+        catch 
         {
             Lib.Log(_entityData.ID, _entityData.Position, isActiveAndEnabled);
         }

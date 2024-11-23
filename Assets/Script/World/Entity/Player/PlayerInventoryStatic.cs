@@ -18,7 +18,7 @@ public class PlayerInventoryStatic : MonoBehaviour
         Instance = this;
     }
 
-    void Update()
+    public void HandleInventoryUpdate()
     {
         HandleInput();  
         HandleSlot();

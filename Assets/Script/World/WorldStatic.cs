@@ -15,11 +15,10 @@ public class WorldStatic : MonoBehaviour
     
     public static Dictionary<int, List<ChunkData>> _loadedChunks;  
 
-    Dictionary<Vector3Int, ChunkData> _chunkCache = new Dictionary<Vector3Int, ChunkData>(); 
+    private Dictionary<Vector3Int, ChunkData> _chunkCache = new Dictionary<Vector3Int, ChunkData>(); 
     private int MAX_CACHE_SIZE = 20;
 
-    private GameObject _player; 
-    private BinaryFormatter _bf = new BinaryFormatter(); 
+    private static BinaryFormatter _bf = new BinaryFormatter(); 
     public static event Action PlayerChunkTraverse;
 
     [HideInInspector] 
@@ -35,8 +34,8 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int CHUNKDEPTH = 35;
 
-    public int RENDER_DISTANCE = 4; 
-    public bool ALWAYS_REGENERATE = false;
+    public static int RENDER_DISTANCE = 4; 
+    public static bool ALWAYS_REGENERATE = false;
 
     private void Awake()
     {
@@ -46,24 +45,16 @@ public class WorldStatic : MonoBehaviour
     void Start()
     {
         Instance = this;
-        _player = GameObject.Find("player");  
         _loadedChunks = new Dictionary<int, List<ChunkData>>(); 
-
-        //TODO 
-        string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-        string filePath = $"{downloadsPath}\\chunks_{0}.dat";
-        if (!File.Exists(filePath) || ALWAYS_REGENERATE)
-        {
-            GenerateRandomMapSave(); 
-        }
-        _chunkPositionPrevious = GetChunkCoordinate(_player.transform.position);
-        
+ 
+        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) GenerateRandomMapSave(); 
+        _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position);
     }
           
 
     async void FixedUpdate()
     {
-        _chunkPosition = GetChunkCoordinate(_player.transform.position);
+        _chunkPosition = GetChunkCoordinate(Game.Player.transform.position);
         if (_chunkPosition != _chunkPositionPrevious)
         {  
             PlayerChunkTraverse?.Invoke();
@@ -92,25 +83,25 @@ public class WorldStatic : MonoBehaviour
     {
         EntityLoadStatic.Instance.HandleSave();
         await Task.Delay(10);
-        string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-        string filePath = $"{downloadsPath}\\chunks_{yLevel}.dat"; 
         
-        using (FileStream file = File.Create(filePath))
+        using (FileStream file = File.Create(getFilePath(yLevel)))
         {
             _bf.Serialize(file, chunks);
         }
     }
 
+    private string getFilePath(int yLevel)
+    {
+        return $"{Game.DOWNLOAD_PATH}\\chunks_{yLevel}.dat";
+    }
     
     public void HandleLoadWorldFile(int yLevel)
     { 
         if (!_loadedChunks.ContainsKey(yLevel))
         {
-            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-            string filePath = $"{downloadsPath}\\chunks_{yLevel}.dat";
-            if (File.Exists(filePath))
+            if (File.Exists(getFilePath(yLevel)))
             { 
-                FileStream file = File.Open(filePath, FileMode.Open);
+                FileStream file = File.Open(getFilePath(yLevel), FileMode.Open);
 
                 List<ChunkData> chunks = (List<ChunkData>)_bf.Deserialize(file);
                 file.Close();

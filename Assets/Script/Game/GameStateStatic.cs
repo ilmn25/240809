@@ -39,7 +39,6 @@ public class GameStateStatic : MonoBehaviour
                 // DialogueSystem.Instance.HandleUpdate(); 
                 break;
             case GameState.FreeRoam:
-                PlayerInteractStatic.Instance.HandleInteraction();
                 break;
         }
     }

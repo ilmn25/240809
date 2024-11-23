@@ -30,7 +30,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         _chunkDepth = WorldStatic.CHUNKDEPTH; 
     }
 
-    void Update()
+    public void HandleTerraformUpdate()
     {
         if (Input.GetMouseButtonDown(0)) //break
         {  
