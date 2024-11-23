@@ -14,18 +14,18 @@ public class EntityDataHandler : MonoBehaviour
      
     void Start()
     {
-        EntityLoadStatic.UpdateEntityParent += HandleUpdateParent;
+        EntityLoadStatic.UpdateEntityListKey += UpdateEntityListKey;
         _positionPrevious = WorldStatic.GetChunkCoordinate(transform.position);
         EntityLoadStatic._entityList[_positionPrevious].Item2.Add(this); 
     }
     
     void OnDestroy() {
-        EntityLoadStatic.UpdateEntityParent -= HandleUpdateParent;
+        EntityLoadStatic.UpdateEntityListKey -= UpdateEntityListKey;
         if (EntityLoadStatic._entityList.ContainsKey(_positionPrevious)) 
             EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this); // if picked up
     }
 
-    public void HandleUpdateParent()
+    public void UpdateEntityListKey()
     {
         _position = WorldStatic.GetChunkCoordinate(transform.position);
         if (_position != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_position))
