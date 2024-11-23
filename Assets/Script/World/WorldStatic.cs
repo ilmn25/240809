@@ -32,7 +32,7 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int CHUNKSIZE = 10; 
     [HideInInspector] 
-    public static int CHUNKDEPTH = 35;
+    public static int CHUNKDEPTH = 25;
 
     public static int RENDER_DISTANCE = 4; 
     public static bool ALWAYS_REGENERATE = false;
@@ -234,11 +234,12 @@ public class WorldStatic : MonoBehaviour
         );
     }
 
-    public void SetBoolInMap(Vector3Int _worldPosition, bool value)
-    { 
-        _boolGrid[_worldPosition.x - _boolGridOrigin.x, 
-            _worldPosition.y, 
-            _worldPosition.z - _boolGridOrigin.z] = value;
+    public void SetBoolInMap(Vector3Int worldPosition, bool value)
+    {
+        if (worldPosition.y >= CHUNKDEPTH) return;
+        _boolGrid[worldPosition.x - _boolGridOrigin.x, 
+            worldPosition.y, 
+            worldPosition.z - _boolGridOrigin.z] = value;
     }
 
     public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)
