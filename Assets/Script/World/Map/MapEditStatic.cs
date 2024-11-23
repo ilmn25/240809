@@ -56,7 +56,7 @@ public class MapEditStatic : MonoBehaviour
             if (breakCost <= 0)
             {
                 ItemLoadStatic.Instance.SpawnItem(ItemLoadStatic.GetEntityData(
-                    ItemLoadStatic.ConvertID(blockNameID)
+                    blockNameID
                     ,Lib.AddToVector(worldPosition, 0.5f, 0.7f, 0.5f)
                     , EntityType.Item));
                 

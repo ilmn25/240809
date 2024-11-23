@@ -65,9 +65,9 @@ public class PlayerInventoryStatic : MonoBehaviour
         ItemData itemData = GetItemAtKey();
         if (itemData != null )
         {
-            PlayerChunkEditStatic.Instance._blockNameID = itemData.StringID; 
+            PlayerChunkEditStatic.Instance._blockStringID = itemData.StringID; 
         } else {
-            PlayerChunkEditStatic.Instance._blockNameID = null;
+            PlayerChunkEditStatic.Instance._blockStringID = null;
         }
     }
 
@@ -88,13 +88,16 @@ public class PlayerInventoryStatic : MonoBehaviour
         }
         return row * INVENTORY_SLOT_AMOUNT + slot;
     }
-
+    
     public ItemData GetItemAtKey(int key = -1)
     {
         int target_key = key == -1 ? CalculateKey() : key;
-    
-        var kvp = PlayerDataStatic.Instance._playerInventory.Find(kvp => kvp.Key == target_key);
-        return kvp.Value;
+
+        if (PlayerDataStatic.Instance._playerInventory.TryGetValue(target_key, out ItemData itemData))
+        {
+            return itemData;
+        }
+        return null;
     }
 
 
@@ -110,20 +113,18 @@ public class PlayerInventoryStatic : MonoBehaviour
 
 
 
-
-    //! DEBUG TOOLS
     private void DebugPrintCurrentSlot()
     {
         int key = CalculateKey(_currentRow, _currentSlot);
 
-        var kvp = PlayerDataStatic.Instance._playerInventory.Find(kvp => kvp.Key == key);
-        if (kvp.Value != null)
+        if (PlayerDataStatic.Instance._playerInventory.TryGetValue(key, out ItemData itemData))
         {
-            Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {kvp.Value.Name} x{kvp.Value.StackSize}");
+            Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {itemData.Name} x{itemData.StackSize}");
         }
         else
         {
             Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nNo item");
         }
     }
+
 }

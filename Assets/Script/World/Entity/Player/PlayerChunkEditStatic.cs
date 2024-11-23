@@ -17,7 +17,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     private Vector3Int _blockCoordinate;
     private int _chunkSize;
     private int _chunkDepth; 
-    [FormerlySerializedAs("_blockID")] [HideInInspector] public string _blockNameID; 
+    [FormerlySerializedAs("_blockNameID")] [FormerlySerializedAs("_blockID")] [HideInInspector] public string _blockStringID; 
 
     public int RANGE = 4; 
     public int BLOCKOVERLAYSPEED = 10; 
@@ -41,10 +41,10 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 AudioStatic.PlaySFX(SOUNDDIG);
             }   
         }
-        else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockNameID)) //place
+        else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
         { 
-            PlayerDataStatic.Instance.RemoveItem(ItemLoadStatic.ConvertID(_blockNameID)); 
-            ReplaceBlock(BlockStatic.ConvertID(_blockNameID));
+            PlayerDataStatic.Instance.RemoveItem(_blockStringID); 
+            ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
         }
         else if (Input.GetKeyDown(KeyCode.X)) //break top
         {  
@@ -76,16 +76,16 @@ public class PlayerChunkEditStatic : MonoBehaviour
 
     void FixedUpdate()
     {    
-        if (_blockNameID != null)
+        if (_blockStringID != null)
         {        
             if (_block == null) 
             {
-                _block = BlockPreviewStatic.Instance.CreateBlock(_blockNameID);
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockStringID);
             }
-            else if (_block.name != _blockNameID)
+            else if (_block.name != _blockStringID)
             {
                 BlockPreviewStatic.Instance.DeleteBlock();
-                _block = BlockPreviewStatic.Instance.CreateBlock(_blockNameID);
+                _block = BlockPreviewStatic.Instance.CreateBlock(_blockStringID);
             }
             
             HandleBlockPosition();  
