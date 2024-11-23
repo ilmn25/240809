@@ -45,7 +45,7 @@ public class ItemPhysicInst : MonoBehaviour
         } 
         else 
         {
-            // HandlePhysics();s
+            // HandlePhysics();
         }
     }
 

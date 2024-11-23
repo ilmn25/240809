@@ -1,8 +1,12 @@
+using System;
 using TMPro;
 using UnityEngine;
  
 public class Game : MonoBehaviour
 {
+    public static string DOWNLOAD_PATH;
+    public static string PLAYER_SAVE_PATH; 
+    
     public static GameObject UserSystem;
     public static GameObject Player;
     public static GameObject ViewportSystem;
@@ -19,6 +23,9 @@ public class Game : MonoBehaviour
 
     void Awake()
     {
+        DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
+        PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";
+        
         MeshMaterial = Resources.Load<Material>("shader/material/custom_lit");
         SpriteMaterial = Resources.Load<Material>("shader/material/custom_lit");
         

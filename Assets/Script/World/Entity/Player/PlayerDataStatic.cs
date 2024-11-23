@@ -98,11 +98,8 @@ public class PlayerDataStatic : MonoBehaviour
 
     //! SAVE LOAD
     private void SavePlayerData()
-    {
-        string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-        string filePath = $"{downloadsPath}\\PlayerData.dat"; 
-        
-        using (FileStream file = File.Create(filePath))
+    { 
+        using (FileStream file = File.Create(Game.PLAYER_SAVE_PATH))
         {
             _binaryFormatter.Serialize(file, _playerInventory);
         }
@@ -110,11 +107,9 @@ public class PlayerDataStatic : MonoBehaviour
 
     private void LoadPlayerData()
     {
-        string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-        string filePath = $"{downloadsPath}\\PlayerData.dat";
-        if (File.Exists(filePath))
+        if (File.Exists(Game.PLAYER_SAVE_PATH))
         {
-            using (FileStream file = File.Open(filePath, FileMode.Open))
+            using (FileStream file = File.Open(Game.PLAYER_SAVE_PATH, FileMode.Open))
             {
                 _playerInventory = (Dictionary<int, ItemData>)_binaryFormatter.Deserialize(file);
             }

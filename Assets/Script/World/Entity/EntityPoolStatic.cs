@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class EntityPoolStatic : MonoBehaviour
 {
@@ -12,26 +13,20 @@ public class EntityPoolStatic : MonoBehaviour
     }
  
     
-    public GameObject GetObject(EntityData entity, string prefabName = null)
+    public GameObject GetObject(string prefabName)
     {
         GameObject obj;
-        EntityHandler entityHandler;
-        if (prefabName == null) prefabName = entity.ID;
          
         if (_pools.ContainsKey(prefabName) && _pools[prefabName].Count > 0)
         {
             obj = _pools[prefabName].Dequeue();
-            entityHandler = obj.AddComponent<EntityHandler>();
-            entityHandler._entityData = entity;
             obj.SetActive(true);
         }
         else
         {
             obj = Instantiate(Resources.Load<GameObject>($"prefab/{prefabName}"));
-            obj.transform.parent = transform;
             obj.name = prefabName;
-            entityHandler = obj.AddComponent<EntityHandler>();
-            entityHandler._entityData = entity;
+            obj.AddComponent<EntityHandler>();
         } 
 
         return obj;
@@ -39,7 +34,6 @@ public class EntityPoolStatic : MonoBehaviour
 
     public void ReturnObject(GameObject obj)
     {
-        Destroy(obj.GetComponent<EntityHandler>());
         string prefabName = obj.name;
         obj.SetActive(false);
 

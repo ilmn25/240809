@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EntityLoadStatic : MonoBehaviour
@@ -95,38 +96,47 @@ public class EntityLoadStatic : MonoBehaviour
 
         foreach (EntityHandler entityHandler in _entityList[key].Item2)
         { 
-            _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity()); 
+            _entityList[key].Item1.Add(entityHandler.GetEntityData()); 
             EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }
 
     public void LoadChunkEntities()
     {  
+        
         // Find the key once
         if (!_entityList.ContainsKey(_currentChunkCoordinate))
         {
             _entityList[_currentChunkCoordinate] = (_chunkEntityList, new List<EntityHandler>());
         }
 
-        foreach (EntityData entity in _chunkEntityList)
+        foreach (EntityData entityData in _chunkEntityList)
         { 
-            switch (entity.Type)
+            switch (entityData.Type)
             {
-                case EntityType.Item:
-                    entity.Position = new SerializableVector3(Lib.CombineVector(_currentChunkCoordinate, entity.Position.ToVector3()));
-                    ItemLoadStatic.Instance.SpawnItem(entity);
+                case EntityType.Item: 
+                    _currentInstance = EntityPoolStatic.Instance.GetObject("item");
+                    entityData.Position = new SerializableVector3(Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3()));
+                    _currentInstance.transform.position = entityData.Position.ToVector3(); 
+        
+                    _currentInstance.GetComponent<SpriteRenderer>().sprite = 
+                        Resources.Load<Sprite>($"texture/sprite/{entityData.ID}"); 
                     break;
 
                 case EntityType.Static:
-                    _currentInstance = EntityPoolStatic.Instance.GetObject(entity);
-                    _currentInstance.transform.position = Lib.CombineVector(_currentChunkCoordinate, entity.Position.ToVector3());
+                    _currentInstance = EntityPoolStatic.Instance.GetObject(entityData.ID);
+                    _currentInstance.transform.position = Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3());
                     break;
 
                 case EntityType.Rigid:
-                    _currentInstance = EntityPoolStatic.Instance.GetObject(entity);
-                    _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(_currentChunkCoordinate, entity.Position.ToVector3()), 0, 0.5f, 0);
+                    _currentInstance = EntityPoolStatic.Instance.GetObject(entityData.ID);
+                    _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3()), 0, 0.5f, 0);
                     break;
             }
+            
+            _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();
+            _entityList[_currentChunkCoordinate].Item2.Add(_currentEntityHandler); 
+            _currentEntityHandler.Initialize(entityData, _currentChunkCoordinate);
         }
     } 
 }

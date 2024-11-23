@@ -17,30 +17,31 @@ public class NPCStateMachine : EntityStateMachine
         _npcPathFindInst = GetComponent<NPCPathFindInst>();
         _npcAnimationInst = GetComponent<NPCAnimationInst>();
         
-        states = new List<EntityState>();
-        states.Add(new NPCIdle(_npcMovementInst, _npcAnimationInst));
-        states.Add(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
+        AddState(new NPCIdle(_npcMovementInst, _npcAnimationInst), true);
+        AddState(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
         DialogueData _dialogueData = new DialogueData();
         _dialogueData.Lines.Add("I'M DELETING YOU, BROTHER!");
         _dialogueData.Lines.Add("\u2588\u2588]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] 10% complete.....");
         _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]]]]]]]]]]] 35% complete....");
         _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]] 60% complete....");
         _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 99% complete.....");
-        states.Add(new CharTalk(this, _dialogueData));
-        
-        Initialize<NPCIdle>(states);    
+        AddState(new CharTalk(this, _dialogueData));
     }
 
+    public override void OnEnable()
+    {
+        SetState<NPCIdle>();
+    }
     protected override void LogicUpdate()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            SetState(GetState<NPCChase>());
+            SetState<NPCChase>();
         }
     }
 
     public void interact()
     {
-        SetState(GetState<CharTalk>());
+        SetState<CharTalk>();
     }
 } 
