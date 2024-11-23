@@ -36,7 +36,7 @@ public class ItemPhysicInst : MonoBehaviour
         
         if (playerDistance <= PICKUP_RANGE)
         {
-            PlayerDataStatic.Instance.AddItem(transform.GetComponent<EntityHandler>()._entityData.ID, 1);
+            PlayerInventoryStatic.AddItem(transform.GetComponent<EntityHandler>()._entityData.ID, 1);
             EntityPoolStatic.Instance.ReturnObject(gameObject);
         }
         else if (transform.position.y < -5) 

@@ -8,11 +8,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class PlayerDataStatic : MonoBehaviour
 { 
     public static PlayerDataStatic Instance { get; private set; }  
-    public PlayerData _playerData;
-    public Dictionary<int, ItemData> _playerInventory;
-    private BinaryFormatter _binaryFormatter = new BinaryFormatter();
+    public static PlayerData _playerData;
+    public static Dictionary<int, ItemData> _playerInventory;
+    private static BinaryFormatter _binaryFormatter = new BinaryFormatter();
 
-    void Start()
+    private void Start()
     {
         Instance = this;
         LoadPlayerData();
@@ -20,84 +20,13 @@ public class PlayerDataStatic : MonoBehaviour
         // AddItem("exampleID", 1000);
     }
 
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         SavePlayerData();
     }
+ 
 
-    public void AddItem(string stringID, int quantity = 1)
-    {
-        foreach (var kvp in _playerInventory)
-        {
-            if (kvp.Value.StringID == stringID)
-            {
-                kvp.Value.StackSize += quantity;
-                return;
-            }
-        }
-
-        ItemData newItemData = ItemLoadStatic.GetItem(stringID);
-        if (newItemData != null)
-        {
-            int slotID = GetSmallestAvailableSlotID();
-            _playerInventory[slotID] = new ItemData(
-                newItemData.StringID,
-                newItemData.Name,
-                quantity,
-                newItemData.Rarity,
-                newItemData.Description,
-                newItemData.IsConsumable,
-                newItemData.CraftingMaterials,
-                newItemData.Damage,
-                newItemData.Knockback,
-                newItemData.UseTime
-            );
-        }
-        // PrintPlayerData();
-    }
-
-    public void RemoveItem(string stringID, int quantity = 1)
-    {
-        foreach (var kvp in _playerInventory)
-        {
-            if (kvp.Value.StringID == stringID)
-            {
-                kvp.Value.StackSize -= quantity;
-                if (kvp.Value.StackSize <= 0)
-                {
-                    _playerInventory.Remove(kvp.Key);
-                }
-                SavePlayerData();
-                return;
-            }
-        }
-    }
-
-    //! UTILITY
-    private int GetSmallestAvailableSlotID()
-    {
-        int slotID = 0;
-        while (_playerInventory.ContainsKey(slotID))
-        {
-            slotID++;
-        }
-        return slotID;
-    } 
-
-    public bool HasItem(string stringID)
-    {
-        foreach (var kvp in _playerInventory)
-        {
-            if (kvp.Value.StringID == stringID)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //! SAVE LOAD
-    private void SavePlayerData()
+    public static void SavePlayerData()
     { 
         using (FileStream file = File.Create(Game.PLAYER_SAVE_PATH))
         {
@@ -105,7 +34,7 @@ public class PlayerDataStatic : MonoBehaviour
         }
     }
 
-    private void LoadPlayerData()
+    public static void LoadPlayerData()
     {
         if (File.Exists(Game.PLAYER_SAVE_PATH))
         {
@@ -121,8 +50,7 @@ public class PlayerDataStatic : MonoBehaviour
         }
     }
 
-    //! DEBUG TOOLS
-    public void PrintPlayerData()
+    public static void PrintPlayerData()
     {
         foreach (var kvp in _playerInventory)
         {

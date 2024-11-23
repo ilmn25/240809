@@ -7,11 +7,11 @@ public class PlayerInventoryStatic : MonoBehaviour
     public static PlayerInventoryStatic Instance { get; private set; }  
     
 
-    private int _currentRow = 0;
-    private int _currentSlot = 0;
+    private static int _currentRow = 0;
+    private static int _currentSlot = 0;
 
-    public int INVENTORY_ROW_AMOUNT = 3; // Example value
-    public int INVENTORY_SLOT_AMOUNT = 12; // Example value
+    public static int INVENTORY_ROW_AMOUNT = 3; // Example value
+    public static int INVENTORY_SLOT_AMOUNT = 12; // Example value
 
     void Start()
     {
@@ -35,7 +35,7 @@ public class PlayerInventoryStatic : MonoBehaviour
 
 
 
-    private void HandleInput()
+    private static void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
@@ -60,7 +60,7 @@ public class PlayerInventoryStatic : MonoBehaviour
         }
     }
 
-    private void HandleSlot()
+    private static void HandleSlot()
     { 
         ItemData itemData = GetItemAtKey();
         if (itemData != null )
@@ -80,7 +80,7 @@ public class PlayerInventoryStatic : MonoBehaviour
 
 
     //! UTILITY
-    private int CalculateKey(int row = -1, int slot = -1)
+    private static int CalculateKey(int row = -1, int slot = -1)
     {
         if (row == -1)
         {
@@ -89,15 +89,87 @@ public class PlayerInventoryStatic : MonoBehaviour
         return row * INVENTORY_SLOT_AMOUNT + slot;
     }
     
-    public ItemData GetItemAtKey(int key = -1)
+    public static ItemData GetItemAtKey(int key = -1)
     {
         int target_key = key == -1 ? CalculateKey() : key;
 
-        if (PlayerDataStatic.Instance._playerInventory.TryGetValue(target_key, out ItemData itemData))
+        if (PlayerDataStatic._playerInventory.TryGetValue(target_key, out ItemData itemData))
         {
             return itemData;
         }
         return null;
+    }
+
+
+    public static void AddItem(string stringID, int quantity = 1)
+    {
+        foreach (var slot in PlayerDataStatic._playerInventory)
+        {
+            if (slot.Value.StringID == stringID)
+            {
+                slot.Value.StackSize += quantity;
+                return;
+            }
+        }
+
+        ItemData newItemData = ItemLoadStatic.GetItem(stringID);
+        if (newItemData != null)
+        {
+            int slotID = GetSmallestAvailableSlotID();
+            PlayerDataStatic._playerInventory[slotID] = new ItemData(
+                newItemData.StringID,
+                newItemData.Name,
+                quantity,
+                newItemData.Rarity,
+                newItemData.Description,
+                newItemData.IsConsumable,
+                newItemData.CraftingMaterials,
+                newItemData.Damage,
+                newItemData.Knockback,
+                newItemData.UseTime
+            );
+        }
+        // PrintPlayerData();
+    }
+
+    public static void RemoveItem(string stringID, int quantity = 1)
+    {
+        foreach (var kvp in PlayerDataStatic._playerInventory)
+        {
+            if (kvp.Value.StringID == stringID)
+            {
+                kvp.Value.StackSize -= quantity;
+                if (kvp.Value.StackSize <= 0)
+                {
+                    PlayerDataStatic._playerInventory.Remove(kvp.Key);
+                }
+                PlayerDataStatic.SavePlayerData();
+                return;
+            }
+        }
+    }
+
+    //! UTILITY
+    private static int GetSmallestAvailableSlotID()
+    {
+        int slotID = 0;
+        while (PlayerDataStatic._playerInventory.ContainsKey(slotID))
+        {
+            slotID++;
+        }
+        return slotID;
+    } 
+
+    public static bool HasItem(string stringID)
+    {
+        foreach (var kvp in PlayerDataStatic._playerInventory)
+        {
+            if (kvp.Value.StringID == stringID)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -111,13 +183,11 @@ public class PlayerInventoryStatic : MonoBehaviour
 
 
 
-
-
-    private void DebugPrintCurrentSlot()
+    private static void DebugPrintCurrentSlot()
     {
         int key = CalculateKey(_currentRow, _currentSlot);
 
-        if (PlayerDataStatic.Instance._playerInventory.TryGetValue(key, out ItemData itemData))
+        if (PlayerDataStatic._playerInventory.TryGetValue(key, out ItemData itemData))
         {
             Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {itemData.Name} x{itemData.StackSize}");
         }
