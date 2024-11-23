@@ -6,6 +6,7 @@ public class Game : MonoBehaviour
 {
     public static string DOWNLOAD_PATH;
     public static string PLAYER_SAVE_PATH; 
+    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit"; 
     
     public static GameObject UserSystem;
     public static GameObject Player;
@@ -18,16 +19,12 @@ public class Game : MonoBehaviour
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
     
-    public static Material MeshMaterial;
-    public static Material SpriteMaterial;
 
     void Awake()
     {
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";
         
-        MeshMaterial = Resources.Load<Material>("shader/material/custom_lit");
-        SpriteMaterial = Resources.Load<Material>("shader/material/custom_lit");
         
         UserSystem = GameObject.Find("game_system");
         Player = GameObject.Find("player");

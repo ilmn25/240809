@@ -25,3 +25,4 @@ public enum EntityType
     Static,
     Rigid
 }
+    

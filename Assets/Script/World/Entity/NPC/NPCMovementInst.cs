@@ -194,7 +194,8 @@ public class NPCMovementInst : MonoBehaviour
         
         if (_direction != Vector3.zero && _previousPosition == transform.position)
         {
-            transform.position = Lib.AddToVector(transform.position, 0, 0.2f, 0); 
+            Vector3 tempPosition = Lib.AddToVector(transform.position, 0, 0.1f, 0);
+            if (IsMovable(tempPosition)) transform.position = tempPosition;
         }
         _previousPosition = transform.position;
     }
