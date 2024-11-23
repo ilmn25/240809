@@ -12,14 +12,14 @@ public class CharTalk : EntityState {
  
     public void OnEndDialogue()
     {
-        _esm.SetState(_esm.GetState<NPCChase>());
+        _esm.SetState<NPCChase>();
     }
     
     public override void OnEnterState() {
         if (!Game.DialogueBox.activeSelf) 
             GUIDialogueStatic.Instance.PlayDialogue(this);  
         else 
-            _esm.SetState(_esm.GetState<NPCChase>());
+            _esm.SetState<NPCChase>();
     }
 
     public override void StateUpdate() {}

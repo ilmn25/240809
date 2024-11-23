@@ -30,7 +30,12 @@ public abstract class EntityStateMachine : MonoBehaviour
     protected abstract void LogicUpdate();
     public void SetState(EntityState entityState)
     {
-        this._entityState = entityState;
+        _entityState = entityState;
+    }
+
+    public void SetState<T>() where T : EntityState
+    {
+        _entityState = GetState<T>();
     }
     
     public T GetState<T>() where T : EntityState
