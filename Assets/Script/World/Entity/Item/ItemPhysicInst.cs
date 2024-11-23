@@ -36,12 +36,12 @@ public class ItemPhysicInst : MonoBehaviour
         
         if (playerDistance <= PICKUP_RANGE)
         {
-            PlayerDataStatic.Instance.AddItem(int.Parse(transform.name), 1);
-            Destroy(gameObject);
+            PlayerDataStatic.Instance.AddItem(int.Parse(transform.GetComponent<EntityHandler>()._entityData.ID), 1);
+            EntityPoolStatic.Instance.ReturnObject(gameObject);
         }
         else if (transform.position.y < -5) 
-        {
-            Destroy(gameObject);
+        {            
+            EntityPoolStatic.Instance.ReturnObject(gameObject);
         } 
         else 
         {

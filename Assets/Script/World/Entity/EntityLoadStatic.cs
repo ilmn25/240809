@@ -95,8 +95,8 @@ public class EntityLoadStatic : MonoBehaviour
 
         foreach (EntityHandler entityHandler in _entityList[key].Item2)
         { 
-            _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity());
-            Destroy(entityHandler.gameObject);  
+            _entityList[key].Item1.Add(entityHandler.GetUpdatedEntity()); 
+            EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }
 
@@ -118,23 +118,15 @@ public class EntityLoadStatic : MonoBehaviour
                     break;
 
                 case EntityType.Static:
-                    InstantiatePrefab(entity);
+                    _currentInstance = EntityPoolStatic.Instance.GetObject(entity);
                     _currentInstance.transform.position = Lib.CombineVector(_currentChunkCoordinate, entity.Position.ToVector3());
                     break;
 
                 case EntityType.Rigid:
-                    InstantiatePrefab(entity);
+                    _currentInstance = EntityPoolStatic.Instance.GetObject(entity);
                     _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(_currentChunkCoordinate, entity.Position.ToVector3()), 0, 0.5f, 0);
                     break;
             }
-        }
-
-        void InstantiatePrefab(EntityData entity)
-        {
-            _currentInstance = Instantiate(Resources.Load<GameObject>($"prefab/{entity.ID}"));
-            _currentEntityHandler = _currentInstance.AddComponent<EntityHandler>();
-            _currentEntityHandler._entityData = entity;
-            _currentInstance.transform.parent = transform;
         }
     } 
 }
