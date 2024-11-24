@@ -15,3 +15,7 @@ public abstract class EntityState
     public virtual void OnExitState() {}
 }
  
+
+class Idle : EntityState
+{
+}
