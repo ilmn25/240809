@@ -33,7 +33,7 @@ public class PlayerInteractStatic : MonoBehaviour
                     if (NPCStateMachine != null)
                     {
                         NPCStateMachine.interact();
-                        break;
+                        break;  
                     }
                 }
             }

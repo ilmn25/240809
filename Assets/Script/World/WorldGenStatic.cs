@@ -161,7 +161,7 @@ public class WorldGenStatic : MonoBehaviour
                                     entityData = new EntityData("slab", entityPosition, new SerializableVector3Int(0, 0, 0));
                                     chunkData.Entity.Add(entityData);
                                 }
-                                else if (random.NextDouble() <= 0.003)
+                                else if (random.NextDouble() <= 0.006)
                                 {
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 2f, z +0.5f);
                                     if (random.NextDouble() <= 0.5)

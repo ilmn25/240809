@@ -1,7 +1,7 @@
 
 public class PlayerStateMachine : EntityStateMachine
 {
-    void Awake()
+    protected override void OnAwake()
     {
         AddState(new PlayerActive(), true);
     }
