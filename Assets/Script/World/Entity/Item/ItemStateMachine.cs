@@ -9,7 +9,7 @@ public class ItemStateMachine : EntityStateMachine
     private NPCAnimationInst _npcAnimationInst; 
     public SpriteRenderer _sprite;
     private List<EntityState> states; 
-    void Awake()
+    protected override void OnAwake()
     {
         _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
         _npcMovementInst = GetComponent<NPCMovementInst>();

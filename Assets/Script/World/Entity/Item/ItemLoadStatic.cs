@@ -18,9 +18,8 @@ public class ItemLoadStatic : MonoBehaviour
         AddBlockDefinition("dirt", "Dirt", 1, "Common", "A basic dirt.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
         AddBlockDefinition("backroom", "Backroom", 1, "Common", "A basic backroom.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
         AddBlockDefinition("stone", "Stone", 1, "Common", "A basic stone.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("Sword", "Sword", 1, "Common", "A basic sword.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-    }
-
+        AddBlockDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+    }    
 
     private static void AddBlockDefinition(string stringID, string name, int stackSize, string rarity, string description, Boolean consumable, string[] materials, int damage, int knockback, int useTime)
     {

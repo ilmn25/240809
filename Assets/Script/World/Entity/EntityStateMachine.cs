@@ -7,6 +7,15 @@ public abstract class EntityStateMachine : MonoBehaviour
     private List<EntityState> states = new List<EntityState>();
     private EntityState _entityState;
     private EntityState _entityStatePrevious;
+    private EntityHandler _entityHandler;
+    
+    private void Awake()
+    {
+        _entityHandler = GetComponent<EntityHandler>();
+        OnAwake();
+    }
+
+    protected abstract void OnAwake();
 
     protected void AddState(EntityState state, Boolean current = false)
     {

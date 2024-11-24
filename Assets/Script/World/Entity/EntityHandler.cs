@@ -34,23 +34,22 @@ public class EntityHandler : MonoBehaviour
     }
 
     public void UpdateEntityListKey()
-    {
-        try
-        {   
-            if (!isActiveAndEnabled) return;
-            _positionCurrent = WorldStatic.GetChunkCoordinate(transform.position);
-            if (_positionCurrent != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_positionCurrent))
-            {
-                // Remove self's EntityHandler from the old coordinate key
-                EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this);
-                EntityLoadStatic._entityList[_positionCurrent].Item2.Add(this);
-
-                _positionPrevious = _positionCurrent;
-            }
-        }
-        catch 
+    { 
+        if (!isActiveAndEnabled) return;
+        _positionCurrent = WorldStatic.GetChunkCoordinate(transform.position);
+        if (_positionCurrent != _positionPrevious && EntityLoadStatic._entityList.ContainsKey(_positionCurrent))
         {
-            Lib.Log(_entityData.ID, _entityData.Position, isActiveAndEnabled);
-        }
+            // Remove self's EntityHandler from the old coordinate key
+            EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this);
+            EntityLoadStatic._entityList[_positionCurrent].Item2.Add(this);
+
+            _positionPrevious = _positionCurrent;
+        } 
+    }
+
+    public void WipeEntity()
+    {
+        EntityPoolStatic.Instance.ReturnObject(gameObject);
+        EntityLoadStatic._entityList[_positionPrevious].Item2.Remove(this);
     }
 } 
