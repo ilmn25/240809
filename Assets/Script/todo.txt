@@ -1,0 +1,3 @@
+start bug
+boolmap update miss few blocks 
+item teleport when fall from tree

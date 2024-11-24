@@ -2,10 +2,11 @@ public class RockStateMachine : EntityStateMachine
 { 
     private int _health;
     private string _item;
+    private int _currentHealth;
     protected override void OnAwake()
     {
         Initialize(ref _item, ref _health);
-    
+        _currentHealth = _health;
         AddState(new ResourceCollapse(this.transform, _item));
         AddState(new Idle(), true);
     }
@@ -18,14 +19,14 @@ public class RockStateMachine : EntityStateMachine
 
     public void OnEnable()
     { 
-        _health = 2;
+        _currentHealth = _health;
         SetState<Idle>();
     }
 
     private void OnMouseDown()
     {
-        _health--;
-        if (_health != 0) return;
+        _currentHealth--;
+        if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
     } 
 }

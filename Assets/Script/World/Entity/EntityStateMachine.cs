@@ -42,6 +42,7 @@ public abstract class EntityStateMachine : MonoBehaviour
         {
             _entityState = state;
             _entityStatePrevious = state;
+            _entityState.OnEnterState();
         }
     }
     public void SetState<T>() where T : EntityState

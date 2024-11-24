@@ -7,10 +7,11 @@ public class TreeStateMachine : EntityStateMachine
     public Transform _spriteObject;
     private int _health;
     private string _item;
+    private int _currentHealth;
     protected override void OnAwake()
     {
         Initialize(ref _item, ref _health);
-        
+        _currentHealth = _health;
         _spriteObject = transform.Find("sprite");
         AddState(new ResourceCollapse(_spriteObject, _item));
         AddState(new Idle(), true);
@@ -20,14 +21,14 @@ public class TreeStateMachine : EntityStateMachine
     
     public void OnEnable()
     { 
-        _health = 3;
+        _currentHealth = _health;
         SetState<Idle>();
     }
 
     private void OnMouseDown()
     {
-        _health--;
-        if (_health != 0) return;
+        _currentHealth--;
+        if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
     } 
 }
@@ -50,7 +51,7 @@ class ResourceCollapse : EntityState
         if (_spriteObject.rotation.eulerAngles.x > 89) 
         {  
             _rotationProgress = 0;
-            ItemLoadStatic.Instance.SpawnItem(_item, StateMachine.transform.position);
+            ItemLoadStatic.Instance.SpawnItem(_item, StateMachine.transform.position + new Vector3(0, 0.2f, 0));
             StateMachine.WipeEntity();
         }
     }
