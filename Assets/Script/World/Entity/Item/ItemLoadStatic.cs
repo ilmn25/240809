@@ -29,8 +29,7 @@ public class ItemLoadStatic : MonoBehaviour
     
     public void SpawnItem(string blockNameID, Vector3 worldPosition)
     {
-        EntityData entityData = GetEntityData(
-            blockNameID, Lib.AddToVector(worldPosition, 0.5f, 0.75f, 0.5f));
+        EntityData entityData = GetEntityData(blockNameID, worldPosition);
         
         GameObject gameObject = EntityPoolStatic.Instance.GetObject("item");
         gameObject.transform.position = entityData.Position.ToVector3(); 

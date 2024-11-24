@@ -13,7 +13,7 @@ public class ItemPhysicInst : MonoBehaviour
     private float BOUNCE_THRESHOLD = 0.5f; 
     private float BOUNCE_FACTOR = 0.4f;  
     private float SLIDE_RANGE = 1;  
-    private float PICKUP_RANGE = 1.5f;
+    private float PICKUP_RANGE = 0.8f;
     private float COLLISION_RANGE = 0.3f;  
 
     void Start()
@@ -37,15 +37,15 @@ public class ItemPhysicInst : MonoBehaviour
         if (playerDistance <= PICKUP_RANGE)
         {
             PlayerInventoryStatic.AddItem(transform.GetComponent<EntityHandler>()._entityData.ID, 1);
-            EntityPoolStatic.Instance.ReturnObject(gameObject);
+            gameObject.GetComponent<EntityHandler>().WipeEntity();
         }
         else if (transform.position.y < -5) 
         {            
-            EntityPoolStatic.Instance.ReturnObject(gameObject);
+            gameObject.GetComponent<EntityHandler>().WipeEntity();
         } 
         else 
         {
-            // HandlePhysics();
+            HandlePhysics();
         }
     }
 

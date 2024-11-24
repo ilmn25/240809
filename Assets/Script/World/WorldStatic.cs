@@ -20,6 +20,8 @@ public class WorldStatic : MonoBehaviour
 
     private static BinaryFormatter _bf = new BinaryFormatter(); 
     public static event Action PlayerChunkTraverse;
+    public delegate void Vector3IntEvent(Vector3Int position); 
+    public static event Vector3IntEvent MapUpdated;
 
     [HideInInspector] 
     public static Vector3Int _chunkPosition;
@@ -235,11 +237,12 @@ public class WorldStatic : MonoBehaviour
     }
 
     public void SetBoolInMap(Vector3Int worldPosition, bool value)
-    {
+    { 
         if (worldPosition.y >= CHUNKDEPTH) return;
         _boolGrid[worldPosition.x - _boolGridOrigin.x, 
             worldPosition.y, 
             worldPosition.z - _boolGridOrigin.z] = value;
+        MapUpdated(worldPosition);
     }
 
     public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)

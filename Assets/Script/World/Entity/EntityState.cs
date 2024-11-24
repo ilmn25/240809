@@ -17,5 +17,20 @@ public abstract class EntityState
  
 
 class Idle : EntityState
-{
+{  
+    public override void OnEnterState()
+    { 
+        WorldStatic.MapUpdated += OnMapUpdate;
+    }
+    public void OnMapUpdate(Vector3Int worldPosition)
+    {
+        if (Vector3Int.FloorToInt(StateMachine.transform.position) - new Vector3Int(0, 1, 0) == worldPosition)
+        {
+            StateMachine.WipeEntity();
+        } 
+    }
+    public override void OnExitState()
+    { 
+        WorldStatic.MapUpdated -= OnMapUpdate;
+    }
 }
