@@ -8,7 +8,7 @@ public class NPCStateMachine : EntityStateMachine
     private NPCMovementInst _npcMovementInst;
     private NPCPathFindInst _npcPathFindInst;
     private NPCAnimationInst _npcAnimationInst; 
-    public SpriteRenderer _sprite;
+    private SpriteRenderer _sprite;
     protected override void OnAwake()
     {
         _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
@@ -18,16 +18,16 @@ public class NPCStateMachine : EntityStateMachine
         
         AddState(new NPCIdle(_npcMovementInst, _npcAnimationInst), true);
         AddState(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
-        DialogueData _dialogueData = new DialogueData();
-        _dialogueData.Lines.Add("I'M DELETING YOU, BROTHER!");
-        _dialogueData.Lines.Add("\u2588\u2588]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] 10% complete.....");
-        _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]]]]]]]]]]] 35% complete....");
-        _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]] 60% complete....");
-        _dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 99% complete.....");
-        AddState(new CharTalk(this, _dialogueData));
+        DialogueData dialogueData = new DialogueData();
+        dialogueData.Lines.Add("I'M DELETING YOU, BROTHER!");
+        dialogueData.Lines.Add("\u2588\u2588]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] 10% complete.....");
+        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]]]]]]]]]]] 35% complete....");
+        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]] 60% complete....");
+        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 99% complete.....");
+        AddState(new CharTalk(this, dialogueData));
     }
 
-    public override void OnEnable()
+    public void OnEnable()
     {
         SetState<NPCIdle>();
         _npcMovementInst.SetDirection(Vector3.zero);
@@ -40,7 +40,7 @@ public class NPCStateMachine : EntityStateMachine
         }
     }
 
-    public void interact()
+    public void Interact()
     {
         SetState<CharTalk>();
     }

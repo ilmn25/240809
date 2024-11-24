@@ -9,12 +9,10 @@ class NPCIdle : EntityState {
         _npcAnimationInst = npcAnimationInst;
     }
  
-    public override void OnEnterState() {}
     public override void StateUpdate() {
         _npcMovementInst.HandleMovementUpdate();
         _npcAnimationInst.HandleAnimationUpdate();
     }
-    public override void OnExitState() {}
 }
 
 class NPCChase : EntityState {
@@ -49,5 +47,4 @@ class NPCChase : EntityState {
             _npcPathFindInst.HandlePathFindPassive(); 
         }
     }
-    public override void OnExitState(){}
 }

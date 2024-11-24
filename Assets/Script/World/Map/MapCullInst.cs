@@ -23,7 +23,7 @@ public class MapCullInst : MonoBehaviour
     
     private int HIDE_ALL_Y = 10; 
     private int CULL_DISTANCE = 2;  
-
+ 
     void Awake()
     {   
         CULL_DISTANCE= WorldStatic.CHUNKSIZE * CULL_DISTANCE;

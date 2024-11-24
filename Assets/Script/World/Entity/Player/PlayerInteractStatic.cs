@@ -32,7 +32,7 @@ public class PlayerInteractStatic : MonoBehaviour
                     NPCStateMachine NPCStateMachine = hitCollider.GetComponent<NPCStateMachine>();
                     if (NPCStateMachine != null)
                     {
-                        NPCStateMachine.interact();
+                        NPCStateMachine.Interact();
                         break;  
                     }
                 }
