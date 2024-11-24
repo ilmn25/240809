@@ -4,14 +4,14 @@ using UnityEngine;
 public abstract class EntityState
 {
     public String[] Tags;
-
+    public EntityStateMachine StateMachine;
     protected EntityState(string[] tags = null)
     {
         Tags = tags;
     }
 
-    public abstract void OnEnterState();
-    public abstract void StateUpdate();
-    public abstract void OnExitState();
+    public virtual void OnEnterState() {}
+    public virtual void StateUpdate() {}
+    public virtual void OnExitState() {}
 }
  

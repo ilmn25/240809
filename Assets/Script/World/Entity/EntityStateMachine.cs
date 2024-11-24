@@ -7,26 +7,15 @@ public abstract class EntityStateMachine : MonoBehaviour
     private List<EntityState> states = new List<EntityState>();
     private EntityState _entityState;
     private EntityState _entityStatePrevious;
-    private EntityHandler _entityHandler;
+     
+
+    protected virtual void OnAwake() {}
+    protected virtual void LogicUpdate() {} 
     
     private void Awake()
     {
-        _entityHandler = GetComponent<EntityHandler>();
         OnAwake();
     }
-
-    protected abstract void OnAwake();
-
-    protected void AddState(EntityState state, Boolean current = false)
-    {
-        states.Add(state);
-        if (current)
-        {
-            _entityState = state;
-            _entityStatePrevious = state;
-        }
-    }
-
     public void Update()
     {
         LogicUpdate();
@@ -38,14 +27,23 @@ public abstract class EntityStateMachine : MonoBehaviour
         }
         _entityState.StateUpdate();
     }
+ 
 
-    public abstract void OnEnable();
-    protected abstract void LogicUpdate();
-    public void SetState(EntityState entityState)
+    
+    
+    
+    
+    
+    protected void AddState(EntityState state, Boolean current = false)
     {
-        _entityState = entityState;
+        state.StateMachine = this;
+        states.Add(state);
+        if (current)
+        {
+            _entityState = state;
+            _entityStatePrevious = state;
+        }
     }
-
     public void SetState<T>() where T : EntityState
     {
         _entityState = GetState<T>();
@@ -62,5 +60,9 @@ public abstract class EntityStateMachine : MonoBehaviour
         }
         return null;
     }
-    
+
+    public void WipeEntity()
+    {
+        GetComponent<EntityHandler>().WipeEntity();
+    }
 }

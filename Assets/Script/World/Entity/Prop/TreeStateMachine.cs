@@ -7,16 +7,22 @@ public class TreeStateMachine : EntityStateMachine
     
     protected override void OnAwake()
     {
+        // gameObject.AddComponent<EntityClickInst>();
         _spriteObject = transform.Find("sprite");
         AddState(new TreeBreak(_spriteObject));
-        AddState(new PropIdle(), true);
+        AddState(new Idle(), true);
     }
 
-    public override void OnEnable()
+    public void OnEnable()
     { 
-        SetState<PropIdle>();
+        SetState<Idle>();
     }
 
+    private void OnMouseDown()
+    {
+        SetState<TreeBreak>();
+    }
+    
     protected override void LogicUpdate()
     { 
         if (Input.GetKeyDown(KeyCode.G)) SetState<TreeBreak>();
@@ -32,8 +38,6 @@ class TreeBreak : EntityState
         _spriteObject = spriteObject;
     }
 
-    public override void OnEnterState(){}
-
     public override void StateUpdate() 
     { 
         _rotationProgress += Time.deltaTime * 0.4f;
@@ -41,7 +45,8 @@ class TreeBreak : EntityState
         if (_spriteObject.rotation.eulerAngles.x > 89) 
         {  
             _rotationProgress = 0;
-            _spriteObject.parent.GetComponent<EntityHandler>().WipeEntity();
+            ItemLoadStatic.Instance.SpawnItem("brick", StateMachine.transform.position);
+            StateMachine.WipeEntity();
         }
     }
 
@@ -50,14 +55,8 @@ class TreeBreak : EntityState
         return Quaternion.Euler(tilt, _spriteObject.rotation.eulerAngles.y, 0);
     }
 
-    public override void OnExitState() {}
 }
 
-class PropIdle : EntityState
+class Idle : EntityState
 {
-    public override void OnEnterState() { }
-
-    public override void StateUpdate() { }
-
-    public override void OnExitState() { }
 }
