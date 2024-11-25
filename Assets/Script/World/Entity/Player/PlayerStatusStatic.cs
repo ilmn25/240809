@@ -23,23 +23,23 @@ public class PlayerStatusStatic : MonoBehaviour
         _speed = PlayerDataStatic._playerData.speed;
     }
 
-    void OnGUI()
-    {
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 25;
-        style.normal.textColor = Color.white;
-        style.alignment = TextAnchor.UpperRight;
-
-        Rect rect = new Rect(Screen.width - 100, 10, 90, 100);
-        GUI.Label(rect, 
-            $"Health: {_health}\n" +
-            $"Mana: {_mana}\n" +
-            $"Sanity: {_sanity}\n" +
-            $"Hunger: {_hunger}\n" +
-            $"Stamina: {_stamina}\n" +
-            $"Speed: {_speed}", 
-            style);
-    }
+    // void OnGUI()
+    // {
+    //     GUIStyle style = new GUIStyle();
+    //     style.fontSize = 25;
+    //     style.normal.textColor = Color.white;
+    //     style.alignment = TextAnchor.UpperRight;
+    //
+    //     Rect rect = new Rect(Screen.width - 100, 10, 90, 100);
+    //     GUI.Label(rect, 
+    //         $"Health: {_health}\n" +
+    //         $"Mana: {_mana}\n" +
+    //         $"Sanity: {_sanity}\n" +
+    //         $"Hunger: {_hunger}\n" +
+    //         $"Stamina: {_stamina}\n" +
+    //         $"Speed: {_speed}", 
+    //         style);
+    // }
 
     public void HandleStatusUpdate()
     {

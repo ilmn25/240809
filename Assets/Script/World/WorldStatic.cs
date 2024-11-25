@@ -32,11 +32,11 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static bool[,,] _boolGrid;
     [HideInInspector] 
-    public static int CHUNKSIZE = 10; 
+    public static int CHUNKSIZE = 8; 
     [HideInInspector] 
     public static int CHUNKDEPTH = 25;
-
-    public static int RENDER_DISTANCE = 4; 
+    private static int MAP_SIZE = 10; 
+    public static int RENDER_DISTANCE = 5; 
     public static bool ALWAYS_REGENERATE = false;
 
     private void Awake()
@@ -94,7 +94,7 @@ public class WorldStatic : MonoBehaviour
 
     private string getFilePath(int yLevel)
     {
-        return $"{Game.DOWNLOAD_PATH}\\chunks_{yLevel}.dat";
+        return $"{Game.DOWNLOAD_PATH}\\MAP{yLevel}.dat";
     }
     
     public void HandleLoadWorldFile(int yLevel)
@@ -390,7 +390,7 @@ public class WorldStatic : MonoBehaviour
     //! debug tools
     private void GenerateRandomMapSave()
     {
-        int range = 8 * CHUNKSIZE;
+        int range = MAP_SIZE * CHUNKSIZE;
         // Generate and save the test chunks
         List<SerializableVector3Int> coordinatesList = new List<SerializableVector3Int>();
 
