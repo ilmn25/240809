@@ -27,12 +27,6 @@ public abstract class EntityStateMachine : MonoBehaviour
         }
         _entityState.StateUpdate();
     }
- 
-
-    
-    
-    
-    
     
     protected void AddState(EntityState state, Boolean current = false)
     {
@@ -71,3 +65,4 @@ public abstract class EntityStateMachine : MonoBehaviour
         return GetComponent<EntityHandler>()._entityData;
     }
 }
+
