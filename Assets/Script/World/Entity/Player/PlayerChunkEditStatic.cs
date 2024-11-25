@@ -20,6 +20,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     private int _chunkSize;
     private int _chunkDepth; 
     [HideInInspector] public string _blockStringID; 
+    [HideInInspector] public ItemData _toolData;
 
     public int RANGE = 4; 
     public int BLOCKOVERLAYSPEED = 10; 
@@ -34,44 +35,58 @@ public class PlayerChunkEditStatic : MonoBehaviour
 
     public void HandleTerraformUpdate()
     { 
-        if (Input.GetMouseButtonDown(0)) //break
-        {  
-            _wasPlace = false;
-            HandleBlockPosition(true);
-            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
-            if (destroyedBlockID != 0) { //occupied check 
-                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
-                AudioStatic.PlaySFX(SOUNDDIG);
-            }   
-        }
-        else if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
+        if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
         { 
             _wasPlace = true;
             PlayerInventoryStatic.RemoveItem(_blockStringID); 
             ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
         }
-        else if (Input.GetKeyDown(KeyCode.X)) //break top
-        {  
-            _wasPlace = false;
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
-            HandleChunkCoordinate(_worldPosition);
-            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
-            if (destroyedBlockID != 0) { //occupied check
-                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
-                AudioStatic.PlaySFX(SOUNDDIG);
-            }   
-        }
-        else if (Input.GetKeyDown(KeyCode.C)) //break under
+
+        if (_toolData != null)
         {
-            _wasPlace = false;
-            _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
-            HandleChunkCoordinate(_worldPosition);
-            int destroyedBlockID = MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
-            if (destroyedBlockID != 0) { //occupied check
-                MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, 1);
-                AudioStatic.PlaySFX(SOUNDDIG);
-            }   
+            if (Input.GetMouseButtonDown(0)) //break
+            {
+                _wasPlace = false;
+                HandleBlockPosition(true);
+                int destroyedBlockID =
+                    MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
+                if (destroyedBlockID != 0)
+                {
+                    //occupied check 
+                    MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate, _toolData.Damage);
+                    AudioStatic.PlaySFX(SOUNDDIG);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.X)) //break top
+            {
+                _wasPlace = false;
+                _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
+                HandleChunkCoordinate(_worldPosition);
+                int destroyedBlockID =
+                    MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
+                if (destroyedBlockID != 0)
+                {
+                    //occupied check
+                    MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate,  _toolData.Damage);
+                    AudioStatic.PlaySFX(SOUNDDIG);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.C)) //break under
+            {
+                _wasPlace = false;
+                _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
+                HandleChunkCoordinate(_worldPosition);
+                int destroyedBlockID =
+                    MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
+                if (destroyedBlockID != 0)
+                {
+                    //occupied check
+                    MapEditStatic.Instance.BreakBlock(_worldPosition, _chunkCoordinate, _blockCoordinate,  _toolData.Damage);
+                    AudioStatic.PlaySFX(SOUNDDIG);
+                }
+            }
         }
+        
 
         if (_wasPlace && _block != null && _worldPosition != new Vector3Int(0, -1, 0))
         {         
