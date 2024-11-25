@@ -147,6 +147,7 @@ public class MapCullInst : MonoBehaviour
     bool zCheck; 
     bool HandleRangeCheck()
     {
+        return true;
         try
         { 
             chunkPosition = WorldStatic._chunkPosition;

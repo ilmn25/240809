@@ -106,7 +106,7 @@ public class CameraStatic : MonoBehaviour
         {
             Camera cameraComponent = Game.Camera.GetComponent<Camera>();
             cameraComponent.fieldOfView -= scrollInput * FOV_CHANGE_SPEED;
-            cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 27f); // Clamp FOV to reasonable values
+            cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 30f); // Clamp FOV to reasonable values
         }
     }
 

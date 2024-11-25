@@ -21,7 +21,7 @@ public class GameStatic : MonoBehaviour
         if (Game.Player.transform.position.y < -100)
         {
             GameObject.Find("map_system").GetComponent<MapCullStatic>().ForceRevertMesh();
-            Game.Player.transform.position = Lib.AddToVector(Game.Player.transform.position, 0, 200, 0);
+            Game.Player.transform.position = new Vector3(Game.Player.transform.position.x , WorldStatic.CHUNKDEPTH + 100, Game.Player.transform.position.z);
         }
 
         _deltaTime = (Time.deltaTime < MAX_DELTA_TIME) ? Time.deltaTime : MAX_DELTA_TIME;
