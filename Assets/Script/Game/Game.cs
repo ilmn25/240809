@@ -6,7 +6,9 @@ public class Game : MonoBehaviour
 {
     public static string DOWNLOAD_PATH;
     public static string PLAYER_SAVE_PATH; 
-    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit"; 
+    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit";
+    
+    public static LayerMask LayerMap;
     
     public static GameObject UserSystem;
     public static GameObject Player;
@@ -22,6 +24,8 @@ public class Game : MonoBehaviour
 
     void Awake()
     {
+        LayerMap  = LayerMask.GetMask("Collision"); 
+        
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";
         

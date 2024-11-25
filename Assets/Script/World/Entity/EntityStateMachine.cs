@@ -66,4 +66,8 @@ public abstract class EntityStateMachine : MonoBehaviour
     {
         GetComponent<EntityHandler>().WipeEntity();
     }
+    public EntityData GetEntityData()
+    {
+        return GetComponent<EntityHandler>()._entityData;
+    }
 }
