@@ -9,23 +9,25 @@ public class ItemLoadStatic : MonoBehaviour
     public static ItemLoadStatic Instance { get; private set; }  
     private static Dictionary<string, ItemData> _itemDefinitions  = new Dictionary<string, ItemData>();
     
-    // id of item in entitydata is number id
-    // id of item in itemdata is name id 
     void Awake()
     {
         Instance = this;
-        AddItemDefinition("brick", "Brick", 1, "Common", "A basic brick.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddItemDefinition("marble", "Marble", 1, "Common", "A basic marble.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddItemDefinition("dirt", "Dirt", 1, "Common", "A basic dirt.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddItemDefinition("backroom", "Backroom", 1, "Common", "A basic backroom.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddItemDefinition("stone", "Stone", 1, "Common", "A basic stone.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddItemDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("brick", "Brick", 20, "Common", "A basic brick.");
+        AddItemDefinition("marble", "Marble", 20, "Common", "A basic marble.");
+        AddItemDefinition("dirt", "Dirt", 20, "Common", "A basic dirt.");
+        AddItemDefinition("backroom", "Backroom", 20, "Common", "A basic backroom.");
+        AddItemDefinition("stone", "Stone", 20, "Common", "A basic stone.");
+        AddItemDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, 10, 2, 20,  
+            new Dictionary<string, int> {
+                {"iron", 1}, 
+                {"wood", 2}
+            });
     }    
 
-    private static void AddItemDefinition(string stringID, string name, int stackSize, string rarity, string description, Boolean consumable, string[] materials, int damage, int knockback, int useTime)
+    private static void AddItemDefinition(string stringID, string name, int stackSize, string rarity, string description = "", Boolean consumable = true, int damage = 0, int knockback = 0, int useTime = 0, Dictionary<string, int> materials = null)
     {
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime);
-        CraftStatic.Instance.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
     
