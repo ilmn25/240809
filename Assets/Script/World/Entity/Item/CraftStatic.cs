@@ -18,7 +18,7 @@ namespace Script.World.Entity.Item
         {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                craftItem("backroom");
+                craftItem("marble");
             }
         }
 
@@ -39,6 +39,11 @@ namespace Script.World.Entity.Item
         void craftItem(string stringID)
         {
             if (!IsCraftable(stringID)) return;
+
+            foreach (var ingredient in _craftList[stringID])
+            {
+                PlayerInventoryStatic.RemoveItem(ingredient.Key, ingredient.Value);
+            }
             PlayerInventoryStatic.AddItem(stringID);
         }
     }
