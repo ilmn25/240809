@@ -62,10 +62,10 @@ public class PlayerInventoryStatic : MonoBehaviour
 
     private static void HandleSlot()
     { 
-        ItemData itemData = GetItemAtKey();
-        if (itemData != null )
+        InvSlotData slot = GetItemAtKey();
+        if (slot != null )
         {
-            PlayerChunkEditStatic.Instance._blockStringID = itemData.StringID; 
+            PlayerChunkEditStatic.Instance._blockStringID = slot.StringID; 
         } else {
             PlayerChunkEditStatic.Instance._blockStringID = null;
         }
@@ -89,13 +89,13 @@ public class PlayerInventoryStatic : MonoBehaviour
         return row * INVENTORY_SLOT_AMOUNT + slot;
     }
     
-    public static ItemData GetItemAtKey(int key = -1)
+    public static InvSlotData GetItemAtKey(int key = -1)
     {
         int target_key = key == -1 ? CalculateKey() : key;
 
-        if (PlayerDataStatic._playerInventory.TryGetValue(target_key, out ItemData itemData))
+        if (PlayerDataStatic._playerInventory.ContainsKey(target_key))
         {
-            return itemData;
+            return PlayerDataStatic._playerInventory[target_key];
         }
         return null;
     }
@@ -107,41 +107,27 @@ public class PlayerInventoryStatic : MonoBehaviour
         {
             if (slot.Value.StringID == stringID)
             {
-                slot.Value.StackSize += quantity;
+                slot.Value.Quantity += quantity;
+                PlayerDataStatic.SavePlayerData();
                 return;
             }
         }
 
-        ItemData newItemData = ItemLoadStatic.GetItem(stringID);
-        if (newItemData != null)
-        {
-            int slotID = GetSmallestAvailableSlotID();
-            PlayerDataStatic._playerInventory[slotID] = new ItemData(
-                newItemData.StringID,
-                newItemData.Name,
-                quantity,
-                newItemData.Rarity,
-                newItemData.Description,
-                newItemData.IsConsumable,
-                newItemData.CraftingMaterials,
-                newItemData.Damage,
-                newItemData.Knockback,
-                newItemData.UseTime
-            );
-        }
-        // PrintPlayerData();
+        int slotID = GetSmallestAvailableSlotID();
+        PlayerDataStatic._playerInventory[slotID] = new InvSlotData(stringID, quantity);
+        PlayerDataStatic.SavePlayerData();
     }
 
     public static void RemoveItem(string stringID, int quantity = 1)
     {
-        foreach (var kvp in PlayerDataStatic._playerInventory)
+        foreach (var slot in PlayerDataStatic._playerInventory)
         {
-            if (kvp.Value.StringID == stringID)
+            if (slot.Value.StringID == stringID)
             {
-                kvp.Value.StackSize -= quantity;
-                if (kvp.Value.StackSize <= 0)
+                slot.Value.Quantity -= quantity;
+                if (slot.Value.Quantity <= 0)
                 {
-                    PlayerDataStatic._playerInventory.Remove(kvp.Key);
+                    PlayerDataStatic._playerInventory.Remove(slot.Key);
                 }
                 PlayerDataStatic.SavePlayerData();
                 return;
@@ -187,9 +173,9 @@ public class PlayerInventoryStatic : MonoBehaviour
     {
         int key = CalculateKey(_currentRow, _currentSlot);
 
-        if (PlayerDataStatic._playerInventory.TryGetValue(key, out ItemData itemData))
+        if (PlayerDataStatic._playerInventory.TryGetValue(key, out InvSlotData slot))
         {
-            Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {itemData.Name} x{itemData.StackSize}");
+            Debug.Log($"Row {_currentRow} Slot {_currentSlot}, Key {key} \nItem {slot.StringID} x{slot.Quantity}");
         }
         else
         {

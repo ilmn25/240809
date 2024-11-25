@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Script.World.Entity.Item;
 using UnityEngine;
 
 public class ItemLoadStatic : MonoBehaviour
@@ -13,17 +14,18 @@ public class ItemLoadStatic : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddBlockDefinition("brick", "Brick", 1, "Common", "A basic brick.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("marble", "Marble", 1, "Common", "A basic marble.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("dirt", "Dirt", 1, "Common", "A basic dirt.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("backroom", "Backroom", 1, "Common", "A basic backroom.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("stone", "Stone", 1, "Common", "A basic stone.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
-        AddBlockDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("brick", "Brick", 1, "Common", "A basic brick.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("marble", "Marble", 1, "Common", "A basic marble.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("dirt", "Dirt", 1, "Common", "A basic dirt.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("backroom", "Backroom", 1, "Common", "A basic backroom.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("stone", "Stone", 1, "Common", "A basic stone.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
+        AddItemDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, new string[] { "Iron", "Wood" }, 10, 2, 20);
     }    
 
-    private static void AddBlockDefinition(string stringID, string name, int stackSize, string rarity, string description, Boolean consumable, string[] materials, int damage, int knockback, int useTime)
+    private static void AddItemDefinition(string stringID, string name, int stackSize, string rarity, string description, Boolean consumable, string[] materials, int damage, int knockback, int useTime)
     {
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, materials, damage, knockback, useTime);
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime);
+        CraftStatic.Instance.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
     

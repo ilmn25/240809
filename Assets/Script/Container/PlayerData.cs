@@ -3,7 +3,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PlayerData
 {
-    public Dictionary<int, ItemData> inventory =  new Dictionary<int, ItemData>();
+    public Dictionary<int, InvSlotData> inventory =  new Dictionary<int, InvSlotData>();
     public int health = 100;
     public int mana = 100;
     public int sanity = 100;
@@ -13,5 +13,17 @@ public class PlayerData
 
     public PlayerData()
     {
+    }
+}
+[System.Serializable]
+public class InvSlotData
+{
+    public int Quantity;
+    public string StringID;
+
+    public InvSlotData(string stringID, int quantity)
+    {
+        StringID = stringID;
+        Quantity = quantity; 
     }
 }
