@@ -7,6 +7,7 @@ public class Game : MonoBehaviour
     public static string DOWNLOAD_PATH;
     public static string PLAYER_SAVE_PATH; 
     public static string MESH_MATERIAL_PATH = "shader/material/custom_lit";
+    public static Game Instance { get; private set; }  
     
     public static LayerMask LayerMap;
     
@@ -21,9 +22,20 @@ public class Game : MonoBehaviour
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
     
+    public float tooldelay = 0f;
+    public float windUpDuration = 0.1f; // Duration of the wind-up in seconds
+    public float toolSwingDuration = 0.2f; // Duration of the tool swing in seconds
+    public float playerSwingDuration = 0.2f; // Duration of the player swing in seconds
+    public float initialZRotation = 0f;
+    public float windUpZRotation = 20f; // Slight backward rotation for wind-up
+    public float toolTargetZRotation = -90f;
+    public float playerTargetZRotation = -35f; // Rotation for player's swing
+    public GameObject playerSprite;
+    public GameObject toolSprite;
 
     void Awake()
     {
+        Instance = this;
         LayerMap  = LayerMask.GetMask("Collision"); 
         
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
