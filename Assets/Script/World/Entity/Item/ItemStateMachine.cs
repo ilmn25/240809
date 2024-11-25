@@ -4,19 +4,41 @@ using UnityEngine;
 
 public class ItemStateMachine : EntityStateMachine
 {
-    private NPCMovementInst _npcMovementInst;
-    private NPCPathFindInst _npcPathFindInst;
-    private NPCAnimationInst _npcAnimationInst; 
-    private SpriteRenderer _sprite;
+    private ItemPhysicInst _itemPhysicInst;
     protected override void OnAwake()
     {
-        _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
-        _npcMovementInst = GetComponent<NPCMovementInst>();
-        _npcPathFindInst = GetComponent<NPCPathFindInst>();
-        _npcAnimationInst = GetComponent<NPCAnimationInst>();
+        _itemPhysicInst = GetComponent<ItemPhysicInst>();
         
-        AddState(new NPCIdle(_npcMovementInst, _npcAnimationInst), true);
-        AddState(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
+        AddState(new ItemIdle(_itemPhysicInst), true);
     }
- 
+}
+
+public class ItemIdle : EntityState
+{
+    private ItemPhysicInst _itemPhysicInst;
+    public ItemIdle(ItemPhysicInst itemPhysicInst)
+    {
+        _itemPhysicInst = itemPhysicInst;
+    }
+
+    public override void OnEnterState()
+    {
+        _itemPhysicInst.PopItem();
+    }
+
+    public override void StateUpdate()
+    {
+
+        float playerDistance = Vector3.Distance(StateMachine.transform.position, Game.Player.transform.position);
+        
+        if (playerDistance <= 0.8f)
+        {
+            PlayerInventoryStatic.AddItem(StateMachine.GetEntityData().ID, 1);
+            StateMachine.WipeEntity();
+        }
+        else if (StateMachine.transform.position.y < -5) 
+        {            
+            StateMachine.WipeEntity();
+        } else _itemPhysicInst.HandlePhysicsUpdate();
+    }
 }
