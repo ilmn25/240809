@@ -8,40 +8,86 @@ public class ItemLoadStatic : MonoBehaviour
 {
     public static ItemLoadStatic Instance { get; private set; }  
     private static Dictionary<string, ItemData> _itemDefinitions  = new Dictionary<string, ItemData>();
-    
-    void Awake()
+ 
+    public void Awake()
     {
         Instance = this;
-        AddItemDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.");
-        AddItemDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.",
-            materials: new Dictionary<string, int> {
-                {"stone", 1}, 
-                {"brick", 1}
-            });
-        AddItemDefinition("dirt", "Dirt", 20, ItemRarity.Common, "A basic dirt.");
-        AddItemDefinition("backroom", "Backroom", 20, ItemRarity.Common, "A basic backroom.",
-            materials: new Dictionary<string, int> {
-                {"dirt", 1}
-            }); 
-        AddItemDefinition("stone", "Stone", 20, ItemRarity.Common, "A basic stone.");
-        AddItemDefinition("sword", "Sword", 1, ItemRarity.Common, "A basic sword.", false, 10, 2, 20,  
-            new Dictionary<string, int> {
-                {"iron", 1}, 
-                {"wood", 2}
-            });
-    }    
+        AddBlockDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.");
+        AddBlockDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.", new Dictionary<string, int> {
+            { "stone", 1 },
+            { "brick", 1 }
+        });
+        AddBlockDefinition("dirt", "Dirt", 20, ItemRarity.Common, "A basic dirt.");
+        AddBlockDefinition("backroom", "Backroom", 20, ItemRarity.Common, "A basic backroom.", new Dictionary<string, int> {
+            { "dirt", 1 }
+        });
+        AddBlockDefinition("stone", "Stone", 20, ItemRarity.Common, "A basic stone.");
+        AddToolDefinition("sword", "Sword", 1, ItemRarity.Common, "A basic sword.", false, 10, 2, 20, new Dictionary<string, int> {
+            { "iron", 1 },
+            { "wood", 2 }
+        });
+    }
 
-    private static void AddItemDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
-        string description = "", Boolean consumable = true, int damage = 0, int knockback = 0, int useTime = 0, Dictionary<string, int> materials = null)
+    private static void AddBlockDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
+        string description = "", Dictionary<string, int> materials = null)
     {
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime);
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        {
+            Type = ItemType.Block
+        };
         if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
+
+    private static void AddToolDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
+        string description = "", bool consumable = false, int damage = 0, float knockback = 0, int useTime = 0, Dictionary<string, int> materials = null)
+    {
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime)
+        {
+            Type = ItemType.Tool
+        };
+        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        _itemDefinitions[stringID] = itemData;
+    }
+
+    private static void AddArmorDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
+        string description = "", int defense = 0, Dictionary<string, int> materials = null)
+    {
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        {
+            Type = ItemType.Armor,
+            // Add additional armor-specific properties here if needed
+        };
+        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        _itemDefinitions[stringID] = itemData;
+    }
+
+    private static void AddAccessoryDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
+        string description = "", bool consumable = false, Dictionary<string, int> materials = null)
+    {
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, 0, 0, 0)
+        {
+            Type = ItemType.Accessory
+        };
+        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        _itemDefinitions[stringID] = itemData;
+    }
+
+    private static void AddFurnitureDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
+        string description = "", Dictionary<string, int> materials = null)
+    {
+        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        {
+            Type = ItemType.Furniture
+        };
+        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        _itemDefinitions[stringID] = itemData;
+    }
+
     
     public void SpawnItem(string blockNameID, Vector3 worldPosition)
     {
-        EntityData entityData = GetEntityData(blockNameID, worldPosition);
+        EntityData entityData = new EntityData(blockNameID, new SerializableVector3(worldPosition), type: EntityType.Item);
         
         GameObject gameObject = EntityPoolStatic.Instance.GetObject("item");
         gameObject.transform.position = entityData.Position.ToVector3(); 
@@ -54,13 +100,6 @@ public class ItemLoadStatic : MonoBehaviour
         currentEntityHandler.Initialize(entityData, currentChunkCoordinate);
          
     }
-
-    public static EntityData GetEntityData(string stringID, Vector3 position)
-    {
-        return new EntityData(stringID, new SerializableVector3(position), type: EntityType.Item);
-    } 
-    
- 
 
     public static ItemData GetItem(string stringID)
     {

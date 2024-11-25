@@ -26,6 +26,8 @@ public class PlayerInventoryStatic : MonoBehaviour
 
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
+    private static int _currentKey = 0;
+    public static InvSlotData CurrentItem;
 
     public static int INVENTORY_ROW_AMOUNT = 3; // Example value
     public static int INVENTORY_SLOT_AMOUNT = 9; // Example value
@@ -37,8 +39,7 @@ public class PlayerInventoryStatic : MonoBehaviour
 
     public void HandleInventoryUpdate()
     {
-        HandleInput();  
-        HandleSlot();
+        HandleInput();   
     }
 
     private static void HandleInput()
@@ -46,6 +47,7 @@ public class PlayerInventoryStatic : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             _currentRow = (_currentRow + 1) % INVENTORY_ROW_AMOUNT;
+            HandleItemUpdate();
         }
 
         // if (Input.mouseScrollDelta.y != 0)
@@ -58,30 +60,23 @@ public class PlayerInventoryStatic : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {  
-                _currentSlot = i; 
+                _currentSlot = i;
+                HandleItemUpdate();
                 break;
             }
         }
     }
 
-    private static void HandleSlot()
-    { 
-        InvSlotData slot = GetItemAtKey();
-        if (slot != null )
-        {
-            PlayerChunkEditStatic.Instance._blockStringID = slot.StringID; 
-        } else {
-            PlayerChunkEditStatic.Instance._blockStringID = null;
-        }
+
+    public static void HandleItemUpdate()
+    {
+        _currentKey = CalculateKey();
+        CurrentItem = GetItemAtKey();
+        InventoryStateMachine.Instance.HandleItemUpdate();
     }
 
 
 
-
-
-
-
- 
     private static int CalculateKey(int row = -1, int slot = -1)
     {
         if (row == -1)
@@ -93,7 +88,7 @@ public class PlayerInventoryStatic : MonoBehaviour
     
     public static InvSlotData GetItemAtKey(int key = -1)
     {
-        int target_key = key == -1 ? CalculateKey() : key;
+        int target_key = key == -1 ? _currentKey : key;
 
         if (_playerInventory.ContainsKey(target_key))
         {
@@ -105,13 +100,12 @@ public class PlayerInventoryStatic : MonoBehaviour
     public static void AddItem(string stringID, int quantity = 1)
     {
         int maxStackSize = ItemLoadStatic.GetItem(stringID).StackSize;
-        int currentKey = CalculateKey();
 
         // First try to add to the current slot
-        if (_playerInventory.ContainsKey(currentKey) && _playerInventory[currentKey].StringID == stringID && _playerInventory[currentKey].Stack < maxStackSize)
+        if (_playerInventory.ContainsKey(_currentKey) && _playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)
         {
-            int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[currentKey].Stack);
-            _playerInventory[currentKey].Stack += addableAmount;
+            int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[_currentKey].Stack);
+            _playerInventory[_currentKey].Stack += addableAmount;
             quantity -= addableAmount;
 
             if (quantity <= 0)
@@ -153,13 +147,12 @@ public class PlayerInventoryStatic : MonoBehaviour
     public static void RemoveItem(string stringID, int quantity = 1)
     {
         // Prioritize current slot
-        int currentKey = CalculateKey();
-        if (_playerInventory.ContainsKey(currentKey) && _playerInventory[currentKey].StringID == stringID)
+        if (_playerInventory.ContainsKey(_currentKey) && _playerInventory[_currentKey].StringID == stringID)
         {
-            int removableAmount = Math.Min(quantity, _playerInventory[currentKey].Stack);
-            _playerInventory[currentKey].Stack -= removableAmount;
+            int removableAmount = Math.Min(quantity, _playerInventory[_currentKey].Stack);
+            _playerInventory[_currentKey].Stack -= removableAmount;
             quantity -= removableAmount;
-            if (_playerInventory[currentKey].Stack <= 0) _playerInventory.Remove(currentKey);
+            if (_playerInventory[_currentKey].Stack <= 0) _playerInventory.Remove(_currentKey);
             if (quantity <= 0)
             {
                 PlayerDataStatic.SavePlayerData();
@@ -224,11 +217,10 @@ public class PlayerInventoryStatic : MonoBehaviour
         float startY = 10;
 
         string rowText = $"Row {_currentRow}\n";
-        int target = CalculateKey();
         for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
         {
             int key = CalculateKey(_currentRow, i);
-            if (key == target) rowText += ">";
+            if (key == _currentKey) rowText += ">";
             if (_playerInventory.TryGetValue(key, out InvSlotData slot))
             {
                 rowText += $"{slot.StringID} {slot.Stack}\n";
