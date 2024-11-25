@@ -12,19 +12,20 @@ public class ItemLoadStatic : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        AddItemDefinition("brick", "Brick", 20, "Common", "A basic brick.");
-        AddItemDefinition("marble", "Marble", 20, "Common", "A basic marble.");
-        AddItemDefinition("dirt", "Dirt", 20, "Common", "A basic dirt.");
-        AddItemDefinition("backroom", "Backroom", 20, "Common", "A basic backroom.");
-        AddItemDefinition("stone", "Stone", 20, "Common", "A basic stone.");
-        AddItemDefinition("sword", "Sword", 1, "Common", "A basic sword.", false, 10, 2, 20,  
+        AddItemDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.");
+        AddItemDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.");
+        AddItemDefinition("dirt", "Dirt", 20, ItemRarity.Common, "A basic dirt.");
+        AddItemDefinition("backroom", "Backroom", 20, ItemRarity.Common, "A basic backroom.");
+        AddItemDefinition("stone", "Stone", 20, ItemRarity.Common, "A basic stone.");
+        AddItemDefinition("sword", "Sword", 1, ItemRarity.Common, "A basic sword.", false, 10, 2, 20,  
             new Dictionary<string, int> {
                 {"iron", 1}, 
                 {"wood", 2}
             });
     }    
 
-    private static void AddItemDefinition(string stringID, string name, int stackSize, string rarity, string description = "", Boolean consumable = true, int damage = 0, int knockback = 0, int useTime = 0, Dictionary<string, int> materials = null)
+    private static void AddItemDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
+        string description = "", Boolean consumable = true, int damage = 0, int knockback = 0, int useTime = 0, Dictionary<string, int> materials = null)
     {
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime);
         if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
