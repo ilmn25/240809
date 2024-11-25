@@ -1,4 +1,4 @@
-[System.Serializable]
+ 
 public class ItemData
 {
     public string StringID { get; set; }
@@ -10,9 +10,8 @@ public class ItemData
     public int UseTime { get; set; }
     public string Description { get; set; }
     public bool IsConsumable { get; set; }
-    public string[] CraftingMaterials { get; set; }
 
-    public ItemData(string stringID, string name, int stackSize, string rarity, string description, bool isConsumable, string[] craftingMaterials, int damage, float knockback, int useTime )
+    public ItemData(string stringID, string name, int stackSize, string rarity, string description, bool isConsumable, int damage, float knockback, int useTime )
     {
         StringID = stringID;
         Name = name;
@@ -23,6 +22,5 @@ public class ItemData
         UseTime = useTime;
         Description = description;
         IsConsumable = isConsumable;
-        CraftingMaterials = craftingMaterials;
     }
 }
