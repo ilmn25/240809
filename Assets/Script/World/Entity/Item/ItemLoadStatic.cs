@@ -13,9 +13,16 @@ public class ItemLoadStatic : MonoBehaviour
     {
         Instance = this;
         AddItemDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.");
-        AddItemDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.");
+        AddItemDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.",
+            materials: new Dictionary<string, int> {
+                {"stone", 1}, 
+                {"brick", 1}
+            });
         AddItemDefinition("dirt", "Dirt", 20, ItemRarity.Common, "A basic dirt.");
-        AddItemDefinition("backroom", "Backroom", 20, ItemRarity.Common, "A basic backroom.");
+        AddItemDefinition("backroom", "Backroom", 20, ItemRarity.Common, "A basic backroom.",
+            materials: new Dictionary<string, int> {
+                {"dirt", 1}
+            }); 
         AddItemDefinition("stone", "Stone", 20, ItemRarity.Common, "A basic stone.");
         AddItemDefinition("sword", "Sword", 1, ItemRarity.Common, "A basic sword.", false, 10, 2, 20,  
             new Dictionary<string, int> {

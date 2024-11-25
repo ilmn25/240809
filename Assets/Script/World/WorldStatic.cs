@@ -246,8 +246,7 @@ public class WorldStatic : MonoBehaviour
     }
 
     public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)
-    {
-        SetBoolInMap(worldCoordinate, blockID == 0);
+    { 
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID; 
         MapLoadStatic.Instance.RefreshExistingChunk(chunkCoordinate); //refresh on screen
             
@@ -284,6 +283,7 @@ public class WorldStatic : MonoBehaviour
         {
             MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNKSIZE, 0, CHUNKSIZE));
         } 
+        SetBoolInMap(worldCoordinate, blockID == 0);
     }
 
  
