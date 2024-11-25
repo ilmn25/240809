@@ -8,8 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class PlayerDataStatic : MonoBehaviour
 { 
     public static PlayerDataStatic Instance { get; private set; }  
-    public static PlayerData _playerData = new PlayerData();
-    public static Dictionary<int, InvSlotData> _playerInventory;
+    public static PlayerData _playerData = new PlayerData(); 
     private static BinaryFormatter _binaryFormatter = new BinaryFormatter();
 
     private void Start()
@@ -30,7 +29,8 @@ public class PlayerDataStatic : MonoBehaviour
     { 
         using (FileStream file = File.Create(Game.PLAYER_SAVE_PATH))
         {
-            _binaryFormatter.Serialize(file, _playerInventory);
+            _playerData.inventory = PlayerInventoryStatic._playerInventory;
+            _binaryFormatter.Serialize(file, _playerData);
         }
     }
 
@@ -40,21 +40,15 @@ public class PlayerDataStatic : MonoBehaviour
         {
             using (FileStream file = File.Open(Game.PLAYER_SAVE_PATH, FileMode.Open))
             {
-                _playerInventory = (Dictionary<int, InvSlotData>)_binaryFormatter.Deserialize(file);
+                _playerData = (PlayerData)_binaryFormatter.Deserialize(file);
+                PlayerInventoryStatic._playerInventory = _playerData.inventory;
             }
         }
         else
         {
             Debug.Log("No playerData file found in Downloads.");
-            _playerInventory = new Dictionary<int, InvSlotData>(); // Initialize if file does not exist
+            PlayerInventoryStatic._playerInventory = new Dictionary<int, InvSlotData>(); // Initialize if file does not exist
         }
     }
-
-    public static void PrintPlayerData()
-    {
-        foreach (var slot in _playerInventory)
-        {
-            Debug.Log("PlayerData contains: "+slot.Value.StringID + " x" + slot.Value.Quantity + " (Slot ID: " + slot.Key + ")");
-        }
-    }
+ 
 }

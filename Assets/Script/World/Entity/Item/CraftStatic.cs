@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,31 +7,39 @@ namespace Script.World.Entity.Item
     public class CraftStatic : MonoBehaviour
     {
         public static CraftStatic Instance { get; private set; }  
-        Dictionary<string, string[]> _craftList = new Dictionary<string, string[]>();
+        private static Dictionary<string, Dictionary<string, int>> _craftList = new Dictionary<string, Dictionary<string, int>>();
 
         void Awake()
         {
             Instance = this;
         }
 
-        public void AddCraftingDefinition(string stringID, string[] ingredients)
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                craftItem("backroom");
+            }
+        }
+
+        public static void AddCraftingDefinition(string stringID, Dictionary<string, int> ingredients)
         {
             _craftList.Add(stringID, ingredients);
         }
 
-        void getCraftableList()
+        bool IsCraftable (string stringID)
         {
-            
-        }
-
-        void IsCraftable(string stringID)
-        {
-            
+            foreach (var ingredient in _craftList[stringID])
+            {
+                if (PlayerInventoryStatic.GetStackAmount(ingredient.Key) < ingredient.Value) return false;
+            } 
+            return true;
         }
         
         void craftItem(string stringID)
         {
-            
+            if (!IsCraftable(stringID)) return;
+            PlayerInventoryStatic.AddItem(stringID);
         }
     }
 }

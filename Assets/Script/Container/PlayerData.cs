@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class PlayerData
@@ -14,16 +15,4 @@ public class PlayerData
     public PlayerData()
     {
     }
-}
-[System.Serializable]
-public class InvSlotData
-{
-    public int Quantity;
-    public string StringID;
-
-    public InvSlotData(string stringID, int quantity)
-    {
-        StringID = stringID;
-        Quantity = quantity; 
-    }
-}
+} 
