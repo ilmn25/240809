@@ -26,6 +26,10 @@ public class ItemLoadStatic : MonoBehaviour
             { "iron", 1 },
             { "wood", 2 }
         });
+        AddToolDefinition("axe", "Axe", 1, ItemRarity.Common, "A basic sword.", false, 10, 2, 20, new Dictionary<string, int> {
+            { "iron", 1 },
+            { "wood", 2 }
+        });
     }
 
     private static void AddBlockDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,

@@ -39,6 +39,10 @@ public class PlayerInventoryStatic : MonoBehaviour
 
     public void HandleInventoryUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            AddItem("axe");
+        }
         HandleInput();   
     }
 
@@ -50,11 +54,11 @@ public class PlayerInventoryStatic : MonoBehaviour
             HandleItemUpdate();
         }
 
-        // if (Input.mouseScrollDelta.y != 0)
-        // { 
-        //     _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)Input.mouseScrollDelta.y, INVENTORY_SLOT_AMOUNT); 
-        //         DebugPrintCurrentSlot(); 
-        // }
+        if (Input.mouseScrollDelta.y != 0)
+        { 
+            _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)Input.mouseScrollDelta.y, INVENTORY_SLOT_AMOUNT); 
+            HandleItemUpdate();
+        }
 
         for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
         {
@@ -134,7 +138,7 @@ public class PlayerInventoryStatic : MonoBehaviour
 
         // If there's still quantity left, find new slots
         while (quantity > 0)
-        {
+        { 
             int slotID = GetSmallestAvailableSlotID();
             int addableAmount = Math.Min(quantity, maxStackSize);
             _playerInventory[slotID] = new InvSlotData(stringID, addableAmount);
