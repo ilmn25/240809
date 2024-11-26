@@ -129,17 +129,17 @@ public class WorldGenStatic : MonoBehaviour
                                 {
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("tree", entityPosition, new SerializableVector3Int(1, 3, 1));
-                                    chunkData.Entity.Add(entityData);
+                                    chunkData.StaticEntity.Add(entityData);
                                 } else if (rng <= 0.07)
                                 {
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("bush1", entityPosition, new SerializableVector3Int(0, 0, 0));
-                                    chunkData.Entity.Add(entityData);
+                                    chunkData.StaticEntity.Add(entityData);
                                 } else if (rng <= 0.35)
                                 {
                                     entityPosition = new SerializableVector3(x + (float)random.NextDouble()/1.5f, y+1, z + (float)random.NextDouble()/1.5f);
                                     entityData = new EntityData("grass", entityPosition);
-                                    chunkData.Entity.Add(entityData);
+                                    chunkData.StaticEntity.Add(entityData);
                                 }
                             }
                         } 
@@ -152,14 +152,14 @@ public class WorldGenStatic : MonoBehaviour
 
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("stage_hand", entityPosition, new SerializableVector3Int(1, 1, 1));
-                                    chunkData.Entity.Add(entityData);
+                                    chunkData.StaticEntity.Add(entityData);
                                 }
                                 else if (random.NextDouble() <= 0.05)
                                 { 
 
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("slab", entityPosition, new SerializableVector3Int(0, 0, 0));
-                                    chunkData.Entity.Add(entityData);
+                                    chunkData.StaticEntity.Add(entityData);
                                 }
                                 else if (random.NextDouble() <= 0.003)
                                 {
@@ -182,7 +182,7 @@ public class WorldGenStatic : MonoBehaviour
                                             entityData = new EntityData("yuuri", entityPosition, type: EntityType.Rigid);
                                         }
                                     }
-                                    chunkData.Entity.Add(entityData); 
+                                    chunkData.DynamicEntity.Add(entityData); 
                                 }
                             } 
                         }
