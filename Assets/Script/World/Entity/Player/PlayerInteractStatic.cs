@@ -13,7 +13,7 @@ public class PlayerInteractStatic : MonoBehaviour
     {
         Instance = this;
         _interactLayer = LayerMask.GetMask("Interact");
-        _animator = transform.Find("sprite").GetComponent<Animator>();
+        _animator = transform.Find("sprite").transform.Find("char").GetComponent<Animator>();
     }
     
     public void HandleInteractionUpdate()

@@ -8,7 +8,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Profiling;
-
+// i fucking hate this script
 public class MapCullInst : MonoBehaviour
 {  
     public int[,,] _chunkMap;
