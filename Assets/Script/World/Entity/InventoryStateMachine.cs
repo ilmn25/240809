@@ -59,21 +59,21 @@ public class ItemTool : State
     private float windUpZRotation = 20f; // Slight backward rotation for wind-up
     private float toolTargetZRotation = -90f;
     private float playerTargetZRotation = -35f; // Rotation for player's swing
-    private GameObject playerSprite;
-    private GameObject toolSprite;
+    private Transform playerSprite;
+    private Transform toolSprite;
 
     public override void OnEnterState()
-    {
-        playerSprite = Game.Player.transform.Find("sprite").gameObject;
-        toolSprite = Game.Player.transform.Find("tool").gameObject;
-        toolSprite.SetActive(true);
+    { 
+        playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
+        toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
+        toolSprite.gameObject.SetActive(true);
         PlayerChunkEditStatic.Instance._toolData = ItemLoadStatic.GetItem(PlayerInventoryStatic.CurrentItem.StringID);
     }
 
     public override void OnExitState()
     {
         PlayerChunkEditStatic.Instance._toolData = null;
-        toolSprite.SetActive(false);
+        toolSprite.gameObject.SetActive(false);
     }
 
     public override void StateUpdate()
