@@ -131,25 +131,19 @@ public class PlayerMovementStatic : MonoBehaviour
 
         HandleMove(); 
     }
- 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private bool fly;
 
     private void HandleJump()
     {
+        if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
+        if (fly && Input.GetKeyDown(KeyCode.Space))
+        {
+            _verticalVelocity = JUMP_VELOCITY;
+        }
+        
+        
         if ( _isGrounded)
         {
             _coyoteTimer = COYOTE_TIME; // Reset coyote timer when grounded

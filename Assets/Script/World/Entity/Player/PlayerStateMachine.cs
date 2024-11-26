@@ -1,4 +1,6 @@
 
+using UnityEngine;
+
 public class PlayerStateMachine : EntityStateMachine
 {
     protected override void OnAwake()
@@ -9,6 +11,7 @@ public class PlayerStateMachine : EntityStateMachine
 } 
 class PlayerActive : EntityState { 
     public override void StateUpdate() {
+        if (Input.GetKey(KeyCode.O)) {Entity.SpawnPrefab("megumin", StateMachine.transform.position + Vector3.up);}
         PlayerMovementStatic.Instance.HandleMovementUpdate();
         PlayerAnimationStatic.Instance.HandleAnimationUpdate(); 
         PlayerChunkEditStatic.Instance.HandleTerraformUpdate(); 
