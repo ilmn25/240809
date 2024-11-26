@@ -28,7 +28,7 @@ public class PlayerAnimationStatic : MonoBehaviour
     {
         Instance = this;
         _sprite = transform.Find("sprite").gameObject;
-        _animator = _sprite.GetComponent<Animator>();
+        _animator = _sprite.transform.Find("char").GetComponent<Animator>();
 
         _targetScale = _sprite.transform.localScale; 
         _originalScale = _sprite.transform.localScale;
