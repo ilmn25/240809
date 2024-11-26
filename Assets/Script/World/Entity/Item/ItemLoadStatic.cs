@@ -87,22 +87,7 @@ public class ItemLoadStatic : MonoBehaviour
         if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
-
-    
-    public void SpawnItem(string blockNameID, Vector3 worldPosition)
-    {
-        EntityData entityData = new EntityData(blockNameID, new SerializableVector3(worldPosition), type: EntityType.Item);
-        
-        GameObject gameObject = EntityPoolStatic.Instance.GetObject("item");
-        gameObject.transform.position = entityData.Position.ToVector3(); 
-        gameObject.GetComponent<SpriteRenderer>().sprite = 
-            Resources.Load<Sprite>($"texture/sprite/{GetItem(entityData.ID).Name}"); 
-        
-        EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
-        EntityLoadDynamic._entityList.Add(currentEntityHandler); 
-        currentEntityHandler.Initialize(entityData, false);
-         
-    }
+ 
 
     public static ItemData GetItem(string stringID)
     {
