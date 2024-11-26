@@ -140,9 +140,9 @@ public class MapCullStatic : MonoBehaviour
     {  
         _signalUpdateSpriteYCull?.Invoke();   
         _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;  
-        foreach (Transform child in transform)
+        foreach (var kvp in MapLoadStatic.Instance._activeChunks)
         {   
-            child.GetComponent<MapCullInst>().CullMeshAsync(); 
+            kvp.Value.GetComponent<MapCullInst>().CullMeshAsync(); 
         }   
     }
    
@@ -156,10 +156,10 @@ public class MapCullStatic : MonoBehaviour
         {
             _signalUpdateSpriteYCull?.Invoke();   
             _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;  
-            foreach (Transform child in transform)
+            foreach (var kvp in MapLoadStatic.Instance._activeChunks)
             {   
-                child.GetComponent<MapCullInst>().CullMeshAsync(); 
-            }  
+                kvp.Value.GetComponent<MapCullInst>().CullMeshAsync(); 
+            }   
         } 
         _delayBuffer = false;
     }

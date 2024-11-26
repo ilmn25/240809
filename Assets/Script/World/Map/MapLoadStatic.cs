@@ -102,7 +102,7 @@ public class MapLoadStatic : MonoBehaviour
         } 
     }
 
-    private Dictionary<Vector3Int, GameObject> _activeChunks = new Dictionary<Vector3Int, GameObject>();
+    public Dictionary<Vector3Int, GameObject> _activeChunks = new Dictionary<Vector3Int, GameObject>();
     private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1); 
     private async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)
     { 
@@ -150,9 +150,8 @@ public class MapLoadStatic : MonoBehaviour
  
         if (!replace)
         {
-            _meshObject = new($"{_chunkCoordinate.x}_{_chunkCoordinate.z}");
+            _meshObject = new("map");
             _meshObject.layer = LayerMask.NameToLayer("Collision");
-            _meshObject.transform.parent = transform;  
             _meshObject.transform.position = _chunkCoordinate; 
 
             _meshObject.AddComponent<MeshFilter>();
