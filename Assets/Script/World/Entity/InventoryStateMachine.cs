@@ -3,48 +3,66 @@ using UnityEngine;
 
 public class InventoryStateMachine : StateMachine
 {
-        public static InventoryStateMachine Instance { get; private set; }  
-        public override void OnAwake()
+    public static InventoryStateMachine Instance { get; private set; }  
+    public override void OnAwake()
+    {
+        Instance = this;
+        AddState(new ItemEmpty(), true);
+        AddState(new ItemBlock());
+        AddState(new ItemTool());
+    }
+    public void HandleItemUpdate()
+    { 
+        if (PlayerInventoryStatic.CurrentItem == null)
         {
-                Instance = this;
-                AddState(new ItemEmpty(), true);
-                AddState(new ItemBlock());
-                AddState(new ItemTool());
+            SetState<ItemEmpty>();
+            return;
         }
-        public void HandleItemUpdate()
-        { 
-                if (PlayerInventoryStatic.CurrentItem == null)
-                {
-                        SetState<ItemEmpty>();
-                        return;
-                }
-                switch (ItemLoadStatic.GetItem(PlayerInventoryStatic.CurrentItem.StringID).Type)
-                {
-                        case ItemType.Block:
-                                SetState<ItemBlock>();
-                                break;
-                        case ItemType.Tool:
-                                SetState<ItemTool>();
-                                break;
-                }
+        switch (ItemLoadStatic.GetItem(PlayerInventoryStatic.CurrentItem.StringID).Type)
+        {
+            case ItemType.Block:
+                SetState<ItemBlock>();
+                break;
+            case ItemType.Tool:
+                SetState<ItemTool>();
+                break;
         }
+    }
 }
 
 public class ItemEmpty : State
 { 
 }
 
+
+public class ItemFurniture : State
+{
+    public string a;
+    public override void OnEnterState()
+    {
+        return;
+    }
+
+    public override void StateUpdate()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            a = PlayerInventoryStatic.CurrentItem.StringID;
+        } 
+    }
+}
+
 public class ItemBlock : State
 {
-        public override void StateUpdate()
-        {  
-                PlayerChunkEditStatic.Instance._blockStringID = PlayerInventoryStatic.CurrentItem.StringID;
-        }
+    public override void StateUpdate()
+    {  
+        PlayerChunkEditStatic.Instance._blockStringID = PlayerInventoryStatic.CurrentItem.StringID;
+    }
 
-        public override void OnExitState()
-        {
-                PlayerChunkEditStatic.Instance._blockStringID = null;
-        }
+    public override void OnExitState()
+    {
+        PlayerChunkEditStatic.Instance._blockStringID = null;
+    }
 } 
 public class ItemTool : State
 {
