@@ -15,6 +15,7 @@ public class EntityPoolStatic : MonoBehaviour
     
     public GameObject GetObject(string prefabName)
     {
+        
         GameObject obj;
          
         if (_pools.ContainsKey(prefabName) && _pools[prefabName].Count > 0)

@@ -83,7 +83,8 @@ public class WorldStatic : MonoBehaviour
  
     public async void HandleSaveWorldFile(List<ChunkData> chunks, int yLevel)
     {
-        EntityLoadStatic.Instance.HandleSave();
+        EntityLoadStatic.Instance.SaveAll();
+        EntityLoadDynamic.Instance.SaveAll();
         await Task.Delay(10);
         
         using (FileStream file = File.Create(getFilePath(yLevel)))
@@ -190,7 +191,7 @@ public class WorldStatic : MonoBehaviour
                     }
                 }
 
-                foreach (var entity in pathFindChunkData.Entity)
+                foreach (var entity in pathFindChunkData.StaticEntity)
                 {
                     if (entity.Type == EntityType.Static)
                     {

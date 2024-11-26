@@ -99,9 +99,8 @@ public class ItemLoadStatic : MonoBehaviour
             Resources.Load<Sprite>($"texture/sprite/{GetItem(entityData.ID).Name}"); 
         
         EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
-        Vector3Int currentChunkCoordinate = WorldStatic.GetChunkCoordinate(gameObject.transform.position);
-        EntityLoadStatic._entityList[currentChunkCoordinate].Item2.Add(currentEntityHandler); 
-        currentEntityHandler.Initialize(entityData, currentChunkCoordinate);
+        EntityLoadDynamic._entityList.Add(currentEntityHandler); 
+        currentEntityHandler.Initialize(entityData, false);
          
     }
 
