@@ -50,13 +50,10 @@ public class WorldStatic : MonoBehaviour
         Instance = this;
         _loadedChunks = new Dictionary<int, List<ChunkData>>(); 
  
-        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) GenerateRandomMapSave(); 
-        _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position);
-
-        GenerateBoolMapAsync();
+        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) GenerateRandomMapSave();
+        _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
     }
           
-
     void FixedUpdate()
     {
         _chunkPosition = GetChunkCoordinate(Game.Player.transform.position);
@@ -144,7 +141,7 @@ public class WorldStatic : MonoBehaviour
 
 
 
-    public void GenerateBoolMapAsync()
+    public void GenerateBoolMap()
     {
         int chunkSpan = MAP_SIZE * CHUNKSIZE;
         int _minXPath, _maxXPath, _minZPath, _maxZPath, _sizeXPath, _sizeZPath;
@@ -406,7 +403,7 @@ public class WorldStatic : MonoBehaviour
 
 
     //! debug tools
-    private void GenerateRandomMapSave()
+    public void GenerateRandomMapSave()
     {
         int range = MAP_SIZE * CHUNKSIZE;
         // Generate and save the test chunks

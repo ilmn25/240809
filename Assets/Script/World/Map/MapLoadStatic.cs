@@ -41,6 +41,8 @@ public class MapLoadStatic : MonoBehaviour
     {
         await Task.Delay(50);
         HandleChunkMapTraverse();
+        EntityLoadStatic.Instance.OnTraverse();
+        WorldStatic.Instance.GenerateBoolMap();
     }
 
 

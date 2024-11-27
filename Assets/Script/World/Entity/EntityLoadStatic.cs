@@ -24,7 +24,7 @@ public class EntityLoadStatic : MonoBehaviour
         WorldStatic.PlayerChunkTraverse += OnTraverse; 
     }
 
-    private void OnTraverse()   
+    public void OnTraverse()   
     {
         HandleUnload();
         HandleLoad();  
