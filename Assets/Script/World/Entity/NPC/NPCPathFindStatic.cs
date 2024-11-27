@@ -32,7 +32,7 @@ public class NPCPathFindStatic : MonoBehaviour
                 _startPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
                 _endPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
 
-                return await Task.Run(() => FindPathAsync(_agent, WorldStatic._boolGridOrigin, WorldStatic._boolGrid, _startPosition, _endPosition));
+                return await Task.Run(() => FindPathAsync(_agent, WorldStatic._boolMapOrigin, WorldStatic._boolMap, _startPosition, _endPosition));
             } 
             return null;
         }
