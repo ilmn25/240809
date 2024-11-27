@@ -97,13 +97,18 @@ public class MapCullStatic : MonoBehaviour
             }
         }
         
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
+        // float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+        // if (Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
+        // {
+        //     _visionHeight += (scrollInput > 0) ? 1 : -1;
+        //     if (_visionHeight > 3) _visionHeight = 3;
+        //     if (_visionHeight < 0) _visionHeight = 0;
+        // } 
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            _visionHeight += (scrollInput > 0) ? 1 : -1;
-            if (_visionHeight > 3) _visionHeight = 3;
-            if (_visionHeight < 0) _visionHeight = 0;
-        } 
+            if (_visionHeight == 1) _visionHeight = 2;
+            else _visionHeight = 1;
+        }
     }
 
     void HandleCheck()
@@ -188,17 +193,17 @@ public class MapCullStatic : MonoBehaviour
             _yThreshold = (int)playerPosition.y + _visionHeight;
             return;
         }  
-
+    
         // Check each ray hit and return early if conditions are met
         rayForward = new Ray(playerPosition, forwardDirection);  
         if (!Physics.Raycast(rayForward, out _, 50, _collisionLayer)) {
-
+    
             _yCheck = false;
             _yThreshold = 0;
             return;
             //fail
         }
-
+    
         rayBackward = new Ray(playerPosition, backwardDirection); 
         if (!Physics.Raycast(rayBackward, out _, 50, _collisionLayer)) {
             
@@ -210,36 +215,69 @@ public class MapCullStatic : MonoBehaviour
                 return;
                 //fail
             }
-
+    
             _yCheck = true;
             _yThreshold = (int)playerPosition.y + _visionHeight;
             return; // camera and forward
         } 
-
+    
         rayLeft = new Ray(playerPosition, leftDirection); 
         if (!Physics.Raycast(rayLeft, out _, 50, _collisionLayer)) {
-
+    
             _yCheck = false;
             _yThreshold = 0;
             return;
             //fail
         }
-
+    
         rayRight = new Ray(playerPosition, rightDirection); 
         if (!Physics.Raycast(rayRight, out _, 50, _collisionLayer)) {
-
+    
             _yCheck = false;
             _yThreshold = 0;
             return;
             //fail
         }
-
+    
         _yCheck = true;
         _yThreshold = (int)playerPosition.y + _visionHeight;
         return; // all 4 directions no camera
     }
 
 
+    //
+    //
+    // void HandleObstructionCheck()
+    // {
+    //     if (_currentCullMode == CullMode.Off)
+    //     {
+    //         _yCheck = false;
+    //         return;
+    //     }
+    //     
+    //     playerPosition = Game.Player.transform.position;
+    //     
+    //     if (_currentCullMode == CullMode.On)
+    //     {
+    //         _yCheck = true;
+    //         _yThreshold = (int)playerPosition.y + _visionHeight;
+    //         return;
+    //     }  
+    //
+    //     rayToCamera = new Ray(playerPosition + Vector3.up * 0.5f, _camera.transform.position - playerPosition);
+    //     if (Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
+    //     {
+    //         
+    //         _yThreshold = (int)playerPosition.y + _visionHeight;
+    //         _yCheck = true;  
+    //     }
+    //     else
+    //     {
+    //         _yCheck = false;
+    //         _yThreshold = 0; 
+    //     }
+    //      
+    // }
  
 
 

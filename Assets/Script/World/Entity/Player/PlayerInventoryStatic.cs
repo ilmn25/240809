@@ -49,7 +49,7 @@ public class PlayerInventoryStatic : MonoBehaviour
 
     private static void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tilde))
         {
             _currentRow = (_currentRow + 1) % INVENTORY_ROW_AMOUNT;
             HandleItemUpdate();
