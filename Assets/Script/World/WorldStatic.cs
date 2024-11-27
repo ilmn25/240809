@@ -28,9 +28,9 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static Vector3Int _chunkPositionPrevious = new Vector3Int(1,0,0);
     [HideInInspector] 
-    public static Vector3Int _boolGridOrigin;
+    public static Vector3Int _boolMapOrigin;
     [HideInInspector] 
-    public static bool[,,] _boolGrid;
+    public static bool[,,] _boolMap;
     [HideInInspector] 
     public static int CHUNKSIZE = 8; 
     [HideInInspector] 
@@ -121,20 +121,20 @@ public class WorldStatic : MonoBehaviour
 
     public bool GetBoolInBoolMap(Vector3Int worldCoordinate)
     {
-        if (_boolGrid == null) return true; 
+        if (_boolMap == null) return true; 
         // Get the relative position in the bool map
         Vector3Int relativePosition = GetRelativePosition(worldCoordinate); 
         // Check if the relative position is within the bounds of the bool map
-        if (relativePosition.x < 0 || relativePosition.x >= _boolGrid.GetLength(0) ||
-            relativePosition.y < 0 || relativePosition.y >= _boolGrid.GetLength(1) ||
-            relativePosition.z < 0 || relativePosition.z >= _boolGrid.GetLength(2))
+        if (relativePosition.x < 0 || relativePosition.x >= _boolMap.GetLength(0) ||
+            relativePosition.y < 0 || relativePosition.y >= _boolMap.GetLength(1) ||
+            relativePosition.z < 0 || relativePosition.z >= _boolMap.GetLength(2))
         {
             // If out of bounds, return false
             return false;
         }
 
         // Access the bool map at the relative position
-        return _boolGrid[relativePosition.x, relativePosition.y, relativePosition.z];
+        return _boolMap[relativePosition.x, relativePosition.y, relativePosition.z];
     }
 
 
@@ -216,34 +216,34 @@ public class WorldStatic : MonoBehaviour
 
         }
 
-        _boolGrid = _pathFindMap;
-        _boolGridOrigin = new Vector3Int(_minXPath, 0, _minZPath);
+        _boolMap = _pathFindMap;
+        _boolMapOrigin = new Vector3Int(_minXPath, 0, _minZPath);
     }
 
 
     public Vector3Int GetRelativePosition(Vector3Int coordinate)
     { 
         return new Vector3Int(
-            coordinate.x - _boolGridOrigin.x,
+            coordinate.x - _boolMapOrigin.x,
             coordinate.y,
-            coordinate.z - _boolGridOrigin.z
+            coordinate.z - _boolMapOrigin.z
         );
     }
     
     public bool GetBoolInMap(Vector3Int worldPosition)
     {
         if (worldPosition.y >= CHUNKDEPTH || 
-            worldPosition.x < _boolGridOrigin.x || 
-            worldPosition.x >= _boolGridOrigin.x + _boolGrid.GetLength(0) || 
-            worldPosition.z < _boolGridOrigin.z || 
-            worldPosition.z >= _boolGridOrigin.z + _boolGrid.GetLength(2))
+            worldPosition.x < _boolMapOrigin.x || 
+            worldPosition.x >= _boolMapOrigin.x + _boolMap.GetLength(0) || 
+            worldPosition.z < _boolMapOrigin.z || 
+            worldPosition.z >= _boolMapOrigin.z + _boolMap.GetLength(2))
         {
             return true; // or handle out-of-bounds case as needed
         }
 
-        return _boolGrid[worldPosition.x - _boolGridOrigin.x, 
+        return _boolMap[worldPosition.x - _boolMapOrigin.x, 
             worldPosition.y, 
-            worldPosition.z - _boolGridOrigin.z];
+            worldPosition.z - _boolMapOrigin.z];
     }
     
     public void SetBoolInMap(Vector3Int worldPosition, bool value)
@@ -252,9 +252,9 @@ public class WorldStatic : MonoBehaviour
         { 
             return;
         }
-        _boolGrid[worldPosition.x - _boolGridOrigin.x, 
+        _boolMap[worldPosition.x - _boolMapOrigin.x, 
             worldPosition.y, 
-            worldPosition.z - _boolGridOrigin.z] = value;
+            worldPosition.z - _boolMapOrigin.z] = value;
         MapUpdated(worldPosition);
     }
 
