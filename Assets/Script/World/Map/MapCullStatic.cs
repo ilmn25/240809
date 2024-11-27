@@ -19,7 +19,7 @@ public class MapCullStatic : MonoBehaviour
     public bool _yCheck = false;   
     [HideInInspector] 
     public int _yThreshold = 0; 
-    private int _visionHeight = 2;
+    private int _visionHeight = 1;
     private enum CullMode { On, Off, Both}
     private CullMode _currentCullMode = CullMode.Both;
     
