@@ -55,7 +55,7 @@ public class PlayerInventoryStatic : MonoBehaviour
             HandleItemUpdate();
         }
 
-        if (Input.mouseScrollDelta.y != 0 && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftAlt))
+        if (Input.mouseScrollDelta.y != 0 && !Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftAlt))
         { 
             _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)Input.mouseScrollDelta.y, INVENTORY_SLOT_AMOUNT); 
             HandleItemUpdate();

@@ -102,7 +102,7 @@ public class CameraStatic : MonoBehaviour
     void HandleFOVChange()
     {
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
+        if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
         {
             Camera cameraComponent = Game.Camera.GetComponent<Camera>();
             cameraComponent.fieldOfView -= scrollInput * FOV_CHANGE_SPEED;

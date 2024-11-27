@@ -34,9 +34,10 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int CHUNKSIZE = 8; 
     [HideInInspector] 
-    public static int CHUNKDEPTH = 25;
+    public static int CHUNKDEPTH = 10;
     private static int MAP_SIZE = 10; 
-    public static int RENDER_DISTANCE = 5; 
+    [HideInInspector] 
+    public static int RENDER_DISTANCE = 4; 
     public static bool ALWAYS_REGENERATE = false;
 
     private void Awake()

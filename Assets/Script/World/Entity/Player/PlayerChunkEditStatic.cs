@@ -34,11 +34,18 @@ public class PlayerChunkEditStatic : MonoBehaviour
 
     public void HandleTerraformUpdate()
     { 
-        if (Input.GetMouseButtonDown(1) && !string.IsNullOrEmpty(_blockStringID)) //place
-        { 
-            PlayerInventoryStatic.RemoveItem(_blockStringID); 
-            ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
-        }
+        if(_block != null)
+        {
+            if (_worldPosition != Vector3.down)
+            {         
+                if (Input.GetMouseButtonDown(1)) //place
+                { 
+                    PlayerInventoryStatic.RemoveItem(_blockStringID); 
+                    ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
+                }
+                _block.transform.position = Vector3.Lerp(_block.transform.position, _worldPosition, Time.deltaTime * BLOCKOVERLAYSPEED);
+            } else _block.transform.position = Vector3.down;
+        } 
 
         if (_toolData != null)
         {
@@ -81,12 +88,6 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 }
             }
         }
-        
-
-        if (_block != null && _worldPosition != new Vector3Int(0, -1, 0))
-        {         
-            _block.transform.position = Vector3.Lerp(_block.transform.position, _worldPosition, Time.deltaTime * BLOCKOVERLAYSPEED);
-        } else if (_block != null) _block.transform.position = Vector3.zero;
     }
 
 
@@ -191,62 +192,70 @@ public class PlayerChunkEditStatic : MonoBehaviour
     // async void HandleRange(bool isBreak)
     {  
         playerPosition = Vector3Int.FloorToInt(transform.position); 
-        if (isBreak)
+        if (Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
+            Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
+            Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE)
         {
-            if (Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
-                Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
-                Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE)
-            {
-                _worldPosition = Vector3Int.down;
+            _worldPosition = Vector3Int.down;
                 
-            }
-            HandleChunkCoordinate(_worldPosition);
         }
-        else
-        {
-            closestBlockPosition = new Vector3Int(0, -1, 0);
-            float closestDistance = -1; //closest coord to place block in current search
-            // Define the rectangle bounds at the player's position 
-            playerBounds = new Bounds(transform.position + _boxCollider.center, _boxCollider.size);
-            blockBounds = new Bounds(Lib.AddToVector(Vector3Int.FloorToInt(_worldPosition), 0.5f, 0.5f, 0.5f), Vector3.one); 
-            bool isEmpty = WorldStatic.Instance.GetBoolInBoolMap(Vector3Int.FloorToInt(_worldPosition));
-            if (!isEmpty || Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
-                Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
-                Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE ||
-                playerBounds.Intersects(blockBounds))
-            { 
-                for (int x = -RANGE; x <= RANGE; x++)
-                {
-                    for (int y = -1; y <= 1; y++)
-                    {
-                        for (int z = -RANGE; z <= RANGE; z++)
-                        {
-                            currentBlockPosition = playerPosition + new Vector3Int(x, y, z); 
-
-                            if (currentBlockPosition.y >= 0 && currentBlockPosition.y < _chunkDepth) //y check
-                            {
-                                float distance = Vector3.Distance(_worldPosition, currentBlockPosition); //closest check
-                                if (distance < closestDistance || closestDistance == -1)
-                                { 
-                                    if (WorldStatic.Instance.GetBoolInBoolMap(currentBlockPosition)) //occupied check
-                                    { 
-                                        blockBounds = new Bounds(Lib.AddToVector(currentBlockPosition, 0.5f, 0.5f, 0.5f), Vector3.one);
-
-                                        if (!playerBounds.Intersects(blockBounds)) //player stuck check
-                                        {   
-                                            closestDistance = distance;
-                                            closestBlockPosition = currentBlockPosition;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                _worldPosition = closestBlockPosition; 
-            }  
-            HandleChunkCoordinate(_worldPosition); 
-        }  
+        HandleChunkCoordinate(_worldPosition);
+        // if (isBreak)
+        // {
+        //     if (Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
+        //         Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
+        //         Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE)
+        //     {
+        //         _worldPosition = Vector3Int.down;
+        //         
+        //     }
+        //     HandleChunkCoordinate(_worldPosition);
+        // }
+        // else
+        // {
+        //     closestBlockPosition = new Vector3Int(0, -1, 0);
+        //     float closestDistance = -1; //closest coord to place block in current search
+        //     // Define the rectangle bounds at the player's position 
+        //     playerBounds = new Bounds(transform.position + _boxCollider.center, _boxCollider.size);
+        //     blockBounds = new Bounds(Lib.AddToVector(Vector3Int.FloorToInt(_worldPosition), 0.5f, 0.5f, 0.5f), Vector3.one); 
+        //     bool isEmpty = WorldStatic.Instance.GetBoolInBoolMap(Vector3Int.FloorToInt(_worldPosition));
+        //     if (!isEmpty || Mathf.Abs(_worldPosition.x - playerPosition.x) > RANGE ||
+        //         Mathf.Abs(_worldPosition.y - playerPosition.y) > RANGE ||
+        //         Mathf.Abs(_worldPosition.z - playerPosition.z) > RANGE ||
+        //         playerBounds.Intersects(blockBounds))
+        //     { 
+        //         for (int x = -RANGE; x <= RANGE; x++)
+        //         {
+        //             for (int y = -1; y <= 1; y++)
+        //             {
+        //                 for (int z = -RANGE; z <= RANGE; z++)
+        //                 {
+        //                     currentBlockPosition = playerPosition + new Vector3Int(x, y, z); 
+        //
+        //                     if (currentBlockPosition.y >= 0 && currentBlockPosition.y < _chunkDepth) //y check
+        //                     {
+        //                         float distance = Vector3.Distance(_worldPosition, currentBlockPosition); //closest check
+        //                         if (distance < closestDistance || closestDistance == -1)
+        //                         { 
+        //                             if (WorldStatic.Instance.GetBoolInBoolMap(currentBlockPosition)) //occupied check
+        //                             { 
+        //                                 blockBounds = new Bounds(Lib.AddToVector(currentBlockPosition, 0.5f, 0.5f, 0.5f), Vector3.one);
+        //
+        //                                 if (!playerBounds.Intersects(blockBounds)) //player stuck check
+        //                                 {   
+        //                                     closestDistance = distance;
+        //                                     closestBlockPosition = currentBlockPosition;
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         _worldPosition = closestBlockPosition; 
+        //     }  
+        //     HandleChunkCoordinate(_worldPosition); 
+        // }  
     }
 
     void HandleChunkCoordinate(Vector3 coordinate)
