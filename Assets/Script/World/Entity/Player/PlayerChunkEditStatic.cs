@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Serialization;
@@ -61,7 +62,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                     AudioStatic.PlaySFX(SOUNDDIG);
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.X)) //break top
+            else if (Input.GetMouseButtonDown(4)) //break top
             {
                 _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
                 HandleChunkCoordinate(_worldPosition);
@@ -74,7 +75,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                     AudioStatic.PlaySFX(SOUNDDIG);
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.C)) //break under
+            else if (Input.GetMouseButtonDown(3)) //break under
             {
                 _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
                 HandleChunkCoordinate(_worldPosition);
