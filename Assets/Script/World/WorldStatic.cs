@@ -52,20 +52,18 @@ public class WorldStatic : MonoBehaviour
  
         if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) GenerateRandomMapSave(); 
         _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position);
+
+        GenerateBoolMapAsync();
     }
           
 
-    async void FixedUpdate()
+    void FixedUpdate()
     {
         _chunkPosition = GetChunkCoordinate(Game.Player.transform.position);
         if (_chunkPosition != _chunkPositionPrevious)
         {  
             PlayerChunkTraverse?.Invoke();
-            _chunkPositionPrevious = _chunkPosition;
-            await Task.Delay(80);
-            (_boolGridOrigin, _boolGrid) = await Task.Run(() => 
-                GenerateBoolMapAsync()
-            ); 
+            _chunkPositionPrevious = _chunkPosition; 
         }
     }
 
@@ -146,9 +144,9 @@ public class WorldStatic : MonoBehaviour
 
 
 
-    public async Task<(Vector3Int, bool[,,])> GenerateBoolMapAsync()
+    public void GenerateBoolMapAsync()
     {
-        int chunkSpan = RENDER_DISTANCE * CHUNKSIZE;
+        int chunkSpan = MAP_SIZE * CHUNKSIZE;
         int _minXPath, _maxXPath, _minZPath, _maxZPath, _sizeXPath, _sizeZPath;
         List<Vector3Int> _chunkCoordinatesPathFind = new List<Vector3Int>();
         int _indexXPath, _indexZPath, _startXPath, _startYPath, _startZPath, _endXPath, _endYPath, _endZPath;
@@ -221,11 +219,10 @@ public class WorldStatic : MonoBehaviour
                 }
             }
 
-            // Yield control back to the main thread to prevent lag spikes
-            await Task.Delay(15);
         }
 
-        return (new Vector3Int(_minXPath, 0, _minZPath), _pathFindMap);
+        _boolGrid = _pathFindMap;
+        _boolGridOrigin = new Vector3Int(_minXPath, 0, _minZPath);
     }
 
 
@@ -237,10 +234,29 @@ public class WorldStatic : MonoBehaviour
             coordinate.z - _boolGridOrigin.z
         );
     }
+    
+    public bool GetBoolInMap(Vector3Int worldPosition)
+    {
+        if (worldPosition.y >= CHUNKDEPTH || 
+            worldPosition.x < _boolGridOrigin.x || 
+            worldPosition.x >= _boolGridOrigin.x + _boolGrid.GetLength(0) || 
+            worldPosition.z < _boolGridOrigin.z || 
+            worldPosition.z >= _boolGridOrigin.z + _boolGrid.GetLength(2))
+        {
+            return true; // or handle out-of-bounds case as needed
+        }
 
+        return _boolGrid[worldPosition.x - _boolGridOrigin.x, 
+            worldPosition.y, 
+            worldPosition.z - _boolGridOrigin.z];
+    }
+    
     public void SetBoolInMap(Vector3Int worldPosition, bool value)
-    { 
-        if (worldPosition.y >= CHUNKDEPTH) return;
+    {
+        if (worldPosition.y >= CHUNKDEPTH)
+        { 
+            return;
+        }
         _boolGrid[worldPosition.x - _boolGridOrigin.x, 
             worldPosition.y, 
             worldPosition.z - _boolGridOrigin.z] = value;
@@ -422,8 +438,7 @@ public class WorldStatic : MonoBehaviour
             HandleSaveWorldFile(kvp.Value, kvp.Key);
         }
 
-    }
-
+    } 
     public void PrintChunk(Vector3Int coordinates, int numLetters = 2)
     {
         if (!_loadedChunks.ContainsKey(0))

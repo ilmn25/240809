@@ -137,7 +137,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
         HandleRange(isBreak);
     }
 
-
+    private Vector3 _thresholdPoint;
     void HandleWorldCoordinate(bool isBreak)
     {
         float yThreshold = MapCullStatic.Instance._yThreshold + 0.05f;
@@ -153,16 +153,22 @@ public class PlayerChunkEditStatic : MonoBehaviour
             {
                 // Calculate the position in the ray's direction where y = yThreshold
                 float distanceToThreshold = (yThreshold - hitInfo.point.y) / ray.direction.y;
-                Vector3 thresholdPoint = hitInfo.point + ray.direction * distanceToThreshold;
-
-                // Cast the ray from the threshold point
-                ray = new Ray(thresholdPoint, ray.direction);
-                if (!Physics.Raycast(ray, out hitInfo))
+                 _thresholdPoint = hitInfo.point + ray.direction * distanceToThreshold;
+                if (isBreak && !WorldStatic.Instance.GetBoolInMap(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down) )
                 {
-                    return; // Exit if the ray doesn't hit anything
+                    hitInfo.point = _thresholdPoint;
+                }
+                else
+                {
+                    // Cast the ray from the threshold point
+                    ray = new Ray(_thresholdPoint, ray.direction);
+                    if (!Physics.Raycast(ray, out hitInfo))
+                    {
+                        return;
+                    }
                 }
             }
-
+ 
             if (isBreak)
             { 
                 // Move 0.2 units further in the ray direction
@@ -288,6 +294,23 @@ public class PlayerChunkEditStatic : MonoBehaviour
         WorldStatic.Instance.UpdateMap(_worldPosition, _chunkCoordinate, _blockCoordinate, blockID); 
         // Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.red);
     }
+    
+    void OnDrawGizmos()
+    {
+        // Adding 0.5 to each coordinate
+    
+        // Adjusting position for hit threshold
+    
+        // Drawing red sphere for world position
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(new Vector3(_worldPosition.x + 0.5f, _worldPosition.y + 0.5f, _worldPosition.z + 0.5f), Vector3.one);
+    
+        // Drawing blue sphere for hit threshold
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down, 0.1f);
+    }
+
+
  
     // void OnGUI()
     // {
