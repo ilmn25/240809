@@ -64,18 +64,15 @@ public class WorldStatic : MonoBehaviour
         }
     }
 
- 
 
-
-
-
-
-    
-
-    void OnApplicationQuit()
+    private void Update()
     {
-        HandleSaveWorldFile(_loadedChunks[0] , 0);
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            HandleSaveWorldFile(_loadedChunks[0] , 0);
+        }
     }
+
  
     public async void HandleSaveWorldFile(List<ChunkData> chunks, int yLevel)
     {
@@ -87,6 +84,7 @@ public class WorldStatic : MonoBehaviour
         {
             _bf.Serialize(file, chunks);
         }
+        Application.Quit();
     }
 
     private string getFilePath(int yLevel)
