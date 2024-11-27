@@ -38,11 +38,11 @@ public class EntityLoadDynamic : MonoBehaviour
         UpdateEntityListKey?.Invoke();
 
         foreach (var entityHandler in _entityList)
-        {
-            if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > 100) { 
-                EntityData entityData = entityHandler.GetEntityData();
-                WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityData.Position.ToVector3())).DynamicEntity.Add(entityData);
-                EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);  
+        { 
+            if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > 60) { 
+                Lib.Log(WorldStatic.GetChunkCoordinate(entityHandler.transform.position));
+                WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityHandler.transform.position)).DynamicEntity.Add(entityHandler.GetEntityData());
+                EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject); 
             }
         }
     }
@@ -59,7 +59,7 @@ public class EntityLoadDynamic : MonoBehaviour
                     Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
                     0,
                     Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
-                );
+                ); 
  
                 _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
                 if  (_currentChunkData != null)
@@ -75,20 +75,19 @@ public class EntityLoadDynamic : MonoBehaviour
     {
         foreach (EntityHandler entityHandler in _entityList)
         { 
-            EntityData entityData = entityHandler.GetEntityData();
-            WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityData.Position.ToVector3())).DynamicEntity.Add(entityData);
+            WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityHandler.transform.position)).DynamicEntity.Add(entityHandler.GetEntityData());
             EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }
 
     public void LoadChunkEntities(List<EntityData> chunkEntityList)
-    {   
+    { 
         foreach (EntityData entityData in chunkEntityList)
-        { 
+        {   
             switch (entityData.Type)
             {
                 case EntityType.Item: 
-                    _currentInstance = EntityPoolStatic.Instance.GetObject("item");
+                    _currentInstance = EntityPoolStatic.Instance.GetObject("item"); 
                     entityData.Position = new SerializableVector3(Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3()));
                     _currentInstance.transform.position = entityData.Position.ToVector3(); 
         

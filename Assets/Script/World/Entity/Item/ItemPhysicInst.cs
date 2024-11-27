@@ -8,7 +8,7 @@ public class ItemPhysicInst : MonoBehaviour
     
     private float GRAVITY = 35;  
     private float BOUNCE_FACTOR = 0.3f;  
-    private float SLIDE_RANGE = 3;   
+    private int SLIDE_RANGE = 3;   
     private float COLLISION_RANGE = 0.3f;  
 
     void Start()
@@ -18,7 +18,7 @@ public class ItemPhysicInst : MonoBehaviour
 
     public void PopItem() //initial pop velocity 
     {
-        _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 5f, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
+        _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 7, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
     }
  
 

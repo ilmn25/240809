@@ -53,7 +53,7 @@ public class MapCullInst : MonoBehaviour
         shadowMeshRenderer.material = BlockStatic._shadowMeshMaterial; 
     }
    
-    public async void HandleAssignment()
+    public void HandleAssignment()
     {
         try
         {
@@ -69,7 +69,6 @@ public class MapCullInst : MonoBehaviour
             _shadowMeshFilter.mesh = shadowMesh;
 
             CullMeshAsync();     
-            await Task.Delay(200);
             _meshCollider.sharedMesh = _meshData;
             _meshCollider.convex = false; 
             _meshCollider.isTrigger = false;  
