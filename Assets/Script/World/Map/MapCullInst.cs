@@ -21,7 +21,9 @@ public class MapCullInst : MonoBehaviour
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;  
     
-    private int CULL_DISTANCE = 2;  
+    private int CULL_DISTANCE = 2; 
+    private Vector3Int _selfChunkPosition;
+    private Vector3Int playerChunkPosition;  
  
     void Awake()
     {   
@@ -33,6 +35,7 @@ public class MapCullInst : MonoBehaviour
         _meshCollider = gameObject.AddComponent<MeshCollider>();
         _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         _meshRenderer.enabled = false;    
+        _selfChunkPosition = Vector3Int.FloorToInt(transform.position);
     }
 
     void Start() { 
@@ -86,21 +89,21 @@ public class MapCullInst : MonoBehaviour
         await _semaphoreSlim.WaitAsync();
         try {
             if (MapCullStatic.Instance._yCheck)
-            {
-                if (transform.position.y < WorldStatic._playerChunkPos.y) 
+            { 
+                if (_selfChunkPosition.y + WorldStatic.CHUNKSIZE < MapCullStatic.Instance._yThreshold)  // lower chunks
                 {
                     _meshRenderer.enabled = true;
                     _meshFilter.mesh = _meshData;
-                    return; // below player chunk level skip
+                    return; 
                 }           
-                if (transform.position.y > WorldStatic._playerChunkPos.y) // above so just turn invisible 
+                if (_selfChunkPosition.y >= MapCullStatic.Instance._yThreshold) // higher chunks
                 {
                     _meshRenderer.enabled = false;
                     // _meshFilter.mesh = _meshData;
                     return;
                 }
                 if (HandleRangeCheck()) // do cull, is in range
-                {
+                { 
                     await Task.Run(() => HandleCullMath());
                     HandleCullMesh();
                 }
@@ -144,8 +147,7 @@ public class MapCullInst : MonoBehaviour
         await Task.Yield();   //do not remove
         _meshRenderer.enabled = true;
     } 
-     
-    Vector3 chunkPosition;
+      
     float xDist;
     float zDist;
     bool xCheck;
@@ -156,9 +158,9 @@ public class MapCullInst : MonoBehaviour
         try
         { 
             //TODO y
-            chunkPosition = WorldStatic._playerChunkPos;
-            xDist = Mathf.Abs(chunkPosition.x - transform.position.x);
-            zDist = Mathf.Abs(chunkPosition.z - transform.position.z);   
+            playerChunkPosition = WorldStatic._playerChunkPos;
+            xDist = Mathf.Abs(playerChunkPosition.x - transform.position.x);
+            zDist = Mathf.Abs(playerChunkPosition.z - transform.position.z);   
             xCheck = xDist <= CULL_DISTANCE; 
             zCheck = zDist <= CULL_DISTANCE;
             return xCheck && zCheck; 
@@ -174,13 +176,12 @@ public class MapCullInst : MonoBehaviour
         NativeArray<Vector3> normals = new NativeArray<Vector3>(_normals, Allocator.TempJob);
         NativeArray<int> triangles = new NativeArray<int>(_triangles, Allocator.TempJob);
         NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
-        NativeArray3D<int> chunkMap = new NativeArray3D<int>(_chunkMap, Allocator.TempJob);
         var job = new HandleCullMathJob
         { 
             chunkSize = WorldStatic.CHUNKSIZE, 
-            yThreshold = MapCullStatic.Instance._yThreshold %  WorldStatic.CHUNKSIZE,
+            yThreshold = MapCullStatic.Instance._yThreshold - _selfChunkPosition.y,
 
-            chunkMap = chunkMap,
+            chunkMap = ChunkMap.Create(_selfChunkPosition),
             vertices = vertices,
             normals = normals,
             triangles = triangles,
@@ -233,7 +234,7 @@ public class MapCullInst : MonoBehaviour
         public int chunkSize; 
 
         [DeallocateOnJobCompletion]
-        public NativeArray3D<int> chunkMap;
+        public NativeMap3D<int> chunkMap;
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> vertices;
         [DeallocateOnJobCompletion]
@@ -279,8 +280,8 @@ public class MapCullInst : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    if (chunkMap[x, yThreshold, z] != 0 // block on top of the face
-                        && chunkMap[x, yThreshold - 1, z] != 0) // block with the top face
+                    if (chunkMap[x, yThreshold, z] != 0 // have block on top of the face burying it
+                        && chunkMap[x, yThreshold - 1, z] != 0) // block the face belongs to exists
                     {
                         Vector3 vertex1 = new Vector3(x, yThreshold, z);
                         Vector3 vertex2 = new Vector3(x + 1, yThreshold, z);
