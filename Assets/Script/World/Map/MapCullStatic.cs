@@ -51,20 +51,20 @@ public class MapCullStatic : MonoBehaviour
 
     void Start()
     {
-        // Calculate the forward and backward directions with a slight angle
         forwardDirection = Quaternion.Euler(ANGLE_OFFSET, 5, 0) * Vector3.up;
         backwardDirection = Quaternion.Euler(-ANGLE_OFFSET, 5, 0) * Vector3.up;
         leftDirection = Quaternion.Euler(0, 5, -ANGLE_OFFSET) * Vector3.up;
         rightDirection = Quaternion.Euler(0, 5, ANGLE_OFFSET) * Vector3.up;
-
-        _collisionLayer = LayerMask.GetMask("Collision");
+ 
         _chunkPositionPrevious = WorldStatic._playerChunkPos;
 
-        _lightIndoor = GameObject.Find("light_indoor"); 
-        _lightSelf = GameObject.Find("light_self");   
+        _collisionLayer = LayerMask.GetMask("Collision");
+        _lightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
+        _lightSelf = Game.Player.transform.Find("light_self").gameObject;   
         
-        _camera = GameObject.Find("main_camera"); 
+        _camera = Game.Camera.gameObject; 
         _volume = _camera.GetComponent<Volume>();
+        
         HandleLight(false); 
     }
 
@@ -106,35 +106,38 @@ public class MapCullStatic : MonoBehaviour
         // } 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (_visionHeight == 1) _visionHeight = 2;
-            else _visionHeight = 1;
+            _visionHeight++;
+            if (_visionHeight == 4) _visionHeight = 1;
         }
     }
 
     void HandleCheck()
-    {  
+    {
         if (Time.frameCount > _cullSyncFrame + 1)
         {
             if (!_yCheckPrevious && _yCheck) // enter
-            { 
-                HandleLight(true); 
+            {
+                HandleLight(true);
                 UpdateYCullDelayed(_yCheck);
             }
             else if (_yCheckPrevious && !_yCheck) // exit
-            { 
-                HandleLight(false); 
+            {
+                HandleLight(false);
                 UpdateYCullDelayed(_yCheck);
-            } 
-            else if (_yCheck && _yThresholdPrevious != _yThreshold && 
-                     !(WorldStatic._playerChunkPos != _chunkPositionPrevious)) //change y threshold but not move
-            {  
-                UpdateYCull();
             }
-            else if (_yCheck && WorldStatic._playerChunkPos != _chunkPositionPrevious) //player moved
-            { 
-                UpdateYCull();
-                _chunkPositionPrevious = WorldStatic._playerChunkPos;
+            else if (_yCheck)   
+            {
+                if (WorldStatic._playerChunkPos != _chunkPositionPrevious)
+                { 
+                    UpdateYCull();
+                    _chunkPositionPrevious = WorldStatic._playerChunkPos;
+                }
+                else if (_yThresholdPrevious != _yThreshold)
+                {
+                    UpdateYCull();
+                }
             }
+
             _yCheckPrevious = _yCheck;
             _yThresholdPrevious = _yThreshold;  
         }
@@ -146,7 +149,7 @@ public class MapCullStatic : MonoBehaviour
     {  
         _signalUpdateSpriteYCull?.Invoke();   
         _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;
-        foreach (var kvp in MapLoadStatic.Instance._activeChunks) // cull off
+        foreach (var kvp in MapLoadStatic.Instance._activeChunks) 
         { 
             kvp.Value.CullMeshAsync();
         }  
@@ -157,7 +160,7 @@ public class MapCullStatic : MonoBehaviour
         if (_delayBuffer) return;
         _delayBuffer = true;
 
-        await Task.Delay(80);
+        await Task.Delay(120);
         if (_yCheck == yCheckPrevious)
         { 
             UpdateYCull();
@@ -190,7 +193,7 @@ public class MapCullStatic : MonoBehaviour
             return;
         }  
     
-        rayToCamera = new Ray(playerPosition + Vector3.up, _camera.transform.position - playerPosition);
+        rayToCamera = new Ray(playerPosition + Vector3.up/2,  _camera.transform.position - (playerPosition + Vector3.up/2));
         if (Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
         {
             _yCheck = true;
@@ -199,9 +202,9 @@ public class MapCullStatic : MonoBehaviour
         }
         
         rayForward = new Ray(playerPosition, forwardDirection);
-        rayBackward = new Ray(playerPosition, backwardDirection); 
-        rayLeft = new Ray(playerPosition, leftDirection); 
-        rayRight = new Ray(playerPosition, rightDirection);   
+        rayBackward = new Ray(playerPosition, backwardDirection);
+        rayLeft = new Ray(playerPosition, leftDirection);
+        rayRight = new Ray(playerPosition, rightDirection);
         if (Physics.Raycast(rayForward, out _, 50, _collisionLayer) &&
             Physics.Raycast(rayBackward, out _, 50, _collisionLayer) &&
             Physics.Raycast(rayLeft, out _, 50, _collisionLayer) &&
@@ -214,6 +217,15 @@ public class MapCullStatic : MonoBehaviour
         _yThreshold = 0;
     }
 
+    // void OnDrawGizmos()
+    // {
+    //     Vector3 playerPosition = Game.Player.transform.position;
+    //     Vector3 cameraPosition = _camera.transform.position;
+    //     Ray rayToCamera = new Ray(playerPosition + Vector3.up/2, cameraPosition - (playerPosition + Vector3.up/2));
+    //
+    //     Gizmos.color = Color.red;
+    //     Gizmos.DrawLine(rayToCamera.origin, rayToCamera.origin + rayToCamera.direction * 100);
+    // }
 
     //
     //
@@ -250,7 +262,7 @@ public class MapCullStatic : MonoBehaviour
     // }
  
 
-
+            
     public void ForceRevertMesh() // for when player fall into void
     {
         _yCheck = false;

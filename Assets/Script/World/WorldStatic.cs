@@ -30,14 +30,14 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static bool[,,] _boolMap;
     [HideInInspector] 
-    public static int CHUNK_SIZE = 15; 
+    public static int CHUNK_SIZE = 25; 
     [HideInInspector] 
     public static int RENDER_DISTANCE = 3; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xSize = 1;
-    public static int ySize = 6;
-    public static int zSize = 1;
+    public static int xSize = 10;
+    public static int ySize = 3;
+    public static int zSize = 10;
     private void Awake()    
     {
         Instance = this;
@@ -78,7 +78,7 @@ public class WorldStatic : MonoBehaviour
 
     private string getFilePath(int yLevel)
     {
-        return $"{Game.DOWNLOAD_PATH}\\World_{yLevel}.dat";
+        return $"{Game.DOWNLOAD_PATH}\\World{yLevel}.dat";
     }
     
     public async void HandleSaveWorldFile(int yLevel)
@@ -232,7 +232,11 @@ public class WorldStatic : MonoBehaviour
     {
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID;
         MapLoadStatic.Instance.RefreshExistingChunk(chunkCoordinate); // Refresh on screen
-
+        if (blockCoordinate.x != 0 && blockCoordinate.x != CHUNK_SIZE - 1 &&
+            blockCoordinate.y != 0 && blockCoordinate.y != CHUNK_SIZE - 1 &&
+            blockCoordinate.z != 0 && blockCoordinate.z != CHUNK_SIZE - 1)
+            return;
+        
         // X-axis checks
         if (blockCoordinate.x == 0)
             MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -CHUNK_SIZE, 0, 0));
