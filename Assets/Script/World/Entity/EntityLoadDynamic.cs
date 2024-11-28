@@ -79,9 +79,12 @@ public class EntityLoadDynamic : MonoBehaviour
       
     public void SaveAll()
     {
+        Vector3Int entityChunkPosition;
         foreach (EntityHandler entityHandler in _entityList)
-        { 
-            WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityHandler.transform.position)).DynamicEntity.Add(entityHandler.GetEntityData());
+        {
+            entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
+            if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
+                WorldStatic.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
             EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }

@@ -35,9 +35,9 @@ public class WorldStatic : MonoBehaviour
     public static int RENDER_DISTANCE = 3; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xSize = 6;
+    public static int xSize = 1;
     public static int ySize = 6;
-    public static int zSize = 6;
+    public static int zSize = 1;
     private void Awake()    
     {
         Instance = this;
