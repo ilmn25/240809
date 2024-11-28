@@ -60,7 +60,7 @@ public class MapLoadStatic : MonoBehaviour
     Vector3 traverseCheckPosition;
     List<Vector3Int> destroyList = new List<Vector3Int>();
     void HandleChunkMapTraverse()
-    { 
+    {
         foreach (var kvp in _activeChunks)
         {
             traverseCheckPosition = kvp.Key;

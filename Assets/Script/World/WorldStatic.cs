@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class WorldStatic : MonoBehaviour
 { 
@@ -34,9 +35,9 @@ public class WorldStatic : MonoBehaviour
     public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xsize = 3;
-    public static int ysize = 2;
-    public static int zsize = 2;
+    public static int xsize = 2;
+    public static int ysize = 50;
+    public static int zsize = 1;
     private void Awake()
     {
         Instance = this;
@@ -121,17 +122,17 @@ public class WorldStatic : MonoBehaviour
     {
         _boolMap = new bool[World.Bounds.x, World.Bounds.y, World.Bounds.z];
         ChunkData chunkData;
-
+        
         for (int wx = 0; wx < World.Length.x; wx++)
-        {
-            for (int wz = 0; wz < World.Length.y; wz++)
+        { 
+            for (int wy = 0; wy < World.Length.y; wy++)
             {
-                for (int wy = 0; wy < World.Length.z; wy++)
+                for (int wz = 0; wz < World.Length.z; wz++)
                 {
                     int startX = wx * CHUNKSIZE;
                     int startY = wy * CHUNKSIZE;
                     int startZ = wz * CHUNKSIZE;
-                    chunkData = World[startX, startY, startZ];
+                    chunkData = World[startX, startY, startZ]; 
                     if (chunkData != null)
                     { 
                         for (int i = 0; i < CHUNKSIZE; i++)
@@ -140,11 +141,11 @@ public class WorldStatic : MonoBehaviour
                             {
                                 for (int k = 0; k < CHUNKSIZE; k++)
                                 {
-                                    _boolMap[startX + i, startY + j, startZ + k] = chunkData.Map[i, j, k] == 0;
+                                        _boolMap[startX + i, startY + j, startZ + k] = chunkData.Map[i, j, k] == 0;
+
                                 }
                             }
                         }
-
                         foreach (var entity in chunkData.StaticEntity)
                         {
                             if (entity.Type == EntityType.Static)
