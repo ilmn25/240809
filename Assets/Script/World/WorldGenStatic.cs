@@ -7,7 +7,6 @@ public class WorldGenStatic : MonoBehaviour
     public static WorldGenStatic Instance { get; private set; }  
     
     private int _chunkSize;
-    private int _chunkDepth; 
     public bool SPAWN_ENTITY; 
 
     // Generate random offsets for Perlin noise
@@ -31,8 +30,7 @@ public class WorldGenStatic : MonoBehaviour
     public ChunkData GenerateTestChunk(Vector3Int coordinates)
     {
         _chunkSize = WorldStatic.CHUNKSIZE;
-        _chunkDepth = WorldStatic.CHUNKDEPTH;
-        ChunkData chunkData = new ChunkData(new SerializableVector3Int(coordinates));
+        ChunkData chunkData = new ChunkData();
         HandleBlockGeneration();
         if (SPAWN_ENTITY) HandleEntityGeneration();
         return chunkData; 
@@ -61,14 +59,14 @@ public class WorldGenStatic : MonoBehaviour
 
                     // Generate Perlin noise value for terrain
                     float perlinValue = Mathf.PerlinNoise(worldX, worldZ);
-                    // Scale the Perlin noise value to the range [0, _chunkDepth]
-                    int terrainHeight = Mathf.FloorToInt(perlinValue * _chunkDepth);
+                    // Scale the Perlin noise value to the range [0, _chunkSize]
+                    int terrainHeight = Mathf.FloorToInt(perlinValue * _chunkSize);
 
                     // Generate Perlin noise value for marble layer height
                     float marbleNoiseValue = Mathf.PerlinNoise(Mathf.Abs(coordinates.x + x) * marbleScale + marbleOffsetX, Mathf.Abs(coordinates.z + z) * marbleScale + marbleOffsetZ);
-                    int marbleLayerHeight = Mathf.FloorToInt(marbleNoiseValue * _chunkDepth);
+                    int marbleLayerHeight = Mathf.FloorToInt(marbleNoiseValue * _chunkSize);
 
-                    for (int y = 0; y < _chunkDepth; y++)
+                    for (int y = 0; y < _chunkSize; y++)
                     {
                         // Normalize coordinates for caves
                         float caveX = Mathf.Abs(coordinates.x + x) * caveScale + caveOffsetX;
@@ -114,15 +112,15 @@ public class WorldGenStatic : MonoBehaviour
             System.Random random = new System.Random();
             EntityData entityData;
             SerializableVector3 entityPosition;
-            for (int x = 0; x < chunkData.Size; x++)
+            for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
             {
-                for (int y = 0; y < chunkData.Depth; y++)
+                for (int y = 0; y < _chunkSize; y++)
                 {
-                    for (int z = 0; z < chunkData.Size; z++)
+                    for (int z = 0; z <  WorldStatic.CHUNKSIZE; z++)
                     {
                         if (chunkData.Map[x, y, z] == BlockStatic.ConvertID("dirt"))
                         {
-                            if (y + 1 < chunkData.Depth && chunkData.Map[x, y + 1, z] == 0) // 5% chance
+                            if (y + 1 < _chunkSize && chunkData.Map[x, y + 1, z] == 0) // 5% chance
                             {
                                 double rng = random.NextDouble();
                                 if (rng <= 0.03)
@@ -145,7 +143,7 @@ public class WorldGenStatic : MonoBehaviour
                         } 
                         else if (chunkData.Map[x, y, z] != 0)
                         {
-                            if (y + 1 < chunkData.Depth && chunkData.Map[x, y + 1, z] == 0) // 5% chance
+                            if (y + 1 < _chunkSize && chunkData.Map[x, y + 1, z] == 0) // 5% chance
                             {
                                 if (random.NextDouble() <= 0.004)
                                 { 

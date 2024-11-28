@@ -17,8 +17,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     private Vector3 _screenPosition;
     private Vector3Int _chunkCoordinate;
     private Vector3Int _blockCoordinate;
-    private int _chunkSize;
-    private int _chunkDepth; 
+    private int _chunkSize; 
     [HideInInspector] public string _blockStringID = null; 
     [HideInInspector] public ItemData _toolData;
 
@@ -29,18 +28,18 @@ public class PlayerChunkEditStatic : MonoBehaviour
     {
         Instance = this;
         _boxCollider = GetComponent<BoxCollider>();
-        _chunkSize = WorldStatic.CHUNKSIZE;
-        _chunkDepth = WorldStatic.CHUNKDEPTH; 
+        _chunkSize = WorldStatic.CHUNKSIZE; 
     }
 
     public void HandleTerraformUpdate()
     { 
         if(_block != null)
-        {
+        { 
             if (_worldPosition != Vector3.down)
             {         
                 if (Input.GetMouseButtonDown(1)) //place
                 { 
+                    if (!WorldStatic.Instance.IsInWorldBounds(_worldPosition)) return;
                     PlayerInventoryStatic.RemoveItem(_blockStringID); 
                     ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
                 }
@@ -53,6 +52,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             if (Input.GetMouseButtonDown(0)) //break
             {
                 HandleBlockPosition(true);
+                if (!WorldStatic.Instance.IsInWorldBounds(_worldPosition)) return;
                 int destroyedBlockID =
                     MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
                 if (destroyedBlockID != 0)
@@ -65,6 +65,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             else if (Input.GetMouseButtonDown(4)) //break top
             {
                 _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, 1, 0);
+                if (!WorldStatic.Instance.IsInWorldBounds(_worldPosition)) return;
                 HandleChunkCoordinate(_worldPosition);
                 int destroyedBlockID =
                     MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
@@ -78,6 +79,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
             else if (Input.GetMouseButtonDown(3)) //break under
             {
                 _worldPosition = Lib.AddToVector(Vector3Int.FloorToInt(Game.Player.transform.position), 0, -1, 0);
+                if (!WorldStatic.Instance.IsInWorldBounds(_worldPosition)) return;
                 HandleChunkCoordinate(_worldPosition);
                 int destroyedBlockID =
                     MapLoadStatic.Instance.GetBlockInChunk(_chunkCoordinate, _blockCoordinate, WorldStatic.Instance);
@@ -89,6 +91,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 }
             }
         }
+ 
     }
 
 
@@ -184,8 +187,8 @@ public class PlayerChunkEditStatic : MonoBehaviour
             _worldPosition.y = Mathf.FloorToInt(adjustedPoint.y);
             _worldPosition.z = Mathf.FloorToInt(adjustedPoint.z);
 
-            if (_worldPosition.y > _chunkDepth - 1) _worldPosition.y = _chunkDepth - 1;
-            if (_worldPosition.y < 0) _worldPosition.y = 0;
+            // if (_worldPosition.y > WorldStatic.World.Bounds.y - 1) _worldPosition.y = WorldStatic.World.Bounds.y - 1;
+            // if (_worldPosition.y < 0) _worldPosition.y = 0;
         }
     }
 
@@ -269,19 +272,21 @@ public class PlayerChunkEditStatic : MonoBehaviour
     {
         // Calculate chunk coordinates
         _chunkCoordinate = new Vector3Int(
-            Mathf.FloorToInt(coordinate.x / _chunkSize) *_chunkSize, 0,
+            Mathf.FloorToInt(coordinate.x / _chunkSize) *_chunkSize, 
+            Mathf.FloorToInt(coordinate.y / _chunkSize) *_chunkSize,
             Mathf.FloorToInt(coordinate.z / _chunkSize) *_chunkSize
         );
 
         // Calculate block coordinates within the chunk
         _blockCoordinate = new Vector3Int(
             (int) coordinate.x % _chunkSize,
-            (int) coordinate.y,
+            (int) coordinate.y % _chunkSize,
             (int) coordinate.z % _chunkSize
         );
  
 
         if (_blockCoordinate.x < 0) _blockCoordinate.x += _chunkSize;
+        if (_blockCoordinate.y < 0) _blockCoordinate.y += _chunkSize;
         if (_blockCoordinate.z < 0) _blockCoordinate.z += _chunkSize;
     }
 

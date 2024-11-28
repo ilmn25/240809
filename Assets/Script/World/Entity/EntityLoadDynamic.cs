@@ -36,12 +36,15 @@ public class EntityLoadDynamic : MonoBehaviour
     {
         var keysToRemove = new List<Vector3Int>();
         UpdateEntityListKey?.Invoke();
-
+        Vector3Int entityChunkPosition;
         foreach (var entityHandler in _entityList)
         { 
             if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > 60) { 
-                Lib.Log(WorldStatic.GetChunkCoordinate(entityHandler.transform.position));
-                WorldStatic.Instance.GetChunk(WorldStatic.GetChunkCoordinate(entityHandler.transform.position)).DynamicEntity.Add(entityHandler.GetEntityData());
+                entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
+                Lib.Log(entityChunkPosition);
+                if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
+                    WorldStatic.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
+                
                 EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject); 
             }
         }
@@ -53,18 +56,21 @@ public class EntityLoadDynamic : MonoBehaviour
 
         for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x += WorldStatic.CHUNKSIZE)
         {
-            for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
+            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y += WorldStatic.CHUNKSIZE)
             {
-                _currentChunkCoordinate = new Vector3Int(
-                    Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
-                    0,
-                    Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
-                ); 
- 
-                _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
-                if  (_currentChunkData != null)
+                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
                 {
-                    LoadChunkEntities(_currentChunkData.DynamicEntity); 
+                    _currentChunkCoordinate = new Vector3Int(
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.y + y),
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
+                    );
+
+                    _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate);
+                    if (_currentChunkData != null)
+                    {
+                        LoadChunkEntities(_currentChunkData.DynamicEntity);
+                    }
                 }
             } 
         } 

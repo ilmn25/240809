@@ -14,7 +14,7 @@ public class GameStatic : MonoBehaviour
         Instance = this;  
         Time.fixedDeltaTime = FIXED_UPDATE_MS;
         Application.targetFrameRate = 200;
-        Game.Player.transform.position = new Vector3(Game.Player.transform.position.x , WorldStatic.CHUNKDEPTH + 10, Game.Player.transform.position.z);
+        Game.Player.transform.position = new Vector3(Game.Player.transform.position.x , WorldStatic.CHUNKSIZE + 10, Game.Player.transform.position.z);
     }
 
     void Update()
@@ -22,7 +22,7 @@ public class GameStatic : MonoBehaviour
         if (Game.Player.transform.position.y < -50)
         {
             GameObject.Find("map_system").GetComponent<MapCullStatic>().ForceRevertMesh();
-            Game.Player.transform.position = new Vector3(Game.Player.transform.position.x , WorldStatic.CHUNKDEPTH + 50, Game.Player.transform.position.z);
+            Game.Player.transform.position = new Vector3(Game.Player.transform.position.x , WorldStatic.CHUNKSIZE + 50, Game.Player.transform.position.z);
         }
 
         _deltaTime = (Time.deltaTime < MAX_DELTA_TIME) ? Time.deltaTime : MAX_DELTA_TIME;

@@ -20,21 +20,11 @@ public class MapLoadStatic : MonoBehaviour
     {   
         Instance = this;
         WorldStatic.PlayerChunkTraverse += HandleChunkMapTraverse;
-        _chunkSize = WorldStatic.CHUNKSIZE;
-        _chunkDepth = WorldStatic.CHUNKDEPTH;
 
         _tileSize = 16;
         _tilesPerRow = 12;
         _colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
-        _rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0}; 
-        _nullFace = new bool[_chunkDepth, _chunkSize]; 
-        for (int i = 0; i < _chunkDepth; i++)
-        {
-            for (int j = 0; j < _chunkSize; j++)
-            {
-                _nullFace[i, j] = false; 
-            }
-        }  
+        _rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};  
     } 
 
     async void Start()
@@ -70,12 +60,12 @@ public class MapLoadStatic : MonoBehaviour
     List<Vector3Int> destroyList = new List<Vector3Int>();
     void HandleChunkMapTraverse()
     { 
-
         foreach (var kvp in _activeChunks)
         {
             traverseCheckPosition = kvp.Key;
-            if (traverseCheckPosition.x > WorldStatic._chunkPosition.x + WorldStatic.RENDER_DISTANCE * _chunkSize || traverseCheckPosition.x < WorldStatic._chunkPosition.x - WorldStatic.RENDER_DISTANCE * _chunkSize
-                || traverseCheckPosition.z > WorldStatic._chunkPosition.z + WorldStatic.RENDER_DISTANCE * _chunkSize || traverseCheckPosition.z < WorldStatic._chunkPosition.z - WorldStatic.RENDER_DISTANCE * _chunkSize)
+            if (kvp.Key.x > WorldStatic._chunkPosition.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.x < WorldStatic._chunkPosition.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
+                || kvp.Key.y > WorldStatic._chunkPosition.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.y < WorldStatic._chunkPosition.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
+                || kvp.Key.z > WorldStatic._chunkPosition.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.z < WorldStatic._chunkPosition.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE)
             {
                 Destroy(kvp.Value);
                 destroyList.Add(kvp.Key);
@@ -92,14 +82,18 @@ public class MapLoadStatic : MonoBehaviour
         // Collect chunk coordinates within render distance
         for (int x = -WorldStatic.RENDER_DISTANCE; x <= WorldStatic.RENDER_DISTANCE; x++)
         {
-            for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
+            for (int y = -WorldStatic.RENDER_DISTANCE; y <= WorldStatic.RENDER_DISTANCE; y++)
             {
-                Vector3Int traverseCheckPosition = new Vector3Int(
-                    WorldStatic._chunkPosition.x + x * _chunkSize,
-                    0,
-                    WorldStatic._chunkPosition.z + z * _chunkSize
-                );
-                if (!_activeChunks.ContainsKey(traverseCheckPosition)) _ = LoadChunksOntoScreenAsync(traverseCheckPosition);
+                for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
+                {
+                    Vector3Int traverseCheckPosition = new Vector3Int(
+                        WorldStatic._chunkPosition.x + x * WorldStatic.CHUNKSIZE,
+                        WorldStatic._chunkPosition.y + y * WorldStatic.CHUNKSIZE,
+                        WorldStatic._chunkPosition.z + z * WorldStatic.CHUNKSIZE
+                    );
+                    if (!_activeChunks.ContainsKey(traverseCheckPosition))
+                        _ = LoadChunksOntoScreenAsync(traverseCheckPosition);
+                }
             }
         } 
     }
@@ -114,8 +108,8 @@ public class MapLoadStatic : MonoBehaviour
             if (replace || !_activeChunks.ContainsKey(chunkCoord))
             {
                 _chunkCoordinate = chunkCoord;
-                (_chunkMap, _frontFace, _backFace, _leftFace, _rightFace, _corner) = LoadChunkMap(chunkCoord, WorldStatic.Instance);
-                if (_chunkMap != null)
+                _chunkData = WorldStatic.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
+                if (_chunkData != ChunkData.Zero)
                 {
                     await Task.Run(() => LoadMeshMath()); 
                     await Task.Delay(10);
@@ -161,7 +155,7 @@ public class MapLoadStatic : MonoBehaviour
             _meshRenderer.material = BlockStatic._meshMaterial; 
 
             _mapCullInst = _meshObject.AddComponent<MapCullInst>();  
-            _mapCullInst._chunkMap = _chunkMap;
+            _mapCullInst._chunkMap = _chunkData.Map;
             _mapCullInst._meshData = _mesh;
             _mapCullInst._verticesShadow = _verticesShadow;
             _activeChunks.Add(_chunkCoordinate, _meshObject);
@@ -173,7 +167,7 @@ public class MapLoadStatic : MonoBehaviour
             _meshRenderer.material = BlockStatic._meshMaterial; 
 
             _mapCullInst = _meshObject.GetComponent<MapCullInst>();  
-            _mapCullInst._chunkMap = _chunkMap;
+            _mapCullInst._chunkMap = _chunkData.Map;
             _mapCullInst._meshData = _mesh;
             _mapCullInst._verticesShadow = _verticesShadow;
             _mapCullInst.HandleAssignment(); 
@@ -184,22 +178,14 @@ public class MapLoadStatic : MonoBehaviour
 
 
     // const
-    private int _chunkSize;
-    private int _chunkDepth;  
     private int _tileSize;
     private int _tilesPerRow;
     private int[] _colx;
     private int[] _rowy; 
-    private bool[,] _nullFace; 
 
     // input
-    public Vector3Int _chunkCoordinate; 
-    public int[,,] _chunkMap; 
-    private bool[,] _frontFace;
-    private bool[,] _backFace;
-    private bool[,] _leftFace;
-    private bool[,] _rightFace; 
-    private bool[,] _corner; 
+    private Vector3Int _chunkCoordinate;
+    private ChunkData _chunkData;  
 
     // output
     private List<Vector3> _vertices;
@@ -222,8 +208,7 @@ public class MapLoadStatic : MonoBehaviour
             MeshMathJob job = new MeshMathJob
             {
                 // const
-                _chunkSize = _chunkSize,
-                _chunkDepth = _chunkDepth, 
+                _chunkSize = WorldStatic.CHUNKSIZE,
                 _tileSize = _tileSize,
                 _tilesPerRow = _tilesPerRow, 
                 _colx = new NativeArray<int>(_colx, Allocator.TempJob),
@@ -232,13 +217,8 @@ public class MapLoadStatic : MonoBehaviour
                 _textureAtlasWidth = BlockStatic._textureAtlasWidth,
                 _textureAtlasHeight = BlockStatic._textureAtlasHeight, 
 
-                // input
-                _chunkMap = new NativeArray3D<int>(_chunkMap, Allocator.TempJob),
-                _frontFace = InitializeFace(_frontFace, Allocator.TempJob),
-                _backFace = InitializeFace(_backFace, Allocator.TempJob),
-                _leftFace = InitializeFace(_leftFace, Allocator.TempJob),
-                _rightFace = InitializeFace(_rightFace, Allocator.TempJob),
-                _corner = InitializeFace(_corner, Allocator.TempJob),
+                // input 
+                _chunkMap = ChunkMap.Create(_chunkCoordinate),
 
                 // output
                 _vertices = new NativeList<Vector3>(Allocator.TempJob),
@@ -248,7 +228,6 @@ public class MapLoadStatic : MonoBehaviour
                 _normals = new NativeList<Vector3>(Allocator.TempJob),
 
                 // local temp
-                _blockData = new NativeArray<int>(6, Allocator.TempJob),
                 _faceVertices = new NativeArray<Vector3>(4, Allocator.TempJob),
                 _faceVerticesShadow = new NativeArray<Vector3>(4, Allocator.TempJob),
                 _spriteUVs = new NativeArray<Vector2>(4, Allocator.TempJob)
@@ -258,7 +237,7 @@ public class MapLoadStatic : MonoBehaviour
             JobHandle jobHandle = job.Schedule();
 
             jobHandle.Complete();
-            
+
             _vertices = new List<Vector3>(job._vertices.ToArray());
             _verticesShadow = new List<Vector3>(job._verticesShadow.ToArray());
             _triangles = new List<int>(job._triangles.ToArray());
@@ -279,28 +258,14 @@ public class MapLoadStatic : MonoBehaviour
             Debug.LogError($"An exception occurred in MeshMathJob: {ex.Message}");
         } 
     }
-        
-    private NativeArray2D<bool> InitializeFace(bool[,] face, Allocator allocator)
-    {
-        if (face != null)
-        {
-            return new NativeArray2D<bool>(face, allocator) { IsValid = true };
-        }
-        else
-        {
-            return new NativeArray2D<bool>(_nullFace, allocator) { IsValid = false };
-        }
-    }
- 
+         
 
     // [BurstCompile(CompileSynchronously = true)]
     public struct MeshMathJob : IJob
     {
         // const
         [DeallocateOnJobCompletion]
-        public int _chunkSize;
-        [DeallocateOnJobCompletion]
-        public int _chunkDepth;   
+        public int _chunkSize; 
         [DeallocateOnJobCompletion]
         public int _tileSize;
         [DeallocateOnJobCompletion]
@@ -318,17 +283,7 @@ public class MapLoadStatic : MonoBehaviour
 
         // input 
         [DeallocateOnJobCompletion]
-        public NativeArray3D<int> _chunkMap; 
-        [DeallocateOnJobCompletion]
-        public NativeArray2D<bool> _frontFace;
-        [DeallocateOnJobCompletion]
-        public NativeArray2D<bool> _backFace;
-        [DeallocateOnJobCompletion]
-        public NativeArray2D<bool> _leftFace;
-        [DeallocateOnJobCompletion]
-        public NativeArray2D<bool> _rightFace; 
-        [DeallocateOnJobCompletion]
-        public NativeArray2D<bool> _corner;
+        public NativeMap3D<int> _chunkMap;  
 
         // output
         public NativeList<Vector3> _vertices;
@@ -342,9 +297,20 @@ public class MapLoadStatic : MonoBehaviour
         private int _blockID;
         [DeallocateOnJobCompletion] 
         private Vector3 _blockPosition;
+        
         [DeallocateOnJobCompletion]
-        public NativeArray<int> _blockData;
+        public int py;
         [DeallocateOnJobCompletion]
+        public int ny;
+        [DeallocateOnJobCompletion]
+        public int px;
+        [DeallocateOnJobCompletion]
+        public int nx;
+        [DeallocateOnJobCompletion]
+        public int pz;
+        [DeallocateOnJobCompletion]
+        public int nz;
+
         public NativeArray<Vector3> _faceVertices;
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> _faceVerticesShadow;
@@ -357,78 +323,42 @@ public class MapLoadStatic : MonoBehaviour
         [DeallocateOnJobCompletion]
         private int edgeValue;
         [DeallocateOnJobCompletion]
-        private int cornerValue; 
-        [DeallocateOnJobCompletion]
-        private bool isBackEdge;
-        [DeallocateOnJobCompletion]
-        private bool isRightEdge;
-        [DeallocateOnJobCompletion]
-        private bool isFrontEdge;
-        [DeallocateOnJobCompletion]
-        private bool isLeftEdge;
-        [DeallocateOnJobCompletion]
-        private bool isTop;
-        [DeallocateOnJobCompletion] 
-        private bool isBottem;
+        private int cornerValue;  
         [DeallocateOnJobCompletion] 
         private Rect _textureRect;
-
-        
-        // private int GetIndex2D(int y, int x)
-        // {
-        //     return y * (_chunkSize - 1) + x;
-        // }
-
-        // private int GetIndex3D(int x, int y, int z)
-        // {
-        //     return x * (_chunkDepth -1) * (_chunkSize -1) + y * (_chunkSize - 1) + z;
-        // }
-
+ 
         public void Execute()
         {   
-            // int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            // UnityEngine.Debug.Log(threadId == 1 ? "Main thread" : $"Worker thread {threadId}");
             for (int z = 0; z < _chunkSize; z++)
             {
                 for (int x = 0; x < _chunkSize; x++)
                 {
-                    for (int y = 0; y < _chunkDepth; y++)
+                    for (int y = 0; y < _chunkSize; y++)
                     {
                         _blockID = _chunkMap[x, y, z];
 
                         if (_blockID != 0)
                         {
-                            HandleBlockProcessData(x, y, z);    
                             _blockPosition = new Vector3(x, y, z);
 
-                            //! Check if the block ID is already in the list, and used to calculate textureatlas size needed  
-                            if (_blockData[0] != -1) HandleMeshFace(1, _blockData[0]);//top
-                            if (_blockData[1] != -1)
-                            {
-                                if (_blockData[5] == 1 || _blockData[5] == 2) HandleMeshFace(4, _blockData[1]);//front
-                                if (_blockData[5] == 1 || _blockData[5] == 3) HandleMeshFace(3, _blockData[1]);//back
-                            }
-
-                            if (_blockData[2] != -1)
-                            {
-                                if (_blockData[3] == 1 || _blockData[3] == 2) HandleMeshFace(5, _blockData[2]);//left
-                                if (_blockData[3] == 1 || _blockData[3] == 3) HandleMeshFace(6, _blockData[2]);//right
-                            }
-                            if (_blockData[4] == 1) HandleMeshFace(2, 33);
-                                
+                            if (_chunkMap[x, y + 1, z] == 0) HandleMeshFace(dir.py, HandleMeshAutoTile(x, y, z, dir.py)); // Top
+                            if (_chunkMap[x, y - 1, z] == 0) HandleMeshFace(dir.ny, HandleMeshAutoTile(x, y, z, dir.ny)); // Bottom
+                            if (_chunkMap[x + 1, y, z] == 0) HandleMeshFace(dir.px, HandleMeshAutoTile(x, y, z, dir.px)); // Right
+                            if (_chunkMap[x - 1, y, z] == 0) HandleMeshFace(dir.nx, HandleMeshAutoTile(x, y, z, dir.nx)); // Left
+                            if (_chunkMap[x, y, z + 1] == 0) HandleMeshFace(dir.pz, HandleMeshAutoTile(x, y, z, dir.pz)); // Front
+                            if (_chunkMap[x, y, z - 1] == 0) HandleMeshFace(dir.nz, HandleMeshAutoTile(x, y, z, dir.nz)); // Back
                         }
                     }
                 }
-            } 
- 
+            }
         }
 
-        void HandleMeshFace(int direction, int textureIndex)
+        void HandleMeshFace(dir direction, int textureIndex)
         { 
             int vertexIndex = _vertices.Length; 
             _normal = Vector3.zero;
 
-            if (direction == 1) // top
+            if (direction == dir.py) // top
             {
                 _faceVertices[0] = _blockPosition + new Vector3(0, 1, 0);
                 _faceVertices[1] = _blockPosition + new Vector3(1, 1, 0);
@@ -448,7 +378,7 @@ public class MapLoadStatic : MonoBehaviour
                 _triangles.Add(vertexIndex + 2);
                 _normal = new Vector3(0, 1, 0);
             }
-            else if (direction == 2) // down
+            else if (direction == dir.ny) // down
             {
                 _faceVertices[0] = _blockPosition + new Vector3(0, 0, 1);
                 _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
@@ -462,7 +392,7 @@ public class MapLoadStatic : MonoBehaviour
                 _triangles.Add(vertexIndex + 2);
                 _normal = new Vector3(0, -1, 0);
             }
-            else if (direction == 3) // back
+            else if (direction == dir.pz) // back
             {
                 _faceVertices[0] = _blockPosition + new Vector3(0, 0, 1);
                 _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
@@ -476,7 +406,7 @@ public class MapLoadStatic : MonoBehaviour
                 _triangles.Add(vertexIndex + 3);
                 _normal = new Vector3(0, 0, 1);
             }
-            else if (direction == 4) // front
+            else if (direction == dir.nz) // front
             {
                 _faceVertices[0] = _blockPosition + new Vector3(0, 0, 0);
                 _faceVertices[1] = _blockPosition + new Vector3(1, 0, 0);
@@ -490,7 +420,7 @@ public class MapLoadStatic : MonoBehaviour
                 _triangles.Add(vertexIndex + 2);
                 _normal = new Vector3(0, 0, -1);
             }
-            else if (direction == 5) // left
+            else if (direction == dir.nx) // left
             {
                 _faceVertices[0] = _blockPosition + new Vector3(0, 0, 0);
                 _faceVertices[1] = _blockPosition + new Vector3(0, 0, 1);
@@ -504,7 +434,7 @@ public class MapLoadStatic : MonoBehaviour
                 _triangles.Add(vertexIndex + 3);
                 _normal = new Vector3(-1, 0, 0);
             }
-            else if (direction == 6) // right
+            else if (direction == dir.px) // right
             {
                 _faceVertices[0] = _blockPosition + new Vector3(1, 0, 0);
                 _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
@@ -547,7 +477,7 @@ public class MapLoadStatic : MonoBehaviour
                 _normals.Add(_normal);
                 _vertices.Add(_faceVertices[i]);
 
-                if (direction == 1) 
+                if (direction == dir.py) 
                 {
                     _verticesShadow.Add(_faceVerticesShadow[i]);
                 }
@@ -565,275 +495,364 @@ public class MapLoadStatic : MonoBehaviour
 
             return new Vector2Int(_colx[targetCol], _rowy[targetRow]);
         }
-        void HandleBlockProcessData(int x, int y, int z)
+         
+        enum dir { px, nx, py, ny, pz, nz }
+
+        int HandleMeshAutoTile(int x, int y, int z, dir mode)
         {
+            spriteNumber = 0;
+            edgeValue = 0;
+            cornerValue = 0;
 
-            bool blockAbove = false;
-            if (y != _chunkDepth - 1) {
-                blockAbove = _chunkMap[x, y + 1, z] != 0;
-            } 
-
-            bool blockFront = false;
-            if (z != 0) {
-                blockFront = _chunkMap[x, y, z - 1] != 0;
-            }
-            else
+            if (mode == dir.py) // Top
             {
-                if (_frontFace.IsValid)
+                bool isPy = _chunkMap[x, y + 1, z] == 0;
+
+                if ((_chunkMap[x, y, z + 1] != 0)
+                    || (isPy && _chunkMap[x, y + 1, z + 1] != 0))
                 {
-                    blockFront = _frontFace[y, x];
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x + 1, y, z] != 0)
+                    || (isPy && _chunkMap[x + 1, y + 1, z] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y, z - 1] != 0)
+                    || (isPy && _chunkMap[x, y + 1, z - 1] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x - 1, y, z] != 0)
+                    || (isPy && _chunkMap[x - 1, y + 1, z] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x - 1, y, z + 1] != 0)
+                    || (isPy && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+
+                if (((_chunkMap[x + 1, y, z + 1] != 0)
+                    || (isPy && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x + 1, y, z - 1] != 0)
+                    || (isPy && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x - 1, y, z - 1] != 0)
+                    || (isPy && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
+            }
+            else if (mode == dir.nx) // Negative X (Left side of the cube)
+            {
+                bool isNx = _chunkMap[x - 1, y, z] == 0;
+
+                if ((_chunkMap[x, y + 1, z] != 0)
+                    || (isNx && _chunkMap[x - 1, y + 1, z] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x, y, z + 1] != 0)
+                    || (isNx && _chunkMap[x - 1, y, z + 1] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y - 1, z] != 0)
+                    || (isNx && _chunkMap[x - 1, y - 1, z] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x, y, z - 1] != 0)
+                    || (isNx && _chunkMap[x - 1, y, z - 1] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x, y + 1, z + 1] != 0)
+                     || (isNx && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x, y - 1, z + 1] != 0)
+                     || (isNx && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x, y - 1, z - 1] != 0)
+                     || (isNx && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
+                
+                if (((_chunkMap[x, y + 1, z - 1] != 0)
+                     || (isNx && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+            }
+            else if (mode == dir.px) // Positive X (Right side of the cube)
+            {
+                bool isPx = _chunkMap[x + 1, y, z] == 0;
+
+                if ((_chunkMap[x, y + 1, z] != 0)
+                    || (isPx && _chunkMap[x + 1, y + 1, z] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x, y, z + 1] != 0)
+                    || (isPx && _chunkMap[x + 1, y, z + 1] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y - 1, z] != 0)
+                    || (isPx && _chunkMap[x + 1, y - 1, z] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x, y, z - 1] != 0)
+                    || (isPx && _chunkMap[x + 1, y, z - 1] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Lib.Log(x,y,z,_chunkMap[x, y + 1, z] != 0, _chunkMap[x, y, z + 1] != 0,_chunkMap[x, y - 1, z] != 0, _chunkMap[x, y, z - 1] != 0, _chunkMap[x, y + 1, z + 1] != 0, _chunkMap[x, y - 1, z + 1] != 0, _chunkMap[x, y - 1, z - 1] != 0, _chunkMap[x, y + 1, z - 1] != 0);
+                // Calculate corner values
+                if (((_chunkMap[x, y + 1, z + 1] != 0)
+                     || (isPx && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x, y - 1, z + 1] != 0)
+                     || (isPx && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x, y - 1, z - 1] != 0)
+                     || (isPx && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
+
+                if (((_chunkMap[x, y + 1, z - 1] != 0)
+                     || (isPx && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+            }
+            else if (mode == dir.pz) // Positive Z (Front of the cube)
+            {
+                bool isPz = _chunkMap[x, y, z + 1] == 0;
+
+                if ((_chunkMap[x, y + 1, z] != 0)
+                    || (isPz && _chunkMap[x, y + 1, z + 1] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x + 1, y, z] != 0)
+                    || (isPz && _chunkMap[x + 1, y, z + 1] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y - 1, z] != 0)
+                    || (isPz && _chunkMap[x, y - 1, z + 1] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x - 1, y, z] != 0)
+                    || (isPz && _chunkMap[x - 1, y, z + 1] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x - 1, y + 1, z] != 0)
+                     || (isPz && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+
+                if (((_chunkMap[x + 1, y + 1, z] != 0)
+                     || (isPz && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x + 1, y - 1, z] != 0)
+                     || (isPz && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x - 1, y - 1, z] != 0)
+                     || (isPz && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
+            }
+            else if (mode == dir.nz) // Negative Z (Back of the cube)
+            {
+                bool isNz = _chunkMap[x, y, z - 1] == 0;
+
+                if ((_chunkMap[x, y + 1, z] != 0)
+                    || (isNz && _chunkMap[x, y + 1, z - 1] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x + 1, y, z] != 0)
+                    || (isNz && _chunkMap[x + 1, y, z - 1] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y - 1, z] != 0)
+                    || (isNz && _chunkMap[x, y - 1, z - 1] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x - 1, y, z] != 0)
+                    || (isNz && _chunkMap[x - 1, y, z - 1] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x - 1, y + 1, z] != 0)
+                     || (isNz && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+
+                if (((_chunkMap[x + 1, y + 1, z] != 0)
+                     || (isNz && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x + 1, y - 1, z] != 0)
+                     || (isNz && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x - 1, y - 1, z] != 0)
+                     || (isNz && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
+            } 
+            else if (mode == dir.ny) // Negative Y (Bottom of the cube)
+            {
+                bool isNy = _chunkMap[x, y - 1, z] == 0;
+
+                if ((_chunkMap[x, y, z + 1] != 0)
+                    || (isNy && _chunkMap[x, y - 1, z + 1] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x + 1, y, z] != 0)
+                    || (isNy && _chunkMap[x + 1, y - 1, z] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y, z - 1] != 0)
+                    || (isNy && _chunkMap[x, y - 1, z - 1] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x - 1, y, z] != 0)
+                    || (isNy && _chunkMap[x - 1, y - 1, z] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x - 1, y, z + 1] != 0)
+                     || (isNy && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+
+                if (((_chunkMap[x + 1, y, z + 1] != 0)
+                     || (isNy && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x + 1, y, z - 1] != 0)
+                     || (isNy && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x - 1, y, z - 1] != 0)
+                     || (isNy && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
                 }
             }
 
-            bool blockBack = false;
-            if (z != _chunkSize - 1) {
-                blockBack = _chunkMap[x, y, z + 1] != 0;
-            }
-            else
-            {
-                if (_backFace.IsValid)
-                {
-                    blockBack = _backFace[y, x];
-                } 
-            }
-
-            bool blockLeft = false;
-            if (x != 0) {
-                blockLeft = _chunkMap[x - 1, y, z] != 0;
-            }
-            else
-            {
-                if (_leftFace.IsValid)
-                {
-                    blockLeft = _leftFace[y, z];
-                }  
-            }
-
-            bool blockRight = false;
-            if (x != _chunkSize - 1) {
-                blockRight = _chunkMap[x + 1, y, z] != 0;
-            }
-            else
-            {
-                if (_rightFace.IsValid)
-                {
-                    blockRight = _rightFace[y, z];
-                }  
-            }
-
-            if (!blockFront && !blockBack)
-            {
-                _blockData[5] = 1;
-            }
-            else if (!blockFront)
-            {
-                _blockData[5] = 2;
-            }
-            else if (!blockBack)
-            {
-                _blockData[5] = 3;
-            }
-
-            if (!blockLeft && !blockRight)
-            {
-                _blockData[3] = 1;
-            }
-            else if (!blockLeft)
-            {
-                _blockData[3] = 2;
-            }
-            else if (!blockRight)
-            {
-                _blockData[3] = 3;
-            }
-
-            // get autotile
-            if (!blockAbove) {
-                _blockData[0] = HandleMeshAutoTile(x, y, z, 1);
-            } else {
-                _blockData[0] = -1;
-            }
-
-            if (!blockFront || !blockBack) {
-                _blockData[1] = HandleMeshAutoTile(x, y, z, 2);
-            } else {
-                _blockData[1] = -1;
-            }
-
-            if (!blockLeft || !blockRight) {
-                _blockData[2] = HandleMeshAutoTile(x, y, z, 3);
-            } else {
-                _blockData[2] = -1;
-            }
-
-            if (y == 0 || _chunkMap[x, y - 1, z] == 0) { // bottom
-                _blockData[4] = 1;
-            } else {
-                _blockData[4] = -1;
-            }
-
-            return;
-        }
-
-        int HandleMeshAutoTile(int x, int y, int z, int mode)
-        {
-            //! GM efficient Auto-tile sprite script
-            // Original script by Taylor Lopez, edited
-            // See the original script on Git Hub: https://github.com/iAmMortos/autotile
-
-            //mode 1 top
-            //mode 2 front
-            //mode 3 sides
-            spriteNumber = 0;
-            edgeValue = 0;
-            cornerValue = 0; 
-
-            if (mode == 1){
-                // Calculate edge values
-                //check out of bounds || check layer || check layer on top
-                isBackEdge = !IsValid(x, y, z + 1);
-                isRightEdge = !IsValid(x + 1, y, z);
-                isFrontEdge = !IsValid(x, y, z - 1);
-                isLeftEdge = !IsValid(x - 1, y, z);
-
-                isTop = !IsValid(x, y + 1, z);
-                // bool isBackEdgeYPlus1 = !IsValid(x, y + 1, z + 1);
-                // bool isRightEdgeYPlus1 = !IsValid(x + 1, y + 1, z);
-                // bool isFrontEdgeYPlus1 = !IsValid(x, y + 1, z - 1);
-                // bool isLeftEdgeYPlus1 = !IsValid(x - 1, y + 1, z);
-
-                if ((isBackEdge && _backFace[y,x])
-                || (!isBackEdge && (_chunkMap[x, y, z + 1] != 0))
-                || (!isTop && isBackEdge && _backFace[y+1,x]) 
-                || (!isTop && !isBackEdge && (_chunkMap[x, y+1, z + 1] != 0)
-                )) edgeValue += 1; // Top
-
-                if ((isRightEdge && _rightFace[y,z] )
-                || (!isRightEdge && (_chunkMap[x + 1, y, z] != 0))
-                || (!isTop && isRightEdge && _rightFace[y+1,z]) 
-                || (!isTop && !isRightEdge && (_chunkMap[x + 1, y+1, z] != 0))
-                ) edgeValue += 2; // Right
-
-                if ((isFrontEdge && _frontFace[y,x] )
-                || (!isFrontEdge && (_chunkMap[x, y, z - 1] != 0 ))
-                || (!isTop && isFrontEdge && _frontFace[y+1,x]) 
-                || (!isTop && !isFrontEdge && (_chunkMap[x, y+1, z - 1] != 0))
-                ) edgeValue += 4; // Bottom
-
-                if ((isLeftEdge && _leftFace[y,z]) 
-                || (!isLeftEdge && (_chunkMap[x - 1, y, z] != 0))
-                || (!isTop && isLeftEdge && _leftFace[y+1,z]) 
-                || (!isTop && !isLeftEdge && (_chunkMap[x - 1, y+1, z] != 0))
-                ) edgeValue += 8; // Left
-
-                
-                // Calculate _corner values
-                if (((isBackEdge && !isLeftEdge && _backFace[y,x-1]) 
-                    || (!isBackEdge && isLeftEdge && _leftFace[y,z+1]) 
-                    || (isBackEdge && isLeftEdge && _corner[0,y]) 
-                    || IsValid(x - 1, y, z + 1) && _chunkMap[x - 1, y, z + 1] != 0 
-                    || (!isTop && isBackEdge && !isLeftEdge && _backFace[y+1,x-1]) 
-                    || (!isTop && !isBackEdge && isLeftEdge && _leftFace[y+1,z+1])
-                    || (!isTop && isBackEdge && isLeftEdge && _corner[0,y+1])
-                    || (IsValid(x - 1, y + 1, z + 1) && _chunkMap[x - 1, y + 1, z + 1] != 0)) 
-                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0) cornerValue += 1; // Top-Left
-
-                if (((isBackEdge && !isRightEdge && _backFace[y,x+1]) 
-                    || (!isBackEdge && isRightEdge && _rightFace[y,z+1]) 
-                    || (isBackEdge && isRightEdge && _corner[1,y]) 
-                    || IsValid(x + 1, y, z + 1) && _chunkMap[x + 1, y, z + 1] != 0 
-                    || (!isTop && isBackEdge && !isRightEdge && _backFace[y+1,x+1]) 
-                    || (!isTop && !isBackEdge && isRightEdge && _rightFace[y+1,z+1])
-                    || (!isTop && isBackEdge && isRightEdge && _corner[1,y+1])
-                    || (IsValid(x + 1, y + 1, z + 1) && _chunkMap[x + 1, y + 1, z + 1] != 0)) 
-                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0) cornerValue += 2; // Top-Right
-
-                if (((isFrontEdge && !isRightEdge && _frontFace[y,x+1]) 
-                    || (!isFrontEdge && isRightEdge && _rightFace[y,z-1]) 
-                    || (isFrontEdge && isRightEdge && _corner[3,y]) 
-                    || (IsValid(x + 1, y, z - 1) && _chunkMap[x + 1, y, z - 1] != 0)
-                    || (!isTop && isFrontEdge && !isRightEdge && _frontFace[y+1,x+1]) 
-                    || (!isTop && !isFrontEdge && isRightEdge && _rightFace[y+1,z-1])
-                    || (!isTop && isFrontEdge && isRightEdge && _corner[3,y+1])
-                    || (IsValid(x + 1, y + 1, z - 1) && _chunkMap[x + 1, y + 1, z - 1] != 0)) 
-                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0) cornerValue += 4; // Bottom-Right
-                if (((isFrontEdge && !isLeftEdge && _frontFace[y,x-1]) 
-                    || (!isFrontEdge && isLeftEdge && _leftFace[y,z-1]) 
-                    || (isFrontEdge && isLeftEdge && _corner[2,y]) 
-                    || IsValid(x - 1, y, z - 1) && _chunkMap[x - 1, y, z - 1] != 0 
-                    || (!isTop && isFrontEdge && !isLeftEdge && _frontFace[y+1,x-1]) 
-                    || (!isTop && !isFrontEdge && isLeftEdge && _leftFace[y+1,z-1])
-                    || (!isTop && isFrontEdge && isLeftEdge && _corner[2,y+1])
-                    || (IsValid(x - 1, y + 1, z - 1) && _chunkMap[x - 1, y + 1, z - 1] != 0)) 
-                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0) cornerValue += 8; // Bottom-Left
 
 
-            } 
-            else if (mode == 2)
-            { 
-                
-                isRightEdge = !IsValid(x + 1, y, z);
-                isLeftEdge = !IsValid(x - 1, y, z);
-                isTop = !IsValid(x, y + 1, z);
-                isBottem = !IsValid(x, y - 1, z);
 
-                // Calculate edge values
-                if (!isTop && _chunkMap[x, y + 1, z] != 0) edgeValue += 1; // Top
-                if (!isRightEdge && _chunkMap[x + 1, y, z] != 0
-                || isRightEdge && _rightFace[y,z]) edgeValue += 2; // Right
-                if (!isBottem && _chunkMap[x, y - 1, z] != 0) edgeValue += 4; // Bottom
-                if (!isLeftEdge && _chunkMap[x - 1, y, z] != 0
-                || isLeftEdge && _leftFace[y,z]) edgeValue += 8; // Left
 
-                // Calculate _corner values
-                if ((!isTop && !isLeftEdge && _chunkMap[x - 1, y + 1, z] != 0 
-                || !isTop && isLeftEdge && _leftFace[y+1,z])
-                && (edgeValue & 1) != 0 && (edgeValue & 8) != 0) cornerValue += 1; // Top-Left
-
-                if ((!isTop && !isRightEdge && _chunkMap[x + 1, y + 1, z] != 0
-                || !isTop && isRightEdge && _rightFace[y+1,z])
-                && (edgeValue & 1) != 0 && (edgeValue & 2) != 0) cornerValue += 2; // Top-Right
-
-                if ((!isBottem && !isRightEdge && _chunkMap[x + 1, y - 1, z] != 0 
-                || !isBottem && isRightEdge && _rightFace[y-1,z])
-                && (edgeValue & 2) != 0 && (edgeValue & 4) != 0) cornerValue += 4; // Bottom-Right
-
-                if ((!isBottem && !isLeftEdge && _chunkMap[x - 1, y - 1, z] != 0 
-                || !isBottem && isLeftEdge && _leftFace[y-1,z])
-                && (edgeValue & 4) != 0 && (edgeValue & 8) != 0) cornerValue += 8; // Bottom-Left
-            }
-            else 
-            { 
-                isFrontEdge = !IsValid(x, y, z - 1);
-                isBackEdge = !IsValid(x, y, z + 1);
-                isTop = !IsValid(x, y + 1, z);
-                isBottem = !IsValid(x, y - 1, z);
-
-                // Calculate edge values
-                if (!isTop && _chunkMap[x, y + 1, z] != 0) edgeValue += 1; // Top
-
-                if (!isBackEdge && _chunkMap[x, y, z + 1] != 0
-                || isBackEdge && _backFace[y,x]) edgeValue += 2; // Right
-
-                if (!isBottem && _chunkMap[x, y - 1, z] != 0) edgeValue += 4; // Bottom 
-                
-                if (!isFrontEdge && _chunkMap[x, y, z - 1] != 0
-                || isFrontEdge && _frontFace[y,x]) edgeValue += 8; // Left
-
-                // Calculate _corner values
-                if ((!isTop && !isFrontEdge && _chunkMap[x, y + 1, z - 1] != 0 
-                || !isTop && isFrontEdge && _frontFace[y+1,x])
-                && (edgeValue & 1) != 0 && (edgeValue & 8) != 0) cornerValue += 1; // Top-Left
-                if ((!isTop && !isBackEdge && _chunkMap[x, y + 1, z + 1] != 0 
-                || !isTop && isBackEdge && _backFace[y+1,x])
-                && (edgeValue & 1) != 0 && (edgeValue & 2) != 0) cornerValue += 2; // Top-Right
-                if ((!isBottem && !isBackEdge && _chunkMap[x, y - 1, z + 1] != 0 
-                || !isBottem && isBackEdge && _backFace[y-1,x])
-                && (edgeValue & 2) != 0 && (edgeValue & 4) != 0) cornerValue += 4; // Bottom-Right
-                if ((!isBottem && !isFrontEdge && _chunkMap[x, y - 1, z - 1] != 0 
-                || !isBottem && isFrontEdge && _frontFace[y-1,x])
-                && (edgeValue & 4) != 0 && (edgeValue & 8) != 0) cornerValue += 8; // Bottom-Left
-            }
+         
 
             // Determine the tile number using nested switch statements
             switch (edgeValue)
@@ -932,139 +951,24 @@ public class MapLoadStatic : MonoBehaviour
                     break;
             }
             
-            if (mode != 1){
+            if (mode != dir.py){
                 spriteNumber += 48;
             }
             return spriteNumber;
         }
-
-        bool IsValid(int x, int y, int z)
-        {
-            return x >= 0 && x < _chunkSize && y >= 0 && y < _chunkDepth && z >= 0 && z < _chunkSize;
-        }
+ 
     }
-
-    public (int[,,], bool[,], bool[,], bool[,], bool[,], bool[,]) LoadChunkMap(Vector3Int coordinates, WorldStatic worldStatic)
-    {
-        ChunkData _targetChunkDataTemp;
-        int[,,] _targetChunk;
-        bool[,] _frontFace, _backFace, _leftFace, _rightFace, _corner;
-        
-        _frontFace = null;
-        _backFace = null;
-        _leftFace = null;
-        _rightFace = null;
-        _corner = new bool[4, WorldStatic.CHUNKDEPTH];
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x, coordinates.y, coordinates.z - WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            _frontFace = new bool[WorldStatic.CHUNKDEPTH, WorldStatic.CHUNKSIZE];
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
-                {
-                    _frontFace[y, x] = !IsAir(_targetChunkDataTemp.Map[x, y, WorldStatic.CHUNKSIZE - 1]);
-                }
-            }
-        } 
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x, coordinates.y, coordinates.z + WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            _backFace = new bool[WorldStatic.CHUNKDEPTH, WorldStatic.CHUNKSIZE];
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
-                {
-                    _backFace[y, x] = !IsAir(_targetChunkDataTemp.Map[x, y, 0]);
-                }
-            }
-        } 
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x - WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z));
-        if (_targetChunkDataTemp != null)
-        {
-            _leftFace = new bool[WorldStatic.CHUNKDEPTH, WorldStatic.CHUNKSIZE];
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
-                {
-                    _leftFace[y, z] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, z]);
-                }
-            }   
-        }  
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x + WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z));
-        if (_targetChunkDataTemp != null)
-        {
-            _rightFace = new bool[WorldStatic.CHUNKDEPTH, WorldStatic.CHUNKSIZE];
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
-                {
-                    _rightFace[y, z] = !IsAir(_targetChunkDataTemp.Map[0, y, z]);
-                }
-            }
-        } 
-        
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x - WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z + WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                _corner[0, y] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, 0]);
-            }
-        }
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x + WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z + WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                _corner[1, y] = !IsAir(_targetChunkDataTemp.Map[0, y, 0]);
-            }
-        }
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x - WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z - WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                _corner[2, y] = !IsAir(_targetChunkDataTemp.Map[WorldStatic.CHUNKSIZE - 1, y, WorldStatic.CHUNKSIZE - 1]);
-            }
-        }
-
-        _targetChunkDataTemp = worldStatic.GetChunk(new Vector3Int(coordinates.x + WorldStatic.CHUNKSIZE, coordinates.y, coordinates.z - WorldStatic.CHUNKSIZE));
-        if (_targetChunkDataTemp != null)
-        {
-            for (int y = 0; y < WorldStatic.CHUNKDEPTH; y++)
-            {
-                _corner[3, y] = !IsAir(_targetChunkDataTemp.Map[0, y, WorldStatic.CHUNKSIZE - 1]);
-            } 
-        }
-
-        ChunkData chunkDataTemp = worldStatic.GetChunk(coordinates);
-        _targetChunk = chunkDataTemp == null? null : chunkDataTemp.Map;
-        return (_targetChunk, _frontFace, _backFace, _leftFace, _rightFace, _corner);
-    }
-
-    public bool IsAir(int ID)
-    {
-        return ID == 0;
-    }
+ 
+ 
 
     public int GetBlockInChunk(Vector3Int chunkCoordinate, Vector3Int blockCoordinate, WorldStatic worldStatic) //0 = empty, 1 = block, error = out of bounds
     {
         try
-        {
-            if (blockCoordinate.y >= 0 && blockCoordinate.y < WorldStatic.CHUNKDEPTH)
+        { 
+            var chunk = worldStatic.GetChunk(chunkCoordinate);
+            if (chunk != null)
             {
-                var chunk = worldStatic.GetChunk(chunkCoordinate);
-                if (chunk != null)
-                {
-                    return chunk.Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z];
-                }
+                return chunk.Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z];
             }
             return 0;
         }
@@ -1078,80 +982,28 @@ public class MapLoadStatic : MonoBehaviour
 
 
 
+ 
 
 
+public struct NativeMap3D<T> where T : struct
+{
+    private NativeArray<T> array;
+    private int size;
 
-
-
-
-
-    public struct NativeArray2D<T> where T : struct
+    public NativeMap3D(int size, Allocator allocator)
     {
-        private NativeArray<T> array;
-        private int rows;
-        private int cols;
-        public bool IsValid;
-
-        public NativeArray2D(T[,] array, Allocator allocator)
-        {
-            rows = array.GetLength(0);
-            cols = array.GetLength(1);
-            this.array = new NativeArray<T>(rows * cols, allocator);
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    this.array[i * cols + j] = array[i, j];
-                }
-            }
-            IsValid = true;
-        }
-
-        public T this[int row, int col]
-        {
-            get => array[row * cols + col];
-            set => array[row * cols + col] = value;
-        }
-
-        public void Dispose()
-        {
-            array.Dispose();
-        }
+        this.size = size;
+        this.array = new NativeArray<T>(size * size * size, allocator);
     }
 
-    public struct NativeArray3D<T> where T : struct
+    public T this[int x, int y, int z]
     {
-        private NativeArray<T> array;
-        private int rows;
-        private int cols;
-        private int depth;
-
-        public NativeArray3D(T[,,] array, Allocator allocator)
-        {
-            rows = array.GetLength(0);
-            cols = array.GetLength(1);
-            depth = array.GetLength(2);
-            this.array = new NativeArray<T>(rows * cols * depth, allocator);
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    for (int k = 0; k < depth; k++)
-                    {
-                        this.array[i * cols * depth + j * depth + k] = array[i, j, k];
-                    }
-                }
-            }
-        }
-
-        public T this[int row, int col, int dep]
-        {
-            get => array[row * cols * depth + col * depth + dep];
-            set => array[row * cols * depth + col * depth + dep] = value;
-        }
-
-        public void Dispose()
-        {
-            array.Dispose();
-        }
+        get => array[(x+1) * size * size + (y+1) * size + (z+1)];
+        set => array[(x+1) * size * size + (y+1) * size + (z+1)] = value;
     }
+
+    public void Dispose()
+    {
+        array.Dispose();
+    }
+}
