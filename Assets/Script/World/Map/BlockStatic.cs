@@ -13,14 +13,15 @@ public class BlockStatic : MonoBehaviour
     public static int _textureAtlasWidth;
     public static int _textureAtlasHeight;
     public static Texture2D _textureAtlas;
-    public static Material _meshMaterial; 
-    public static Material _shadowMeshMaterial; 
     
+    public static Material MeshMaterial; 
+    public static Material ShadowMeshMaterial; 
+    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit";
     void Awake()
     {
         Instance = this;
-        _shadowMeshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH));
-        _meshMaterial = new(Resources.Load<Material>(Game.MESH_MATERIAL_PATH));
+        ShadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_shadow"));
+        MeshMaterial = new(Resources.Load<Material>(MESH_MATERIAL_PATH));
 
         // Add block definitions
         AddBlockDefinition("brick", 1, 2, "Brick", "A block of brick");
@@ -61,7 +62,7 @@ public class BlockStatic : MonoBehaviour
             _textureRectDictionary[kvp.Key] = _textureRects[index];
             index++;
         }
-        _meshMaterial.mainTexture = _textureAtlas;
+        MeshMaterial.mainTexture = _textureAtlas;
     }
 
     private static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost, string name, string description)

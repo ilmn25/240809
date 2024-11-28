@@ -5,8 +5,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     public static string DOWNLOAD_PATH;
-    public static string PLAYER_SAVE_PATH; 
-    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit";
+    public static string PLAYER_SAVE_PATH;  
     public static Game Instance { get; private set; }  
     
     public static LayerMask LayerMap;

@@ -144,13 +144,13 @@ public class MapCullStatic : MonoBehaviour
     void UpdateYCull()
     {  
         _signalUpdateSpriteYCull?.Invoke();   
-        _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;  
-        foreach (var kvp in MapLoadStatic.Instance._activeChunks)
-        {   
-            kvp.Value.GetComponent<MapCullInst>().CullMeshAsync(); 
-        }   
-    }
-   
+        _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;
+        foreach (var kvp in MapLoadStatic.Instance._activeChunks) // cull off
+        { 
+            kvp.Value.CullMeshAsync();
+        }  
+    }  
+
     async void UpdateYCullDelayed(bool yCheckPrevious)
     { 
         if (_delayBuffer) return;
@@ -158,13 +158,8 @@ public class MapCullStatic : MonoBehaviour
 
         await Task.Delay(80);
         if (_yCheck == yCheckPrevious)
-        {
-            _signalUpdateSpriteYCull?.Invoke();   
-            _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;  
-            foreach (var kvp in MapLoadStatic.Instance._activeChunks)
-            {   
-                kvp.Value.GetComponent<MapCullInst>().CullMeshAsync(); 
-            }   
+        { 
+            UpdateYCull();
         } 
         _delayBuffer = false;
     }

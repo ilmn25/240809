@@ -30,15 +30,15 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static bool[,,] _boolMap;
     [HideInInspector] 
-    public static int CHUNKSIZE = 30; 
+    public static int CHUNKSIZE = 20; 
     [HideInInspector] 
-    public static int RENDER_DISTANCE = 2; 
+    public static int RENDER_DISTANCE = 1; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xsize = 2;
-    public static int ysize = 50;
-    public static int zsize = 1;
-    private void Awake()
+    public static int xsize = 8;
+    public static int ysize = 5;
+    public static int zsize = 8;
+    private void Awake()    
     {
         Instance = this;
     }
