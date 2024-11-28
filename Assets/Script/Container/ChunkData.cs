@@ -34,7 +34,6 @@ public class ChunkData
     }
 }
 
-
 public class ChunkMap
 {
     private static NativeMap3D<int> _map;
