@@ -66,9 +66,9 @@ public class MapLoadStatic : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             traverseCheckPosition = kvp.Key;
-            if (kvp.Key.x > WorldStatic._playerChunkPos.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.x < WorldStatic._playerChunkPos.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
-                || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
-                || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE)
+            if (kvp.Key.x > WorldStatic._playerChunkPos.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.x < WorldStatic._playerChunkPos.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
+                || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
+                || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE)
             {
                 Destroy(kvp.Value.gameObject, 1);
                 destroyList.Add(kvp.Key);
@@ -90,9 +90,9 @@ public class MapLoadStatic : MonoBehaviour
                 for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
                 {
                     Vector3Int traverseCheckPosition = new Vector3Int(
-                        WorldStatic._playerChunkPos.x + x * WorldStatic.CHUNKSIZE,
-                        WorldStatic._playerChunkPos.y + y * WorldStatic.CHUNKSIZE,
-                        WorldStatic._playerChunkPos.z + z * WorldStatic.CHUNKSIZE
+                        WorldStatic._playerChunkPos.x + x * WorldStatic.CHUNK_SIZE,
+                        WorldStatic._playerChunkPos.y + y * WorldStatic.CHUNK_SIZE,
+                        WorldStatic._playerChunkPos.z + z * WorldStatic.CHUNK_SIZE
                     );
                     if (!_activeChunks.ContainsKey(traverseCheckPosition) && WorldStatic.Instance.IsInWorldBounds(traverseCheckPosition))
                         _ = LoadChunksOntoScreenAsync(traverseCheckPosition);
@@ -212,7 +212,7 @@ public class MapLoadStatic : MonoBehaviour
             MeshMathJob job = new MeshMathJob
             {
                 // const
-                _chunkSize = WorldStatic.CHUNKSIZE,
+                _chunkSize = WorldStatic.CHUNK_SIZE,
                 _tileSize = _tileSize,
                 _tilesPerRow = _tilesPerRow, 
                 _colx = new NativeArray<int>(_colx, Allocator.TempJob),

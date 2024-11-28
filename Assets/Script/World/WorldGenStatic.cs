@@ -27,97 +27,100 @@ public class WorldGenStatic : MonoBehaviour
         caveOffsetX = Random.Range(0f, 1000f); 
         caveOffsetZ = Random.Range(0f, 1000f);
     }
-
     public ChunkData GenerateTestChunk(Vector3Int coordinates)
     {
-        _chunkSize = WorldStatic.CHUNKSIZE;
+        _chunkSize = WorldStatic.CHUNK_SIZE;
         ChunkData chunkData = new ChunkData();
         HandleBlockGeneration();
         HandleEntityGeneration();
-        return chunkData; 
+        return chunkData;
 
         void HandleBlockGeneration()
         {
-            float terrainScale = 0.07f; // Adjust the scale to change the frequency of the terrain noise
-            float caveScale = 0.15f; // Adjust the scale to change the frequency of the cave noise
-            float caveThreshold = 0.15f; // Adjust the threshold to change the density of the caves
-            float marbleScale = 0.02f; // Adjust the scale to change the frequency of the marble noise
-            int wallHeight = 4; // Height of the maze walls
-            int floorHeight = 1; // Height of the floor
+            int worldHeight = WorldStatic.ySize * WorldStatic.CHUNK_SIZE;
+            
+            float stoneScale = 0.05f; 
+            float dirtScale = 0.06f; 
+            
+            float caveScale = 0.15f;  
+            float caveThreshold = 0.2f; 
+            
+            int wallHeight = 5;  
+            int floorHeight = 2;  
             bool wall = new System.Random().NextDouble() < 0.1;
- 
-
-            // Updated maze generation logic
             bool[,] maze = HandleMazeAlgorithm(_chunkSize, _chunkSize);
 
-            for (int x = 0; x < _chunkSize; x++)
+            for (int y = 0; y < _chunkSize; y++)
             {
-                for (int z = 0; z < _chunkSize; z++)
+                for (int x = 0; x < _chunkSize; x++)
                 {
-                    // Normalize coordinates to ensure they are always positive
-                    float worldX = Mathf.Abs(coordinates.x + x + 100) * terrainScale + terrainOffsetX;
-                    float worldZ = Mathf.Abs(coordinates.z + z + 100) * terrainScale + terrainOffsetZ;
-
-                    // Generate Perlin noise value for terrain
-                    float perlinValue = Mathf.PerlinNoise(worldX, worldZ);
-                    // Scale the Perlin noise value to the range [0, _chunkSize]
-                    int terrainHeight = Mathf.FloorToInt(perlinValue * _chunkSize);
-
-                    // Generate Perlin noise value for marble layer height
-                    float marbleNoiseValue = Mathf.PerlinNoise(Mathf.Abs(coordinates.x + x) * marbleScale + marbleOffsetX, Mathf.Abs(coordinates.z + z) * marbleScale + marbleOffsetZ);
-                    int marbleLayerHeight = Mathf.FloorToInt(marbleNoiseValue * _chunkSize);
-
-                    for (int y = 0; y < _chunkSize; y++)
+                    for (int z = 0; z < _chunkSize; z++)
                     {
-                        // Normalize coordinates for caves
+                        float stoneX = Mathf.Abs(coordinates.x + x) * stoneScale + terrainOffsetX;
+                        float stoneZ = Mathf.Abs(coordinates.z + z) * stoneScale + terrainOffsetZ;
+                        float stoneNoiseValue = Mathf.PerlinNoise(stoneX, stoneZ);
+                        int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * worldHeight);
+
+                        float dirtX = Mathf.Abs(coordinates.x + x) * dirtScale + terrainOffsetZ;
+                        float dirtz = Mathf.Abs(coordinates.z + z) * dirtScale + terrainOffsetX; //swapped
+                        float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtz);
+                        int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * worldHeight);
+
                         float caveX = Mathf.Abs(coordinates.x + x) * caveScale + caveOffsetX;
                         float caveY = Mathf.Abs(coordinates.y + y) * caveScale;
                         float caveZ = Mathf.Abs(coordinates.z + z) * caveScale + caveOffsetZ;
+                        float caveValue = Mathf.PerlinNoise(caveX + caveY, caveZ - caveY);
 
-                        // Generate Perlin noise value for caves
-                        float caveValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
-
-                        if (y < floorHeight)
+                        
+                        if (y + coordinates.y < floorHeight)
                         {
                             chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Floor
                         }
-                        else if (y == wallHeight + floorHeight)
+                        else if (y + coordinates.y == wallHeight + floorHeight)
                         {
                             chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Ceiling
                         }
-                        else if (maze[x, z] && y < wallHeight + floorHeight)
+                        else if (maze[x, z] && y + coordinates.y < wallHeight + floorHeight)
                         {
                             chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Walls
                         }
-                        if (y > wallHeight + floorHeight) {
-                            if (wall & (z == 1 || z == 2) && y < 17)
+
+                        
+                        
+                        if (y + coordinates.y > wallHeight + floorHeight)
+                        {
+                            if (wall & (z == 1 || z == 2) && y + coordinates.y < 17)
                             {
                                 chunkData.Map[x, y, z] = BlockStatic.ConvertID("brick");
-                            } 
-                            else if (y <= terrainHeight && caveValue > caveThreshold)
-                            {
-                                chunkData.Map[x, y, z] = BlockStatic.ConvertID("stone");
                             }
-                            else if (y < marbleLayerHeight - 4)
+                            else if (caveValue > caveThreshold)
                             {
-                                chunkData.Map[x, y, z] = BlockStatic.ConvertID("dirt");
-                            } 
-                        } 
+                                if (y + coordinates.y <= stoneHeight)
+                                {
+                                    chunkData.Map[x, y, z] = BlockStatic.ConvertID("stone");
+                                }
+                                else if (y + coordinates.y < dirtHeight - 4)
+                                {
+                                    chunkData.Map[x, y, z] = BlockStatic.ConvertID("dirt");
+                                }
+                            }  
+                        }
                     }
                 }
-            } 
+            }
         }
+
 
         void HandleEntityGeneration()
         {
             System.Random random = new System.Random();
             EntityData entityData;
             SerializableVector3 entityPosition;
-            for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < _chunkSize; y++)
                 {
-                    for (int z = 0; z <  WorldStatic.CHUNKSIZE; z++)
+                    for (int z = 0; z <  WorldStatic.CHUNK_SIZE; z++)
                     {
                         if (SPAWN_STATIC_ENTITY && chunkData.Map[x, y, z] == BlockStatic.ConvertID("dirt"))
                         {

@@ -2,3 +2,4 @@ start bug
 boolmap update miss few blocks 
 item teleport when fall from tree
 collider colission blocking objects, solution = set layer to ignore raycast and then use tag to clossion
+flash between layer y fall cull

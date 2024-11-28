@@ -28,7 +28,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
     {
         Instance = this;
         _boxCollider = GetComponent<BoxCollider>();
-        _chunkSize = WorldStatic.CHUNKSIZE; 
+        _chunkSize = WorldStatic.CHUNK_SIZE; 
     }
 
     public void HandleTerraformUpdate()

@@ -46,12 +46,12 @@ public class EntityLoadStatic : MonoBehaviour
             // Extract chunk coordinates from the key
             int chunkX = key.x, chunkY = key.y, chunkZ = key.z;
 
-            if (chunkX > WorldStatic._playerChunkPos.x + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkX < WorldStatic._playerChunkPos.x - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
-                || chunkY > WorldStatic._playerChunkPos.y + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkY < WorldStatic._playerChunkPos.y - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
-                || chunkZ > WorldStatic._playerChunkPos.z + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkZ < WorldStatic._playerChunkPos.z - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE)
+            if (chunkX > WorldStatic._playerChunkPos.x + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
+                || chunkX < WorldStatic._playerChunkPos.x - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE
+                || chunkY > WorldStatic._playerChunkPos.y + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
+                || chunkY < WorldStatic._playerChunkPos.y - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE
+                || chunkZ > WorldStatic._playerChunkPos.z + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
+                || chunkZ < WorldStatic._playerChunkPos.z - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE)
             {
                 UpdateEntityList(key);
                 keysToRemove.Add(key);
@@ -65,11 +65,11 @@ public class EntityLoadStatic : MonoBehaviour
     {
         WorldStatic.Instance.HandleLoadWorldFile(0); 
 
-        for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x += WorldStatic.CHUNKSIZE)
+        for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x += WorldStatic.CHUNK_SIZE)
         {
-            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y += WorldStatic.CHUNKSIZE)
+            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y += WorldStatic.CHUNK_SIZE)
             {
-                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
+                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z += WorldStatic.CHUNK_SIZE)
                 {
                     _currentChunkCoordinate = new Vector3Int(
                         Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),
