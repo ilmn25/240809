@@ -58,7 +58,7 @@ public class MapCullStatic : MonoBehaviour
         rightDirection = Quaternion.Euler(0, 5, ANGLE_OFFSET) * Vector3.up;
 
         _collisionLayer = LayerMask.GetMask("Collision");
-        _chunkPositionPrevious = WorldStatic._chunkPosition;
+        _chunkPositionPrevious = WorldStatic._playerChunkPos;
 
         _lightIndoor = GameObject.Find("light_indoor"); 
         _lightSelf = GameObject.Find("light_self");   
@@ -129,10 +129,10 @@ public class MapCullStatic : MonoBehaviour
             {  
                 UpdateYCull();
             }
-            else if (_yCheck && WorldStatic._chunkPosition != _chunkPositionPrevious) //player moved
+            else if (_yCheck && WorldStatic._playerChunkPos != _chunkPositionPrevious) //player moved
             { 
                 UpdateYCull();
-                _chunkPositionPrevious = WorldStatic._chunkPosition;
+                _chunkPositionPrevious = WorldStatic._playerChunkPos;
             }
             _yCheckPrevious = _yCheck;
             _yThresholdPrevious = _yThreshold;  

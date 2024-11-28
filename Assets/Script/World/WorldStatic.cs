@@ -21,7 +21,7 @@ public class WorldStatic : MonoBehaviour
     public static event Vector3IntEvent MapUpdated;
 
     [HideInInspector] 
-    public static Vector3Int _chunkPosition;
+    public static Vector3Int _playerChunkPos;
     [HideInInspector] 
     public static Vector3Int _chunkPositionPrevious = Vector3Int.one;
     [HideInInspector] 
@@ -52,11 +52,11 @@ public class WorldStatic : MonoBehaviour
           
     void FixedUpdate()
     {
-        _chunkPosition = GetChunkCoordinate(Game.Player.transform.position);
-        if (_chunkPosition != _chunkPositionPrevious)
+        _playerChunkPos = GetChunkCoordinate(Game.Player.transform.position);
+        if (_playerChunkPos != _chunkPositionPrevious)
         {  
             PlayerChunkTraverse?.Invoke();
-            _chunkPositionPrevious = _chunkPosition; 
+            _chunkPositionPrevious = _playerChunkPos; 
         }
     }
 

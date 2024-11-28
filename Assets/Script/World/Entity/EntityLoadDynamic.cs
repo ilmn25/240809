@@ -41,7 +41,7 @@ public class EntityLoadDynamic : MonoBehaviour
         { 
             if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > 60) { 
                 entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
-                Lib.Log(entityChunkPosition);
+                // Lib.Log(entityChunkPosition);
                 if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
                     WorldStatic.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
                 
@@ -61,9 +61,9 @@ public class EntityLoadDynamic : MonoBehaviour
                 for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
                 {
                     _currentChunkCoordinate = new Vector3Int(
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.y + y),
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.y + y),
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.z + z)
                     );
 
                     _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate);
