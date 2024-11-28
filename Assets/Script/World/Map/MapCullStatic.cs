@@ -125,7 +125,8 @@ public class MapCullStatic : MonoBehaviour
                 HandleLight(false); 
                 UpdateYCullDelayed(_yCheck);
             } 
-            else if (_yCheck && _yThresholdPrevious != _yThreshold) //change y threshold
+            else if (_yCheck && _yThresholdPrevious != _yThreshold && 
+                     !(WorldStatic._playerChunkPos != _chunkPositionPrevious)) //change y threshold but not move
             {  
                 UpdateYCull();
             }
@@ -189,54 +190,28 @@ public class MapCullStatic : MonoBehaviour
             return;
         }  
     
-        // Check each ray hit and return early if conditions are met
-        rayForward = new Ray(playerPosition, forwardDirection);  
-        if (!Physics.Raycast(rayForward, out _, 50, _collisionLayer)) {
-    
-            _yCheck = false;
-            _yThreshold = 0;
-            return;
-            //fail
-        }
-    
-        rayBackward = new Ray(playerPosition, backwardDirection); 
-        if (!Physics.Raycast(rayBackward, out _, 50, _collisionLayer)) {
-            
-            rayToCamera = new Ray(playerPosition, _camera.transform.position - playerPosition);
-            if (!Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
-            {
-                _yCheck = false;
-                _yThreshold = 0;
-                return;
-                //fail
-            }
-    
+        rayToCamera = new Ray(playerPosition + Vector3.up, _camera.transform.position - playerPosition);
+        if (Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
+        {
             _yCheck = true;
             _yThreshold = (int)playerPosition.y + _visionHeight;
-            return; // camera and forward
-        } 
-    
+            return;
+        }
+        
+        rayForward = new Ray(playerPosition, forwardDirection);
+        rayBackward = new Ray(playerPosition, backwardDirection); 
         rayLeft = new Ray(playerPosition, leftDirection); 
-        if (!Physics.Raycast(rayLeft, out _, 50, _collisionLayer)) {
-    
-            _yCheck = false;
-            _yThreshold = 0;
-            return;
-            //fail
+        rayRight = new Ray(playerPosition, rightDirection);   
+        if (Physics.Raycast(rayForward, out _, 50, _collisionLayer) &&
+            Physics.Raycast(rayBackward, out _, 50, _collisionLayer) &&
+            Physics.Raycast(rayLeft, out _, 50, _collisionLayer) &&
+            Physics.Raycast(rayRight, out _, 50, _collisionLayer)) {
+            _yCheck = true;
+            _yThreshold = (int)playerPosition.y + _visionHeight;
         }
-    
-        rayRight = new Ray(playerPosition, rightDirection); 
-        if (!Physics.Raycast(rayRight, out _, 50, _collisionLayer)) {
-    
-            _yCheck = false;
-            _yThreshold = 0;
-            return;
-            //fail
-        }
-    
-        _yCheck = true;
-        _yThreshold = (int)playerPosition.y + _visionHeight;
-        return; // all 4 directions no camera
+     
+        _yCheck = false;
+        _yThreshold = 0;
     }
 
 
