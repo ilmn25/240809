@@ -8,6 +8,8 @@ using Unity.VisualScripting;
 using Unity.Jobs;
 using Unity.Collections;
 using UnityEngine.Profiling;
+using UnityEngine.Rendering;
+
 // using Unity.Burst;
 
 public class MapLoadStatic : MonoBehaviour
@@ -68,7 +70,7 @@ public class MapLoadStatic : MonoBehaviour
                 || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
                 || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE)
             {
-                Destroy(kvp.Value);
+                Destroy(kvp.Value.gameObject, 1);
                 destroyList.Add(kvp.Key);
             }
         }
@@ -99,7 +101,7 @@ public class MapLoadStatic : MonoBehaviour
         } 
     }
 
-    public Dictionary<Vector3Int, GameObject> _activeChunks = new Dictionary<Vector3Int, GameObject>();
+    public Dictionary<Vector3Int, MapCullInst> _activeChunks = new Dictionary<Vector3Int, MapCullInst>();
     private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1); 
     private async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)
     { 
@@ -154,19 +156,19 @@ public class MapLoadStatic : MonoBehaviour
 
             _meshObject.AddComponent<MeshFilter>();
             _meshRenderer = _meshObject.AddComponent<MeshRenderer>();  
-            _meshRenderer.material = BlockStatic._meshMaterial; 
+            _meshRenderer.material = BlockStatic.MeshMaterial; 
 
             _mapCullInst = _meshObject.AddComponent<MapCullInst>();  
             _mapCullInst._chunkMap = _chunkData.Map;
             _mapCullInst._meshData = _mesh;
             _mapCullInst._verticesShadow = _verticesShadow;
-            _activeChunks.Add(_chunkCoordinate, _meshObject);
+            _activeChunks.Add(_chunkCoordinate, _mapCullInst);
         } 
         else 
         {
-            _meshObject = _activeChunks[_chunkCoordinate];
+            _meshObject = _activeChunks[_chunkCoordinate].gameObject;
             _meshRenderer = _meshObject.GetComponent<MeshRenderer>(); 
-            _meshRenderer.material = BlockStatic._meshMaterial; 
+            _meshRenderer.material = BlockStatic.MeshMaterial; 
 
             _mapCullInst = _meshObject.GetComponent<MapCullInst>();  
             _mapCullInst._chunkMap = _chunkData.Map;

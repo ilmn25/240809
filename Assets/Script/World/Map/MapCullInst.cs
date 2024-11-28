@@ -21,7 +21,6 @@ public class MapCullInst : MonoBehaviour
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;  
     
-    private int HIDE_ALL_Y = 10; 
     private int CULL_DISTANCE = 2;  
  
     void Awake()
@@ -42,14 +41,14 @@ public class MapCullInst : MonoBehaviour
     }  
     void CreateShadowMesh()
     {  
-        GameObject _shadowObject = new GameObject("Shadow"); 
-        _shadowObject.transform.parent = transform;
-        _shadowObject.transform.position = transform.position;
+        GameObject shadowObject = new GameObject("Shadow"); 
+        shadowObject.transform.parent = transform;
+        shadowObject.transform.position = transform.position;
 
-        _shadowMeshFilter = _shadowObject.AddComponent<MeshFilter>();
-        MeshRenderer shadowMeshRenderer = _shadowObject.AddComponent<MeshRenderer>();
+        _shadowMeshFilter = shadowObject.AddComponent<MeshFilter>();
+        MeshRenderer shadowMeshRenderer = shadowObject.AddComponent<MeshRenderer>();
         shadowMeshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-        shadowMeshRenderer.material = BlockStatic._shadowMeshMaterial; 
+        shadowMeshRenderer.material = BlockStatic.ShadowMeshMaterial; 
     }
    
     public void HandleAssignment()
@@ -85,38 +84,46 @@ public class MapCullInst : MonoBehaviour
     public async void CullMeshAsync()
     { 
         await _semaphoreSlim.WaitAsync();
-        try
-        {
+        try {
             if (MapCullStatic.Instance._yCheck)
             {
-                if (HandleRangeCheck()) // cull and is in range
-                {  
-                    await Task.Run(() => HandleCullMath());  
-                    HandleCullMesh();   
-                }
-                else 
+                if (transform.position.y < WorldStatic._playerChunkPos.y) 
                 {
-                    if ((int)Game.Player.transform.position.y < HIDE_ALL_Y) // cull but out of range and player is low 
-                    {
-                        _meshRenderer.enabled = false; 
-                        _meshFilter.mesh = _meshData;
-                    }
+                    _meshRenderer.enabled = true;
+                    _meshFilter.mesh = _meshData;
+                    return; // below player chunk level skip
+                }           
+                if (transform.position.y > WorldStatic._playerChunkPos.y) // above so just turn invisible 
+                {
+                    _meshRenderer.enabled = false;
+                    // _meshFilter.mesh = _meshData;
+                    return;
                 }
+                if (HandleRangeCheck()) // do cull, is in range
+                {
+                    await Task.Run(() => HandleCullMath());
+                    HandleCullMesh();
+                }
+                // else
+                // {
+                //     if ((int)Game.Player.transform.position.y < HIDE_ALL_Y) // cull but out of range and player is low ???? 
+                //     {
+                //         Lib.Log();
+                //         _meshRenderer.enabled = false;
+                //         _meshFilter.mesh = _meshData;
+                //     }
+                // } 
             }
-            else // no cull at all
+            else // no cull, revert to normal
             {
                 _meshRenderer.enabled = true;
                 _meshFilter.mesh = _meshData;
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             if (ex is not MissingReferenceException && ex is not NullReferenceException)
                 throw new Exception("An exception occurred in CullMeshAsync method.", ex);
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
+        } finally {
+            _semaphoreSlim.Release(); // called even if return
         }
     }
 
