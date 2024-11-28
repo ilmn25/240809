@@ -149,6 +149,7 @@ public class MapCullInst : MonoBehaviour
         // return true;
         try
         { 
+            //TODO y
             chunkPosition = WorldStatic._chunkPosition;
             xDist = Mathf.Abs(chunkPosition.x - transform.position.x);
             zDist = Mathf.Abs(chunkPosition.z - transform.position.z);   
@@ -160,9 +161,7 @@ public class MapCullInst : MonoBehaviour
         {  
             return false; 
         }
-    } 
-    
-
+    }  
     void HandleCullMath()
     {
         NativeArray<Vector3> vertices = new NativeArray<Vector3>(_vertices, Allocator.TempJob);
@@ -170,11 +169,10 @@ public class MapCullInst : MonoBehaviour
         NativeArray<int> triangles = new NativeArray<int>(_triangles, Allocator.TempJob);
         NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
         NativeArray3D<int> chunkMap = new NativeArray3D<int>(_chunkMap, Allocator.TempJob);
-
         var job = new HandleCullMathJob
         { 
             chunkSize = WorldStatic.CHUNKSIZE, 
-            yThreshold = MapCullStatic.Instance._yThreshold,
+            yThreshold = MapCullStatic.Instance._yThreshold %  WorldStatic.CHUNKSIZE,
 
             chunkMap = chunkMap,
             vertices = vertices,
@@ -270,6 +268,7 @@ public class MapCullInst : MonoBehaviour
                 } 
             }
 
+            
             for (int x = 0; x < chunkSize; x++)
             {
                 for (int z = 0; z < chunkSize; z++)
@@ -314,4 +313,42 @@ public class MapCullInst : MonoBehaviour
         }
     }
 
+}
+
+    
+
+public struct NativeArray3D<T> where T : struct
+{
+    private NativeArray<T> array;
+    private int rows;
+    private int cols;
+    private int depth;
+
+    public NativeArray3D(T[,,] array, Allocator allocator)
+    {
+        rows = array.GetLength(0);
+        cols = array.GetLength(1);
+        depth = array.GetLength(2);
+        this.array = new NativeArray<T>(rows * cols * depth, allocator);
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                for (int k = 0; k < depth; k++)
+                {
+                    this.array[i * cols * depth + j * depth + k] = array[i, j, k];
+                }
+            }
+        }
+    }
+
+    public T this[int row, int col, int dep]
+    {
+        get => array[row * cols * depth + col * depth + dep];
+    }
+
+    public void Dispose()
+    {
+        array.Dispose();
+    }
 }

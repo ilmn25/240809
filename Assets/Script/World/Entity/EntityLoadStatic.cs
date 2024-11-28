@@ -44,10 +44,12 @@ public class EntityLoadStatic : MonoBehaviour
         foreach (var key in _entityList.Keys)
         {
             // Extract chunk coordinates from the key
-            int chunkX = key.x, chunkZ = key.z;
+            int chunkX = key.x, chunkY = key.y, chunkZ = key.z;
 
             if (chunkX > WorldStatic._chunkPosition.x + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
                 || chunkX < WorldStatic._chunkPosition.x - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
+                || chunkY > WorldStatic._chunkPosition.y + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkY < WorldStatic._chunkPosition.y - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
                 || chunkZ > WorldStatic._chunkPosition.z + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
                 || chunkZ < WorldStatic._chunkPosition.z - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE)
             {
@@ -65,22 +67,25 @@ public class EntityLoadStatic : MonoBehaviour
 
         for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x += WorldStatic.CHUNKSIZE)
         {
-            for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
+            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; y += WorldStatic.CHUNKSIZE)
             {
-                _currentChunkCoordinate = new Vector3Int(
-                    Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
-                    0,
-                    Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
-                );
-
-                if (!_entityList.ContainsKey(_currentChunkCoordinate))
+                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
                 {
-                    _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
-                    if  (_currentChunkData != null)
+                    _currentChunkCoordinate = new Vector3Int(
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.y + y),
+                        Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
+                    );
+
+                    if (!_entityList.ContainsKey(_currentChunkCoordinate))
                     {
-                        _chunkEntityList = _currentChunkData.StaticEntity;  
-                        LoadChunkEntities(); 
-                    }
+                        _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
+                        if  (_currentChunkData != null)
+                        {
+                            _chunkEntityList = _currentChunkData.StaticEntity;  
+                            LoadChunkEntities(); 
+                        }
+                    }  
                 }  
             } 
         } 
