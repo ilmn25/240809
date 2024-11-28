@@ -38,6 +38,10 @@ public class NPCStateMachine : EntityStateMachine
         {
             SetState<NPCChase>();
         }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            transform.position = Game.Player.transform.position;
+        }
     }
 
     public void Interact()

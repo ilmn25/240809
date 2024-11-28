@@ -31,12 +31,12 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int CHUNKSIZE = 30; 
     [HideInInspector] 
-    public static int RENDER_DISTANCE = 4; 
+    public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
 
-    int xsize = 3;
-    int ysize = 2;
-    int zsize = 2;
+    public static int xsize = 3;
+    public static int ysize = 2;
+    public static int zsize = 2;
     private void Awake()
     {
         Instance = this;
@@ -65,27 +65,31 @@ public class WorldStatic : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HandleSaveWorldFile(World , 0);
+            HandleSaveWorldFile(0);
+            Application.Quit();
         }
     }
 
- 
+    private void OnApplicationQuit()
+    {
+        HandleSaveWorldFile(0);
+    }
+
     private string getFilePath(int yLevel)
     {
-        return $"{Game.DOWNLOAD_PATH}\\MAP{yLevel}.dat";
+        return $"{Game.DOWNLOAD_PATH}\\World_{yLevel}.dat";
     }
-    public async void HandleSaveWorldFile(WorldData world, int yLevel)
+    
+    public async void HandleSaveWorldFile(int yLevel)
     {
         EntityLoadStatic.Instance.SaveAll();
         EntityLoadDynamic.Instance.SaveAll();
         await Task.Delay(10);
-        Lib.Log();
         
         using (FileStream file = File.Create(getFilePath(yLevel)))
         {
-            _bf.Serialize(file, world);
-        }
-        Application.Quit();
+            _bf.Serialize(file, World);
+        } 
     }
  
     public void HandleLoadWorldFile(int yLevel)
@@ -124,13 +128,12 @@ public class WorldStatic : MonoBehaviour
             {
                 for (int wy = 0; wy < World.Length.z; wy++)
                 {
-                    chunkData = World[wx, wy, wz];
+                    int startX = wx * CHUNKSIZE;
+                    int startY = wy * CHUNKSIZE;
+                    int startZ = wz * CHUNKSIZE;
+                    chunkData = World[startX, startY, startZ];
                     if (chunkData != null)
-                    {
-                        int startX = wx * CHUNKSIZE;
-                        int startY = wy * CHUNKSIZE;
-                        int startZ = wz * CHUNKSIZE;
-
+                    { 
                         for (int i = 0; i < CHUNKSIZE; i++)
                         {
                             for (int j = 0; j < CHUNKSIZE; j++)

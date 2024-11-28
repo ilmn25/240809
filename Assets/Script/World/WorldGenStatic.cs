@@ -7,7 +7,8 @@ public class WorldGenStatic : MonoBehaviour
     public static WorldGenStatic Instance { get; private set; }  
     
     private int _chunkSize;
-    public bool SPAWN_ENTITY; 
+    public bool SPAWN_STATIC_ENTITY; 
+    public bool SPAWN_DYNAMIC_ENTITY; 
 
     // Generate random offsets for Perlin noise
     float terrainOffsetX;
@@ -32,7 +33,7 @@ public class WorldGenStatic : MonoBehaviour
         _chunkSize = WorldStatic.CHUNKSIZE;
         ChunkData chunkData = new ChunkData();
         HandleBlockGeneration();
-        if (SPAWN_ENTITY) HandleEntityGeneration();
+        HandleEntityGeneration();
         return chunkData; 
 
         void HandleBlockGeneration()
@@ -118,7 +119,7 @@ public class WorldGenStatic : MonoBehaviour
                 {
                     for (int z = 0; z <  WorldStatic.CHUNKSIZE; z++)
                     {
-                        if (chunkData.Map[x, y, z] == BlockStatic.ConvertID("dirt"))
+                        if (SPAWN_STATIC_ENTITY && chunkData.Map[x, y, z] == BlockStatic.ConvertID("dirt"))
                         {
                             if (y + 1 < _chunkSize && chunkData.Map[x, y + 1, z] == 0) // 5% chance
                             {
@@ -145,23 +146,23 @@ public class WorldGenStatic : MonoBehaviour
                         {
                             if (y + 1 < _chunkSize && chunkData.Map[x, y + 1, z] == 0) // 5% chance
                             {
-                                if (random.NextDouble() <= 0.004)
+                                if (SPAWN_STATIC_ENTITY && random.NextDouble() <= 0.004)
                                 { 
 
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("stage_hand", entityPosition, new SerializableVector3Int(1, 1, 1));
                                     chunkData.StaticEntity.Add(entityData);
                                 }
-                                else if (random.NextDouble() <= 0.05)
+                                else if (SPAWN_STATIC_ENTITY && random.NextDouble() <= 0.05)
                                 { 
 
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("slab", entityPosition, new SerializableVector3Int(0, 0, 0));
                                     chunkData.StaticEntity.Add(entityData);
                                 }
-                                else if (random.NextDouble() <= 0.003)
+                                else if (SPAWN_DYNAMIC_ENTITY && random.NextDouble() <= 0.003)
                                 {
-                                    entityPosition = new SerializableVector3(x + 0.5f, y + 2f, z +0.5f);
+                                    entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     if (random.NextDouble() <= 0.5)
                                     {
                                         if (random.NextDouble() <= 0.5)

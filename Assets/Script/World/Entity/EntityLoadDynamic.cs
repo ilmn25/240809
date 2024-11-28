@@ -8,8 +8,6 @@ using UnityEngine;
 public class EntityLoadDynamic : MonoBehaviour
 {
     public static EntityLoadDynamic Instance { get; private set; }  
-    public static event Action UpdateEntityListKey; 
-    private Vector3Int _currentChunkCoordinate;
     private List<EntityData> chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
@@ -34,8 +32,6 @@ public class EntityLoadDynamic : MonoBehaviour
     
     void HandleUnload()
     {
-        var keysToRemove = new List<Vector3Int>();
-        UpdateEntityListKey?.Invoke();
         Vector3Int entityChunkPosition;
         foreach (var entityHandler in _entityList)
         { 
@@ -53,6 +49,7 @@ public class EntityLoadDynamic : MonoBehaviour
     void HandleLoad()
     {
         WorldStatic.Instance.HandleLoadWorldFile(0); 
+        Vector3Int entityChunkPosition;
 
         for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; x += WorldStatic.CHUNKSIZE)
         {
@@ -60,17 +57,20 @@ public class EntityLoadDynamic : MonoBehaviour
             {
                 for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
                 {
-                    _currentChunkCoordinate = new Vector3Int(
+                    entityChunkPosition = new Vector3Int(
                         Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),
                         Mathf.FloorToInt(WorldStatic._playerChunkPos.y + y),
                         Mathf.FloorToInt(WorldStatic._playerChunkPos.z + z)
                     );
-
-                    _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate);
-                    if (_currentChunkData != null)
+                    if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
                     {
-                        LoadChunkEntities(_currentChunkData.DynamicEntity);
+                        _currentChunkData = WorldStatic.Instance.GetChunk(entityChunkPosition);
+                        if (_currentChunkData != null)
+                        {
+                            LoadChunkEntities(_currentChunkData.DynamicEntity, entityChunkPosition);
+                        }
                     }
+ 
                 }
             } 
         } 
@@ -86,7 +86,7 @@ public class EntityLoadDynamic : MonoBehaviour
         }
     }
 
-    public void LoadChunkEntities(List<EntityData> chunkEntityList)
+    public void LoadChunkEntities(List<EntityData> chunkEntityList, Vector3Int chunkCoordinate)
     { 
         foreach (EntityData entityData in chunkEntityList)
         {   
@@ -94,7 +94,7 @@ public class EntityLoadDynamic : MonoBehaviour
             {
                 case EntityType.Item: 
                     _currentInstance = EntityPoolStatic.Instance.GetObject("item"); 
-                    entityData.Position = new SerializableVector3(Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3()));
+                    entityData.Position = new SerializableVector3(Lib.CombineVector(chunkCoordinate, entityData.Position.ToVector3()));
                     _currentInstance.transform.position = entityData.Position.ToVector3(); 
         
                     _currentInstance.GetComponent<SpriteRenderer>().sprite = 
@@ -103,7 +103,7 @@ public class EntityLoadDynamic : MonoBehaviour
 
                 case EntityType.Rigid:
                     _currentInstance = EntityPoolStatic.Instance.GetObject(entityData.ID);
-                    _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3()), 0, 0.5f, 0);
+                    _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(chunkCoordinate, entityData.Position.ToVector3()), 0, 2f, 0);
                     break;
             }
             
