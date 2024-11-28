@@ -27,7 +27,7 @@ public class MapCullInst : MonoBehaviour
  
     void Awake()
     {   
-        CULL_DISTANCE= WorldStatic.CHUNKSIZE * CULL_DISTANCE;
+        CULL_DISTANCE= WorldStatic.CHUNK_SIZE * CULL_DISTANCE;
         _mesh = new Mesh();    
 
         _meshFilter = GetComponent<MeshFilter>();  
@@ -90,13 +90,13 @@ public class MapCullInst : MonoBehaviour
         try {
             if (MapCullStatic.Instance._yCheck)
             { 
-                if (_selfChunkPosition.y + WorldStatic.CHUNKSIZE < MapCullStatic.Instance._yThreshold)  // lower chunks
+                if (_selfChunkPosition.y + WorldStatic.CHUNK_SIZE < MapCullStatic.Instance._yThreshold)  // lower chunks
                 {
                     _meshRenderer.enabled = true;
                     _meshFilter.mesh = _meshData;
                     return; 
                 }           
-                if (_selfChunkPosition.y >= MapCullStatic.Instance._yThreshold) // higher chunks
+                if (_selfChunkPosition.y >= MapCullStatic.Instance._yThreshold) // higher chunks (invis)
                 {
                     _meshRenderer.enabled = false;
                     // _meshFilter.mesh = _meshData;
@@ -145,6 +145,7 @@ public class MapCullInst : MonoBehaviour
         
         if (MapCullStatic.Instance._yCheck) _meshFilter.mesh = _mesh; 
         await Task.Yield();   //do not remove
+        await Task.Yield();   //do not remove
         _meshRenderer.enabled = true;
     } 
       
@@ -178,7 +179,7 @@ public class MapCullInst : MonoBehaviour
         NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
         var job = new HandleCullMathJob
         { 
-            chunkSize = WorldStatic.CHUNKSIZE, 
+            chunkSize = WorldStatic.CHUNK_SIZE, 
             yThreshold = MapCullStatic.Instance._yThreshold - _selfChunkPosition.y,
 
             chunkMap = ChunkMap.Create(_selfChunkPosition),

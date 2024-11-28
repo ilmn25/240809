@@ -14,11 +14,11 @@ public class ChunkData
     static ChunkData()
     {
         Zero = new ChunkData();
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
         {
-            for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
             {
-                for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
                 {
                     Zero.Map[x, y, z] = 0;
                 }
@@ -28,7 +28,7 @@ public class ChunkData
 
     public ChunkData()
     {
-        Map = new int[WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE];
+        Map = new int[WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE];
         StaticEntity = new List<EntityData>();
         DynamicEntity = new List<EntityData>();
     }
@@ -36,11 +36,11 @@ public class ChunkData
 
 public class ChunkMap
 {
-    private static NativeMap3D<int> _map;
-    private static int _size = WorldStatic.CHUNKSIZE + 2; 
+    private static int _size = WorldStatic.CHUNK_SIZE + 2;
+
     public static NativeMap3D<int> Create(Vector3Int coordinate)
     {
-        _map = new NativeMap3D<int>(_size, Allocator.TempJob);
+        NativeMap3D<int> _map = new NativeMap3D<int>(_size, Allocator.TempJob);
 
         // Call methods to set faces
         SetPX(coordinate);
@@ -73,256 +73,280 @@ public class ChunkMap
         SetCornerPNP(coordinate);
         SetCornerPPN(coordinate);
         SetCornerPPP(coordinate);
-        
-        SetMiddle(coordinate); 
+
+        SetMiddle(coordinate);
         return _map;
-    }
- 
- 
-    
-    public static void SetMiddle(Vector3Int coordinate)
-    { 
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+
+
+
+        void SetMiddle(Vector3Int coordinate)
         {
-            for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
-                for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+                for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
                 {
-                    _map[x, y, z] = chunkData.Map[x, y, z];
+                    for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                    {
+                        _map[x, y, z] = chunkData.Map[x, y, z];
+                    }
                 }
             }
         }
-    }
 
-    public static void SetPX(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetPX(Vector3Int coordinate)
         {
-            for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE, coordinate.y, coordinate.z];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
             {
-                _map[WorldStatic.CHUNKSIZE, y, z] = chunkData.Map[0, y, z];
+                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                {
+                    _map[WorldStatic.CHUNK_SIZE, y, z] = chunkData.Map[0, y, z];
+                }
             }
         }
-    }
 
-    public static void SetNX(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetNX(Vector3Int coordinate)
         {
-            for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE, coordinate.y, coordinate.z];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
             {
-                _map[-1, y, z] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, y, z];
+                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                {
+                    _map[-1, y, z] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, y, z];
+                }
             }
         }
-    }
 
-    public static void SetPY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetPY(Vector3Int coordinate)
         {
-            for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
-                _map[x, WorldStatic.CHUNKSIZE, z] = chunkData.Map[x, 0, z];
+                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                {
+                    _map[x, WorldStatic.CHUNK_SIZE, z] = chunkData.Map[x, 0, z];
+                }
             }
         }
-    }
 
-    public static void SetNY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetNY(Vector3Int coordinate)
         {
-            for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
-                _map[x, -1, z] = chunkData.Map[x, WorldStatic.CHUNKSIZE - 1, z];
+                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                {
+                    _map[x, -1, z] = chunkData.Map[x, WorldStatic.CHUNK_SIZE - 1, z];
+                }
             }
         }
-    }
 
-    public static void SetPZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z + WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetPZ(Vector3Int coordinate)
         {
-            for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z + WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
-                _map[x, y, WorldStatic.CHUNKSIZE] = chunkData.Map[x, y, 0];
+                for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+                {
+                    _map[x, y, WorldStatic.CHUNK_SIZE] = chunkData.Map[x, y, 0];
+                }
             }
         }
-    }
 
-    public static void SetNZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z - WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetNZ(Vector3Int coordinate)
         {
-            for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y, coordinate.z - WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
             {
-                _map[x, y, -1] = chunkData.Map[x, y, WorldStatic.CHUNKSIZE - 1];
+                for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+                {
+                    _map[x, y, -1] = chunkData.Map[x, y, WorldStatic.CHUNK_SIZE - 1];
+                }
             }
         }
-    }
-    // Methods to set the edges
-    public static void SetEdgePXNY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+
+        // Methods to set the edges
+        void SetEdgePXNY(Vector3Int coordinate)
         {
-            _map[WorldStatic.CHUNKSIZE, -1, z] = chunkData.Map[0, WorldStatic.CHUNKSIZE - 1, z];
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+            {
+                _map[WorldStatic.CHUNK_SIZE, -1, z] = chunkData.Map[0, WorldStatic.CHUNK_SIZE - 1, z];
+            }
         }
-    }
 
-    public static void SetEdgePXPY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+        void SetEdgePXPY(Vector3Int coordinate)
         {
-            _map[WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE, z] = chunkData.Map[0, 0, z];
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+            {
+                _map[WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE, z] = chunkData.Map[0, 0, z];
+            }
         }
-    }
 
-    public static void SetEdgePXPZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z + WorldStatic.CHUNKSIZE];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetEdgePXPZ(Vector3Int coordinate)
         {
-            _map[WorldStatic.CHUNKSIZE, y, WorldStatic.CHUNKSIZE] = chunkData.Map[0, y, 0];
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE, coordinate.y,
+                coordinate.z + WorldStatic.CHUNK_SIZE];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+            {
+                _map[WorldStatic.CHUNK_SIZE, y, WorldStatic.CHUNK_SIZE] = chunkData.Map[0, y, 0];
+            }
         }
-    }
 
-    public static void SetEdgePXNZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z - WorldStatic.CHUNKSIZE];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetEdgePXNZ(Vector3Int coordinate)
         {
-            _map[WorldStatic.CHUNKSIZE, y, -1] = chunkData.Map[0, y, WorldStatic.CHUNKSIZE - 1];
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE, coordinate.y,
+                coordinate.z - WorldStatic.CHUNK_SIZE];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+            {
+                _map[WorldStatic.CHUNK_SIZE, y, -1] = chunkData.Map[0, y, WorldStatic.CHUNK_SIZE - 1];
+            }
         }
-    }
 
-    public static void SetEdgeNXNY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+        void SetEdgeNXNY(Vector3Int coordinate)
         {
-            _map[-1, -1, -1] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1, z];
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+            {
+                _map[-1, -1, -1] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, WorldStatic.CHUNK_SIZE - 1, z];
+            }
         }
-    }
 
-    public static void SetEdgeNXPY(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z];
-        for (int z = 0; z < WorldStatic.CHUNKSIZE; z++)
+        void SetEdgeNXPY(Vector3Int coordinate)
         {
-            _map[-1, WorldStatic.CHUNKSIZE, z] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, 0, z];
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z];
+            for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+            {
+                _map[-1, WorldStatic.CHUNK_SIZE, z] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, 0, z];
+            }
         }
-    }
 
-    public static void SetEdgeNXPZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z + WorldStatic.CHUNKSIZE];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetEdgeNXPZ(Vector3Int coordinate)
         {
-            _map[-1, y, WorldStatic.CHUNKSIZE] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, y, 0];
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE, coordinate.y,
+                coordinate.z + WorldStatic.CHUNK_SIZE];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+            {
+                _map[-1, y, WorldStatic.CHUNK_SIZE] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, y, 0];
+            }
         }
-    }
 
-    public static void SetEdgeNXNZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y, coordinate.z - WorldStatic.CHUNKSIZE];
-        for (int y = 0; y < WorldStatic.CHUNKSIZE; y++)
+        void SetEdgeNXNZ(Vector3Int coordinate)
         {
-            _map[-1, y, -1] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, y, WorldStatic.CHUNKSIZE - 1];
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE, coordinate.y,
+                coordinate.z - WorldStatic.CHUNK_SIZE];
+            for (int y = 0; y < WorldStatic.CHUNK_SIZE; y++)
+            {
+                _map[-1, y, -1] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, y, WorldStatic.CHUNK_SIZE - 1];
+            }
         }
-    }
 
-    public static void SetEdgePYNZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetEdgePYNZ(Vector3Int coordinate)
         {
-            _map[x, WorldStatic.CHUNKSIZE, -1] = chunkData.Map[x, 0, WorldStatic.CHUNKSIZE - 1];
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNK_SIZE,
+                coordinate.z - WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
+            {
+                _map[x, WorldStatic.CHUNK_SIZE, -1] = chunkData.Map[x, 0, WorldStatic.CHUNK_SIZE - 1];
+            }
         }
-    }
 
-    public static void SetEdgePYPZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetEdgePYPZ(Vector3Int coordinate)
         {
-            _map[x, WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE] = chunkData.Map[x, 0, 0];
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y + WorldStatic.CHUNK_SIZE,
+                coordinate.z + WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
+            {
+                _map[x, WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE] = chunkData.Map[x, 0, 0];
+            }
         }
-    }
 
-    public static void SetEdgeNYNZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetEdgeNYNZ(Vector3Int coordinate)
         {
-            _map[x, -1, -1] = chunkData.Map[x, WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1];
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNK_SIZE,
+                coordinate.z - WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
+            {
+                _map[x, -1, -1] = chunkData.Map[x, WorldStatic.CHUNK_SIZE - 1, WorldStatic.CHUNK_SIZE - 1];
+            }
         }
-    }
 
-    public static void SetEdgeNYPZ(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        for (int x = 0; x < WorldStatic.CHUNKSIZE; x++)
+        void SetEdgeNYPZ(Vector3Int coordinate)
         {
-            _map[x, -1, WorldStatic.CHUNKSIZE] = chunkData.Map[x, WorldStatic.CHUNKSIZE - 1, 0];
+            ChunkData chunkData = WorldStatic.World[coordinate.x, coordinate.y - WorldStatic.CHUNK_SIZE,
+                coordinate.z + WorldStatic.CHUNK_SIZE];
+            for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
+            {
+                _map[x, -1, WorldStatic.CHUNK_SIZE] = chunkData.Map[x, WorldStatic.CHUNK_SIZE - 1, 0];
+            }
         }
-    }
 
-    // Methods to set the corners
-    public static void SetCornerNNN(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        _map[-1, -1, -1] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1];
-    }
+        // Methods to set the corners
+        void SetCornerNNN(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z - WorldStatic.CHUNK_SIZE];
+            _map[-1, -1, -1] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, WorldStatic.CHUNK_SIZE - 1,
+                WorldStatic.CHUNK_SIZE - 1];
+        }
 
-    public static void SetCornerNNP(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        _map[0, -1, WorldStatic.CHUNKSIZE] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1, 0];
-    }
+        void SetCornerNNP(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z + WorldStatic.CHUNK_SIZE];
+            _map[0, -1, WorldStatic.CHUNK_SIZE] =
+                chunkData.Map[WorldStatic.CHUNK_SIZE - 1, WorldStatic.CHUNK_SIZE - 1, 0];
+        }
 
-    public static void SetCornerNPN(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        _map[-1, WorldStatic.CHUNKSIZE, -1] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, 0, WorldStatic.CHUNKSIZE - 1];
-    }
+        void SetCornerNPN(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z - WorldStatic.CHUNK_SIZE];
+            _map[-1, WorldStatic.CHUNK_SIZE, -1] =
+                chunkData.Map[WorldStatic.CHUNK_SIZE - 1, 0, WorldStatic.CHUNK_SIZE - 1];
+        }
 
-    public static void SetCornerNPP(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        _map[-1, WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE] = chunkData.Map[WorldStatic.CHUNKSIZE - 1, 0, 0];
-    }
+        void SetCornerNPP(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x - WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z + WorldStatic.CHUNK_SIZE];
+            _map[-1, WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE] = chunkData.Map[WorldStatic.CHUNK_SIZE - 1, 0, 0];
+        }
 
-    public static void SetCornerPNN(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        _map[WorldStatic.CHUNKSIZE, -1, -1] = chunkData.Map[0, WorldStatic.CHUNKSIZE - 1, WorldStatic.CHUNKSIZE - 1];
-    }
+        void SetCornerPNN(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z - WorldStatic.CHUNK_SIZE];
+            _map[WorldStatic.CHUNK_SIZE, -1, -1] =
+                chunkData.Map[0, WorldStatic.CHUNK_SIZE - 1, WorldStatic.CHUNK_SIZE - 1];
+        }
 
-    public static void SetCornerPNP(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y - WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        _map[WorldStatic.CHUNKSIZE, -1, WorldStatic.CHUNKSIZE] = chunkData.Map[0, WorldStatic.CHUNKSIZE - 1, 0];
-    }
+        void SetCornerPNP(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y - WorldStatic.CHUNK_SIZE, coordinate.z + WorldStatic.CHUNK_SIZE];
+            _map[WorldStatic.CHUNK_SIZE, -1, WorldStatic.CHUNK_SIZE] = chunkData.Map[0, WorldStatic.CHUNK_SIZE - 1, 0];
+        }
 
-    public static void SetCornerPPN(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z - WorldStatic.CHUNKSIZE];
-        _map[WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE, -1] = chunkData.Map[0, 0, WorldStatic.CHUNKSIZE - 1];
-    }
+        void SetCornerPPN(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z - WorldStatic.CHUNK_SIZE];
+            _map[WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE, -1] = chunkData.Map[0, 0, WorldStatic.CHUNK_SIZE - 1];
+        }
 
-    public static void SetCornerPPP(Vector3Int coordinate)
-    {
-        ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNKSIZE, coordinate.y + WorldStatic.CHUNKSIZE, coordinate.z + WorldStatic.CHUNKSIZE];
-        _map[WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE, WorldStatic.CHUNKSIZE] = chunkData.Map[0, 0, 0];
+        void SetCornerPPP(Vector3Int coordinate)
+        {
+            ChunkData chunkData = WorldStatic.World[coordinate.x + WorldStatic.CHUNK_SIZE,
+                coordinate.y + WorldStatic.CHUNK_SIZE, coordinate.z + WorldStatic.CHUNK_SIZE];
+            _map[WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE] = chunkData.Map[0, 0, 0];
+        }
+
     }
-    
-    
 }

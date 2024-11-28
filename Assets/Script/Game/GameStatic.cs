@@ -14,7 +14,7 @@ public class GameStatic : MonoBehaviour
         Instance = this;  
         Time.fixedDeltaTime = FIXED_UPDATE_MS;
         Application.targetFrameRate = 200;
-        Game.Player.transform.position = new Vector3( WorldStatic.CHUNKSIZE/2 , WorldStatic.CHUNKSIZE * WorldStatic.ysize,  WorldStatic.CHUNKSIZE/2);
+        Game.Player.transform.position = new Vector3( WorldStatic.CHUNK_SIZE/2 , WorldStatic.CHUNK_SIZE * WorldStatic.ySize + 15,  WorldStatic.CHUNK_SIZE/2);
     }
 
     void Update()
