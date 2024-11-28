@@ -51,7 +51,8 @@ public class MapLoadStatic : MonoBehaviour
 
     
     public void RefreshExistingChunk(Vector3Int chunkCoordinates)
-    { 
+    {
+        if (!WorldStatic.Instance.IsInWorldBounds(chunkCoordinates)) return;
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
  
@@ -63,9 +64,9 @@ public class MapLoadStatic : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             traverseCheckPosition = kvp.Key;
-            if (kvp.Key.x > WorldStatic._chunkPosition.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.x < WorldStatic._chunkPosition.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
-                || kvp.Key.y > WorldStatic._chunkPosition.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.y < WorldStatic._chunkPosition.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
-                || kvp.Key.z > WorldStatic._chunkPosition.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.z < WorldStatic._chunkPosition.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE)
+            if (kvp.Key.x > WorldStatic._playerChunkPos.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.x < WorldStatic._playerChunkPos.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
+                || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE
+                || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNKSIZE)
             {
                 Destroy(kvp.Value);
                 destroyList.Add(kvp.Key);
@@ -87,11 +88,11 @@ public class MapLoadStatic : MonoBehaviour
                 for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
                 {
                     Vector3Int traverseCheckPosition = new Vector3Int(
-                        WorldStatic._chunkPosition.x + x * WorldStatic.CHUNKSIZE,
-                        WorldStatic._chunkPosition.y + y * WorldStatic.CHUNKSIZE,
-                        WorldStatic._chunkPosition.z + z * WorldStatic.CHUNKSIZE
+                        WorldStatic._playerChunkPos.x + x * WorldStatic.CHUNKSIZE,
+                        WorldStatic._playerChunkPos.y + y * WorldStatic.CHUNKSIZE,
+                        WorldStatic._playerChunkPos.z + z * WorldStatic.CHUNKSIZE
                     );
-                    if (!_activeChunks.ContainsKey(traverseCheckPosition))
+                    if (!_activeChunks.ContainsKey(traverseCheckPosition) && WorldStatic.Instance.IsInWorldBounds(traverseCheckPosition))
                         _ = LoadChunksOntoScreenAsync(traverseCheckPosition);
                 }
             }
@@ -114,7 +115,7 @@ public class MapLoadStatic : MonoBehaviour
                     await Task.Run(() => LoadMeshMath()); 
                     await Task.Delay(10);
                     LoadMeshObject(replace);
-                }  
+                }  else Lib.Log("Chunk in queue is zero");
             }
         }
         catch (Exception ex)
@@ -132,10 +133,11 @@ public class MapLoadStatic : MonoBehaviour
  
     //! SUBSYSTEMS BELOW
 
-    Mesh _mesh; 
-    GameObject _meshObject;
-    MeshRenderer _meshRenderer;
-    MapCullInst _mapCullInst;
+    private Mesh _mesh; 
+    private GameObject _meshObject;
+    private MeshRenderer _meshRenderer;
+    private MapCullInst _mapCullInst;
+    private int counter;
     private void LoadMeshObject(bool replace = false)
     {
         _mesh = new Mesh();
@@ -146,7 +148,7 @@ public class MapLoadStatic : MonoBehaviour
  
         if (!replace)
         {
-            _meshObject = new("map");
+            _meshObject = new("MAP " + counter++);
             _meshObject.layer = LayerMask.NameToLayer("Collision");
             _meshObject.transform.position = _chunkCoordinate; 
 
@@ -250,7 +252,7 @@ public class MapLoadStatic : MonoBehaviour
             job._triangles.Dispose();
             job._uvs.Dispose();
             job._normals.Dispose(); 
-
+            
             job._textureRectDictionary.Dispose();
         }
         catch (Exception ex)
@@ -311,6 +313,7 @@ public class MapLoadStatic : MonoBehaviour
         [DeallocateOnJobCompletion]
         public int nz;
 
+        [DeallocateOnJobCompletion]
         public NativeArray<Vector3> _faceVertices;
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> _faceVerticesShadow;

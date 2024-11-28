@@ -39,8 +39,7 @@ public class MapCullInst : MonoBehaviour
     void Start() { 
         CreateShadowMesh();
         HandleAssignment();    
-    }
- 
+    }  
     void CreateShadowMesh()
     {  
         GameObject _shadowObject = new GameObject("Shadow"); 
@@ -150,7 +149,7 @@ public class MapCullInst : MonoBehaviour
         try
         { 
             //TODO y
-            chunkPosition = WorldStatic._chunkPosition;
+            chunkPosition = WorldStatic._playerChunkPos;
             xDist = Mathf.Abs(chunkPosition.x - transform.position.x);
             zDist = Mathf.Abs(chunkPosition.z - transform.position.z);   
             xCheck = xDist <= CULL_DISTANCE; 

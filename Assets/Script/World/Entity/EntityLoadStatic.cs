@@ -46,12 +46,12 @@ public class EntityLoadStatic : MonoBehaviour
             // Extract chunk coordinates from the key
             int chunkX = key.x, chunkY = key.y, chunkZ = key.z;
 
-            if (chunkX > WorldStatic._chunkPosition.x + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkX < WorldStatic._chunkPosition.x - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
-                || chunkY > WorldStatic._chunkPosition.y + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkY < WorldStatic._chunkPosition.y - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
-                || chunkZ > WorldStatic._chunkPosition.z + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
-                || chunkZ < WorldStatic._chunkPosition.z - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE)
+            if (chunkX > WorldStatic._playerChunkPos.x + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkX < WorldStatic._playerChunkPos.x - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
+                || chunkY > WorldStatic._playerChunkPos.y + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkY < WorldStatic._playerChunkPos.y - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE
+                || chunkZ > WorldStatic._playerChunkPos.z + ENTITY_DISTANCE * WorldStatic.CHUNKSIZE 
+                || chunkZ < WorldStatic._playerChunkPos.z - ENTITY_DISTANCE * WorldStatic.CHUNKSIZE)
             {
                 UpdateEntityList(key);
                 keysToRemove.Add(key);
@@ -72,9 +72,9 @@ public class EntityLoadStatic : MonoBehaviour
                 for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNKSIZE; z += WorldStatic.CHUNKSIZE)
                 {
                     _currentChunkCoordinate = new Vector3Int(
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.x + x),
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.y + y),
-                        Mathf.FloorToInt(WorldStatic._chunkPosition.z + z)
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.y + y),
+                        Mathf.FloorToInt(WorldStatic._playerChunkPos.z + z)
                     );
 
                     if (!_entityList.ContainsKey(_currentChunkCoordinate))
