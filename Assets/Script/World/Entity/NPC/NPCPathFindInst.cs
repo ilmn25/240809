@@ -145,7 +145,7 @@ public class NPCPathFindInst : MonoBehaviour
                     int potentialSkipPoint = _nextPoint + _jumpSkipAmount;
                     if (potentialSkipPoint < _path.Count - 1 
                     && !(bool)_path[potentialSkipPoint][1] 
-                    && ((Vector3)_path[potentialSkipPoint][0]).y == ((Vector3)_path[_nextPoint][0]).y)
+                    && Mathf.Approximately(((Vector3)_path[potentialSkipPoint][0]).y, ((Vector3)_path[_nextPoint][0]).y))
                     {
                         _nextPoint = potentialSkipPoint;
                     }

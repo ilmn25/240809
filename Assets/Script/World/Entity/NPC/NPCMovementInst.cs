@@ -62,7 +62,7 @@ public class NPCMovementInst : MonoBehaviour
 
     public void HandleMovementUpdate()
     { 
-        if (transform.position.y < -1) transform.position = Lib.AddToVector(transform.position, 0, 40, 0);
+        if (transform.position.y < -1) transform.position = Lib.AddToVector(transform.position, 0, 100, 0);
 
         // _deltaTime = GameSystem._deltaTime;
         _deltaTime = GameStatic.GetDeltaTime();
@@ -93,11 +93,11 @@ public class NPCMovementInst : MonoBehaviour
             _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / DECELERATION_TIME);
 
             _newPosition.x += _directionBuffer.x * _speedCurrent * _deltaTime;
-            _newPosition.z += _directionBuffer.y * _speedCurrent * _deltaTime;
+            _newPosition.z += _directionBuffer.z * _speedCurrent * _deltaTime;
 
             if (!IsMovable(_newPosition))
             {
-                _speedCurrent = _speedCurrent/2;
+                _speedCurrent /= 2;
                 _newPosition = transform.position;
             }
         }

@@ -32,7 +32,7 @@ public class NPCPathFindStatic : MonoBehaviour
                 _startPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
                 _endPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
 
-                return await Task.Run(() => FindPathAsync(_agent, WorldStatic._boolMapOrigin, WorldStatic._boolMap, _startPosition, _endPosition));
+                return await Task.Run(() => FindPathAsync(_agent, _startPosition, _endPosition));
             } 
             return null;
         }
@@ -42,7 +42,7 @@ public class NPCPathFindStatic : MonoBehaviour
         }
     } 
  
-    private async Task<List<object[]>> FindPathAsync(int[] agent, Vector3Int gridOrigin, bool[,,] grid, Vector3Int startPosition, Vector3Int endPosition)
+    private async Task<List<object[]>> FindPathAsync(int[] agent, Vector3Int startPosition, Vector3Int endPosition)
     {  
         int yieldCounter;
         bool validity;
@@ -249,13 +249,13 @@ public class NPCPathFindStatic : MonoBehaviour
                 pos.x >= 0 
                 && pos.y >= 0 
                 && pos.z >= 0 
-                && pos.x < grid.GetLength(0) //x 
-                && pos.z < grid.GetLength(2) //z 
+                && pos.x < WorldStatic.World.Bounds.x 
+                && pos.z < WorldStatic.World.Bounds.z 
             ); //check bounds x z 
             if (isClear)
             {
-                isClear = pos.y >= grid.GetLength(1)? true : false; //check bounds y (true even if above max y)
-                isClear = isClear ? true : grid[pos.x, pos.y, pos.z]; //check air or block
+                isClear = pos.y >= WorldStatic._boolMap.GetLength(1)? true : false; //check bounds y (true even if above max y)
+                isClear = isClear || WorldStatic._boolMap[pos.x, pos.y, pos.z]; //check air or block
             } else isClear= false;
             return isClear;
         }
@@ -269,9 +269,9 @@ public class NPCPathFindStatic : MonoBehaviour
             {
                 // Adjust the node position and add 0.5 to each axis
                 adjustedPosition = new Vector3(
-                    currentNode.Position.x + gridOrigin.x + 0.5f,
+                    currentNode.Position.x + 0.5f,
                     currentNode.Position.y,
-                    currentNode.Position.z + gridOrigin.z + 0.5f
+                    currentNode.Position.z + 0.5f
                 );
 
                 // Create an array with adjustedPosition and currentNode.isFloat

@@ -563,6 +563,63 @@ public class MapLoadStatic : MonoBehaviour
                 {
                     cornerValue += 8; // Bottom-Left
                 }
+            } 
+            else if (mode == dir.ny) // Negative Y (Bottom of the cube)
+            {
+                bool isNy = _chunkMap[x, y - 1, z] == 0;
+
+                if ((_chunkMap[x, y, z + 1] != 0)
+                    || (isNy && _chunkMap[x, y - 1, z + 1] != 0))
+                {
+                    edgeValue += 1; // Top
+                }
+
+                if ((_chunkMap[x + 1, y, z] != 0)
+                    || (isNy && _chunkMap[x + 1, y - 1, z] != 0))
+                {
+                    edgeValue += 2; // Right
+                }
+
+                if ((_chunkMap[x, y, z - 1] != 0)
+                    || (isNy && _chunkMap[x, y - 1, z - 1] != 0))
+                {
+                    edgeValue += 4; // Bottom
+                }
+
+                if ((_chunkMap[x - 1, y, z] != 0)
+                    || (isNy && _chunkMap[x - 1, y - 1, z] != 0))
+                {
+                    edgeValue += 8; // Left
+                }
+
+                // Calculate corner values
+                if (((_chunkMap[x - 1, y, z + 1] != 0)
+                     || (isNy && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+
+                if (((_chunkMap[x + 1, y, z + 1] != 0)
+                     || (isNy && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+                {
+                    cornerValue += 2; // Top-Right
+                }
+
+                if (((_chunkMap[x + 1, y, z - 1] != 0)
+                     || (isNy && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+                {
+                    cornerValue += 4; // Bottom-Right
+                }
+
+                if (((_chunkMap[x - 1, y, z - 1] != 0)
+                     || (isNy && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 8; // Bottom-Left
+                }
             }
             else if (mode == dir.nx) // Negative X (Left side of the cube)
             {
@@ -593,6 +650,13 @@ public class MapLoadStatic : MonoBehaviour
                 }
 
                 // Calculate corner values
+                
+                if (((_chunkMap[x, y + 1, z - 1] != 0)
+                     || (isNx && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
                 if (((_chunkMap[x, y + 1, z + 1] != 0)
                      || (isNx && _chunkMap[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
@@ -612,14 +676,7 @@ public class MapLoadStatic : MonoBehaviour
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
-                }
-                
-                if (((_chunkMap[x, y + 1, z - 1] != 0)
-                     || (isNx && _chunkMap[x - 1, y + 1, z - 1] != 0))
-                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
-                {
-                    cornerValue += 1; // Top-Left
-                }
+                } 
             }
             else if (mode == dir.px) // Positive X (Right side of the cube)
             {
@@ -651,6 +708,14 @@ public class MapLoadStatic : MonoBehaviour
 
                 // Lib.Log(x,y,z,_chunkMap[x, y + 1, z] != 0, _chunkMap[x, y, z + 1] != 0,_chunkMap[x, y - 1, z] != 0, _chunkMap[x, y, z - 1] != 0, _chunkMap[x, y + 1, z + 1] != 0, _chunkMap[x, y - 1, z + 1] != 0, _chunkMap[x, y - 1, z - 1] != 0, _chunkMap[x, y + 1, z - 1] != 0);
                 // Calculate corner values
+
+                if (((_chunkMap[x, y + 1, z - 1] != 0)
+                     || (isPx && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+                {
+                    cornerValue += 1; // Top-Left
+                }
+                
                 if (((_chunkMap[x, y + 1, z + 1] != 0)
                      || (isPx && _chunkMap[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
@@ -670,14 +735,7 @@ public class MapLoadStatic : MonoBehaviour
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
-                }
-
-                if (((_chunkMap[x, y + 1, z - 1] != 0)
-                     || (isPx && _chunkMap[x + 1, y + 1, z - 1] != 0))
-                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
-                {
-                    cornerValue += 1; // Top-Left
-                }
+                } 
             }
             else if (mode == dir.pz) // Positive Z (Front of the cube)
             {
@@ -793,63 +851,6 @@ public class MapLoadStatic : MonoBehaviour
                     cornerValue += 8; // Bottom-Left
                 }
             } 
-            else if (mode == dir.ny) // Negative Y (Bottom of the cube)
-            {
-                bool isNy = _chunkMap[x, y - 1, z] == 0;
-
-                if ((_chunkMap[x, y, z + 1] != 0)
-                    || (isNy && _chunkMap[x, y - 1, z + 1] != 0))
-                {
-                    edgeValue += 1; // Top
-                }
-
-                if ((_chunkMap[x + 1, y, z] != 0)
-                    || (isNy && _chunkMap[x + 1, y - 1, z] != 0))
-                {
-                    edgeValue += 2; // Right
-                }
-
-                if ((_chunkMap[x, y, z - 1] != 0)
-                    || (isNy && _chunkMap[x, y - 1, z - 1] != 0))
-                {
-                    edgeValue += 4; // Bottom
-                }
-
-                if ((_chunkMap[x - 1, y, z] != 0)
-                    || (isNy && _chunkMap[x - 1, y - 1, z] != 0))
-                {
-                    edgeValue += 8; // Left
-                }
-
-                // Calculate corner values
-                if (((_chunkMap[x - 1, y, z + 1] != 0)
-                     || (isNy && _chunkMap[x - 1, y - 1, z + 1] != 0))
-                    && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
-                {
-                    cornerValue += 1; // Top-Left
-                }
-
-                if (((_chunkMap[x + 1, y, z + 1] != 0)
-                     || (isNy && _chunkMap[x + 1, y - 1, z + 1] != 0))
-                    && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
-                {
-                    cornerValue += 2; // Top-Right
-                }
-
-                if (((_chunkMap[x + 1, y, z - 1] != 0)
-                     || (isNy && _chunkMap[x + 1, y - 1, z - 1] != 0))
-                    && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
-                {
-                    cornerValue += 4; // Bottom-Right
-                }
-
-                if (((_chunkMap[x - 1, y, z - 1] != 0)
-                     || (isNy && _chunkMap[x - 1, y - 1, z - 1] != 0))
-                    && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
-                {
-                    cornerValue += 8; // Bottom-Left
-                }
-            }
 
 
 
