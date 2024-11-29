@@ -4,31 +4,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class NPCMovementInst : MonoBehaviour
+public class MovementModule : MonoBehaviour
 {
-
     [SerializeField] public float SPEED_WALK = 6f;
     [SerializeField] private float SPEED_RUN = 8f;
-    [SerializeField] private float ACCELERATION_TIME = 0.3f; // time to reach full speed
-    [SerializeField] private float DECELERATION_TIME = 0.08f; // time to stop
-    [SerializeField] private float SLIDE_DEGREE = 0.3f; //degree of slide against walkk when collide
+    [SerializeField] private float ACCELERATION_TIME = 0.3f;  
+    [SerializeField] private float DECELERATION_TIME = 0.08f; 
+    [SerializeField] private float SLIDE_DEGREE = 0.3f; //against wall
     [SerializeField] private float GRAVITY = -40f;
     [SerializeField] private float JUMP_VELOCITY = 12f;
-
-
-    private bool _isGrounded = false;
-    private float _speedCurrent;
-    private float _speedTarget;
-    private float _speedAdjust;
-    private Vector3 _newPosition;
-    private Vector3 _previousPosition;
-    private Vector3 _direction = Vector3.zero;
-    private Vector3 _directionBuffer = Vector3.zero;
-    private float _verticalVelocity = 0f;
-    private float _deltaTime;
-    private Vector3[] _collider;
-    private float _colliderRadius; 
-
+    [SerializeField] private float COLLISION_RADIUS = 0.3f; 
+    
     public void SetDirection(Vector3 dir)
     {
         _direction = dir;
@@ -37,7 +23,6 @@ public class NPCMovementInst : MonoBehaviour
     {
         return _direction;
     }
-
     public float GetSpeed()
     {
         return _speedCurrent;
@@ -46,18 +31,35 @@ public class NPCMovementInst : MonoBehaviour
     {
         return _isGrounded;
     }
+    
+    
+    
+    
+    // variables
+    private bool _isGrounded = false;
+    
+    private float _speedCurrent;
+    private float _speedTarget;
+    private float _speedAdjust;
+    
+    private Vector3 _newPosition;
+    private Vector3 _previousPosition;
+    
+    private Vector3 _direction = Vector3.zero;
+    private Vector3 _directionBuffer = Vector3.zero;
+    
+    private float _verticalVelocity = 0f;
+    
+    private float _deltaTime; 
+    
+    private float _testPosition;
+    private Vector3 _testPositionA;
+    private Vector3 _testPositionB;
 
-    private void Start() {
-
-        CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
-        Vector3 point1 = capsuleCollider.center + Vector3.up * (capsuleCollider.height / 2 - capsuleCollider.radius);
-        Vector3 point2 = capsuleCollider.center + Vector3.down * (capsuleCollider.height / 2 - capsuleCollider.radius);
-        _collider = new Vector3[] { point1, point2};
-        _colliderRadius = capsuleCollider.radius;
-        // Destroy(capsuleCollider);
-    }
-      
-
+    private Vector3 _newPositionY;
+    
+    private Collider[] _colliderArray = new Collider[1];
+    
     public void HandleMovementUpdate()
     { 
         if (transform.position.y < -1) transform.position = Lib.AddToVector(transform.position, 0, 100, 0);
@@ -113,13 +115,7 @@ public class NPCMovementInst : MonoBehaviour
         }  
         // _isGrounded = _verticalVelocity == 0;
     }
- 
-
-
- 
-    float testPosition;
-    Vector3 testPositionA;
-    Vector3 testPositionB;
+  
     private void HandleObstacle(Vector3 position)
     {
         _newPosition = transform.position;
@@ -137,48 +133,47 @@ public class NPCMovementInst : MonoBehaviour
             //! slide against wall if possible
             if (_direction.x != 0)
             {
-                testPosition = transform.position.x + SLIDE_DEGREE * _direction.x * _speedCurrent * _deltaTime;
-                testPositionA = new Vector3(testPosition, transform.position.y, transform.position.z);
-                testPositionB = new Vector3(testPosition, transform.position.y, transform.position.z);
-                testPositionA.z += -1 * _speedCurrent * _deltaTime;
-                testPositionB.z += 1 * _speedCurrent * _deltaTime;
-                if (IsMovable(testPositionA) && !IsMovable(testPositionB))
+                _testPosition = transform.position.x + SLIDE_DEGREE * _direction.x * _speedCurrent * _deltaTime;
+                _testPositionA = new Vector3(_testPosition, transform.position.y, transform.position.z);
+                _testPositionB = new Vector3(_testPosition, transform.position.y, transform.position.z);
+                _testPositionA.z += -1 * _speedCurrent * _deltaTime;
+                _testPositionB.z += 1 * _speedCurrent * _deltaTime;
+                if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
                 {
-                    _newPosition = testPositionA;
+                    _newPosition = _testPositionA;
                 }
-                else if (!IsMovable(testPositionA) && IsMovable(testPositionB))
+                else if (!IsMovable(_testPositionA) && IsMovable(_testPositionB))
                 {
-                    _newPosition = testPositionB;
+                    _newPosition = _testPositionB;
                 }
             }
             else
             {
-                testPosition = transform.position.z + SLIDE_DEGREE * _direction.z * _speedCurrent * _deltaTime;
-                testPositionA = new Vector3(transform.position.x, transform.position.y, testPosition);
-                testPositionB = new Vector3(transform.position.x, transform.position.y, testPosition);
-                testPositionA.x += -1 * _speedCurrent * _deltaTime;
-                testPositionB.x += 1 * _speedCurrent * _deltaTime;
-                if (IsMovable(testPositionA) && !IsMovable(testPositionB))
+                _testPosition = transform.position.z + SLIDE_DEGREE * _direction.z * _speedCurrent * _deltaTime;
+                _testPositionA = new Vector3(transform.position.x, transform.position.y, _testPosition);
+                _testPositionB = new Vector3(transform.position.x, transform.position.y, _testPosition);
+                _testPositionA.x += -1 * _speedCurrent * _deltaTime;
+                _testPositionB.x += 1 * _speedCurrent * _deltaTime;
+                if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
                 {
-                    _newPosition = testPositionA;
+                    _newPosition = _testPositionA;
                 }
-                else if (!IsMovable(testPositionA) && IsMovable(testPositionB))
+                else if (!IsMovable(_testPositionA) && IsMovable(_testPositionB))
                 {
-                    _newPosition = testPositionB;
+                    _newPosition = _testPositionB;
                 }
             }
         }
     } 
-   
-    private Vector3 newPositionY;
+    
     private void HandleMove()
     { 
         if (_verticalVelocity > GRAVITY) //terminal velocity
         {
             _verticalVelocity += GRAVITY * _deltaTime;
         } 
-        newPositionY = new Vector3(_newPosition.x, _newPosition.y + _verticalVelocity * _deltaTime, _newPosition.z);
-        if (!IsMovable(newPositionY))
+        _newPositionY = new Vector3(_newPosition.x, _newPosition.y + _verticalVelocity * _deltaTime, _newPosition.z);
+        if (!IsMovable(_newPositionY))
         { 
             if (_verticalVelocity < 0) _isGrounded = true;
             _verticalVelocity = 0;
@@ -186,7 +181,7 @@ public class NPCMovementInst : MonoBehaviour
         } 
         else
         {
-            transform.position = newPositionY;
+            transform.position = _newPositionY;
         } 
         
         
@@ -197,16 +192,13 @@ public class NPCMovementInst : MonoBehaviour
         }
         _previousPosition = transform.position;
     }
-
-    Collider[] tempCollisionArray = new Collider[1];
-    int collisionCount; 
-    private bool IsMovable(Vector3 _newPosition)
-    {  
+     
+    private bool IsMovable(Vector3 newPosition)
+    {
         // Define an array to store the results
-        tempCollisionArray = new Collider[1]; 
-        collisionCount = Physics.OverlapCapsuleNonAlloc(_newPosition + _collider[0], _newPosition + _collider[1], _colliderRadius, tempCollisionArray, Game.LayerCollide);
+        _colliderArray = new Collider[1];
 
-        return !(collisionCount > 0);
+        return !(Physics.OverlapSphereNonAlloc(newPosition, COLLISION_RADIUS, _colliderArray, Game.LayerCollide) > 0);
     }
 } 
 

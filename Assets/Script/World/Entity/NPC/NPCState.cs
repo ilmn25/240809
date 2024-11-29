@@ -1,50 +1,84 @@
 using UnityEngine;
 class NPCIdle : EntityState {
-    NPCMovementInst _npcMovementInst;
-    NPCAnimationInst _npcAnimationInst; 
+    MovementModule _movementModule;
+    AnimationModule _animationModule; 
 
-    public NPCIdle(NPCMovementInst npcMovementInst, NPCAnimationInst npcAnimationInst)
+    public NPCIdle(MovementModule movementModule, AnimationModule animationModule)
     {
-        _npcMovementInst = npcMovementInst;
-        _npcAnimationInst = npcAnimationInst;
+        _movementModule = movementModule;
+        _animationModule = animationModule;
     }
  
     public override void StateUpdate() {
-        _npcMovementInst.HandleMovementUpdate();
-        _npcAnimationInst.HandleAnimationUpdate();
+        _movementModule.HandleMovementUpdate();
+        _animationModule.HandleAnimationUpdate();
     }
 }
 
-class NPCChase : EntityState {
-    NPCMovementInst _npcMovementInst;
-    NPCPathFindInst _npcPathFindInst;
-    NPCAnimationInst _npcAnimationInst; 
+class NPCRoam : EntityState {
+    MovementModule _movementModule;
+    PathFindModule _pathFindModule;
+    AnimationModule _animationModule; 
     SpriteRenderer _sprite;
 
-    public NPCChase(NPCMovementInst npcMovementInst, NPCPathFindInst npcPathFindInst, 
-        NPCAnimationInst npcAnimationInst, SpriteRenderer sprite)
+    public NPCRoam(MovementModule movementModule, PathFindModule pathFindModule, 
+        AnimationModule animationModule, SpriteRenderer sprite)
     {
-        _npcMovementInst = npcMovementInst;
-        _npcAnimationInst = npcAnimationInst;
-        _npcPathFindInst = npcPathFindInst;
+        _movementModule = movementModule;
+        _animationModule = animationModule;
+        _pathFindModule = pathFindModule;
         _sprite = sprite; 
     }
 
     public override void OnEnterState()
     {
-        _npcPathFindInst.SetTarget(Game.Player);
+        _pathFindModule.SetTarget(null);
     }
+    
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            _npcMovementInst.SetDirection(_npcPathFindInst.HandlePathFindActive());
-            // _entityMovementHandler.HandleMovementUpdateTest();
-            _npcMovementInst.HandleMovementUpdate();
-            _npcAnimationInst.HandleAnimationUpdate();
+            _movementModule.SetDirection(_pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded()));
+            _movementModule.HandleMovementUpdate();
+            _animationModule.HandleAnimationUpdate();
         }
         else
         {  
-            _npcPathFindInst.HandlePathFindPassive(); 
+            _pathFindModule.HandlePathFindPassive(_movementModule.SPEED_WALK); 
+        }
+    }
+}
+
+class NPCChase : EntityState {
+    MovementModule _movementModule;
+    PathFindModule _pathFindModule;
+    AnimationModule _animationModule; 
+    SpriteRenderer _sprite;
+
+    public NPCChase(MovementModule movementModule, PathFindModule pathFindModule, 
+        AnimationModule animationModule, SpriteRenderer sprite)
+    {
+        _movementModule = movementModule;
+        _animationModule = animationModule;
+        _pathFindModule = pathFindModule;
+        _sprite = sprite; 
+    }
+
+    public override void OnEnterState()
+    {
+        _pathFindModule.SetTarget(Game.Player.transform);
+    }
+    
+    public override void StateUpdate() {
+        if (_sprite.isVisible)
+        {
+            _movementModule.SetDirection(_pathFindModule.HandlePathFindActive(_movementModule.IsGrounded()));
+            _movementModule.HandleMovementUpdate();
+            _animationModule.HandleAnimationUpdate();
+        }
+        else
+        {  
+            _pathFindModule.HandlePathFindPassive(_movementModule.SPEED_WALK); 
         }
     }
 }
