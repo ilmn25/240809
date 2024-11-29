@@ -5,43 +5,43 @@ using UnityEngine;
 
 public class NPCStateMachine : EntityStateMachine
 {
-    private NPCMovementInst _npcMovementInst;
-    private NPCPathFindInst _npcPathFindInst;
-    private NPCAnimationInst _npcAnimationInst; 
+    private MovementModule _movementModule;
+    private PathFindModule _pathFindModule;
+    private AnimationModule _animationModule; 
     private SpriteRenderer _sprite;
     protected override void OnAwake()
     {
         _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
-        _npcMovementInst = GetComponent<NPCMovementInst>();
-        _npcPathFindInst = GetComponent<NPCPathFindInst>();
-        _npcAnimationInst = GetComponent<NPCAnimationInst>();
+        _movementModule = GetComponent<MovementModule>();
+        _pathFindModule = GetComponent<PathFindModule>();
+        _animationModule = GetComponent<AnimationModule>();
         
-        AddState(new NPCIdle(_npcMovementInst, _npcAnimationInst), true);
-        AddState(new NPCChase(_npcMovementInst, _npcPathFindInst, _npcAnimationInst, _sprite));
+        AddState(new NPCIdle(_movementModule, _animationModule), true);
+        AddState(new NPCChase(_movementModule, _pathFindModule, _animationModule, _sprite));
+        AddState(new NPCRoam(_movementModule, _pathFindModule, _animationModule, _sprite));
         DialogueData dialogueData = new DialogueData();
-        dialogueData.Lines.Add("I'M DELETING YOU, BROTHER!");
-        dialogueData.Lines.Add("\u2588\u2588]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] 10% complete.....");
-        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]]]]]]]]]]] 35% complete....");
-        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588]]]]]]]]]]]] 60% complete....");
-        dialogueData.Lines.Add("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588] 99% complete.....");
+        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one in your hand and it starts twitching its like its nuzzling you(/ω＼) or when they perk up and look at you like\" owo nya? :3” hehe ~ penis-kun is happy to see me!!");
         AddState(new CharTalk(this, dialogueData));
     }
 
     public void OnEnable()
     {
         SetState<NPCIdle>();
-        _npcMovementInst.SetDirection(Vector3.zero);
+        _movementModule.SetDirection(Vector3.zero);
     }
     protected override void LogicUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
             SetState<NPCChase>();
+        }else if (Input.GetKeyDown(KeyCode.T))
+        {
+            SetState<NPCRoam>();
         }
-        if (Input.GetKeyDown(KeyCode.U))
+        else if (Input.GetKeyDown(KeyCode.U))
         {
             transform.position = Game.Player.transform.position;
-        }
+        }  
     }
 
     public void Interact()
