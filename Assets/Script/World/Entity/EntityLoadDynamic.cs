@@ -14,7 +14,7 @@ public class EntityLoadDynamic : MonoBehaviour
     EntityHandler _currentEntityHandler;
 
     public static List<EntityHandler> _entityList = new List<EntityHandler>();
-    private int ENTITY_DISTANCE = 2;
+    private int ENTITY_DISTANCE = 3;
 
     void Awake()
     {
@@ -35,7 +35,7 @@ public class EntityLoadDynamic : MonoBehaviour
         Vector3Int entityChunkPosition;
         foreach (var entityHandler in _entityList)
         { 
-            if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > WorldStatic.CHUNK_SIZE * (ENTITY_DISTANCE + 2)){ 
+            if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > WorldStatic.CHUNK_SIZE * ENTITY_DISTANCE){ 
                 entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
                 // Lib.Log(entityChunkPosition);
                 if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))

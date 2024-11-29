@@ -157,7 +157,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 // Calculate the position in the ray's direction where y = yThreshold
                 float distanceToThreshold = (yThreshold - hitInfo.point.y) / ray.direction.y;
                  _thresholdPoint = hitInfo.point + ray.direction * distanceToThreshold;
-                if (isBreak && !WorldStatic.Instance.GetBoolInMap(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down) )
+                if (isBreak && !WorldStatic.Instance.GetBoolInMap(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
                 {
                     hitInfo.point = _thresholdPoint;
                 }

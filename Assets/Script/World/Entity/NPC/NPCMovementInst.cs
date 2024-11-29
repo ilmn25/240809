@@ -17,7 +17,6 @@ public class NPCMovementInst : MonoBehaviour
 
 
     private bool _isGrounded = false;
-    private LayerMask _collisionLayer;
     private float _speedCurrent;
     private float _speedTarget;
     private float _speedAdjust;
@@ -49,7 +48,6 @@ public class NPCMovementInst : MonoBehaviour
     }
 
     private void Start() {
-        _collisionLayer = LayerMask.GetMask("Collision");
 
         CapsuleCollider capsuleCollider = GetComponent<CapsuleCollider>();
         Vector3 point1 = capsuleCollider.center + Vector3.up * (capsuleCollider.height / 2 - capsuleCollider.radius);
@@ -206,7 +204,7 @@ public class NPCMovementInst : MonoBehaviour
     {  
         // Define an array to store the results
         tempCollisionArray = new Collider[1]; 
-        collisionCount = Physics.OverlapCapsuleNonAlloc(_newPosition + _collider[0], _newPosition + _collider[1], _colliderRadius, tempCollisionArray, _collisionLayer);
+        collisionCount = Physics.OverlapCapsuleNonAlloc(_newPosition + _collider[0], _newPosition + _collider[1], _colliderRadius, tempCollisionArray, Game.LayerCollide);
 
         return !(collisionCount > 0);
     }

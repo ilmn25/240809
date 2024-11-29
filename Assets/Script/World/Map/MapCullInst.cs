@@ -92,7 +92,7 @@ public class MapCullInst : MonoBehaviour
             { 
                 if (_selfChunkPosition.y + WorldStatic.CHUNK_SIZE < MapCullStatic.Instance._yThreshold)  // lower chunks
                 {
-                    while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame) await Task.Yield();
+                    while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame + 2) await Task.Yield();
                     _meshRenderer.enabled = true;
                     _meshFilter.mesh = _meshData;
                     return; 

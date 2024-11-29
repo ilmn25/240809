@@ -52,7 +52,7 @@ public class ItemPhysicInst : MonoBehaviour
     {  
         // Define an array to store the results
         tempCollisionArray[0] = null;
-        collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), COLLISION_RANGE, tempCollisionArray, Game.LayerMap);
+        collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), COLLISION_RANGE, tempCollisionArray, Game.LayerCollide);
 
         return !(collisionCount > 0);
     }

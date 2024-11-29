@@ -151,7 +151,7 @@ public class MapLoadStatic : MonoBehaviour
         if (!replace)
         {
             _meshObject = new("MAP " + counter++);
-            _meshObject.layer = LayerMask.NameToLayer("Collision");
+            _meshObject.layer = Game.IndexLayerMap;
             _meshObject.transform.position = _chunkCoordinate; 
 
             _meshObject.AddComponent<MeshFilter>();
