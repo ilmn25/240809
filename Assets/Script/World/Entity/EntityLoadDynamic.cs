@@ -14,8 +14,10 @@ public class EntityLoadDynamic : MonoBehaviour
     EntityHandler _currentEntityHandler;
 
     public static List<EntityHandler> _entityList = new List<EntityHandler>();
-    private int ENTITY_DISTANCE = 3;
 
+    private int ENTITY_LOAD_DISTANCE = (WorldStatic.RENDER_DISTANCE - 1) * WorldStatic.CHUNK_SIZE;
+    private int ENTITY_UNLOAD_DISTANCE = (WorldStatic.RENDER_DISTANCE) * WorldStatic.CHUNK_SIZE;
+    
     void Awake()
     {
         Instance = this;
@@ -35,8 +37,12 @@ public class EntityLoadDynamic : MonoBehaviour
         Vector3Int entityChunkPosition;
         foreach (var entityHandler in _entityList)
         { 
-            if (Vector3.Distance(entityHandler.transform.position, Game.Player.transform.position) > WorldStatic.CHUNK_SIZE * ENTITY_DISTANCE){ 
-                entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
+            entityChunkPosition = WorldStatic.GetChunkCoordinate(entityHandler.transform.position);
+            
+            if (entityChunkPosition.x > WorldStatic._playerChunkPos.x + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.x < WorldStatic._playerChunkPos.x - ENTITY_UNLOAD_DISTANCE ||
+                entityChunkPosition.y > WorldStatic._playerChunkPos.y + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.y < WorldStatic._playerChunkPos.y - ENTITY_UNLOAD_DISTANCE ||
+                entityChunkPosition.z > WorldStatic._playerChunkPos.z + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.z < WorldStatic._playerChunkPos.z - ENTITY_UNLOAD_DISTANCE)
+            {
                 // Lib.Log(entityChunkPosition);
                 if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
                     WorldStatic.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
@@ -51,11 +57,11 @@ public class EntityLoadDynamic : MonoBehaviour
         WorldStatic.Instance.HandleLoadWorldFile(0); 
         Vector3Int entityChunkPosition;
 
-        for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x += WorldStatic.CHUNK_SIZE)
+        for (int x = -ENTITY_LOAD_DISTANCE; x <= ENTITY_LOAD_DISTANCE; x += WorldStatic.CHUNK_SIZE)
         {
-            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y += WorldStatic.CHUNK_SIZE)
+            for (int y = -ENTITY_LOAD_DISTANCE; y <= ENTITY_LOAD_DISTANCE; y += WorldStatic.CHUNK_SIZE)
             {
-                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z += WorldStatic.CHUNK_SIZE)
+                for (int z = -ENTITY_LOAD_DISTANCE; z <= ENTITY_LOAD_DISTANCE; z += WorldStatic.CHUNK_SIZE)
                 {
                     entityChunkPosition = new Vector3Int(
                         Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),

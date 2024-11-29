@@ -66,19 +66,15 @@ public class MapCullStatic : MonoBehaviour
         HandleLight(false); 
     }
 
+    private int zeroVelocityCount = 0;  
     void Update()
     {
         HandleInput();
  
-    }
-
-    private int zeroVelocityCount = 0;
-    private void FixedUpdate()
-    {
         if (PlayerMovementStatic.Instance._verticalVelocity == 0)
         {
             zeroVelocityCount++;
-            if (zeroVelocityCount > 2)
+            if (zeroVelocityCount > 4)
             {
                 HandleObstructionCheck();
                 HandleCheck();
@@ -89,6 +85,7 @@ public class MapCullStatic : MonoBehaviour
             zeroVelocityCount = 0;
         }
     }
+ 
     
     void HandleInput()
     {
@@ -204,11 +201,16 @@ public class MapCullStatic : MonoBehaviour
         }  
     
         rayToCamera = new Ray(playerPosition + Vector3.up * 0.9f,  _camera.transform.position - (playerPosition + Vector3.up * 0.9f));
-        if (Physics.Raycast(rayToCamera, out _, 50, Game.LayerMap))
+        if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition + Vector3.up * 0.9f, _camera.transform.position), Game.LayerMap))
         {
-            _yCheck = true;
-            _yThreshold = (int)playerPosition.y + _visionHeight;
-            return;
+            // head then feet check
+            rayToCamera = new Ray(playerPosition,  _camera.transform.position - playerPosition);
+            if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, _camera.transform.position), Game.LayerMap))
+            {
+                _yCheck = true;
+                _yThreshold = (int)playerPosition.y + _visionHeight;
+                return;
+            }
         }
         
         rayForward = new Ray(playerPosition, forwardDirection);
