@@ -30,14 +30,14 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static bool[,,] _boolMap;
     [HideInInspector] 
-    public static int CHUNK_SIZE = 25; 
+    public static int CHUNK_SIZE = 20; 
     [HideInInspector] 
-    public static int RENDER_DISTANCE = 1; 
+    public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xSize = 1;
-    public static int ySize = 3;
-    public static int zSize = 2;
+    public static int xSize = 30;
+    public static int ySize = 2;
+    public static int zSize = 30;
     private void Awake()    
     {
         Instance = this;
@@ -129,10 +129,10 @@ public class WorldStatic : MonoBehaviour
             {
                 for (int wz = 0; wz < World.Length.z; wz++)
                 {
-                    int startX = wx * CHUNK_SIZE;
-                    int startY = wy * CHUNK_SIZE;
-                    int startZ = wz * CHUNK_SIZE;
-                    chunkData = World[startX, startY, startZ]; 
+                    int chunkX = wx * CHUNK_SIZE;
+                    int chunkY = wy * CHUNK_SIZE;
+                    int chunkZ = wz * CHUNK_SIZE;
+                    chunkData = World[chunkX, chunkY, chunkZ]; 
                     if (chunkData != null)
                     { 
                         for (int i = 0; i < CHUNK_SIZE; i++)
@@ -141,33 +141,30 @@ public class WorldStatic : MonoBehaviour
                             {
                                 for (int k = 0; k < CHUNK_SIZE; k++)
                                 {
-                                        _boolMap[startX + i, startY + j, startZ + k] = chunkData.Map[i, j, k] == 0;
+                                        _boolMap[chunkX + i, chunkY + j, chunkZ + k] = chunkData.Map[i, j, k] == 0;
 
                                 }
                             }
                         }
                         foreach (var entity in chunkData.StaticEntity)
                         {
-                            if (entity.Type == EntityType.Static)
+                            int entityX = chunkX + Mathf.FloorToInt(entity.Position.x);
+                            int entityY = chunkY + Mathf.FloorToInt(entity.Position.y);
+                            int entityZ = chunkZ + Mathf.FloorToInt(entity.Position.z);
+
+                            int entityEndX = entityX + entity.Bounds.x;
+                            int entityEndY = entityY + entity.Bounds.y;
+                            int entityEndZ = entityZ + entity.Bounds.z;
+
+                            for (int x = entityX; x < entityEndX; x++)
                             {
-                                int _startX = Mathf.FloorToInt(entity.Position.x);
-                                int _startY = Mathf.FloorToInt(entity.Position.y);
-                                int _startZ = Mathf.FloorToInt(entity.Position.z);
-
-                                int _endX = _startX + entity.Bounds.x;
-                                int _endY = _startY + entity.Bounds.y;
-                                int _endZ = _startZ + entity.Bounds.z;
-
-                                for (int x = _startX; x < _endX; x++)
+                                for (int y = entityY; y < entityEndY; y++)
                                 {
-                                    for (int y = _startY; y < _endY; y++)
+                                    for (int z = entityZ; z < entityEndZ; z++)
                                     {
-                                        for (int z = _startZ; z < _endZ; z++)
+                                        if (IsInWorldBounds(x, y, z))
                                         {
-                                            if (IsInWorldBounds(x, y, z))
-                                            {
-                                                _boolMap[x, y, z] = false;
-                                            }
+                                            _boolMap[x, y, z] = false;
                                         }
                                     }
                                 }

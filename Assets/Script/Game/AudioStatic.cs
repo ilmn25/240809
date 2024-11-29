@@ -27,7 +27,7 @@ public class AudioStatic : MonoBehaviour
             _audioSources.Add(newSource);
         }
         
-        PlayBGM(BGM, 0.1f);
+        // PlayBGM(BGM, 0.1f);
         PlaySFX(WIND, 0.2f, true);
         PlaySFX(NOISE, 0.3f, true);
     }
