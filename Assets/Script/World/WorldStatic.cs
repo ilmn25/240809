@@ -32,12 +32,12 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int CHUNK_SIZE = 25; 
     [HideInInspector] 
-    public static int RENDER_DISTANCE = 3; 
+    public static int RENDER_DISTANCE = 1; 
     public static bool ALWAYS_REGENERATE = false;
 
-    public static int xSize = 10;
+    public static int xSize = 1;
     public static int ySize = 3;
-    public static int zSize = 10;
+    public static int zSize = 2;
     private void Awake()    
     {
         Instance = this;
@@ -191,7 +191,7 @@ public class WorldStatic : MonoBehaviour
     
     public bool GetBoolInMap(Vector3Int worldPosition)
     {
-        if (!IsInWorldBounds(worldPosition)) return false;
+        if (!IsInWorldBounds(worldPosition)) return true;
         
         return _boolMap[worldPosition.x - _boolMapOrigin.x,
             worldPosition.y - _boolMapOrigin.y,
@@ -200,7 +200,10 @@ public class WorldStatic : MonoBehaviour
     
     public void SetBoolInMap(Vector3Int worldPosition, bool value)
     {
-        if (!IsInWorldBounds(worldPosition)) return;
+        if (!IsInWorldBounds(worldPosition))
+        {
+            return;
+        }
         
         _boolMap[worldPosition.x - _boolMapOrigin.x,
             worldPosition.y - _boolMapOrigin.y,
@@ -231,6 +234,8 @@ public class WorldStatic : MonoBehaviour
     public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)
     {
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID;
+        SetBoolInMap(worldCoordinate, blockID == 0);
+        
         MapLoadStatic.Instance.RefreshExistingChunk(chunkCoordinate); // Refresh on screen
         if (blockCoordinate.x != 0 && blockCoordinate.x != CHUNK_SIZE - 1 &&
             blockCoordinate.y != 0 && blockCoordinate.y != CHUNK_SIZE - 1 &&
@@ -298,8 +303,7 @@ public class WorldStatic : MonoBehaviour
             MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, CHUNK_SIZE, 0, CHUNK_SIZE));
         else if (blockCoordinate.y == CHUNK_SIZE - 1 && blockCoordinate.z == CHUNK_SIZE - 1)
             MapLoadStatic.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, CHUNK_SIZE, CHUNK_SIZE));
-
-        SetBoolInMap(worldCoordinate, blockID == 0);
+ 
     }
 
  

@@ -16,7 +16,7 @@ public class EntityLoadStatic : MonoBehaviour
     EntityHandler _currentEntityHandler;
 
     public static Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)>();
-    public int ENTITY_DISTANCE = 4;
+    private int ENTITY_DISTANCE = WorldStatic.RENDER_DISTANCE;
 
     void Awake()
     {

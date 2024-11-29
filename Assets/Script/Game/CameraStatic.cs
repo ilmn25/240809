@@ -42,7 +42,8 @@ public class CameraStatic : MonoBehaviour
     }
 
     void Update()
-    {  
+    {   
+        
         HandlePlayerFollow(); 
         HandleCameraSway();
         HandleFOVChange();
@@ -59,7 +60,7 @@ public class CameraStatic : MonoBehaviour
             _orbitRotation -= 45;
             if (_orbitRotation <= -180) _orbitRotation = 180;
             UpdateOrbit();
- 
+
         }
         else transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, _orbitRotation, 0), Time.deltaTime * 7);
 

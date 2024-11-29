@@ -8,7 +8,9 @@ public class Game : MonoBehaviour
     public static string PLAYER_SAVE_PATH;  
     public static Game Instance { get; private set; }  
     
-    public static LayerMask LayerMap;
+    public static LayerMask LayerMap; // just map
+    public static LayerMask LayerCollide;
+    public static int IndexLayerMap;
     
     public static GameObject UserSystem;
     public static GameObject Player;
@@ -35,7 +37,9 @@ public class Game : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        LayerMap  = LayerMask.GetMask("Collision"); 
+        LayerMap  = LayerMask.GetMask("Map"); 
+        LayerCollide  = LayerMask.GetMask("Map", "Entity"); 
+        IndexLayerMap = LayerMask.NameToLayer("Map");
         
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";

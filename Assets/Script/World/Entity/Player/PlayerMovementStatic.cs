@@ -15,7 +15,6 @@ public class PlayerMovementStatic : MonoBehaviour
     private List<Vector2> _inputBuffer = new List<Vector2>();
     [HideInInspector] public float _speedCurrent; 
     private float _speedTarget;
-    private LayerMask _collisionLayer;
     private Vector3 _newPosition;  
     private int _inputBufferCount = 4;
     private float _jumpGraceTimer;
@@ -44,7 +43,6 @@ public class PlayerMovementStatic : MonoBehaviour
         boxCollider.enabled = false;
         boxColliderSize = boxCollider.size / 2; // Recalculate halfSize here
 
-        _collisionLayer = LayerMask.GetMask("Collision");
     }
 
 
@@ -287,7 +285,7 @@ public class PlayerMovementStatic : MonoBehaviour
     private bool IsMovable(Vector3 _newPosition)
     {
         // Define an array to store the results  
-        collisionCount = Physics.OverlapBoxNonAlloc(_newPosition + boxCollider.center, boxColliderSize, tempCollisionArray, Quaternion.identity, _collisionLayer);
+        collisionCount = Physics.OverlapBoxNonAlloc(_newPosition + boxCollider.center, boxColliderSize, tempCollisionArray, Quaternion.identity, Game.LayerCollide);
         return !(collisionCount > 0);
     }
  

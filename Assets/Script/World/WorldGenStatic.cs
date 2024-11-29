@@ -39,10 +39,10 @@ public class WorldGenStatic : MonoBehaviour
         {
             int worldHeight = WorldStatic.ySize * WorldStatic.CHUNK_SIZE;
             
-            float stoneScale = 0.05f; 
-            float dirtScale = 0.06f; 
+            float stoneScale = 0.03f; 
+            float dirtScale = 0.01f; 
             
-            float caveScale = 0.15f;  
+            float caveScale = 0.03f;  
             float caveThreshold = 0.2f; 
             
             int wallHeight = 5;  
@@ -67,9 +67,10 @@ public class WorldGenStatic : MonoBehaviour
                         int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * worldHeight);
 
                         float caveX = Mathf.Abs(coordinates.x + x) * caveScale + caveOffsetX;
-                        float caveY = Mathf.Abs(coordinates.y + y) * caveScale;
+                        float caveY = Mathf.Abs(coordinates.y + y) * caveScale + caveOffsetX;
                         float caveZ = Mathf.Abs(coordinates.z + z) * caveScale + caveOffsetZ;
-                        float caveValue = Mathf.PerlinNoise(caveX + caveY, caveZ - caveY);
+                        float caveValue = Mathf.PerlinNoise(caveX + caveY, caveZ + caveY);
+                        int caveHeight = Mathf.FloorToInt(caveValue * worldHeight);
 
                         
                         if (y + coordinates.y < floorHeight)
@@ -89,17 +90,17 @@ public class WorldGenStatic : MonoBehaviour
                         
                         if (y + coordinates.y > wallHeight + floorHeight)
                         {
-                            if (wall & (z == 1 || z == 2) && y + coordinates.y < 17)
+                            if (wall & (z > 1 && z < 8) && y + coordinates.y < 100)
                             {
                                 chunkData.Map[x, y, z] = BlockStatic.ConvertID("brick");
                             }
-                            else if (caveValue > caveThreshold)
+                            else if (caveThreshold <= caveHeight)
                             {
-                                if (y + coordinates.y <= stoneHeight)
+                                if (y + coordinates.y <= stoneHeight - 15)
                                 {
                                     chunkData.Map[x, y, z] = BlockStatic.ConvertID("stone");
                                 }
-                                else if (y + coordinates.y < dirtHeight - 4)
+                                else if (y + coordinates.y <= dirtHeight)
                                 {
                                     chunkData.Map[x, y, z] = BlockStatic.ConvertID("dirt");
                                 }
@@ -132,12 +133,12 @@ public class WorldGenStatic : MonoBehaviour
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("tree", entityPosition, new SerializableVector3Int(1, 3, 1));
                                     chunkData.StaticEntity.Add(entityData);
-                                } else if (rng <= 0.07)
+                                } else if (rng <= 0.03)
                                 {
                                     entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
                                     entityData = new EntityData("bush1", entityPosition, new SerializableVector3Int(0, 0, 0));
                                     chunkData.StaticEntity.Add(entityData);
-                                } else if (rng <= 0.35)
+                                } else if (rng <= 0.02)
                                 {
                                     entityPosition = new SerializableVector3(x + (float)random.NextDouble()/1.5f, y+1, z + (float)random.NextDouble()/1.5f);
                                     entityData = new EntityData("grass", entityPosition);

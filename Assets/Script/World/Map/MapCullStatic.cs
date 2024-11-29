@@ -27,7 +27,6 @@ public class MapCullStatic : MonoBehaviour
     private GameObject _lightSelf;
 
     private GameObject _camera;
-    private LayerMask _collisionLayer;
     private Volume _volume;
  
     Vector3 forwardDirection;
@@ -58,7 +57,6 @@ public class MapCullStatic : MonoBehaviour
  
         _chunkPositionPrevious = WorldStatic._playerChunkPos;
 
-        _collisionLayer = LayerMask.GetMask("Collision");
         _lightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
         _lightSelf = Game.Player.transform.Find("light_self").gameObject;   
         
@@ -71,15 +69,27 @@ public class MapCullStatic : MonoBehaviour
     void Update()
     {
         HandleInput();
+ 
+    }
 
+    private int zeroVelocityCount = 0;
+    private void FixedUpdate()
+    {
         if (PlayerMovementStatic.Instance._verticalVelocity == 0)
         {
-            HandleObstructionCheck();
-            HandleCheck(); 
+            zeroVelocityCount++;
+            if (zeroVelocityCount > 2)
+            {
+                HandleObstructionCheck();
+                HandleCheck();
+            }
+        }
+        else
+        {
+            zeroVelocityCount = 0;
         }
     }
- 
- 
+    
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Z)) {
@@ -193,8 +203,8 @@ public class MapCullStatic : MonoBehaviour
             return;
         }  
     
-        rayToCamera = new Ray(playerPosition + Vector3.up/2,  _camera.transform.position - (playerPosition + Vector3.up/2));
-        if (Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
+        rayToCamera = new Ray(playerPosition + Vector3.up * 0.9f,  _camera.transform.position - (playerPosition + Vector3.up * 0.9f));
+        if (Physics.Raycast(rayToCamera, out _, 50, Game.LayerMap))
         {
             _yCheck = true;
             _yThreshold = (int)playerPosition.y + _visionHeight;
@@ -205,10 +215,10 @@ public class MapCullStatic : MonoBehaviour
         rayBackward = new Ray(playerPosition, backwardDirection);
         rayLeft = new Ray(playerPosition, leftDirection);
         rayRight = new Ray(playerPosition, rightDirection);
-        if (Physics.Raycast(rayForward, out _, 50, _collisionLayer) &&
-            Physics.Raycast(rayBackward, out _, 50, _collisionLayer) &&
-            Physics.Raycast(rayLeft, out _, 50, _collisionLayer) &&
-            Physics.Raycast(rayRight, out _, 50, _collisionLayer)) {
+        if (Physics.Raycast(rayForward, out _, 50, Game.LayerMap) &&
+            Physics.Raycast(rayBackward, out _, 50, Game.LayerMap) &&
+            Physics.Raycast(rayLeft, out _, 50, Game.LayerMap) &&
+            Physics.Raycast(rayRight, out _, 50, Game.LayerMap)) {
             _yCheck = true;
             _yThreshold = (int)playerPosition.y + _visionHeight;
         }
@@ -219,10 +229,6 @@ public class MapCullStatic : MonoBehaviour
 
     // void OnDrawGizmos()
     // {
-    //     Vector3 playerPosition = Game.Player.transform.position;
-    //     Vector3 cameraPosition = _camera.transform.position;
-    //     Ray rayToCamera = new Ray(playerPosition + Vector3.up/2, cameraPosition - (playerPosition + Vector3.up/2));
-    //
     //     Gizmos.color = Color.red;
     //     Gizmos.DrawLine(rayToCamera.origin, rayToCamera.origin + rayToCamera.direction * 100);
     // }
@@ -247,7 +253,7 @@ public class MapCullStatic : MonoBehaviour
     //     }  
     //
     //     rayToCamera = new Ray(playerPosition + Vector3.up * 0.5f, _camera.transform.position - playerPosition);
-    //     if (Physics.Raycast(rayToCamera, out _, 50, _collisionLayer))
+    //     if (Physics.Raycast(rayToCamera, out _, 50, Game.LayerMap))
     //     {
     //         
     //         _yThreshold = (int)playerPosition.y + _visionHeight;
