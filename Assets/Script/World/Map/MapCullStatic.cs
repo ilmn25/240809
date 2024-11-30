@@ -71,7 +71,7 @@ public class MapCullStatic : MonoBehaviour
     {
         HandleInput();
  
-        if (PlayerMovementStatic.Instance._verticalVelocity == 0)
+        if (PlayerMovementSingleton.Instance._verticalVelocity == 0)
         {
             zeroVelocityCount++;
             if (zeroVelocityCount > 4)

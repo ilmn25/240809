@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStatusStatic : MonoBehaviour
+public class PlayerStatusSingleton : MonoBehaviour
 {
-    public static PlayerStatusStatic Instance { get; private set; }
+    public static PlayerStatusSingleton Instance { get; private set; }
     public static float _health;
     public static float _mana;
     public static float _sanity;
@@ -15,12 +15,12 @@ public class PlayerStatusStatic : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        _health = PlayerDataStatic._playerData.health;
-        _mana = PlayerDataStatic._playerData.mana;
-        _sanity = PlayerDataStatic._playerData.sanity;
-        _hunger = PlayerDataStatic._playerData.hunger;
-        _stamina = PlayerDataStatic._playerData.stamina;
-        _speed = PlayerDataStatic._playerData.speed;
+        _health = PlayerDataSingleton._playerData.health;
+        _mana = PlayerDataSingleton._playerData.mana;
+        _sanity = PlayerDataSingleton._playerData.sanity;
+        _hunger = PlayerDataSingleton._playerData.hunger;
+        _stamina = PlayerDataSingleton._playerData.stamina;
+        _speed = PlayerDataSingleton._playerData.speed;
     }
 
     // void OnGUI()
@@ -49,7 +49,7 @@ public class PlayerStatusStatic : MonoBehaviour
     public void UpdateHealth(int amount)
     {
         _health += amount;
-        if (_health > PlayerDataStatic._playerData.health) _health = PlayerDataStatic._playerData.health;
+        if (_health > PlayerDataSingleton._playerData.health) _health = PlayerDataSingleton._playerData.health;
         else if (_health < 0) _health = 0;
         Debug.Log("Current Health: " + _health);
     }

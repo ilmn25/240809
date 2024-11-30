@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
-public class PlayerMovementStatic : MonoBehaviour
+public class PlayerMovementSingleton : MonoBehaviour
 { 
-    public static PlayerMovementStatic Instance { get; private set; }  
+    public static PlayerMovementSingleton Instance { get; private set; }  
 
     [HideInInspector] public float _verticalVelocity = 0f; 
     [HideInInspector] public bool _isGrounded = false;  
@@ -60,7 +60,7 @@ public class PlayerMovementStatic : MonoBehaviour
             _input = Vector2.zero;
             return;
         }
-        orbitRotation = Mathf.Deg2Rad * -CameraStatic._orbitRotation;
+        orbitRotation = Mathf.Deg2Rad * -CameraSingleton._orbitRotation;
         cosAngle = Mathf.Cos(orbitRotation);
         sinAngle = Mathf.Sin(orbitRotation);
         _input.x = _rawInput.x * cosAngle - _rawInput.y * sinAngle;
@@ -81,15 +81,15 @@ public class PlayerMovementStatic : MonoBehaviour
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatusStatic._stamina > 1)
+            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatusSingleton._stamina > 1)
             {
                 _speedTarget = SPEED_RUN;
-                PlayerStatusStatic._stamina -= 0.1f;
+                PlayerStatusSingleton._stamina -= 0.1f;
             }
             else
             {
                 _speedTarget = SPEED_WALK;
-                PlayerStatusStatic._stamina += 0.1f;
+                PlayerStatusSingleton._stamina += 0.1f;
             }
             
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);

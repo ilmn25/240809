@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class ChunkData
 {
+    [SerializeField]
     public int[,,] Map { get; private set; }
     public List<EntityData> StaticEntity { get; private set; }
     public List<EntityData> DynamicEntity { get; private set; }
@@ -26,9 +27,10 @@ public class ChunkData
         }
     }
 
-    public ChunkData()
+    public ChunkData(int chunkSize = 0)
     {
-        Map = new int[WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE, WorldStatic.CHUNK_SIZE];
+        if (chunkSize == 0) chunkSize = WorldStatic.CHUNK_SIZE;
+        Map = new int[chunkSize, chunkSize, chunkSize];
         StaticEntity = new List<EntityData>();
         DynamicEntity = new List<EntityData>();
     }

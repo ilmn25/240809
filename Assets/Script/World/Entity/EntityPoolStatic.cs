@@ -43,5 +43,6 @@ public class EntityPoolStatic : MonoBehaviour
             _pools[prefabName] = new Queue<GameObject>();
         }
 
-        _pools[prefabName].Enqueue(obj); }
+        _pools[prefabName].Enqueue(obj);
+    }
 }

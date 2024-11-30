@@ -34,10 +34,7 @@ public class WorldStatic : MonoBehaviour
     [HideInInspector] 
     public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
-
-    public static int xSize = 5;
-    public static int ySize = 4;
-    public static int zSize = 5;
+ 
     private void Awake()    
     {
         Instance = this;
@@ -47,7 +44,7 @@ public class WorldStatic : MonoBehaviour
     { 
         Instance = this;
  
-        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) GenerateRandomMapSave();
+        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) WorldGenStatic.Instance.GenerateRandomMapSave();
         _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
     }
           
@@ -230,6 +227,7 @@ public class WorldStatic : MonoBehaviour
     
     public void UpdateMap(Vector3Int worldCoordinate, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, int blockID = 0)
     {
+        AudioSingleton.PlaySFX(Game.DigSound);
         GetChunk(chunkCoordinate).Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z] = blockID;
         SetBoolInMap(worldCoordinate, blockID == 0);
         
@@ -368,37 +366,7 @@ public class WorldStatic : MonoBehaviour
 
 
 
-
-
-
-
-
-
-    //! debug tools
-    public void GenerateRandomMapSave()
-    { 
-        
-        World = new WorldData(xSize, ySize, zSize);
-        List<Vector3Int> coordinatesList = new List<Vector3Int>();
-
-        for (int x = 0; x < xSize * CHUNK_SIZE; x += CHUNK_SIZE)
-        {
-            for (int y = 0; y < ySize * CHUNK_SIZE; y += CHUNK_SIZE)
-            {
-                for (int z = 0; z < zSize * CHUNK_SIZE; z += CHUNK_SIZE)
-                {
-                    coordinatesList.Add(new Vector3Int(x, y, z));
-                }
-            }
-        } 
-        
-        foreach (var coordinates in coordinatesList)
-        {
-            World[coordinates.x, coordinates.y, coordinates.z] = WorldGenStatic.Instance.GenerateTestChunk(coordinates); 
-        }
-
-    }  
-    
+ 
 
     public void PrintChunks(int[,,] chunkBlocksArray)
     {

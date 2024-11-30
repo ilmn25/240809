@@ -142,7 +142,7 @@ public abstract class PathFindModule : MonoBehaviour
             }
         } else if (_path != null)
         {
-            HandleMovePoint(false); 
+            HandleMovePoint(); 
         } 
 
         return _direction;
@@ -155,7 +155,7 @@ public abstract class PathFindModule : MonoBehaviour
         
         if (!_repathRoutine) CheckRepathRoutine();
  
-        if (_updateEntityPosition && _isGrounded)
+        if (_updateEntityPosition)
         { 
             _selfPositionPrevious = transform.position;
             _updateEntityPosition = false; 
@@ -197,7 +197,7 @@ public abstract class PathFindModule : MonoBehaviour
         return _direction;
     }
     
-    private void HandleMovePoint(bool forced = true)
+    private void HandleMovePoint()
     { 
         if (_nextPoint != _path.Count - 1)
         { 
@@ -236,9 +236,16 @@ public abstract class PathFindModule : MonoBehaviour
                 }
             } 
             _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
-        } else if (forced) _direction = (Lib.AddToVector(_target.transform.position, 0, -0.3f, 0) - transform.position).normalized;
+        } 
+        else if (_target)
+        { 
+            _direction = (Lib.AddToVector(_target.transform.position, 0, -0.3f, 0) - transform.position).normalized;
+        }
         else
+        {
+            Lib.Log();
             _direction = (Lib.AddToVector((Vector3)_path[^1][0], 0, -0.3f, 0) - transform.position).normalized;
+        }
     }
      
  

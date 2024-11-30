@@ -72,7 +72,7 @@ public class GUIDialogueStatic : MonoBehaviour
                 {
                     ++_current_line;
                     // check if have next line, end speech or play next 
-                    AudioStatic.PlaySFX(TEXT, 0.2f); //sound effect click
+                    AudioSingleton.PlaySFX(TEXT, 0.2f); //sound effect click
                     
                     if (_current_line < _entityState._dialogueData.Lines.Count)
                     {   
@@ -111,8 +111,8 @@ public class GUIDialogueStatic : MonoBehaviour
         _isTyping = true;
         Game.DialogueText.text = "";
         
-         AudioStatic.StopSFX(_audioSource);
-        _audioSource = AudioStatic.PlaySFX(TEXT, 0.2f, true);
+         AudioSingleton.StopSFX(_audioSource);
+        _audioSource = AudioSingleton.PlaySFX(TEXT, 0.2f, true);
         foreach (var letter in line.ToCharArray())        
         {
             // _skip text scroll
@@ -120,14 +120,14 @@ public class GUIDialogueStatic : MonoBehaviour
             {
                 _skip = 1;
                 Game.DialogueText.text = line;
-                AudioStatic.StopSFX(_audioSource);
+                AudioSingleton.StopSFX(_audioSource);
                 break;
             }
             Game.DialogueText.text += letter;
             yield return new WaitForSeconds(1f / TEXT_SPEED);
         }
         _isTyping = false;
-        AudioStatic.StopSFX(_audioSource);
+        AudioSingleton.StopSFX(_audioSource);
     }
 
     private IEnumerator HideDialogueBox()
@@ -185,7 +185,7 @@ public class GUIDialogueStatic : MonoBehaviour
             {
                 StopCoroutine(showDialogueCoroutine);
                 Game.DialogueBox.SetActive(false);
-                AudioStatic.StopSFX(_audioSource);
+                AudioSingleton.StopSFX(_audioSource);
                 _isInputBlocked = true;
             }
             _scaleBusy = false;

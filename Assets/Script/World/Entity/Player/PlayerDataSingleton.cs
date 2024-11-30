@@ -5,9 +5,9 @@ using System.IO;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class PlayerDataStatic : MonoBehaviour
+public class PlayerDataSingleton : MonoBehaviour
 { 
-    public static PlayerDataStatic Instance { get; private set; }  
+    public static PlayerDataSingleton Instance { get; private set; }  
     public static PlayerData _playerData = new PlayerData(); 
     private static BinaryFormatter _binaryFormatter = new BinaryFormatter();
 

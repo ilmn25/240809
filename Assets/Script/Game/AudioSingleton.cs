@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioStatic : MonoBehaviour
+public class AudioSingleton : MonoBehaviour
 {
     //TODO 
     public AudioClip BGM;

@@ -13,12 +13,12 @@ class PlayerActive : EntityState {
     public override void StateUpdate() {
         if (Input.GetKeyDown(KeyCode.O)) {Entity.SpawnPrefab("chito", StateMachine.transform.position + Vector3.up);}
 
-        PlayerMovementStatic.Instance.HandleMovementUpdate();
-        PlayerAnimationStatic.Instance.HandleAnimationUpdate(); 
-        PlayerChunkEditStatic.Instance.HandleTerraformUpdate(); 
-        PlayerInteractStatic.Instance.HandleInteractionUpdate();
+        PlayerMovementSingleton.Instance.HandleMovementUpdate();
+        PlayerAnimationSingleton.Instance.HandleAnimationUpdate(); 
+        PlayerChunkEditSingleton.Instance.HandleTerraformUpdate(); 
+        PlayerInteractSingleton.Instance.HandleInteractionUpdate();
         PlayerInventorySingleton.Instance.HandleInventoryUpdate();
-        PlayerStatusStatic.Instance.HandleStatusUpdate();
+        PlayerStatusSingleton.Instance.HandleStatusUpdate();
     }
 }
 

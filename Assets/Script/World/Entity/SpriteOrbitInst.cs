@@ -8,25 +8,25 @@ public class SpriteOrbitInst : MonoBehaviour
     void Awake()
     {
         _sprite = GetComponent<SpriteRenderer>();
-        transform.rotation = CameraStatic._currentRotation;
+        transform.rotation = CameraSingleton._currentRotation;
     }
     
     void Start()
     {   
-        CameraStatic.OnOrbitRotate += UpdateOrbit;
+        CameraSingleton.OnOrbitRotate += UpdateOrbit;
     }
     
     void OnDestroy()
     {
-        CameraStatic.OnOrbitRotate -= UpdateOrbit; 
+        CameraSingleton.OnOrbitRotate -= UpdateOrbit; 
     }   
     
     void OnBecameVisible() {
-        transform.rotation = CameraStatic._currentRotation;
+        transform.rotation = CameraSingleton._currentRotation;
     }
  
     void UpdateOrbit()
     { 
-        if (_sprite.isVisible) transform.rotation = CameraStatic._currentRotation;
+        if (_sprite.isVisible) transform.rotation = CameraSingleton._currentRotation;
     }
 }

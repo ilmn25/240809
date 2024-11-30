@@ -22,6 +22,7 @@ public class Game : MonoBehaviour
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
+    public static AudioClip DigSound;
     
     public float tooldelay = 0f;
     public float windUpDuration = 0.1f; // Duration of the wind-up in seconds
@@ -36,6 +37,7 @@ public class Game : MonoBehaviour
 
     void Awake()
     {
+        DigSound = Resources.Load<AudioClip>("audio/sfx/dig/stone");
         Instance = this;
         LayerMap  = LayerMask.GetMask("Map"); 
         LayerCollide  = LayerMask.GetMask("Map", "Entity"); 
