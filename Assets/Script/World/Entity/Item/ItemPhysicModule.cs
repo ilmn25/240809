@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class ItemPhysicInst : MonoBehaviour
+public class ItemPhysicModule : MonoBehaviour
 {
     private Vector3 _velocity;
     private float _deltaTime;

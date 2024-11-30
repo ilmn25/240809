@@ -26,6 +26,7 @@ public class EntityLoadStatic : MonoBehaviour
 
     public void OnTraverse()   
     {
+        if (WorldStatic._boolMap == null) return; // dont delete before boolmap load
         HandleUnload();
         HandleLoad();  
     }

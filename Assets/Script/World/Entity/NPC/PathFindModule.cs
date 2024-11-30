@@ -22,7 +22,7 @@ public abstract class PathFindModule : MonoBehaviour
         float targetReachedInner = 1f, 
         float targetReachedOuter = 2f, 
         float pointReachDistance = 0.45f, 
-        float pointMissDistance = 2f, 
+        float pointMissDistance = 3f, 
         float repathInterval = 0.1f, 
         int jumpSkipAmount = 1,
         int scanCount = 9000)
@@ -76,7 +76,6 @@ public abstract class PathFindModule : MonoBehaviour
     private int _nextPoint = 0;
     private int _nextPointQueued = -1;
     
-    private Vector3 _nextPointPosition; 
     private float _nextPointDistance; 
     private float _targetDistance;
     private float _selfMoveDistance;
@@ -106,7 +105,7 @@ public abstract class PathFindModule : MonoBehaviour
             else if (_path != null)
             {  
                 await Task.Delay((int)(1500 / passiveJumpSpeed)); // Convert seconds to milliseconds
-                if (this != null && _nextPoint < _path.Count -2)
+                if (this && _nextPoint < _path.Count -2)
                 {
                     _nextPoint++;  
                     transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
@@ -121,6 +120,13 @@ public abstract class PathFindModule : MonoBehaviour
         _isGrounded = isGrounded;
         _direction = Vector3.zero;
 
+        if (!_repathRoutine) CheckRepathRoutineStill();
+        if (_updateEntityPosition)
+        { 
+            _selfPositionPrevious = transform.position;
+            _updateEntityPosition = false; 
+        }
+        
         if (_path == null || _nextPoint >= _path.Count - 2)
         {
             if (_nextPointQueued != -1)
@@ -195,8 +201,7 @@ public abstract class PathFindModule : MonoBehaviour
     { 
         if (_nextPoint != _path.Count - 1)
         { 
-            _nextPointPosition = (Vector3)_path[_nextPoint][0];  
-            _nextPointDistance = Vector3.Distance(transform.position, _nextPointPosition); 
+            _nextPointDistance = Vector3.Distance(transform.position,  (Vector3)_path[_nextPoint][0]);
             if (_isGrounded && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
@@ -232,6 +237,8 @@ public abstract class PathFindModule : MonoBehaviour
             } 
             _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
         } else if (forced) _direction = (Lib.AddToVector(_target.transform.position, 0, -0.3f, 0) - transform.position).normalized;
+        else
+            _direction = (Lib.AddToVector((Vector3)_path[^1][0], 0, -0.3f, 0) - transform.position).normalized;
     }
      
  
@@ -240,7 +247,7 @@ public abstract class PathFindModule : MonoBehaviour
         _repathRoutine = true;
         await Task.Delay((int)_repathInterval * 1000); 
  
-        if (!_targetReached && !_isPathFinding)
+        if (_nextPointQueued == -1 && !_targetReached && !_isPathFinding )
         {
             _targetMoved = Vector3.Distance(_targetPositionPrevious, _target.transform.position) > 0.8f;  //should be less than inner player near
 
@@ -262,22 +269,27 @@ public abstract class PathFindModule : MonoBehaviour
         _repathRoutine = false;  
     }
 
+    private async void CheckRepathRoutineStill()
+    { 
+        _repathRoutine = true;
+        await Task.Delay((int)_repathInterval * 1000); 
+ 
+        if (_nextPointQueued == -1 && IsStuck())
+        {
+            GetPath();
+        }   
+        _updateEntityPosition = true; 
+        _repathRoutine = false;  
+    }
+    
     bool IsStuck()
-    {
-        if (_isGrounded) 
+    { 
+        _selfMoveDistance = Vector2.Distance(
+            new Vector2(_selfPositionPrevious.x, _selfPositionPrevious.z), 
+            new Vector2(transform.position.x, transform.position.z)); 
+        if (_selfMoveDistance < 0.001f)
         { 
-            if (_nextPointDistance > _pointMissDistance)
-            {
-                return true;
-            }
-            
-            _selfMoveDistance = Vector2.Distance(
-                new Vector2(_selfPositionPrevious.x, _selfPositionPrevious.z), 
-                new Vector2(transform.position.x, transform.position.z)); 
-            if (_selfMoveDistance < 0.001f)
-            { 
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -290,7 +302,7 @@ public abstract class PathFindModule : MonoBehaviour
         {  
              
             if (!_target)
-                _pathQueued = await PathFindSingleton.Instance.FindPath(this, transform, null, 10);  
+                _pathQueued = await PathFindSingleton.Instance.FindPath(this, transform, null, 15);  
             else
                 _pathQueued = await PathFindSingleton.Instance.FindPath(this, transform, _target, _scanCount); 
             

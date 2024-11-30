@@ -40,7 +40,7 @@ public class PlayerChunkEditStatic : MonoBehaviour
                 if (Input.GetMouseButtonDown(1)) //place
                 { 
                     if (!WorldStatic.Instance.IsInWorldBounds(_worldPosition)) return;
-                    PlayerInventoryStatic.RemoveItem(_blockStringID); 
+                    PlayerInventorySingleton.RemoveItem(_blockStringID); 
                     ReplaceBlock(BlockStatic.ConvertID(_blockStringID));
                 }
                 _block.transform.position = Vector3.Lerp(_block.transform.position, _worldPosition, Time.deltaTime * BLOCKOVERLAYSPEED);

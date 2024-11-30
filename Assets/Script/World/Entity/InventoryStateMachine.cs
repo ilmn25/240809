@@ -13,12 +13,13 @@ public class InventoryStateMachine : StateMachine
     }
     public void HandleItemUpdate()
     { 
-        if (PlayerInventoryStatic.CurrentItem == null)
+        if (PlayerInventorySingleton.CurrentItem == null)
         {
             SetState<ItemEmpty>();
             return;
         }
-        switch (ItemLoadStatic.GetItem(PlayerInventoryStatic.CurrentItem.StringID).Type)
+
+        switch (ItemLoadSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID).Type)
         {
             case ItemType.Block:
                 SetState<ItemBlock>();
@@ -26,28 +27,31 @@ public class InventoryStateMachine : StateMachine
             case ItemType.Tool:
                 SetState<ItemTool>();
                 break;
+            default:
+                SetState<ItemEmpty>();
+                break;
         }
     }
 }
 
 public class ItemEmpty : State
-{ 
+{
+    public override void OnEnterState()
+    {
+        StateMachine.transform.Find("sprite").transform.Find("tool").gameObject.SetActive(false);
+    }
 }
 
 
 public class ItemFurniture : State
 {
-    public string a;
-    public override void OnEnterState()
-    {
-        return;
-    }
+    public string stringID; 
 
     public override void StateUpdate()
     {
         if (Input.GetMouseButtonDown(1))
         {
-            a = PlayerInventoryStatic.CurrentItem.StringID;
+            stringID = PlayerInventorySingleton.CurrentItem.StringID;
         } 
     }
 }
@@ -56,7 +60,7 @@ public class ItemBlock : State
 {
     public override void StateUpdate()
     {  
-        PlayerChunkEditStatic.Instance._blockStringID = PlayerInventoryStatic.CurrentItem.StringID;
+        PlayerChunkEditStatic.Instance._blockStringID = PlayerInventorySingleton.CurrentItem.StringID;
     }
 
     public override void OnExitState()
@@ -85,7 +89,7 @@ public class ItemTool : State
         playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
         toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
         toolSprite.gameObject.SetActive(true);
-        PlayerChunkEditStatic.Instance._toolData = ItemLoadStatic.GetItem(PlayerInventoryStatic.CurrentItem.StringID);
+        PlayerChunkEditStatic.Instance._toolData = ItemLoadSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID);
     }
 
     public override void OnExitState()

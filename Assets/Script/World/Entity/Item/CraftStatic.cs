@@ -31,7 +31,7 @@ namespace Script.World.Entity.Item
         {
             foreach (var ingredient in _craftList[stringID])
             {
-                if (PlayerInventoryStatic.GetStackAmount(ingredient.Key) < ingredient.Value) return false;
+                if (PlayerInventorySingleton.GetStackAmount(ingredient.Key) < ingredient.Value) return false;
             } 
             return true;
         }
@@ -42,9 +42,9 @@ namespace Script.World.Entity.Item
 
             foreach (var ingredient in _craftList[stringID])
             {
-                PlayerInventoryStatic.RemoveItem(ingredient.Key, ingredient.Value);
+                PlayerInventorySingleton.RemoveItem(ingredient.Key, ingredient.Value);
             }
-            PlayerInventoryStatic.AddItem(stringID);
+            PlayerInventorySingleton.AddItem(stringID);
         }
     }
 }

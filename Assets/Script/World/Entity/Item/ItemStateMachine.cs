@@ -4,41 +4,48 @@ using UnityEngine;
 
 public class ItemStateMachine : EntityStateMachine
 {
-    private ItemPhysicInst _itemPhysicInst;
+    private ItemPhysicModule _itemPhysicModule;
     protected override void OnAwake()
     {
-        _itemPhysicInst = GetComponent<ItemPhysicInst>();
+        _itemPhysicModule = GetComponent<ItemPhysicModule>();
         
-        AddState(new ItemIdle(_itemPhysicInst), true);
+        AddState(new ItemIdle(_itemPhysicModule), true);
+    }
+
+    protected override void LogicUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            float playerDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
+        
+            if (playerDistance <= 0.8f)
+            {
+                PlayerInventorySingleton.AddItem(GetEntityData().ID, 1);
+                WipeEntity();
+            }
+        } 
     }
 }
 
 public class ItemIdle : EntityState
 {
-    private ItemPhysicInst _itemPhysicInst;
-    public ItemIdle(ItemPhysicInst itemPhysicInst)
+    private ItemPhysicModule _itemPhysicModule;
+    public ItemIdle(ItemPhysicModule itemPhysicModule)
     {
-        _itemPhysicInst = itemPhysicInst;
+        _itemPhysicModule = itemPhysicModule;
     }
 
     public override void OnEnterState()
     {
-        _itemPhysicInst.PopItem();
+        _itemPhysicModule.PopItem();
     }
 
     public override void StateUpdate()
     {
-
-        float playerDistance = Vector3.Distance(StateMachine.transform.position, Game.Player.transform.position);
-        
-        if (playerDistance <= 0.8f)
-        {
-            PlayerInventoryStatic.AddItem(StateMachine.GetEntityData().ID, 1);
-            StateMachine.WipeEntity();
-        }
-        else if (StateMachine.transform.position.y < -5) 
+ 
+        if (StateMachine.transform.position.y < -5) 
         {            
             StateMachine.WipeEntity();
-        } else _itemPhysicInst.HandlePhysicsUpdate();
+        } else _itemPhysicModule.HandlePhysicsUpdate();
     }
 }

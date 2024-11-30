@@ -36,7 +36,7 @@ public class WorldStatic : MonoBehaviour
     public static bool ALWAYS_REGENERATE = false;
 
     public static int xSize = 5;
-    public static int ySize = 1;
+    public static int ySize = 4;
     public static int zSize = 5;
     private void Awake()    
     {
