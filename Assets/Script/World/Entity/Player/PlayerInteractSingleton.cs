@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteractStatic : MonoBehaviour
+public class PlayerInteractSingleton : MonoBehaviour
 {
-    public static PlayerInteractStatic Instance { get; private set; }  
+    public static PlayerInteractSingleton Instance { get; private set; }  
     
     private LayerMask _interactLayer;
     private Animator _animator;

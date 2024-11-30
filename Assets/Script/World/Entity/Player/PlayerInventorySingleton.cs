@@ -117,7 +117,7 @@ public class PlayerInventorySingleton : MonoBehaviour
 
             if (quantity <= 0)
             {
-                PlayerDataStatic.SavePlayerData();
+                PlayerDataSingleton.SavePlayerData();
                 HandleItemUpdate();
                 return;
             }
@@ -134,7 +134,7 @@ public class PlayerInventorySingleton : MonoBehaviour
 
                 if (quantity <= 0)
                 {
-                    PlayerDataStatic.SavePlayerData();
+                    PlayerDataSingleton.SavePlayerData();
                     HandleItemUpdate();
                     return;
                 }
@@ -150,7 +150,7 @@ public class PlayerInventorySingleton : MonoBehaviour
             quantity -= addableAmount;
         }
 
-        PlayerDataStatic.SavePlayerData();
+        PlayerDataSingleton.SavePlayerData();
         HandleItemUpdate();
     }
 
@@ -165,7 +165,7 @@ public class PlayerInventorySingleton : MonoBehaviour
             if (_playerInventory[_currentKey].Stack <= 0) _playerInventory.Remove(_currentKey);
             if (quantity <= 0)
             {
-                PlayerDataStatic.SavePlayerData();
+                PlayerDataSingleton.SavePlayerData();
                 HandleItemUpdate();
                 return;
             }
@@ -185,13 +185,13 @@ public class PlayerInventorySingleton : MonoBehaviour
                 }
                 if (quantity <= 0)
                 {
-                    PlayerDataStatic.SavePlayerData();
+                    PlayerDataSingleton.SavePlayerData();
                     HandleItemUpdate();
                     return;
                 }
             }
         }
-        PlayerDataStatic.SavePlayerData();
+        PlayerDataSingleton.SavePlayerData();
         HandleItemUpdate();
     }
 

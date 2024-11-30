@@ -5,9 +5,9 @@ using UnityEngine;
 
 public enum GameState { FreeRoam, Dialogue, Battle }
 
-public class GameStateStatic : MonoBehaviour
+public class GameStateSingleton : MonoBehaviour
 {
-    public static GameStateStatic Instance { get; private set; }  
+    public static GameStateSingleton Instance { get; private set; }  
     
 
     [HideInInspector]

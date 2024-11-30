@@ -38,14 +38,7 @@ class NPCRoam : EntityState {
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            if (Input.GetKey(KeyCode.C))
-            {
-                Vector3 a = _pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded());
-                Lib.Log(a);
-                _movementModule.SetDirection(a);
-            } else 
-                _movementModule.SetDirection(_pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded()));
-
+            _movementModule.SetDirection(_pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded()));
             _movementModule.HandleMovementUpdate();
             _animationModule.HandleAnimationUpdate();
         }

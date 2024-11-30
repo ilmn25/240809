@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PlayerAnimationStatic : MonoBehaviour
+public class PlayerAnimationSingleton : MonoBehaviour
 { 
-    public static PlayerAnimationStatic Instance { get; private set; }  
+    public static PlayerAnimationSingleton Instance { get; private set; }  
     
     private Animator _animator;
     private GameObject _sprite;
@@ -34,28 +34,28 @@ public class PlayerAnimationStatic : MonoBehaviour
         _originalScale = _sprite.transform.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
 
-        CameraStatic.OnOrbitRotate += UpdateOrbit;
+        CameraSingleton.OnOrbitRotate += UpdateOrbit;
     }
 
     void OnDestroy()
     {
-        CameraStatic.OnOrbitRotate -= UpdateOrbit; 
+        CameraSingleton.OnOrbitRotate -= UpdateOrbit; 
     }   
  
     void UpdateOrbit()
     { 
-        transform.rotation = CameraStatic._currentRotation;
+        transform.rotation = CameraSingleton._currentRotation;
     }
 
     public void HandleAnimationUpdate()
     {
         // facing direction 
-        if (PlayerMovementStatic.Instance._rawInput != Vector2.zero){
-            _animator.SetFloat("PosX", PlayerMovementStatic.Instance._rawInput.x);
-            _animator.SetFloat("PosY", PlayerMovementStatic.Instance._rawInput.y);
+        if (PlayerMovementSingleton.Instance._rawInput != Vector2.zero){
+            _animator.SetFloat("PosX", PlayerMovementSingleton.Instance._rawInput.x);
+            _animator.SetFloat("PosY", PlayerMovementSingleton.Instance._rawInput.y);
         } 
 
-        bool isMoving = PlayerMovementStatic.Instance._speedCurrent > 0.35 && PlayerMovementStatic.Instance._isGrounded;
+        bool isMoving = PlayerMovementSingleton.Instance._speedCurrent > 0.35 && PlayerMovementSingleton.Instance._isGrounded;
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {
@@ -68,7 +68,7 @@ public class PlayerAnimationStatic : MonoBehaviour
             { 
                 SmokeParticleStatic.CreateSmokeParticle(transform.position, true);
                 _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
-                AudioStatic.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
+                AudioSingleton.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }
         } else _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, 0, _sprite.transform.localPosition.z);
 
@@ -79,7 +79,7 @@ public class PlayerAnimationStatic : MonoBehaviour
 
     void HandleFlipCheck()
     {     
-        if ((int)PlayerMovementStatic.Instance._rawInput.x != 0) 
+        if ((int)PlayerMovementSingleton.Instance._rawInput.x != 0) 
         {
             if (Mathf.Sign((int)_animator.GetFloat("PosX")) != Mathf.Sign(_targetScale.x))
             {

@@ -43,7 +43,7 @@ public class AnimationModule : MonoBehaviour
         { 
             _relativeDirection.x = Mathf.Abs(_relativeDirection.x) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.x);
             _relativeDirection.y = Mathf.Abs(_relativeDirection.y) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.y);
-            _relativeDirection = CameraStatic.GetRelativeDirection(_relativeDirection); 
+            _relativeDirection = CameraSingleton.GetRelativeDirection(_relativeDirection); 
             _animator.SetFloat("PosX", _relativeDirection.x);
             _animator.SetFloat("PosY", _relativeDirection.y);
         }

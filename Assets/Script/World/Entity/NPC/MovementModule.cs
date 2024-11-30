@@ -192,20 +192,20 @@ public class MovementModule : MonoBehaviour
         _previousPosition = transform.position;
     }
     
-    // private bool IsMovable(Vector3 newPosition)
-    // {
-    //     _colliderArray = new Collider[1];
-    //
-    //     Vector3 halfExtents = new Vector3(COLLISION_RADIUS, COLLISION_RADIUS, COLLISION_RADIUS);
-    //
-    //     return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.LayerCollide) > 0);
-    // }
     private bool IsMovable(Vector3 newPosition)
     {
-        // Define an array to store the results
         _colliderArray = new Collider[1];
 
-        return !(Physics.OverlapSphereNonAlloc(newPosition, COLLISION_RADIUS, _colliderArray, Game.LayerCollide) > 0);
+        Vector3 halfExtents = new Vector3(COLLISION_RADIUS, COLLISION_RADIUS, COLLISION_RADIUS);
+
+        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.LayerCollide) > 0);
     }
+    // private bool IsMovable(Vector3 newPosition)
+    // {
+    //     // Define an array to store the results
+    //     _colliderArray = new Collider[1];
+    //
+    //     return !(Physics.OverlapSphereNonAlloc(newPosition, COLLISION_RADIUS, _colliderArray, Game.LayerCollide) > 0);
+    // }
 } 
 

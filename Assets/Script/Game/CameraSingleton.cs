@@ -3,9 +3,9 @@ using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class CameraStatic : MonoBehaviour
+public class CameraSingleton : MonoBehaviour
 {
-    public static CameraStatic Instance { get; private set; }  
+    public static CameraSingleton Instance { get; private set; }  
     
     public static int _orbitRotation = 0;
     public static Quaternion _currentRotation;
@@ -78,7 +78,7 @@ public class CameraStatic : MonoBehaviour
         _cosAngle = Mathf.Cos(orbitRotation);
         _sinAngle = Mathf.Sin(orbitRotation);
 
-        targetRotation = Quaternion.Euler(0, CameraStatic._orbitRotation, 0);
+        targetRotation = Quaternion.Euler(0, CameraSingleton._orbitRotation, 0);
         isOrbiting = true;
     }
 
