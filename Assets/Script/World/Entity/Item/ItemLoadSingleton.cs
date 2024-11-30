@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Script.World.Entity.Item;
 using UnityEngine;
 
-public class ItemLoadStatic : MonoBehaviour
+public class ItemLoadSingleton : MonoBehaviour
 {
-    public static ItemLoadStatic Instance { get; private set; }  
+    public static ItemLoadSingleton Instance { get; private set; }  
     private static Dictionary<string, ItemData> _itemDefinitions  = new Dictionary<string, ItemData>();
  
     public void Awake()

@@ -32,9 +32,9 @@ public class MapLoadStatic : MonoBehaviour
     async void Start()
     {
         await Task.Delay(50);
-        HandleChunkMapTraverse();
-        EntityLoadStatic.Instance.OnTraverse();
+        HandleChunkMapTraverse(); 
         WorldStatic.Instance.GenerateBoolMap();
+        EntityLoadStatic.Instance.OnTraverse();
     }
 
 
@@ -57,30 +57,30 @@ public class MapLoadStatic : MonoBehaviour
         if (!WorldStatic.Instance.IsInWorldBounds(chunkCoordinates)) return;
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
- 
 
-    Vector3 traverseCheckPosition;
-    List<Vector3Int> destroyList = new List<Vector3Int>();
+
+    private Vector3Int _traverseCheckPosition;
+    private List<Vector3Int> _destroyList = new List<Vector3Int>();
     void HandleChunkMapTraverse()
     {
         foreach (var kvp in _activeChunks)
         {
-            traverseCheckPosition = kvp.Key;
+            _traverseCheckPosition = kvp.Key;
             if (kvp.Key.x > WorldStatic._playerChunkPos.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.x < WorldStatic._playerChunkPos.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
                 || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
                 || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE)
             {
                 Destroy(kvp.Value.gameObject, 1);
-                destroyList.Add(kvp.Key);
+                _destroyList.Add(kvp.Key);
             }
         }
 
         // Remove the keys after iteration to avoid modifying the collection while iterating
-        foreach (var key in destroyList)
+        foreach (var key in _destroyList)
         {
             _activeChunks.Remove(key);
         }
-        destroyList.Clear();
+        _destroyList.Clear();
 
         // Collect chunk coordinates within render distance
         for (int x = -WorldStatic.RENDER_DISTANCE; x <= WorldStatic.RENDER_DISTANCE; x++)
@@ -89,13 +89,13 @@ public class MapLoadStatic : MonoBehaviour
             {
                 for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
                 {
-                    Vector3Int traverseCheckPosition = new Vector3Int(
+                    _traverseCheckPosition = new Vector3Int(
                         WorldStatic._playerChunkPos.x + x * WorldStatic.CHUNK_SIZE,
                         WorldStatic._playerChunkPos.y + y * WorldStatic.CHUNK_SIZE,
                         WorldStatic._playerChunkPos.z + z * WorldStatic.CHUNK_SIZE
                     );
-                    if (!_activeChunks.ContainsKey(traverseCheckPosition) && WorldStatic.Instance.IsInWorldBounds(traverseCheckPosition))
-                        _ = LoadChunksOntoScreenAsync(traverseCheckPosition);
+                    if (!_activeChunks.ContainsKey(_traverseCheckPosition) && WorldStatic.Instance.IsInWorldBounds(_traverseCheckPosition))
+                        _ = LoadChunksOntoScreenAsync(_traverseCheckPosition);
                 }
             }
         } 

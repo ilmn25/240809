@@ -29,7 +29,7 @@ public class PlayerDataStatic : MonoBehaviour
     { 
         using (FileStream file = File.Create(Game.PLAYER_SAVE_PATH))
         {
-            _playerData.inventory = PlayerInventoryStatic._playerInventory;
+            _playerData.inventory = PlayerInventorySingleton._playerInventory;
             _binaryFormatter.Serialize(file, _playerData);
         }
     }
@@ -41,13 +41,13 @@ public class PlayerDataStatic : MonoBehaviour
             using (FileStream file = File.Open(Game.PLAYER_SAVE_PATH, FileMode.Open))
             {
                 _playerData = (PlayerData)_binaryFormatter.Deserialize(file);
-                PlayerInventoryStatic._playerInventory = _playerData.inventory;
+                PlayerInventorySingleton._playerInventory = _playerData.inventory;
             }
         }
         else
         {
             Debug.Log("No playerData file found in Downloads.");
-            PlayerInventoryStatic._playerInventory = new Dictionary<int, InvSlotData>(); // Initialize if file does not exist
+            PlayerInventorySingleton._playerInventory = new Dictionary<int, InvSlotData>(); // Initialize if file does not exist
         }
     }
  

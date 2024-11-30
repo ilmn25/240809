@@ -18,9 +18,9 @@ public class InvSlotData
     }
 }
 
-public class PlayerInventoryStatic : MonoBehaviour
+public class PlayerInventorySingleton : MonoBehaviour
 {
-    public static PlayerInventoryStatic Instance { get; private set; }  
+    public static PlayerInventorySingleton Instance { get; private set; }  
     
     public static Dictionary<int, InvSlotData> _playerInventory;
 
@@ -44,11 +44,12 @@ public class PlayerInventoryStatic : MonoBehaviour
         {
             AddItem("axe");
         }
-        HandleInput();   
-    }
-
-    private static void HandleInput()
-    {
+        if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
+        {
+            Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position);
+            RemoveItem(CurrentItem.StringID); 
+        }
+        
         if (Input.GetKeyDown(KeyCode.Tilde))
         {
             _currentRow = (_currentRow + 1) % INVENTORY_ROW_AMOUNT;
@@ -71,6 +72,7 @@ public class PlayerInventoryStatic : MonoBehaviour
             }
         }
     }
+ 
 
 
     public static void HandleItemUpdate()
@@ -104,7 +106,7 @@ public class PlayerInventoryStatic : MonoBehaviour
     
     public static void AddItem(string stringID, int quantity = 1)
     {
-        int maxStackSize = ItemLoadStatic.GetItem(stringID).StackSize;
+        int maxStackSize = ItemLoadSingleton.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
         if (_playerInventory.ContainsKey(_currentKey) && _playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)
@@ -116,6 +118,7 @@ public class PlayerInventoryStatic : MonoBehaviour
             if (quantity <= 0)
             {
                 PlayerDataStatic.SavePlayerData();
+                HandleItemUpdate();
                 return;
             }
         }
@@ -132,6 +135,7 @@ public class PlayerInventoryStatic : MonoBehaviour
                 if (quantity <= 0)
                 {
                     PlayerDataStatic.SavePlayerData();
+                    HandleItemUpdate();
                     return;
                 }
             }
@@ -147,6 +151,7 @@ public class PlayerInventoryStatic : MonoBehaviour
         }
 
         PlayerDataStatic.SavePlayerData();
+        HandleItemUpdate();
     }
 
     public static void RemoveItem(string stringID, int quantity = 1)
@@ -161,6 +166,7 @@ public class PlayerInventoryStatic : MonoBehaviour
             if (quantity <= 0)
             {
                 PlayerDataStatic.SavePlayerData();
+                HandleItemUpdate();
                 return;
             }
         }
@@ -180,11 +186,13 @@ public class PlayerInventoryStatic : MonoBehaviour
                 if (quantity <= 0)
                 {
                     PlayerDataStatic.SavePlayerData();
+                    HandleItemUpdate();
                     return;
                 }
             }
         }
         PlayerDataStatic.SavePlayerData();
+        HandleItemUpdate();
     }
 
     public static int GetStackAmount(string stringID)
