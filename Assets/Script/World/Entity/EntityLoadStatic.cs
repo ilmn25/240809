@@ -63,8 +63,7 @@ public class EntityLoadStatic : MonoBehaviour
     }
 
     void HandleLoad()
-    {
-        WorldStatic.Instance.HandleLoadWorldFile(0); 
+    { 
 
         for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x += WorldStatic.CHUNK_SIZE)
         {

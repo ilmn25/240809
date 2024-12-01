@@ -35,8 +35,13 @@ public class Game : MonoBehaviour
     public GameObject playerSprite;
     public GameObject toolSprite;
 
+    public static float MAX_DELTA_TIME = 0.03f;
+    float FIXED_UPDATE_MS = 0.10f;
     void Awake()
     {
+        Time.fixedDeltaTime = FIXED_UPDATE_MS;
+        Application.targetFrameRate = 200;
+        
         DigSound = Resources.Load<AudioClip>("audio/sfx/dig/stone");
         Instance = this;
         LayerMap  = LayerMask.GetMask("Map"); 
@@ -51,12 +56,34 @@ public class Game : MonoBehaviour
         Player = GameObject.Find("player");
         ViewportSystem = GameObject.Find("viewport_system");
         Camera = GameObject.Find("main_camera");
+        
         DialogueBox = GameObject.Find("gui").transform.Find("dialogue_box").gameObject;
-        DialogueText = DialogueBox.transform.Find("dialogue_text").GetComponent<TextMeshProUGUI>(); 
+        DialogueText = DialogueBox.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        
         AudioSystem = GameObject.Find("audio_system");
         WorldSystem = GameObject.Find("world_system");
         EntitySystem = GameObject.Find("entity_system");
         MapSystem = GameObject.Find("map_system");
          
+    }
+    
+    void Update()
+    { 
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            if (Screen.fullScreen)
+            {
+                Screen.SetResolution(960, 540, false);
+            }
+            else
+            {
+                Screen.SetResolution(1920, 1080, true);
+            }
+        }
+    }
+    
+    public static float GetDeltaTime()
+    {
+        return (Time.deltaTime < MAX_DELTA_TIME) ? Time.deltaTime : MAX_DELTA_TIME;
     }
 }

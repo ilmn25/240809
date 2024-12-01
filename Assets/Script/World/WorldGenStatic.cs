@@ -49,7 +49,7 @@ public class WorldGenStatic : MonoBehaviour
 
 
     public static int xSize = 5;
-    public static int ySize = 65;
+    public static int ySize = 3;
     public static int zSize = 3;
 
 
@@ -98,12 +98,12 @@ public class WorldGenStatic : MonoBehaviour
                             .Map[localChunkX, localChunkY, localChunkZ] == BlockStatic.ConvertID("dirt"))
                     {
 
-                        if (_random.NextDouble() <= 0.00006)
+                        if (_random.NextDouble() <= 0.0002)
                         {
                             _setPiece = house;
                             pasteSetPiece(new Vector3Int(x, y, z));
                         }
-                        else if (_random.NextDouble() <= 0.0001)
+                        else if (_random.NextDouble() <= 0.0004)
                         {
                             _setPiece = tree;
                             pasteSetPiece(new Vector3Int(x, y, z));
@@ -172,11 +172,7 @@ public class WorldGenStatic : MonoBehaviour
                         _chunkData.Map[x, y, z] = 0; // Empty space for caves
                     }
                     else if (y + _chunkCoord.y > _wallHeight + _floorHeight)
-                    {
-                        if (wall & (z > 1 && z < 8) && y + _chunkCoord.y < 100)
-                        {
-                            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("brick");
-                        }
+                    { 
                         if (y + _chunkCoord.y <= stoneHeight - 15)
                         {
                             _chunkData.Map[x, y, z] = BlockStatic.ConvertID("stone");
