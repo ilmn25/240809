@@ -70,7 +70,7 @@ public class PlayerMovementSingleton : MonoBehaviour
     public void HandleMovementUpdate()
     {  
         
-        _deltaTime = GameStatic.GetDeltaTime();
+        _deltaTime = Game.GetDeltaTime();
         _newPosition = transform.position;
 
         // get input

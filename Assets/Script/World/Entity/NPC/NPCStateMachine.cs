@@ -20,7 +20,10 @@ public class NPCStateMachine : EntityStateMachine
         AddState(new NPCChase(_movementModule, _pathFindModule, _animationModule, _sprite));
         AddState(new NPCRoam(_movementModule, _pathFindModule, _animationModule, _sprite));
         DialogueData dialogueData = new DialogueData();
-        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one in your hand and it starts twitching its like its nuzzling you(/ω＼) or when they perk up and look at you like\" owo nya? :3” hehe ~ penis-kun is happy to see me!!");
+        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
+        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
+        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
+        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
         AddState(new CharTalk(this, dialogueData));
     }
 
@@ -41,11 +44,11 @@ public class NPCStateMachine : EntityStateMachine
         else if (Input.GetKeyDown(KeyCode.U))
         {
             transform.position = Game.Player.transform.position;
-        }  
-    }
+        }
 
-    public void Interact()
-    {
-        SetState<CharTalk>();
+        if (Input.GetKeyDown(KeyCode.F) && Vector3.Distance(transform.position, Game.Player.transform.position) < 1.4f)
+        {
+            SetState<CharTalk>();
+        }
     }
 } 

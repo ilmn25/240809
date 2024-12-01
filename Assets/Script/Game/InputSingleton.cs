@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Script.Game
 {
-    public class InputStatic : MonoBehaviour
+    public class InputSingleton : MonoBehaviour
     {
         public static event Action Jump; 
         public static event Action Up; 

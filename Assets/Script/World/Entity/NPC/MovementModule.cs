@@ -65,7 +65,7 @@ public class MovementModule : MonoBehaviour
         if (transform.position.y < -1) transform.position = Lib.AddToVector(transform.position, 0, 100, 0);
 
         // _deltaTime = GameSystem._deltaTime;
-        _deltaTime = GameStatic.GetDeltaTime();
+        _deltaTime = Game.GetDeltaTime();
         _newPosition = transform.position;
 
         HandleJump();

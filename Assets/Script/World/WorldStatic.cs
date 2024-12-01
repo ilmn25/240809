@@ -44,7 +44,11 @@ public class WorldStatic : MonoBehaviour
     { 
         Instance = this;
  
-        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) WorldGenStatic.Instance.GenerateRandomMapSave();
+        if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) 
+            WorldGenStatic.Instance.GenerateRandomMapSave();
+        else 
+            WorldStatic.Instance.HandleLoadWorldFile(0); 
+        
         _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
     }
           
