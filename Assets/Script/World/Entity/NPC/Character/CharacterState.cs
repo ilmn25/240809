@@ -17,13 +17,7 @@ public class CharTalk : EntityState {
     
     public override void OnEnterState()
     {
-        if (!Game.DialogueBox.activeSelf)
-            DialogueBoxSingleton.Instance.StartCoroutine(DialogueBoxSingleton.Instance.StartDialogue(this));
-        else
-            _esm.SetState<NPCIdle>();
+        GUIDialogueSingleton.Instance.StartDialogue(this);
     }
-
-    public override void StateUpdate() {}
  
-    public override void OnExitState() {}
 }

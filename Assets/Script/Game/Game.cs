@@ -10,7 +10,9 @@ public class Game : MonoBehaviour
     
     public static LayerMask LayerMap; // just map
     public static LayerMask LayerCollide;
-    public static int IndexLayerMap;
+    public static int MapLayerIndex;
+    public static int UILayerIndex;
+    public static int EntityLayerIndex;
     
     public static GameObject UserSystem;
     public static GameObject Player;
@@ -18,6 +20,7 @@ public class Game : MonoBehaviour
     public static GameObject Camera;
     public static GameObject DialogueBox;
     public static TextMeshProUGUI DialogueText;
+    public static GameObject GUIInventory;
     public static GameObject AudioSystem;
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
@@ -33,8 +36,8 @@ public class Game : MonoBehaviour
     public float toolTargetZRotation = -90f;
     public float playerTargetZRotation = -35f; // Rotation for player's swing
     public GameObject playerSprite;
-    public GameObject toolSprite;
-
+    public GameObject toolSprite; 
+    
     public static float MAX_DELTA_TIME = 0.03f;
     float FIXED_UPDATE_MS = 0.10f;
     void Awake()
@@ -46,7 +49,9 @@ public class Game : MonoBehaviour
         Instance = this;
         LayerMap  = LayerMask.GetMask("Map"); 
         LayerCollide  = LayerMask.GetMask("Map", "Entity"); 
-        IndexLayerMap = LayerMask.NameToLayer("Map");
+        MapLayerIndex = LayerMask.NameToLayer("Map");
+        UILayerIndex = LayerMask.NameToLayer("UI");
+        EntityLayerIndex = LayerMask.NameToLayer("Entity");
         
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";
@@ -59,6 +64,7 @@ public class Game : MonoBehaviour
         
         DialogueBox = GameObject.Find("gui").transform.Find("dialogue_box").gameObject;
         DialogueText = DialogueBox.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        GUIInventory = GameObject.Find("gui").transform.Find("inventory").gameObject;
         
         AudioSystem = GameObject.Find("audio_system");
         WorldSystem = GameObject.Find("world_system");

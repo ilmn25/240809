@@ -143,8 +143,7 @@ public class PlayerChunkEditSingleton : MonoBehaviour
     {
         float yThreshold = MapCullStatic.Instance._yThreshold + 0.05f;
 
-        _screenPosition = Input.mousePosition;
-        Ray ray = Camera.main.ScreenPointToRay(_screenPosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
         {
             _worldPosition = new Vector3Int();
