@@ -26,14 +26,14 @@ public class PathFindSingleton : MonoBehaviour
         { 
             if (start)
             {
-                _startPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
+                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
                 if (!end)
                     _endPosition = _startPosition + new Vector3Int(
                        UnityEngine.Random.Range(-scanCount, scanCount),  
                        UnityEngine.Random.Range(-1, 1),  
                        UnityEngine.Random.Range(-scanCount, scanCount));
                 else 
-                    _endPosition = WorldStatic.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
+                    _endPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
 
                 return await Task.Run(() => FindPathAsync(agent, _startPosition, _endPosition, scanCount));
             } 
@@ -197,13 +197,13 @@ public class PathFindSingleton : MonoBehaviour
             pos.x >= 0 
             && pos.y >= 0 
             && pos.z >= 0 
-            && pos.x < WorldStatic.World.Bounds.x 
-            && pos.z < WorldStatic.World.Bounds.z 
+            && pos.x < WorldSingleton.World.Bounds.x 
+            && pos.z < WorldSingleton.World.Bounds.z 
         ); //check bounds x z 
         if (isClear)
         {
-            isClear = pos.y >= WorldStatic._boolMap.GetLength(1)? true : false; //check bounds y (true even if above max y)
-            isClear = isClear || WorldStatic._boolMap[pos.x, pos.y, pos.z]; //check air or block
+            isClear = pos.y >= WorldSingleton._boolMap.GetLength(1)? true : false; //check bounds y (true even if above max y)
+            isClear = isClear || WorldSingleton._boolMap[pos.x, pos.y, pos.z]; //check air or block
         }
         return isClear;
     }

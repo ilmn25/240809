@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Script.World.Entity.Item
 {
-    public class CraftStatic : MonoBehaviour
+    public class CraftSingleton : MonoBehaviour
     {
-        public static CraftStatic Instance { get; private set; }  
+        public static CraftSingleton Instance { get; private set; }  
         private static Dictionary<string, Dictionary<string, int>> _craftList = new Dictionary<string, Dictionary<string, int>>();
 
         void Awake()

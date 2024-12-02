@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Threading.Tasks;
 
-public class SmokeParticleInst : MonoBehaviour
+public class SmokeParticleModule : MonoBehaviour
 {
     private Animator _animator;
     private AnimatorStateInfo _stateInfo;
@@ -33,7 +33,7 @@ public class SmokeParticleInst : MonoBehaviour
         if (this != null)
         {
             transform.position = new Vector3(0, 500, 0);
-            SmokeParticleStatic.ReturnSmokeParticleToPool(gameObject);
+            SmokeParticleSingleton.ReturnSmokeParticleToPool(gameObject);
         }
     }
 }

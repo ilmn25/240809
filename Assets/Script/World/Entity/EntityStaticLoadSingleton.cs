@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class EntityLoadStatic : MonoBehaviour
+public class EntityStaticLoadSingleton : MonoBehaviour
 {
-    public static EntityLoadStatic Instance { get; private set; }  
+    public static EntityStaticLoadSingleton Instance { get; private set; }  
     
     private Vector3Int _currentChunkCoordinate;
     private List<EntityData> _chunkEntityList;
@@ -16,17 +16,17 @@ public class EntityLoadStatic : MonoBehaviour
     EntityHandler _currentEntityHandler;
 
     public static Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)>();
-    private int ENTITY_DISTANCE = WorldStatic.RENDER_DISTANCE;
+    private int ENTITY_DISTANCE = WorldSingleton.RENDER_DISTANCE;
 
     void Awake()
     {
         Instance = this;
-        WorldStatic.PlayerChunkTraverse += OnTraverse; 
+        WorldSingleton.PlayerChunkTraverse += OnTraverse; 
     }
 
     public void OnTraverse()   
     {
-        if (WorldStatic._boolMap == null) return; // dont delete before boolmap load
+        if (WorldSingleton._boolMap == null) return; // dont delete before boolmap load
         HandleUnload();
         HandleLoad();  
     }
@@ -47,12 +47,12 @@ public class EntityLoadStatic : MonoBehaviour
             // Extract chunk coordinates from the key
             int chunkX = coordinate.x, chunkY = coordinate.y, chunkZ = coordinate.z;
 
-            if (chunkX > WorldStatic._playerChunkPos.x + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
-                || chunkX < WorldStatic._playerChunkPos.x - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE
-                || chunkY > WorldStatic._playerChunkPos.y + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
-                || chunkY < WorldStatic._playerChunkPos.y - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE
-                || chunkZ > WorldStatic._playerChunkPos.z + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
-                || chunkZ < WorldStatic._playerChunkPos.z - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE)
+            if (chunkX > WorldSingleton._playerChunkPos.x + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
+                || chunkX < WorldSingleton._playerChunkPos.x - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE
+                || chunkY > WorldSingleton._playerChunkPos.y + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
+                || chunkY < WorldSingleton._playerChunkPos.y - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE
+                || chunkZ > WorldSingleton._playerChunkPos.z + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
+                || chunkZ < WorldSingleton._playerChunkPos.z - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE)
             {
                 UpdateEntityList(coordinate);
                 removeList.Add(coordinate);
@@ -65,21 +65,21 @@ public class EntityLoadStatic : MonoBehaviour
     void HandleLoad()
     { 
 
-        for (int x = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; x += WorldStatic.CHUNK_SIZE)
+        for (int x = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; x += WorldSingleton.CHUNK_SIZE)
         {
-            for (int y = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; y += WorldStatic.CHUNK_SIZE)
+            for (int y = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; y <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; y += WorldSingleton.CHUNK_SIZE)
             {
-                for (int z = -ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z <= ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE; z += WorldStatic.CHUNK_SIZE)
+                for (int z = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; z <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; z += WorldSingleton.CHUNK_SIZE)
                 {
                     _currentChunkCoordinate = new Vector3Int(
-                        Mathf.FloorToInt(WorldStatic._playerChunkPos.x + x),
-                        Mathf.FloorToInt(WorldStatic._playerChunkPos.y + y),
-                        Mathf.FloorToInt(WorldStatic._playerChunkPos.z + z)
+                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.x + x),
+                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.y + y),
+                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.z + z)
                     );
 
                     if (!_entityList.ContainsKey(_currentChunkCoordinate))
                     {
-                        _currentChunkData = WorldStatic.Instance.GetChunk(_currentChunkCoordinate); 
+                        _currentChunkData = WorldSingleton.Instance.GetChunk(_currentChunkCoordinate); 
                         if  (_currentChunkData != null)
                         {
                             _chunkEntityList = _currentChunkData.StaticEntity;  
@@ -97,7 +97,7 @@ public class EntityLoadStatic : MonoBehaviour
         foreach (EntityHandler entityHandler in _entityList[key].Item2)
         { 
             _entityList[key].Item1.Add(entityHandler.GetEntityData()); 
-            EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject);   
+            EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }
 
@@ -112,7 +112,7 @@ public class EntityLoadStatic : MonoBehaviour
 
         foreach (EntityData entityData in _chunkEntityList)
         { 
-            _currentInstance = EntityPoolStatic.Instance.GetObject(entityData.ID);
+            _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.ID);
             _currentInstance.transform.position = Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3());
 
             _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();

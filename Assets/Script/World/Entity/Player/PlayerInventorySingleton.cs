@@ -35,7 +35,7 @@ public class PlayerInventorySingleton : MonoBehaviour
     void Start()
     {
         Instance = this;
-        HandleItemUpdate();
+        RefreshInventory();
     }
 
     public void HandleInventoryUpdate()
@@ -53,13 +53,13 @@ public class PlayerInventorySingleton : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tilde))
         {
             _currentRow = (_currentRow + 1) % INVENTORY_ROW_AMOUNT;
-            HandleItemUpdate();
+            RefreshInventory();
         }
 
         if (Input.mouseScrollDelta.y != 0 && !Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftAlt))
         { 
             _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)Input.mouseScrollDelta.y, INVENTORY_SLOT_AMOUNT); 
-            HandleItemUpdate();
+            RefreshInventory();
         }
 
         for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
@@ -67,7 +67,7 @@ public class PlayerInventorySingleton : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {  
                 _currentSlot = i;
-                HandleItemUpdate();
+                RefreshInventory();
                 break;
             }
         }
@@ -75,11 +75,12 @@ public class PlayerInventorySingleton : MonoBehaviour
  
 
 
-    public static void HandleItemUpdate()
-    {
+    public static void RefreshInventory()
+    { 
         _currentKey = CalculateKey();
         CurrentItem = GetItemAtKey();
         InventoryStateMachine.Instance.HandleItemUpdate();
+        GUIInventorySingleton.Instance.Refresh();
     }
 
 
@@ -117,8 +118,7 @@ public class PlayerInventorySingleton : MonoBehaviour
 
             if (quantity <= 0)
             {
-                PlayerDataSingleton.SavePlayerData();
-                HandleItemUpdate();
+                RefreshInventory();
                 return;
             }
         }
@@ -133,9 +133,8 @@ public class PlayerInventorySingleton : MonoBehaviour
                 quantity -= addableAmount;
 
                 if (quantity <= 0)
-                {
-                    PlayerDataSingleton.SavePlayerData();
-                    HandleItemUpdate();
+                { 
+                    RefreshInventory();
                     return;
                 }
             }
@@ -149,9 +148,8 @@ public class PlayerInventorySingleton : MonoBehaviour
             _playerInventory[slotID] = new InvSlotData(stringID, addableAmount);
             quantity -= addableAmount;
         }
-
-        PlayerDataSingleton.SavePlayerData();
-        HandleItemUpdate();
+ 
+        RefreshInventory();
     }
 
     public static void RemoveItem(string stringID, int quantity = 1)
@@ -164,9 +162,8 @@ public class PlayerInventorySingleton : MonoBehaviour
             quantity -= removableAmount;
             if (_playerInventory[_currentKey].Stack <= 0) _playerInventory.Remove(_currentKey);
             if (quantity <= 0)
-            {
-                PlayerDataSingleton.SavePlayerData();
-                HandleItemUpdate();
+            { 
+                RefreshInventory();
                 return;
             }
         }
@@ -185,14 +182,12 @@ public class PlayerInventorySingleton : MonoBehaviour
                 }
                 if (quantity <= 0)
                 {
-                    PlayerDataSingleton.SavePlayerData();
-                    HandleItemUpdate();
+                    RefreshInventory();
                     return;
                 }
             }
-        }
-        PlayerDataSingleton.SavePlayerData();
-        HandleItemUpdate();
+        } 
+        RefreshInventory();
     }
 
     public static int GetStackAmount(string stringID)

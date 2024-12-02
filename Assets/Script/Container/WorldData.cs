@@ -10,7 +10,7 @@ public class WorldData
     // Constructor to initialize the World array
     public WorldData(int x, int y, int z)
     {
-        Bounds = new SerializableVector3Int(x * WorldStatic.CHUNK_SIZE, y * WorldStatic.CHUNK_SIZE, z * WorldStatic.CHUNK_SIZE);
+        Bounds = new SerializableVector3Int(x * WorldSingleton.CHUNK_SIZE, y * WorldSingleton.CHUNK_SIZE, z * WorldSingleton.CHUNK_SIZE);
         Length = new SerializableVector3Int(x, y, z);
         _world = new ChunkData[x, y, z];
     }
@@ -20,9 +20,9 @@ public class WorldData
     {
         get
         {
-            int chunkX = x / WorldStatic.CHUNK_SIZE;
-            int chunkY = y / WorldStatic.CHUNK_SIZE;
-            int chunkZ = z / WorldStatic.CHUNK_SIZE;
+            int chunkX = x / WorldSingleton.CHUNK_SIZE;
+            int chunkY = y / WorldSingleton.CHUNK_SIZE;
+            int chunkZ = z / WorldSingleton.CHUNK_SIZE;
 
             if (chunkX >= 0 && chunkX < _world.GetLength(0) &&
                 chunkY >= 0 && chunkY < _world.GetLength(1) &&
@@ -37,9 +37,9 @@ public class WorldData
         }
         set
         {
-            int chunkX = x / WorldStatic.CHUNK_SIZE;
-            int chunkY = y / WorldStatic.CHUNK_SIZE;
-            int chunkZ = z / WorldStatic.CHUNK_SIZE; 
+            int chunkX = x / WorldSingleton.CHUNK_SIZE;
+            int chunkY = y / WorldSingleton.CHUNK_SIZE;
+            int chunkZ = z / WorldSingleton.CHUNK_SIZE; 
             if (chunkX >= 0 && chunkX < _world.GetLength(0) &&
                 chunkY >= 0 && chunkY < _world.GetLength(1) &&
                 chunkZ >= 0 && chunkZ < _world.GetLength(2))

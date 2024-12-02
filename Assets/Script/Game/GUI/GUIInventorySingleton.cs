@@ -5,27 +5,28 @@ using System.Collections.Generic;
 
 public class GUIInventorySingleton : MonoBehaviour
 {
+    public static GUIInventorySingleton Instance { get; private set; }  
+    
     private GameObject inventory; 
-    private int slotSize = 25;
+    private int slotSize = 30;
     private Vector2 offset = new Vector2(-160, 30);
     private Vector2 padding = new Vector2(5, 5);
-    private Dictionary<int, Image> slotImages = new Dictionary<int, Image>();
+    private Dictionary<int, GUIItemSlotModule> _itemSlotMap = new Dictionary<int, GUIItemSlotModule>();
 
     private void Start()
     {
-        inventory = Game.GUIInventory;
-        Camera.main.depth = 0;
-        CreateSlots();
+        Instance = this;
+         
+        inventory = Game.GUIInventory; 
+        Initialize();
     }
 
-    private void CreateSlots()
+    private void Initialize()
     {
         int totalSlots = PlayerInventorySingleton.INVENTORY_SLOT_AMOUNT * PlayerInventorySingleton.INVENTORY_ROW_AMOUNT;
         for (int i = 0; i < totalSlots; i++)
         {
-            GameObject newSlot = new GameObject("Slot");
-            Image slotImage = newSlot.AddComponent<Image>(); // Add Image component
-            newSlot.transform.SetParent(inventory.transform, false);
+            GameObject newSlot = Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), inventory.transform, false);
 
             // Set the position in the grid
             int row = i / PlayerInventorySingleton.INVENTORY_SLOT_AMOUNT;
@@ -37,33 +38,19 @@ public class GUIInventorySingleton : MonoBehaviour
                 column * (slotSize + padding.x) + offset.x, 
                 -row * (slotSize + padding.y) + offset.y
             );
-
-            // Add SlotScaler component for hover effects
-            newSlot.AddComponent<GUIItemSlot>();
-
-            slotImages.Add(PlayerInventorySingleton.CalculateKey(row, column), slotImage);
+ 
+            _itemSlotMap.Add(PlayerInventorySingleton.CalculateKey(row, column), newSlot.GetComponent<GUIItemSlotModule>());
         }
     }
 
-    public void UpdateSlots()
+    public void Refresh()
     {
-        foreach (var slot in slotImages)
+        foreach (var slot in _itemSlotMap)
         {
-            int key = slot.Key;
-
-            if (PlayerInventorySingleton._playerInventory.TryGetValue(key, out InvSlotData slotData))
-            {
-                // Load and set the sprite based on the stringID
-                Sprite itemSprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");
-                slot.Value.sprite = itemSprite;
-                slot.Value.color = Color.white; // Ensure the slot is visible
-            }
+            if (PlayerInventorySingleton._playerInventory.TryGetValue(slot.Key, out InvSlotData slotData))
+                slot.Value.SetItem(slotData);
             else
-            {
-                // Clear the slot if no item is present
-                slot.Value.sprite = null;
-                slot.Value.color = Color.clear; // Make slot transparent to indicate empty
-            }
+                slot.Value.SetItem();
         }
     }
 
@@ -72,15 +59,16 @@ public class GUIInventorySingleton : MonoBehaviour
     [SerializeField] private float HIDE_DURATION = 0.2f;  
     private void Update()
     {
-        // Call UpdateSlots() whenever the inventory changes
-        if (Input.GetKeyDown(KeyCode.T)) // Example key to trigger update
+        if (Input.GetKeyDown(KeyCode.Tab))  
         {
             if (scaleTask == null || (scaleTask != null && !scaleTask.Running))
             {
                 if (!inventory.activeSelf)
                 {
+                    Camera.main.depth = -1;
+                    Game.GUIBusy = true;
                     inventory.SetActive(true);
-                    UpdateSlots();
+                    Refresh();
                     scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, inventory));
                     scaleTask.Finished += (bool isManual) => 
                     {
@@ -92,6 +80,8 @@ public class GUIInventorySingleton : MonoBehaviour
                     scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, inventory));
                     scaleTask.Finished += (bool isManual) => 
                     {
+                        Camera.main.depth = 1;
+                        Game.GUIBusy = false;
                         scaleTask = null;
                         inventory.SetActive(false);
                     };

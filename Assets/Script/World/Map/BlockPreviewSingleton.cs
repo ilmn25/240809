@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockPreviewStatic : MonoBehaviour
+public class BlockPreviewSingleton : MonoBehaviour
 { 
-    public static BlockPreviewStatic Instance { get; private set; }  
+    public static BlockPreviewSingleton Instance { get; private set; }  
     
     private float OPACITY = 0.45f;
     
@@ -47,7 +47,7 @@ public class BlockPreviewStatic : MonoBehaviour
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshFilter.mesh = mesh;
-        Material meshMaterial = new(Resources.Load<Material>(BlockStatic.MESH_MATERIAL_PATH))
+        Material meshMaterial = new(Resources.Load<Material>(BlockSingleton.MESH_MATERIAL_PATH))
         {
             mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
         };

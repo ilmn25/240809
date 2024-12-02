@@ -1,44 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class MapEditStatic : MonoBehaviour
+public class MapEditSingleton : MonoBehaviour
 {
-    public static MapEditStatic Instance { get; private set; }  
-    private List<(Vector3 chunkCoordinate, Vector3 blockCoordinate, float breakCost, float breakThreshold)> blockDataList;
+    public static MapEditSingleton Instance { get; private set; }  
+    private List<(Vector3Int coordinate, int breakCost, int breakThreshold)> blockDataList;
     
     void Start()
     {
         Instance = this;
-        blockDataList = new List<(Vector3, Vector3, float, float)>();
+        blockDataList = new List<(Vector3Int, int, int)>();
     }
 
-    public void BreakBlock(Vector3Int worldPosition, Vector3Int chunkCoordinate, Vector3Int blockCoordinate, float breakValue)
+    public void BreakBlock(Vector3Int coordinate, int breakValue)
     {
         
         // Check if the coordinates already exist in the list
-        var existingBlockData = blockDataList.Find(data => data.chunkCoordinate == chunkCoordinate && data.blockCoordinate == blockCoordinate);
+        var existingBlockData = blockDataList.Find(data => data.coordinate == coordinate);
 
-        float breakCost;
-        float breakThreshold;
+        int breakCost;
+        int breakThreshold;
         string blockNameID;
         if (existingBlockData != default)
         {
             // Use existing breakCost and breakThreshold
             breakCost = existingBlockData.breakCost;
             breakThreshold = existingBlockData.breakThreshold;
-            blockNameID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
+            blockNameID = BlockSingleton.ConvertID(MapLoadSingleton.Instance.GetBlockInChunk(coordinate));
         }
         else
         {
             // Check if the block is occupied
-            blockNameID = BlockStatic.ConvertID(MapLoadStatic.Instance.GetBlockInChunk(chunkCoordinate, blockCoordinate, WorldStatic.Instance));
+            blockNameID = BlockSingleton.ConvertID(MapLoadSingleton.Instance.GetBlockInChunk(coordinate));
             if (blockNameID == null)
             {
                 return; // Block is not occupied or an error occurred
             }
 
             // Get the block value
-            BlockData targetBlockData = BlockStatic.GetBlock(blockNameID);
+            BlockData targetBlockData = BlockSingleton.GetBlock(blockNameID);
             breakCost = targetBlockData.BreakCost;
             breakThreshold = targetBlockData.BreakThreshold;
             
@@ -55,15 +55,15 @@ public class MapEditStatic : MonoBehaviour
             // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
-                Entity.SpawnItem(blockNameID, Lib.AddToVector(worldPosition, 0.5f, 0, 0.5f));
-                WorldStatic.Instance.UpdateMap(worldPosition, chunkCoordinate, blockCoordinate, 0);
+                Entity.SpawnItem(blockNameID, Lib.AddToVector(coordinate, 0.5f, 0, 0.5f));
+                WorldSingleton.Instance.UpdateMap(coordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }
             else
             {
                 // Update the block data in the list
                 blockDataList.Remove(existingBlockData);
-                blockDataList.Add((chunkCoordinate, blockCoordinate, breakCost, breakThreshold));
+                blockDataList.Add((coordinate, breakCost, breakThreshold));
             }
         }
     }

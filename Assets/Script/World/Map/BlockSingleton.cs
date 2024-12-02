@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockStatic : MonoBehaviour
+public class BlockSingleton : MonoBehaviour
 {
-    public static BlockStatic Instance { get; private set; }  
+    public static BlockSingleton Instance { get; private set; }  
     private static Dictionary<int, BlockData> _blockDefinitions  = new Dictionary<int, BlockData>();
     private static IntStringMap<int, string> _blockIDMap = new IntStringMap<int, string>();
     private static int _nextBlockID = 1;

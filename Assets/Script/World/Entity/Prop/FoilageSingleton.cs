@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class FoilageStatic : MonoBehaviour
+public class FoilageSingleton : MonoBehaviour
 {
-    public static FoilageStatic Instance { get; private set; }  
+    public static FoilageSingleton Instance { get; private set; }  
     private SpriteRenderer spriteRenderer;
 
     // Start is called before the first frame update

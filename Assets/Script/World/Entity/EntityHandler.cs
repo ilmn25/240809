@@ -9,7 +9,7 @@ public class EntityHandler : MonoBehaviour
     private Boolean _isStatic;
     public EntityData GetEntityData()
     {
-        _entityData.Position = new SerializableVector3(WorldStatic.GetBlockCoordinate(transform.position));
+        _entityData.Position = new SerializableVector3(WorldSingleton.GetBlockCoordinate(transform.position));
         return _entityData;
     }
  
@@ -21,10 +21,10 @@ public class EntityHandler : MonoBehaviour
     public void WipeEntity()
     {
         if (_isStatic)
-            EntityLoadStatic._entityList[WorldStatic.GetChunkCoordinate(transform.position)].Item2.Remove(this);
+            EntityStaticLoadSingleton._entityList[WorldSingleton.GetChunkCoordinate(transform.position)].Item2.Remove(this);
         else 
-            EntityLoadDynamic._entityList.Remove(this);
+            EntityDynamicLoadSingleton._entityList.Remove(this);
         
-        EntityPoolStatic.Instance.ReturnObject(gameObject); 
+        EntityPoolSingleton.Instance.ReturnObject(gameObject); 
     }
 } 

@@ -3,7 +3,8 @@ using TMPro;
 using UnityEngine;
  
 public class Game : MonoBehaviour
-{
+{ 
+    public static bool GUIBusy = false;
     public static string DOWNLOAD_PATH;
     public static string PLAYER_SAVE_PATH;  
     public static Game Instance { get; private set; }  
@@ -41,7 +42,7 @@ public class Game : MonoBehaviour
     public static float MAX_DELTA_TIME = 0.03f;
     float FIXED_UPDATE_MS = 0.10f;
     void Awake()
-    {
+    { 
         Time.fixedDeltaTime = FIXED_UPDATE_MS;
         Application.targetFrameRate = 200;
         
@@ -71,6 +72,9 @@ public class Game : MonoBehaviour
         EntitySystem = GameObject.Find("entity_system");
         MapSystem = GameObject.Find("map_system");
          
+        Physics.IgnoreLayerCollision(Game.EntityLayerIndex, Game.MapLayerIndex);
+        Physics.IgnoreLayerCollision(Game.UILayerIndex, Game.MapLayerIndex);
+        Physics.IgnoreLayerCollision(Game.UILayerIndex, Game.EntityLayerIndex);
     }
     
     void Update()

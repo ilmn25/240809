@@ -1,4 +1,5 @@
  
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -25,12 +26,23 @@ public class TreeStateMachine : EntityStateMachine
         SetState<Idle>();
     }
 
-    private void OnMouseDown()
+    public void OnMouseDown()
     {
+        if (Game.GUIBusy) return;
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
-    } 
+    }
+
+    private void OnMouseEnter()
+    {
+        transform.localScale = Vector3.one * 1.1f;
+    }
+    
+    private void OnMouseExit()
+    {
+        transform.localScale = Vector3.one;
+    }
 }
  
 class ResourceCollapse : EntityState
