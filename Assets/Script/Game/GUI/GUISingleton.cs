@@ -6,29 +6,26 @@ using UnityEngine;
 public class GUISingleton : MonoBehaviour
 {
     public static GUISingleton Instance { get; private set; }  
-    public static AudioSource _audioSource;
     
     private void Awake()
     {
         Instance = this;
     }
  
-    public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, AudioClip audioClip = null, int speed = 75)
+    public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)
     {
-        textBox.text = "";
-        if (audioClip) _audioSource = AudioSingleton.PlaySFX(audioClip, 0.2f, true);
+        textBox.text = ""; 
     
         foreach (var letter in line.ToCharArray())        
         { 
             textBox.text += letter;
             yield return new WaitForSeconds(1f / speed);
         }
-     
-        AudioSingleton.StopSFX(_audioSource);
+      
     }
 
 
-    public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed)
+    public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed = 0.5f)
     {
         Vector3 targetScale = show ? Vector3.one : Vector3.zero;
         Vector3 initialScale = show ? Vector3.zero : Vector3.one;

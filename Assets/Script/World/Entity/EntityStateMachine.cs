@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class EntityStateMachine : MonoBehaviour
 {
     private List<EntityState> states = new List<EntityState>();
-    private EntityState _entityState;
+    protected EntityState _entityState;
     private EntityState _entityStatePrevious;
      
 

@@ -84,7 +84,7 @@ public class PlayerInventorySingleton : MonoBehaviour
 
 
 
-    private static int CalculateKey(int row = -1, int slot = -1)
+    public static int CalculateKey(int row = -1, int slot = -1)
     {
         if (row == -1)
         {

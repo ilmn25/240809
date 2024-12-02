@@ -38,7 +38,7 @@ public class BlockPreviewStatic : MonoBehaviour
 
         meshObject = new(blockID)
         {
-            layer = Game.IndexLayerMap
+            layer = Game.MapLayerIndex
         };
     
         meshObject.transform.parent = transform; 

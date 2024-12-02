@@ -11,6 +11,7 @@ public class NPCStateMachine : EntityStateMachine
     private SpriteRenderer _sprite;
     protected override void OnAwake()
     {
+        GUIDialogueSingleton.DialogueAction += DialogueAction;
         _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
         _movementModule = GetComponent<MovementModule>();
         _pathFindModule = GetComponent<PathFindModule>();
@@ -20,11 +21,18 @@ public class NPCStateMachine : EntityStateMachine
         AddState(new NPCChase(_movementModule, _pathFindModule, _animationModule, _sprite));
         AddState(new NPCRoam(_movementModule, _pathFindModule, _animationModule, _sprite));
         DialogueData dialogueData = new DialogueData();
-        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
-        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
-        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
-        dialogueData.Lines.Add("Dicks are so cute omg UwU when you hold one");
+        dialogueData.Lines.Add("help");
+        dialogueData.Lines.Add("I cant fix my raycast ");
+        dialogueData.Lines.Add("im about to kms rahhhhhhh");
         AddState(new CharTalk(this, dialogueData));
+    }
+
+    private void DialogueAction()
+    {
+        if (Vector3.Distance(transform.position, Game.Player.transform.position) < 1.4f)
+        {
+            SetState<CharTalk>();
+        }
     }
 
     public void OnEnable()
@@ -45,10 +53,6 @@ public class NPCStateMachine : EntityStateMachine
         {
             transform.position = Game.Player.transform.position;
         }
-
-        if (Input.GetKeyDown(KeyCode.F) && Vector3.Distance(transform.position, Game.Player.transform.position) < 1.4f)
-        {
-            SetState<CharTalk>();
-        }
+ 
     }
 } 
