@@ -4,9 +4,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class WorldGenStatic : MonoBehaviour
+public class WorldGenSingleton : MonoBehaviour
 {
-    public static WorldGenStatic Instance { get; private set; }
+    public static WorldGenSingleton Instance { get; private set; }
     private static System.Random _random = new System.Random();
     
     public bool SPAWN_STATIC_ENTITY; 
@@ -20,8 +20,8 @@ public class WorldGenStatic : MonoBehaviour
     private float _dirtOffsetZ;
     private float _caveOffset;
     
-    private int _chunkSize = WorldStatic.CHUNK_SIZE;
-    private int _worldHeight = ySize * WorldStatic.CHUNK_SIZE;
+    private int _chunkSize = WorldSingleton.CHUNK_SIZE;
+    private int _worldHeight = ySize * WorldSingleton.CHUNK_SIZE;
     
     private float _stoneScale = 0.03f;
     private float _dirtScale = 0.005f;
@@ -48,22 +48,22 @@ public class WorldGenStatic : MonoBehaviour
 
 
 
-    public static int xSize = 5;
-    public static int ySize = 3;
-    public static int zSize = 3;
+    public static int xSize = 1;
+    public static int ySize = 2;
+    public static int zSize = 1;
 
 
     //! debug tools
     public void GenerateRandomMapSave()
     { 
-        WorldStatic.World = new WorldData(xSize, ySize, zSize);
+        WorldSingleton.World = new WorldData(xSize, ySize, zSize);
         List<Vector3Int> coordinatesList = new List<Vector3Int>();
 
-        for (int x = 0; x < xSize * WorldStatic.CHUNK_SIZE; x += WorldStatic.CHUNK_SIZE)
+        for (int x = 0; x < xSize * WorldSingleton.CHUNK_SIZE; x += WorldSingleton.CHUNK_SIZE)
         {
-            for (int y = 0; y < ySize * WorldStatic.CHUNK_SIZE; y += WorldStatic.CHUNK_SIZE)
+            for (int y = 0; y < ySize * WorldSingleton.CHUNK_SIZE; y += WorldSingleton.CHUNK_SIZE)
             {
-                for (int z = 0; z < zSize * WorldStatic.CHUNK_SIZE; z += WorldStatic.CHUNK_SIZE)
+                for (int z = 0; z < zSize * WorldSingleton.CHUNK_SIZE; z += WorldSingleton.CHUNK_SIZE)
                 {
                     coordinatesList.Add(new Vector3Int(x, y, z));
                 }
@@ -72,30 +72,30 @@ public class WorldGenStatic : MonoBehaviour
         
         foreach (var coordinates in coordinatesList)
         {
-            WorldStatic.World[coordinates.x, coordinates.y, coordinates.z] = GenerateTestChunk(coordinates); 
+            WorldSingleton.World[coordinates.x, coordinates.y, coordinates.z] = GenerateTestChunk(coordinates); 
         }
         
         
         ChunkData house = LoadSetPieceFile("house_stone");
         ChunkData tree = LoadSetPieceFile("tree_a");
 
-        int chunkSize = WorldStatic.CHUNK_SIZE;
-        for (int x = 0; x < WorldStatic.World.Bounds.x; x++)
+        int chunkSize = WorldSingleton.CHUNK_SIZE;
+        for (int x = 0; x < WorldSingleton.World.Bounds.x; x++)
         {
-            for (int y = 0; y < WorldStatic.World.Bounds.y - 1; y++)
+            for (int y = 0; y < WorldSingleton.World.Bounds.y - 1; y++)
             {
-                for (int z = 0; z < WorldStatic.World.Bounds.z; z++)
+                for (int z = 0; z < WorldSingleton.World.Bounds.z; z++)
                 { 
                     Vector3Int worldPos = new Vector3Int(x, y, z);
-                    Vector3Int chunkPos = WorldStatic.Instance.GetRelativePosition(worldPos);
+                    Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
                     int localChunkX = worldPos.x % chunkSize;
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (WorldStatic.World[chunkPos.x, chunkPos.y, chunkPos.z]
-                            .Map[localChunkX, localChunkY, localChunkZ] == BlockStatic.ConvertID("dirt") &&
-                        WorldStatic.World[chunkPos.x, chunkPos.y, chunkPos.z]
-                            .Map[localChunkX, localChunkY, localChunkZ] == BlockStatic.ConvertID("dirt"))
+                    if (WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z]
+                            .Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
+                        WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z]
+                            .Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt"))
                     {
 
                         if (_random.NextDouble() <= 0.0002)
@@ -123,9 +123,9 @@ public class WorldGenStatic : MonoBehaviour
         {
             if (coordinates.y == 0)
             {
-                for (int z = 0; z < WorldStatic.CHUNK_SIZE; z++)
+                for (int z = 0; z < WorldSingleton.CHUNK_SIZE; z++)
                 {
-                    for (int x = 0; x < WorldStatic.CHUNK_SIZE; x++)
+                    for (int x = 0; x < WorldSingleton.CHUNK_SIZE; x++)
                     {
                         _chunkData.Map[x, 0, z] = 1;
                     }
@@ -175,11 +175,11 @@ public class WorldGenStatic : MonoBehaviour
                     { 
                         if (y + _chunkCoord.y <= stoneHeight - 15)
                         {
-                            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("stone");
+                            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("stone");
                         }
                         else if (y + _chunkCoord.y <= dirtHeight)
                         {
-                            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("dirt");
+                            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("dirt");
                         }
                     }
                     else
@@ -195,15 +195,15 @@ public class WorldGenStatic : MonoBehaviour
     {
         if (y + _chunkCoord.y < _floorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Floor
+            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Floor
         }
         else if (y + _chunkCoord.y == _wallHeight + _floorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Ceiling
+            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Ceiling
         }
         else if (maze[x, z] && y + _chunkCoord.y < _wallHeight + _floorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockStatic.ConvertID("backroom"); // Walls
+            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Walls
         }
     }
  
@@ -225,7 +225,7 @@ public class WorldGenStatic : MonoBehaviour
                     {
                         if (SPAWN_STATIC_ENTITY)
                         {
-                            if (chunkData.Map[x, y, z] == BlockStatic.ConvertID("dirt"))
+                            if (chunkData.Map[x, y, z] == BlockSingleton.ConvertID("dirt"))
                             {
                                 {
                                     double rng = _random.NextDouble();
@@ -418,12 +418,12 @@ public class WorldGenStatic : MonoBehaviour
                     Vector3Int worldPos = new Vector3Int(x, y, z);
                     Vector3Int localPos = worldPos - min;
 
-                    Vector3Int chunkPos = WorldStatic.Instance.GetRelativePosition(worldPos);
-                    int localChunkX = worldPos.x % WorldStatic.CHUNK_SIZE;
-                    int localChunkY = worldPos.y % WorldStatic.CHUNK_SIZE;
-                    int localChunkZ = worldPos.z % WorldStatic.CHUNK_SIZE;
+                    Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
+                    int localChunkX = worldPos.x % WorldSingleton.CHUNK_SIZE;
+                    int localChunkY = worldPos.y % WorldSingleton.CHUNK_SIZE;
+                    int localChunkZ = worldPos.z % WorldSingleton.CHUNK_SIZE;
                 
-                    _setPiece.Map[localPos.x, localPos.y, localPos.z] = WorldStatic.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ];
+                    _setPiece.Map[localPos.x, localPos.y, localPos.z] = WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ];
                 }
             }
         }
@@ -431,7 +431,7 @@ public class WorldGenStatic : MonoBehaviour
     
     private void pasteSetPiece(Vector3Int position)
     {
-        int chunkSize = WorldStatic.CHUNK_SIZE;
+        int chunkSize = WorldSingleton.CHUNK_SIZE;
         Vector3Int min = position;
 
         for (int x = 0; x < _setPiece.Map.GetLength(0); x++)
@@ -444,13 +444,13 @@ public class WorldGenStatic : MonoBehaviour
                     if (blockID != 0)
                     {
                         Vector3Int worldPos = new Vector3Int(min.x + x, min.y + y, min.z + z);
-                        Vector3Int chunkPos = WorldStatic.Instance.GetRelativePosition(worldPos);
+                        Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
                         int localChunkX = worldPos.x % chunkSize;
                         int localChunkY = worldPos.y % chunkSize;
                         int localChunkZ = worldPos.z % chunkSize;
 
-                        if (WorldStatic.Instance.IsInWorldBounds(worldPos))
-                            WorldStatic.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] = blockID;
+                        if (WorldSingleton.Instance.IsInWorldBounds(worldPos))
+                            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] = blockID;
                     }
                 }
             }

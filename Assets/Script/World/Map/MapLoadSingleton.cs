@@ -12,16 +12,16 @@ using UnityEngine.Rendering;
 
 // using Unity.Burst;
 
-public class MapLoadStatic : MonoBehaviour
+public class MapLoadSingleton : MonoBehaviour
          
 {
-    public static MapLoadStatic Instance { get; private set; }  
+    public static MapLoadSingleton Instance { get; private set; }  
   
     
     public void Awake()
     {   
         Instance = this;
-        WorldStatic.PlayerChunkTraverse += HandleChunkMapTraverse;
+        WorldSingleton.PlayerChunkTraverse += HandleChunkMapTraverse;
 
         _tileSize = 16;
         _tilesPerRow = 12;
@@ -33,8 +33,8 @@ public class MapLoadStatic : MonoBehaviour
     {
         await Task.Delay(50);
         HandleChunkMapTraverse(); 
-        WorldStatic.Instance.GenerateBoolMap();
-        EntityLoadStatic.Instance.OnTraverse();
+        WorldSingleton.Instance.GenerateBoolMap();
+        EntityStaticLoadSingleton.Instance.OnTraverse();
     }
 
 
@@ -54,10 +54,19 @@ public class MapLoadStatic : MonoBehaviour
     
     public void RefreshExistingChunk(Vector3Int chunkCoordinates)
     {
-        if (!WorldStatic.Instance.IsInWorldBounds(chunkCoordinates)) return;
+        if (!WorldSingleton.Instance.IsInWorldBounds(chunkCoordinates)) return;
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
-
+    
+    private bool InPlayerRange(Vector3 chunkPos)
+    {
+        return chunkPos.x <= WorldSingleton._playerChunkPos.x + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               chunkPos.x >= WorldSingleton._playerChunkPos.x - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               chunkPos.y <= WorldSingleton._playerChunkPos.y + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               chunkPos.y >= WorldSingleton._playerChunkPos.y - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               chunkPos.z <= WorldSingleton._playerChunkPos.z + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               chunkPos.z >= WorldSingleton._playerChunkPos.z - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE;
+    }
 
     private Vector3Int _traverseCheckPosition;
     private List<Vector3Int> _destroyList = new List<Vector3Int>();
@@ -66,9 +75,7 @@ public class MapLoadStatic : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             _traverseCheckPosition = kvp.Key;
-            if (kvp.Key.x > WorldStatic._playerChunkPos.x + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.x < WorldStatic._playerChunkPos.x - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
-                || kvp.Key.y > WorldStatic._playerChunkPos.y + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.y < WorldStatic._playerChunkPos.y - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE
-                || kvp.Key.z > WorldStatic._playerChunkPos.z + WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE || kvp.Key.z < WorldStatic._playerChunkPos.z - WorldStatic.RENDER_DISTANCE * WorldStatic.CHUNK_SIZE)
+            if (!InPlayerRange(kvp.Key))
             {
                 Destroy(kvp.Value.gameObject, 1);
                 _destroyList.Add(kvp.Key);
@@ -83,35 +90,35 @@ public class MapLoadStatic : MonoBehaviour
         _destroyList.Clear();
 
         // Collect chunk coordinates within render distance
-        for (int x = -WorldStatic.RENDER_DISTANCE; x <= WorldStatic.RENDER_DISTANCE; x++)
+        for (int x = -WorldSingleton.RENDER_DISTANCE; x <= WorldSingleton.RENDER_DISTANCE; x++)
         {
-            for (int y = -WorldStatic.RENDER_DISTANCE; y <= WorldStatic.RENDER_DISTANCE; y++)
+            for (int y = -WorldSingleton.RENDER_DISTANCE; y <= WorldSingleton.RENDER_DISTANCE; y++)
             {
-                for (int z = -WorldStatic.RENDER_DISTANCE; z <= WorldStatic.RENDER_DISTANCE; z++)
+                for (int z = -WorldSingleton.RENDER_DISTANCE; z <= WorldSingleton.RENDER_DISTANCE; z++)
                 {
                     _traverseCheckPosition = new Vector3Int(
-                        WorldStatic._playerChunkPos.x + x * WorldStatic.CHUNK_SIZE,
-                        WorldStatic._playerChunkPos.y + y * WorldStatic.CHUNK_SIZE,
-                        WorldStatic._playerChunkPos.z + z * WorldStatic.CHUNK_SIZE
+                        WorldSingleton._playerChunkPos.x + x * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton._playerChunkPos.y + y * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton._playerChunkPos.z + z * WorldSingleton.CHUNK_SIZE
                     );
-                    if (!_activeChunks.ContainsKey(_traverseCheckPosition) && WorldStatic.Instance.IsInWorldBounds(_traverseCheckPosition))
+                    if (!_activeChunks.ContainsKey(_traverseCheckPosition) && WorldSingleton.Instance.IsInWorldBounds(_traverseCheckPosition))
                         _ = LoadChunksOntoScreenAsync(_traverseCheckPosition);
                 }
             }
         } 
     }
 
-    public Dictionary<Vector3Int, MapCullInst> _activeChunks = new Dictionary<Vector3Int, MapCullInst>();
+    public Dictionary<Vector3Int, MapCullModule> _activeChunks = new Dictionary<Vector3Int, MapCullModule>();
     private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1); 
     private async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)
     { 
         await _semaphoreSlim.WaitAsync();
         try
         { 
-            if (replace || !_activeChunks.ContainsKey(chunkCoord))
+            if ((replace || !_activeChunks.ContainsKey(chunkCoord)) && InPlayerRange(chunkCoord))
             {
                 _chunkCoordinate = chunkCoord;
-                _chunkData = WorldStatic.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
+                _chunkData = WorldSingleton.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
                 if (_chunkData != ChunkData.Zero)
                 {
                     await Task.Run(() => LoadMeshMath()); 
@@ -138,7 +145,7 @@ public class MapLoadStatic : MonoBehaviour
     private Mesh _mesh; 
     private GameObject _meshObject;
     private MeshRenderer _meshRenderer;
-    private MapCullInst _mapCullInst;
+    private MapCullModule _mapCullModule;
     private int counter;
     private void LoadMeshObject(bool replace = false)
     {
@@ -156,25 +163,25 @@ public class MapLoadStatic : MonoBehaviour
 
             _meshObject.AddComponent<MeshFilter>();
             _meshRenderer = _meshObject.AddComponent<MeshRenderer>();  
-            _meshRenderer.material = BlockStatic.MeshMaterial; 
+            _meshRenderer.material = BlockSingleton.MeshMaterial; 
 
-            _mapCullInst = _meshObject.AddComponent<MapCullInst>();  
-            _mapCullInst._chunkMap = _chunkData.Map;
-            _mapCullInst._meshData = _mesh;
-            _mapCullInst._verticesShadow = _verticesShadow;
-            _activeChunks.Add(_chunkCoordinate, _mapCullInst);
+            _mapCullModule = _meshObject.AddComponent<MapCullModule>();  
+            _mapCullModule._chunkMap = _chunkData.Map;
+            _mapCullModule._meshData = _mesh;
+            _mapCullModule._verticesShadow = _verticesShadow;
+            _activeChunks.Add(_chunkCoordinate, _mapCullModule);
         } 
         else 
         {
             _meshObject = _activeChunks[_chunkCoordinate].gameObject;
             _meshRenderer = _meshObject.GetComponent<MeshRenderer>(); 
-            _meshRenderer.material = BlockStatic.MeshMaterial; 
+            _meshRenderer.material = BlockSingleton.MeshMaterial; 
 
-            _mapCullInst = _meshObject.GetComponent<MapCullInst>();  
-            _mapCullInst._chunkMap = _chunkData.Map;
-            _mapCullInst._meshData = _mesh;
-            _mapCullInst._verticesShadow = _verticesShadow;
-            _mapCullInst.HandleAssignment(); 
+            _mapCullModule = _meshObject.GetComponent<MapCullModule>();  
+            _mapCullModule._chunkMap = _chunkData.Map;
+            _mapCullModule._meshData = _mesh;
+            _mapCullModule._verticesShadow = _verticesShadow;
+            _mapCullModule.HandleAssignment(); 
         } 
     }
  
@@ -202,8 +209,8 @@ public class MapLoadStatic : MonoBehaviour
     { 
         try
         {   
-            NativeHashMap<int, Rect> _textureRectDictionary = new NativeHashMap<int, Rect>(BlockStatic._textureRectDictionary.Count, Allocator.TempJob);
-            foreach (var kvp in BlockStatic._textureRectDictionary)
+            NativeHashMap<int, Rect> _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton._textureRectDictionary.Count, Allocator.TempJob);
+            foreach (var kvp in BlockSingleton._textureRectDictionary)
             {
                 _textureRectDictionary[kvp.Key] = kvp.Value;
             }
@@ -212,14 +219,14 @@ public class MapLoadStatic : MonoBehaviour
             MeshMathJob job = new MeshMathJob
             {
                 // const
-                _chunkSize = WorldStatic.CHUNK_SIZE,
+                _chunkSize = WorldSingleton.CHUNK_SIZE,
                 _tileSize = _tileSize,
                 _tilesPerRow = _tilesPerRow, 
                 _colx = new NativeArray<int>(_colx, Allocator.TempJob),
                 _rowy = new NativeArray<int>(_rowy, Allocator.TempJob),  
                 _textureRectDictionary = _textureRectDictionary,
-                _textureAtlasWidth = BlockStatic._textureAtlasWidth,
-                _textureAtlasHeight = BlockStatic._textureAtlasHeight, 
+                _textureAtlasWidth = BlockSingleton._textureAtlasWidth,
+                _textureAtlasHeight = BlockSingleton._textureAtlasHeight, 
 
                 // input 
                 _chunkMap = ChunkMap.Create(_chunkCoordinate),
@@ -967,22 +974,16 @@ public class MapLoadStatic : MonoBehaviour
  
  
 
-    public int GetBlockInChunk(Vector3Int chunkCoordinate, Vector3Int blockCoordinate, WorldStatic worldStatic) //0 = empty, 1 = block, error = out of bounds
+    public int GetBlockInChunk(Vector3Int coordinate) //0 = empty, 1 = block, error = out of bounds
     {
-        try
-        { 
-            var chunk = worldStatic.GetChunk(chunkCoordinate);
-            if (chunk != null)
-            {
-                return chunk.Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z];
-            }
-            return 0;
-        }
-        catch
+        Vector3Int blockCoordinate = WorldSingleton.GetBlockCoordinate(coordinate);
+        Vector3Int chunkCoordinate = WorldSingleton.GetChunkCoordinate(coordinate); 
+        ChunkData chunk = WorldSingleton.Instance.GetChunk(chunkCoordinate);
+        if (chunk != null)
         {
-            Lib.Log("error in isblocknull");
-            return 0;
+            return chunk.Map[blockCoordinate.x, blockCoordinate.y, blockCoordinate.z];
         }
+        return 0; 
     }
 }
 

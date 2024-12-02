@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SmokeParticleStatic : MonoBehaviour
+public class SmokeParticleSingleton : MonoBehaviour
 {
-    public static SmokeParticleStatic Instance { get; private set; }  
+    public static SmokeParticleSingleton Instance { get; private set; }  
     
     private static GameObject _smokeParticlePrefab;
     private static Queue<GameObject> _smokeParticlePool = new Queue<GameObject>();
@@ -34,7 +34,7 @@ public class SmokeParticleStatic : MonoBehaviour
             if (smokeParticle != null)
             {
                 smokeParticle.SetActive(true);
-                smokeParticle.GetComponent<SmokeParticleInst>().SpawnSmoke(smokePosition);
+                smokeParticle.GetComponent<SmokeParticleModule>().SpawnSmoke(smokePosition);
                 if (!force) _smokeParticleCount++;
             }
         }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpriteOrbitInst : MonoBehaviour
+public class SpriteOrbitModule : MonoBehaviour
 {
     private SpriteRenderer _sprite;
     void Awake()

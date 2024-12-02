@@ -9,7 +9,7 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Profiling;
 // i fucking hate this script
-public class MapCullInst : MonoBehaviour
+public class MapCullModule : MonoBehaviour
 {  
     public int[,,] _chunkMap;
     public Mesh _meshData;
@@ -27,7 +27,7 @@ public class MapCullInst : MonoBehaviour
  
     void Awake()
     {   
-        CULL_DISTANCE= WorldStatic.CHUNK_SIZE * CULL_DISTANCE;
+        CULL_DISTANCE= WorldSingleton.CHUNK_SIZE * CULL_DISTANCE;
         _mesh = new Mesh();    
 
         _meshFilter = GetComponent<MeshFilter>();  
@@ -51,7 +51,7 @@ public class MapCullInst : MonoBehaviour
         _shadowMeshFilter = shadowObject.AddComponent<MeshFilter>();
         MeshRenderer shadowMeshRenderer = shadowObject.AddComponent<MeshRenderer>();
         shadowMeshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-        shadowMeshRenderer.material = BlockStatic.ShadowMeshMaterial; 
+        shadowMeshRenderer.material = BlockSingleton.ShadowMeshMaterial; 
     }
    
     public void HandleAssignment()
@@ -88,18 +88,18 @@ public class MapCullInst : MonoBehaviour
     { 
         await _semaphoreSlim.WaitAsync();
         try {
-            if (MapCullStatic.Instance._yCheck)
+            if (MapCullSingleton.Instance._yCheck)
             { 
-                if (_selfChunkPosition.y + WorldStatic.CHUNK_SIZE < MapCullStatic.Instance._yThreshold)  // lower chunks
+                if (_selfChunkPosition.y + WorldSingleton.CHUNK_SIZE < MapCullSingleton.Instance._yThreshold)  // lower chunks
                 {
-                    while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame + 2) await Task.Yield();
+                    while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame + 2) await Task.Yield();
                     _meshRenderer.enabled = true;
                     _meshFilter.mesh = _meshData;
                     return; 
                 }           
-                if (_selfChunkPosition.y >= MapCullStatic.Instance._yThreshold) // higher chunks (invis)
+                if (_selfChunkPosition.y >= MapCullSingleton.Instance._yThreshold) // higher chunks (invis)
                 {
-                    while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame) await Task.Yield();
+                    while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame) await Task.Yield();
                     _meshRenderer.enabled = false;
                     // _meshFilter.mesh = _meshData;
                     return;
@@ -143,9 +143,9 @@ public class MapCullInst : MonoBehaviour
         _mesh.SetUVs(0, _culledUVs);
         _mesh.SetNormals(_culledNormals);   
          
-        while (Time.frameCount < MapCullStatic.Instance._cullSyncFrame) await Task.Yield();
+        while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame) await Task.Yield();
         
-        if (MapCullStatic.Instance._yCheck) _meshFilter.mesh = _mesh; 
+        if (MapCullSingleton.Instance._yCheck) _meshFilter.mesh = _mesh; 
         await Task.Yield();   //do not remove
         await Task.Yield();   //do not remove
         _meshRenderer.enabled = true;
@@ -161,7 +161,7 @@ public class MapCullInst : MonoBehaviour
         try
         { 
             //TODO y
-            playerChunkPosition = WorldStatic._playerChunkPos;
+            playerChunkPosition = WorldSingleton._playerChunkPos;
             xDist = Mathf.Abs(playerChunkPosition.x - transform.position.x);
             zDist = Mathf.Abs(playerChunkPosition.z - transform.position.z);   
             xCheck = xDist <= CULL_DISTANCE; 
@@ -181,8 +181,8 @@ public class MapCullInst : MonoBehaviour
         NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
         var job = new HandleCullMathJob
         { 
-            chunkSize = WorldStatic.CHUNK_SIZE, 
-            yThreshold = MapCullStatic.Instance._yThreshold - _selfChunkPosition.y,
+            chunkSize = WorldSingleton.CHUNK_SIZE, 
+            yThreshold = MapCullSingleton.Instance._yThreshold - _selfChunkPosition.y,
 
             chunkMap = ChunkMap.Create(_selfChunkPosition),
             vertices = vertices,

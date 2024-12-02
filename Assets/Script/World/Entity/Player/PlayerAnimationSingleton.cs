@@ -66,7 +66,7 @@ public class PlayerAnimationSingleton : MonoBehaviour
             // smoke trail
             if (Time.time >= _nextTrailTimer)
             { 
-                SmokeParticleStatic.CreateSmokeParticle(transform.position, true);
+                SmokeParticleSingleton.CreateSmokeParticle(transform.position, true);
                 _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
                 AudioSingleton.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }

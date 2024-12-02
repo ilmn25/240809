@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering; 
 
-public class MapCullStatic : MonoBehaviour
+public class MapCullSingleton : MonoBehaviour
 { 
-    public static MapCullStatic Instance { get; private set; }  
+    public static MapCullSingleton Instance { get; private set; }  
     public static event Action _signalUpdateSpriteYCull;
  
     [HideInInspector] 
@@ -55,7 +55,7 @@ public class MapCullStatic : MonoBehaviour
         leftDirection = Quaternion.Euler(0, 5, -ANGLE_OFFSET) * Vector3.up;
         rightDirection = Quaternion.Euler(0, 5, ANGLE_OFFSET) * Vector3.up;
  
-        _chunkPositionPrevious = WorldStatic._playerChunkPos;
+        _chunkPositionPrevious = WorldSingleton._playerChunkPos;
 
         _lightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
         _lightSelf = Game.Player.transform.Find("light_self").gameObject;   
@@ -111,7 +111,7 @@ public class MapCullStatic : MonoBehaviour
         //     if (_visionHeight > 3) _visionHeight = 3;
         //     if (_visionHeight < 0) _visionHeight = 0;
         // } 
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.CapsLock))
         {
             _visionHeight++;
             if (_visionHeight == 4) _visionHeight = 1;
@@ -134,10 +134,10 @@ public class MapCullStatic : MonoBehaviour
             }
             else if (_yCheck)   
             {
-                if (WorldStatic._playerChunkPos != _chunkPositionPrevious)
+                if (WorldSingleton._playerChunkPos != _chunkPositionPrevious)
                 { 
                     UpdateYCull();
-                    _chunkPositionPrevious = WorldStatic._playerChunkPos;
+                    _chunkPositionPrevious = WorldSingleton._playerChunkPos;
                 }
                 else if (_yThresholdPrevious != _yThreshold)
                 {
@@ -156,7 +156,7 @@ public class MapCullStatic : MonoBehaviour
     {  
         _signalUpdateSpriteYCull?.Invoke();   
         _cullSyncFrame = Time.frameCount + CULL_SYNC_DELAY;
-        foreach (var kvp in MapLoadStatic.Instance._activeChunks) 
+        foreach (var kvp in MapLoadSingleton.Instance._activeChunks) 
         { 
             kvp.Value.CullMeshAsync();
         }  

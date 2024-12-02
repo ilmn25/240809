@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class LightBlock : MonoBehaviour
+public class SpotLightModule : MonoBehaviour
 {
     private const float DELAY = 4.0f; // Delay in seconds before starting the calls
     private const int ENABLE_THRESHOLD = 200; // Number of frames shouldEnable needs to be true
@@ -28,8 +28,8 @@ public class LightBlock : MonoBehaviour
             _offset.Normalize();
 
             bool shouldEnable = 
-                WorldStatic.Instance.GetBoolInMap(Vector3Int.FloorToInt(transform.position)) &&
-                WorldStatic.Instance.GetBoolInMap(Vector3Int.FloorToInt(transform.position + _offset + Vector3Int.down));
+                WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(transform.position)) &&
+                WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(transform.position + _offset + Vector3Int.down));
 
             if (shouldEnable) // on
             {

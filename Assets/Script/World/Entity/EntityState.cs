@@ -20,7 +20,7 @@ class Idle : EntityState
 {  
     public override void OnEnterState()
     { 
-        WorldStatic.MapUpdated += OnMapUpdate;
+        WorldSingleton.MapUpdated += OnMapUpdate;
     }
     public void OnMapUpdate(Vector3Int worldPosition)
     {
@@ -31,6 +31,6 @@ class Idle : EntityState
     }
     public override void OnExitState()
     { 
-        WorldStatic.MapUpdated -= OnMapUpdate;
+        WorldSingleton.MapUpdated -= OnMapUpdate;
     }
 }

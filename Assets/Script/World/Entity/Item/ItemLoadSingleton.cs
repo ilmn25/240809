@@ -39,7 +39,7 @@ public class ItemLoadSingleton : MonoBehaviour
         {
             Type = ItemType.Block
         };
-        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
 
@@ -50,7 +50,7 @@ public class ItemLoadSingleton : MonoBehaviour
         {
             Type = ItemType.Tool
         };
-        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
 
@@ -62,7 +62,7 @@ public class ItemLoadSingleton : MonoBehaviour
             Type = ItemType.Armor,
             // Add additional armor-specific properties here if needed
         };
-        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
 
@@ -73,7 +73,7 @@ public class ItemLoadSingleton : MonoBehaviour
         {
             Type = ItemType.Accessory
         };
-        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
 
@@ -84,7 +84,7 @@ public class ItemLoadSingleton : MonoBehaviour
         {
             Type = ItemType.Furniture
         };
-        if (materials != null) CraftStatic.AddCraftingDefinition(stringID, materials);
+        if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
         _itemDefinitions[stringID] = itemData;
     }
  
