@@ -41,11 +41,11 @@ public class EntityLoadStatic : MonoBehaviour
     
     void HandleUnload()
     {
-        var keysToRemove = new List<Vector3Int>();
-        foreach (var key in _entityList.Keys)
+        var removeList = new List<Vector3Int>();
+        foreach (var coordinate in _entityList.Keys)
         {
             // Extract chunk coordinates from the key
-            int chunkX = key.x, chunkY = key.y, chunkZ = key.z;
+            int chunkX = coordinate.x, chunkY = coordinate.y, chunkZ = coordinate.z;
 
             if (chunkX > WorldStatic._playerChunkPos.x + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
                 || chunkX < WorldStatic._playerChunkPos.x - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE
@@ -54,12 +54,12 @@ public class EntityLoadStatic : MonoBehaviour
                 || chunkZ > WorldStatic._playerChunkPos.z + ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE 
                 || chunkZ < WorldStatic._playerChunkPos.z - ENTITY_DISTANCE * WorldStatic.CHUNK_SIZE)
             {
-                UpdateEntityList(key);
-                keysToRemove.Add(key);
+                UpdateEntityList(coordinate);
+                removeList.Add(coordinate);
             }
         }
         // Remove the marked keys from the dictionary
-        foreach (var key in keysToRemove) _entityList.Remove(key);
+        foreach (var coordinate in removeList) _entityList.Remove(coordinate);
     }
 
     void HandleLoad()

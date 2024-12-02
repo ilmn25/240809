@@ -34,6 +34,7 @@ public class EntityLoadDynamic : MonoBehaviour
     
     void HandleUnload()
     {
+        List<EntityHandler> removeList = new List<EntityHandler>();
         Vector3Int entityChunkPosition;
         foreach (var entityHandler in _entityList)
         { 
@@ -46,10 +47,11 @@ public class EntityLoadDynamic : MonoBehaviour
                 // Lib.Log(entityChunkPosition);
                 if (WorldStatic.Instance.IsInWorldBounds(entityChunkPosition))
                     WorldStatic.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
-                
+                removeList.Add(entityHandler);
                 EntityPoolStatic.Instance.ReturnObject(entityHandler.gameObject); 
             }
         }
+        foreach (var entityHandler in removeList) _entityList.Remove(entityHandler);
     }
 
     void HandleLoad()
