@@ -12,13 +12,13 @@ public class InventoryStateMachine : StateMachine
         AddState(new ItemTool());
     }
     public void HandleItemUpdate()
-    { 
-        if (PlayerInventorySingleton.CurrentItem == null)
+    {  
+        if (PlayerInventorySingleton.CurrentItem.Stack == 0)
         {
             SetState<ItemEmpty>();
             return;
         }
-
+        
         switch (ItemLoadSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID).Type)
         {
             case ItemType.Block:

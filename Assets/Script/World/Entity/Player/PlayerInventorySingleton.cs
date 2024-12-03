@@ -9,21 +9,8 @@ public class InvSlotData
     public int Stack = 0;
     public string StringID;
     public string Modifier;
-    public bool Locked;
-
-    public InvSlotData(string stringID, int stack)
-    {
-        StringID = stringID;
-        Stack = stack; 
-    }
-    public InvSlotData(int stack, string stringID, string modifier, bool locked)
-    {
-        Stack = stack;
-        StringID = stringID;
-        Modifier = modifier;
-        Locked = locked;
-    } 
-
+    public bool Locked; 
+    
     public void SetItem(int stack, string stringID, string modifier, bool locked)
     {
         Stack = stack;
@@ -35,6 +22,43 @@ public class InvSlotData
     public void clear()
     {
         Stack = 0;
+        StringID = null;
+        Modifier = null;
+        Locked = false;
+    }
+ 
+    public void Add(InvSlotData slotData, int amountToAdd = 0)
+    {
+        if (slotData.isEmpty()) return;
+        int maxStackSize = ItemLoadSingleton.GetItem(slotData.StringID).StackSize;
+        int addableAmount;
+
+        if (amountToAdd == 0)
+            addableAmount = Math.Min(slotData.Stack, maxStackSize - Stack);
+        else
+            addableAmount = Math.Min(amountToAdd, Math.Min(slotData.Stack, maxStackSize - Stack));
+
+        if (isEmpty())
+        {
+            StringID = slotData.StringID;
+            Modifier = slotData.Modifier;
+            Locked = slotData.Locked;
+        }
+        
+        Stack += addableAmount;
+        slotData.Stack -= addableAmount;
+
+        if (slotData.Stack == 0) slotData.clear();
+    }
+
+    public bool isSame(InvSlotData slotData)
+    {
+        return slotData.StringID == StringID && slotData.Modifier == Modifier;
+    }
+    
+    public bool isEmpty()
+    {
+        return Stack == 0;
     }
 }
 
@@ -42,15 +66,15 @@ public class PlayerInventorySingleton : MonoBehaviour
 {
     public static PlayerInventorySingleton Instance { get; private set; }  
     
-    public static Dictionary<int, InvSlotData> _playerInventory;
+    public static List<InvSlotData> _playerInventory;
 
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
     private static int _currentKey = 0;
     public static InvSlotData CurrentItem;
 
-    public static int INVENTORY_ROW_AMOUNT = 3; // Example value
-    public static int INVENTORY_SLOT_AMOUNT = 9; // Example value
+    public static int INVENTORY_ROW_AMOUNT = 3;
+    public static int INVENTORY_SLOT_AMOUNT = 9;
 
     void Start()
     {
@@ -98,46 +122,24 @@ public class PlayerInventorySingleton : MonoBehaviour
     public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = GetItemAtKey();
+        CurrentItem = _playerInventory[_currentKey];
         InventoryStateMachine.Instance.HandleItemUpdate();
         GUIInventorySingleton.Instance.Refresh();
     }
 
-
-
     public static int CalculateKey(int row = -1, int slot = -1)
     {
         if (row == -1)
-        {
             return _currentRow * INVENTORY_SLOT_AMOUNT + _currentSlot;
-        }
         return row * INVENTORY_SLOT_AMOUNT + slot;
-    }
-    
-    public static InvSlotData GetItemAtKey(int key = -1)
-    {
-        int target_key = key == -1 ? _currentKey : key;
-
-        if (_playerInventory.ContainsKey(target_key))
-        {
-            return _playerInventory[target_key];
-        }
-        return null;
-    }
-    
-
-    public static void ModifySlot(int key, int delta)
-    {
-        _playerInventory[key].Stack += delta;
-        if (_playerInventory[key].Stack == 0) _playerInventory.Remove(key);
-    }
+    } 
     
     public static void AddItem(string stringID, int quantity = 1)
     {
         int maxStackSize = ItemLoadSingleton.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
-        if (_playerInventory.ContainsKey(_currentKey) && _playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)
+        if (_playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)
         {
             int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[_currentKey].Stack);
             _playerInventory[_currentKey].Stack += addableAmount;
@@ -153,10 +155,10 @@ public class PlayerInventorySingleton : MonoBehaviour
         // Try to add to existing slots with the same item
         foreach (var slot in _playerInventory)
         {
-            if (slot.Value.StringID == stringID && slot.Value.Stack < maxStackSize)
+            if (slot.StringID == stringID && slot.Stack < maxStackSize)
             {
-                int addableAmount = Math.Min(quantity, maxStackSize - slot.Value.Stack);
-                slot.Value.Stack += addableAmount;
+                int addableAmount = Math.Min(quantity, maxStackSize - slot.Stack);
+                slot.Stack += addableAmount;
                 quantity -= addableAmount;
 
                 if (quantity <= 0)
@@ -170,24 +172,24 @@ public class PlayerInventorySingleton : MonoBehaviour
         // If there's still quantity left, find new slots
         while (quantity > 0)
         { 
-            int slotID = GetSmallestAvailableSlotID();
-            int addableAmount = Math.Min(quantity, maxStackSize);
-            _playerInventory[slotID] = new InvSlotData(stringID, addableAmount);
+            int slotID = GetEmptySlot();
+            int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[slotID].Stack);
+            _playerInventory[slotID].SetItem(_playerInventory[slotID].Stack + addableAmount, stringID, _playerInventory[slotID].Modifier, _playerInventory[slotID].Locked);
             quantity -= addableAmount;
         }
- 
+
         RefreshInventory();
     }
-
+    
     public static void RemoveItem(string stringID, int quantity = 1)
     {
         // Prioritize current slot
-        if (_playerInventory.ContainsKey(_currentKey) && _playerInventory[_currentKey].StringID == stringID)
+        if (_playerInventory[_currentKey].StringID == stringID)
         {
             int removableAmount = Math.Min(quantity, _playerInventory[_currentKey].Stack);
             _playerInventory[_currentKey].Stack -= removableAmount;
             quantity -= removableAmount;
-            if (_playerInventory[_currentKey].Stack <= 0) _playerInventory.Remove(_currentKey);
+            if (_playerInventory[_currentKey].Stack <= 0) _playerInventory[_currentKey].clear();
             if (quantity <= 0)
             { 
                 RefreshInventory();
@@ -198,14 +200,14 @@ public class PlayerInventorySingleton : MonoBehaviour
         // Continue with other slots if necessary
         foreach (var slot in _playerInventory)
         {
-            if (slot.Value.StringID == stringID)
+            if (slot.StringID == stringID)
             {
-                int removableAmount = Math.Min(quantity, slot.Value.Stack);
-                slot.Value.Stack -= removableAmount;
+                int removableAmount = Math.Min(quantity, slot.Stack);
+                slot.Stack -= removableAmount;
                 quantity -= removableAmount;
-                if (slot.Value.Stack <= 0)
+                if (slot.Stack <= 0)
                 {
-                    _playerInventory.Remove(slot.Key);
+                    slot.clear();
                 }
                 if (quantity <= 0)
                 {
@@ -216,30 +218,30 @@ public class PlayerInventorySingleton : MonoBehaviour
         } 
         RefreshInventory();
     }
-
-    public static int GetStackAmount(string stringID)
+    
+    public static int GetAmount(string stringID)
     {
         int count = 0;
         foreach (var slot in _playerInventory)
         {
-            if (slot.Value.StringID == stringID)
+            if (slot.StringID == stringID)
             { 
-                count += slot.Value.Stack;
+                count += slot.Stack;
             }
         }
         return count;
     }
 
-    private static int GetSmallestAvailableSlotID()
+    private static int GetEmptySlot()
     {
         int slotID = 0;
-        while (_playerInventory.ContainsKey(slotID))
+        while (_playerInventory[slotID].Stack != 0)
         {
             slotID++;
         }
         return slotID;
     }
-    //
+    
     // void OnGUI()
     // {
     //     GUIStyle style = new GUIStyle();
@@ -269,5 +271,4 @@ public class PlayerInventorySingleton : MonoBehaviour
     //     Rect rect = new Rect(startX, startY, 290, Screen.height - 20); // Adjusting position and size for the row display
     //     GUI.Label(rect, rowText, style);
     // }
-
 }
