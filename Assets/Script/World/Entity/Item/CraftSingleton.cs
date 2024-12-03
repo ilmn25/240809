@@ -31,7 +31,7 @@ namespace Script.World.Entity.Item
         {
             foreach (var ingredient in _craftList[stringID])
             {
-                if (PlayerInventorySingleton.GetStackAmount(ingredient.Key) < ingredient.Value) return false;
+                if (PlayerInventorySingleton.GetAmount(ingredient.Key) < ingredient.Value) return false;
             } 
             return true;
         }

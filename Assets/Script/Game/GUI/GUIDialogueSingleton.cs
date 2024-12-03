@@ -91,14 +91,14 @@ public class GUIDialogueSingleton : MonoBehaviour
         _current_line = 0;
         Game.GUIDialogue.SetActive(true);
         HandleScroll(); 
-        scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, Game.GUIDialogue, EASE_SPEED)); 
+        scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, Game.GUIDialogue, EASE_SPEED, 0.9f)); 
     }
  
     private void HideDialogue()
     {
         _entityState.OnEndDialogue(); 
         
-        scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, Game.GUIDialogue, EASE_SPEED));
+        scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, Game.GUIDialogue, EASE_SPEED, 0.9f));
         scaleTask.Finished += (bool isManual) => 
         {
             Game.GUIDialogue.SetActive(false);

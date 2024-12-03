@@ -12,7 +12,7 @@ public class PlayerStatusSingleton : MonoBehaviour
     public static float _stamina;
     public static float _speed;
 
-    void Awake()
+    void Start()
     {
         Instance = this;
         _health = PlayerDataSingleton._playerData.health;

@@ -64,17 +64,24 @@ public class GUIInventorySingleton : MonoBehaviour
     public void SetInfoPanel(int slotNumber = -1)
     {
         _currentSlotKey = slotNumber;
+        
         if (slotNumber == -1)
         {  
             Game.GUIInventoryCursorInfo.SetActive(false);
+            return;
         }
-        else if (PlayerInventorySingleton._playerInventory.TryGetValue(slotNumber, out InvSlotData slotData))
-        { 
+
+        InvSlotData slotData = PlayerInventorySingleton._playerInventory[_currentSlotKey];
+        if (slotData.Stack != 0)
+        {
             Game.GUIInventoryCursorInfo.SetActive(true);
-            _cursorInfoText.text = slotData.StringID + "\n" + ItemLoadSingleton.GetItem(slotData.StringID).Description;
-        }
+            _cursorInfoText.text = slotData.StringID + " (" + slotData.Stack + ")\n" + 
+                                   ItemLoadSingleton.GetItem(slotData.StringID).Description + "\n" +
+                                   slotData.Modifier;
+        } 
     }
-    private InvSlotData _cursorSlot = new InvSlotData("", 0);
+    
+    private InvSlotData _cursorSlot = new InvSlotData();
 
     private void UpdateCursorSlot()
     {
@@ -88,70 +95,46 @@ public class GUIInventorySingleton : MonoBehaviour
             _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{_cursorSlot.StringID}");
             _cursorSlotText.text = _cursorSlot.Stack.ToString();
         } 
-    }
-
-    private void swapSlotData(InvSlotData Slot1, InvSlotData Slot2)
-    {
-        String tempString;
-        bool tempBool;
-        int tempInt;
-        
-        tempString = Slot1.StringID;
-        Slot1.StringID = Slot2.StringID;
-        Slot2.StringID = tempString;
-        
-        tempString = Slot1.Modifier;
-        Slot1.Modifier = Slot2.Modifier;
-        Slot2.Modifier = tempString;
-        
-        tempBool = Slot1.Locked;
-        Slot1.Locked = Slot2.Locked;
-        Slot2.Locked = tempBool;
-        
-        tempInt = Slot1.Stack;
-        Slot1.Stack = Slot2.Stack;
-        Slot2.Stack = tempInt;
-    }
+    } 
     
     private void HandleInput()
     {
         if (_currentSlotKey == -1) return; 
+  
         if (Input.GetMouseButtonDown(0))
-        { 
-            PlayerInventorySingleton._playerInventory.TryGetValue(_currentSlotKey, out InvSlotData slotData);
-            Lib.Log(_cursorSlot.Stack , slotData);
-            if (_cursorSlot.Stack != 0 && slotData == null) // empty slot (add)
-            {
-                slotData = new InvSlotData(_cursorSlot.Stack, _cursorSlot.StringID, _cursorSlot.Modifier, _cursorSlot.Locked);
-                PlayerInventorySingleton._playerInventory.Add(_currentSlotKey, slotData);
-                _cursorSlot.clear();
-                UpdateCursorSlot();
-                Refresh();
-            }
-            else if (_cursorSlot.Stack != 0 && slotData != null) // both not empty (swap)
-            {
-                swapSlotData(slotData, _cursorSlot);
-                UpdateCursorSlot();
-                Refresh();
-            }
-            else if (_cursorSlot.Stack == 0 && slotData != null)
-            { 
-                _cursorSlot.SetItem(slotData.Stack, slotData.StringID, slotData.Modifier, slotData.Locked); 
-                PlayerInventorySingleton.ModifySlot(_currentSlotKey, -slotData.Stack);
-                UpdateCursorSlot();
-                Refresh();
-            } 
-        }
-
-        if (Input.GetMouseButtonDown(1))
         {
-            if (PlayerInventorySingleton._playerInventory.TryGetValue(_currentSlotKey, out InvSlotData slotData))
-            {  
-                _cursorSlot.SetItem(slotData.Stack/2, slotData.StringID, slotData.Modifier, slotData.Locked);
-                PlayerInventorySingleton.ModifySlot(_currentSlotKey, slotData.Stack / 2);
-                UpdateCursorSlot();
-                Refresh();
+            if (_cursorSlot.isEmpty())
+            {
+                _cursorSlot.Add(PlayerInventorySingleton._playerInventory[_currentSlotKey]);
+            }
+            else if (PlayerInventorySingleton._playerInventory[_currentSlotKey].isSame(_cursorSlot))
+            {
+                PlayerInventorySingleton._playerInventory[_currentSlotKey].Add(_cursorSlot);
             } 
+            else
+            {
+                (PlayerInventorySingleton._playerInventory[_currentSlotKey], _cursorSlot) = 
+                    (_cursorSlot, PlayerInventorySingleton._playerInventory[_currentSlotKey]);
+            } 
+            UpdateCursorSlot();
+            Refresh();
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            InvSlotData invSlot = PlayerInventorySingleton._playerInventory[_currentSlotKey];
+            if (!invSlot.isEmpty())
+            {
+                if (_cursorSlot.isEmpty() || invSlot.isSame(_cursorSlot))
+                {
+                    if (Input.GetKey(KeyCode.LeftShift))
+                        _cursorSlot.Add(invSlot, invSlot.Stack/2);
+                    else 
+                        _cursorSlot.Add(invSlot, 1);
+                        
+                    UpdateCursorSlot();
+                    Refresh();
+                }
+            }
         }
     }
     
@@ -160,6 +143,7 @@ public class GUIInventorySingleton : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_inventoryRect, Input.mousePosition,  Game.GUICamera,out Vector2 mousePosition);
         _cursorRect.anchoredPosition = mousePosition;
         HandleInput();
+        
         if (Input.GetKeyDown(KeyCode.Tab))  
         {
             if (_scaleTask == null || (_scaleTask != null && !_scaleTask.Running))

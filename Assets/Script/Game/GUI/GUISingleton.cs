@@ -25,10 +25,10 @@ public class GUISingleton : MonoBehaviour
     }
 
 
-    public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed = 0.5f)
+    public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed = 0.5f, float scale = 1f)
     {
-        Vector3 targetScale = show ? Vector3.one : Vector3.zero;
-        Vector3 initialScale = show ? Vector3.zero : Vector3.one;
+        Vector3 targetScale = show ? Vector3.one * scale : Vector3.zero;
+        Vector3 initialScale = show ? Vector3.zero : Vector3.one * scale;
         float elapsedTime = 0f;
         target.transform.localScale = initialScale;  
 

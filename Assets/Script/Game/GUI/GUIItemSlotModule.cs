@@ -20,7 +20,8 @@ public class GUIItemSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnRefreshSlot()
     {
-        if (PlayerInventorySingleton._playerInventory.TryGetValue(SlotNumber, out InvSlotData slotData))
+        InvSlotData slotData = PlayerInventorySingleton._playerInventory[SlotNumber];
+        if (slotData.Stack != 0)
         {
             _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");
             _image.color = Color.white;
