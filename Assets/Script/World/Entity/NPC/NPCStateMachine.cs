@@ -40,12 +40,14 @@ public class NPCStateMachine : EntityStateMachine
         SetState<NPCIdle>();
         _movementModule.SetDirection(Vector3.zero);
     }
+    
     protected override void LogicUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
             SetState<NPCChase>();
-        }else if (Input.GetKeyDown(KeyCode.T))
+        }
+        else if (Input.GetKeyDown(KeyCode.T))
         {
             SetState<NPCRoam>();
         }

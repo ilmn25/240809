@@ -26,23 +26,13 @@ public class TreeStateMachine : EntityStateMachine
         SetState<Idle>();
     }
 
-    public void OnMouseDown()
+    public override void LeftClick()
     {
         if (Game.GUIBusy) return;
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
-    }
-
-    private void OnMouseEnter()
-    {
-        transform.localScale = Vector3.one * 1.1f;
-    }
-    
-    private void OnMouseExit()
-    {
-        transform.localScale = Vector3.one;
-    }
+    } 
 }
  
 class ResourceCollapse : EntityState

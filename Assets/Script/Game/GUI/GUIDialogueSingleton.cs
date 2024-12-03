@@ -32,7 +32,7 @@ public class GUIDialogueSingleton : MonoBehaviour
  
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F) && _entityState == null) DialogueAction.Invoke();
+        if (Input.GetKeyDown(KeyCode.F) && _entityState == null) DialogueAction?.Invoke();
 
         if (_entityState != null){ 
             
@@ -53,7 +53,7 @@ public class GUIDialogueSingleton : MonoBehaviour
                 if (scrollTask.Running)
                 {
                     scrollTask.Stop(); 
-                    Game.DialogueText.text = _entityState._dialogueData.Lines[_current_line];
+                    Game.GUIDialogueText.text = _entityState._dialogueData.Lines[_current_line];
                 }                 
                 else if (_current_line < _entityState._dialogueData.Lines.Count - 1)
                 {    
@@ -72,35 +72,39 @@ public class GUIDialogueSingleton : MonoBehaviour
     {
         _audioSource = AudioSingleton.PlaySFX(_textSFX, 0.2f, true);
         
-        scrollTask =  new CoroutineTask(GUISingleton.ScrollText(_entityState._dialogueData.Lines[_current_line], Game.DialogueText));
+        scrollTask =  new CoroutineTask(GUISingleton.ScrollText(_entityState._dialogueData.Lines[_current_line], Game.GUIDialogueText));
         scrollTask.Finished += (bool isManual) => 
         { 
             AudioSingleton.StopSFX(_audioSource);
+            _audioSource = null;
         }; 
     }
 
     public void StartDialogue(CharTalk entityState)
-    { 
+    {
+        if (_entityState != null)
+        {
+            entityState.OnEndDialogue(); 
+            return;
+        } 
         _entityState = entityState;
         _current_line = 0;
-        Game.DialogueBox.SetActive(true);
+        Game.GUIDialogue.SetActive(true);
         HandleScroll(); 
-         
-        scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, Game.DialogueBox, EASE_SPEED)); 
+        scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, Game.GUIDialogue, EASE_SPEED)); 
     }
  
     private void HideDialogue()
     {
         _entityState.OnEndDialogue(); 
         
-        scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, Game.DialogueBox, EASE_SPEED));
+        scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, Game.GUIDialogue, EASE_SPEED));
         scaleTask.Finished += (bool isManual) => 
         {
-            Game.DialogueBox.SetActive(false);
+            Game.GUIDialogue.SetActive(false);
             _entityState = null;
         }; 
     }
- 
 }
 
 

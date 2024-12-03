@@ -16,7 +16,10 @@ public class InputSingleton : MonoBehaviour
     
     private void Update()
     {
+        if (Game.GUIBusy) return;
         HandleRaycast(); 
+        // if (Input.GetMouseButtonDown(0))
+        //     Lib.Log(_layerMask, _gameObject, _position, IsInRange());
         if (_layerMask != -1 && IsInRange())
             HandleInput();
     } 
@@ -69,7 +72,7 @@ public class InputSingleton : MonoBehaviour
     }
 
     private void HandleInput()
-    { 
+    {
         if (_layerMask == Game.MapLayerIndex)
         {
             PlayerChunkEditSingleton.Instance.HandlePositionInfo(_position,  _direction);
@@ -83,10 +86,10 @@ public class InputSingleton : MonoBehaviour
             }
         }
         else if (_layerMask == Game.EntityLayerIndex)
-        {
+        { 
             if (Input.GetMouseButtonDown(0))
             {
-                _targetInfo.collider.gameObject.GetComponent<TreeStateMachine>().OnMouseDown();
+                _targetInfo.collider.gameObject.GetComponent<EntityStateMachine>().LeftClick();
             }
         }
     }

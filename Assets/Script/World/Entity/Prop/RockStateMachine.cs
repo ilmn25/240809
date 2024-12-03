@@ -23,7 +23,7 @@ public class RockStateMachine : EntityStateMachine
         SetState<Idle>();
     }
 
-    private void OnMouseDown()
+    public override void LeftClick()
     {
         _currentHealth--;
         if (_currentHealth != 0) return;

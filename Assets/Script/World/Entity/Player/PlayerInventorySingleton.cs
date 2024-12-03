@@ -6,7 +6,7 @@ using UnityEngine;
 [System.Serializable]
 public class InvSlotData
 {
-    public int Stack;
+    public int Stack = 0;
     public string StringID;
     public string Modifier;
     public bool Locked;
@@ -15,6 +15,26 @@ public class InvSlotData
     {
         StringID = stringID;
         Stack = stack; 
+    }
+    public InvSlotData(int stack, string stringID, string modifier, bool locked)
+    {
+        Stack = stack;
+        StringID = stringID;
+        Modifier = modifier;
+        Locked = locked;
+    } 
+
+    public void SetItem(int stack, string stringID, string modifier, bool locked)
+    {
+        Stack = stack;
+        StringID = stringID;
+        Modifier = modifier;
+        Locked = locked;
+    }
+
+    public void clear()
+    {
+        Stack = 0;
     }
 }
 
@@ -103,6 +123,13 @@ public class PlayerInventorySingleton : MonoBehaviour
             return _playerInventory[target_key];
         }
         return null;
+    }
+    
+
+    public static void ModifySlot(int key, int delta)
+    {
+        _playerInventory[key].Stack += delta;
+        if (_playerInventory[key].Stack == 0) _playerInventory.Remove(key);
     }
     
     public static void AddItem(string stringID, int quantity = 1)
@@ -212,35 +239,35 @@ public class PlayerInventorySingleton : MonoBehaviour
         }
         return slotID;
     }
-
-    void OnGUI()
-    {
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 25;
-        style.normal.textColor = Color.white;
-        style.alignment = TextAnchor.UpperRight;
-
-        // Starting position for the labels
-        float startX = Screen.width - 300;
-        float startY = 10;
-
-        string rowText = $"Row {_currentRow}\n";
-        for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
-        {
-            int key = CalculateKey(_currentRow, i);
-            if (key == _currentKey) rowText += ">";
-            if (_playerInventory.TryGetValue(key, out InvSlotData slot))
-            {
-                rowText += $"{slot.StringID} {slot.Stack}\n";
-            }
-            else
-            {
-                rowText += "Empty\n";
-            }
-        }
-
-        Rect rect = new Rect(startX, startY, 290, Screen.height - 20); // Adjusting position and size for the row display
-        GUI.Label(rect, rowText, style);
-    }
+    //
+    // void OnGUI()
+    // {
+    //     GUIStyle style = new GUIStyle();
+    //     style.fontSize = 25;
+    //     style.normal.textColor = Color.white;
+    //     style.alignment = TextAnchor.UpperRight;
+    //
+    //     // Starting position for the labels
+    //     float startX = Screen.width - 300;
+    //     float startY = 10;
+    //
+    //     string rowText = $"Row {_currentRow}\n";
+    //     for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
+    //     {
+    //         int key = CalculateKey(_currentRow, i);
+    //         if (key == _currentKey) rowText += ">";
+    //         if (_playerInventory.TryGetValue(key, out InvSlotData slot))
+    //         {
+    //             rowText += $"{slot.StringID} {slot.Stack}\n";
+    //         }
+    //         else
+    //         {
+    //             rowText += "Empty\n";
+    //         }
+    //     }
+    //
+    //     Rect rect = new Rect(startX, startY, 290, Screen.height - 20); // Adjusting position and size for the row display
+    //     GUI.Label(rect, rowText, style);
+    // }
 
 }

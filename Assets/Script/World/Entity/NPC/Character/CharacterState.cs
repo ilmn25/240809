@@ -12,7 +12,7 @@ public class CharTalk : EntityState {
  
     public void OnEndDialogue()
     {
-        _esm.SetState<NPCIdle>();
+        _esm.SetState<NPCChase>();
     }
     
     public override void OnEnterState()
