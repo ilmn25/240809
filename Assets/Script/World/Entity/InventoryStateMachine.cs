@@ -99,16 +99,7 @@ public class ItemTool : State
     }
 
     public override void StateUpdate()
-    {
-        TOOL_DELAY = Game.Instance.tooldelay;
-        windUpDuration = Game.Instance.windUpDuration; // Duration of the wind-up in seconds
-        toolSwingDuration = Game.Instance.toolSwingDuration; // Duration of the tool swing in seconds
-        playerSwingDuration = Game.Instance.playerSwingDuration; // Duration of the player swing in seconds
-        initialZRotation = Game.Instance.initialZRotation;
-        windUpZRotation = Game.Instance.windUpZRotation; // Slight backward rotation for wind-up
-        toolTargetZRotation = Game.Instance.toolTargetZRotation;
-        playerTargetZRotation = Game.Instance.playerTargetZRotation; // Rotation for player's swing
-
+    { 
         if (!isSwinging)
         {
             if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(0))

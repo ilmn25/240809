@@ -10,32 +10,38 @@ public class GUIItemSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private Image _image;
     [SerializeField]
     private TextMeshProUGUI _text;
+    public int SlotNumber;
     
-    private void Start()
+    private void Awake()
     {
+        GUIInventorySingleton.OnRefreshSlot += OnRefreshSlot;
         gameObject.layer = Game.UILayerIndex;
     }
 
-    public void SetItem(InvSlotData slotData = null)
+    public void OnRefreshSlot()
     {
-        if (slotData == null)
+        if (PlayerInventorySingleton._playerInventory.TryGetValue(SlotNumber, out InvSlotData slotData))
+        {
+            _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");
+            _image.color = Color.white;
+            _text.text = slotData.Stack.ToString();
+        }
+        else 
         {
             _image.color = Color.clear;
             _text.text = "";
-            return;
-        }
-        _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");
-        _image.color = Color.white;
-        _text.text = slotData.Stack.ToString();
+        } 
     }
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        ScaleSlot(1.5f);
+        GUIInventorySingleton.Instance.SetInfoPanel(SlotNumber);
+        ScaleSlot(1.1f);
     }
-
+ 
     public void OnPointerExit(PointerEventData eventData)
     {
+        GUIInventorySingleton.Instance.SetInfoPanel();
         ScaleSlot(1f);
     }
 

@@ -19,26 +19,20 @@ public class Game : MonoBehaviour
     public static GameObject Player;
     public static GameObject ViewportSystem;
     public static GameObject Camera;
-    public static GameObject DialogueBox;
-    public static TextMeshProUGUI DialogueText;
+    public static Camera GUICamera;
+    public static GameObject GUI;
+    public static GameObject GUIDialogue;
+    public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInventory;
+    public static GameObject GUIInventoryCursor;
+    public static GameObject GUIInventoryCursorInfo;
+    public static GameObject GUIInventoryCursorSlot;
     public static GameObject AudioSystem;
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
     public static AudioClip DigSound;
-    
-    public float tooldelay = 0f;
-    public float windUpDuration = 0.1f; // Duration of the wind-up in seconds
-    public float toolSwingDuration = 0.2f; // Duration of the tool swing in seconds
-    public float playerSwingDuration = 0.2f; // Duration of the player swing in seconds
-    public float initialZRotation = 0f;
-    public float windUpZRotation = 20f; // Slight backward rotation for wind-up
-    public float toolTargetZRotation = -90f;
-    public float playerTargetZRotation = -35f; // Rotation for player's swing
-    public GameObject playerSprite;
-    public GameObject toolSprite; 
-    
+     
     public static float MAX_DELTA_TIME = 0.03f;
     float FIXED_UPDATE_MS = 0.10f;
     void Awake()
@@ -62,10 +56,15 @@ public class Game : MonoBehaviour
         Player = GameObject.Find("player");
         ViewportSystem = GameObject.Find("viewport_system");
         Camera = GameObject.Find("main_camera");
-        
-        DialogueBox = GameObject.Find("gui").transform.Find("dialogue_box").gameObject;
-        DialogueText = DialogueBox.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        GUIInventory = GameObject.Find("gui").transform.Find("inventory").gameObject;
+
+        GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
+        GUI = GameObject.Find("gui");
+        GUIDialogue = GUI.transform.Find("dialogue_box").gameObject;
+        GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        GUIInventory = GUI.transform.Find("inventory").gameObject;
+        GUIInventoryCursor = GUIInventory.transform.Find("cursor").gameObject;
+        GUIInventoryCursorInfo = GUIInventoryCursor.transform.Find("info").gameObject;
+        GUIInventoryCursorSlot = GUIInventoryCursor.transform.Find("slot").gameObject;
         
         AudioSystem = GameObject.Find("audio_system");
         WorldSystem = GameObject.Find("world_system");
