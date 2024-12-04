@@ -41,7 +41,7 @@ public class InputSingleton : MonoBehaviour
         }
         else
         {
-            PlayerInventorySingleton.Instance.HandleScrollInput(scroll);
+            InventorySingleton.Instance.HandleScrollInput(scroll);
         }
     }
     

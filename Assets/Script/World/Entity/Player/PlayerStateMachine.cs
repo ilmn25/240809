@@ -29,7 +29,7 @@ class PlayerActive : EntityState {
         PlayerMovementSingleton.Instance.HandleMovementUpdate();
         PlayerAnimationSingleton.Instance.HandleAnimationUpdate(); 
         PlayerChunkEditSingleton.Instance.HandleChunkEditInput(); 
-        PlayerInventorySingleton.Instance.HandleInventoryUpdate();
+        InventorySingleton.Instance.HandleInventoryUpdate();
         PlayerStatusSingleton.Instance.HandleStatusUpdate();
     }
 }

@@ -20,7 +20,7 @@ public class ItemStateMachine : EntityStateMachine
         
             if (playerDistance <= 0.8f)
             {
-                PlayerInventorySingleton.AddItem(GetEntityData().ID, 1);
+                InventorySingleton.AddItem(GetEntityData().ID, 1);
                 WipeEntity();
             }
         } 

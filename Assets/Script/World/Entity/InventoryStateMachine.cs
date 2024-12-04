@@ -13,13 +13,13 @@ public class InventoryStateMachine : StateMachine
     }
     public void HandleItemUpdate()
     {  
-        if (PlayerInventorySingleton.CurrentItem.Stack == 0)
+        if (InventorySingleton.CurrentItem.Stack == 0)
         {
             SetState<ItemEmpty>();
             return;
         }
         
-        switch (ItemSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID).Type)
+        switch (ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID).Type)
         {
             case ItemType.Block:
                 SetState<ItemBlock>();
@@ -51,7 +51,7 @@ public class ItemFurniture : State
     {
         if (Input.GetMouseButtonDown(1))
         {
-            stringID = PlayerInventorySingleton.CurrentItem.StringID;
+            stringID = InventorySingleton.CurrentItem.StringID;
         } 
     }
 }
@@ -60,7 +60,7 @@ public class ItemBlock : State
 {
     public override void StateUpdate()
     {  
-        PlayerChunkEditSingleton.Instance._blockStringID = PlayerInventorySingleton.CurrentItem.StringID;
+        PlayerChunkEditSingleton.Instance._blockStringID = InventorySingleton.CurrentItem.StringID;
     }
 
     public override void OnExitState()
@@ -89,7 +89,7 @@ public class ItemTool : State
         playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
         toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
         toolSprite.gameObject.SetActive(true);
-        PlayerChunkEditSingleton.Instance._toolData = ItemSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID);
+        PlayerChunkEditSingleton.Instance._toolData = ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID);
     }
 
     public override void OnExitState()

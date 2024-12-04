@@ -27,7 +27,7 @@ public class PlayerDataSingleton : MonoBehaviour
     { 
         using (FileStream file = File.Create(Game.PLAYER_SAVE_PATH))
         {
-            _playerData.inventory = PlayerInventorySingleton._playerInventory;
+            _playerData.inventory = InventorySingleton._playerInventory;
             _binaryFormatter.Serialize(file, _playerData);
         }
     }
@@ -45,7 +45,7 @@ public class PlayerDataSingleton : MonoBehaviour
         {
             _playerData = new PlayerData(); 
         }
-        PlayerInventorySingleton._playerInventory = _playerData.inventory;
+        InventorySingleton._playerInventory = _playerData.inventory;
     }
  
 }

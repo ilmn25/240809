@@ -8,7 +8,7 @@ public class CraftData
     public Dictionary<string, int> Ingredients;
     public string[] Modifiers;
 
-    public CraftData(Dictionary<string, int> ingredients, string[] modifiers = null, int stack = 1)
+    public CraftData(Dictionary<string, int> ingredients, int stack, string[] modifiers)
     {
         Stack = stack;
         Ingredients = ingredients;
@@ -34,16 +34,16 @@ namespace Script.World.Entity.Item
             return _craftList[stringID];
         }
         
-        public static void AddCraftingDefinition(string stringID, Dictionary<string, int> ingredients)
+        public static void AddCraftingDefinition(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
         {
-            _craftList.Add(stringID, new CraftData(ingredients));
+            _craftList.Add(stringID, new CraftData(ingredients, stack, modifiers));
         }
 
         bool IsCraftable (string stringID)
         {
             foreach (var ingredient in _craftList[stringID].Ingredients)
             {
-                if (PlayerInventorySingleton.GetAmount(ingredient.Key) < ingredient.Value) return false;
+                if (InventorySingleton.GetAmount(ingredient.Key) < ingredient.Value) return false;
             } 
             return true;
         }
@@ -54,7 +54,7 @@ namespace Script.World.Entity.Item
 
             foreach (var ingredient in _craftList[stringID].Ingredients)
             {
-                PlayerInventorySingleton.RemoveItem(ingredient.Key, ingredient.Value);
+                InventorySingleton.RemoveItem(ingredient.Key, ingredient.Value);
             }
             
             InvSlotData craftedItem = new InvSlotData();
@@ -67,7 +67,7 @@ namespace Script.World.Entity.Item
             
             if (craftedItem.Stack > 0)
             { 
-                PlayerInventorySingleton.AddItem(stringID);
+                InventorySingleton.AddItem(stringID);
             } 
         }
     }

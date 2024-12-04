@@ -18,14 +18,20 @@ public class WorldGenSingleton : MonoBehaviour
     private float _stoneOffsetZ;
     private float _dirtOffsetX;
     private float _dirtOffsetZ;
+    private float _sandOffsetX;
+    private float _sandOffsetZ;
+    private float _marbleOffsetX;
+    private float _marbleOffsetZ;
     private float _caveOffset;
     
     private int _chunkSize = WorldSingleton.CHUNK_SIZE;
     private int _worldHeight = ySize * WorldSingleton.CHUNK_SIZE;
     
-    private float _stoneScale = 0.03f;
+    private float _stoneScale = 0.01f;
     private float _dirtScale = 0.005f;
-    private float _caveScale = 0.05f; // Scale for cave noise
+    private float _sandScale = 0.02f;
+    private float _marbleScale = 0.007f;
+    private float _caveScale = 0.06f; // Scale for cave noise
     private int _wallHeight = 5;
     private int _floorHeight = 2;
 
@@ -42,15 +48,19 @@ public class WorldGenSingleton : MonoBehaviour
         _stoneOffsetZ = Random.Range(0f, 1000f);
         _dirtOffsetX = Random.Range(0f, 1000f);
         _dirtOffsetZ = Random.Range(0f, 1000f);
+        _sandOffsetX = Random.Range(0f, 1000f);
+        _sandOffsetZ = Random.Range(0f, 1000f);
+        _marbleOffsetX = Random.Range(0f, 1000f);
+        _marbleOffsetZ = Random.Range(0f, 1000f);
         _caveOffset = Random.Range(0f, 1000f); 
     }
 
 
 
 
-    public static int xSize = 2;
-    public static int ySize = 2;
-    public static int zSize = 2;
+    public static int xSize = 10;
+    public static int ySize = 40;
+    public static int zSize = 10;
 
 
     //! debug tools
@@ -149,7 +159,7 @@ public class WorldGenSingleton : MonoBehaviour
         // Calculate the center of the map
         int centerX = WorldSingleton.World.Bounds.x / 2;
         int centerZ = WorldSingleton.World.Bounds.z / 2;
-        int craterRadius = WorldSingleton.World.Bounds.z / 4; // Adjust the radius as needed
+        int craterRadius = WorldSingleton.World.Bounds.z / 3; // Adjust the radius as needed
     
         for (int y = 0; y < _chunkSize; y++)
         {
@@ -188,7 +198,7 @@ public class WorldGenSingleton : MonoBehaviour
 
         return distanceFromCenter <= taperedRadius;
     }
-
+    
     private void GenerateTerrainBlocks(int x, int y, int z)
     {
         float stoneX = Mathf.Abs(_chunkCoord.x + x) * _stoneScale + _stoneOffsetX;
@@ -197,19 +207,37 @@ public class WorldGenSingleton : MonoBehaviour
         int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
         float dirtX = Mathf.Abs(_chunkCoord.x + x) * _dirtScale + _dirtOffsetX;
-        float dirtz = Mathf.Abs(_chunkCoord.z + z) * _dirtScale + _dirtOffsetZ; // swapped
-        float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtz);
+        float dirtZ = Mathf.Abs(_chunkCoord.z + z) * _dirtScale + _dirtOffsetZ;  
+        float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtZ);
         int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+
+        float sandX = Mathf.Abs(_chunkCoord.x + x) * _sandScale + _sandOffsetX;
+        float sandZ = Mathf.Abs(_chunkCoord.z + z) * _sandScale + _sandOffsetZ;
+        float sandNoiseValue = Mathf.PerlinNoise(sandX, sandZ);
+        int sandHeight = Mathf.FloorToInt(sandNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+
+        float marbleX = Mathf.Abs(_chunkCoord.x + x) * _marbleScale + _marbleOffsetX;
+        float marbleZ = Mathf.Abs(_chunkCoord.z + z) * _marbleScale + _marbleOffsetZ;
+        float marbleNoiseValue = Mathf.PerlinNoise(marbleX, marbleZ);
+        int marbleHeight = Mathf.FloorToInt(marbleNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
         if (y + _chunkCoord.y > _wallHeight + _floorHeight)
         {
-            if (y + _chunkCoord.y <= stoneHeight - 15)
+            if (y + _chunkCoord.y <= marbleHeight - 50)
+            {
+                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("marble");
+            } 
+            else if (y + _chunkCoord.y <= stoneHeight - 5)
             {
                 _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("stone");
             }
             else if (y + _chunkCoord.y <= dirtHeight)
             {
                 _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("dirt");
+            }
+            else if (y + _chunkCoord.y <= sandHeight)
+            {
+                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("sand");
             }
         }
     }
@@ -382,8 +410,8 @@ public class WorldGenSingleton : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.N))
         {
-            PlayerInventorySingleton.AddItem("marble", 100);
-            PlayerInventorySingleton.AddItem("backroom", 100);
+            InventorySingleton.AddItem("marble", 100);
+            InventorySingleton.AddItem("backroom", 100);
         }
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {

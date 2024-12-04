@@ -61,7 +61,7 @@ public class PlayerChunkEditSingleton : MonoBehaviour
             
             if (!WorldSingleton.Instance.IsInWorldBounds(_coordinate)) return;
             
-            PlayerInventorySingleton.RemoveItem(_blockStringID);
+            InventorySingleton.RemoveItem(_blockStringID);
             
             if (MapLoadSingleton.Instance.GetBlockInChunk(_coordinate) == 0)
                 WorldSingleton.Instance.UpdateMap(_coordinate, BlockSingleton.ConvertID(_blockStringID));

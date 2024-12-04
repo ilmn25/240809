@@ -22,14 +22,7 @@ public class BlockSingleton : MonoBehaviour
         Instance = this;
         ShadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_shadow"));
         MeshMaterial = new(Resources.Load<Material>(MESH_MATERIAL_PATH));
-
-        // Add block definitions
-        AddBlockDefinition("brick", 2, 4, "Brick", "A block of brick");
-        AddBlockDefinition("marble", 2, 4, "Marble", "A block of marble");
-        AddBlockDefinition("stone", 1, 2, "Stone", "A block of stone");
-        AddBlockDefinition("dirt", 1, 1, "Dirt", "A block of dirt");
-        AddBlockDefinition("backroom", 2, 3, "Backroom", "A block of backroom");
-
+ 
         HandleTextureAtlas();
     }
  
@@ -65,10 +58,10 @@ public class BlockSingleton : MonoBehaviour
         MeshMaterial.mainTexture = _textureAtlas;
     }
 
-    private static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost, string name, string description)
+    public static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost)
     {
         int id = _nextBlockID++;
-        BlockData blockData = new BlockData(stringID, breakThreshold, breakCost, name, description);
+        BlockData blockData = new BlockData(stringID, breakThreshold, breakCost);
         _blockDefinitions[id] = blockData;
         _blockIDMap.Add(id, stringID);
     }

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInventorySingleton : MonoBehaviour
+public class InventorySingleton : MonoBehaviour
 {
-    public static PlayerInventorySingleton Instance { get; private set; }  
+    public static InventorySingleton Instance { get; private set; }  
     
     public static List<InvSlotData> _playerInventory;
 
