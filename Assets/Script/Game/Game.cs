@@ -23,10 +23,12 @@ public class Game : MonoBehaviour
     public static GameObject GUI;
     public static GameObject GUIDialogue;
     public static TextMeshProUGUI GUIDialogueText;
-    public static GameObject GUIInventory;
-    public static GameObject GUIInventoryCursor;
-    public static GameObject GUIInventoryCursorInfo;
-    public static GameObject GUIInventoryCursorSlot;
+    public static GameObject GUIInv;
+    public static GameObject GUIInvCrafting;
+    public static GameObject GUIInvStorage;
+    public static GameObject GUICursor;
+    public static GameObject GUICursorInfo;
+    public static GameObject GUICursorSlot;
     public static GameObject AudioSystem;
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
@@ -61,10 +63,12 @@ public class Game : MonoBehaviour
         GUI = GameObject.Find("gui");
         GUIDialogue = GUI.transform.Find("dialogue_box").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        GUIInventory = GUI.transform.Find("inventory").gameObject;
-        GUIInventoryCursor = GUIInventory.transform.Find("cursor").gameObject;
-        GUIInventoryCursorInfo = GUIInventoryCursor.transform.Find("info").gameObject;
-        GUIInventoryCursorSlot = GUIInventoryCursor.transform.Find("slot").gameObject;
+        GUIInv = GUI.transform.Find("inventory").gameObject;
+        GUIInvCrafting = GUIInv.transform.Find("crafting").gameObject;
+        GUIInvStorage = GUIInv.transform.Find("storage").gameObject;
+        GUICursor = GUI.transform.Find("cursor").Find("cursor").gameObject;
+        GUICursorInfo = GUICursor.transform.Find("info").gameObject;
+        GUICursorSlot = GUICursor.transform.Find("slot").gameObject;
         
         AudioSystem = GameObject.Find("audio_system");
         WorldSystem = GameObject.Find("world_system");

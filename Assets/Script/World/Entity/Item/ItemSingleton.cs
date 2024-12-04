@@ -4,17 +4,19 @@ using System.Collections.Generic;
 using Script.World.Entity.Item;
 using UnityEngine;
 
-public class ItemLoadSingleton : MonoBehaviour
+public class ItemSingleton : MonoBehaviour
 {
-    public static ItemLoadSingleton Instance { get; private set; }  
-    private static Dictionary<string, ItemData> _itemDefinitions  = new Dictionary<string, ItemData>();
+    public static ItemSingleton Instance { get; private set; }  
+    private static Dictionary<string, ItemData> _itemList  = new Dictionary<string, ItemData>();
  
     public void Awake()
     {
         Instance = this;
-        AddBlockDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.");
+        AddBlockDefinition("brick", "Brick", 20, ItemRarity.Common, "A basic brick.", new Dictionary<string, int> {
+            { "stone", 1 }
+        });
         AddBlockDefinition("marble", "Marble", 20, ItemRarity.Common, "A basic marble.", new Dictionary<string, int> {
-            { "stone", 1 },
+            { "stone", 1 }, 
             { "brick", 1 }
         });
         AddBlockDefinition("dirt", "Dirt", 20, ItemRarity.Common, "A basic dirt.");
@@ -40,7 +42,7 @@ public class ItemLoadSingleton : MonoBehaviour
             Type = ItemType.Block
         };
         if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
-        _itemDefinitions[stringID] = itemData;
+        _itemList[stringID] = itemData;
     }
 
     private static void AddToolDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
@@ -51,7 +53,7 @@ public class ItemLoadSingleton : MonoBehaviour
             Type = ItemType.Tool
         };
         if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
-        _itemDefinitions[stringID] = itemData;
+        _itemList[stringID] = itemData;
     }
 
     private static void AddArmorDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
@@ -63,7 +65,7 @@ public class ItemLoadSingleton : MonoBehaviour
             // Add additional armor-specific properties here if needed
         };
         if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
-        _itemDefinitions[stringID] = itemData;
+        _itemList[stringID] = itemData;
     }
 
     private static void AddAccessoryDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
@@ -74,7 +76,7 @@ public class ItemLoadSingleton : MonoBehaviour
             Type = ItemType.Accessory
         };
         if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
-        _itemDefinitions[stringID] = itemData;
+        _itemList[stringID] = itemData;
     }
 
     private static void AddFurnitureDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
@@ -85,15 +87,15 @@ public class ItemLoadSingleton : MonoBehaviour
             Type = ItemType.Furniture
         };
         if (materials != null) CraftSingleton.AddCraftingDefinition(stringID, materials);
-        _itemDefinitions[stringID] = itemData;
+        _itemList[stringID] = itemData;
     }
  
 
     public static ItemData GetItem(string stringID)
     {
-        if (_itemDefinitions.ContainsKey(stringID))
+        if (_itemList.ContainsKey(stringID))
         {
-            return _itemDefinitions[stringID];
+            return _itemList[stringID];
         }
         return null;
     }

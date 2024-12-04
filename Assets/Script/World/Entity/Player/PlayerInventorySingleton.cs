@@ -30,7 +30,7 @@ public class InvSlotData
     public void Add(InvSlotData slotData, int amountToAdd = 0)
     {
         if (slotData.isEmpty()) return;
-        int maxStackSize = ItemLoadSingleton.GetItem(slotData.StringID).StackSize;
+        int maxStackSize = ItemSingleton.GetItem(slotData.StringID).StackSize;
         int addableAmount;
 
         if (amountToAdd == 0)
@@ -54,6 +54,10 @@ public class InvSlotData
     public bool isSame(InvSlotData slotData)
     {
         return slotData.StringID == StringID && slotData.Modifier == Modifier;
+    }
+    public bool isSame(string stringID, string modifier)
+    {
+        return stringID == StringID && modifier == Modifier;
     }
     
     public bool isEmpty()
@@ -124,7 +128,7 @@ public class PlayerInventorySingleton : MonoBehaviour
         _currentKey = CalculateKey();
         CurrentItem = _playerInventory[_currentKey];
         InventoryStateMachine.Instance.HandleItemUpdate();
-        GUIInventorySingleton.Instance.Refresh();
+        GUIStorageSingleton.Instance.RefreshCursorSlot();
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)
@@ -136,7 +140,7 @@ public class PlayerInventorySingleton : MonoBehaviour
     
     public static void AddItem(string stringID, int quantity = 1)
     {
-        int maxStackSize = ItemLoadSingleton.GetItem(stringID).StackSize;
+        int maxStackSize = ItemSingleton.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
         if (_playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)

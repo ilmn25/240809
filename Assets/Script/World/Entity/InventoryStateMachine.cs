@@ -19,7 +19,7 @@ public class InventoryStateMachine : StateMachine
             return;
         }
         
-        switch (ItemLoadSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID).Type)
+        switch (ItemSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID).Type)
         {
             case ItemType.Block:
                 SetState<ItemBlock>();
@@ -89,7 +89,7 @@ public class ItemTool : State
         playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
         toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
         toolSprite.gameObject.SetActive(true);
-        PlayerChunkEditSingleton.Instance._toolData = ItemLoadSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID);
+        PlayerChunkEditSingleton.Instance._toolData = ItemSingleton.GetItem(PlayerInventorySingleton.CurrentItem.StringID);
     }
 
     public override void OnExitState()
