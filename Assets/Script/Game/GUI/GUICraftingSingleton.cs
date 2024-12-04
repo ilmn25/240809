@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Script.World.Entity.Item;
 using TMPro;
 using UnityEngine;
@@ -8,10 +10,12 @@ public class GUICraftingSingleton : MonoBehaviour
     public static GUICraftingSingleton Instance { get; private set; }   
     private string _stringID;
      
+    private RectTransform _craftRect;
     private int SLOT_SIZE = 30;
     private Vector2 MARGIN = new Vector2(10, 10);
     private void Start()
     {
+        _craftRect = Game.GUIInvCrafting.GetComponent<RectTransform>();
         Instance = this;
         Initialize();
     }
@@ -25,7 +29,7 @@ public class GUICraftingSingleton : MonoBehaviour
      
             RectTransform slotRectTransform = slot.GetComponent<RectTransform>();
             slotRectTransform.sizeDelta = new Vector2(SLOT_SIZE, SLOT_SIZE);
-            slotRectTransform.anchoredPosition = new Vector2(0, count * (SLOT_SIZE + MARGIN.y));
+            slotRectTransform.anchoredPosition = new Vector2(count * (SLOT_SIZE + MARGIN.x), 0);
             slot.AddComponent<GUICraftSlotModule>().Initialize(recipe.Key);
             count++;
         }
@@ -61,5 +65,31 @@ public class GUICraftingSingleton : MonoBehaviour
             CraftSingleton.Instance.CraftItem(_stringID);
             GUICursorSingleton.UpdateCursorSlot();
         } 
+    }
+
+    private Coroutine decelerateCoroutine;
+    private float scrollSpeed;
+    
+    public void HandleScrollInput(float input)
+    {
+        scrollSpeed = input * 10000;
+
+        if (decelerateCoroutine != null)
+        {
+            StopCoroutine(decelerateCoroutine);
+        }
+
+        decelerateCoroutine = StartCoroutine(Decelerate());
+    }
+
+    private IEnumerator Decelerate()
+    {
+        while (Mathf.Abs(scrollSpeed) > 0.1f)
+        {
+            _craftRect.anchoredPosition += new Vector2(scrollSpeed * Time.deltaTime, 0);
+            scrollSpeed = Mathf.Lerp(scrollSpeed, 0, Time.deltaTime * 5);
+            yield return null;
+        }
+        scrollSpeed = 0;
     }
 }

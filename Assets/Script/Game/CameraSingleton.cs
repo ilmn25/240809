@@ -46,7 +46,6 @@ public class CameraSingleton : MonoBehaviour
         
         HandlePlayerFollow(); 
         HandleCameraSway();
-        HandleFOVChange();
 
         if (Input.GetKeyDown(KeyCode.Q))
         { 
@@ -99,23 +98,12 @@ public class CameraSingleton : MonoBehaviour
         }
     }
 
-
-    void HandleFOVChange()
-    {
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
-        {
-            Camera cameraComponent = Game.Camera.GetComponent<Camera>();
-            cameraComponent.fieldOfView -= scrollInput * FOV_CHANGE_SPEED;
-            cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 30f);
-        }
+    public void HandleScrollInput(float input)
+    { 
+        Camera cameraComponent = Game.Camera.GetComponent<Camera>();
+        cameraComponent.fieldOfView -= input * FOV_CHANGE_SPEED;
+        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 30f);
     }
-
-
-
-  
-
-
 
     void HandleChangeSortAxis()
     {

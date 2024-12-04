@@ -19,7 +19,7 @@ public class MapCullSingleton : MonoBehaviour
     public bool _yCheck = false;   
     [HideInInspector] 
     public int _yThreshold = 0; 
-    private int _visionHeight = 1;
+    private int _visionHeight = 5;
     private enum CullMode { On, Off, Both}
     private CullMode _currentCullMode = CullMode.Both;
     
@@ -111,10 +111,10 @@ public class MapCullSingleton : MonoBehaviour
         //     if (_visionHeight > 3) _visionHeight = 3;
         //     if (_visionHeight < 0) _visionHeight = 0;
         // } 
-        if (Input.GetKeyDown(KeyCode.CapsLock))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             _visionHeight++;
-            if (_visionHeight == 4) _visionHeight = 1;
+            if (_visionHeight == 6) _visionHeight = 1;
         }
     }
 
