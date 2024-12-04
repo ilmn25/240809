@@ -4,18 +4,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class GUIItemSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField]
     private Image _image;
-    [SerializeField]
     private TextMeshProUGUI _text;
     public int SlotNumber;
     
     private void Awake()
     {
-        GUIInventorySingleton.OnRefreshSlot += OnRefreshSlot;
-        gameObject.layer = Game.UILayerIndex;
+        GUIStorageSingleton.OnRefreshSlot += OnRefreshSlot;
+        _image = transform.Find("image").GetComponent<Image>();
+        _text = transform.Find("text").GetComponent<TextMeshProUGUI>();
     }
 
     public void OnRefreshSlot()
@@ -36,13 +35,13 @@ public class GUIItemSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerEx
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        GUIInventorySingleton.Instance.SetInfoPanel(SlotNumber);
+        GUIStorageSingleton.Instance.SetInfoPanel(SlotNumber);
         ScaleSlot(1.1f);
     }
  
     public void OnPointerExit(PointerEventData eventData)
     {
-        GUIInventorySingleton.Instance.SetInfoPanel();
+        GUIStorageSingleton.Instance.SetInfoPanel();
         ScaleSlot(1f);
     }
 

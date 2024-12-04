@@ -48,9 +48,9 @@ public class WorldGenSingleton : MonoBehaviour
 
 
 
-    public static int xSize = 1;
+    public static int xSize = 2;
     public static int ySize = 2;
-    public static int zSize = 1;
+    public static int zSize = 2;
 
 
     //! debug tools
@@ -139,58 +139,94 @@ public class WorldGenSingleton : MonoBehaviour
         } 
         
         return _chunkData;
-    }
-
+    }  
+    
     private void HandleBlockGeneration()
-    { 
+    {
         bool wall = new System.Random().NextDouble() < 0.1;
         bool[,] maze = HandleMazeAlgorithm(_chunkSize, _chunkSize);
 
+        // Calculate the center of the map
+        int centerX = WorldSingleton.World.Bounds.x / 2;
+        int centerZ = WorldSingleton.World.Bounds.z / 2;
+        int craterRadius = WorldSingleton.World.Bounds.z / 4; // Adjust the radius as needed
+    
         for (int y = 0; y < _chunkSize; y++)
         {
             for (int x = 0; x < _chunkSize; x++)
             {
                 for (int z = 0; z < _chunkSize; z++)
                 {
-                    float stoneX = Mathf.Abs(_chunkCoord.x + x) * _stoneScale + _stoneOffsetX;
-                    float stoneZ = Mathf.Abs(_chunkCoord.z + z) * _stoneScale + _stoneOffsetZ;
-                    float stoneNoiseValue = Mathf.PerlinNoise(stoneX, stoneZ);
-                    int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * _worldHeight);
-
-                    float dirtX = Mathf.Abs(_chunkCoord.x + x) * _dirtScale + _dirtOffsetX;
-                    float dirtz = Mathf.Abs(_chunkCoord.z + z) * _dirtScale + _dirtOffsetZ; // swapped
-                    float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtz);
-                    int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * _worldHeight);
-
-                    float caveX = (_chunkCoord.x + x) * _caveScale + _caveOffset;
-                    float caveY = (_chunkCoord.y + y) * _caveScale + _caveOffset;
-                    float caveZ = (_chunkCoord.z + z) * _caveScale + _caveOffset;
-                    float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
-
-                    if (caveNoiseValue > 0.35f)
+                    if (IsWithinCrater(x, y, z, centerX, centerZ, craterRadius))
                     {
-                        _chunkData.Map[x, y, z] = 0; // Empty space for caves
+                        _chunkData.Map[x, y, z] = 0; // Empty space for the crater
+                        continue;
                     }
-                    else if (y + _chunkCoord.y > _wallHeight + _floorHeight)
-                    { 
-                        if (y + _chunkCoord.y <= stoneHeight - 15)
-                        {
-                            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("stone");
-                        }
-                        else if (y + _chunkCoord.y <= dirtHeight)
-                        {
-                            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("dirt");
-                        }
-                    }
-                    else
-                    {
-                        HandleBackroomGeneration(x, y, z, maze);
-                    }
+
+                    GenerateTerrainBlocks(x, y, z);
+                    GenerateCaves(x, y, z);
+                    HandleBackroomGeneration(x, y, z, maze);
                 }
             }
         }
     }
+    private bool IsWithinCrater(int x, int y, int z, int centerX, int centerZ, int craterRadius)
+    {
+        int distanceX = Mathf.Abs(centerX - (_chunkCoord.x + x));
+        int distanceZ = Mathf.Abs(centerZ - (_chunkCoord.z + z));
+        float distanceFromCenter = Mathf.Sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
+        // Calculate the taper factor so that it decreases with depth
+        float taperFactor = (float)(y + _chunkCoord.y) / _worldHeight;
+        float taperedRadius = craterRadius * taperFactor;
+
+        // Add noise to the crater walls
+        float noiseX = (_chunkCoord.x + x) * _caveScale + _caveOffset;
+        float noiseZ = (_chunkCoord.z + z) * _caveScale + _caveOffset;
+        float wallNoise = Mathf.PerlinNoise(noiseX, noiseZ) * 2.0f - 1.0f; // Noise value between -1 and 1
+        taperedRadius += wallNoise;
+
+        return distanceFromCenter <= taperedRadius;
+    }
+
+    private void GenerateTerrainBlocks(int x, int y, int z)
+    {
+        float stoneX = Mathf.Abs(_chunkCoord.x + x) * _stoneScale + _stoneOffsetX;
+        float stoneZ = Mathf.Abs(_chunkCoord.z + z) * _stoneScale + _stoneOffsetZ;
+        float stoneNoiseValue = Mathf.PerlinNoise(stoneX, stoneZ);
+        int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+
+        float dirtX = Mathf.Abs(_chunkCoord.x + x) * _dirtScale + _dirtOffsetX;
+        float dirtz = Mathf.Abs(_chunkCoord.z + z) * _dirtScale + _dirtOffsetZ; // swapped
+        float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtz);
+        int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+
+        if (y + _chunkCoord.y > _wallHeight + _floorHeight)
+        {
+            if (y + _chunkCoord.y <= stoneHeight - 15)
+            {
+                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("stone");
+            }
+            else if (y + _chunkCoord.y <= dirtHeight)
+            {
+                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("dirt");
+            }
+        }
+    }
+
+    private void GenerateCaves(int x, int y, int z)
+    {
+        float caveX = (_chunkCoord.x + x) * _caveScale + _caveOffset;
+        float caveY = (_chunkCoord.y + y) * _caveScale + _caveOffset;
+        float caveZ = (_chunkCoord.z + z) * _caveScale + _caveOffset;
+        float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
+
+        if (caveNoiseValue > 0.35f)
+        {
+            _chunkData.Map[x, y, z] = 0; // Empty space for caves
+        }
+    }
+ 
     private void HandleBackroomGeneration(int x, int y, int z, bool[,] maze)
     {
         if (y + _chunkCoord.y < _floorHeight)

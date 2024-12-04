@@ -16,13 +16,20 @@ public class InputSingleton : MonoBehaviour
     
     private void Update()
     {
+        HandleScroll();
+        
         if (Game.GUIBusy) return;
         HandleRaycast(); 
         // if (Input.GetMouseButtonDown(0))
         //     Lib.Log(_layerMask, _gameObject, _position, IsInRange());
         if (_layerMask != -1 && IsInRange())
             HandleInput();
-    } 
+    }
+
+    private void HandleScroll()
+    {
+        
+    }
     
     private void HandleRaycast()
     { 
