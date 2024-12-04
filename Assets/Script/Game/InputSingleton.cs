@@ -28,7 +28,21 @@ public class InputSingleton : MonoBehaviour
 
     private void HandleScroll()
     {
-        
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll == 0) return;
+
+        if (Game.GUIBusy)
+        {
+            GUICraftingSingleton.Instance.HandleScrollInput(scroll);
+        }
+        else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
+        {
+            CameraSingleton.Instance.HandleScrollInput(scroll);
+        }
+        else
+        {
+            PlayerInventorySingleton.Instance.HandleScrollInput(scroll);
+        }
     }
     
     private void HandleRaycast()

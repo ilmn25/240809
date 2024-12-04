@@ -102,7 +102,7 @@ public class ItemTool : State
     { 
         if (!isSwinging)
         {
-            if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(3) || Input.GetMouseButtonDown(4))
             {
                 isSwinging = true;
                 swingTimer = 0f;
