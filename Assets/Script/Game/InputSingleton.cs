@@ -37,6 +37,10 @@ public class InputSingleton : MonoBehaviour
         }
         else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
         {
+            MapCullSingleton.Instance.HandleScrollInput(scroll);
+        } 
+        else if (Input.GetKey(KeyCode.LeftShift))
+        {
             CameraSingleton.Instance.HandleScrollInput(scroll);
         }
         else

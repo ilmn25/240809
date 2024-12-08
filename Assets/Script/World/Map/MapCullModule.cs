@@ -14,6 +14,7 @@ public class MapCullModule : MonoBehaviour
     public int[,,] _chunkMap;
     public Mesh _meshData;
     public List<Vector3> _verticesShadow;
+    public int[] _count;
 
     private MeshCollider _meshCollider;
     private MeshFilter _shadowMeshFilter;
@@ -141,7 +142,7 @@ public class MapCullModule : MonoBehaviour
         _mesh.SetVertices(_culledVertices);
         _mesh.SetTriangles(_culledTriangles, 0);  
         _mesh.SetUVs(0, _culledUVs);
-        _mesh.SetNormals(_culledNormals);   
+        _mesh.SetNormals(_culledNormals);     
          
         while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame) await Task.Yield();
         
@@ -179,6 +180,7 @@ public class MapCullModule : MonoBehaviour
         NativeArray<Vector3> normals = new NativeArray<Vector3>(_normals, Allocator.TempJob);
         NativeArray<int> triangles = new NativeArray<int>(_triangles, Allocator.TempJob);
         NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
+        NativeArray<int> count = new NativeArray<int>(_count, Allocator.TempJob);
         var job = new HandleCullMathJob
         { 
             chunkSize = WorldSingleton.CHUNK_SIZE, 
@@ -189,6 +191,7 @@ public class MapCullModule : MonoBehaviour
             normals = normals,
             triangles = triangles,
             uvs = uvs, 
+            count = count,
 
             culledVertices  = new NativeList<Vector3>(Allocator.TempJob),
             culledNormals  = new NativeList<Vector3>(Allocator.TempJob),
@@ -245,39 +248,33 @@ public class MapCullModule : MonoBehaviour
         [DeallocateOnJobCompletion]
         public NativeArray<int> triangles;
         [DeallocateOnJobCompletion]
-        public NativeArray<Vector2> uvs; 
+        public NativeArray<Vector2> uvs;  
+        [DeallocateOnJobCompletion]
+        public NativeArray<int> count; 
 
         public NativeList<Vector3> culledVertices;
         public NativeList<Vector3> culledNormals;
         public NativeList<int> culledTriangles;
-        public NativeList<Vector2> culledUVs; 
+        public NativeList<Vector2> culledUVs;  
 
         public NativeHashMap<int, int> vertexMap;  
 
         public void Execute()
-        { 
-
-            for (int i = 0; i < vertices.Length; i++)
+        {
+            for (int i = 0; i < count[yThreshold-1]*4; i++)
             {
-                if (vertices[i].y <= yThreshold)
-                {
-                    vertexMap[i] = culledVertices.Length;
-                    culledVertices.Add(vertices[i]);
-                    culledNormals.Add(normals[i]);
-                    culledUVs.Add(uvs[i]);
-                }  
+                vertexMap[i] = culledVertices.Length;
+                culledVertices.Add(vertices[i]);
+                culledNormals.Add(normals[i]);
+                culledUVs.Add(uvs[i]);
             }
 
-            for (int i = 0; i < triangles.Length; i += 3)
+            for (int i = 0; i < count[yThreshold-1]*6; i += 3)
             {
-                if (vertexMap.ContainsKey(triangles[i]) && vertexMap.ContainsKey(triangles[i + 1]) && vertexMap.ContainsKey(triangles[i + 2]))
-                {
-                    culledTriangles.Add(vertexMap[triangles[i]]);
-                    culledTriangles.Add(vertexMap[triangles[i + 1]]);
-                    culledTriangles.Add(vertexMap[triangles[i + 2]]);
-                } 
+                culledTriangles.Add(vertexMap[triangles[i]]);
+                culledTriangles.Add(vertexMap[triangles[i + 1]]);
+                culledTriangles.Add(vertexMap[triangles[i + 2]]);
             }
-
             
             for (int x = 0; x < chunkSize; x++)
             {
@@ -324,8 +321,6 @@ public class MapCullModule : MonoBehaviour
     }
 
 }
-
-    
 
 public struct NativeArray3D<T> where T : struct
 {
