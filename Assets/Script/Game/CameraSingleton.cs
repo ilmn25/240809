@@ -102,7 +102,7 @@ public class CameraSingleton : MonoBehaviour
     { 
         Camera cameraComponent = Game.Camera.GetComponent<Camera>();
         cameraComponent.fieldOfView -= input * FOV_CHANGE_SPEED;
-        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 30f);
+        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 45f);
     }
 
     void HandleChangeSortAxis()

@@ -46,8 +46,17 @@ public class MapCullSingleton : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        StartCoroutine(yCheckRoutine());
     }
-
+    private IEnumerator yCheckRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.05f);
+            HandleObstructionCheck();
+            HandleCheck();
+        }
+    }
     void Start()
     {
         forwardDirection = Quaternion.Euler(ANGLE_OFFSET, 5, 0) * Vector3.up;
@@ -65,29 +74,8 @@ public class MapCullSingleton : MonoBehaviour
         
         HandleLight(false); 
     }
-
-    private int zeroVelocityCount = 0;  
-    void Update()
-    {
-        HandleInput();
  
-        if (PlayerMovementSingleton.Instance._verticalVelocity == 0)
-        {
-            zeroVelocityCount++;
-            if (zeroVelocityCount > 4)
-            {
-                HandleObstructionCheck();
-                HandleCheck();
-            }
-        }
-        else
-        {
-            zeroVelocityCount = 0;
-        }
-    }
- 
-    
-    void HandleInput()
+    void Update() 
     {
         if (Input.GetKeyDown(KeyCode.Z)) {
             switch (_currentCullMode)
@@ -103,25 +91,25 @@ public class MapCullSingleton : MonoBehaviour
                     break;
             }
         }
-        
-        // float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        // if (Input.GetKey(KeyCode.LeftShift) && scrollInput != 0)
-        // {
-        //     _visionHeight += (scrollInput > 0) ? 1 : -1;
-        //     if (_visionHeight > 3) _visionHeight = 3;
-        //     if (_visionHeight < 0) _visionHeight = 0;
-        // } 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            _visionHeight++;
-            if (_visionHeight == 6) _visionHeight = 1;
-        }
+          
     }
 
     void HandleCheck()
     {
         if (Time.frameCount > _cullSyncFrame + 1)
         {
+            if (_yThreshold < (int)playerPosition.y)
+            {
+                Lib.Log(_yThreshold);
+                _yThreshold = (int)playerPosition.y;
+                _visionHeight = _yThreshold;
+            }
+            else if (_yThreshold > (int)playerPosition.y + 10)
+            {
+                _yThreshold = (int)playerPosition.y + 10;
+                _visionHeight = _yThreshold;
+            }
+            
             if (!_yCheckPrevious && _yCheck) // enter
             {
                 HandleLight(true);
@@ -196,7 +184,7 @@ public class MapCullSingleton : MonoBehaviour
         if (_currentCullMode == CullMode.On)
         {
             _yCheck = true;
-            _yThreshold = (int)playerPosition.y + _visionHeight;
+            _yThreshold = _visionHeight;
             return;
         }  
     
@@ -208,7 +196,7 @@ public class MapCullSingleton : MonoBehaviour
             if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, _camera.transform.position), Game.LayerMap))
             {
                 _yCheck = true;
-                _yThreshold = (int)playerPosition.y + _visionHeight;
+                _yThreshold = _visionHeight;
                 return;
             }
         }
@@ -222,52 +210,12 @@ public class MapCullSingleton : MonoBehaviour
             Physics.Raycast(rayLeft, out _, 50, Game.LayerMap) &&
             Physics.Raycast(rayRight, out _, 50, Game.LayerMap)) {
             _yCheck = true;
-            _yThreshold = (int)playerPosition.y + _visionHeight;
+            _yThreshold = _visionHeight;
+            return;
         }
      
-        _yCheck = false;
-        _yThreshold = 0;
+        _yCheck = false; 
     }
-
-    // void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawLine(rayToCamera.origin, rayToCamera.origin + rayToCamera.direction * 100);
-    // }
-
-    //
-    //
-    // void HandleObstructionCheck()
-    // {
-    //     if (_currentCullMode == CullMode.Off)
-    //     {
-    //         _yCheck = false;
-    //         return;
-    //     }
-    //     
-    //     playerPosition = Game.Player.transform.position;
-    //     
-    //     if (_currentCullMode == CullMode.On)
-    //     {
-    //         _yCheck = true;
-    //         _yThreshold = (int)playerPosition.y + _visionHeight;
-    //         return;
-    //     }  
-    //
-    //     rayToCamera = new Ray(playerPosition + Vector3.up * 0.5f, _camera.transform.position - playerPosition);
-    //     if (Physics.Raycast(rayToCamera, out _, 50, Game.LayerMap))
-    //     {
-    //         
-    //         _yThreshold = (int)playerPosition.y + _visionHeight;
-    //         _yCheck = true;  
-    //     }
-    //     else
-    //     {
-    //         _yCheck = false;
-    //         _yThreshold = 0; 
-    //     }
-    //      
-    // }
  
 
             
@@ -279,4 +227,8 @@ public class MapCullSingleton : MonoBehaviour
         UpdateYCull(); 
     }
 
+    public void HandleScrollInput(float scroll)
+    {
+        _visionHeight += (scroll > 0) ? 1 : -1;
+    }
 }
