@@ -34,6 +34,7 @@ public class MapCullModule : MonoBehaviour
         _meshFilter = GetComponent<MeshFilter>();  
         _meshRenderer = GetComponent<MeshRenderer>(); 
         _meshCollider = gameObject.AddComponent<MeshCollider>();
+        _meshCollider.includeLayers = Game.MaskMap;
         _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         _meshRenderer.enabled = false;    
         _selfChunkPosition = Vector3Int.FloorToInt(transform.position);

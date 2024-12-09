@@ -15,41 +15,40 @@ using UnityEngine.Rendering;
 public class MapLoadSingleton : MonoBehaviour
          
 {
-    public static MapLoadSingleton Instance { get; private set; }  
-  
-    
-    public void Awake()
+    public static MapLoadSingleton Instance { get; private set; }
+ 
+
+    private void OnApplicationQuit()
+    {
+        _colx.Dispose();
+        _rowy.Dispose();
+        _textureRectDictionary.Dispose();
+    }
+    private async void Start()
     {   
         Instance = this;
         WorldSingleton.PlayerChunkTraverse += HandleChunkMapTraverse;
 
         _tileSize = 16;
         _tilesPerRow = 12;
-        _colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
-        _rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};  
-    } 
-
-    async void Start()
-    {
+        int[] colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
+        int[] rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};
+        _colx = new NativeArray<int>(colx, Allocator.Persistent);
+        _rowy = new NativeArray<int>(rowy, Allocator.Persistent);
+        
+        _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton._textureRectDictionary.Count, Allocator.Persistent);
+        foreach (var kvp in BlockSingleton._textureRectDictionary)
+        {
+            _textureRectDictionary[kvp.Key] = kvp.Value;
+        }
+        
+        
+        
         await Task.Delay(50);
         HandleChunkMapTraverse(); 
         WorldSingleton.Instance.GenerateBoolMap();
         EntityStaticLoadSingleton.Instance.OnTraverse();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     
     public void RefreshExistingChunk(Vector3Int chunkCoordinates)
@@ -158,7 +157,7 @@ public class MapLoadSingleton : MonoBehaviour
         if (!replace)
         {
             _meshObject = new("MAP " + counter++);
-            _meshObject.layer = Game.MapLayerIndex;
+            _meshObject.layer = Game.IndexMap;
             _meshObject.transform.position = _chunkCoordinate; 
 
             _meshObject.AddComponent<MeshFilter>();
@@ -193,8 +192,9 @@ public class MapLoadSingleton : MonoBehaviour
     // const
     private int _tileSize;
     private int _tilesPerRow;
-    private int[] _colx;
-    private int[] _rowy; 
+    private NativeArray<int> _colx;
+    private NativeArray<int> _rowy; 
+    private NativeHashMap<int, Rect> _textureRectDictionary;
 
     // input
     private Vector3Int _chunkCoordinate;
@@ -210,41 +210,35 @@ public class MapLoadSingleton : MonoBehaviour
     private void LoadMeshMath()
     { 
         try
-        {   
-            NativeHashMap<int, Rect> _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton._textureRectDictionary.Count, Allocator.TempJob);
-            foreach (var kvp in BlockSingleton._textureRectDictionary)
-            {
-                _textureRectDictionary[kvp.Key] = kvp.Value;
-            }
-
+        {    
             // Initialize local temp arrays 
             MeshMathJob job = new MeshMathJob
             {
                 // const
-                _chunkSize = WorldSingleton.CHUNK_SIZE,
-                _tileSize = _tileSize,
-                _tilesPerRow = _tilesPerRow, 
-                _colx = new NativeArray<int>(_colx, Allocator.TempJob),
-                _rowy = new NativeArray<int>(_rowy, Allocator.TempJob),  
-                _textureRectDictionary = _textureRectDictionary,
-                _textureAtlasWidth = BlockSingleton._textureAtlasWidth,
-                _textureAtlasHeight = BlockSingleton._textureAtlasHeight, 
+                chunkSize = WorldSingleton.CHUNK_SIZE,
+                tileSize = _tileSize,
+                tilesPerRow = _tilesPerRow, 
+                colx = _colx,
+                rowy = _rowy,  
+                textureRectDictionary = _textureRectDictionary,
+                textureAtlasWidth = BlockSingleton._textureAtlasWidth,
+                textureAtlasHeight = BlockSingleton._textureAtlasHeight, 
 
                 // input 
-                _chunkMap = ChunkMap.Create(_chunkCoordinate),
+                chunkMap = ChunkMap.Create(_chunkCoordinate),
 
                 // output
-                _vertices = new NativeList<Vector3>(Allocator.TempJob),
-                _verticesShadow = new NativeList<Vector3>(Allocator.TempJob),
-                _triangles = new NativeList<int>(Allocator.TempJob),
-                _uvs = new NativeList<Vector2>(Allocator.TempJob),
-                _normals = new NativeList<Vector3>(Allocator.TempJob),
-                _count = new NativeList<int>(Allocator.TempJob),
+                vertices = new NativeList<Vector3>(Allocator.TempJob),
+                verticesShadow = new NativeList<Vector3>(Allocator.TempJob),
+                triangles = new NativeList<int>(Allocator.TempJob),
+                uvs = new NativeList<Vector2>(Allocator.TempJob),
+                normals = new NativeList<Vector3>(Allocator.TempJob),
+                count = new NativeList<int>(Allocator.TempJob),
                 
                 // local temp
-                _faceVertices = new NativeArray<Vector3>(4, Allocator.TempJob),
-                _faceVerticesShadow = new NativeArray<Vector3>(4, Allocator.TempJob),
-                _spriteUVs = new NativeArray<Vector2>(4, Allocator.TempJob)
+                faceVertices = new NativeArray<Vector3>(4, Allocator.TempJob),
+                faceVerticesShadow = new NativeArray<Vector3>(4, Allocator.TempJob),
+                spriteUVs = new NativeArray<Vector2>(4, Allocator.TempJob)
             };
 
             // Schedule the job
@@ -252,22 +246,21 @@ public class MapLoadSingleton : MonoBehaviour
 
             jobHandle.Complete();
 
-            _vertices = new List<Vector3>(job._vertices.ToArray());
-            _verticesShadow = new List<Vector3>(job._verticesShadow.ToArray());
-            _triangles = new List<int>(job._triangles.ToArray());
-            _uvs = new List<Vector2>(job._uvs.ToArray());
-            _normals = new List<Vector3>(job._normals.ToArray());   
-            _count = job._count.ToArray();
+            _vertices = new List<Vector3>(job.vertices.ToArray());
+            _verticesShadow = new List<Vector3>(job.verticesShadow.ToArray());
+            _triangles = new List<int>(job.triangles.ToArray());
+            _uvs = new List<Vector2>(job.uvs.ToArray());
+            _normals = new List<Vector3>(job.normals.ToArray());   
+            _count = job.count.ToArray();
             
             // Dispose of the native arrays and lists 
-            job._vertices.Dispose();
-            job._verticesShadow.Dispose();
-            job._triangles.Dispose();
-            job._uvs.Dispose();
-            job._normals.Dispose();
-            job._count.Dispose();
-            
-            job._textureRectDictionary.Dispose();
+            job.vertices.Dispose();
+            job.verticesShadow.Dispose();
+            job.triangles.Dispose();
+            job.uvs.Dispose();
+            job.normals.Dispose();
+            job.count.Dispose();
+             
         }
         catch (Exception ex)
         {
@@ -282,39 +275,37 @@ public class MapLoadSingleton : MonoBehaviour
     {
         // const
         [DeallocateOnJobCompletion]
-        public int _chunkSize; 
+        public int chunkSize; 
         [DeallocateOnJobCompletion]
-        public int _tileSize;
+        public int tileSize;
         [DeallocateOnJobCompletion]
-        public int _tilesPerRow;
+        public int tilesPerRow; 
+        public NativeArray<int> colx; 
+        public NativeArray<int> rowy;    
+        public NativeHashMap<int, Rect> textureRectDictionary;
+        
         [DeallocateOnJobCompletion]
-        public NativeArray<int> _colx;
+        public int textureAtlasWidth;
         [DeallocateOnJobCompletion]
-        public NativeArray<int> _rowy;    
-
-        public NativeHashMap<int, Rect> _textureRectDictionary;
-        [DeallocateOnJobCompletion]
-        public int _textureAtlasWidth;
-        [DeallocateOnJobCompletion]
-        public int _textureAtlasHeight; 
+        public int textureAtlasHeight; 
 
         // input 
         [DeallocateOnJobCompletion]
-        public NativeMap3D<int> _chunkMap;  
+        public NativeMap3D<int> chunkMap;  
 
         // output
-        public NativeList<Vector3> _vertices;
-        public NativeList<Vector3> _verticesShadow;
-        public NativeList<int> _triangles;
-        public NativeList<Vector2> _uvs;
-        public NativeList<Vector3> _normals;
-        public NativeList<int> _count; 
+        public NativeList<Vector3> vertices;
+        public NativeList<Vector3> verticesShadow;
+        public NativeList<int> triangles;
+        public NativeList<Vector2> uvs;
+        public NativeList<Vector3> normals;
+        public NativeList<int> count; 
 
         // local temp
         [DeallocateOnJobCompletion]
-        private int _blockID;
+        private int blockID;
         [DeallocateOnJobCompletion] 
-        private Vector3Int _blockPosition;
+        private Vector3Int blockPosition;
         
         [DeallocateOnJobCompletion]
         public int py;
@@ -330,13 +321,13 @@ public class MapLoadSingleton : MonoBehaviour
         public int nz;
 
         [DeallocateOnJobCompletion]
-        public NativeArray<Vector3> _faceVertices;
+        public NativeArray<Vector3> faceVertices;
         [DeallocateOnJobCompletion]
-        public NativeArray<Vector3> _faceVerticesShadow;
+        public NativeArray<Vector3> faceVerticesShadow;
         [DeallocateOnJobCompletion] 
-        private Vector3 _normal;
+        private Vector3 normal;
         [DeallocateOnJobCompletion]
-        public NativeArray<Vector2> _spriteUVs; 
+        public NativeArray<Vector2> spriteUVs; 
         [DeallocateOnJobCompletion]
         private int spriteNumber;
         [DeallocateOnJobCompletion]
@@ -344,29 +335,29 @@ public class MapLoadSingleton : MonoBehaviour
         [DeallocateOnJobCompletion]
         private int cornerValue;  
         [DeallocateOnJobCompletion] 
-        private Rect _textureRect;
+        private Rect textureRect;
   
         public void Execute()
         {   
-            for (int y = 0; y < _chunkSize; y++)
+            for (int y = 0; y < chunkSize; y++)
             {
-                _count.Add(y == 0? 0 : _count[y-1]);
-                for (int z = 0; z < _chunkSize; z++)
+                count.Add(y == 0? 0 : count[y-1]);
+                for (int z = 0; z < chunkSize; z++)
                 {
-                    for (int x = 0; x < _chunkSize; x++)
+                    for (int x = 0; x < chunkSize; x++)
                     { 
-                        _blockID = _chunkMap[x, y, z];
+                        blockID = chunkMap[x, y, z];
 
-                        if (_blockID != 0)
+                        if (blockID != 0)
                         {
-                            _blockPosition = new Vector3Int(x, y, z);
+                            blockPosition = new Vector3Int(x, y, z);
 
-                            if (_chunkMap[x, y + 1, z] == 0) HandleMeshFace(dir.py, HandleMeshAutoTile(x, y, z, dir.py)); // Top
-                            if (_chunkMap[x, y - 1, z] == 0) HandleMeshFace(dir.ny, 1); // Bottom
-                            if (_chunkMap[x + 1, y, z] == 0) HandleMeshFace(dir.px, HandleMeshAutoTile(x, y, z, dir.px)); // Right
-                            if (_chunkMap[x - 1, y, z] == 0) HandleMeshFace(dir.nx, HandleMeshAutoTile(x, y, z, dir.nx)); // Left
-                            if (_chunkMap[x, y, z + 1] == 0) HandleMeshFace(dir.pz, HandleMeshAutoTile(x, y, z, dir.pz)); // Front
-                            if (_chunkMap[x, y, z - 1] == 0) HandleMeshFace(dir.nz, HandleMeshAutoTile(x, y, z, dir.nz)); // Back
+                            if (chunkMap[x, y + 1, z] == 0) HandleMeshFace(dir.py, HandleMeshAutoTile(x, y, z, dir.py)); // Top
+                            if (chunkMap[x, y - 1, z] == 0) HandleMeshFace(dir.ny, 1); // Bottom
+                            if (chunkMap[x + 1, y, z] == 0) HandleMeshFace(dir.px, HandleMeshAutoTile(x, y, z, dir.px)); // Right
+                            if (chunkMap[x - 1, y, z] == 0) HandleMeshFace(dir.nx, HandleMeshAutoTile(x, y, z, dir.nx)); // Left
+                            if (chunkMap[x, y, z + 1] == 0) HandleMeshFace(dir.pz, HandleMeshAutoTile(x, y, z, dir.pz)); // Front
+                            if (chunkMap[x, y, z - 1] == 0) HandleMeshFace(dir.nz, HandleMeshAutoTile(x, y, z, dir.nz)); // Back
                         }
                     }
                 }
@@ -376,98 +367,98 @@ public class MapLoadSingleton : MonoBehaviour
 
         void HandleMeshFace(dir direction, int textureIndex)
         {
-            _count[_blockPosition.y]++;
-            int vertexIndex = _vertices.Length; 
-            _normal = Vector3.zero;
+            count[blockPosition.y]++;
+            int vertexIndex = vertices.Length; 
+            normal = Vector3.zero;
 
             if (direction == dir.py) // top
             {
-                _faceVertices[0] = _blockPosition + new Vector3(0, 1, 0);
-                _faceVertices[1] = _blockPosition + new Vector3(1, 1, 0);
-                _faceVertices[2] = _blockPosition + new Vector3(1, 1, 1);
-                _faceVertices[3] = _blockPosition + new Vector3(0, 1, 1);
+                faceVertices[0] = blockPosition + new Vector3(0, 1, 0);
+                faceVertices[1] = blockPosition + new Vector3(1, 1, 0);
+                faceVertices[2] = blockPosition + new Vector3(1, 1, 1);
+                faceVertices[3] = blockPosition + new Vector3(0, 1, 1);
 
-                _faceVerticesShadow[0] = _blockPosition + new Vector3(-0.03f, 1, -0.03f);
-                _faceVerticesShadow[1] = _blockPosition + new Vector3(1.03f, 1, -0.03f);
-                _faceVerticesShadow[2] = _blockPosition + new Vector3(1.03f, 1, 1.03f);
-                _faceVerticesShadow[3] = _blockPosition + new Vector3(-0.03f, 1, 1.03f);
+                faceVerticesShadow[0] = blockPosition + new Vector3(-0.03f, 1, -0.03f);
+                faceVerticesShadow[1] = blockPosition + new Vector3(1.03f, 1, -0.03f);
+                faceVerticesShadow[2] = blockPosition + new Vector3(1.03f, 1, 1.03f);
+                faceVerticesShadow[3] = blockPosition + new Vector3(-0.03f, 1, 1.03f);
                  
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 3);
-                _triangles.Add(vertexIndex + 2);
-                _normal = new Vector3(0, 1, 0);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 3);
+                triangles.Add(vertexIndex + 2);
+                normal = new Vector3(0, 1, 0);
             } else if (direction == dir.ny) // down
             {
-                _faceVertices[0] = _blockPosition + new Vector3(0, 0, 1);
-                _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
-                _faceVertices[2] = _blockPosition + new Vector3(1, 0, 0);
-                _faceVertices[3] = _blockPosition + new Vector3(0, 0, 0);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 3);
-                _triangles.Add(vertexIndex + 2);
-                _normal = new Vector3(0, -1, 0);
+                faceVertices[0] = blockPosition + new Vector3(0, 0, 1);
+                faceVertices[1] = blockPosition + new Vector3(1, 0, 1);
+                faceVertices[2] = blockPosition + new Vector3(1, 0, 0);
+                faceVertices[3] = blockPosition + new Vector3(0, 0, 0);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 3);
+                triangles.Add(vertexIndex + 2);
+                normal = new Vector3(0, -1, 0);
             }
             else if (direction == dir.pz) // back
             {
-                _faceVertices[0] = _blockPosition + new Vector3(0, 0, 1);
-                _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
-                _faceVertices[2] = _blockPosition + new Vector3(1, 1, 1);
-                _faceVertices[3] = _blockPosition + new Vector3(0, 1, 1);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 3);
-                _normal = new Vector3(0, 0, 1);
+                faceVertices[0] = blockPosition + new Vector3(0, 0, 1);
+                faceVertices[1] = blockPosition + new Vector3(1, 0, 1);
+                faceVertices[2] = blockPosition + new Vector3(1, 1, 1);
+                faceVertices[3] = blockPosition + new Vector3(0, 1, 1);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 3);
+                normal = new Vector3(0, 0, 1);
             }
             else if (direction == dir.nz) // front
             {
-                _faceVertices[0] = _blockPosition + new Vector3(0, 0, 0);
-                _faceVertices[1] = _blockPosition + new Vector3(1, 0, 0);
-                _faceVertices[2] = _blockPosition + new Vector3(1, 1, 0);
-                _faceVertices[3] = _blockPosition + new Vector3(0, 1, 0);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 3);
-                _triangles.Add(vertexIndex + 2);
-                _normal = new Vector3(0, 0, -1);
+                faceVertices[0] = blockPosition + new Vector3(0, 0, 0);
+                faceVertices[1] = blockPosition + new Vector3(1, 0, 0);
+                faceVertices[2] = blockPosition + new Vector3(1, 1, 0);
+                faceVertices[3] = blockPosition + new Vector3(0, 1, 0);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 3);
+                triangles.Add(vertexIndex + 2);
+                normal = new Vector3(0, 0, -1);
             }
             else if (direction == dir.nx) // left
             {
-                _faceVertices[0] = _blockPosition + new Vector3(0, 0, 0);
-                _faceVertices[1] = _blockPosition + new Vector3(0, 0, 1);
-                _faceVertices[2] = _blockPosition + new Vector3(0, 1, 1);
-                _faceVertices[3] = _blockPosition + new Vector3(0, 1, 0);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 3);
-                _normal = new Vector3(-1, 0, 0);
+                faceVertices[0] = blockPosition + new Vector3(0, 0, 0);
+                faceVertices[1] = blockPosition + new Vector3(0, 0, 1);
+                faceVertices[2] = blockPosition + new Vector3(0, 1, 1);
+                faceVertices[3] = blockPosition + new Vector3(0, 1, 0);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 3);
+                normal = new Vector3(-1, 0, 0);
             }
             else if (direction == dir.px) // right
             {
-                _faceVertices[0] = _blockPosition + new Vector3(1, 0, 0);
-                _faceVertices[1] = _blockPosition + new Vector3(1, 0, 1);
-                _faceVertices[2] = _blockPosition + new Vector3(1, 1, 1);
-                _faceVertices[3] = _blockPosition + new Vector3(1, 1, 0);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 2);
-                _triangles.Add(vertexIndex + 1);
-                _triangles.Add(vertexIndex);
-                _triangles.Add(vertexIndex + 3);
-                _triangles.Add(vertexIndex + 2);
-                _normal = new Vector3(1, 0, 0);
+                faceVertices[0] = blockPosition + new Vector3(1, 0, 0);
+                faceVertices[1] = blockPosition + new Vector3(1, 0, 1);
+                faceVertices[2] = blockPosition + new Vector3(1, 1, 1);
+                faceVertices[3] = blockPosition + new Vector3(1, 1, 0);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 2);
+                triangles.Add(vertexIndex + 1);
+                triangles.Add(vertexIndex);
+                triangles.Add(vertexIndex + 3);
+                triangles.Add(vertexIndex + 2);
+                normal = new Vector3(1, 0, 0);
             }
  
  
@@ -475,46 +466,46 @@ public class MapLoadSingleton : MonoBehaviour
             Vector2[] _spriteUVs = new Vector2[]
             {
                 new Vector2(tile.x, tile.y),
-                new Vector2(tile.x + _tileSize, tile.y),
-                new Vector2(tile.x + _tileSize, tile.y + _tileSize),
-                new Vector2(tile.x, tile.y + _tileSize)
+                new Vector2(tile.x + tileSize, tile.y),
+                new Vector2(tile.x + tileSize, tile.y + tileSize),
+                new Vector2(tile.x, tile.y + tileSize)
             };
 
-            _textureRect = _textureRectDictionary[_blockID];
+            textureRect = textureRectDictionary[blockID];
 
             // Calculate the new UVs based on the original rect's position and size
             for (int i = 0; i < _spriteUVs.Length; i++)
             {
                 _spriteUVs[i] = new Vector2(
-                    (_spriteUVs[i].x / _textureAtlasWidth) + _textureRect.x,
-                    (_spriteUVs[i].y / _textureAtlasHeight) + _textureRect.y
+                    (_spriteUVs[i].x / textureAtlasWidth) + textureRect.x,
+                    (_spriteUVs[i].y / textureAtlasHeight) + textureRect.y
                 );
             }
  
             // Add each UV coordinate individually
             for (int i = 0; i < _spriteUVs.Length; i++)
             {
-                _uvs.Add(_spriteUVs[i]);
-                _normals.Add(_normal);
-                _vertices.Add(_faceVertices[i]);
+                uvs.Add(_spriteUVs[i]);
+                normals.Add(normal);
+                vertices.Add(faceVertices[i]);
 
                 if (direction == dir.py) 
                 {
-                    _verticesShadow.Add(_faceVerticesShadow[i]);
+                    verticesShadow.Add(faceVerticesShadow[i]);
                 }
                 else
                 {
-                    _verticesShadow.Add(_faceVertices[i]);
+                    verticesShadow.Add(faceVertices[i]);
                 }
             } 
         }
 
         Vector2Int GetTileRect(int index)
         { 
-            int targetRow = index / _tilesPerRow;
-            int targetCol = index % _tilesPerRow;  
+            int targetRow = index / tilesPerRow;
+            int targetCol = index % tilesPerRow;  
 
-            return new Vector2Int(_colx[targetCol], _rowy[targetRow]);
+            return new Vector2Int(colx[targetCol], rowy[targetRow]);
         }
           
 
@@ -526,56 +517,56 @@ public class MapLoadSingleton : MonoBehaviour
 
             if (mode == dir.py) // Top
             {
-                bool isPy = _chunkMap[x, y + 1, z] == 0;
+                bool isPy = chunkMap[x, y + 1, z] == 0;
 
-                if ((_chunkMap[x, y, z + 1] != 0)
-                    || (isPy && _chunkMap[x, y + 1, z + 1] != 0))
+                if ((chunkMap[x, y, z + 1] != 0)
+                    || (isPy && chunkMap[x, y + 1, z + 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((_chunkMap[x + 1, y, z] != 0)
-                    || (isPy && _chunkMap[x + 1, y + 1, z] != 0))
+                if ((chunkMap[x + 1, y, z] != 0)
+                    || (isPy && chunkMap[x + 1, y + 1, z] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((_chunkMap[x, y, z - 1] != 0)
-                    || (isPy && _chunkMap[x, y + 1, z - 1] != 0))
+                if ((chunkMap[x, y, z - 1] != 0)
+                    || (isPy && chunkMap[x, y + 1, z - 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((_chunkMap[x - 1, y, z] != 0)
-                    || (isPy && _chunkMap[x - 1, y + 1, z] != 0))
+                if ((chunkMap[x - 1, y, z] != 0)
+                    || (isPy && chunkMap[x - 1, y + 1, z] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((_chunkMap[x - 1, y, z + 1] != 0)
-                    || (isPy && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x - 1, y, z + 1] != 0)
+                    || (isPy && chunkMap[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((_chunkMap[x + 1, y, z + 1] != 0)
-                    || (isPy && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x + 1, y, z + 1] != 0)
+                    || (isPy && chunkMap[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((_chunkMap[x + 1, y, z - 1] != 0)
-                    || (isPy && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x + 1, y, z - 1] != 0)
+                    || (isPy && chunkMap[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((_chunkMap[x - 1, y, z - 1] != 0)
-                    || (isPy && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x - 1, y, z - 1] != 0)
+                    || (isPy && chunkMap[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -583,56 +574,56 @@ public class MapLoadSingleton : MonoBehaviour
             }  
             else if (mode == dir.nx) // Negative X (Left side of the cube)
             {
-                bool isNx = _chunkMap[x - 1, y, z] == 0;
+                bool isNx = chunkMap[x - 1, y, z] == 0;
 
-                if ((_chunkMap[x, y + 1, z] != 0)
-                    || (isNx && _chunkMap[x - 1, y + 1, z] != 0))
+                if ((chunkMap[x, y + 1, z] != 0)
+                    || (isNx && chunkMap[x - 1, y + 1, z] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((_chunkMap[x, y, z + 1] != 0)
-                    || (isNx && _chunkMap[x - 1, y, z + 1] != 0))
+                if ((chunkMap[x, y, z + 1] != 0)
+                    || (isNx && chunkMap[x - 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((_chunkMap[x, y - 1, z] != 0)
-                    || (isNx && _chunkMap[x - 1, y - 1, z] != 0))
+                if ((chunkMap[x, y - 1, z] != 0)
+                    || (isNx && chunkMap[x - 1, y - 1, z] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((_chunkMap[x, y, z - 1] != 0)
-                    || (isNx && _chunkMap[x - 1, y, z - 1] != 0))
+                if ((chunkMap[x, y, z - 1] != 0)
+                    || (isNx && chunkMap[x - 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
                 
-                if (((_chunkMap[x, y + 1, z - 1] != 0)
-                     || (isNx && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x, y + 1, z - 1] != 0)
+                     || (isNx && chunkMap[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
-                if (((_chunkMap[x, y + 1, z + 1] != 0)
-                     || (isNx && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x, y + 1, z + 1] != 0)
+                     || (isNx && chunkMap[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((_chunkMap[x, y - 1, z + 1] != 0)
-                     || (isNx && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                if (((chunkMap[x, y - 1, z + 1] != 0)
+                     || (isNx && chunkMap[x - 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((_chunkMap[x, y - 1, z - 1] != 0)
-                     || (isNx && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                if (((chunkMap[x, y - 1, z - 1] != 0)
+                     || (isNx && chunkMap[x - 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -640,28 +631,28 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.px) // Positive X (Right side of the cube)
             {
-                bool isPx = _chunkMap[x + 1, y, z] == 0;
+                bool isPx = chunkMap[x + 1, y, z] == 0;
 
-                if ((_chunkMap[x, y + 1, z] != 0)
-                    || (isPx && _chunkMap[x + 1, y + 1, z] != 0))
+                if ((chunkMap[x, y + 1, z] != 0)
+                    || (isPx && chunkMap[x + 1, y + 1, z] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((_chunkMap[x, y, z + 1] != 0)
-                    || (isPx && _chunkMap[x + 1, y, z + 1] != 0))
+                if ((chunkMap[x, y, z + 1] != 0)
+                    || (isPx && chunkMap[x + 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((_chunkMap[x, y - 1, z] != 0)
-                    || (isPx && _chunkMap[x + 1, y - 1, z] != 0))
+                if ((chunkMap[x, y - 1, z] != 0)
+                    || (isPx && chunkMap[x + 1, y - 1, z] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((_chunkMap[x, y, z - 1] != 0)
-                    || (isPx && _chunkMap[x + 1, y, z - 1] != 0))
+                if ((chunkMap[x, y, z - 1] != 0)
+                    || (isPx && chunkMap[x + 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
@@ -669,29 +660,29 @@ public class MapLoadSingleton : MonoBehaviour
                 // Lib.Log(x,y,z,_chunkMap[x, y + 1, z] != 0, _chunkMap[x, y, z + 1] != 0,_chunkMap[x, y - 1, z] != 0, _chunkMap[x, y, z - 1] != 0, _chunkMap[x, y + 1, z + 1] != 0, _chunkMap[x, y - 1, z + 1] != 0, _chunkMap[x, y - 1, z - 1] != 0, _chunkMap[x, y + 1, z - 1] != 0);
                 // Calculate corner values
 
-                if (((_chunkMap[x, y + 1, z - 1] != 0)
-                     || (isPx && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x, y + 1, z - 1] != 0)
+                     || (isPx && chunkMap[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
                 
-                if (((_chunkMap[x, y + 1, z + 1] != 0)
-                     || (isPx && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x, y + 1, z + 1] != 0)
+                     || (isPx && chunkMap[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((_chunkMap[x, y - 1, z + 1] != 0)
-                     || (isPx && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                if (((chunkMap[x, y - 1, z + 1] != 0)
+                     || (isPx && chunkMap[x + 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((_chunkMap[x, y - 1, z - 1] != 0)
-                     || (isPx && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                if (((chunkMap[x, y - 1, z - 1] != 0)
+                     || (isPx && chunkMap[x + 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -699,56 +690,56 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.pz) // Positive Z (Front of the cube)
             {
-                bool isPz = _chunkMap[x, y, z + 1] == 0;
+                bool isPz = chunkMap[x, y, z + 1] == 0;
 
-                if ((_chunkMap[x, y + 1, z] != 0)
-                    || (isPz && _chunkMap[x, y + 1, z + 1] != 0))
+                if ((chunkMap[x, y + 1, z] != 0)
+                    || (isPz && chunkMap[x, y + 1, z + 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((_chunkMap[x + 1, y, z] != 0)
-                    || (isPz && _chunkMap[x + 1, y, z + 1] != 0))
+                if ((chunkMap[x + 1, y, z] != 0)
+                    || (isPz && chunkMap[x + 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((_chunkMap[x, y - 1, z] != 0)
-                    || (isPz && _chunkMap[x, y - 1, z + 1] != 0))
+                if ((chunkMap[x, y - 1, z] != 0)
+                    || (isPz && chunkMap[x, y - 1, z + 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((_chunkMap[x - 1, y, z] != 0)
-                    || (isPz && _chunkMap[x - 1, y, z + 1] != 0))
+                if ((chunkMap[x - 1, y, z] != 0)
+                    || (isPz && chunkMap[x - 1, y, z + 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((_chunkMap[x - 1, y + 1, z] != 0)
-                     || (isPz && _chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x - 1, y + 1, z] != 0)
+                     || (isPz && chunkMap[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((_chunkMap[x + 1, y + 1, z] != 0)
-                     || (isPz && _chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((chunkMap[x + 1, y + 1, z] != 0)
+                     || (isPz && chunkMap[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((_chunkMap[x + 1, y - 1, z] != 0)
-                     || (isPz && _chunkMap[x + 1, y - 1, z + 1] != 0))
+                if (((chunkMap[x + 1, y - 1, z] != 0)
+                     || (isPz && chunkMap[x + 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((_chunkMap[x - 1, y - 1, z] != 0)
-                     || (isPz && _chunkMap[x - 1, y - 1, z + 1] != 0))
+                if (((chunkMap[x - 1, y - 1, z] != 0)
+                     || (isPz && chunkMap[x - 1, y - 1, z + 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -756,56 +747,56 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.nz) // Negative Z (Back of the cube)
             {
-                bool isNz = _chunkMap[x, y, z - 1] == 0;
+                bool isNz = chunkMap[x, y, z - 1] == 0;
 
-                if ((_chunkMap[x, y + 1, z] != 0)
-                    || (isNz && _chunkMap[x, y + 1, z - 1] != 0))
+                if ((chunkMap[x, y + 1, z] != 0)
+                    || (isNz && chunkMap[x, y + 1, z - 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((_chunkMap[x + 1, y, z] != 0)
-                    || (isNz && _chunkMap[x + 1, y, z - 1] != 0))
+                if ((chunkMap[x + 1, y, z] != 0)
+                    || (isNz && chunkMap[x + 1, y, z - 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((_chunkMap[x, y - 1, z] != 0)
-                    || (isNz && _chunkMap[x, y - 1, z - 1] != 0))
+                if ((chunkMap[x, y - 1, z] != 0)
+                    || (isNz && chunkMap[x, y - 1, z - 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((_chunkMap[x - 1, y, z] != 0)
-                    || (isNz && _chunkMap[x - 1, y, z - 1] != 0))
+                if ((chunkMap[x - 1, y, z] != 0)
+                    || (isNz && chunkMap[x - 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((_chunkMap[x - 1, y + 1, z] != 0)
-                     || (isNz && _chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x - 1, y + 1, z] != 0)
+                     || (isNz && chunkMap[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((_chunkMap[x + 1, y + 1, z] != 0)
-                     || (isNz && _chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((chunkMap[x + 1, y + 1, z] != 0)
+                     || (isNz && chunkMap[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((_chunkMap[x + 1, y - 1, z] != 0)
-                     || (isNz && _chunkMap[x + 1, y - 1, z - 1] != 0))
+                if (((chunkMap[x + 1, y - 1, z] != 0)
+                     || (isNz && chunkMap[x + 1, y - 1, z - 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((_chunkMap[x - 1, y - 1, z] != 0)
-                     || (isNz && _chunkMap[x - 1, y - 1, z - 1] != 0))
+                if (((chunkMap[x - 1, y - 1, z] != 0)
+                     || (isNz && chunkMap[x - 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left

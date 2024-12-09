@@ -142,8 +142,7 @@ public class WorldSingleton : MonoBehaviour
                             {
                                 for (int k = 0; k < CHUNK_SIZE; k++)
                                 {
-                                        _boolMap[chunkX + i, chunkY + j, chunkZ + k] = chunkData.Map[i, j, k] == 0;
-
+                                    _boolMap[chunkX + i, chunkY + j, chunkZ + k] = chunkData.Map[i, j, k] == 0;
                                 }
                             }
                         }

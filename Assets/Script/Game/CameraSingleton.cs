@@ -16,13 +16,15 @@ public class CameraSingleton : MonoBehaviour
     private float _screenHeight; 
     private Quaternion _targetRotation;
     private Vector3 _targetPosition;
-
-    [SerializeField] private float TILT_DEGREE_X = 0.15f;
-    [SerializeField] private float TILT_DEGREE_Y = 0.2f; // Maximum rotation angle
-    [SerializeField] private float PAN_DEGREE = 1f; // Maximum rotation angle
-    [SerializeField] private float TILT_SPEED = 1f; // Speed of rotation
-    [SerializeField] private float FOLLOW_SPEED = 10f; // Speed of following the player
-    [SerializeField] private float FOV_CHANGE_SPEED = 11f; // Speed of FOV change
+    
+    private float DISTANCE = 20;
+    private int FOV = 50;
+    private float TILT_DEGREE_X = 0.15f;
+    private float TILT_DEGREE_Y = 0.2f; // Maximum rotation angle
+    private float PAN_DEGREE = 1f; // Maximum rotation angle
+    private float TILT_SPEED = 1f; // Speed of rotation
+    private float FOLLOW_SPEED = 10f; // Speed of following the player
+    private float FOV_CHANGE_SPEED = 11f; // Speed of FOV change
  
     private static float _sinAngle = 0;
     private static float _cosAngle = 0; 
@@ -101,8 +103,9 @@ public class CameraSingleton : MonoBehaviour
     public void HandleScrollInput(float input)
     { 
         Camera cameraComponent = Game.Camera.GetComponent<Camera>();
+        // DISTANCE -= input * FOV_CHANGE_SPEED;
         cameraComponent.fieldOfView -= input * FOV_CHANGE_SPEED;
-        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, 45f);
+        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, FOV);
     }
 
     void HandleChangeSortAxis()
@@ -125,8 +128,8 @@ public class CameraSingleton : MonoBehaviour
         float newRotationY =  angleX * TILT_DEGREE_Y;
         float newRotationX =  angleY * TILT_DEGREE_X;
         // UnityEngine.Debug.Log(Game.Camera.transform.rotation.y); 
-        _targetRotation = Quaternion.Euler(45 - newRotationX, newRotationY , 0);
-        _targetPosition = new Vector3(newRotationY * PAN_DEGREE, 30, -30); 
+        _targetRotation = Quaternion.Euler(45 - newRotationX, newRotationY , 0); 
+        _targetPosition = new Vector3(newRotationY * PAN_DEGREE, DISTANCE, -DISTANCE); 
 
         Game.Camera.transform.localRotation = Quaternion.Lerp(Game.Camera.transform.localRotation, _targetRotation, Time.deltaTime * TILT_SPEED);
         Game.Camera.transform.localPosition = Vector3.Lerp(Game.Camera.transform.localPosition, _targetPosition, Time.deltaTime * TILT_SPEED);
