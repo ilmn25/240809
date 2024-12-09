@@ -38,7 +38,7 @@ public class BlockPreviewSingleton : MonoBehaviour
 
         meshObject = new(blockID)
         {
-            layer = Game.MapLayerIndex
+            layer = Game.IndexMap
         };
     
         meshObject.transform.parent = transform; 

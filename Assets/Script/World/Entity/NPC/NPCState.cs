@@ -39,7 +39,7 @@ class NPCRoam : EntityState {
         if (_sprite.isVisible)
         {
             _movementModule.SetDirection(_pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded()));
-            _movementModule.HandleMovementUpdate();
+            _movementModule.HandleMovementUpdate(true);
             _animationModule.HandleAnimationUpdate();
         }
         else

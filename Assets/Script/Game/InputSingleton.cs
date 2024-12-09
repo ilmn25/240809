@@ -35,14 +35,14 @@ public class InputSingleton : MonoBehaviour
         {
             GUICraftingSingleton.Instance.HandleScrollInput(scroll);
         }
-        else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
+        else if (Input.GetMouseButton(1))
         {
             MapCullSingleton.Instance.HandleScrollInput(scroll);
-        } 
-        else if (Input.GetKey(KeyCode.LeftShift))
-        {
-            CameraSingleton.Instance.HandleScrollInput(scroll);
         }
+        else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
+        {
+            CameraSingleton.Instance.HandleScrollInput(scroll); 
+        }  
         else
         {
             InventorySingleton.Instance.HandleScrollInput(scroll);
@@ -61,7 +61,7 @@ public class InputSingleton : MonoBehaviour
             
             if (!WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
             { 
-                _layerMask = Game.MapLayerIndex;
+                _layerMask = Game.MaskMap;
                 _position = Vector3Int.FloorToInt(_thresholdPoint); ;
                 _direction = Vector3.down;
                 return;
@@ -76,7 +76,8 @@ public class InputSingleton : MonoBehaviour
 
         if (_targetInfo.collider)
         {
-            _layerMask = _targetInfo.collider.gameObject.layer;
+            // _layerMask = _targetInfo.collider.gameObject.layer;
+            _layerMask = _targetInfo.collider.includeLayers;
             _gameObject = _targetInfo.collider.gameObject;
             _position = _targetInfo.point;
             _direction = ray.direction;
@@ -98,7 +99,7 @@ public class InputSingleton : MonoBehaviour
 
     private void HandleInput()
     {
-        if (_layerMask == Game.MapLayerIndex)
+        if (Game.isLayer(_layerMask, Game.IndexMap))
         {
             PlayerChunkEditSingleton.Instance.HandlePositionInfo(_position,  _direction);
             if (Input.GetMouseButtonDown(0))
@@ -110,7 +111,7 @@ public class InputSingleton : MonoBehaviour
                 PlayerChunkEditSingleton.Instance.HandleMapPlace();
             }
         }
-        else if (_layerMask == Game.EntityLayerIndex)
+        else if (Game.isLayer(_layerMask, Game.IndexLC))
         { 
             if (Input.GetMouseButtonDown(0))
             {

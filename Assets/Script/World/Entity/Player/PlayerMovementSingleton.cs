@@ -285,7 +285,7 @@ public class PlayerMovementSingleton : MonoBehaviour
     private bool IsMovable(Vector3 _newPosition)
     {
         // Define an array to store the results  
-        collisionCount = Physics.OverlapBoxNonAlloc(_newPosition + boxCollider.center, boxColliderSize, tempCollisionArray, Quaternion.identity, Game.LayerCollide);
+        collisionCount = Physics.OverlapBoxNonAlloc(_newPosition + boxCollider.center, boxColliderSize, tempCollisionArray, Quaternion.identity, Game.MaskMapAndCollision);
         return !(collisionCount > 0);
     }
  

@@ -73,7 +73,7 @@ public class MovementModule : MonoBehaviour
         if (_direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = _isGrounded ? isRoam? SPEED_WALK * 0.7f : SPEED_WALK : SPEED_RUN;
+            _speedTarget = _isGrounded ? isRoam? SPEED_WALK * 0.8f : SPEED_WALK : SPEED_RUN;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
             _speedAdjust = (_direction.x != 0 && _direction.z != 0) ? 1 / 1.25f : 1; 
 
@@ -198,7 +198,7 @@ public class MovementModule : MonoBehaviour
 
         Vector3 halfExtents = new Vector3(COLLISION_RADIUS, COLLISION_RADIUS, COLLISION_RADIUS);
 
-        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.LayerCollide) > 0);
+        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.MaskMapAndCollision) > 0);
     }
     // private bool IsMovable(Vector3 newPosition)
     // {

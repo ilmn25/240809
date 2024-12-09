@@ -100,7 +100,6 @@ public class MapCullSingleton : MonoBehaviour
         {
             if (_yThreshold < (int)playerPosition.y)
             {
-                Lib.Log(_yThreshold);
                 _yThreshold = (int)playerPosition.y;
                 _visionHeight = _yThreshold;
             }
@@ -189,11 +188,11 @@ public class MapCullSingleton : MonoBehaviour
         }  
     
         rayToCamera = new Ray(playerPosition + Vector3.up * 0.9f,  _camera.transform.position - (playerPosition + Vector3.up * 0.9f));
-        if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition + Vector3.up * 0.9f, _camera.transform.position), Game.LayerMap))
+        if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition + Vector3.up * 0.9f, _camera.transform.position), Game.MaskMap))
         {
             // head then feet check
             rayToCamera = new Ray(playerPosition,  _camera.transform.position - playerPosition);
-            if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, _camera.transform.position), Game.LayerMap))
+            if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, _camera.transform.position), Game.MaskMap))
             {
                 _yCheck = true;
                 _yThreshold = _visionHeight;
@@ -205,10 +204,10 @@ public class MapCullSingleton : MonoBehaviour
         rayBackward = new Ray(playerPosition, backwardDirection);
         rayLeft = new Ray(playerPosition, leftDirection);
         rayRight = new Ray(playerPosition, rightDirection);
-        if (Physics.Raycast(rayForward, out _, 50, Game.LayerMap) &&
-            Physics.Raycast(rayBackward, out _, 50, Game.LayerMap) &&
-            Physics.Raycast(rayLeft, out _, 50, Game.LayerMap) &&
-            Physics.Raycast(rayRight, out _, 50, Game.LayerMap)) {
+        if (Physics.Raycast(rayForward, out _, 50, Game.MaskMap) &&
+            Physics.Raycast(rayBackward, out _, 50, Game.MaskMap) &&
+            Physics.Raycast(rayLeft, out _, 50, Game.MaskMap) &&
+            Physics.Raycast(rayRight, out _, 50, Game.MaskMap)) {
             _yCheck = true;
             _yThreshold = _visionHeight;
             return;

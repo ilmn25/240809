@@ -4,9 +4,9 @@ public class DecorStateMachine : EntityStateMachine
     {
         AddState(new Idle(), true);
     }
- 
-    private void OnMouseDown()
-    {
-        WipeEntity();
-    } 
+    //
+    // private void OnMouseDown()
+    // {
+    //     WipeEntity();
+    // } 
 }

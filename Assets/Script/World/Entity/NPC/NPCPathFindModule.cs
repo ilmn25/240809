@@ -26,13 +26,6 @@ public class NPCPathFindModule : PathFindModule
             }
         } 
         if (!validity) return false;
-
-        
-        
-        
-        
-        
-        
         
         //! check for diagonal walls
         validity = false;
@@ -50,13 +43,6 @@ public class NPCPathFindModule : PathFindModule
             validity = true;
         }
         if (!validity) return false;
-
-        
-        
-        
-        
-        
-        
         
         //! check jump and air time
         if (JUMP == 0) {
@@ -124,5 +110,4 @@ public class NPCPathFindModule : PathFindModule
 
         return true;
     }
- 
 }

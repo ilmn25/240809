@@ -9,11 +9,12 @@ public class Game : MonoBehaviour
     public static string PLAYER_SAVE_PATH;  
     public static Game Instance { get; private set; }  
     
-    public static LayerMask LayerMap; // just map
-    public static LayerMask LayerCollide;
-    public static int MapLayerIndex;
-    public static int UILayerIndex;
-    public static int EntityLayerIndex;
+    public static LayerMask MaskMap; // just map
+    public static LayerMask MaskMapAndCollision;
+    public static int IndexMap;
+    public static int IndexUI;
+    public static int IndexEntity;
+    public static int IndexLC;
     
     public static GameObject UserSystem;
     public static GameObject Player;
@@ -44,11 +45,16 @@ public class Game : MonoBehaviour
         
         DigSound = Resources.Load<AudioClip>("audio/sfx/dig/stone");
         Instance = this;
-        LayerMap  = LayerMask.GetMask("Map"); 
-        LayerCollide  = LayerMask.GetMask("Map", "Entity"); 
-        MapLayerIndex = LayerMask.NameToLayer("Map");
-        UILayerIndex = LayerMask.NameToLayer("UI");
-        EntityLayerIndex = LayerMask.NameToLayer("Entity");
+        
+        MaskMap  = LayerMask.GetMask("Map"); 
+        MaskMapAndCollision  = LayerMask.GetMask("Collision", "Map"); 
+        LayerMask.GetMask("Entity"); 
+        LayerMask.GetMask("LC");
+        IndexMap = LayerMask.NameToLayer("Map");
+        IndexUI = LayerMask.NameToLayer("UI");
+        IndexEntity = LayerMask.NameToLayer("Entity");
+        LayerMask.NameToLayer("Collision");
+        IndexLC = LayerMask.NameToLayer("LC");
         
         DOWNLOAD_PATH = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PLAYER_SAVE_PATH = $"{DOWNLOAD_PATH}\\PlayerData.dat";
@@ -75,9 +81,9 @@ public class Game : MonoBehaviour
         EntitySystem = GameObject.Find("entity_system");
         MapSystem = GameObject.Find("map_system");
          
-        Physics.IgnoreLayerCollision(Game.EntityLayerIndex, Game.MapLayerIndex);
-        Physics.IgnoreLayerCollision(Game.UILayerIndex, Game.MapLayerIndex);
-        Physics.IgnoreLayerCollision(Game.UILayerIndex, Game.EntityLayerIndex);
+        Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
+        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
+        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
     }
     
     void Update()
@@ -93,6 +99,11 @@ public class Game : MonoBehaviour
                 Screen.SetResolution(1920, 1080, true);
             }
         }
+    }
+
+    public static bool isLayer(int colliderIndex, int targetIndex)
+    {
+        return (colliderIndex & (1 << targetIndex)) != 0;
     }
     
     public static float GetDeltaTime()
