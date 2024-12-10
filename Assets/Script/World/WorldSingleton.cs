@@ -10,6 +10,47 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+
+public class BoolMap
+{
+    private BitArray _bitMap;
+    private int _xSize, _ySize, _zSize;
+
+    public BoolMap(int x, int y, int z)
+    {
+        _xSize = x;
+        _ySize = y;
+        _zSize = z;
+        _bitMap = new BitArray(x * y * z);
+    }
+
+    public bool this[int x, int y, int z]
+    {
+        get
+        {
+            int index = GetIndex(x, y, z);
+            return _bitMap[index];
+        }
+        set
+        {
+            int index = GetIndex(x, y, z);
+            _bitMap[index] = value;
+        }
+    }
+
+    private int GetIndex(int x, int y, int z)
+    {
+        return x + _xSize * (y + _ySize * z);
+    }
+
+    public bool IsInBounds(int x, int y, int z)
+    {
+        return x >= 0 && x < _xSize &&
+               y >= 0 && y < _ySize &&
+               z >= 0 && z < _zSize;
+    }
+}
+
 public class WorldSingleton : MonoBehaviour
 { 
     public static WorldSingleton Instance { get; private set; }  
@@ -28,7 +69,7 @@ public class WorldSingleton : MonoBehaviour
     [HideInInspector] 
     public static Vector3Int _boolMapOrigin = Vector3Int.zero;
     [HideInInspector] 
-    public static bool[,,] _boolMap;
+    public static BoolMap _boolMap;
     [HideInInspector] 
     public static int CHUNK_SIZE = 20; 
     [HideInInspector] 
@@ -71,11 +112,7 @@ public class WorldSingleton : MonoBehaviour
             Application.Quit();
         }
     }
-
-    private void OnApplicationQuit()
-    {
-        HandleSaveWorldFile(0);
-    }
+ 
 
     private string getFilePath(int yLevel)
     {
@@ -121,7 +158,7 @@ public class WorldSingleton : MonoBehaviour
  
     public void GenerateBoolMap()
     {
-        _boolMap = new bool[World.Bounds.x, World.Bounds.y, World.Bounds.z];
+        _boolMap = new BoolMap(World.Bounds.x, World.Bounds.y, World.Bounds.z);
         ChunkData chunkData;
         
         for (int wx = 0; wx < World.Length.x; wx++)

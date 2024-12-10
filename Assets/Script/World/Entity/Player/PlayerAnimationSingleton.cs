@@ -34,12 +34,12 @@ public class PlayerAnimationSingleton : MonoBehaviour
         _originalScale = _sprite.transform.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
 
-        CameraSingleton.OnOrbitRotate += UpdateOrbit;
+        CameraSingleton.UpdateOrbitRotate += UpdateOrbit;
     }
 
     void OnDestroy()
     {
-        CameraSingleton.OnOrbitRotate -= UpdateOrbit; 
+        CameraSingleton.UpdateOrbitRotate -= UpdateOrbit; 
     }   
  
     void UpdateOrbit()

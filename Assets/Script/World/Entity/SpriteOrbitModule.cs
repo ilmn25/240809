@@ -13,12 +13,12 @@ public class SpriteOrbitModule : MonoBehaviour
     
     void Start()
     {   
-        CameraSingleton.OnOrbitRotate += UpdateOrbit;
+        CameraSingleton.UpdateOrbitRotate += UpdateOrbit;
     }
     
     void OnDestroy()
     {
-        CameraSingleton.OnOrbitRotate -= UpdateOrbit; 
+        CameraSingleton.UpdateOrbitRotate -= UpdateOrbit; 
     }   
     
     void OnBecameVisible() {

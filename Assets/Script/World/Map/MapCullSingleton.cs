@@ -47,6 +47,7 @@ public class MapCullSingleton : MonoBehaviour
     {
         Instance = this;
         StartCoroutine(yCheckRoutine());
+        CameraSingleton.OnOrbitRotate += HandleObstructionCheck;
     }
     private IEnumerator yCheckRoutine()
     {
@@ -111,12 +112,12 @@ public class MapCullSingleton : MonoBehaviour
             
             if (!_yCheckPrevious && _yCheck) // enter
             {
-                HandleLight(true);
+                // HandleLight(true);
                 UpdateYCullDelayed(_yCheck);
             }
             else if (_yCheckPrevious && !_yCheck) // exit
             {
-                HandleLight(false);
+                // HandleLight(false);
                 UpdateYCullDelayed(_yCheck);
             }
             else if (_yCheck)   
@@ -154,7 +155,7 @@ public class MapCullSingleton : MonoBehaviour
         if (_delayBuffer) return;
         _delayBuffer = true;
 
-        await Task.Delay(120);
+        await Task.Delay(65);
         if (_yCheck == yCheckPrevious)
         { 
             UpdateYCull();
@@ -185,14 +186,15 @@ public class MapCullSingleton : MonoBehaviour
             _yCheck = true;
             _yThreshold = _visionHeight;
             return;
-        }  
-    
-        rayToCamera = new Ray(playerPosition + Vector3.up * 0.9f,  _camera.transform.position - (playerPosition + Vector3.up * 0.9f));
-        if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition + Vector3.up * 0.9f, _camera.transform.position), Game.MaskMap))
+        }
+        
+        Vector3 cameraPosition = playerPosition +  (Quaternion.Euler(0, CameraSingleton._orbitRotation, 0) * new Vector3(0, CameraSingleton.DISTANCE, -CameraSingleton.DISTANCE));
+        rayToCamera = new Ray(playerPosition + Vector3.up * 0.9f,  cameraPosition - (playerPosition + Vector3.up * 0.9f));
+        if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition + Vector3.up * 0.9f, cameraPosition), Game.MaskMap))
         {
             // head then feet check
-            rayToCamera = new Ray(playerPosition,  _camera.transform.position - playerPosition);
-            if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, _camera.transform.position), Game.MaskMap))
+            rayToCamera = new Ray(playerPosition,  cameraPosition - playerPosition);
+            if (Physics.Raycast(rayToCamera, out _, Vector3.Distance(playerPosition, cameraPosition), Game.MaskMap))
             {
                 _yCheck = true;
                 _yThreshold = _visionHeight;

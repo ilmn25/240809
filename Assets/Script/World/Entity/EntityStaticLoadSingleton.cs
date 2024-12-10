@@ -113,7 +113,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
         foreach (EntityData entityData in _chunkEntityList)
         { 
             _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.ID);
-            _currentInstance.transform.position = Lib.CombineVector(_currentChunkCoordinate, entityData.Position.ToVector3());
+            _currentInstance.transform.position = _currentChunkCoordinate + entityData.Position.ToVector3() + new Vector3(0.5f, 0, 0.5f);
 
             _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();
             _entityList[_currentChunkCoordinate].Item2.Add(_currentEntityHandler);  

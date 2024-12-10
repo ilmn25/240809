@@ -9,22 +9,26 @@ public class CameraSingleton : MonoBehaviour
     
     public static int _orbitRotation = 0;
     public static Quaternion _currentRotation;
+    public static event Action UpdateOrbitRotate;
     public static event Action OnOrbitRotate;
     private Coroutine _orbitCoroutine; 
+    private Camera _camera;
     
     private float _screenWidth;
     private float _screenHeight; 
     private Quaternion _targetRotation;
     private Vector3 _targetPosition;
+    private float _targetFOV = 40;
     
-    private float DISTANCE = 20;
-    private int FOV = 50;
+    
+    public static float DISTANCE = 26;
+    private int FOV = 55;
     private float TILT_DEGREE_X = 0.15f;
     private float TILT_DEGREE_Y = 0.2f; // Maximum rotation angle
     private float PAN_DEGREE = 1f; // Maximum rotation angle
     private float TILT_SPEED = 1f; // Speed of rotation
     private float FOLLOW_SPEED = 10f; // Speed of following the player
-    private float FOV_CHANGE_SPEED = 11f; // Speed of FOV change
+    private int FOV_CHANGE_SPEED = 32; // Speed of FOV change
  
     private static float _sinAngle = 0;
     private static float _cosAngle = 0; 
@@ -33,18 +37,21 @@ public class CameraSingleton : MonoBehaviour
     void Start()
     {  
         Instance = this;
-        
+
+        _camera = Game.Camera.GetComponent<Camera>();
+        _camera.transparencySortMode = TransparencySortMode.CustomAxis; 
         _screenWidth = Screen.width;
         _screenHeight = Screen.height;
         _targetRotation = Game.Camera.transform.rotation;
-        _targetPosition = Game.Camera.transform.localPosition;
-        Game.Camera.GetComponent<Camera>().transparencySortMode = TransparencySortMode.CustomAxis; 
+        _targetPosition = Game.Camera.transform.localPosition; 
 
         UpdateOrbit();
     }
 
     void Update()
     {   
+        
+        _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
         
         HandlePlayerFollow(); 
         HandleCameraSway();
@@ -54,6 +61,7 @@ public class CameraSingleton : MonoBehaviour
             _orbitRotation += 45;
             if (_orbitRotation >= 180) _orbitRotation = -180;
             UpdateOrbit();
+            OnOrbitRotate?.Invoke();
  
         }
         else if (Input.GetKeyDown(KeyCode.E))
@@ -61,7 +69,7 @@ public class CameraSingleton : MonoBehaviour
             _orbitRotation -= 45;
             if (_orbitRotation <= -180) _orbitRotation = 180;
             UpdateOrbit();
-
+            OnOrbitRotate?.Invoke();
         }
         else transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, _orbitRotation, 0), Time.deltaTime * 7);
 
@@ -90,7 +98,7 @@ public class CameraSingleton : MonoBehaviour
             if (Quaternion.Angle(transform.rotation, targetRotation) > 0.1f)
             {
                 _currentRotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 7);
-                OnOrbitRotate?.Invoke();
+                UpdateOrbitRotate?.Invoke();
             }
             else
             {
@@ -101,11 +109,10 @@ public class CameraSingleton : MonoBehaviour
     }
 
     public void HandleScrollInput(float input)
-    { 
-        Camera cameraComponent = Game.Camera.GetComponent<Camera>();
+    {  
         // DISTANCE -= input * FOV_CHANGE_SPEED;
-        cameraComponent.fieldOfView -= input * FOV_CHANGE_SPEED;
-        cameraComponent.fieldOfView = Mathf.Clamp(cameraComponent.fieldOfView, 6f, FOV);
+        _targetFOV -= input * FOV_CHANGE_SPEED;
+        _targetFOV = Mathf.Clamp(_targetFOV, 10, FOV);
     }
 
     void HandleChangeSortAxis()

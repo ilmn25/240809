@@ -5,6 +5,9 @@ using UnityEngine;
 public class ItemStateMachine : EntityStateMachine
 {
     private ItemPhysicModule _itemPhysicModule;
+    public bool pickUp = true;
+    private bool wasInRange = false;
+    
     protected override void OnAwake()
     {
         _itemPhysicModule = GetComponent<ItemPhysicModule>();
@@ -14,16 +17,20 @@ public class ItemStateMachine : EntityStateMachine
 
     protected override void LogicUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            float playerDistance = Vector3.Distance(transform.position, Game.Player.transform.position);
-        
-            if (playerDistance <= 0.8f)
+        if (Vector3.Distance(transform.position, Game.Player.transform.position) <= 0.8f)
+        { 
+            if (pickUp)
             {
+                AudioSingleton.PlaySFX(Game.PickUpSound);
                 InventorySingleton.AddItem(GetEntityData().ID, 1);
                 WipeEntity();
-            }
-        } 
+            } 
+            wasInRange = true;
+        }
+        else if (wasInRange)
+        {
+            pickUp = true;
+        }
     }
 }
 

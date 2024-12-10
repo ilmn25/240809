@@ -34,7 +34,10 @@ public class Game : MonoBehaviour
     public static GameObject WorldSystem;
     public static GameObject EntitySystem;
     public static GameObject MapSystem;
+    
     public static AudioClip DigSound;
+    public static AudioClip PickUpSound;
+    public static AudioClip ChatSound;
      
     public static float MAX_DELTA_TIME = 0.03f;
     float FIXED_UPDATE_MS = 0.10f;
@@ -44,6 +47,8 @@ public class Game : MonoBehaviour
         Application.targetFrameRate = 200;
         
         DigSound = Resources.Load<AudioClip>("audio/sfx/dig/stone");
+        PickUpSound = Resources.Load<AudioClip>("audio/sfx/pick_up");
+        ChatSound = Resources.Load<AudioClip>("audio/sfx/chat");
         Instance = this;
         
         MaskMap  = LayerMask.GetMask("Map"); 

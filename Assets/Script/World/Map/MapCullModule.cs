@@ -319,42 +319,201 @@ public class MapCullModule : MonoBehaviour
                 }
             }
         }
-    }
-
-}
-
-public struct NativeArray3D<T> where T : struct
-{
-    private NativeArray<T> array;
-    private int rows;
-    private int cols;
-    private int depth;
-
-    public NativeArray3D(T[,,] array, Allocator allocator)
-    {
-        rows = array.GetLength(0);
-        cols = array.GetLength(1);
-        depth = array.GetLength(2);
-        this.array = new NativeArray<T>(rows * cols * depth, allocator);
-        for (int i = 0; i < rows; i++)
+        
+        
+        int HandleMeshAutoTile(int x, int y, int z)
         {
-            for (int j = 0; j < cols; j++)
+            int spriteNumber = 0;
+            int edgeValue = 0;
+            int cornerValue = 0;
+            bool isPy = chunkMap[x, y + 1, z] == 0;
+
+            if ((chunkMap[x, y, z + 1] != 0)
+                || (isPy && chunkMap[x, y + 1, z + 1] != 0))
             {
-                for (int k = 0; k < depth; k++)
-                {
-                    this.array[i * cols * depth + j * depth + k] = array[i, j, k];
-                }
+                edgeValue += 1; // Top
             }
+
+            if ((chunkMap[x + 1, y, z] != 0)
+                || (isPy && chunkMap[x + 1, y + 1, z] != 0))
+            {
+                edgeValue += 2; // Right
+            }
+
+            if ((chunkMap[x, y, z - 1] != 0)
+                || (isPy && chunkMap[x, y + 1, z - 1] != 0))
+            {
+                edgeValue += 4; // Bottom
+            }
+
+            if ((chunkMap[x - 1, y, z] != 0)
+                || (isPy && chunkMap[x - 1, y + 1, z] != 0))
+            {
+                edgeValue += 8; // Left
+            }
+
+            // Calculate corner values
+            if (((chunkMap[x - 1, y, z + 1] != 0)
+                || (isPy && chunkMap[x - 1, y + 1, z + 1] != 0))
+                && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
+            {
+                cornerValue += 1; // Top-Left
+            }
+
+            if (((chunkMap[x + 1, y, z + 1] != 0)
+                || (isPy && chunkMap[x + 1, y + 1, z + 1] != 0))
+                && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
+            {
+                cornerValue += 2; // Top-Right
+            }
+
+            if (((chunkMap[x + 1, y, z - 1] != 0)
+                || (isPy && chunkMap[x + 1, y + 1, z - 1] != 0))
+                && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
+            {
+                cornerValue += 4; // Bottom-Right
+            }
+
+            if (((chunkMap[x - 1, y, z - 1] != 0)
+                || (isPy && chunkMap[x - 1, y + 1, z - 1] != 0))
+                && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
+            {
+                cornerValue += 8; // Bottom-Left
+            }
+
+            // Determine the tile number using nested switch statements
+            switch (edgeValue)
+            {
+                case 0: spriteNumber = 36; break;
+                case 1: spriteNumber = 24; break;
+                case 2: spriteNumber = 37; break;
+                case 3:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 25; break;
+                        case 2: spriteNumber = 44; break;
+                    }
+                    break;
+                case 4: spriteNumber = 0; break;
+                case 5: spriteNumber = 12; break;
+                case 6:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 1; break;
+                        case 4: spriteNumber = 8; break;
+                    }
+                    break;
+                case 7:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 13; break;
+                        case 2: spriteNumber = 28; break;
+                        case 4: spriteNumber = 16; break;
+                        case 6: spriteNumber = 20; break;
+                    }
+                    break;
+                case 8: spriteNumber = 39; break;
+                case 9:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 27; break;
+                        case 1: spriteNumber = 47; break;
+                    }
+                    break;
+                case 10: spriteNumber = 38; break;
+                case 11:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 26; break;
+                        case 1: spriteNumber = 42; break;
+                        case 2: spriteNumber = 41; break;
+                        case 3: spriteNumber = 45; break;
+                    }
+                    break;
+                case 12:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 3; break;
+                        case 8: spriteNumber = 11; break;
+                    }
+                    break;
+                case 13:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 15; break;
+                        case 1: spriteNumber = 31; break;
+                        case 8: spriteNumber = 19; break;
+                        case 9: spriteNumber = 35; break;
+                    }
+                    break;
+                case 14:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 2; break;
+                        case 4: spriteNumber = 5; break;
+                        case 8: spriteNumber = 6; break;
+                        case 12: spriteNumber = 10; break;
+                    }
+                    break;
+                case 15:
+                    switch (cornerValue)
+                    {
+                        case 0: spriteNumber = 14; break;
+                        case 1: spriteNumber = 4; break;
+                        case 2: spriteNumber = 7; break;
+                        case 3: spriteNumber = 46; break;
+                        case 4: spriteNumber = 43; break;
+                        case 5: spriteNumber = 34; break;
+                        case 6: spriteNumber = 32; break;
+                        case 7: spriteNumber = 29; break;
+                        case 8: spriteNumber = 40; break;
+                        case 9: spriteNumber = 23; break;
+                        case 10: spriteNumber = 21; break;
+                        case 11: spriteNumber = 30; break;
+                        case 12: spriteNumber = 9; break;
+                        case 13: spriteNumber = 18; break;
+                        case 14: spriteNumber = 17; break;
+                        case 15: spriteNumber = 33; break;
+                    }
+                    break;
+            } 
+            return spriteNumber;
         }
     }
-
-    public T this[int row, int col, int dep]
-    {
-        get => array[row * cols * depth + col * depth + dep];
-    }
-
-    public void Dispose()
-    {
-        array.Dispose();
-    }
 }
+//
+// public struct NativeArray3D<T> where T : struct
+// {
+//     private NativeArray<T> array;
+//     private int rows;
+//     private int cols;
+//     private int depth;
+//
+//     public NativeArray3D(T[,,] array, Allocator allocator)
+//     {
+//         rows = array.GetLength(0);
+//         cols = array.GetLength(1);
+//         depth = array.GetLength(2);
+//         this.array = new NativeArray<T>(rows * cols * depth, allocator);
+//         for (int i = 0; i < rows; i++)
+//         {
+//             for (int j = 0; j < cols; j++)
+//             {
+//                 for (int k = 0; k < depth; k++)
+//                 {
+//                     this.array[i * cols * depth + j * depth + k] = array[i, j, k];
+//                 }
+//             }
+//         }
+//     }
+//
+//     public T this[int row, int col, int dep]
+//     {
+//         get => array[row * cols * depth + col * depth + dep];
+//     }
+//
+//     public void Dispose()
+//     {
+//         array.Dispose();
+//     }
+// }

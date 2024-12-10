@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class NPCPathFindModule : PathFindModule
+public class CharNpcPathFindAbstract : NPCPathFindAbstract
 {
     public int HEIGHT = 1;
     public int JUMP = 1;

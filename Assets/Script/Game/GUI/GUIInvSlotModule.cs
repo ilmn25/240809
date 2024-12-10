@@ -1,4 +1,3 @@
-using Script.World.Map;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;

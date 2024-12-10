@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class Entity
+public class EntitySpawner
 {
-        public static void SpawnItem(string stringID, Vector3 worldPosition)
+        public static void SpawnItem(string stringID, Vector3 worldPosition, bool pickUp = true)
         {
                 EntityData entityData = new EntityData(stringID, new SerializableVector3(worldPosition), type: EntityType.Item);
         
@@ -14,8 +14,9 @@ public class Entity
                 EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
                 EntityDynamicLoadSingleton._entityList.Add(currentEntityHandler); 
                 currentEntityHandler.Initialize(entityData, false);
-         
+                gameObject.transform.GetComponent<ItemStateMachine>().pickUp = pickUp;
         }
+        
         public static void SpawnPrefab(string stringID, Vector3 worldPosition)
         {
                 EntityData entityData = new EntityData(stringID, new SerializableVector3(worldPosition), type: EntityType.Rigid);
@@ -25,6 +26,5 @@ public class Entity
                 EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
                 EntityDynamicLoadSingleton._entityList.Add(currentEntityHandler); 
                 currentEntityHandler.Initialize(entityData, false);
-         
         }
 }
