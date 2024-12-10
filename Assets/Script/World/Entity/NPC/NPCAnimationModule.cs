@@ -1,11 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-public class AnimationModule : MonoBehaviour
+public class NPCAnimationModule : MonoBehaviour
 {
     private Animator _animator;
     private GameObject _sprite;
-    private MovementModule _movementModule;
+    private NPCMovementModule _npcMovementModule;
     private int _flipDirection;
     private float _nextTrailTimer = 0f; // Time when the next trail should be created
     private Vector2 _relativeDirection;
@@ -24,7 +24,7 @@ public class AnimationModule : MonoBehaviour
     void Awake()
     {
         _sprite = transform.Find("sprite").gameObject;
-        _movementModule = GetComponent<MovementModule>();
+        _npcMovementModule = GetComponent<NPCMovementModule>();
         _animator = _sprite.GetComponent<Animator>();
         
         _targetScale = _sprite.transform.localScale; 
@@ -37,7 +37,7 @@ public class AnimationModule : MonoBehaviour
     public void HandleAnimationUpdate()
     {
         // facing _relativeDirection 
-        _relativeDirection = new Vector2(_movementModule.GetDirection().x, _movementModule.GetDirection().z);  
+        _relativeDirection = new Vector2(_npcMovementModule.GetDirection().x, _npcMovementModule.GetDirection().z);  
         _relativeDirection.Normalize(); 
         if (_relativeDirection != Vector2.zero)
         { 
@@ -48,7 +48,7 @@ public class AnimationModule : MonoBehaviour
             _animator.SetFloat("PosY", _relativeDirection.y);
         }
 
-        isMoving = _movementModule.GetSpeed() > 0.35 && _movementModule.IsGrounded();
+        isMoving = _npcMovementModule.GetSpeed() > 0.35 && _npcMovementModule.IsGrounded();
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class PathFindModule : MonoBehaviour
+public abstract class NPCPathFindAbstract : MonoBehaviour
 {
     // parameters
     private Transform _target;
@@ -18,14 +18,14 @@ public abstract class PathFindModule : MonoBehaviour
     private int _jumpSkipAmount;
     private int _scanCount;
     
-    public PathFindModule(
+    public NPCPathFindAbstract(
         float targetReachedInner = 1f, 
         float targetReachedOuter = 2f, 
         float pointReachDistance = 0.45f, 
         float pointMissDistance = 3f, 
         float repathInterval = 0.1f, 
         int jumpSkipAmount = 1,
-        int scanCount = 9000)
+        int scanCount = 3000)
     {
         _targetReachedInner = targetReachedInner;
         _targetReachedOuter = targetReachedOuter;
@@ -37,11 +37,14 @@ public abstract class PathFindModule : MonoBehaviour
     }
 
     public virtual bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode)
-    {
-        Lib.Log("not implemented");
+    { 
         return false;
     } 
     
+    public virtual bool GetTargetPosition()
+    { 
+        return false;
+    } 
     public void SetTarget(Transform target)
     {
         _target = target;

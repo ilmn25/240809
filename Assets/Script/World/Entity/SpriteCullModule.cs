@@ -18,7 +18,14 @@ public class SpriteCullModule : MonoBehaviour
     }
  
     void HandleCull()
-    {  
-        _sprite.enabled = !(MapCullSingleton.Instance._yCheck && transform.position.y > MapCullSingleton.Instance._yThreshold); 
+    {
+        if (MapCullSingleton.Instance._yCheck && transform.position.y > MapCullSingleton.Instance._yThreshold)
+        {
+            _sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+        }
+        else
+        {
+            _sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        } 
     }
 }

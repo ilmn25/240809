@@ -19,7 +19,7 @@ public class PathFindSingleton : MonoBehaviour
           
     Vector3Int _startPosition; 
     Vector3Int _endPosition; 
-    public async Task<List<object[]>> FindPath(PathFindModule agent, Transform start, Transform end, int scanCount)
+    public async Task<List<object[]>> FindPath(NPCPathFindAbstract agent, Transform start, Transform end, int scanCount)
     {
         await _semaphore.WaitAsync();
         try
@@ -45,7 +45,7 @@ public class PathFindSingleton : MonoBehaviour
         }
     } 
  
-    private async Task<List<object[]>> FindPathAsync(PathFindModule agent, Vector3Int startPosition, Vector3Int endPosition, int scanCount)
+    private async Task<List<object[]>> FindPathAsync(NPCPathFindAbstract agent, Vector3Int startPosition, Vector3Int endPosition, int scanCount)
     {  
         float gCost;
         float hCost;
@@ -202,7 +202,7 @@ public class PathFindSingleton : MonoBehaviour
         ); //check bounds x z 
         if (isClear)
         {
-            isClear = pos.y >= WorldSingleton._boolMap.GetLength(1)? true : false; //check bounds y (true even if above max y)
+            isClear = pos.y >= WorldSingleton.World.Bounds.y? true : false; //check bounds y (true even if above max y)
             isClear = isClear || WorldSingleton._boolMap[pos.x, pos.y, pos.z]; //check air or block
         }
         return isClear;

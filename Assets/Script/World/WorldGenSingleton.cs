@@ -58,9 +58,9 @@ public class WorldGenSingleton : MonoBehaviour
 
 
 
-    public static int xSize = 5;
+    public static int xSize = 10;
     public static int ySize = 2;
-    public static int zSize = 5;
+    public static int zSize = 10;
 
 
     //! debug tools
@@ -157,9 +157,9 @@ public class WorldGenSingleton : MonoBehaviour
         bool[,] maze = HandleMazeAlgorithm(_chunkSize, _chunkSize);
 
         // Calculate the center of the map
-        int centerX = WorldSingleton.World.Bounds.x / 2;
-        int centerZ = WorldSingleton.World.Bounds.z / 2;
-        int craterRadius = WorldSingleton.World.Bounds.z / 3; // Adjust the radius as needed
+        int centerX = WorldSingleton.World.Bounds.x / 3;
+        int centerZ = WorldSingleton.World.Bounds.z / 3;
+        int craterRadius = 35; // Adjust the radius as needed
     
         for (int y = 0; y < _chunkSize; y++)
         {
@@ -295,14 +295,14 @@ public class WorldGenSingleton : MonoBehaviour
                                     double rng = _random.NextDouble();
                                     if (rng <= 0.03)
                                     {
-                                        entityPosition = new SerializableVector3(x + 0.5f, y + 1, z + 0.5f);
+                                        entityPosition = new SerializableVector3(x, y + 1, z);
                                         entityData = new EntityData("tree", entityPosition,
                                             new SerializableVector3Int(1, 3, 1));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
-                                        entityPosition = new SerializableVector3(x + 0.5f, y + 1, z + 0.5f);
+                                        entityPosition = new SerializableVector3(x, y + 1, z);
                                         entityData = new EntityData("bush1", entityPosition,
                                             new SerializableVector3Int(0, 0, 0));
                                         chunkData.StaticEntity.Add(entityData);
@@ -321,7 +321,7 @@ public class WorldGenSingleton : MonoBehaviour
                                 if (_random.NextDouble() <= 0.003)
                                 {
 
-                                    entityPosition = new SerializableVector3(x + 0.5f, y + 1, z + 0.5f);
+                                    entityPosition = new SerializableVector3(x, y + 1, z);
                                     entityData = new EntityData("stage_hand", entityPosition,
                                         new SerializableVector3Int(1, 1, 1));
                                     chunkData.StaticEntity.Add(entityData);
@@ -329,7 +329,7 @@ public class WorldGenSingleton : MonoBehaviour
                                 else if (_random.NextDouble() <= 0.03)
                                 {
 
-                                    entityPosition = new SerializableVector3(x + 0.5f, y + 1, z + 0.5f);
+                                    entityPosition = new SerializableVector3(x, y + 1, z);
                                     entityData = new EntityData("slab", entityPosition,
                                         new SerializableVector3Int(0, 0, 0));
                                     chunkData.StaticEntity.Add(entityData);

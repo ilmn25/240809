@@ -87,6 +87,8 @@ public class GUIDialogueSingleton : MonoBehaviour
             entityState.OnEndDialogue(); 
             return;
         } 
+        
+        AudioSingleton.PlaySFX(Game.ChatSound);
         _entityState = entityState;
         _current_line = 0;
         Game.GUIDialogue.SetActive(true);

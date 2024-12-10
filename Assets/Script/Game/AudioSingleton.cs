@@ -43,7 +43,7 @@ public class AudioSingleton : MonoBehaviour
     public static AudioSource PlaySFX(AudioClip clip, float volume = 1f, bool loop = false)
     {
         AudioSource availableSource = GetAvailableAudioSource();
-        if (availableSource != null)
+        if (availableSource)
         {
             availableSource.clip = clip;
             availableSource.volume = volume * SFXVOLUME;

@@ -1,84 +1,84 @@
 using UnityEngine;
 class NPCIdle : EntityState {
-    MovementModule _movementModule;
-    AnimationModule _animationModule; 
+    NPCMovementModule _npcMovementModule;
+    NPCAnimationModule _npcAnimationModule; 
 
-    public NPCIdle(MovementModule movementModule, AnimationModule animationModule)
+    public NPCIdle(NPCMovementModule npcMovementModule, NPCAnimationModule npcAnimationModule)
     {
-        _movementModule = movementModule;
-        _animationModule = animationModule;
+        _npcMovementModule = npcMovementModule;
+        _npcAnimationModule = npcAnimationModule;
     }
  
     public override void StateUpdate() {
-        _movementModule.HandleMovementUpdate();
-        _animationModule.HandleAnimationUpdate();
+        _npcMovementModule.HandleMovementUpdate();
+        _npcAnimationModule.HandleAnimationUpdate();
     }
 }
 
 class NPCRoam : EntityState {
-    MovementModule _movementModule;
-    PathFindModule _pathFindModule;
-    AnimationModule _animationModule; 
+    NPCMovementModule _npcMovementModule;
+    NPCPathFindAbstract _npcPathFindAbstract;
+    NPCAnimationModule _npcAnimationModule; 
     SpriteRenderer _sprite;
 
-    public NPCRoam(MovementModule movementModule, PathFindModule pathFindModule, 
-        AnimationModule animationModule, SpriteRenderer sprite)
+    public NPCRoam(NPCMovementModule npcMovementModule, NPCPathFindAbstract npcPathFindAbstract, 
+        NPCAnimationModule npcAnimationModule, SpriteRenderer sprite)
     {
-        _movementModule = movementModule;
-        _animationModule = animationModule;
-        _pathFindModule = pathFindModule;
+        _npcMovementModule = npcMovementModule;
+        _npcAnimationModule = npcAnimationModule;
+        _npcPathFindAbstract = npcPathFindAbstract;
         _sprite = sprite; 
     }
 
     public override void OnEnterState()
     {
-        _pathFindModule.SetTarget(null);
+        _npcPathFindAbstract.SetTarget(null);
     }
     
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            _movementModule.SetDirection(_pathFindModule.HandlePathFindRandom(_movementModule.IsGrounded()));
-            _movementModule.HandleMovementUpdate(true);
-            _animationModule.HandleAnimationUpdate();
+            _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindRandom(_npcMovementModule.IsGrounded()));
+            _npcMovementModule.HandleMovementUpdate(true);
+            _npcAnimationModule.HandleAnimationUpdate();
         }
         else
         {  
-            _pathFindModule.HandlePathFindPassive(_movementModule.SPEED_WALK); 
+            _npcPathFindAbstract.HandlePathFindPassive(_npcMovementModule.SPEED_WALK); 
         }
     }
 }
 
 class NPCChase : EntityState {
-    MovementModule _movementModule;
-    PathFindModule _pathFindModule;
-    AnimationModule _animationModule; 
+    NPCMovementModule _npcMovementModule;
+    NPCPathFindAbstract _npcPathFindAbstract;
+    NPCAnimationModule _npcAnimationModule; 
     SpriteRenderer _sprite;
 
-    public NPCChase(MovementModule movementModule, PathFindModule pathFindModule, 
-        AnimationModule animationModule, SpriteRenderer sprite)
+    public NPCChase(NPCMovementModule npcMovementModule, NPCPathFindAbstract npcPathFindAbstract, 
+        NPCAnimationModule npcAnimationModule, SpriteRenderer sprite)
     {
-        _movementModule = movementModule;
-        _animationModule = animationModule;
-        _pathFindModule = pathFindModule;
+        _npcMovementModule = npcMovementModule;
+        _npcAnimationModule = npcAnimationModule;
+        _npcPathFindAbstract = npcPathFindAbstract;
         _sprite = sprite; 
     }
 
     public override void OnEnterState()
     {
-        _pathFindModule.SetTarget(Game.Player.transform);
+        _npcPathFindAbstract.SetTarget(Game.Player.transform);
     }
     
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            _movementModule.SetDirection(_pathFindModule.HandlePathFindActive(_movementModule.IsGrounded()));
-            _movementModule.HandleMovementUpdate();
-            _animationModule.HandleAnimationUpdate();
+            _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindActive(_npcMovementModule.IsGrounded()));
+            _npcMovementModule.HandleMovementUpdate();
+            _npcAnimationModule.HandleAnimationUpdate();
         }
         else
         {  
-            _pathFindModule.HandlePathFindPassive(_movementModule.SPEED_WALK); 
+            _npcPathFindAbstract.HandlePathFindPassive(_npcMovementModule.SPEED_WALK); 
         }
     }
 }

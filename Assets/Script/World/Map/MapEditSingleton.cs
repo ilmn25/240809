@@ -55,7 +55,7 @@ public class MapEditSingleton : MonoBehaviour
             // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
-                Entity.SpawnItem(blockNameID, Lib.AddToVector(coordinate, 0.5f, 0, 0.5f));
+                EntitySpawner.SpawnItem(blockNameID, Lib.AddToVector(coordinate, 0.5f, 0, 0.5f));
                 WorldSingleton.Instance.UpdateMap(coordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }

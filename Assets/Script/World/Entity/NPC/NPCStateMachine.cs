@@ -5,21 +5,21 @@ using UnityEngine;
 
 public class NPCStateMachine : EntityStateMachine
 {
-    private MovementModule _movementModule;
-    private PathFindModule _pathFindModule;
-    private AnimationModule _animationModule; 
+    private NPCMovementModule _npcMovementModule;
+    private NPCPathFindAbstract _npcPathFindAbstract;
+    private NPCAnimationModule _npcAnimationModule; 
     private SpriteRenderer _sprite;
     protected override void OnAwake()
     {
         GUIDialogueSingleton.DialogueAction += DialogueAction;
         _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
-        _movementModule = GetComponent<MovementModule>();
-        _pathFindModule = GetComponent<PathFindModule>();
-        _animationModule = GetComponent<AnimationModule>();
+        _npcMovementModule = GetComponent<NPCMovementModule>();
+        _npcPathFindAbstract = GetComponent<NPCPathFindAbstract>();
+        _npcAnimationModule = GetComponent<NPCAnimationModule>();
         
-        AddState(new NPCIdle(_movementModule, _animationModule), true);
-        AddState(new NPCChase(_movementModule, _pathFindModule, _animationModule, _sprite));
-        AddState(new NPCRoam(_movementModule, _pathFindModule, _animationModule, _sprite));
+        AddState(new NPCIdle(_npcMovementModule, _npcAnimationModule), true);
+        AddState(new NPCChase(_npcMovementModule, _npcPathFindAbstract, _npcAnimationModule, _sprite));
+        AddState(new NPCRoam(_npcMovementModule, _npcPathFindAbstract, _npcAnimationModule, _sprite));
         DialogueData dialogueData = new DialogueData();
         dialogueData.Lines.Add("help");
         dialogueData.Lines.Add("I cant fix my raycast ");
@@ -38,7 +38,7 @@ public class NPCStateMachine : EntityStateMachine
     public void OnEnable()
     {
         SetState<NPCIdle>();
-        _movementModule.SetDirection(Vector3.zero);
+        _npcMovementModule.SetDirection(Vector3.zero);
     }
     
     protected override void LogicUpdate()

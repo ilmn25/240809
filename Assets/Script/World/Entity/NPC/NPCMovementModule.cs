@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class MovementModule : MonoBehaviour
+public class NPCMovementModule : MonoBehaviour
 {
     [SerializeField] public float SPEED_WALK = 6f;
     [SerializeField] private float SPEED_RUN = 8f;
