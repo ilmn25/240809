@@ -185,13 +185,14 @@ public class WorldSingleton : MonoBehaviour
                         }
                         foreach (var entity in chunkData.StaticEntity)
                         {
-                            int entityX = chunkX + Mathf.FloorToInt(entity.Position.x);
-                            int entityY = chunkY + Mathf.FloorToInt(entity.Position.y);
-                            int entityZ = chunkZ + Mathf.FloorToInt(entity.Position.z);
+                            int entityX = chunkX + Mathf.FloorToInt(entity.position.x);
+                            int entityY = chunkY + Mathf.FloorToInt(entity.position.y);
+                            int entityZ = chunkZ + Mathf.FloorToInt(entity.position.z);
 
-                            int entityEndX = entityX + entity.Bounds.x;
-                            int entityEndY = entityY + entity.Bounds.y;
-                            int entityEndZ = entityZ + entity.Bounds.z;
+                            Vector3Int bounds = EntitySingleton.dictionary[entity.stringID].Bounds;
+                            int entityEndX = entityX + bounds.x;
+                            int entityEndY = entityY + bounds.y;
+                            int entityEndZ = entityZ + bounds.z;
 
                             for (int x = entityX; x < entityEndX; x++)
                             {

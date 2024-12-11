@@ -8,7 +8,7 @@ using UnityEngine;
 public class EntityDynamicLoadSingleton : MonoBehaviour
 {
     public static EntityDynamicLoadSingleton Instance { get; private set; }  
-    private List<EntityData> chunkEntityList;
+    private List<ChunkEntityData> chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
     EntityHandler _currentEntityHandler;
@@ -98,23 +98,23 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         _entityList.Clear();
     }
 
-    public void LoadChunkEntities(List<EntityData> chunkEntityList, Vector3Int chunkCoordinate)
+    public void LoadChunkEntities(List<ChunkEntityData> chunkEntityList, Vector3Int chunkCoordinate)
     { 
-        foreach (EntityData entityData in chunkEntityList)
+        foreach (ChunkEntityData entityData in chunkEntityList)
         {   
-            switch (entityData.Type)
+            switch (EntitySingleton.dictionary[entityData.stringID].Type)
             {
                 case EntityType.Item: 
                     _currentInstance = EntityPoolSingleton.Instance.GetObject("item"); 
-                    _currentInstance.transform.position = chunkCoordinate + entityData.Position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    _currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
         
                     _currentInstance.GetComponent<SpriteRenderer>().sprite = 
-                        Resources.Load<Sprite>($"texture/sprite/{entityData.ID}"); 
+                        Resources.Load<Sprite>($"texture/sprite/{entityData.stringID}"); 
                     break;
 
                 case EntityType.Rigid:
-                    _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.ID);
-                    _currentInstance.transform.position = chunkCoordinate + entityData.Position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
+                    _currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
                     break;
             }
             

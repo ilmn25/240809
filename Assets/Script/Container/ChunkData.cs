@@ -8,8 +8,8 @@ public class SerializableChunkData
 {
     public int[] map;
     public int size;
-    public List<EntityData> StaticEntity = new List<EntityData>();
-    public List<EntityData> DynamicEntity = new List<EntityData>();
+    public List<ChunkEntityData> StaticEntity = new List<ChunkEntityData>();
+    public List<ChunkEntityData> DynamicEntity = new List<ChunkEntityData>();
 
     public SerializableChunkData(int size)
     {
@@ -38,8 +38,8 @@ public class SerializableChunkData
 public class ChunkData
 {
     public Array3D<int> Map;
-    public List<EntityData> StaticEntity;
-    public List<EntityData> DynamicEntity;
+    public List<ChunkEntityData> StaticEntity;
+    public List<ChunkEntityData> DynamicEntity;
     public static ChunkData Zero;
 
     static ChunkData()
@@ -61,8 +61,8 @@ public class ChunkData
     {
         Map = new Array3D<int>();
         Map.Initialize(size == 0 ? WorldSingleton.CHUNK_SIZE : size);
-        StaticEntity = new List<EntityData>();
-        DynamicEntity = new List<EntityData>();
+        StaticEntity = new List<ChunkEntityData>();
+        DynamicEntity = new List<ChunkEntityData>();
     }
  
 }
