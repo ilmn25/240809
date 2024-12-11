@@ -6,7 +6,8 @@ using UnityEngine;
 public abstract class NPCPathFindAbstract : MonoBehaviour
 {
     // parameters
-    private Transform _target;
+    protected Transform Target;
+    protected Vector3 TargetPosition;
     private Boolean _isGrounded;
     
     // const
@@ -25,7 +26,7 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         float pointMissDistance = 3f, 
         float repathInterval = 0.1f, 
         int jumpSkipAmount = 1,
-        int scanCount = 3000)
+        int scanCount = 7000)
     {
         _targetReachedInner = targetReachedInner;
         _targetReachedOuter = targetReachedOuter;
@@ -40,15 +41,15 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
     { 
         return false;
     } 
-    
-    public virtual bool GetTargetPosition()
-    { 
-        return false;
+    public virtual Vector3 GetTargetPosition()
+    {
+        return Vector3.zero;
     } 
+    public virtual void OnStuck() { } 
     public void SetTarget(Transform target)
     {
-        _target = target;
-    } 
+        Target = target; 
+    }
      
       
     
@@ -117,39 +118,39 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
             _moveOccupied = false; 
         }
     }
-
-    public Vector3 HandlePathFindRandom(Boolean isGrounded)
-    { 
-        _isGrounded = isGrounded;
-        _direction = Vector3.zero;
-
-        if (!_repathRoutine) CheckRepathRoutineStill();
-        if (_updateEntityPosition)
-        { 
-            _selfPositionPrevious = transform.position;
-            _updateEntityPosition = false; 
-        }
-        
-        if (_path == null || _nextPoint >= _path.Count - 2)
-        {
-            if (_nextPointQueued != -1)
-            {
-                _path = _pathQueued;
-                _nextPoint = _nextPointQueued;
-                _nextPointQueued = -1;
-            }
-            else
-            {
-                GetPath();
-                return Vector3.zero;
-            }
-        } else if (_path != null)
-        {
-            HandleMovePoint(); 
-        } 
-
-        return _direction;
-    }
+    //
+    // public Vector3 HandlePathFindRandom(Boolean isGrounded)
+    // { 
+    //     _isGrounded = isGrounded;
+    //     _direction = Vector3.zero;
+    //
+    //     if (!_repathRoutine) CheckRepathRoutineStill();
+    //     if (_updateEntityPosition)
+    //     { 
+    //         _selfPositionPrevious = transform.position;
+    //         _updateEntityPosition = false; 
+    //     }
+    //     
+    //     if (_path == null || _nextPoint >= _path.Count - 2)
+    //     {
+    //         if (_nextPointQueued != -1)
+    //         {
+    //             _path = _pathQueued;
+    //             _nextPoint = _nextPointQueued;
+    //             _nextPointQueued = -1;
+    //         }
+    //         else
+    //         {
+    //             GetPath();
+    //             return Vector3.zero;
+    //         }
+    //     } else if (_path != null)
+    //     {
+    //         HandleMovePoint(); 
+    //     } 
+    //
+    //     return _direction;
+    // }
 
     public Vector3 HandlePathFindActive(Boolean isGrounded)
     {
@@ -166,13 +167,13 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         // if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
         if (_updateTargetPosition) 
         {
-            _targetPositionPrevious = _target.transform.position;
+            _targetPositionPrevious = GetTargetPosition();
             _updateTargetPosition = false;
         }
         
         _direction = Vector3.zero; 
 
-        _targetDistance = Vector3.Distance(transform.position, _target.transform.position);
+        _targetDistance = Vector3.Distance(transform.position, GetTargetPosition());
         if (!_targetReached)
         {   
             _targetReached = _targetDistance < _targetReachedInner;
@@ -240,15 +241,10 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
             } 
             _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
         } 
-        else if (_target)
-        { 
-            _direction = (Lib.AddToVector(_target.transform.position, 0, -0.3f, 0) - transform.position).normalized;
-        }
         else
-        {
-            Lib.Log();
-            _direction = (Lib.AddToVector((Vector3)_path[^1][0], 0, -0.3f, 0) - transform.position).normalized;
-        }
+        { 
+            _direction = (Lib.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - transform.position).normalized;
+        } 
     }
      
  
@@ -259,17 +255,18 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
  
         if (_nextPointQueued == -1 && !_targetReached && !_isPathFinding )
         {
-            _targetMoved = Vector3.Distance(_targetPositionPrevious, _target.transform.position) > 0.8f;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > 0.8f;  //should be less than inner player near
 
             // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             if (_targetMoved)
             { 
                 GetPath();  
                 _updateTargetPosition = true;//! dont move
-                // _playerPositionPrevious = _target.transform.position;
+                // _playerPositionPrevious = GetTargetPosition();
             }   
-            else if (IsStuck()) 
+            else if (IsStuck())
             {
+                OnStuck();
                 GetPath();
             }
         }   
@@ -310,12 +307,7 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         _isPathFinding = true;
         try
         {  
-             
-            if (!_target)
-                _pathQueued = await PathFindSingleton.Instance.FindPath(this, transform, null, 15);  
-            else
-                _pathQueued = await PathFindSingleton.Instance.FindPath(this, transform, _target, _scanCount); 
-            
+            _pathQueued = await PathFindSingleton.Instance.FindPath(this, _scanCount); 
             if (this)
             {
                 _positionWhenPathSearched = transform.position;

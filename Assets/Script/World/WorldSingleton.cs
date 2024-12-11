@@ -71,7 +71,7 @@ public class WorldSingleton : MonoBehaviour
     [HideInInspector] 
     public static BoolMap _boolMap;
     [HideInInspector] 
-    public static int CHUNK_SIZE = 20; 
+    public static int CHUNK_SIZE = 15; 
     [HideInInspector] 
     public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
@@ -88,7 +88,7 @@ public class WorldSingleton : MonoBehaviour
         if (!File.Exists(getFilePath(0)) || ALWAYS_REGENERATE) 
             WorldGenSingleton.Instance.GenerateRandomMapSave();
         else 
-            WorldSingleton.Instance.HandleLoadWorldFile(0); 
+            HandleLoadWorldFile(0); 
         
         _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
     }
@@ -247,7 +247,7 @@ public class WorldSingleton : MonoBehaviour
             MapUpdated(worldPosition);
     }
     
-    public Boolean IsInWorldBounds(Vector3Int worldPosition)
+    public Boolean IsInWorldBounds(Vector3 worldPosition)
     {
         if (worldPosition.x < World.Bounds.x && worldPosition.x >= 0 &&
             worldPosition.y < World.Bounds.y && worldPosition.y >= 0 &&

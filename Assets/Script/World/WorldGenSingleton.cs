@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -37,9 +39,7 @@ public class WorldGenSingleton : MonoBehaviour
 
     private ChunkData _chunkData;
     private Vector3Int _chunkCoord;
-    
-    private Vector3Int _positionA;
-    private Vector3Int _positionB;
+     
     private ChunkData _setPiece;
     
     private void Awake() {
@@ -55,12 +55,15 @@ public class WorldGenSingleton : MonoBehaviour
         _caveOffset = Random.Range(0f, 1000f); 
     }
 
+    private void Update()
+    {
+        SetPiece.Update();
+    }
 
 
-
-    public static int xSize = 10;
-    public static int ySize = 2;
-    public static int zSize = 10;
+    public static int xSize = 2;
+    public static int ySize = 1;
+    public static int zSize = 2;
 
 
     //! debug tools
@@ -86,8 +89,8 @@ public class WorldGenSingleton : MonoBehaviour
         }
         
         
-        ChunkData house = LoadSetPieceFile("house_stone");
-        ChunkData tree = LoadSetPieceFile("tree_a");
+        SerializableChunkData house = SetPiece.LoadSetPieceFile("house_stone");
+        SerializableChunkData tree = SetPiece.LoadSetPieceFile("tree_a");
 
         int chunkSize = WorldSingleton.CHUNK_SIZE;
         for (int x = 0; x < WorldSingleton.World.Bounds.x; x++)
@@ -102,21 +105,17 @@ public class WorldGenSingleton : MonoBehaviour
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z]
-                            .Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
-                        WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z]
-                            .Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt"))
+                    if (WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
+                        localChunkY + 1 != chunkSize &&
+                        WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-
                         if (_random.NextDouble() <= 0.0002)
                         {
-                            _setPiece = house;
-                            pasteSetPiece(new Vector3Int(x, y, z));
+                            SetPiece.PasteSetPiece(new Vector3Int(x, y, z), house);
                         }
-                        else if (_random.NextDouble() <= 0.0004)
+                        else if (_random.NextDouble() <= 0.002)
                         {
-                            _setPiece = tree;
-                            pasteSetPiece(new Vector3Int(x, y, z));
+                            SetPiece.PasteSetPiece(new Vector3Int(x, y, z), tree);
                         }
                     } 
                 }
@@ -274,7 +273,7 @@ public class WorldGenSingleton : MonoBehaviour
     private void HandleEntityGeneration(ChunkData chunkData)
     { 
         EntityData entityData;
-        SerializableVector3 entityPosition;
+        SerializableVector3Int entityPosition;
         
         for (int x = 0; x < _chunkSize; x++)
         {
@@ -295,22 +294,21 @@ public class WorldGenSingleton : MonoBehaviour
                                     double rng = _random.NextDouble();
                                     if (rng <= 0.03)
                                     {
-                                        entityPosition = new SerializableVector3(x, y + 1, z);
+                                        entityPosition = new SerializableVector3Int(x, y + 1, z);
                                         entityData = new EntityData("tree", entityPosition,
                                             new SerializableVector3Int(1, 3, 1));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
-                                        entityPosition = new SerializableVector3(x, y + 1, z);
+                                        entityPosition = new SerializableVector3Int(x, y + 1, z);
                                         entityData = new EntityData("bush1", entityPosition,
                                             new SerializableVector3Int(0, 0, 0));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
-                                        entityPosition = new SerializableVector3(x + (float)_random.NextDouble() / 1.5f,
-                                            y + 1, z + (float)_random.NextDouble() / 1.5f);
+                                        entityPosition = new SerializableVector3Int(x, y + 1, z);
                                         entityData = new EntityData("grass", entityPosition);
                                         chunkData.StaticEntity.Add(entityData);
                                     }
@@ -321,7 +319,7 @@ public class WorldGenSingleton : MonoBehaviour
                                 if (_random.NextDouble() <= 0.003)
                                 {
 
-                                    entityPosition = new SerializableVector3(x, y + 1, z);
+                                    entityPosition = new SerializableVector3Int(x, y + 1, z);
                                     entityData = new EntityData("stage_hand", entityPosition,
                                         new SerializableVector3Int(1, 1, 1));
                                     chunkData.StaticEntity.Add(entityData);
@@ -329,7 +327,7 @@ public class WorldGenSingleton : MonoBehaviour
                                 else if (_random.NextDouble() <= 0.03)
                                 {
 
-                                    entityPosition = new SerializableVector3(x, y + 1, z);
+                                    entityPosition = new SerializableVector3Int(x, y + 1, z);
                                     entityData = new EntityData("slab", entityPosition,
                                         new SerializableVector3Int(0, 0, 0));
                                     chunkData.StaticEntity.Add(entityData);
@@ -339,7 +337,7 @@ public class WorldGenSingleton : MonoBehaviour
                         }
                         if (SPAWN_DYNAMIC_ENTITY && _random.NextDouble() <= 0.003)
                         {
-                            entityPosition = new SerializableVector3(x + 0.5f, y + 1, z +0.5f);
+                            entityPosition = new SerializableVector3Int(x, y + 1, z);
                             if (_random.NextDouble() <= 0.5)
                             {
                                 if (_random.NextDouble() <= 0.5)
@@ -404,120 +402,4 @@ public class WorldGenSingleton : MonoBehaviour
         return maze;
     }
  
-    
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            InventorySingleton.AddItem("marble", 100);
-            InventorySingleton.AddItem("backroom", 100);
-        }
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
-        {
-            Lib.Log("anchor A set");
-            _positionA = Vector3Int.FloorToInt(Game.Player.transform.position);
-        }
-
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-        {
-            Lib.Log("anchor B set");
-            _positionB = Vector3Int.FloorToInt(Game.Player.transform.position);
-        } 
-    
-        if (Input.GetKeyDown(KeyCode.Equals))
-        {
-            Lib.Log("exported to file");
-            copySetPiece();
-            SaveSetPieceFile(_setPiece, "tree_a");
-        }
-        if (Input.GetKeyDown(KeyCode.Minus))
-        {
-            Lib.Log("imported to world"); 
-            pasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position));
-        }
-    }
-
-    void SaveSetPieceFile(ChunkData data, string fileName)
-    {
-        BinaryFormatter formatter = new BinaryFormatter();
-        string path = Path.Combine(Application.dataPath, "Resources/set", fileName + ".dat");
-        using (FileStream stream = new FileStream(path, FileMode.Create))
-        {
-            formatter.Serialize(stream, data);
-        }
-    }
-
-    ChunkData LoadSetPieceFile(string fileName)
-    {
-        string path = Path.Combine(Application.dataPath, "Resources/set", fileName + ".dat");
-        if (File.Exists(path))
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream stream = new FileStream(path, FileMode.Open))
-            {
-                return (ChunkData)formatter.Deserialize(stream);
-            }
-        }
-        return null;
-    }
-    
-    private void copySetPiece()
-    {
-        int minX = Mathf.Min(_positionA.x, _positionB.x);
-        int minY = Mathf.Min(_positionA.y, _positionB.y);
-        int minZ = Mathf.Min(_positionA.z, _positionB.z);
-        int maxX = Mathf.Max(_positionA.x, _positionB.x);
-        int maxY = Mathf.Max(_positionA.y, _positionB.y);
-        int maxZ = Mathf.Max(_positionA.z, _positionB.z);
-        
-        _setPiece = new ChunkData(Mathf.Max(maxX,maxY,maxZ));
-        Vector3Int min = new Vector3Int(minX, minY, minZ);
-        for (int x = minX; x <= maxX; x++)
-        {
-            for (int y = minY; y <= maxY; y++)
-            {
-                for (int z = minZ; z <= maxZ; z++)
-                {
-                    Vector3Int worldPos = new Vector3Int(x, y, z);
-                    Vector3Int localPos = worldPos - min;
-
-                    Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
-                    int localChunkX = worldPos.x % WorldSingleton.CHUNK_SIZE;
-                    int localChunkY = worldPos.y % WorldSingleton.CHUNK_SIZE;
-                    int localChunkZ = worldPos.z % WorldSingleton.CHUNK_SIZE;
-                
-                    _setPiece.Map[localPos.x, localPos.y, localPos.z] = WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ];
-                }
-            }
-        }
-    }
-    
-    private void pasteSetPiece(Vector3Int position)
-    {
-        int chunkSize = WorldSingleton.CHUNK_SIZE;
-        Vector3Int min = position;
-
-        for (int x = 0; x < _setPiece.Map.GetLength(0); x++)
-        {
-            for (int y = 0; y < _setPiece.Map.GetLength(1); y++)
-            {
-                for (int z = 0; z < _setPiece.Map.GetLength(2); z++)
-                {
-                    int blockID = _setPiece.Map[x, y, z];
-                    if (blockID != 0)
-                    {
-                        Vector3Int worldPos = new Vector3Int(min.x + x, min.y + y, min.z + z);
-                        Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
-                        int localChunkX = worldPos.x % chunkSize;
-                        int localChunkY = worldPos.y % chunkSize;
-                        int localChunkZ = worldPos.z % chunkSize;
-
-                        if (WorldSingleton.Instance.IsInWorldBounds(worldPos))
-                            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] = blockID;
-                    }
-                }
-            }
-        }
-    }
 }

@@ -7,6 +7,7 @@ public class SerializableVector3
     public float y;
     public float z;
 
+    public SerializableVector3() {}
     public SerializableVector3(float x, float y, float z)
     {
         this.x = x;

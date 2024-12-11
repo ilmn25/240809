@@ -3,13 +3,13 @@ using System.Collections.Generic;
 [System.Serializable]
 public class EntityData
 {
-    public string ID { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
-    public SerializableVector3 Position { get; set; }
-    public SerializableVector3Int Bounds { get; set; }
-    public EntityType Type { get; set; }
+    public string ID;
+    public Dictionary<string, object> Parameters;
+    public SerializableVector3Int Position;
+    public SerializableVector3Int Bounds;
+    public EntityType Type;
 
-    public EntityData(string id, SerializableVector3 position, SerializableVector3Int bounds = null, Dictionary<string, object> parameters = null, EntityType type = EntityType.Static)
+    public EntityData(string id, SerializableVector3Int position, SerializableVector3Int bounds = null, EntityType type = EntityType.Static, Dictionary<string, object> parameters = null)
     {
         ID = id;
         Position = position;
@@ -18,6 +18,7 @@ public class EntityData
         Type = type;
     }
 }
+
 [System.Serializable]
 public enum EntityType
 {

@@ -38,8 +38,8 @@ class NPCRoam : EntityState {
     public override void StateUpdate() {
         if (_sprite.isVisible)
         {
-            _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindRandom(_npcMovementModule.IsGrounded()));
-            _npcMovementModule.HandleMovementUpdate(true);
+            _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindActive(_npcMovementModule.IsGrounded()));
+            _npcMovementModule.HandleMovementUpdate();
             _npcAnimationModule.HandleAnimationUpdate();
         }
         else
