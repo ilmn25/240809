@@ -19,21 +19,15 @@ public class PathFindSingleton : MonoBehaviour
           
     Vector3Int _startPosition; 
     Vector3Int _endPosition; 
-    public async Task<List<object[]>> FindPath(NPCPathFindAbstract agent, Transform start, Transform end, int scanCount)
+    public async Task<List<object[]>> FindPath(NPCPathFindAbstract agent, int scanCount)
     {
         await _semaphore.WaitAsync();
         try
         { 
-            if (start)
+            if (agent.transform)
             {
-                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(start.position));
-                if (!end)
-                    _endPosition = _startPosition + new Vector3Int(
-                       UnityEngine.Random.Range(-scanCount, scanCount),  
-                       UnityEngine.Random.Range(-1, 1),  
-                       UnityEngine.Random.Range(-scanCount, scanCount));
-                else 
-                    _endPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(end.position)); 
+                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.transform.position));
+                _endPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.GetTargetPosition())); 
 
                 return await Task.Run(() => FindPathAsync(agent, _startPosition, _endPosition, scanCount));
             } 

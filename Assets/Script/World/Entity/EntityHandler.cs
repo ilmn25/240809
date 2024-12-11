@@ -9,7 +9,7 @@ public class EntityHandler : MonoBehaviour
     private Boolean _isStatic;
     public EntityData GetEntityData()
     {
-        _entityData.Position = new SerializableVector3(WorldSingleton.GetBlockCoordinate(transform.position));
+        _entityData.Position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
         return _entityData;
     }
  

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Script.World.Entity.Item;
 using UnityEngine;
 
 public class ItemSingleton : MonoBehaviour

@@ -1,4 +1,3 @@
-using Script.World.Entity.Item;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;

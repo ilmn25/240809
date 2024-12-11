@@ -1,16 +1,46 @@
 using System.Collections.Generic;
+using System.IO;
 using Unity.Collections;
 using UnityEngine;
 
 [System.Serializable]
+public class SerializableChunkData
+{
+    public int[] map;
+    public int size;
+    public List<EntityData> StaticEntity = new List<EntityData>();
+    public List<EntityData> DynamicEntity = new List<EntityData>();
+
+    public SerializableChunkData(int size)
+    {
+        this.size = size;
+        map = new int[size * size * size];
+    }
+    
+    public int this[int x, int y, int z]
+    {
+        get => map[x + size * (y + size * z)];
+        set => map[x + size * (y + size * z)] = value;
+    }
+    
+    public ChunkData Deserialize()
+    {
+        ChunkData data = new ChunkData(size);
+        data.Map.array = map;
+        data.StaticEntity = StaticEntity;
+        data.DynamicEntity = DynamicEntity;
+        return data;
+    }
+}
+
+
+[System.Serializable]
 public class ChunkData
 {
-    [SerializeField]
-    public int[,,] Map { get; private set; }
-    public List<EntityData> StaticEntity { get; private set; }
-    public List<EntityData> DynamicEntity { get; private set; }
-
-    public static ChunkData Zero { get; private set; }
+    public Array3D<int> Map;
+    public List<EntityData> StaticEntity;
+    public List<EntityData> DynamicEntity;
+    public static ChunkData Zero;
 
     static ChunkData()
     {
@@ -27,14 +57,16 @@ public class ChunkData
         }
     }
 
-    public ChunkData(int chunkSize = 0)
+    public ChunkData(int size = 0)
     {
-        if (chunkSize == 0) chunkSize = WorldSingleton.CHUNK_SIZE;
-        Map = new int[chunkSize, chunkSize, chunkSize];
+        Map = new Array3D<int>();
+        Map.Initialize(size == 0 ? WorldSingleton.CHUNK_SIZE : size);
         StaticEntity = new List<EntityData>();
         DynamicEntity = new List<EntityData>();
     }
+ 
 }
+ 
 
 public class ChunkMap
 {

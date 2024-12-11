@@ -31,7 +31,7 @@ public class InventorySingleton : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
         {
-            EntitySpawner.SpawnItem(CurrentItem.StringID, Game.Player.transform.position, false);
+            EntitySpawner.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
             RemoveItem(CurrentItem.StringID); 
         }
         

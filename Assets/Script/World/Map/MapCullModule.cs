@@ -11,7 +11,6 @@ using UnityEngine.Profiling;
 // i fucking hate this script
 public class MapCullModule : MonoBehaviour
 {  
-    public int[,,] _chunkMap;
     public Mesh _meshData;
     public List<Vector3> _verticesShadow;
     public int[] _count;
@@ -480,40 +479,4 @@ public class MapCullModule : MonoBehaviour
             return spriteNumber;
         }
     }
-}
-//
-// public struct NativeArray3D<T> where T : struct
-// {
-//     private NativeArray<T> array;
-//     private int rows;
-//     private int cols;
-//     private int depth;
-//
-//     public NativeArray3D(T[,,] array, Allocator allocator)
-//     {
-//         rows = array.GetLength(0);
-//         cols = array.GetLength(1);
-//         depth = array.GetLength(2);
-//         this.array = new NativeArray<T>(rows * cols * depth, allocator);
-//         for (int i = 0; i < rows; i++)
-//         {
-//             for (int j = 0; j < cols; j++)
-//             {
-//                 for (int k = 0; k < depth; k++)
-//                 {
-//                     this.array[i * cols * depth + j * depth + k] = array[i, j, k];
-//                 }
-//             }
-//         }
-//     }
-//
-//     public T this[int row, int col, int dep]
-//     {
-//         get => array[row * cols * depth + col * depth + dep];
-//     }
-//
-//     public void Dispose()
-//     {
-//         array.Dispose();
-//     }
-// }
+} 

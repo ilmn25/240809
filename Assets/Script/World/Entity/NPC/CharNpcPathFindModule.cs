@@ -1,14 +1,43 @@
 
 using UnityEngine;
 
-public class CharNpcPathFindAbstract : NPCPathFindAbstract
+public class CharNpcPathFindModule : NPCPathFindAbstract
 {
     public int HEIGHT = 1;
     public int JUMP = 1;
     public int FALL = 15;
     public int AIR = 3;
+    public int ROAM = 20;
     // 1 2 15 6 flea
+    public override Vector3 GetTargetPosition()
+    {
+        if (Target)
+            return Target.position;
+
+        if (Vector3.Distance(transform.position, TargetPosition) < ROAM / 4 || TargetPosition == Vector3.zero)
+        {
+            ChangeRandomTargetPosition();
+        }
+        return TargetPosition;
+    }
+
+    public void ChangeRandomTargetPosition()
+    {
+        do
+        {
+            TargetPosition = transform.position + new Vector3Int(
+                Random.Range(-ROAM, ROAM),  
+                Random.Range(-2, 2),  
+                Random.Range(-ROAM, ROAM));
+        } while (!WorldSingleton.Instance.IsInWorldBounds(TargetPosition) && 
+                 !WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition)) && 
+                 WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition) + Vector3Int.down)); 
+    }
     
+    public override void OnStuck()
+    {
+        if (!Target) ChangeRandomTargetPosition();
+    }
     
     public override bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode)
     { 

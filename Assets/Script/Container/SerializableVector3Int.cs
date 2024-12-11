@@ -6,7 +6,8 @@ public class SerializableVector3Int
     public int x;
     public int y;
     public int z;
-
+    
+    public SerializableVector3Int() {}
     public SerializableVector3Int(int x, int y, int z)
     {
         this.x = x;

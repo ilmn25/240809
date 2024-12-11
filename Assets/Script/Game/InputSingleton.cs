@@ -36,12 +36,12 @@ public class InputSingleton : MonoBehaviour
             GUICraftingSingleton.Instance.HandleScrollInput(scroll);
         }
         else if (Input.GetMouseButton(1))
-        {
-            MapCullSingleton.Instance.HandleScrollInput(scroll);
+        { 
+            CameraSingleton.Instance.HandleScrollInput(scroll); 
         }
         else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
         {
-            CameraSingleton.Instance.HandleScrollInput(scroll); 
+            MapCullSingleton.Instance.HandleScrollInput(scroll);
         }  
         else
         {

@@ -25,6 +25,7 @@ public class RockStateMachine : EntityStateMachine
 
     public override void LeftClick()
     {
+        AudioSingleton.PlaySFX(Game.DigSound);
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();

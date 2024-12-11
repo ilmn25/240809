@@ -95,6 +95,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
                 WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
             EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
         }
+        _entityList.Clear();
     }
 
     public void LoadChunkEntities(List<EntityData> chunkEntityList, Vector3Int chunkCoordinate)
@@ -105,8 +106,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
             {
                 case EntityType.Item: 
                     _currentInstance = EntityPoolSingleton.Instance.GetObject("item"); 
-                    entityData.Position = new SerializableVector3(Lib.CombineVector(chunkCoordinate, entityData.Position.ToVector3()));
-                    _currentInstance.transform.position = entityData.Position.ToVector3(); 
+                    _currentInstance.transform.position = chunkCoordinate + entityData.Position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
         
                     _currentInstance.GetComponent<SpriteRenderer>().sprite = 
                         Resources.Load<Sprite>($"texture/sprite/{entityData.ID}"); 
@@ -114,7 +114,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
 
                 case EntityType.Rigid:
                     _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.ID);
-                    _currentInstance.transform.position = Lib.AddToVector(Lib.CombineVector(chunkCoordinate, entityData.Position.ToVector3()), 0, 2f, 0);
+                    _currentInstance.transform.position = chunkCoordinate + entityData.Position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
                     break;
             }
             
