@@ -1,10 +1,26 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class EntitySpawner
+public class EntitySingleton : MonoBehaviour
 {
+        public static Dictionary<string, EntityData> dictionary = new Dictionary<string, EntityData>();
+
+        private void Awake()
+        {
+                dictionary.Add("tree", new EntityData( new Vector3Int(1, 3, 1)));
+                dictionary.Add("bush1", EntityData.Zero);
+                dictionary.Add("grass", EntityData.Zero);
+                dictionary.Add("stage_hand", EntityData.One);
+                dictionary.Add("slab", EntityData.Zero);
+                dictionary.Add("snare_flea", EntityData.Rigid);
+                dictionary.Add("chito", EntityData.Rigid);
+                dictionary.Add("megumin", EntityData.Rigid);
+                dictionary.Add("yuuri", EntityData.Rigid);
+        }
+        
         public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true)
         {
-                EntityData entityData = new EntityData(stringID, new SerializableVector3Int(worldPosition), type: EntityType.Item);
+                ChunkEntityData entityData = new ChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
         
                 GameObject gameObject = EntityPoolSingleton.Instance.GetObject("item");
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
@@ -19,7 +35,7 @@ public class EntitySpawner
         
         public static void SpawnPrefab(string stringID, Vector3Int worldPosition)
         {
-                EntityData entityData = new EntityData(stringID, new SerializableVector3Int(worldPosition), type: EntityType.Rigid);
+                ChunkEntityData entityData = new ChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
                 GameObject gameObject = EntityPoolSingleton.Instance.GetObject(stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
         

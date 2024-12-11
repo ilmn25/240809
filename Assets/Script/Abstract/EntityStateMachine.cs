@@ -62,7 +62,7 @@ public abstract class EntityStateMachine : MonoBehaviour
     {
         GetComponent<EntityHandler>().WipeEntity();
     }
-    public EntityData GetEntityData()
+    public ChunkEntityData GetEntityData()
     {
         return GetComponent<EntityHandler>()._entityData;
     }

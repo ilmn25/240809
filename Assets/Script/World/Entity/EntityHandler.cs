@@ -3,17 +3,17 @@ using UnityEngine;
 
 public class EntityHandler : MonoBehaviour
 {
-    public EntityData _entityData;
+    public ChunkEntityData _entityData;
     private Vector3Int _positionCurrent;
     private Vector3Int _positionPrevious;
     private Boolean _isStatic;
-    public EntityData GetEntityData()
+    public ChunkEntityData GetEntityData()
     {
-        _entityData.Position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
+        _entityData.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
         return _entityData;
     }
  
-    public void Initialize(EntityData entityData, Boolean isStatic) { 
+    public void Initialize(ChunkEntityData entityData, Boolean isStatic) { 
         _entityData = entityData; 
         _isStatic = isStatic;
     }

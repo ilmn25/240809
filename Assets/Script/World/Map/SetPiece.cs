@@ -56,7 +56,7 @@ public static class SetPiece
 
         SerializableChunkData setPiece = new SerializableChunkData(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
         Vector3Int min = new Vector3Int(minX, minY, minZ);
-
+        Vector3Int chunkPos, worldPos, localPos, blockPos;
         List<Vector3Int> scannedChunks = new List<Vector3Int>();
 
         for (int x = minX; x <= maxX; x++)
@@ -65,16 +65,13 @@ public static class SetPiece
             {
                 for (int z = minZ; z <= maxZ; z++)
                 {
-                    Vector3Int worldPos = new Vector3Int(x, y, z);
-                    Vector3Int localPos = worldPos - min;
-
-                    Vector3Int chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-                    int localChunkX = worldPos.x - chunkPos.x;
-                    int localChunkY = worldPos.y - chunkPos.y;
-                    int localChunkZ = worldPos.z - chunkPos.z;
+                    worldPos = new Vector3Int(x, y, z);
+                    localPos = worldPos - min;
+                    chunkPos = WorldSingleton.GetChunkCoordinate(worldPos); 
+                    blockPos = worldPos - chunkPos; 
 
                     ChunkData chunk = WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z];
-                    setPiece[localPos.x, localPos.y, localPos.z] = chunk.Map[localChunkX, localChunkY, localChunkZ];
+                    setPiece[localPos.x, localPos.y, localPos.z] = chunk.Map[blockPos.x, blockPos.y, blockPos.z];
                     
                     if (!scannedChunks.Contains(chunkPos))
                     {
@@ -91,9 +88,9 @@ public static class SetPiece
             // Check and add static entities
             foreach (var entity in chunk.StaticEntity)
             {
-                if (IsEntityInRange(entity.Position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
+                if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.Position = new SerializableVector3Int(entity.Position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
+                    entity.position = new SerializableVector3Int(entity.position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
                     setPiece.StaticEntity.Add(entity); 
                 }
             }
@@ -101,9 +98,9 @@ public static class SetPiece
             // Check and add dynamic entities
             foreach (var entity in chunk.DynamicEntity)
             {
-                if (IsEntityInRange(entity.Position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
+                if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.Position = new SerializableVector3Int(entity.Position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
+                    entity.position = new SerializableVector3Int(entity.position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
                     setPiece.DynamicEntity.Add(entity); 
                 }
             }
@@ -114,19 +111,20 @@ public static class SetPiece
     public static void PasteSetPiece(Vector3Int position, SerializableChunkData setPiece)
     { 
         int chunkSize = WorldSingleton.CHUNK_SIZE;
-        Vector3Int chunkPos;
+        Vector3Int chunkPos, worldPos, blockPos;
         
         foreach (var entity in setPiece.StaticEntity)
         {
-            chunkPos = WorldSingleton.GetChunkCoordinate(position + entity.Position.ToVector3Int());
-            entity.Position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(position + entity.Position.ToVector3Int()));
+            chunkPos = WorldSingleton.GetChunkCoordinate(position + entity.position.ToVector3Int());
+            entity.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(position + entity.position.ToVector3Int()));
             WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].StaticEntity.Add(entity);
         }
 
         foreach (var entity in setPiece.DynamicEntity)
         {
-            chunkPos = WorldSingleton.GetChunkCoordinate(position + entity.Position.ToVector3Int());
-            entity.Position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(position + entity.Position.ToVector3Int()));
+            chunkPos = WorldSingleton.GetChunkCoordinate(position + entity.position.ToVector3Int());
+            Lib.Log(WorldSingleton.GetBlockCoordinate(position + entity.position.ToVector3Int()));
+            entity.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(position + entity.position.ToVector3Int()));
             WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
         }
         
@@ -139,14 +137,12 @@ public static class SetPiece
                     int blockID = setPiece[x, y, z];
                     if (blockID != 0)
                     {
-                        Vector3Int worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
-                        chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
-                        int localChunkX = worldPos.x % chunkSize;
-                        int localChunkY = worldPos.y % chunkSize;
-                        int localChunkZ = worldPos.z % chunkSize;
+                        worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
+                        chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
+                        blockPos = worldPos - chunkPos; 
 
                         if (WorldSingleton.Instance.IsInWorldBounds(worldPos))
-                            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] = blockID;
+                            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[blockPos.x, blockPos.y, blockPos.z] = blockID;
                     }
                 }
             }

@@ -61,9 +61,9 @@ public class WorldGenSingleton : MonoBehaviour
     }
 
 
-    public static int xSize = 2;
-    public static int ySize = 1;
-    public static int zSize = 2;
+    public static int xSize = 7;
+    public static int ySize = 3;
+    public static int zSize = 7;
 
 
     //! debug tools
@@ -272,7 +272,7 @@ public class WorldGenSingleton : MonoBehaviour
  
     private void HandleEntityGeneration(ChunkData chunkData)
     { 
-        EntityData entityData;
+        ChunkEntityData entityData;
         SerializableVector3Int entityPosition;
         
         for (int x = 0; x < _chunkSize; x++)
@@ -295,21 +295,19 @@ public class WorldGenSingleton : MonoBehaviour
                                     if (rng <= 0.03)
                                     {
                                         entityPosition = new SerializableVector3Int(x, y + 1, z);
-                                        entityData = new EntityData("tree", entityPosition,
-                                            new SerializableVector3Int(1, 3, 1));
+                                        entityData = new ChunkEntityData("tree", entityPosition);
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
                                         entityPosition = new SerializableVector3Int(x, y + 1, z);
-                                        entityData = new EntityData("bush1", entityPosition,
-                                            new SerializableVector3Int(0, 0, 0));
+                                        entityData = new ChunkEntityData("bush1", entityPosition);
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
                                         entityPosition = new SerializableVector3Int(x, y + 1, z);
-                                        entityData = new EntityData("grass", entityPosition);
+                                        entityData = new ChunkEntityData("grass", entityPosition);
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                 }
@@ -320,16 +318,14 @@ public class WorldGenSingleton : MonoBehaviour
                                 {
 
                                     entityPosition = new SerializableVector3Int(x, y + 1, z);
-                                    entityData = new EntityData("stage_hand", entityPosition,
-                                        new SerializableVector3Int(1, 1, 1));
+                                    entityData = new ChunkEntityData("stage_hand", entityPosition);
                                     chunkData.StaticEntity.Add(entityData);
                                 }
                                 else if (_random.NextDouble() <= 0.03)
                                 {
 
                                     entityPosition = new SerializableVector3Int(x, y + 1, z);
-                                    entityData = new EntityData("slab", entityPosition,
-                                        new SerializableVector3Int(0, 0, 0));
+                                    entityData = new ChunkEntityData("slab", entityPosition);
                                     chunkData.StaticEntity.Add(entityData);
                                 }
                             }
@@ -342,18 +338,18 @@ public class WorldGenSingleton : MonoBehaviour
                             {
                                 if (_random.NextDouble() <= 0.5)
                                 {
-                                    entityData = new EntityData("snare_flea", entityPosition, type: EntityType.Rigid);
+                                    entityData = new ChunkEntityData("snare_flea", entityPosition);
                                 } else
                                 {
-                                    entityData = new EntityData("chito", entityPosition, type: EntityType.Rigid);
+                                    entityData = new ChunkEntityData("chito", entityPosition);
                                 }
                             } else { 
                                 if (_random.NextDouble() <= 0.5)
                                 {
-                                    entityData = new EntityData("megumin", entityPosition, type: EntityType.Rigid);
+                                    entityData = new ChunkEntityData("megumin", entityPosition);
                                 } else
                                 {
-                                    entityData = new EntityData("yuuri", entityPosition, type: EntityType.Rigid);
+                                    entityData = new ChunkEntityData("yuuri", entityPosition);
                                 }
                             }
                             chunkData.DynamicEntity.Add(entityData); 

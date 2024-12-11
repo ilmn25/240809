@@ -21,7 +21,7 @@ public class PlayerStateMachine : EntityStateMachine
         }
         
         if (Input.GetKeyDown(KeyCode.O)) 
-            EntitySpawner.SpawnPrefab("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
     }
 } 
 class PlayerActive : EntityState { 

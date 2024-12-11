@@ -54,7 +54,7 @@ class ResourceCollapse : EntityState
         if (_spriteObject.rotation.eulerAngles.x > 89) 
         {  
             _rotationProgress = 0;
-            EntitySpawner.SpawnItem(_item, Vector3Int.FloorToInt(StateMachine.transform.position));
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(StateMachine.transform.position));
             StateMachine.WipeEntity();
         }
     }

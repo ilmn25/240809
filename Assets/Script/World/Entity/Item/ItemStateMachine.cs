@@ -22,7 +22,7 @@ public class ItemStateMachine : EntityStateMachine
             if (pickUp)
             {
                 AudioSingleton.PlaySFX(Game.PickUpSound);
-                InventorySingleton.AddItem(GetEntityData().ID, 1);
+                InventorySingleton.AddItem(GetEntityData().stringID, 1);
                 WipeEntity();
             } 
             wasInRange = true;

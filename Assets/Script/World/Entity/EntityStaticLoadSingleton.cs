@@ -10,12 +10,12 @@ public class EntityStaticLoadSingleton : MonoBehaviour
     public static EntityStaticLoadSingleton Instance { get; private set; }  
     
     private Vector3Int _currentChunkCoordinate;
-    private List<EntityData> _chunkEntityList;
+    private List<ChunkEntityData> _chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
     EntityHandler _currentEntityHandler;
 
-    public static Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<EntityData>, List<EntityHandler>)>();
+    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityHandler>)>();
     private int ENTITY_DISTANCE = WorldSingleton.RENDER_DISTANCE;
 
     void Awake()
@@ -111,10 +111,10 @@ public class EntityStaticLoadSingleton : MonoBehaviour
             _entityList[_currentChunkCoordinate] = (_chunkEntityList, new List<EntityHandler>());
         }
 
-        foreach (EntityData entityData in _chunkEntityList)
+        foreach (ChunkEntityData entityData in _chunkEntityList)
         { 
-            _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.ID);
-            _currentInstance.transform.position = _currentChunkCoordinate + entityData.Position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
+            _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
+            _currentInstance.transform.position = _currentChunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
             _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();
             _entityList[_currentChunkCoordinate].Item2.Add(_currentEntityHandler);  
