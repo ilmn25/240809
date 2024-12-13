@@ -22,6 +22,7 @@ public class EntityData
     public static EntityData Zero = new EntityData();
     public static EntityData One = new EntityData(Vector3Int.one);
     public static EntityData Rigid = new EntityData(type: EntityType.Rigid);
+    public static EntityData Item = new EntityData(type: EntityType.Item);
     public EntityData(Vector3Int? bounds = null, EntityType type = EntityType.Static, Dictionary<string, object> parameters = null)
     {
         Bounds = bounds ?? Vector3Int.zero;

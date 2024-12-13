@@ -42,6 +42,7 @@ public class MapCullModule : MonoBehaviour
     void Start() { 
         CreateShadowMesh();
         HandleAssignment();    
+        EntityDynamicLoadSingleton.Instance.LoadChunkEntities(_selfChunkPosition);
     }  
     void CreateShadowMesh()
     {  

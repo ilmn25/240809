@@ -11,8 +11,6 @@ public abstract class EntityStateMachine : MonoBehaviour
 
     protected virtual void OnAwake() {}
     protected virtual void LogicUpdate() {} 
-    public virtual void LeftClick() {} 
-    public virtual void RightClick() {} 
     
     private void Awake()
     {

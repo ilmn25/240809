@@ -28,7 +28,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     {
         //when move to new chunk 
         HandleUnload();
-        HandleLoad();  
+        // HandleLoad();  
     }
   
     
@@ -75,7 +75,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
                         _currentChunkData = WorldSingleton.Instance.GetChunk(entityChunkPosition);
                         if (_currentChunkData != null)
                         {
-                            LoadChunkEntities(_currentChunkData.DynamicEntity, entityChunkPosition);
+                            LoadChunkEntities(entityChunkPosition);
                         }
                     }
  
@@ -98,8 +98,9 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         _entityList.Clear();
     }
 
-    public void LoadChunkEntities(List<ChunkEntityData> chunkEntityList, Vector3Int chunkCoordinate)
-    { 
+    public void LoadChunkEntities(Vector3Int chunkCoordinate)
+    {
+        List<ChunkEntityData> chunkEntityList = WorldSingleton.World[chunkCoordinate].DynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
             switch (EntitySingleton.dictionary[entityData.stringID].Type)

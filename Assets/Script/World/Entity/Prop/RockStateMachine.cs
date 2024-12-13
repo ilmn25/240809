@@ -1,4 +1,4 @@
-public class RockStateMachine : EntityStateMachine
+public class RockStateMachine : EntityStateMachine, LeftClickable
 { 
     private int _health;
     private string _item;
@@ -23,7 +23,7 @@ public class RockStateMachine : EntityStateMachine
         SetState<Idle>();
     }
 
-    public override void LeftClick()
+    public void OnLeftClick()
     {
         AudioSingleton.PlaySFX(Game.DigSound);
         _currentHealth--;

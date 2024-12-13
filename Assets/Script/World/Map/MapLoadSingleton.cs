@@ -36,8 +36,8 @@ public class MapLoadSingleton : MonoBehaviour
         _colx = new NativeArray<int>(colx, Allocator.Persistent);
         _rowy = new NativeArray<int>(rowy, Allocator.Persistent);
         
-        _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton._textureRectDictionary.Count, Allocator.Persistent);
-        foreach (var kvp in BlockSingleton._textureRectDictionary)
+        _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton.TextureRectDictionary.Count, Allocator.Persistent);
+        foreach (var kvp in BlockSingleton.TextureRectDictionary)
         {
             _textureRectDictionary[kvp.Key] = kvp.Value;
         }
@@ -219,8 +219,8 @@ public class MapLoadSingleton : MonoBehaviour
                 colx = _colx,
                 rowy = _rowy,  
                 textureRectDictionary = _textureRectDictionary,
-                textureAtlasWidth = BlockSingleton._textureAtlasWidth,
-                textureAtlasHeight = BlockSingleton._textureAtlasHeight, 
+                textureAtlasWidth = BlockSingleton.TextureAtlasWidth,
+                textureAtlasHeight = BlockSingleton.TextureAtlasHeight, 
 
                 // input 
                 chunkMap = ChunkMap.Create(_chunkCoordinate),

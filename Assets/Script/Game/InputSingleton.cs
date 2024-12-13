@@ -111,13 +111,11 @@ public class InputSingleton : MonoBehaviour
                 PlayerChunkEditSingleton.Instance.HandleMapPlace();
             }
         }
-        else if (Game.isLayer(_layerMask, Game.IndexLC))
-        { 
-            if (Input.GetMouseButtonDown(0))
-            {
-                _targetInfo.collider.gameObject.GetComponent<EntityStateMachine>().LeftClick();
-            }
-        }
+        
+        if (Input.GetMouseButtonDown(0))
+            _targetInfo.collider.gameObject.GetComponent<LeftClickable>()?.OnLeftClick(); 
+        if (Input.GetMouseButtonDown(1))
+            _targetInfo.collider.gameObject.GetComponent<RightClickable>()?.OnRightClick(); 
     }
       
 }
