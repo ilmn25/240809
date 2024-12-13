@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 [System.Serializable]
 public class WorldData
@@ -14,8 +15,45 @@ public class WorldData
         Length = new SerializableVector3Int(x, y, z);
         _world = new ChunkData[x, y, z];
     }
+ 
+    public ChunkData this[Vector3Int position]
+    {
+        
+        get
+        {
+            int chunkX = position.x / WorldSingleton.CHUNK_SIZE;
+            int chunkY = position.y / WorldSingleton.CHUNK_SIZE;
+            int chunkZ = position.z / WorldSingleton.CHUNK_SIZE;
 
-    // Indexer to access the World array
+            if (chunkX >= 0 && chunkX < _world.GetLength(0) &&
+                chunkY >= 0 && chunkY < _world.GetLength(1) &&
+                chunkZ >= 0 && chunkZ < _world.GetLength(2))
+            {
+                return _world[chunkX, chunkY, chunkZ];
+            }
+            else
+            {
+                return ChunkData.Zero;
+            }
+        }
+        set
+        {
+            int chunkX = position.x / WorldSingleton.CHUNK_SIZE;
+            int chunkY = position.y / WorldSingleton.CHUNK_SIZE;
+            int chunkZ = position.z / WorldSingleton.CHUNK_SIZE; 
+            if (chunkX >= 0 && chunkX < _world.GetLength(0) &&
+                chunkY >= 0 && chunkY < _world.GetLength(1) &&
+                chunkZ >= 0 && chunkZ < _world.GetLength(2))
+            {
+                _world[chunkX, chunkY, chunkZ] = value;
+            }
+            else
+            {
+                throw new IndexOutOfRangeException("Coordinates are out of bounds.");
+            }
+        }
+    }
+    
     public ChunkData this[int x, int y, int z]
     {
         get

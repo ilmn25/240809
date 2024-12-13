@@ -28,6 +28,9 @@ public class InventorySingleton : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             AddItem("axe");
+            AddItem("brick", 40);
+            AddItem("wood", 40);
+            AddItem("marble", 40);
         }
         if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
         {

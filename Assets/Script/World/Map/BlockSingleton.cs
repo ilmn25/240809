@@ -4,19 +4,20 @@ using UnityEngine;
 public class BlockSingleton : MonoBehaviour
 {
     public static BlockSingleton Instance { get; private set; }  
-    private static Dictionary<int, BlockData> _blockDefinitions  = new Dictionary<int, BlockData>();
+    private static Dictionary<int, BlockData> _dictionary  = new Dictionary<int, BlockData>();
     private static IntStringMap<int, string> _blockIDMap = new IntStringMap<int, string>();
     private static int _nextBlockID = 1;
  
     
-    public static Dictionary<int, Rect> _textureRectDictionary; // Dictionary to store the ID and corresponding Rect
-    public static int _textureAtlasWidth;
-    public static int _textureAtlasHeight;
-    public static Texture2D _textureAtlas;
+    public static Dictionary<int, Rect> TextureRectDictionary; // Dictionary to store the ID and corresponding Rect
+    public static int TextureAtlasWidth;
+    public static int TextureAtlasHeight;
+    public static Texture2D TextureAtlas;
     
     public static Material MeshMaterial; 
-    public static Material ShadowMeshMaterial; 
-    public static string MESH_MATERIAL_PATH = "shader/material/custom_lit";
+    public static Material ShadowMeshMaterial;
+    public const string MESH_MATERIAL_PATH = "shader/material/custom_lit";
+
     void Awake()
     {
         Instance = this;
@@ -39,38 +40,38 @@ public class BlockSingleton : MonoBehaviour
         // Create texture atlas 
         //TODO 8192 4096 2048 if too small, uv mapping will BREAK
         int textureAtlasSize = (_blockIDMap.InttoString.Count * 128) + 64; 
-        _textureAtlas = new Texture2D(textureAtlasSize, textureAtlasSize);
-        _textureAtlas.filterMode = FilterMode.Point;
-        _textureRects = _textureAtlas.PackTextures(_textures.ToArray(), 0, textureAtlasSize); 
+        TextureAtlas = new Texture2D(textureAtlasSize, textureAtlasSize);
+        TextureAtlas.filterMode = FilterMode.Point;
+        _textureRects = TextureAtlas.PackTextures(_textures.ToArray(), 0, textureAtlasSize); 
 
         // System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/TextureAtlas.png", _textureAtlas.EncodeToPNG());  
-        _textureAtlasWidth = _textureAtlas.width;
-        _textureAtlasHeight = _textureAtlas.height;
+        TextureAtlasWidth = TextureAtlas.width;
+        TextureAtlasHeight = TextureAtlas.height;
 
         // Create the dictionary to pair the int ID with the texture rect
-        _textureRectDictionary = new Dictionary<int, Rect>();
+        TextureRectDictionary = new Dictionary<int, Rect>();
         int index = 0;
         foreach (var kvp in _blockIDMap.InttoString)
         { 
-            _textureRectDictionary[kvp.Key] = _textureRects[index];
+            TextureRectDictionary[kvp.Key] = _textureRects[index];
             index++;
         }
-        MeshMaterial.mainTexture = _textureAtlas;
+        MeshMaterial.mainTexture = TextureAtlas;
     }
 
     public static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost)
     {
         int id = _nextBlockID++;
         BlockData blockData = new BlockData(stringID, breakThreshold, breakCost);
-        _blockDefinitions[id] = blockData;
+        _dictionary[id] = blockData;
         _blockIDMap.Add(id, stringID);
     }
 
     public static BlockData GetBlock(int id)
     {
-        if (_blockDefinitions.ContainsKey(id))
+        if (_dictionary.ContainsKey(id))
         {
-            return _blockDefinitions[id];
+            return _dictionary[id];
         }
         return null;
     }
@@ -78,9 +79,9 @@ public class BlockSingleton : MonoBehaviour
     public static BlockData GetBlock(string stringID)
     {
         int id = _blockIDMap.StringtoInt[stringID];
-        if (_blockDefinitions.ContainsKey(id))
+        if (_dictionary.ContainsKey(id))
         {
-            return _blockDefinitions[id];
+            return _dictionary[id];
         }
         return null;
     }

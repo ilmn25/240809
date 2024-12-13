@@ -3,7 +3,7 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class TreeStateMachine : EntityStateMachine
+public class TreeStateMachine : EntityStateMachine, LeftClickable
 { 
     public Transform _spriteObject;
     private int _health;
@@ -26,13 +26,17 @@ public class TreeStateMachine : EntityStateMachine
         SetState<Idle>();
     }
 
-    public override void LeftClick()
+    public void OnLeftClick()
     {
         AudioSingleton.PlaySFX(Game.DigSound);
         if (Game.GUIBusy) return;
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
+    } 
+    public void OnHover()
+    {
+        
     } 
 }
  

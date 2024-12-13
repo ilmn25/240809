@@ -1,11 +1,9 @@
 using System;
-using UnityEngine;
+using UnityEngine; 
 
 public class EntityHandler : MonoBehaviour
 {
     public ChunkEntityData _entityData;
-    private Vector3Int _positionCurrent;
-    private Vector3Int _positionPrevious;
     private Boolean _isStatic;
     public ChunkEntityData GetEntityData()
     {

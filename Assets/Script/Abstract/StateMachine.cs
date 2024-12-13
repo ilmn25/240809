@@ -55,7 +55,7 @@ public abstract class StateMachine : MonoBehaviour
     }
 }
 
-
+ 
 public abstract class State
 {
     public String[] Tags;

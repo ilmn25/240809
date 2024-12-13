@@ -17,6 +17,11 @@ public class EntitySingleton : MonoBehaviour
                 dictionary.Add("megumin", EntityData.Rigid);
                 dictionary.Add("yuuri", EntityData.Rigid);
         }
+
+        public static void AddItem(string stringID)
+        {
+                dictionary.Add(stringID, EntityData.Item);
+        }
         
         public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true)
         {
