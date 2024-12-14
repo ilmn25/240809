@@ -8,7 +8,7 @@ class NPCIdle : State {
         _npcAnimationModule = npcAnimationModule;
     }
  
-    public override void StateUpdate() {
+    public override void OnUpdateState() {
         _npcMovementModule.HandleMovementUpdate();
         _npcAnimationModule.HandleAnimationUpdate();
     }

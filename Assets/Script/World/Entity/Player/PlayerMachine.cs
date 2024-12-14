@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class PlayerBrain : StateMachine
+public class PlayerMachine : StateMachine
 {
     public override void OnAwake()
     {

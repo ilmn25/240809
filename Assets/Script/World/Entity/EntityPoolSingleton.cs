@@ -27,7 +27,6 @@ public class EntityPoolSingleton : MonoBehaviour
         {
             obj = Instantiate(Resources.Load<GameObject>($"prefab/{prefabName}"));
             obj.name = prefabName;
-            obj.AddComponent<EntityHandler>();
         } 
 
         return obj;

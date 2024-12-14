@@ -20,7 +20,7 @@ class NPCRoam : State {
         _npcPathFindAbstract.SetTarget(null);
     }
     
-    public override void StateUpdate() {
+    public override void OnUpdateState() {
         if (_sprite.isVisible)
         {
             _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindActive(_npcMovementModule.IsGrounded()));

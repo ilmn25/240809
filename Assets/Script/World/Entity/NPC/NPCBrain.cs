@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class NPCBrain : StateMachine
+public class NPCBrain : EntityMachine
 {
     public override void OnAwake()
     {
@@ -50,7 +50,7 @@ public class NPCState : State
         _npcMovementModule.SetDirection(Vector3.zero);
     }
     
-    public override void StateUpdate()
+    public override void OnUpdateState()
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
