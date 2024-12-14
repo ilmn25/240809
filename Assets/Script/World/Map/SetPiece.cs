@@ -23,12 +23,12 @@ public static class SetPiece
         if (Input.GetKeyDown(KeyCode.Equals))
         {
             Lib.Log("exported to file");
-            SaveSetPieceFile(CopySetPiece(), "tree_a");
+            SaveSetPieceFile(CopySetPiece(), WorldSingleton.Instance.setPieceName);
         }
         if (Input.GetKeyDown(KeyCode.Minus))
         {
             Lib.Log("imported to world"); 
-            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile("tree_a"));
+            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(WorldSingleton.Instance.setPieceName));
         }
     }
      

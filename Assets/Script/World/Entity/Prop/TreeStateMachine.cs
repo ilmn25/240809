@@ -3,7 +3,7 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class TreeStateMachine : EntityStateMachine, LeftClickable
+public class TreeStateMachine : EntityStateMachine, ILeftClick
 { 
     public Transform _spriteObject;
     private int _health;

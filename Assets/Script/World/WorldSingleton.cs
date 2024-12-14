@@ -76,6 +76,7 @@ public class WorldSingleton : MonoBehaviour
     public static int RENDER_DISTANCE = 2; 
     public static bool ALWAYS_REGENERATE = false;
  
+    public string setPieceName = "tree_a";
     private void Awake()    
     {
         Instance = this;

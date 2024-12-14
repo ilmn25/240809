@@ -40,9 +40,9 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         { 
             entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityHandler.transform.position);
             
-            if (entityChunkPosition.x > WorldSingleton._playerChunkPos.x + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.x < WorldSingleton._playerChunkPos.x - ENTITY_UNLOAD_DISTANCE ||
-                entityChunkPosition.y > WorldSingleton._playerChunkPos.y + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.y < WorldSingleton._playerChunkPos.y - ENTITY_UNLOAD_DISTANCE ||
-                entityChunkPosition.z > WorldSingleton._playerChunkPos.z + ENTITY_UNLOAD_DISTANCE || entityChunkPosition.z < WorldSingleton._playerChunkPos.z - ENTITY_UNLOAD_DISTANCE)
+            if (Math.Abs(entityChunkPosition.x - WorldSingleton._playerChunkPos.x) > ENTITY_UNLOAD_DISTANCE ||
+                Math.Abs(entityChunkPosition.y - WorldSingleton._playerChunkPos.y) > ENTITY_UNLOAD_DISTANCE ||
+                Math.Abs(entityChunkPosition.z - WorldSingleton._playerChunkPos.z) > ENTITY_UNLOAD_DISTANCE)
             {
                 // Lib.Log(entityChunkPosition);
                 if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))

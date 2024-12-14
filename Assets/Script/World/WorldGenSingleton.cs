@@ -27,7 +27,7 @@ public class WorldGenSingleton : MonoBehaviour
     private float _caveOffset;
     
     private int _chunkSize = WorldSingleton.CHUNK_SIZE;
-    private int _worldHeight = ySize * WorldSingleton.CHUNK_SIZE;
+    private int _worldHeight = (ySize - 2) * WorldSingleton.CHUNK_SIZE;
     
     private float _stoneScale = 0.01f;
     private float _dirtScale = 0.005f;
@@ -40,7 +40,7 @@ public class WorldGenSingleton : MonoBehaviour
     private ChunkData _chunkData;
     private Vector3Int _chunkCoord;
      
-    private ChunkData _setPiece;
+    private ChunkData _setPiece; 
     
     private void Awake() {
         Instance = this;
@@ -61,9 +61,9 @@ public class WorldGenSingleton : MonoBehaviour
     }
 
 
-    public static int xSize = 7;
-    public static int ySize = 4;
-    public static int zSize = 7;
+    public static int xSize = 25;
+    public static int ySize = 8;
+    public static int zSize = 25;
 
 
     //! debug tools
@@ -111,11 +111,11 @@ public class WorldGenSingleton : MonoBehaviour
                     {
                         if (_random.NextDouble() <= 0.0002)
                         {
-                            SetPiece.PasteSetPiece(new Vector3Int(x, y, z), house);
+                            SetPiece.PasteSetPiece(new Vector3Int(x, y+2, z), house);
                         }
                         else if (_random.NextDouble() <= 0.002)
                         {
-                            SetPiece.PasteSetPiece(new Vector3Int(x, y, z), tree);
+                            SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), tree);
                         }
                     } 
                 }
