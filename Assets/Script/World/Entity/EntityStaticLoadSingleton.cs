@@ -12,9 +12,9 @@ public class EntityStaticLoadSingleton : MonoBehaviour
     private List<ChunkEntityData> _chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
-    EntityHandler _currentEntityHandler;
+    EntityMachine _currentEntityMachine;
 
-    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityHandler>)> _entityList = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityHandler>)>();
+    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> _entityList = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
     private int ENTITY_DISTANCE = WorldSingleton.RENDER_DISTANCE;
 
     void Awake()
@@ -62,7 +62,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
       
     public void UpdateEntityList(Vector3Int key)
     {
-        foreach (EntityHandler entityHandler in _entityList[key].Item2)
+        foreach (EntityMachine entityHandler in _entityList[key].Item2)
         { 
             _entityList[key].Item1.Add(entityHandler.GetEntityData()); 
             EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
@@ -75,7 +75,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
         // Find the key once
         if (!_entityList.ContainsKey(coordinate))
         {
-            _entityList[coordinate] = (_chunkEntityList, new List<EntityHandler>());
+            _entityList[coordinate] = (_chunkEntityList, new List<EntityMachine>());
         }
 
         foreach (ChunkEntityData entityData in _chunkEntityList)
@@ -83,9 +83,9 @@ public class EntityStaticLoadSingleton : MonoBehaviour
             _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
             _currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
-            _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();
-            _entityList[coordinate].Item2.Add(_currentEntityHandler);  
-            _currentEntityHandler.Initialize(entityData, true);
+            _currentEntityMachine = _currentInstance.GetComponent<EntityMachine>();
+            _entityList[coordinate].Item2.Add(_currentEntityMachine);  
+            _currentEntityMachine.Initialize(entityData);
         }
         _chunkEntityList.Clear();
     } 

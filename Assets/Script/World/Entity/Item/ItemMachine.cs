@@ -47,7 +47,7 @@ public class ItemState : State
         _itemPhysicModule.PopItem();
     }
 
-    public override void StateUpdate()
+    public override void OnUpdateState()
     { 
         if (Root.transform.position.y < -5)
         { 

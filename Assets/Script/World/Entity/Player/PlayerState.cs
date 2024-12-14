@@ -8,7 +8,7 @@ public class PlayerState : State
         AddState(new PlayerActive(), true); 
     }
 
-    public override void StateUpdate()
+    public override void OnUpdateState()
     {
         if (Root.transform.position.y < -50)
         {
@@ -21,7 +21,7 @@ public class PlayerState : State
     }
 } 
 class PlayerActive : State { 
-    public override void StateUpdate() { 
+    public override void OnUpdateState() { 
         PlayerMovementSingleton.Instance.HandleMovementUpdate();
         PlayerAnimationSingleton.Instance.HandleAnimationUpdate(); 
         PlayerChunkEditSingleton.Instance.HandleChunkEditInput(); 

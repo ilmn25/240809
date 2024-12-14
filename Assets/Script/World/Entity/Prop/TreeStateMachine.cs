@@ -46,7 +46,7 @@ class ResourceCollapse : State
         _spriteObject = spriteObject;
     }
 
-    public override void StateUpdate() 
+    public override void OnUpdateState() 
     { 
         _rotationProgress += Time.deltaTime * 0.8f;
         _spriteObject.rotation = Quaternion.Lerp(CreateRotation(0), CreateRotation(90), _rotationProgress);

@@ -4,13 +4,25 @@ using UnityEngine;
 
 public abstract class EntityMachine : StateMachine
 { 
-    public void WipeEntity()
-    {
-        GetComponent<EntityHandler>().WipeEntity();
-    }
+    public ChunkEntityData _entityData; 
     public ChunkEntityData GetEntityData()
     {
-        return GetComponent<EntityHandler>()._entityData;
+        _entityData.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
+        return _entityData;
     }
+ 
+    public void Initialize(ChunkEntityData entityData) { 
+        _entityData = entityData;  
+    }
+ 
+    public void WipeEntity()
+    {
+        if (EntitySingleton.dictionary[_entityData.stringID].Type == EntityType.Static)
+            EntityStaticLoadSingleton._entityList[WorldSingleton.GetChunkCoordinate(transform.position)].Item2.Remove(this);
+        else 
+            EntityDynamicLoadSingleton._entityList.Remove(this);
+        
+        EntityPoolSingleton.Instance.ReturnObject(gameObject); 
+    }  
 }
 

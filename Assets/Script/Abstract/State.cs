@@ -12,7 +12,7 @@ public abstract class State
     protected State _statePrevious;
 
     public virtual void OnEnterState() {}
-    public virtual void StateUpdate() {}
+    public virtual void OnUpdateState() {}
     public virtual void OnExitState() {}
  
     protected State(string[] tags = null)
@@ -20,9 +20,9 @@ public abstract class State
         Tags = tags;
     }
     
-    public void OnUpdate()
+    public void OnUpdateInternal()
     {
-        StateUpdate();
+        OnUpdateState();
         if (_stateCurrent != null)
         { 
             if (_stateCurrent != _statePrevious)
@@ -31,7 +31,7 @@ public abstract class State
                 _statePrevious.OnExitState();
                 _statePrevious = _stateCurrent;
             }
-            _stateCurrent.StateUpdate();
+            _stateCurrent.OnUpdateState();
         } 
     }
     

@@ -45,7 +45,7 @@ public class ItemFurniture : State
 {
     public string stringID; 
 
-    public override void StateUpdate()
+    public override void OnUpdateState()
     {
         if (Input.GetMouseButtonDown(1))
         {
@@ -56,7 +56,7 @@ public class ItemFurniture : State
 
 public class ItemBlock : State
 { 
-    public override void StateUpdate()
+    public override void OnUpdateState()
     {  
         PlayerChunkEditSingleton.Instance._blockStringID = InventorySingleton.CurrentItem.StringID;
     }
@@ -96,7 +96,7 @@ public class ItemTool : State
         toolSprite.gameObject.SetActive(false);
     }
 
-    public override void StateUpdate()
+    public override void OnUpdateState()
     { 
         if (!isSwinging)
         {

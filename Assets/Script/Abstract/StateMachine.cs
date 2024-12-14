@@ -13,10 +13,10 @@ public abstract class StateMachine : MonoBehaviour
         State.OnEnterState();
     }
     
-    public void Update()
+    private void Update()
     {
         OnUpdate(); 
-        State.OnUpdate(); 
+        State.OnUpdateInternal(); 
     }
 
     public void Terminate()
