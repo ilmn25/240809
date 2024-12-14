@@ -26,11 +26,10 @@ public class InventorySingleton : MonoBehaviour
     public void HandleInventoryUpdate()
     {
         if (Input.GetKeyDown(KeyCode.P))
-        {
-            AddItem("axe");
-            AddItem("brick", 40);
-            AddItem("wood", 40);
-            AddItem("marble", 40);
+        { 
+            AddItem("brick", 100);
+            AddItem("stone", 100);
+            AddItem("dirt", 100);
         }
         if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
         {

@@ -1,4 +1,4 @@
-public class RockStateMachine : EntityStateMachine, LeftClickable
+public class RockStateMachine : EntityStateMachine, ILeftClick
 { 
     private int _health;
     private string _item;

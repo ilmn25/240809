@@ -9,7 +9,6 @@ public class EntityStaticLoadSingleton : MonoBehaviour
 {
     public static EntityStaticLoadSingleton Instance { get; private set; }  
     
-    private Vector3Int _currentChunkCoordinate;
     private List<ChunkEntityData> _chunkEntityList;
     private ChunkData _currentChunkData; 
     private GameObject _currentInstance;
@@ -28,7 +27,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
     {
         if (WorldSingleton._boolMap == null) return; // dont delete before boolmap load
         HandleUnload();
-        HandleLoad();  
+        // HandleLoad();  
     }
  
     public void SaveAll()
@@ -48,12 +47,9 @@ public class EntityStaticLoadSingleton : MonoBehaviour
             // Extract chunk coordinates from the key
             int chunkX = coordinate.x, chunkY = coordinate.y, chunkZ = coordinate.z;
 
-            if (chunkX > WorldSingleton._playerChunkPos.x + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
-                || chunkX < WorldSingleton._playerChunkPos.x - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE
-                || chunkY > WorldSingleton._playerChunkPos.y + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
-                || chunkY < WorldSingleton._playerChunkPos.y - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE
-                || chunkZ > WorldSingleton._playerChunkPos.z + ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE 
-                || chunkZ < WorldSingleton._playerChunkPos.z - ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE)
+            if (Math.Abs(chunkX - WorldSingleton._playerChunkPos.x) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE ||
+                Math.Abs(chunkY - WorldSingleton._playerChunkPos.y) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE ||
+                Math.Abs(chunkZ - WorldSingleton._playerChunkPos.z) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE)
             {
                 UpdateEntityList(coordinate);
                 removeList.Add(coordinate);
@@ -61,36 +57,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
         }
         // Remove the marked keys from the dictionary
         foreach (var coordinate in removeList) _entityList.Remove(coordinate);
-    }
-
-    void HandleLoad()
-    { 
-
-        for (int x = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; x <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; x += WorldSingleton.CHUNK_SIZE)
-        {
-            for (int y = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; y <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; y += WorldSingleton.CHUNK_SIZE)
-            {
-                for (int z = -ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; z <= ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE; z += WorldSingleton.CHUNK_SIZE)
-                {
-                    _currentChunkCoordinate = new Vector3Int(
-                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.x + x),
-                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.y + y),
-                        Mathf.FloorToInt(WorldSingleton._playerChunkPos.z + z)
-                    );
-
-                    if (!_entityList.ContainsKey(_currentChunkCoordinate))
-                    {
-                        _currentChunkData = WorldSingleton.Instance.GetChunk(_currentChunkCoordinate); 
-                        if  (_currentChunkData != null)
-                        {
-                            _chunkEntityList = _currentChunkData.StaticEntity;  
-                            LoadChunkEntities(); 
-                        }
-                    }  
-                }  
-            } 
-        } 
-    }
+    } 
      
       
     public void UpdateEntityList(Vector3Int key)
@@ -102,22 +69,22 @@ public class EntityStaticLoadSingleton : MonoBehaviour
         }
     }
 
-    public void LoadChunkEntities()
+    public void LoadChunkEntities(Vector3Int coordinate)
     {  
-        
+        _chunkEntityList = WorldSingleton.World[coordinate].StaticEntity;
         // Find the key once
-        if (!_entityList.ContainsKey(_currentChunkCoordinate))
+        if (!_entityList.ContainsKey(coordinate))
         {
-            _entityList[_currentChunkCoordinate] = (_chunkEntityList, new List<EntityHandler>());
+            _entityList[coordinate] = (_chunkEntityList, new List<EntityHandler>());
         }
 
         foreach (ChunkEntityData entityData in _chunkEntityList)
         { 
             _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
-            _currentInstance.transform.position = _currentChunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
+            _currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
             _currentEntityHandler = _currentInstance.GetComponent<EntityHandler>();
-            _entityList[_currentChunkCoordinate].Item2.Add(_currentEntityHandler);  
+            _entityList[coordinate].Item2.Add(_currentEntityHandler);  
             _currentEntityHandler.Initialize(entityData, true);
         }
         _chunkEntityList.Clear();

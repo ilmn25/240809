@@ -113,9 +113,9 @@ public class InputSingleton : MonoBehaviour
         }
         
         if (Input.GetMouseButtonDown(0))
-            _targetInfo.collider.gameObject.GetComponent<LeftClickable>()?.OnLeftClick(); 
+            _targetInfo.collider.gameObject.GetComponent<ILeftClick>()?.OnLeftClick(); 
         if (Input.GetMouseButtonDown(1))
-            _targetInfo.collider.gameObject.GetComponent<RightClickable>()?.OnRightClick(); 
+            _targetInfo.collider.gameObject.GetComponent<IRightClick>()?.OnRightClick(); 
     }
       
 }

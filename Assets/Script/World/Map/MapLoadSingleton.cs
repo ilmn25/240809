@@ -59,12 +59,9 @@ public class MapLoadSingleton : MonoBehaviour
     
     private bool InPlayerRange(Vector3 chunkPos)
     {
-        return chunkPos.x <= WorldSingleton._playerChunkPos.x + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               chunkPos.x >= WorldSingleton._playerChunkPos.x - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               chunkPos.y <= WorldSingleton._playerChunkPos.y + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               chunkPos.y >= WorldSingleton._playerChunkPos.y - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               chunkPos.z <= WorldSingleton._playerChunkPos.z + WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               chunkPos.z >= WorldSingleton._playerChunkPos.z - WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE;
+        return Math.Abs(chunkPos.x - WorldSingleton._playerChunkPos.x) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               Math.Abs(chunkPos.y - WorldSingleton._playerChunkPos.y) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
+               Math.Abs(chunkPos.z - WorldSingleton._playerChunkPos.z) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE;
     }
 
     private Vector3Int _traverseCheckPosition;
