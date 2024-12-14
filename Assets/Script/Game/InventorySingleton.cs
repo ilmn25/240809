@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventorySingleton : MonoBehaviour
+public class InventorySingleton : StateMachine
 {
-    public static InventorySingleton Instance { get; private set; }  
-    
+    public static InventorySingleton Instance { get; private set; }
     public static List<InvSlotData> _playerInventory;
 
     private static int _currentRow = 0;
@@ -17,12 +16,22 @@ public class InventorySingleton : MonoBehaviour
     public static int INVENTORY_ROW_AMOUNT = 3;
     public static int INVENTORY_SLOT_AMOUNT = 9;
 
-    void Start()
-    {
-        Instance = this;
-        RefreshInventory();
+    public override void OnAwake()
+    { 
+        State = new InventoryStateGraph();
     }
 
+    void Start()
+    {
+        Instance = this; 
+    }
+
+    public void SetInventory(List<InvSlotData> data)
+    {
+        _playerInventory = data;
+        RefreshInventory();
+    }
+    
     public void HandleInventoryUpdate()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -61,11 +70,11 @@ public class InventorySingleton : MonoBehaviour
         RefreshInventory(); 
     }
 
-    public static void RefreshInventory()
+    public void RefreshInventory()
     { 
         _currentKey = CalculateKey();
         CurrentItem = _playerInventory[_currentKey];
-        InventoryStateMachine.Instance.HandleItemUpdate();
+        ((InventoryStateGraph)State).HandleItemUpdate();
         GUIStorageSingleton.Instance.RefreshCursorSlot();
     }
 
@@ -76,7 +85,7 @@ public class InventorySingleton : MonoBehaviour
         return row * INVENTORY_SLOT_AMOUNT + slot;
     } 
     
-    public static void AddItem(string stringID, int quantity = 1)
+    public void AddItem(string stringID, int quantity = 1)
     {
         int maxStackSize = ItemSingleton.GetItem(stringID).StackSize;
 
@@ -123,7 +132,7 @@ public class InventorySingleton : MonoBehaviour
         RefreshInventory();
     }
     
-    public static void RemoveItem(string stringID, int quantity = 1)
+    public void RemoveItem(string stringID, int quantity = 1)
     {
         // Prioritize current slot
         if (_playerInventory[_currentKey].StringID == stringID)

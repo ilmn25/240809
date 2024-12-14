@@ -1,46 +1,41 @@
  
 using System;
 using Unity.VisualScripting;
-using UnityEngine;
+using UnityEngine; 
+ 
 
-public class TreeStateMachine : EntityStateMachine, ILeftClick
+public class TreeStateMachine : State
 { 
     public Transform _spriteObject;
     private int _health;
     private string _item;
     private int _currentHealth;
-    protected override void OnAwake()
-    {
-        Initialize(ref _item, ref _health);
+    public override void OnEnterState()
+    { 
         _currentHealth = _health;
-        _spriteObject = transform.Find("sprite");
+        _spriteObject = Root.transform.Find("sprite");
         AddState(new ResourceCollapse(_spriteObject, _item));
         AddState(new Idle(), true);
     }
 
-    protected virtual void Initialize(ref string item, ref int health ) {}
-    
-    public void OnEnable()
-    { 
-        _currentHealth = _health;
-        SetState<Idle>();
+    public TreeStateMachine(string item, int health)
+    {
+        _item = item;
+        _health = health;
     }
 
-    public void OnLeftClick()
+    public void Hit()
     {
         AudioSingleton.PlaySFX(Game.DigSound);
         if (Game.GUIBusy) return;
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();
-    } 
-    public void OnHover()
-    {
-        
-    } 
+        _currentHealth = _health;
+    }  
 }
  
-class ResourceCollapse : EntityState
+class ResourceCollapse : State
 {
     private Transform _spriteObject;
     private float _rotationProgress = 0;
@@ -58,8 +53,9 @@ class ResourceCollapse : EntityState
         if (_spriteObject.rotation.eulerAngles.x > 89) 
         {  
             _rotationProgress = 0;
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(StateMachine.transform.position));
-            StateMachine.WipeEntity();
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Root.transform.position)); 
+            SetState<Idle>();
+            ((EntityMachine)Root).WipeEntity();
         }
     }
 

@@ -3,19 +3,28 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class NPCStateMachine : EntityStateMachine
+public class NPCBrain : StateMachine
 {
-    private NPCMovementModule _npcMovementModule;
-    private NPCPathFindAbstract _npcPathFindAbstract;
-    private NPCAnimationModule _npcAnimationModule; 
-    private SpriteRenderer _sprite;
-    protected override void OnAwake()
+    public override void OnAwake()
     {
-        GUIDialogueSingleton.DialogueAction += DialogueAction;
-        _sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
-        _npcMovementModule = GetComponent<NPCMovementModule>();
-        _npcPathFindAbstract = GetComponent<NPCPathFindAbstract>();
-        _npcAnimationModule = GetComponent<NPCAnimationModule>();
+        NPCState state = new NPCState();
+        state._sprite = transform.Find("sprite").GetComponent<SpriteRenderer>();
+        state._npcMovementModule = GetComponent<NPCMovementModule>();
+        state._npcPathFindAbstract = GetComponent<NPCPathFindAbstract>();
+        state._npcAnimationModule = GetComponent<NPCAnimationModule>();
+        State = state;
+    } 
+}
+
+public class NPCState : State
+{
+    public NPCMovementModule _npcMovementModule;
+    public NPCPathFindAbstract _npcPathFindAbstract;
+    public NPCAnimationModule _npcAnimationModule; 
+    public SpriteRenderer _sprite;
+    public override void OnEnterState()
+    {
+        GUIDialogueSingleton.DialogueAction += DialogueAction; 
         
         AddState(new NPCIdle(_npcMovementModule, _npcAnimationModule), true);
         AddState(new NPCChase(_npcMovementModule, _npcPathFindAbstract, _npcAnimationModule, _sprite));
@@ -24,12 +33,12 @@ public class NPCStateMachine : EntityStateMachine
         dialogueData.Lines.Add("help");
         dialogueData.Lines.Add("I cant fix my raycast ");
         dialogueData.Lines.Add("im about to kms rahhhhhhh");
-        AddState(new CharTalk(this, dialogueData));
+        AddState(new CharTalk(dialogueData));
     }
 
     private void DialogueAction()
     {
-        if (Vector3.Distance(transform.position, Game.Player.transform.position) < 1.4f)
+        if (Vector3.Distance(Root.transform.position, Game.Player.transform.position) < 1.4f)
         {
             SetState<CharTalk>();
         }
@@ -41,7 +50,7 @@ public class NPCStateMachine : EntityStateMachine
         _npcMovementModule.SetDirection(Vector3.zero);
     }
     
-    protected override void LogicUpdate()
+    public override void StateUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
@@ -53,7 +62,7 @@ public class NPCStateMachine : EntityStateMachine
         }
         else if (Input.GetKeyDown(KeyCode.U))
         {
-            transform.position = Game.Player.transform.position;
+            Root.transform.position = Game.Player.transform.position;
         }
  
     }

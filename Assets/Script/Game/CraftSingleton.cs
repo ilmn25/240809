@@ -38,7 +38,7 @@ public class CraftSingleton : MonoBehaviour
 
         foreach (var ingredient in _craftList[stringID].Ingredients)
         {
-            InventorySingleton.RemoveItem(ingredient.Key, ingredient.Value);
+            InventorySingleton.Instance.RemoveItem(ingredient.Key, ingredient.Value);
         }
         
         InvSlotData craftedItem = new InvSlotData();
@@ -51,7 +51,7 @@ public class CraftSingleton : MonoBehaviour
         
         if (craftedItem.Stack > 0)
         { 
-            InventorySingleton.AddItem(stringID);
+            InventorySingleton.Instance.AddItem(stringID);
         } 
     }
 }

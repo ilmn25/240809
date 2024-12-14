@@ -1,18 +1,16 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class InventoryStateMachine : StateMachine
+public class InventoryStateGraph : State
 {
-    public static InventoryStateMachine Instance { get; private set; }  
-    public override void OnAwake()
+    public override void OnEnterState()
     {
-        Instance = this;
         AddState(new ItemEmpty(), true);
         AddState(new ItemBlock());
         AddState(new ItemTool());
     }
     public void HandleItemUpdate()
-    {  
+    {
         if (InventorySingleton.CurrentItem.Stack == 0)
         {
             SetState<ItemEmpty>();
@@ -38,7 +36,7 @@ public class ItemEmpty : State
 {
     public override void OnEnterState()
     {
-        StateMachine.transform.Find("sprite").transform.Find("tool").gameObject.SetActive(false);
+        Root.transform.Find("sprite").transform.Find("tool").gameObject.SetActive(false);
     }
 }
 
@@ -57,7 +55,7 @@ public class ItemFurniture : State
 }
 
 public class ItemBlock : State
-{
+{ 
     public override void StateUpdate()
     {  
         PlayerChunkEditSingleton.Instance._blockStringID = InventorySingleton.CurrentItem.StringID;

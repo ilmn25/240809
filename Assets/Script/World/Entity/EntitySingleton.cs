@@ -35,7 +35,7 @@ public class EntitySingleton : MonoBehaviour
                 EntityHandler currentEntityHandler = gameObject.GetComponent<EntityHandler>();
                 EntityDynamicLoadSingleton._entityList.Add(currentEntityHandler); 
                 currentEntityHandler.Initialize(entityData, false);
-                gameObject.transform.GetComponent<ItemStateMachine>().pickUp = pickUp;
+                gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
         }
         
         public static void SpawnPrefab(string stringID, Vector3Int worldPosition)

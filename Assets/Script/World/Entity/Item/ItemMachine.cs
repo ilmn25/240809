@@ -2,27 +2,27 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ItemStateMachine : EntityStateMachine
+public class ItemMachine : EntityMachine
 {
     private ItemPhysicModule _itemPhysicModule;
     public bool pickUp = true;
     private bool wasInRange = false;
     
-    protected override void OnAwake()
+    public override void OnAwake()
     {
         _itemPhysicModule = GetComponent<ItemPhysicModule>();
-        
-        AddState(new ItemIdle(_itemPhysicModule), true);
+
+        State = new ItemState(_itemPhysicModule);
     }
 
-    protected override void LogicUpdate()
+    public override void OnUpdate()
     {
         if (Vector3.Distance(transform.position, Game.Player.transform.position) <= 0.8f)
         { 
             if (pickUp)
             {
                 AudioSingleton.PlaySFX(Game.PickUpSound);
-                InventorySingleton.AddItem(GetEntityData().stringID, 1);
+                InventorySingleton.Instance.AddItem(GetEntityData().stringID, 1);
                 WipeEntity();
             } 
             wasInRange = true;
@@ -34,10 +34,10 @@ public class ItemStateMachine : EntityStateMachine
     }
 }
 
-public class ItemIdle : EntityState
+public class ItemState : State
 {
     private ItemPhysicModule _itemPhysicModule;
-    public ItemIdle(ItemPhysicModule itemPhysicModule)
+    public ItemState(ItemPhysicModule itemPhysicModule)
     {
         _itemPhysicModule = itemPhysicModule;
     }
@@ -48,11 +48,10 @@ public class ItemIdle : EntityState
     }
 
     public override void StateUpdate()
-    {
- 
-        if (StateMachine.transform.position.y < -5) 
-        {            
-            StateMachine.WipeEntity();
+    { 
+        if (Root.transform.position.y < -5)
+        { 
+            ((EntityMachine)Root).WipeEntity();
         } else _itemPhysicModule.HandlePhysicsUpdate();
     }
 }

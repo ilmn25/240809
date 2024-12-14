@@ -45,7 +45,7 @@ public class PlayerDataSingleton : MonoBehaviour
         {
             _playerData = new PlayerData(); 
         }
-        InventorySingleton._playerInventory = _playerData.inventory;
+        InventorySingleton.Instance.SetInventory(_playerData.inventory);
     }
  
 }

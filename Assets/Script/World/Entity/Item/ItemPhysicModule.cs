@@ -23,7 +23,7 @@ public class ItemPhysicModule : MonoBehaviour
  
 
     public void HandlePhysicsUpdate()
-    {
+    { 
         _deltaTime = Game.GetDeltaTime();
 
         if (!IsMovable(transform.position))
