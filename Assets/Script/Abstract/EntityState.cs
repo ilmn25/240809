@@ -1,22 +1,8 @@
 using System;
 using UnityEngine;
-
-public abstract class EntityState
-{
-    public String[] Tags;
-    public EntityStateMachine StateMachine;
-    protected EntityState(string[] tags = null)
-    {
-        Tags = tags;
-    }
-
-    public virtual void OnEnterState() {}
-    public virtual void StateUpdate() {}
-    public virtual void OnExitState() {}
-}
  
 
-class Idle : EntityState
+class Idle : State
 {  
     public override void OnEnterState()
     { 
@@ -24,9 +10,9 @@ class Idle : EntityState
     }
     public void OnMapUpdate(Vector3Int worldPosition)
     {
-        if (Vector3Int.FloorToInt(StateMachine.transform.position) - new Vector3Int(0, 1, 0) == worldPosition)
+        if (Vector3Int.FloorToInt(Root.transform.position) - new Vector3Int(0, 1, 0) == worldPosition)
         {
-            StateMachine.WipeEntity();
+            ((EntityMachine) Root).WipeEntity();
         } 
     }
     public override void OnExitState()

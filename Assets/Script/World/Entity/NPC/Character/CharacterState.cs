@@ -1,18 +1,16 @@
 using UnityEngine;
 
-public class CharTalk : EntityState {
-    public EntityStateMachine _esm;
+public class CharTalk : State {
     public DialogueData _dialogueData; 
 
-    public CharTalk(EntityStateMachine esm, DialogueData dialogueData)
+    public CharTalk(DialogueData dialogueData)
     {
-        _esm = esm;
         _dialogueData = dialogueData;
     }
  
     public void OnEndDialogue()
     {
-        _esm.SetState<NPCChase>();
+        Parent.SetState<NPCChase>();
     }
     
     public override void OnEnterState()
