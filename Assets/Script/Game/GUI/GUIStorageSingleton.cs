@@ -22,9 +22,7 @@ public class GUIStorageSingleton : MonoBehaviour
 
     private void Initialize()
     {
-        for (int i = 0;
-             i < InventorySingleton.INVENTORY_SLOT_AMOUNT * InventorySingleton.INVENTORY_ROW_AMOUNT;
-             i++)
+        for (int i = 0; i < InventorySingleton.INVENTORY_SLOT_AMOUNT * InventorySingleton.INVENTORY_ROW_AMOUNT; i++)
         {
             GameObject slot = Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), Game.GUIInvStorage.transform, false);
     
@@ -34,7 +32,7 @@ public class GUIStorageSingleton : MonoBehaviour
             RectTransform slotRectTransform = slot.GetComponent<RectTransform>();
             slotRectTransform.sizeDelta = new Vector2(SLOT_SIZE, SLOT_SIZE);
             slotRectTransform.anchoredPosition = new Vector2(
-                column * (SLOT_SIZE + MARGIN.x),
+                column * (SLOT_SIZE + MARGIN.x) - 160,
                 -row * (SLOT_SIZE + MARGIN.y)
             );
             slot.AddComponent<GUIInvSlotModule>().SlotNumber = InventorySingleton.CalculateKey(row, column);

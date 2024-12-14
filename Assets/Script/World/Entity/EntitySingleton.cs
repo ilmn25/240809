@@ -33,7 +33,7 @@ public class EntitySingleton : MonoBehaviour
                         Resources.Load<Sprite>($"texture/sprite/{stringID}"); 
         
                 EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
-                EntityDynamicLoadSingleton._entityList.Add(currentEntityMachine); 
+                EntityDynamicLoadSingleton.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
                 gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
         }
@@ -45,7 +45,7 @@ public class EntitySingleton : MonoBehaviour
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
         
                 EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
-                EntityDynamicLoadSingleton._entityList.Add(currentEntityMachine); 
+                EntityDynamicLoadSingleton.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
         }
 }

@@ -19,6 +19,8 @@ public class GUISingleton : MonoBehaviour
  
     private void Update()
     {
+        if (Game.GUIBusy && Input.GetMouseButtonDown(0)) AudioSingleton.PlaySFX(Game.PickUpSound);
+
         if (Input.GetKeyDown(KeyCode.Tab))  
         {
             if (_scaleTask == null || (_scaleTask != null && !_scaleTask.Running))

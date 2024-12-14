@@ -61,9 +61,9 @@ public class WorldGenSingleton : MonoBehaviour
     }
 
 
-    public static int xSize = 5;
-    public static int ySize = 6;
-    public static int zSize = 5;
+    public static int xSize = 20;
+    public static int ySize = 7;
+    public static int zSize = 20;
 
 
     //! debug tools

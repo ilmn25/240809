@@ -71,9 +71,12 @@ public class WorldSingleton : MonoBehaviour
     [HideInInspector] 
     public static BoolMap _boolMap;
     [HideInInspector] 
-    public static int CHUNK_SIZE = 15; 
+    public static readonly int CHUNK_SIZE = 15; 
     [HideInInspector] 
-    public static int RENDER_DISTANCE = 2; 
+    public static readonly int RENDER_RANGE = 2; 
+    [HideInInspector] 
+    public static readonly int RENDER_DISTANCE = RENDER_RANGE * CHUNK_SIZE; 
+    
     public static bool ALWAYS_REGENERATE = false;
  
     public string setPieceName = "tree_a";
@@ -81,7 +84,7 @@ public class WorldSingleton : MonoBehaviour
     {
         Instance = this;
     }
-
+ 
     void Start()
     { 
         Instance = this;
@@ -122,8 +125,8 @@ public class WorldSingleton : MonoBehaviour
     
     public async void HandleSaveWorldFile(int yLevel)
     {
-        EntityStaticLoadSingleton.Instance.SaveAll();
-        EntityDynamicLoadSingleton.Instance.SaveAll();
+        EntityStaticLoadSingleton.Instance.UnloadWorld();
+        EntityDynamicLoadSingleton.Instance.UnloadWorld();
         await Task.Delay(10);
         
         using (FileStream file = File.Create(getFilePath(yLevel)))
@@ -156,6 +159,12 @@ public class WorldSingleton : MonoBehaviour
 
 
 
+    public static bool InPlayerRange(Vector3 position, float distance)
+    {
+        return Math.Abs(position.x - _playerChunkPos.x) <= distance &&
+               Math.Abs(position.y - _playerChunkPos.y) <= distance &&
+               Math.Abs(position.z - _playerChunkPos.z) <= distance;
+    }
  
     public void GenerateBoolMap()
     {
