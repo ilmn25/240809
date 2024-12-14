@@ -8,86 +8,56 @@ using UnityEngine;
 public class EntityStaticLoadSingleton : MonoBehaviour
 {
     public static EntityStaticLoadSingleton Instance { get; private set; }  
-    
-    private List<ChunkEntityData> _chunkEntityList;
-    private ChunkData _currentChunkData; 
-    private GameObject _currentInstance;
-    EntityMachine _currentEntityMachine;
-
-    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> _entityList = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
-    private int ENTITY_DISTANCE = WorldSingleton.RENDER_DISTANCE;
+     
+    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> _activeEntities = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
 
     void Awake()
     {
         Instance = this;
-        WorldSingleton.PlayerChunkTraverse += OnTraverse; 
-    }
-
-    public void OnTraverse()   
-    {
-        if (WorldSingleton._boolMap == null) return; // dont delete before boolmap load
-        HandleUnload();
-        // HandleLoad();  
     }
  
-    public void SaveAll()
-    {
-        foreach (var key in _entityList.Keys)
-        {
-            UpdateEntityList(key);
-        }
-        _entityList.Clear();
-    }
+    public static void ForgetEntity(EntityMachine entity) { }
+    public static void InviteEntity(EntityMachine entity) { }
     
-    void HandleUnload()
+    public void UnloadWorld()
     {
-        var removeList = new List<Vector3Int>();
-        foreach (var coordinate in _entityList.Keys)
+        foreach (var key in _activeEntities.Keys)
         {
-            // Extract chunk coordinates from the key
-            int chunkX = coordinate.x, chunkY = coordinate.y, chunkZ = coordinate.z;
-
-            if (Math.Abs(chunkX - WorldSingleton._playerChunkPos.x) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE ||
-                Math.Abs(chunkY - WorldSingleton._playerChunkPos.y) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE ||
-                Math.Abs(chunkZ - WorldSingleton._playerChunkPos.z) > ENTITY_DISTANCE * WorldSingleton.CHUNK_SIZE)
-            {
-                UpdateEntityList(coordinate);
-                removeList.Add(coordinate);
-            }
+            UnloadEntitiesInChunk(key);
         }
-        // Remove the marked keys from the dictionary
-        foreach (var coordinate in removeList) _entityList.Remove(coordinate);
-    } 
-     
+        _activeEntities.Clear();
+    }
       
-    public void UpdateEntityList(Vector3Int key)
+    public void UnloadEntitiesInChunk(Vector3Int key)
     {
-        foreach (EntityMachine entityHandler in _entityList[key].Item2)
+        foreach (EntityMachine entityHandler in _activeEntities[key].Item2)
         { 
-            _entityList[key].Item1.Add(entityHandler.GetEntityData()); 
+            _activeEntities[key].Item1.Add(entityHandler.GetEntityData()); 
             EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
         }
     }
 
-    public void LoadChunkEntities(Vector3Int coordinate)
+    public void LoadEntitiesInChunk(Vector3Int coordinate)
     {  
-        _chunkEntityList = WorldSingleton.World[coordinate].StaticEntity;
+        EntityMachine currentEntityMachine;
+        GameObject currentInstance;
+        List<ChunkEntityData> activeEntities = WorldSingleton.World[coordinate].StaticEntity;
         // Find the key once
-        if (!_entityList.ContainsKey(coordinate))
+        if (!_activeEntities.ContainsKey(coordinate))
         {
-            _entityList[coordinate] = (_chunkEntityList, new List<EntityMachine>());
+            _activeEntities[coordinate] = (activeEntities, new List<EntityMachine>());
         }
 
-        foreach (ChunkEntityData entityData in _chunkEntityList)
+        foreach (ChunkEntityData entityData in activeEntities)
         { 
-            _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
-            _currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
+            currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
+            currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
-            _currentEntityMachine = _currentInstance.GetComponent<EntityMachine>();
-            _entityList[coordinate].Item2.Add(_currentEntityMachine);  
-            _currentEntityMachine.Initialize(entityData);
+            currentEntityMachine = currentInstance.GetComponent<EntityMachine>();
+            _activeEntities[coordinate].Item2.Add(currentEntityMachine);  
+            currentEntityMachine.Initialize(entityData);
         }
-        _chunkEntityList.Clear();
+        activeEntities.Clear();
     } 
 }
  

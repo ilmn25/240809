@@ -47,8 +47,8 @@ public static class SetPiece
     
     public static SerializableChunkData CopySetPiece()
     {
-        EntityStaticLoadSingleton.Instance.SaveAll();
-        EntityDynamicLoadSingleton.Instance.SaveAll();
+        EntityStaticLoadSingleton.Instance.UnloadWorld();
+        EntityDynamicLoadSingleton.Instance.UnloadWorld();
         int minX = Mathf.Min(_positionA.x, _positionB.x);
         int minY = Mathf.Min(_positionA.y, _positionB.y);
         int minZ = Mathf.Min(_positionA.z, _positionB.z);

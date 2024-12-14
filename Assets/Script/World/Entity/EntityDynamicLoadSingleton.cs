@@ -7,92 +7,79 @@ using UnityEngine;
 
 public class EntityDynamicLoadSingleton : MonoBehaviour
 {
-    public static EntityDynamicLoadSingleton Instance { get; private set; }  
-    private List<ChunkEntityData> chunkEntityList;
-    private ChunkData _currentChunkData; 
-    private GameObject _currentInstance;
-    EntityMachine _currentEntityMachine;
+    public static EntityDynamicLoadSingleton Instance { get; private set; }    
 
-    public static List<EntityMachine> _entityList = new List<EntityMachine>();
-
-    private int ENTITY_LOAD_DISTANCE = (WorldSingleton.RENDER_DISTANCE - 1) * WorldSingleton.CHUNK_SIZE;
-    private int ENTITY_UNLOAD_DISTANCE = (WorldSingleton.RENDER_DISTANCE) * WorldSingleton.CHUNK_SIZE;
+    private static List<EntityMachine> _activeEntities = new List<EntityMachine>(); 
     
     void Awake()
     {
         Instance = this;
-        WorldSingleton.PlayerChunkTraverse += OnTraverse; 
+        WorldSingleton.PlayerChunkTraverse += ScanAndUnload; 
     }
 
-    private void OnTraverse()   
-    {
-        //when move to new chunk 
-        HandleUnload();
-        // HandleLoad();  
-    }
-  
+    public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
+    public static void InviteEntity(EntityMachine entity) { _activeEntities.Add(entity); }
     
-    void HandleUnload()
+    void ScanAndUnload()
     {
         List<EntityMachine> removeList = new List<EntityMachine>();
         Vector3Int entityChunkPosition;
-        foreach (var entityMachine in _entityList)
+        foreach (var entityMachine in _activeEntities)
         { 
             entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityMachine.transform.position);
             
-            if (Math.Abs(entityChunkPosition.x - WorldSingleton._playerChunkPos.x) > ENTITY_UNLOAD_DISTANCE ||
-                Math.Abs(entityChunkPosition.y - WorldSingleton._playerChunkPos.y) > ENTITY_UNLOAD_DISTANCE ||
-                Math.Abs(entityChunkPosition.z - WorldSingleton._playerChunkPos.z) > ENTITY_UNLOAD_DISTANCE)
+            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.RENDER_DISTANCE))
             {
-                // Lib.Log(entityChunkPosition);
                 if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))
                     WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityMachine.GetEntityData());
                 removeList.Add(entityMachine);
                 EntityPoolSingleton.Instance.ReturnObject(entityMachine.gameObject); 
             }
         }
-        foreach (var entityMachine in removeList) _entityList.Remove(entityMachine);
+        foreach (var entityMachine in removeList) _activeEntities.Remove(entityMachine);
     }
  
      
       
-    public void SaveAll()
+    public void UnloadWorld()
     {
         Vector3Int entityChunkPosition;
-        foreach (EntityMachine entityHandler in _entityList)
+        foreach (EntityMachine entityHandler in _activeEntities)
         {
             entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityHandler.transform.position);
             if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))
                 WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
             EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
         }
-        _entityList.Clear();
+        _activeEntities.Clear();
     }
 
-    public void LoadChunkEntities(Vector3Int chunkCoordinate)
-    {
+    public void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
+    { 
+        EntityMachine currentEntityMachine;
+        GameObject currentInstance = null;
         List<ChunkEntityData> chunkEntityList = WorldSingleton.World[chunkCoordinate].DynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
             switch (EntitySingleton.dictionary[entityData.stringID].Type)
             {
                 case EntityType.Item: 
-                    _currentInstance = EntityPoolSingleton.Instance.GetObject("item"); 
-                    _currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    currentInstance = EntityPoolSingleton.Instance.GetObject("item"); 
+                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
         
-                    _currentInstance.GetComponent<SpriteRenderer>().sprite = 
+                    currentInstance.GetComponent<SpriteRenderer>().sprite = 
                         Resources.Load<Sprite>($"texture/sprite/{entityData.stringID}"); 
                     break;
 
                 case EntityType.Rigid:
-                    _currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
-                    _currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
+                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
                     break;
             }
             
-            _currentEntityMachine = _currentInstance.GetComponent<EntityMachine>();
-            _entityList.Add(_currentEntityMachine); 
-            _currentEntityMachine.Initialize(entityData);
+            currentEntityMachine = currentInstance.GetComponent<EntityMachine>();
+            _activeEntities.Add(currentEntityMachine); 
+            currentEntityMachine.Initialize(entityData);
         }
         chunkEntityList.Clear();
     } 

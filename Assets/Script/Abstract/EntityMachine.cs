@@ -18,9 +18,10 @@ public abstract class EntityMachine : StateMachine
     public void WipeEntity()
     {
         if (EntitySingleton.dictionary[_entityData.stringID].Type == EntityType.Static)
-            EntityStaticLoadSingleton._entityList[WorldSingleton.GetChunkCoordinate(transform.position)].Item2.Remove(this);
-        else 
-            EntityDynamicLoadSingleton._entityList.Remove(this);
+            EntityStaticLoadSingleton._activeEntities[WorldSingleton.GetChunkCoordinate(transform.position)].Item2
+                .Remove(this);
+        else
+            EntityDynamicLoadSingleton.ForgetEntity(this);
         
         EntityPoolSingleton.Instance.ReturnObject(gameObject); 
     }  

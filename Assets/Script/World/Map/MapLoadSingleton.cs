@@ -24,6 +24,7 @@ public class MapLoadSingleton : MonoBehaviour
         _rowy.Dispose();
         _textureRectDictionary.Dispose();
     }
+    
     private async void Start()
     {   
         Instance = this;
@@ -47,7 +48,6 @@ public class MapLoadSingleton : MonoBehaviour
         await Task.Delay(50);
         HandleChunkMapTraverse(); 
         WorldSingleton.Instance.GenerateBoolMap();
-        EntityStaticLoadSingleton.Instance.OnTraverse();
     }
 
     
@@ -56,13 +56,7 @@ public class MapLoadSingleton : MonoBehaviour
         if (!WorldSingleton.Instance.IsInWorldBounds(chunkCoordinates)) return;
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
-    
-    private bool InPlayerRange(Vector3 chunkPos)
-    {
-        return Math.Abs(chunkPos.x - WorldSingleton._playerChunkPos.x) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               Math.Abs(chunkPos.y - WorldSingleton._playerChunkPos.y) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE &&
-               Math.Abs(chunkPos.z - WorldSingleton._playerChunkPos.z) <= WorldSingleton.RENDER_DISTANCE * WorldSingleton.CHUNK_SIZE;
-    }
+     
 
     private Vector3Int _traverseCheckPosition;
     private List<Vector3Int> _destroyList = new List<Vector3Int>();
@@ -71,9 +65,11 @@ public class MapLoadSingleton : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             _traverseCheckPosition = kvp.Key;
-            if (!InPlayerRange(kvp.Key))
+            if (!WorldSingleton.InPlayerRange(kvp.Key, WorldSingleton.RENDER_DISTANCE))
             {
                 Destroy(kvp.Value.gameObject, 1);
+                EntityStaticLoadSingleton.Instance.UnloadEntitiesInChunk(kvp.Key); //static entities load in 
+                EntityStaticLoadSingleton._activeEntities.Remove(kvp.Key);
                 _destroyList.Add(kvp.Key);
             }
         }
@@ -86,11 +82,11 @@ public class MapLoadSingleton : MonoBehaviour
         _destroyList.Clear();
 
         // Collect chunk coordinates within render distance
-        for (int x = -WorldSingleton.RENDER_DISTANCE; x <= WorldSingleton.RENDER_DISTANCE; x++)
+        for (int x = -WorldSingleton.RENDER_RANGE; x <= WorldSingleton.RENDER_RANGE; x++)
         {
-            for (int y = -WorldSingleton.RENDER_DISTANCE; y <= WorldSingleton.RENDER_DISTANCE; y++)
+            for (int y = -WorldSingleton.RENDER_RANGE; y <= WorldSingleton.RENDER_RANGE; y++)
             {
-                for (int z = -WorldSingleton.RENDER_DISTANCE; z <= WorldSingleton.RENDER_DISTANCE; z++)
+                for (int z = -WorldSingleton.RENDER_RANGE; z <= WorldSingleton.RENDER_RANGE; z++)
                 {
                     _traverseCheckPosition = new Vector3Int(
                         WorldSingleton._playerChunkPos.x + x * WorldSingleton.CHUNK_SIZE,
@@ -111,7 +107,7 @@ public class MapLoadSingleton : MonoBehaviour
         await _semaphoreSlim.WaitAsync();
         try
         { 
-            if ((replace || !_activeChunks.ContainsKey(chunkCoord)) && InPlayerRange(chunkCoord))
+            if ((replace || !_activeChunks.ContainsKey(chunkCoord)) && WorldSingleton.InPlayerRange(chunkCoord, WorldSingleton.RENDER_DISTANCE))
             {
                 _chunkCoordinate = chunkCoord;
                 _chunkData = WorldSingleton.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
