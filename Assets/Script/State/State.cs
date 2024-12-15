@@ -4,13 +4,14 @@ using System.Collections.Generic;
 public abstract class State
 {
     public String[] Tags;
-    public StateMachine Root;
+    public Machine Machine;
     public State Parent;
 
     protected List<State> states = new List<State>();
     protected State _stateCurrent;
     protected State _statePrevious;
 
+    public virtual void OnInitialize() {}
     public virtual void OnEnterState() {}
     public virtual void OnUpdateState() {}
     public virtual void OnExitState() {}
@@ -34,12 +35,19 @@ public abstract class State
             _stateCurrent.OnUpdateState();
         } 
     }
+
+    public void OnTerminate()
+    {
+        OnExitState();
+        _stateCurrent.OnTerminate();
+    }
     
     protected void AddState(State state, Boolean current = false)
     {
-        state.Root = Root;
+        state.Machine = Machine;
         state.Parent = this;
         states.Add(state);
+        state.OnInitialize();
         if (current)
         {
             _stateCurrent = state;

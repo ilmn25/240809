@@ -6,13 +6,12 @@ class NPCRoam : State {
     NPCAnimationModule _npcAnimationModule; 
     SpriteRenderer _sprite;
 
-    public NPCRoam(NPCMovementModule npcMovementModule, NPCPathFindAbstract npcPathFindAbstract, 
-        NPCAnimationModule npcAnimationModule, SpriteRenderer sprite)
+    public override void OnInitialize()
     {
-        _npcMovementModule = npcMovementModule;
-        _npcAnimationModule = npcAnimationModule;
-        _npcPathFindAbstract = npcPathFindAbstract;
-        _sprite = sprite; 
+        _npcMovementModule = Machine.GetModule<NPCMovementModule>();
+        _npcPathFindAbstract = Machine.GetModule<NPCPathFindAbstract>();
+        _npcAnimationModule = Machine.GetModule<NPCAnimationModule>();
+        _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
     }
 
     public override void OnEnterState()
@@ -23,13 +22,13 @@ class NPCRoam : State {
     public override void OnUpdateState() {
         if (_sprite.isVisible)
         {
-            _npcMovementModule.SetDirection(_npcPathFindAbstract.HandlePathFindActive(_npcMovementModule.IsGrounded()));
+            _npcMovementModule.SetDirection(_npcPathFindAbstract.GetNextDirection(_npcMovementModule.IsGrounded()));
             _npcMovementModule.HandleMovementUpdate();
             _npcAnimationModule.HandleAnimationUpdate();
         }
         else
         {  
-            _npcPathFindAbstract.HandlePathFindPassive(_npcMovementModule.SPEED_WALK); 
+            _npcPathFindAbstract.PassivePathFollow(_npcMovementModule.SPEED_WALK); 
         }
     }
 }

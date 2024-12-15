@@ -13,9 +13,9 @@ public class TreeState : State
     public override void OnEnterState()
     { 
         _currentHealth = _health;
-        _spriteObject = Root.transform.Find("sprite");
+        _spriteObject = Machine.transform.Find("sprite");
         AddState(new ResourceCollapse(_spriteObject, _item));
-        AddState(new Idle(), true);
+        AddState(new StaticIdle(), true);
     }
 
     public TreeState(string item, int health)

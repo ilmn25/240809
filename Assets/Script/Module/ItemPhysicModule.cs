@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class ItemPhysicModule : MonoBehaviour
+public class ItemPhysicModule : Module
 {
     private Vector3 _velocity;
     private float _deltaTime;
@@ -10,35 +10,29 @@ public class ItemPhysicModule : MonoBehaviour
     private float BOUNCE_FACTOR = 0.3f;  
     private int SLIDE_RANGE = 3;   
     private float COLLISION_RANGE = 0.3f;  
-
-    void Start()
-    {
-        PopItem();
-    }
-
-    public void PopItem() //initial pop velocity 
+ 
+    public void PopItem() //spawn velocity 
     {
         _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 7, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
     }
  
-
     public void HandlePhysicsUpdate()
     { 
         _deltaTime = Game.GetDeltaTime();
 
-        if (!IsMovable(transform.position))
+        if (!IsMovable(Machine.transform.position))
         {
-            transform.position += new Vector3(0, 5, 0) * _deltaTime;
+            Machine.transform.position += new Vector3(0, 5, 0) * _deltaTime;
             return;
         }
 
         _velocity += GRAVITY * _deltaTime * Vector3.down;
         _velocity.y = Mathf.Max(_velocity.y, -GRAVITY); 
-        Vector3 newPosition = transform.position + _velocity * _deltaTime;
+        Vector3 newPosition = Machine.transform.position + _velocity * _deltaTime;
         
         if (IsMovable(newPosition))
         {
-            transform.position = newPosition;
+            Machine.transform.position = newPosition;
         }
         else
         { 
@@ -61,7 +55,7 @@ public class ItemPhysicModule : MonoBehaviour
     // void OnDrawGizmos()
     // {
     //     Gizmos.color = Color.blue;
-    //     Vector3 newPosition = transform.position + _velocity * Time.fixedDeltaTime;
+    //     Vector3 newPosition = Machine.transform.position + _velocity * Time.fixedDeltaTime;
     //     Gizmos.DrawWireSphere(newPosition, COLLISION_RANGE);
     // }
 }

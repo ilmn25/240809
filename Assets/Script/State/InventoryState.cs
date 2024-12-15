@@ -36,7 +36,7 @@ public class ItemEmpty : State
 {
     public override void OnEnterState()
     {
-        Root.transform.Find("sprite").transform.Find("tool").gameObject.SetActive(false);
+        Machine.transform.Find("sprite").transform.Find("tool").gameObject.SetActive(false);
     }
 }
 

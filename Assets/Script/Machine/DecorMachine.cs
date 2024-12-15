@@ -1,8 +1,13 @@
+using UnityEngine;
+
 public class DecorMachine : EntityMachine
 { 
-    public override void OnAwake()
+    public override void OnInitialize()
     {
-        State = new Idle();
+        State = new StaticIdle();
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        AddModule(new SpriteCullModule(spriteRenderer)); 
+        AddModule(new SpriteOrbitModule(spriteRenderer)); 
     }
     //
     // private void OnMouseDown()

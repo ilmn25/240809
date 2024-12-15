@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class NPCMovementModule : MonoBehaviour
+public class NPCMovementModule : Module
 {
     [SerializeField] public float SPEED_WALK = 6f;
     [SerializeField] private float SPEED_RUN = 8f;
@@ -62,11 +62,11 @@ public class NPCMovementModule : MonoBehaviour
     
     public void HandleMovementUpdate(bool isRoam = false)
     { 
-        if (transform.position.y < -1) transform.position = Lib.AddToVector(transform.position, 0, 100, 0);
+        if (Machine.transform.position.y < -1) Machine.transform.position = Lib.AddToVector(Machine.transform.position, 0, 100, 0);
 
         // _deltaTime = GameSystem._deltaTime;
         _deltaTime = Game.GetDeltaTime();
-        _newPosition = transform.position;
+        _newPosition = Machine.transform.position;
 
         HandleJump();
 
@@ -97,7 +97,7 @@ public class NPCMovementModule : MonoBehaviour
             if (!IsMovable(_newPosition))
             {
                 _speedCurrent /= 2;
-                _newPosition = transform.position;
+                _newPosition = Machine.transform.position;
             }
         }
  
@@ -117,24 +117,24 @@ public class NPCMovementModule : MonoBehaviour
   
     private void HandleObstacle(Vector3 position)
     {
-        _newPosition = transform.position;
+        _newPosition = Machine.transform.position;
         //! go any possible direction when going diagonally against a wall
-        if (_direction.x != 0 && IsMovable(new Vector3(position.x, transform.position.y, transform.position.z)))
+        if (_direction.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
         {
-            _newPosition = new Vector3(position.x, transform.position.y, transform.position.z);
+            _newPosition = new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z);
         }
-        else if (_direction.z != 0 && IsMovable(new Vector3(transform.position.x, transform.position.y, position.z)))
+        else if (_direction.z != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
         {
-            _newPosition = new Vector3(transform.position.x, transform.position.y, position.z);
+            _newPosition = new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z);
         }
         else
         {
             //! slide against wall if possible
             if (_direction.x != 0)
             {
-                _testPosition = transform.position.x + SLIDE_DEGREE * _direction.x * _speedCurrent * _deltaTime;
-                _testPositionA = new Vector3(_testPosition, transform.position.y, transform.position.z);
-                _testPositionB = new Vector3(_testPosition, transform.position.y, transform.position.z);
+                _testPosition = Machine.transform.position.x + SLIDE_DEGREE * _direction.x * _speedCurrent * _deltaTime;
+                _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
+                _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionA.z += -1 * _speedCurrent * _deltaTime;
                 _testPositionB.z += 1 * _speedCurrent * _deltaTime;
                 if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
@@ -148,9 +148,9 @@ public class NPCMovementModule : MonoBehaviour
             }
             else
             {
-                _testPosition = transform.position.z + SLIDE_DEGREE * _direction.z * _speedCurrent * _deltaTime;
-                _testPositionA = new Vector3(transform.position.x, transform.position.y, _testPosition);
-                _testPositionB = new Vector3(transform.position.x, transform.position.y, _testPosition);
+                _testPosition = Machine.transform.position.z + SLIDE_DEGREE * _direction.z * _speedCurrent * _deltaTime;
+                _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
+                _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionA.x += -1 * _speedCurrent * _deltaTime;
                 _testPositionB.x += 1 * _speedCurrent * _deltaTime;
                 if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
@@ -176,20 +176,20 @@ public class NPCMovementModule : MonoBehaviour
         { 
             if (_verticalVelocity < 0) _isGrounded = true;
             _verticalVelocity = 0;
-            transform.position = _newPosition;
+            Machine.transform.position = _newPosition;
         } 
         else
         {
-            transform.position = _newPositionY;
+            Machine.transform.position = _newPositionY;
         } 
         
         
-        if (_direction != Vector3.zero && _previousPosition == transform.position)
+        if (_direction != Vector3.zero && _previousPosition == Machine.transform.position)
         {
-            Vector3 tempPosition = Lib.AddToVector(transform.position, 0, 0.1f, 0);
-            if (IsMovable(tempPosition)) transform.position = tempPosition;
+            Vector3 tempPosition = Lib.AddToVector(Machine.transform.position, 0, 0.1f, 0);
+            if (IsMovable(tempPosition)) Machine.transform.position = tempPosition;
         }
-        _previousPosition = transform.position;
+        _previousPosition = Machine.transform.position;
     }
     
     private bool IsMovable(Vector3 newPosition)

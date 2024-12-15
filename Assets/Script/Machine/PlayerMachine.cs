@@ -1,9 +1,9 @@
  
 using UnityEngine;
 
-public class PlayerMachine : StateMachine
+public class PlayerMachine : Machine
 {
-    public override void OnAwake()
+    public override void OnInitialize()
     {
         State = new PlayerState();
         transform.position = new Vector3( 
