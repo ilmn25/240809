@@ -216,7 +216,7 @@ public class MapLoadSingleton : MonoBehaviour
                 textureAtlasHeight = BlockSingleton.TextureAtlasHeight, 
 
                 // input 
-                chunkMap = ChunkMap.Create(_chunkCoordinate),
+                mapLoadData = MapLoadData.Create(_chunkCoordinate),
 
                 // output
                 vertices = new NativeList<Vector3>(Allocator.TempJob),
@@ -282,7 +282,7 @@ public class MapLoadSingleton : MonoBehaviour
 
         // input 
         [DeallocateOnJobCompletion]
-        public NativeMap3D<int> chunkMap;  
+        public NativeMap3D<int> mapLoadData;  
 
         // output
         public NativeList<Vector3> vertices;
@@ -297,20 +297,8 @@ public class MapLoadSingleton : MonoBehaviour
         private int blockID;
         [DeallocateOnJobCompletion] 
         private Vector3Int blockPosition;
-        
-        [DeallocateOnJobCompletion]
-        public int py;
-        [DeallocateOnJobCompletion]
-        public int ny;
-        [DeallocateOnJobCompletion]
-        public int px;
-        [DeallocateOnJobCompletion]
-        public int nx;
-        [DeallocateOnJobCompletion]
-        public int pz;
-        [DeallocateOnJobCompletion]
-        public int nz;
 
+        
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> faceVertices;
         [DeallocateOnJobCompletion]
@@ -337,18 +325,18 @@ public class MapLoadSingleton : MonoBehaviour
                 {
                     for (int x = 0; x < chunkSize; x++)
                     { 
-                        blockID = chunkMap[x, y, z];
+                        blockID = mapLoadData[x, y, z];
 
                         if (blockID != 0)
                         {
                             blockPosition = new Vector3Int(x, y, z);
 
-                            if (chunkMap[x, y + 1, z] == 0) HandleMeshFace(dir.py, HandleMeshAutoTile(x, y, z, dir.py)); // Top
-                            if (chunkMap[x, y - 1, z] == 0) HandleMeshFace(dir.ny, 1); // Bottom
-                            if (chunkMap[x + 1, y, z] == 0) HandleMeshFace(dir.px, HandleMeshAutoTile(x, y, z, dir.px)); // Right
-                            if (chunkMap[x - 1, y, z] == 0) HandleMeshFace(dir.nx, HandleMeshAutoTile(x, y, z, dir.nx)); // Left
-                            if (chunkMap[x, y, z + 1] == 0) HandleMeshFace(dir.pz, HandleMeshAutoTile(x, y, z, dir.pz)); // Front
-                            if (chunkMap[x, y, z - 1] == 0) HandleMeshFace(dir.nz, HandleMeshAutoTile(x, y, z, dir.nz)); // Back
+                            if (mapLoadData[x, y + 1, z] == 0) HandleMeshFace(dir.py, HandleMeshAutoTile(x, y, z, dir.py)); // Top
+                            if (mapLoadData[x, y - 1, z] == 0) HandleMeshFace(dir.ny, 1); // Bottom
+                            if (mapLoadData[x + 1, y, z] == 0) HandleMeshFace(dir.px, HandleMeshAutoTile(x, y, z, dir.px)); // Right
+                            if (mapLoadData[x - 1, y, z] == 0) HandleMeshFace(dir.nx, HandleMeshAutoTile(x, y, z, dir.nx)); // Left
+                            if (mapLoadData[x, y, z + 1] == 0) HandleMeshFace(dir.pz, HandleMeshAutoTile(x, y, z, dir.pz)); // Front
+                            if (mapLoadData[x, y, z - 1] == 0) HandleMeshFace(dir.nz, HandleMeshAutoTile(x, y, z, dir.nz)); // Back
                         }
                     }
                 }
@@ -508,56 +496,56 @@ public class MapLoadSingleton : MonoBehaviour
 
             if (mode == dir.py) // Top
             {
-                bool isPy = chunkMap[x, y + 1, z] == 0;
+                bool isPy = mapLoadData[x, y + 1, z] == 0;
 
-                if ((chunkMap[x, y, z + 1] != 0)
-                    || (isPy && chunkMap[x, y + 1, z + 1] != 0))
+                if ((mapLoadData[x, y, z + 1] != 0)
+                    || (isPy && mapLoadData[x, y + 1, z + 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((chunkMap[x + 1, y, z] != 0)
-                    || (isPy && chunkMap[x + 1, y + 1, z] != 0))
+                if ((mapLoadData[x + 1, y, z] != 0)
+                    || (isPy && mapLoadData[x + 1, y + 1, z] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((chunkMap[x, y, z - 1] != 0)
-                    || (isPy && chunkMap[x, y + 1, z - 1] != 0))
+                if ((mapLoadData[x, y, z - 1] != 0)
+                    || (isPy && mapLoadData[x, y + 1, z - 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((chunkMap[x - 1, y, z] != 0)
-                    || (isPy && chunkMap[x - 1, y + 1, z] != 0))
+                if ((mapLoadData[x - 1, y, z] != 0)
+                    || (isPy && mapLoadData[x - 1, y + 1, z] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((chunkMap[x - 1, y, z + 1] != 0)
-                    || (isPy && chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x - 1, y, z + 1] != 0)
+                    || (isPy && mapLoadData[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((chunkMap[x + 1, y, z + 1] != 0)
-                    || (isPy && chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x + 1, y, z + 1] != 0)
+                    || (isPy && mapLoadData[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((chunkMap[x + 1, y, z - 1] != 0)
-                    || (isPy && chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x + 1, y, z - 1] != 0)
+                    || (isPy && mapLoadData[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((chunkMap[x - 1, y, z - 1] != 0)
-                    || (isPy && chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x - 1, y, z - 1] != 0)
+                    || (isPy && mapLoadData[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -565,56 +553,56 @@ public class MapLoadSingleton : MonoBehaviour
             }  
             else if (mode == dir.nx) // Negative X (Left side of the cube)
             {
-                bool isNx = chunkMap[x - 1, y, z] == 0;
+                bool isNx = mapLoadData[x - 1, y, z] == 0;
 
-                if ((chunkMap[x, y + 1, z] != 0)
-                    || (isNx && chunkMap[x - 1, y + 1, z] != 0))
+                if ((mapLoadData[x, y + 1, z] != 0)
+                    || (isNx && mapLoadData[x - 1, y + 1, z] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((chunkMap[x, y, z + 1] != 0)
-                    || (isNx && chunkMap[x - 1, y, z + 1] != 0))
+                if ((mapLoadData[x, y, z + 1] != 0)
+                    || (isNx && mapLoadData[x - 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((chunkMap[x, y - 1, z] != 0)
-                    || (isNx && chunkMap[x - 1, y - 1, z] != 0))
+                if ((mapLoadData[x, y - 1, z] != 0)
+                    || (isNx && mapLoadData[x - 1, y - 1, z] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((chunkMap[x, y, z - 1] != 0)
-                    || (isNx && chunkMap[x - 1, y, z - 1] != 0))
+                if ((mapLoadData[x, y, z - 1] != 0)
+                    || (isNx && mapLoadData[x - 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
                 
-                if (((chunkMap[x, y + 1, z - 1] != 0)
-                     || (isNx && chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x, y + 1, z - 1] != 0)
+                     || (isNx && mapLoadData[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
-                if (((chunkMap[x, y + 1, z + 1] != 0)
-                     || (isNx && chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x, y + 1, z + 1] != 0)
+                     || (isNx && mapLoadData[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((chunkMap[x, y - 1, z + 1] != 0)
-                     || (isNx && chunkMap[x - 1, y - 1, z + 1] != 0))
+                if (((mapLoadData[x, y - 1, z + 1] != 0)
+                     || (isNx && mapLoadData[x - 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((chunkMap[x, y - 1, z - 1] != 0)
-                     || (isNx && chunkMap[x - 1, y - 1, z - 1] != 0))
+                if (((mapLoadData[x, y - 1, z - 1] != 0)
+                     || (isNx && mapLoadData[x - 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -622,28 +610,28 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.px) // Positive X (Right side of the cube)
             {
-                bool isPx = chunkMap[x + 1, y, z] == 0;
+                bool isPx = mapLoadData[x + 1, y, z] == 0;
 
-                if ((chunkMap[x, y + 1, z] != 0)
-                    || (isPx && chunkMap[x + 1, y + 1, z] != 0))
+                if ((mapLoadData[x, y + 1, z] != 0)
+                    || (isPx && mapLoadData[x + 1, y + 1, z] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((chunkMap[x, y, z + 1] != 0)
-                    || (isPx && chunkMap[x + 1, y, z + 1] != 0))
+                if ((mapLoadData[x, y, z + 1] != 0)
+                    || (isPx && mapLoadData[x + 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((chunkMap[x, y - 1, z] != 0)
-                    || (isPx && chunkMap[x + 1, y - 1, z] != 0))
+                if ((mapLoadData[x, y - 1, z] != 0)
+                    || (isPx && mapLoadData[x + 1, y - 1, z] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((chunkMap[x, y, z - 1] != 0)
-                    || (isPx && chunkMap[x + 1, y, z - 1] != 0))
+                if ((mapLoadData[x, y, z - 1] != 0)
+                    || (isPx && mapLoadData[x + 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
@@ -651,29 +639,29 @@ public class MapLoadSingleton : MonoBehaviour
                 // Lib.Log(x,y,z,_chunkMap[x, y + 1, z] != 0, _chunkMap[x, y, z + 1] != 0,_chunkMap[x, y - 1, z] != 0, _chunkMap[x, y, z - 1] != 0, _chunkMap[x, y + 1, z + 1] != 0, _chunkMap[x, y - 1, z + 1] != 0, _chunkMap[x, y - 1, z - 1] != 0, _chunkMap[x, y + 1, z - 1] != 0);
                 // Calculate corner values
 
-                if (((chunkMap[x, y + 1, z - 1] != 0)
-                     || (isPx && chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x, y + 1, z - 1] != 0)
+                     || (isPx && mapLoadData[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
                 
-                if (((chunkMap[x, y + 1, z + 1] != 0)
-                     || (isPx && chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x, y + 1, z + 1] != 0)
+                     || (isPx && mapLoadData[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((chunkMap[x, y - 1, z + 1] != 0)
-                     || (isPx && chunkMap[x + 1, y - 1, z + 1] != 0))
+                if (((mapLoadData[x, y - 1, z + 1] != 0)
+                     || (isPx && mapLoadData[x + 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((chunkMap[x, y - 1, z - 1] != 0)
-                     || (isPx && chunkMap[x + 1, y - 1, z - 1] != 0))
+                if (((mapLoadData[x, y - 1, z - 1] != 0)
+                     || (isPx && mapLoadData[x + 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -681,56 +669,56 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.pz) // Positive Z (Front of the cube)
             {
-                bool isPz = chunkMap[x, y, z + 1] == 0;
+                bool isPz = mapLoadData[x, y, z + 1] == 0;
 
-                if ((chunkMap[x, y + 1, z] != 0)
-                    || (isPz && chunkMap[x, y + 1, z + 1] != 0))
+                if ((mapLoadData[x, y + 1, z] != 0)
+                    || (isPz && mapLoadData[x, y + 1, z + 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((chunkMap[x + 1, y, z] != 0)
-                    || (isPz && chunkMap[x + 1, y, z + 1] != 0))
+                if ((mapLoadData[x + 1, y, z] != 0)
+                    || (isPz && mapLoadData[x + 1, y, z + 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((chunkMap[x, y - 1, z] != 0)
-                    || (isPz && chunkMap[x, y - 1, z + 1] != 0))
+                if ((mapLoadData[x, y - 1, z] != 0)
+                    || (isPz && mapLoadData[x, y - 1, z + 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((chunkMap[x - 1, y, z] != 0)
-                    || (isPz && chunkMap[x - 1, y, z + 1] != 0))
+                if ((mapLoadData[x - 1, y, z] != 0)
+                    || (isPz && mapLoadData[x - 1, y, z + 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((chunkMap[x - 1, y + 1, z] != 0)
-                     || (isPz && chunkMap[x - 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x - 1, y + 1, z] != 0)
+                     || (isPz && mapLoadData[x - 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((chunkMap[x + 1, y + 1, z] != 0)
-                     || (isPz && chunkMap[x + 1, y + 1, z + 1] != 0))
+                if (((mapLoadData[x + 1, y + 1, z] != 0)
+                     || (isPz && mapLoadData[x + 1, y + 1, z + 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((chunkMap[x + 1, y - 1, z] != 0)
-                     || (isPz && chunkMap[x + 1, y - 1, z + 1] != 0))
+                if (((mapLoadData[x + 1, y - 1, z] != 0)
+                     || (isPz && mapLoadData[x + 1, y - 1, z + 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((chunkMap[x - 1, y - 1, z] != 0)
-                     || (isPz && chunkMap[x - 1, y - 1, z + 1] != 0))
+                if (((mapLoadData[x - 1, y - 1, z] != 0)
+                     || (isPz && mapLoadData[x - 1, y - 1, z + 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left
@@ -738,56 +726,56 @@ public class MapLoadSingleton : MonoBehaviour
             }
             else if (mode == dir.nz) // Negative Z (Back of the cube)
             {
-                bool isNz = chunkMap[x, y, z - 1] == 0;
+                bool isNz = mapLoadData[x, y, z - 1] == 0;
 
-                if ((chunkMap[x, y + 1, z] != 0)
-                    || (isNz && chunkMap[x, y + 1, z - 1] != 0))
+                if ((mapLoadData[x, y + 1, z] != 0)
+                    || (isNz && mapLoadData[x, y + 1, z - 1] != 0))
                 {
                     edgeValue += 1; // Top
                 }
 
-                if ((chunkMap[x + 1, y, z] != 0)
-                    || (isNz && chunkMap[x + 1, y, z - 1] != 0))
+                if ((mapLoadData[x + 1, y, z] != 0)
+                    || (isNz && mapLoadData[x + 1, y, z - 1] != 0))
                 {
                     edgeValue += 2; // Right
                 }
 
-                if ((chunkMap[x, y - 1, z] != 0)
-                    || (isNz && chunkMap[x, y - 1, z - 1] != 0))
+                if ((mapLoadData[x, y - 1, z] != 0)
+                    || (isNz && mapLoadData[x, y - 1, z - 1] != 0))
                 {
                     edgeValue += 4; // Bottom
                 }
 
-                if ((chunkMap[x - 1, y, z] != 0)
-                    || (isNz && chunkMap[x - 1, y, z - 1] != 0))
+                if ((mapLoadData[x - 1, y, z] != 0)
+                    || (isNz && mapLoadData[x - 1, y, z - 1] != 0))
                 {
                     edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
-                if (((chunkMap[x - 1, y + 1, z] != 0)
-                     || (isNz && chunkMap[x - 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x - 1, y + 1, z] != 0)
+                     || (isNz && mapLoadData[x - 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 1; // Top-Left
                 }
 
-                if (((chunkMap[x + 1, y + 1, z] != 0)
-                     || (isNz && chunkMap[x + 1, y + 1, z - 1] != 0))
+                if (((mapLoadData[x + 1, y + 1, z] != 0)
+                     || (isNz && mapLoadData[x + 1, y + 1, z - 1] != 0))
                     && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
                 {
                     cornerValue += 2; // Top-Right
                 }
 
-                if (((chunkMap[x + 1, y - 1, z] != 0)
-                     || (isNz && chunkMap[x + 1, y - 1, z - 1] != 0))
+                if (((mapLoadData[x + 1, y - 1, z] != 0)
+                     || (isNz && mapLoadData[x + 1, y - 1, z - 1] != 0))
                     && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
                 {
                     cornerValue += 4; // Bottom-Right
                 }
 
-                if (((chunkMap[x - 1, y - 1, z] != 0)
-                     || (isNz && chunkMap[x - 1, y - 1, z - 1] != 0))
+                if (((mapLoadData[x - 1, y - 1, z] != 0)
+                     || (isNz && mapLoadData[x - 1, y - 1, z - 1] != 0))
                     && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
                 {
                     cornerValue += 8; // Bottom-Left

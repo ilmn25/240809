@@ -1,7 +1,7 @@
 using Unity.Collections;
 using UnityEngine;
 
-public class ChunkMap
+public class MapLoadData
 {
     private static int _size = WorldSingleton.CHUNK_SIZE + 2;
 

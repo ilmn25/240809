@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
-public class PlayerMovementSingleton : MonoBehaviour
+public class PlayerMovementModule : Module
 { 
-    public static PlayerMovementSingleton Instance { get; private set; }  
-
     [HideInInspector] public float _verticalVelocity = 0f; 
     [HideInInspector] public bool _isGrounded = false;  
     [HideInInspector] public Vector2 _rawInput;  
@@ -22,8 +20,8 @@ public class PlayerMovementSingleton : MonoBehaviour
     private float _deltaTime;  
     private float _speedAdjust;
 
-    [SerializeField] private float SPEED_WALK = 6.5f;
-    [SerializeField] private float SPEED_RUN = 8f;
+    [SerializeField] private float SPEED_WALK = 8f;
+    [SerializeField] private float SPEED_RUN = 25f;
     [SerializeField] private float ACCELERATION_TIME = 0.2f; // time to reach full speed
     [SerializeField] private float DECELERATION_TIME = 0.08f; // time to stop
     [SerializeField] private float SLIDE_DEGREE = 0.3f; //degree of slide against walkk when collide
@@ -36,10 +34,9 @@ public class PlayerMovementSingleton : MonoBehaviour
 
     BoxCollider boxCollider;
 
-    void Awake()
+    public override void Initialize()
     {
-        Instance = this; 
-        boxCollider = GetComponent<BoxCollider>(); 
+        boxCollider = Machine.GetComponent<BoxCollider>(); 
         boxCollider.enabled = false;
         boxColliderSize = boxCollider.size / 2; // Recalculate halfSize here
 
@@ -71,7 +68,7 @@ public class PlayerMovementSingleton : MonoBehaviour
     {  
         
         _deltaTime = Game.GetDeltaTime();
-        _newPosition = transform.position;
+        _newPosition = Machine.transform.position;
 
         // get input
         HandleInput();
@@ -122,8 +119,8 @@ public class PlayerMovementSingleton : MonoBehaviour
 
             if (!IsMovable(_newPosition))
             {
-                _speedCurrent = _speedCurrent/2;
-                _newPosition = transform.position;
+                _speedCurrent /= 2;
+                _newPosition = Machine.transform.position;
             }
         }
 
@@ -198,32 +195,32 @@ public class PlayerMovementSingleton : MonoBehaviour
     Vector3 testPositionB;
     private void HandleObstacle(Vector3 position)
     {
-        _newPosition = transform.position;
+        _newPosition = Machine.transform.position;
         //! go any possible direction when going diagonally against a wall
-        if (_input.x != 0 && IsMovable(new Vector3(position.x, transform.position.y, transform.position.z)))
+        if (_input.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
         { 
-            _newPosition = new Vector3(position.x, transform.position.y, transform.position.z);
+            _newPosition = new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z);
         }
-        else if (_input.y != 0 && IsMovable(new Vector3(transform.position.x, transform.position.y, position.z)))
+        else if (_input.y != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
         { 
-            _newPosition = new Vector3(transform.position.x, transform.position.y, position.z);
+            _newPosition = new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z);
         }
         else
         { 
             //! slide against wall if possible
             if (_input.x != 0)
             {
-                testPosition = transform.position.x + SLIDE_DEGREE * _input.x * _speedCurrent * _deltaTime;
-                testPositionA = new Vector3(testPosition, transform.position.y, transform.position.z);
-                testPositionB = new Vector3(testPosition, transform.position.y, transform.position.z);
+                testPosition = Machine.transform.position.x + SLIDE_DEGREE * _input.x * _speedCurrent * _deltaTime;
+                testPositionA = new Vector3(testPosition, Machine.transform.position.y, Machine.transform.position.z);
+                testPositionB = new Vector3(testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 testPositionA.z += -1 * _speedCurrent * _deltaTime;
                 testPositionB.z += 1 * _speedCurrent * _deltaTime; 
             }
             else
             {
-                testPosition = transform.position.z + SLIDE_DEGREE * _input.y * _speedCurrent * _deltaTime;
-                testPositionA = new Vector3(transform.position.x, transform.position.y, testPosition);
-                testPositionB = new Vector3(transform.position.x, transform.position.y, testPosition);
+                testPosition = Machine.transform.position.z + SLIDE_DEGREE * _input.y * _speedCurrent * _deltaTime;
+                testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, testPosition);
+                testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, testPosition);
                 testPositionA.x += -1 * _speedCurrent * _deltaTime;
                 testPositionB.x += 1 * _speedCurrent * _deltaTime; 
             }
@@ -271,11 +268,11 @@ public class PlayerMovementSingleton : MonoBehaviour
         {
             if (_verticalVelocity < 0) _isGrounded = true;
             _verticalVelocity = 0;
-            transform.position = _newPosition;
+            Machine.transform.position = _newPosition;
         } 
         else 
         {
-            transform.position = newPositionY;
+            Machine.transform.position = newPositionY;
         }
     }
          

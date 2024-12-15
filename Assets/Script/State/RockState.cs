@@ -3,6 +3,16 @@ public class RockState : State
     private int _health;
     private string _item;
     private int _currentHealth;
+    
+    public override void OnInitialize()
+    {
+        ((RockMachine)Machine).Hit += Hit;
+    }
+    public override void OnExitState()
+    {
+        ((RockMachine)Machine).Hit -= Hit;
+    }
+
     public override void OnEnterState()
     {
         _item = "stone";

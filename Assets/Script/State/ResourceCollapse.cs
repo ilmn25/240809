@@ -15,9 +15,14 @@ class ResourceCollapse : State
     { 
         _rotationProgress += Time.deltaTime * 0.8f;
         _spriteObject.rotation = Quaternion.Lerp(CreateRotation(0), CreateRotation(90), _rotationProgress);
-        if (_spriteObject.rotation.eulerAngles.x > 89) 
-        {  
+        if (_spriteObject.rotation.eulerAngles.x > 89)
+        {
+            _spriteObject.rotation = CreateRotation(0);
             _rotationProgress = 0;
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
             EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
             SetState<StaticIdle>();
             ((EntityMachine)Machine).WipeEntity();

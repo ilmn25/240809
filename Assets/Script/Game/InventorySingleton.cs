@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventorySingleton : Machine
+public class InventorySingleton : MonoBehaviour
 {
     public static InventorySingleton Instance { get; private set; }
     public static List<InvSlotData> _playerInventory;
@@ -16,12 +16,10 @@ public class InventorySingleton : Machine
     public static int INVENTORY_ROW_AMOUNT = 3;
     public static int INVENTORY_SLOT_AMOUNT = 9;
 
-    public override void OnInitialize()
-    { 
-        State = new InventoryState();
-    }
+    public static event Action SlotUpdate;
+     
 
-    void Start()
+    void Awake()
     {
         Instance = this; 
     }
@@ -74,7 +72,7 @@ public class InventorySingleton : Machine
     { 
         _currentKey = CalculateKey();
         CurrentItem = _playerInventory[_currentKey];
-        ((InventoryState)State).HandleItemUpdate();
+        SlotUpdate?.Invoke();
         GUIStorageSingleton.Instance.RefreshCursorSlot();
     }
 

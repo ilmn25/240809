@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PlayerAnimationSingleton : MonoBehaviour
+public class PlayerAnimationModule : Module
 { 
-    public static PlayerAnimationSingleton Instance { get; private set; }  
+    private PlayerMovementModule _playerMovementModule;
     
     private Animator _animator;
     private GameObject _sprite;
@@ -24,10 +24,10 @@ public class PlayerAnimationSingleton : MonoBehaviour
     private Vector3 _targetScale; 
     private float _previousY = 1;
 
-    void Awake()
+    public override void Initialize()
     {
-        Instance = this;
-        _sprite = transform.Find("sprite").gameObject;
+        _playerMovementModule = Machine.GetModule<PlayerMovementModule>();
+        _sprite = Machine.transform.Find("sprite").gameObject;
         _animator = _sprite.transform.Find("char").GetComponent<Animator>();
 
         _targetScale = _sprite.transform.localScale; 
@@ -37,25 +37,25 @@ public class PlayerAnimationSingleton : MonoBehaviour
         CameraSingleton.UpdateOrbitRotate += UpdateOrbit;
     }
 
-    void OnDestroy()
+    public override void Terminate()
     {
         CameraSingleton.UpdateOrbitRotate -= UpdateOrbit; 
     }   
  
     void UpdateOrbit()
     { 
-        transform.rotation = CameraSingleton._currentRotation;
+        Machine.transform.rotation = CameraSingleton._currentRotation;
     }
 
     public void HandleAnimationUpdate()
     {
         // facing direction 
-        if (PlayerMovementSingleton.Instance._rawInput != Vector2.zero){
-            _animator.SetFloat("PosX", PlayerMovementSingleton.Instance._rawInput.x);
-            _animator.SetFloat("PosY", PlayerMovementSingleton.Instance._rawInput.y);
+        if (_playerMovementModule._rawInput != Vector2.zero){
+            _animator.SetFloat("PosX", _playerMovementModule._rawInput.x);
+            _animator.SetFloat("PosY", _playerMovementModule._rawInput.y);
         } 
 
-        bool isMoving = PlayerMovementSingleton.Instance._speedCurrent > 0.35 && PlayerMovementSingleton.Instance._isGrounded;
+        bool isMoving = _playerMovementModule._speedCurrent > 0.35 && _playerMovementModule._isGrounded;
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {
@@ -66,7 +66,7 @@ public class PlayerAnimationSingleton : MonoBehaviour
             // smoke trail
             if (Time.time >= _nextTrailTimer)
             { 
-                SmokeParticleSingleton.CreateSmokeParticle(transform.position, true);
+                SmokeParticleSingleton.CreateSmokeParticle(Machine.transform.position, true);
                 _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
                 AudioSingleton.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }
@@ -79,7 +79,7 @@ public class PlayerAnimationSingleton : MonoBehaviour
 
     void HandleFlipCheck()
     {     
-        if ((int)PlayerMovementSingleton.Instance._rawInput.x != 0) 
+        if ((int)_playerMovementModule._rawInput.x != 0) 
         {
             if (Mathf.Sign((int)_animator.GetFloat("PosX")) != Mathf.Sign(_targetScale.x))
             {

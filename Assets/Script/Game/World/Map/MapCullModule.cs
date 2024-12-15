@@ -188,7 +188,7 @@ public class MapCullModule : MonoBehaviour
             chunkSize = WorldSingleton.CHUNK_SIZE, 
             yThreshold = MapCullSingleton.Instance._yThreshold - _selfChunkPosition.y,
 
-            chunkMap = ChunkMap.Create(_selfChunkPosition),
+            mapLoadData = MapLoadData.Create(_selfChunkPosition),
             vertices = vertices,
             normals = normals,
             triangles = triangles,
@@ -242,7 +242,7 @@ public class MapCullModule : MonoBehaviour
         public int chunkSize; 
 
         [DeallocateOnJobCompletion]
-        public NativeMap3D<int> chunkMap;
+        public NativeMap3D<int> mapLoadData;
         [DeallocateOnJobCompletion]
         public NativeArray<Vector3> vertices;
         [DeallocateOnJobCompletion]
@@ -282,8 +282,8 @@ public class MapCullModule : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    if (chunkMap[x, yThreshold, z] != 0 // have block on top of the face burying it
-                        && chunkMap[x, yThreshold - 1, z] != 0) // block the face belongs to exists
+                    if (mapLoadData[x, yThreshold, z] != 0 // have block on top of the face burying it
+                        && mapLoadData[x, yThreshold - 1, z] != 0) // block the face belongs to exists
                     {
                         Vector3 vertex1 = new Vector3(x, yThreshold, z);
                         Vector3 vertex2 = new Vector3(x + 1, yThreshold, z);
@@ -327,56 +327,56 @@ public class MapCullModule : MonoBehaviour
             int spriteNumber = 0;
             int edgeValue = 0;
             int cornerValue = 0;
-            bool isPy = chunkMap[x, y + 1, z] == 0;
+            bool isPy = mapLoadData[x, y + 1, z] == 0;
 
-            if ((chunkMap[x, y, z + 1] != 0)
-                || (isPy && chunkMap[x, y + 1, z + 1] != 0))
+            if ((mapLoadData[x, y, z + 1] != 0)
+                || (isPy && mapLoadData[x, y + 1, z + 1] != 0))
             {
                 edgeValue += 1; // Top
             }
 
-            if ((chunkMap[x + 1, y, z] != 0)
-                || (isPy && chunkMap[x + 1, y + 1, z] != 0))
+            if ((mapLoadData[x + 1, y, z] != 0)
+                || (isPy && mapLoadData[x + 1, y + 1, z] != 0))
             {
                 edgeValue += 2; // Right
             }
 
-            if ((chunkMap[x, y, z - 1] != 0)
-                || (isPy && chunkMap[x, y + 1, z - 1] != 0))
+            if ((mapLoadData[x, y, z - 1] != 0)
+                || (isPy && mapLoadData[x, y + 1, z - 1] != 0))
             {
                 edgeValue += 4; // Bottom
             }
 
-            if ((chunkMap[x - 1, y, z] != 0)
-                || (isPy && chunkMap[x - 1, y + 1, z] != 0))
+            if ((mapLoadData[x - 1, y, z] != 0)
+                || (isPy && mapLoadData[x - 1, y + 1, z] != 0))
             {
                 edgeValue += 8; // Left
             }
 
             // Calculate corner values
-            if (((chunkMap[x - 1, y, z + 1] != 0)
-                || (isPy && chunkMap[x - 1, y + 1, z + 1] != 0))
+            if (((mapLoadData[x - 1, y, z + 1] != 0)
+                || (isPy && mapLoadData[x - 1, y + 1, z + 1] != 0))
                 && (edgeValue & 1) != 0 && (edgeValue & 8) != 0)
             {
                 cornerValue += 1; // Top-Left
             }
 
-            if (((chunkMap[x + 1, y, z + 1] != 0)
-                || (isPy && chunkMap[x + 1, y + 1, z + 1] != 0))
+            if (((mapLoadData[x + 1, y, z + 1] != 0)
+                || (isPy && mapLoadData[x + 1, y + 1, z + 1] != 0))
                 && (edgeValue & 1) != 0 && (edgeValue & 2) != 0)
             {
                 cornerValue += 2; // Top-Right
             }
 
-            if (((chunkMap[x + 1, y, z - 1] != 0)
-                || (isPy && chunkMap[x + 1, y + 1, z - 1] != 0))
+            if (((mapLoadData[x + 1, y, z - 1] != 0)
+                || (isPy && mapLoadData[x + 1, y + 1, z - 1] != 0))
                 && (edgeValue & 2) != 0 && (edgeValue & 4) != 0)
             {
                 cornerValue += 4; // Bottom-Right
             }
 
-            if (((chunkMap[x - 1, y, z - 1] != 0)
-                || (isPy && chunkMap[x - 1, y + 1, z - 1] != 0))
+            if (((mapLoadData[x - 1, y, z - 1] != 0)
+                || (isPy && mapLoadData[x - 1, y + 1, z - 1] != 0))
                 && (edgeValue & 4) != 0 && (edgeValue & 8) != 0)
             {
                 cornerValue += 8; // Bottom-Left

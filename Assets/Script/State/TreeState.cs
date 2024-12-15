@@ -10,6 +10,16 @@ public class TreeState : State
     private int _health;
     private string _item;
     private int _currentHealth;
+    public override void OnInitialize()
+    {
+        ((OakMachine)Machine).Hit += Hit;
+    }
+    public override void OnExitState()
+    {
+        ((OakMachine)Machine).Hit -= Hit;
+    }
+
+
     public override void OnEnterState()
     { 
         _currentHealth = _health;
