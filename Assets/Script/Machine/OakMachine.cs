@@ -1,10 +1,12 @@
+using System;
 using UnityEngine;
 
 public class OakMachine : EntityMachine, ILeftClick
 {
+    public event Action Hit;
     public override void OnInitialize()
     {
-        State = new TreeState("wood", 5);
+        AddState(new TreeState("wood", 5));
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         AddModule(new SpriteCullModule(spriteRenderer)); 
         AddModule(new SpriteOrbitModule(spriteRenderer)); 
@@ -12,6 +14,6 @@ public class OakMachine : EntityMachine, ILeftClick
 
     public void OnLeftClick()
     {
-        ((TreeState)State).Hit();
+        Hit?.Invoke();
     }
 }

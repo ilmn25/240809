@@ -20,10 +20,19 @@ public class PlayerState : State
             EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
 } 
-class PlayerActive : State { 
+class PlayerActive : State {
+    PlayerAnimationModule _playerAnimationModule;
+    PlayerMovementModule _playerMovementModule;
+    
+    public override void OnInitialize()
+    {
+        _playerMovementModule = Machine.GetModule<PlayerMovementModule>();
+        _playerAnimationModule = Machine.GetModule<PlayerAnimationModule>();
+    }
+
     public override void OnUpdateState() { 
-        PlayerMovementSingleton.Instance.HandleMovementUpdate();
-        PlayerAnimationSingleton.Instance.HandleAnimationUpdate(); 
+        _playerMovementModule.HandleMovementUpdate();
+        _playerAnimationModule.HandleAnimationUpdate(); 
         PlayerChunkEditSingleton.Instance.HandleChunkEditInput(); 
         InventorySingleton.Instance.HandleInventoryUpdate();
         PlayerStatusSingleton.Instance.HandleStatusUpdate();

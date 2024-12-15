@@ -7,7 +7,7 @@ public class NPCMachine : EntityMachine
 {
     public override void OnInitialize()
     {
-        State = new NPCState(); 
+        AddState(new NPCState()); 
         AddModule(new NPCMovementModule());
         AddModule(new CharNpcPathFindModule());
         AddModule(new NPCAnimationModule()); 

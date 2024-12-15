@@ -14,16 +14,6 @@ public static class Lib
         return new Vector3Int(vector.x + x, vector.y + y, vector.z + z);
     }
 
-    public static Vector3 CombineVector(Vector3 vectorA, Vector3 vectorB)
-    {
-        return new Vector3(vectorA.x + vectorB.x, vectorA.y + vectorB.y, vectorA.z + vectorB.z);
-    }
-
-    public static Vector3 AddBlockCenterOffset(Vector3Int vector)
-    {
-        return new Vector3(vector.x + 0.5f, vector.y, vector.z + 0.5f);
-    }
-
     public static void Log(params object[] parameters)
     {
         if (parameters.Length == 0)

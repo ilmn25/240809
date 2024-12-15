@@ -4,19 +4,23 @@ using UnityEngine;
  
 public abstract class Machine : MonoBehaviour
 {  
-    protected State State;
     private Dictionary<System.Type, Module> _modules = new Dictionary<System.Type, Module>();
+    private List<State> _states = new List<State>();
     
     public virtual void OnInitialize() {}
     public virtual void OnUpdate() {}
     public virtual void OnTerminate() {}
  
+    public void AddState(State state)
+    {
+        state.Machine = this; 
+        _states.Add(state); 
+    }
     
     public void AddModule(Module module)
     {
         module.Machine = this;
-        _modules[module.GetType()] = module;
-        module.Initialize();
+        _modules[module.GetType()] = module; 
     }
 
     public T GetModule<T>() where T : Module
@@ -37,10 +41,18 @@ public abstract class Machine : MonoBehaviour
             TerminateMachine();
     }
 
+    private void OnDisable()
+    {
+        TerminateMachine();
+    }
+
     public void TerminateMachine()
     {
         OnTerminate();
-        State.OnTerminate();
+        foreach (State state in _states)
+        {
+            state.OnTerminate();
+        } 
         foreach (var module in _modules.Values)
         {
             module.Terminate();
@@ -49,9 +61,17 @@ public abstract class Machine : MonoBehaviour
  
     public void InitializeInteral()
     {
-        OnInitialize();
-        State.Machine = this; 
-        State.OnEnterState();
+        _states.Clear();
+        OnInitialize(); 
+        foreach (var module in _modules.Values)
+        {
+            module.Initialize();
+        }
+        foreach (State state in _states)
+        {
+            state.OnInitialize(); 
+            state.OnEnterState(); 
+        }
     }
     
     protected virtual void Awake()
@@ -62,7 +82,10 @@ public abstract class Machine : MonoBehaviour
     private void Update()
     {
         OnUpdate(); 
-        State.OnUpdateInternal(); 
+        foreach (State state in _states)
+        {
+            state.OnUpdateInternal();
+        } 
     }
  
 }

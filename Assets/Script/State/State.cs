@@ -39,7 +39,7 @@ public abstract class State
     public void OnTerminate()
     {
         OnExitState();
-        _stateCurrent.OnTerminate();
+        _stateCurrent?.OnTerminate();
     }
     
     protected void AddState(State state, Boolean current = false)

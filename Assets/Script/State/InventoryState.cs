@@ -3,6 +3,16 @@ using UnityEngine;
 
 public class InventoryState : State
 {
+    public override void OnInitialize()
+    {
+        InventorySingleton.SlotUpdate += HandleItemUpdate;
+    }
+
+    public override void OnExitState()
+    {
+        InventorySingleton.SlotUpdate -= HandleItemUpdate;
+    }
+
     public override void OnEnterState()
     {
         AddState(new ItemEmpty(), true);

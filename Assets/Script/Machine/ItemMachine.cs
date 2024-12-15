@@ -9,7 +9,7 @@ public class ItemMachine : EntityMachine
     
     public override void OnInitialize()
     { 
-        State = new ItemState();
+        AddState(new ItemState());
         AddModule(new ItemPhysicModule());
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         AddModule(new SpriteCullModule(spriteRenderer)); 
