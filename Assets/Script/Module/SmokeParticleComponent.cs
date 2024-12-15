@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Threading.Tasks;
 
-public class SmokeParticleModule : MonoBehaviour
+public class SmokeParticleComponent : MonoBehaviour
 {
     private Animator _animator;
     private AnimatorStateInfo _stateInfo;

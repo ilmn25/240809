@@ -1,40 +1,5 @@
- 
-using System;
-using Unity.VisualScripting;
-using UnityEngine; 
- 
+using UnityEngine;
 
-public class TreeStateMachine : State
-{ 
-    public Transform _spriteObject;
-    private int _health;
-    private string _item;
-    private int _currentHealth;
-    public override void OnEnterState()
-    { 
-        _currentHealth = _health;
-        _spriteObject = Root.transform.Find("sprite");
-        AddState(new ResourceCollapse(_spriteObject, _item));
-        AddState(new Idle(), true);
-    }
-
-    public TreeStateMachine(string item, int health)
-    {
-        _item = item;
-        _health = health;
-    }
-
-    public void Hit()
-    {
-        AudioSingleton.PlaySFX(Game.DigSound);
-        if (Game.GUIBusy) return;
-        _currentHealth--;
-        if (_currentHealth != 0) return;
-        SetState<ResourceCollapse>();
-        _currentHealth = _health;
-    }  
-}
- 
 class ResourceCollapse : State
 {
     private Transform _spriteObject;
@@ -63,4 +28,4 @@ class ResourceCollapse : State
     {
         return Quaternion.Euler(tilt, _spriteObject.rotation.eulerAngles.y, 0);
     }
-} 
+}

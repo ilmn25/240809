@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class InventoryStateGraph : State
+public class InventoryState : State
 {
     public override void OnEnterState()
     {

@@ -34,7 +34,7 @@ public class SmokeParticleSingleton : MonoBehaviour
             if (smokeParticle != null)
             {
                 smokeParticle.SetActive(true);
-                smokeParticle.GetComponent<SmokeParticleModule>().SpawnSmoke(smokePosition);
+                smokeParticle.GetComponent<SmokeParticleComponent>().SpawnSmoke(smokePosition);
                 if (!force) _smokeParticleCount++;
             }
         }

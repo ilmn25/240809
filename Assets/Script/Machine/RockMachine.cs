@@ -1,4 +1,4 @@
-public class RockEntity : EntityMachine, ILeftClick
+public class RockMachine : EntityMachine, ILeftClick
 {
     public override void OnAwake()
     {
