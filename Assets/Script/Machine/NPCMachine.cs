@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class NPCBrain : EntityMachine
+public class NPCMachine : EntityMachine
 {
     public override void OnAwake()
     {

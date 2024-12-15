@@ -18,7 +18,7 @@ public class InventorySingleton : StateMachine
 
     public override void OnAwake()
     { 
-        State = new InventoryStateGraph();
+        State = new InventoryState();
     }
 
     void Start()
@@ -74,7 +74,7 @@ public class InventorySingleton : StateMachine
     { 
         _currentKey = CalculateKey();
         CurrentItem = _playerInventory[_currentKey];
-        ((InventoryStateGraph)State).HandleItemUpdate();
+        ((InventoryState)State).HandleItemUpdate();
         GUIStorageSingleton.Instance.RefreshCursorSlot();
     }
 
