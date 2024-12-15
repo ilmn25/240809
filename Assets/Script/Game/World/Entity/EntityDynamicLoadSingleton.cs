@@ -65,7 +65,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
             {
                 case EntityType.Item: 
                     currentInstance = EntityPoolSingleton.Instance.GetObject("item"); 
-                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
         
                     currentInstance.GetComponent<SpriteRenderer>().sprite = 
                         Resources.Load<Sprite>($"texture/sprite/{entityData.stringID}"); 
@@ -73,7 +73,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
 
                 case EntityType.Rigid:
                     currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
-                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 1, 0.5f); 
+                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
                     break;
             }
             

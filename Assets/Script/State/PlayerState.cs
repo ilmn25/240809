@@ -10,14 +10,14 @@ public class PlayerState : State
 
     public override void OnUpdateState()
     {
-        if (Root.transform.position.y < -50)
+        if (Machine.transform.position.y < -50)
         {
             MapCullSingleton.Instance.ForceRevertMesh(); 
-            Root.transform.position = new Vector3(Game.Player.transform.position.x , WorldSingleton.World.Bounds.y + 40, Game.Player.transform.position.z);
+            Machine.transform.position = new Vector3(Game.Player.transform.position.x , WorldSingleton.World.Bounds.y + 40, Game.Player.transform.position.z);
         }
         
         if (Input.GetKeyDown(KeyCode.O)) 
-            EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(Root.transform.position + Vector3.up));
+            EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
 } 
 class PlayerActive : State { 

@@ -2,31 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpriteOrbitModule : MonoBehaviour
+public class SpriteOrbitModule : Module
 {
     private SpriteRenderer _sprite;
-    void Awake()
+
+    public SpriteOrbitModule(SpriteRenderer sprite = null)
     {
-        _sprite = GetComponent<SpriteRenderer>();
-        transform.rotation = CameraSingleton._currentRotation;
+        _sprite = sprite;
     }
     
-    void Start()
-    {   
+    public override void Initialize()
+    {
+        if (!_sprite) _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
+        Machine.transform.rotation = CameraSingleton._currentRotation;
         CameraSingleton.UpdateOrbitRotate += UpdateOrbit;
     }
     
-    void OnDestroy()
+    public override void Terminate()
     {
         CameraSingleton.UpdateOrbitRotate -= UpdateOrbit; 
     }   
-    
-    void OnBecameVisible() {
-        transform.rotation = CameraSingleton._currentRotation;
-    }
  
     void UpdateOrbit()
     { 
-        if (_sprite.isVisible) transform.rotation = CameraSingleton._currentRotation;
+        if (_sprite.isVisible) Machine.transform.rotation = CameraSingleton._currentRotation;
     }
 }

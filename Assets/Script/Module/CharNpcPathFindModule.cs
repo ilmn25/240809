@@ -14,7 +14,7 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
         if (Target)
             return Target.position;
 
-        if (Vector3.Distance(transform.position, TargetPosition) < ROAM / 4 || TargetPosition == Vector3.zero)
+        if (Vector3.Distance(Machine.transform.position, TargetPosition) < ROAM / 4 || TargetPosition == Vector3.zero)
         {
             ChangeRandomTargetPosition();
         }
@@ -25,7 +25,7 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
     {
         do
         {
-            TargetPosition = transform.position + new Vector3Int(
+            TargetPosition = Machine.transform.position + new Vector3Int(
                 Random.Range(-ROAM, ROAM),  
                 Random.Range(-2, 2),  
                 Random.Range(-ROAM, ROAM));

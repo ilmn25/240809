@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class ItemMachine : EntityMachine
 {
-    private ItemPhysicModule _itemPhysicModule;
     public bool pickUp = true;
-    private bool wasInRange = false;
+    private bool _wasInRange;
     
-    public override void OnAwake()
-    {
-        _itemPhysicModule = GetComponent<ItemPhysicModule>();
-
-        State = new ItemState(_itemPhysicModule);
+    public override void OnInitialize()
+    { 
+        State = new ItemState();
+        AddModule(new ItemPhysicModule());
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        AddModule(new SpriteCullModule(spriteRenderer)); 
+        AddModule(new SpriteOrbitModule(spriteRenderer)); 
     }
 
     public override void OnUpdate()
@@ -25,9 +26,9 @@ public class ItemMachine : EntityMachine
                 InventorySingleton.Instance.AddItem(GetEntityData().stringID, 1);
                 WipeEntity();
             } 
-            wasInRange = true;
+            _wasInRange = true;
         }
-        else if (wasInRange)
+        else if (_wasInRange)
         {
             pickUp = true;
         }
@@ -36,22 +37,19 @@ public class ItemMachine : EntityMachine
 
 public class ItemState : State
 {
-    private ItemPhysicModule _itemPhysicModule;
-    public ItemState(ItemPhysicModule itemPhysicModule)
-    {
-        _itemPhysicModule = itemPhysicModule;
-    }
+    private ItemPhysicModule _itemPhysicModule; 
 
     public override void OnEnterState()
     {
+        _itemPhysicModule = Machine.GetModule<ItemPhysicModule>();
         _itemPhysicModule.PopItem();
     }
 
     public override void OnUpdateState()
     { 
-        if (Root.transform.position.y < -5)
+        if (Machine.transform.position.y < -5)
         { 
-            ((EntityMachine)Root).WipeEntity();
+            ((EntityMachine)Machine).WipeEntity();
         } else _itemPhysicModule.HandlePhysicsUpdate();
     }
 }

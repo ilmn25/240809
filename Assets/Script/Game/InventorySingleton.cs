@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventorySingleton : StateMachine
+public class InventorySingleton : Machine
 {
     public static InventorySingleton Instance { get; private set; }
     public static List<InvSlotData> _playerInventory;
@@ -16,7 +16,7 @@ public class InventorySingleton : StateMachine
     public static int INVENTORY_ROW_AMOUNT = 3;
     public static int INVENTORY_SLOT_AMOUNT = 9;
 
-    public override void OnAwake()
+    public override void OnInitialize()
     { 
         State = new InventoryState();
     }

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class NPCAnimationModule : MonoBehaviour
+public class NPCAnimationModule : Module
 {
     private Animator _animator;
     private GameObject _sprite;
@@ -21,10 +21,10 @@ public class NPCAnimationModule : MonoBehaviour
     private Vector3 _flatScale;
     private Vector3 _targetScale; 
 
-    void Awake()
+    public override void Initialize()
     {
-        _sprite = transform.Find("sprite").gameObject;
-        _npcMovementModule = GetComponent<NPCMovementModule>();
+        _sprite = Machine.transform.Find("sprite").gameObject;
+        _npcMovementModule = Machine.GetModule<NPCMovementModule>();
         _animator = _sprite.GetComponent<Animator>();
         
         _targetScale = _sprite.transform.localScale; 
@@ -59,7 +59,7 @@ public class NPCAnimationModule : MonoBehaviour
             // smoke trail
             if (Time.time >= _nextTrailTimer)
             {
-                SmokeParticleSingleton.CreateSmokeParticle(transform.position, false);
+                SmokeParticleSingleton.CreateSmokeParticle(Machine.transform.position, false);
                 _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
                 // AudioSystem.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }

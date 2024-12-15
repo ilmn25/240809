@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class NPCPathFindAbstract : MonoBehaviour
+public abstract class NPCPathFindAbstract : Module
 {
     // parameters
     protected Transform Target;
@@ -92,7 +92,7 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
     private Vector3 _positionWhenPathSearched; 
     private Vector3 _direction; 
 
-    public async void HandlePathFindPassive(float passiveJumpSpeed)
+    public async void PassivePathFollow(float speed)
     {  
         if (!_moveOccupied)
         {
@@ -108,51 +108,18 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
             } 
             else if (_path != null)
             {  
-                await Task.Delay((int)(1500 / passiveJumpSpeed)); // Convert seconds to milliseconds
-                if (this && _nextPoint < _path.Count -2)
+                await Task.Delay((int)(1500 / speed)); // Convert seconds to milliseconds
+                if (Machine.transform && _nextPoint < _path.Count -2)
                 {
                     _nextPoint++;  
-                    transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
+                    Machine.transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
                 } else return;
             }   
             _moveOccupied = false; 
         }
-    }
-    //
-    // public Vector3 HandlePathFindRandom(Boolean isGrounded)
-    // { 
-    //     _isGrounded = isGrounded;
-    //     _direction = Vector3.zero;
-    //
-    //     if (!_repathRoutine) CheckRepathRoutineStill();
-    //     if (_updateEntityPosition)
-    //     { 
-    //         _selfPositionPrevious = transform.position;
-    //         _updateEntityPosition = false; 
-    //     }
-    //     
-    //     if (_path == null || _nextPoint >= _path.Count - 2)
-    //     {
-    //         if (_nextPointQueued != -1)
-    //         {
-    //             _path = _pathQueued;
-    //             _nextPoint = _nextPointQueued;
-    //             _nextPointQueued = -1;
-    //         }
-    //         else
-    //         {
-    //             GetPath();
-    //             return Vector3.zero;
-    //         }
-    //     } else if (_path != null)
-    //     {
-    //         HandleMovePoint(); 
-    //     } 
-    //
-    //     return _direction;
-    // }
+    } 
 
-    public Vector3 HandlePathFindActive(Boolean isGrounded)
+    public Vector3 GetNextDirection(Boolean isGrounded)
     {
         
         _isGrounded = isGrounded;
@@ -161,7 +128,7 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
  
         if (_updateEntityPosition)
         { 
-            _selfPositionPrevious = transform.position;
+            _selfPositionPrevious = Machine.transform.position;
             _updateEntityPosition = false; 
         }
         // if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
@@ -173,7 +140,7 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         
         _direction = Vector3.zero; 
 
-        _targetDistance = Vector3.Distance(transform.position, GetTargetPosition());
+        _targetDistance = Vector3.Distance(Machine.transform.position, GetTargetPosition());
         if (!_targetReached)
         {   
             _targetReached = _targetDistance < _targetReachedInner;
@@ -205,16 +172,16 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
     { 
         if (_nextPoint != _path.Count - 1)
         { 
-            _nextPointDistance = Vector3.Distance(transform.position,  (Vector3)_path[_nextPoint][0]);
+            _nextPointDistance = Vector3.Distance(Machine.transform.position,  (Vector3)_path[_nextPoint][0]);
             if (_isGrounded && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
             } 
             else if (_nextPoint < _path.Count - 1 && (bool)_path[_nextPoint][1] 
-            && ((Vector3)_path[_nextPoint][0]).y >= (int)transform.position.y - 1)
+            && ((Vector3)_path[_nextPoint][0]).y >= (int)Machine.transform.position.y - 1)
             {
                 while (_nextPoint < _path.Count - 1 && (bool)_path[_nextPoint][1]
-                && ((Vector3)_path[_nextPoint][0]).y >= (int)transform.position.y)
+                && ((Vector3)_path[_nextPoint][0]).y >= (int)Machine.transform.position.y)
                 { 
                     _nextPoint++;
                 }
@@ -230,20 +197,20 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
             else
             {
                 if (_nextPoint == 0 ||
-                    (((Vector3)_path[_nextPoint][0]).y > (int)transform.position.y &&
+                    (((Vector3)_path[_nextPoint][0]).y > (int)Machine.transform.position.y &&
                     Vector2.Distance(
                         new Vector2(((Vector3)_path[_nextPoint][0]).x, ((Vector3)_path[_nextPoint][0]).z), 
-                        new Vector2(transform.position.x, transform.position.z)
+                        new Vector2(Machine.transform.position.x, Machine.transform.position.z)
                     ) < _pointReachDistance))
                 {
                     _nextPoint++;
                 }
             } 
-            _direction = ((Vector3)_path[_nextPoint][0] - transform.position).normalized; 
+            _direction = ((Vector3)_path[_nextPoint][0] - Machine.transform.position).normalized; 
         } 
         else
         { 
-            _direction = (Lib.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - transform.position).normalized;
+            _direction = (Lib.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
         } 
     }
      
@@ -271,29 +238,17 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
             }
         }   
         _updateEntityPosition = true; 
-        // _selfPositionPrevious = transform.position; 
+        // _selfPositionPrevious = Machine.transform.position; 
 
         _repathRoutine = false;  
     }
-
-    private async void CheckRepathRoutineStill()
-    { 
-        _repathRoutine = true;
-        await Task.Delay((int)_repathInterval * 1000); 
  
-        if (_nextPointQueued == -1 && IsStuck())
-        {
-            GetPath();
-        }   
-        _updateEntityPosition = true; 
-        _repathRoutine = false;  
-    }
     
-    bool IsStuck()
+    private bool IsStuck()
     { 
         _selfMoveDistance = Vector2.Distance(
             new Vector2(_selfPositionPrevious.x, _selfPositionPrevious.z), 
-            new Vector2(transform.position.x, transform.position.z)); 
+            new Vector2(Machine.transform.position.x, Machine.transform.position.z)); 
         if (_selfMoveDistance < 0.001f)
         { 
             return true;
@@ -308,9 +263,9 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         try
         {  
             _pathQueued = await PathFindSingleton.Instance.FindPath(this, _scanCount); 
-            if (this)
+            if (Machine.transform)
             {
-                _positionWhenPathSearched = transform.position;
+                _positionWhenPathSearched = Machine.transform.position;
                 await Task.Run(() => {
                     FindNearestPointEntity(ref _pathQueued);
                 }); 
@@ -349,7 +304,24 @@ public abstract class NPCPathFindAbstract : MonoBehaviour
         _isPathFinding = false; 
     }
 
-    private void OnDrawGizmos()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public void DrawGizmos()
     {
         try
         {

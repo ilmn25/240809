@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
  
 
-class Idle : State
+class StaticIdle : State
 {  
     public override void OnEnterState()
     { 
@@ -10,9 +10,9 @@ class Idle : State
     }
     public void OnMapUpdate(Vector3Int worldPosition)
     {
-        if (Vector3Int.FloorToInt(Root.transform.position) - new Vector3Int(0, 1, 0) == worldPosition)
+        if (Vector3Int.FloorToInt(Machine.transform.position) + Vector3Int.down == worldPosition) // if block under is gone
         {
-            ((EntityMachine) Root).WipeEntity();
+            ((EntityMachine) Machine).WipeEntity();
         } 
     }
     public override void OnExitState()

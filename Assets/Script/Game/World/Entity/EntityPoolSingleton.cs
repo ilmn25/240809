@@ -11,7 +11,6 @@ public class EntityPoolSingleton : MonoBehaviour
     {
         Instance = this; 
     }
- 
     
     public GameObject GetObject(string prefabName)
     {

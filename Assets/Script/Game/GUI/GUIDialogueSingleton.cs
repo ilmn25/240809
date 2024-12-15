@@ -36,7 +36,7 @@ public class GUIDialogueSingleton : MonoBehaviour
 
         if (_entityState != null){ 
             
-            if (!scaleTask.Running && Vector3.Distance(Game.Player.transform.position, _entityState.Root.transform.position) > 3) { //walk away from npc
+            if (!scaleTask.Running && Vector3.Distance(Game.Player.transform.position, _entityState.Machine.transform.position) > 3) { //walk away from npc
                 HideDialogue();
                 if (scrollTask.Running) scrollTask.Stop();
             }

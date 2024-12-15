@@ -24,9 +24,9 @@ public class PathFindSingleton : MonoBehaviour
         await _semaphore.WaitAsync();
         try
         { 
-            if (agent.transform)
+            if (agent.Machine.transform)
             {
-                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.transform.position));
+                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
                 _endPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.GetTargetPosition())); 
 
                 return await Task.Run(() => FindPathAsync(agent, _startPosition, _endPosition, scanCount));
