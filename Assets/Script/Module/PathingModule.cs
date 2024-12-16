@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class PathingModule : Module
 {
     // parameters 
-    private bool _isGrounded;
+    private NPCMovementModule _npcMovementModule;
     protected Transform Target;
     public void SetTarget(Transform target)
     {
@@ -26,12 +26,17 @@ public abstract class PathingModule : Module
         float pointReachDistance = 0.45f, 
         float repathInterval = 0.1f, 
         int jumpSkipAmount = 1)
-    {
+    { 
         _targetReachedInner = targetReachedInner;
         _targetReachedOuter = targetReachedOuter;
         _pointReachDistance = pointReachDistance;
         _repathInterval = repathInterval;
         _jumpSkipAmount = jumpSkipAmount;
+    }
+
+    public override void Initialize()
+    {
+        _npcMovementModule = Machine.GetModule<NPCMovementModule>();
     }
 
     public abstract bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode);
@@ -104,10 +109,8 @@ public abstract class PathingModule : Module
         }
     } 
 
-    public Vector3 GetNextDirection(Boolean isGrounded)
-    {
-        
-        _isGrounded = isGrounded;
+    public Vector3 GetNextDirection()
+    { 
         
         if (!_repathRoutine) CheckRepathRoutine();
  
@@ -158,7 +161,7 @@ public abstract class PathingModule : Module
         if (_nextPoint != Path.Count - 1)
         { 
             _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
-            if (_isGrounded && _nextPointDistance < _pointReachDistance)
+            if (_npcMovementModule.IsGrounded() && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
             } 
@@ -218,7 +221,6 @@ public abstract class PathingModule : Module
             }   
             else if (_nextPoint != 1 && IsStuck())
             {
-                Lib.Log();
                 Repath();
             }
         }   

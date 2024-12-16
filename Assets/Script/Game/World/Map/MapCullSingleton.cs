@@ -65,7 +65,7 @@ public class MapCullSingleton : MonoBehaviour
         leftDirection = Quaternion.Euler(0, 5, -ANGLE_OFFSET) * Vector3.up;
         rightDirection = Quaternion.Euler(0, 5, ANGLE_OFFSET) * Vector3.up;
  
-        _chunkPositionPrevious = WorldSingleton._playerChunkPos;
+        _chunkPositionPrevious = WorldSingleton.PlayerChunkPosition;
 
         _lightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
         _lightSelf = Game.Player.transform.Find("light_self").gameObject;   
@@ -122,10 +122,10 @@ public class MapCullSingleton : MonoBehaviour
             }
             else if (_yCheck)   
             {
-                if (WorldSingleton._playerChunkPos != _chunkPositionPrevious)
+                if (WorldSingleton.PlayerChunkPosition != _chunkPositionPrevious)
                 { 
                     UpdateYCull();
-                    _chunkPositionPrevious = WorldSingleton._playerChunkPos;
+                    _chunkPositionPrevious = WorldSingleton.PlayerChunkPosition;
                 }
                 else if (_yThresholdPrevious != _yThreshold)
                 {

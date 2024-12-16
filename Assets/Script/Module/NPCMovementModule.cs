@@ -14,11 +14,7 @@ public class NPCMovementModule : Module
     [SerializeField] private float GRAVITY = -40f;
     [SerializeField] private float JUMP_VELOCITY = 12f;
     [SerializeField] private float COLLISION_RADIUS = 0.3f; 
-    
-    public void SetDirection(Vector3 dir)
-    {
-        _direction = dir;
-    }
+     
     public Vector3 GetDirection()
     {
         return _direction;
@@ -60,8 +56,9 @@ public class NPCMovementModule : Module
     
     private Collider[] _colliderArray = new Collider[1];
     
-    public void HandleMovementUpdate(bool isRoam = false)
-    { 
+    public void HandleMovementUpdate(Vector3 direction)
+    {
+        _direction = direction;
         if (Machine.transform.position.y < -1) Machine.transform.position = Lib.AddToVector(Machine.transform.position, 0, 100, 0);
 
         // _deltaTime = GameSystem._deltaTime;
@@ -73,7 +70,7 @@ public class NPCMovementModule : Module
         if (_direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = _isGrounded ? isRoam? SPEED_WALK * 0.8f : SPEED_WALK : SPEED_RUN;
+            _speedTarget = _isGrounded ? SPEED_WALK : SPEED_RUN;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
             _speedAdjust = (_direction.x != 0 && _direction.z != 0) ? 1 / 1.25f : 1; 
 

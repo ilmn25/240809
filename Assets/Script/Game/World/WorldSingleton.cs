@@ -16,25 +16,29 @@ public class WorldSingleton : MonoBehaviour
     
     public static WorldData World;
 
-    private static BinaryFormatter _bf = new BinaryFormatter(); 
+    private static BinaryFormatter _binaryFormatter = new BinaryFormatter(); 
     public static event Action PlayerChunkTraverse;
     public delegate void Vector3IntEvent(Vector3Int position); 
     public static event Vector3IntEvent MapUpdated;
 
     [HideInInspector] 
-    public static Vector3Int _playerChunkPos;
+    public static Vector3Int PlayerChunkPosition;
     [HideInInspector] 
-    public static Vector3Int _chunkPositionPrevious = Vector3Int.one;
+    private static Vector3Int _playerChunkPositionPrevious;
     [HideInInspector] 
     public static Vector3Int _boolMapOrigin = Vector3Int.zero;
     [HideInInspector] 
     public static BoolMap _boolMap;
     [HideInInspector] 
-    public static readonly int CHUNK_SIZE = 15; 
+    public static readonly int CHUNK_SIZE = 15;
     [HideInInspector] 
-    public static readonly int RENDER_RANGE = 2; 
+    public static readonly int RENDER_RANGE = 2;
+    [HideInInspector] 
+    public static readonly int LOGIC_RANGE = 3; 
     [HideInInspector] 
     public static readonly int RENDER_DISTANCE = RENDER_RANGE * CHUNK_SIZE; 
+    [HideInInspector] 
+    public static readonly int LOGIC_DISTANCE = LOGIC_RANGE * CHUNK_SIZE; 
     
     public static bool ALWAYS_REGENERATE = false;
  
@@ -53,16 +57,16 @@ public class WorldSingleton : MonoBehaviour
         else 
             HandleLoadWorldFile(0); 
         
-        _chunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
+        _playerChunkPositionPrevious = GetChunkCoordinate(Game.Player.transform.position); 
     }
           
     void FixedUpdate()
     {
-        _playerChunkPos = GetChunkCoordinate(Game.Player.transform.position);
-        if (_playerChunkPos != _chunkPositionPrevious)
+        PlayerChunkPosition = GetChunkCoordinate(Game.Player.transform.position);
+        if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {  
             PlayerChunkTraverse?.Invoke();
-            _chunkPositionPrevious = _playerChunkPos; 
+            _playerChunkPositionPrevious = PlayerChunkPosition; 
         }
     }
 
@@ -90,7 +94,7 @@ public class WorldSingleton : MonoBehaviour
         
         using (FileStream file = File.Create(getFilePath(yLevel)))
         {
-            _bf.Serialize(file, World);
+            _binaryFormatter.Serialize(file, World);
         } 
     }
  
@@ -102,7 +106,7 @@ public class WorldSingleton : MonoBehaviour
             { 
                 FileStream file = File.Open(getFilePath(yLevel), FileMode.Open);
 
-                World = (WorldData)_bf.Deserialize(file);
+                World = (WorldData)_binaryFormatter.Deserialize(file);
                 file.Close();
             } 
             else
@@ -120,9 +124,9 @@ public class WorldSingleton : MonoBehaviour
 
     public static bool InPlayerRange(Vector3 position, float distance)
     {
-        return Math.Abs(position.x - _playerChunkPos.x) <= distance &&
-               Math.Abs(position.y - _playerChunkPos.y) <= distance &&
-               Math.Abs(position.z - _playerChunkPos.z) <= distance;
+        return Math.Abs(position.x - PlayerChunkPosition.x) <= distance &&
+               Math.Abs(position.y - PlayerChunkPosition.y) <= distance &&
+               Math.Abs(position.z - PlayerChunkPosition.z) <= distance;
     }
  
     public void GenerateBoolMap()
