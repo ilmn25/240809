@@ -17,19 +17,22 @@ public class NPCPathingModule : PathingModule
         if (Target)
             return Target.position;
 
-        if (Path == null || Vector3.Distance(Machine.transform.position, Path[^1].Position) < 0.3f)
-        {
-            Lib.Log();
+        if (Path == null || Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
             Repath();
-        } 
         
         return Path == null? Vector3.down : Path[^1].Position;
     }
 
     protected override async Task<List<Node>> GetPath()
-    { 
+    {
         if (Target)
+        {
+            while (Node.IsAir(Vector3Int.FloorToInt(Target.position) + Vector3Int.down * JUMP))
+            {
+                await Task.Delay(100); // Yield control back to the caller and continue checking
+            }
             return await PathFind.FindPath(this, SCAN); 
+        } 
         return PathRandom.FindPath(this, ROAM); 
     } 
     

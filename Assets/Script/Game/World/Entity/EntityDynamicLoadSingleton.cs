@@ -15,6 +15,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     {
         Instance = this;
         WorldSingleton.PlayerChunkTraverse += ScanAndUnload; 
+        WorldSingleton.PlayerChunkTraverse += ScanAndLoad; 
     }
 
     public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
@@ -28,7 +29,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         { 
             entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityMachine.transform.position);
             
-            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.RENDER_DISTANCE))
+            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.LOGIC_DISTANCE))
             {
                 if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))
                     WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityMachine.GetEntityData());
@@ -39,7 +40,25 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         foreach (var entityMachine in removeList) _activeEntities.Remove(entityMachine);
     }
  
-     
+    
+    void ScanAndLoad()
+    {
+        // Collect chunk coordinates within render distance
+        for (int x = -WorldSingleton.LOGIC_RANGE; x <= WorldSingleton.LOGIC_RANGE; x++)
+        {
+            for (int y = -WorldSingleton.LOGIC_RANGE; y <= WorldSingleton.LOGIC_RANGE; y++)
+            {
+                for (int z = -WorldSingleton.LOGIC_RANGE; z <= WorldSingleton.LOGIC_RANGE; z++)
+                {
+                    LoadEntitiesInChunk(new Vector3Int(
+                        WorldSingleton.PlayerChunkPosition.x + x * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton.PlayerChunkPosition.y + y * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton.PlayerChunkPosition.z + z * WorldSingleton.CHUNK_SIZE
+                    ));
+                }
+            }
+        } 
+    } 
       
     public void UnloadWorld()
     {

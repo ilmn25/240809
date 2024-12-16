@@ -20,10 +20,9 @@ class NPCRoam : State {
     }
     
     public override void OnUpdateState() {
-        if (_sprite.isVisible)
+        if (_sprite.isVisible && MapLoadSingleton.Instance._activeChunks.ContainsKey(WorldSingleton.GetChunkCoordinate(Machine.transform.position)))
         {
-            _npcMovementModule.SetDirection(_pathingModule.GetNextDirection(_npcMovementModule.IsGrounded()));
-            _npcMovementModule.HandleMovementUpdate();
+            _npcMovementModule.HandleMovementUpdate(_pathingModule.GetNextDirection());
             _npcAnimationModule.HandleAnimationUpdate();
         }
         else

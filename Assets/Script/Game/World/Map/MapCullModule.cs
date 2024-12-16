@@ -42,7 +42,6 @@ public class MapCullModule : MonoBehaviour
     void Start() { 
         CreateShadowMesh();
         HandleAssignment();    
-        EntityDynamicLoadSingleton.Instance.LoadEntitiesInChunk(_selfChunkPosition);
         EntityStaticLoadSingleton.Instance.LoadEntitiesInChunk(_selfChunkPosition);
     }  
     void CreateShadowMesh()
@@ -164,7 +163,7 @@ public class MapCullModule : MonoBehaviour
         try
         { 
             //TODO y
-            playerChunkPosition = WorldSingleton._playerChunkPos;
+            playerChunkPosition = WorldSingleton.PlayerChunkPosition;
             xDist = Mathf.Abs(playerChunkPosition.x - transform.position.x);
             zDist = Mathf.Abs(playerChunkPosition.z - transform.position.z);   
             xCheck = xDist <= CULL_DISTANCE; 

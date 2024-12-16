@@ -89,9 +89,9 @@ public class MapLoadSingleton : MonoBehaviour
                 for (int z = -WorldSingleton.RENDER_RANGE; z <= WorldSingleton.RENDER_RANGE; z++)
                 {
                     _traverseCheckPosition = new Vector3Int(
-                        WorldSingleton._playerChunkPos.x + x * WorldSingleton.CHUNK_SIZE,
-                        WorldSingleton._playerChunkPos.y + y * WorldSingleton.CHUNK_SIZE,
-                        WorldSingleton._playerChunkPos.z + z * WorldSingleton.CHUNK_SIZE
+                        WorldSingleton.PlayerChunkPosition.x + x * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton.PlayerChunkPosition.y + y * WorldSingleton.CHUNK_SIZE,
+                        WorldSingleton.PlayerChunkPosition.z + z * WorldSingleton.CHUNK_SIZE
                     );
                     if (!_activeChunks.ContainsKey(_traverseCheckPosition) && WorldSingleton.Instance.IsInWorldBounds(_traverseCheckPosition))
                         _ = LoadChunksOntoScreenAsync(_traverseCheckPosition);
