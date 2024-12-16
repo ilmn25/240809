@@ -17,7 +17,7 @@ public class NPCMachine : EntityMachine
     {
         AddState(new NPCState()); 
         AddModule(new NPCMovementModule());
-        AddModule(new CharNpcPathFindModule());
+        AddModule(new NPCPathingModule());
         AddModule(new NPCAnimationModule()); 
         AddModule(new SpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
