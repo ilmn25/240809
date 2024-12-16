@@ -1,7 +1,9 @@
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class CharNpcPathFindModule : NPCPathFindAbstract
+public class NPCPathingModule : PathingModule
 {
     public int HEIGHT = 1;
     public int JUMP = 1;
@@ -19,6 +21,11 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
             ChangeRandomTargetPosition();
         }
         return TargetPosition;
+    }
+
+    protected override async Task<List<Node>> GetPath()
+    { 
+        return await PathFindSingleton.FindPath(this, 7000); 
     }
 
     public void ChangeRandomTargetPosition()
@@ -51,7 +58,7 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
             {
                 validity = false;
             }
-            if (!PathFindSingleton.IsClear(new Vector3Int(currentNode.Position.x, currentNode.Position.y + height + dir.y, currentNode.Position.z)))
+            if (!PathFindSingleton.IsClear(Vector3Int.FloorToInt(new Vector3(currentNode.Position.x, currentNode.Position.y + height + dir.y, currentNode.Position.z))))
             {
                 validity = false;
             }

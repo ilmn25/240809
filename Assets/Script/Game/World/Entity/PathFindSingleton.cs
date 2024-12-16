@@ -4,22 +4,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine; 
 
-public class PathFindSingleton : MonoBehaviour
+public class PathFindSingleton 
 {
-    public static PathFindSingleton Instance { get; private set; }  
 
-    private int MAX_TASK_COUNT = 10;
-    private SemaphoreSlim _semaphore;
-
-    void Start()
-    {
-        Instance = this;
-        _semaphore = new SemaphoreSlim(MAX_TASK_COUNT, MAX_TASK_COUNT);
+    private static readonly int MaxTaskCount = 10;
+    private static SemaphoreSlim _semaphore;
+    static PathFindSingleton(){
+        _semaphore = new SemaphoreSlim(MaxTaskCount, MaxTaskCount);
     } 
+           
           
-    Vector3Int _startPosition; 
-    Vector3Int _endPosition; 
-    public async Task<List<object[]>> FindPath(NPCPathFindAbstract agent, int scanCount)
+    private static Vector3Int _startPosition; 
+    private static Vector3Int _endPosition; 
+    public static async Task<List<Node>> FindPath(PathingModule agent, int scanCount)
     {
         await _semaphore.WaitAsync();
         try
@@ -39,25 +36,25 @@ public class PathFindSingleton : MonoBehaviour
         }
     } 
  
-    private async Task<List<object[]>> FindPathAsync(NPCPathFindAbstract agent, Vector3Int startPosition, Vector3Int endPosition, int scanCount)
+    private static List<Node> FindPathAsync(PathingModule agent, Vector3Int startPosition, Vector3Int endPosition, int scanCount)
     {  
-        float gCost;
-        float hCost;
-        Vector3Int neighborPos;
-        bool isFloat;
-        Node neighborNode;
-        float currentDistance;
-        
         List<Node> openList = new List<Node>(); 
-        HashSet<Vector3Int> closedList = new HashSet<Vector3Int>();
+        HashSet<Vector3> closedList = new HashSet<Vector3>();
         
-        Node closestNode = null;
-        float closestDistance = 10000; 
+        float currentDistance;
+        float closestDistance = 1000; 
+        Vector3Int dirPosition;
+        
+        float gCost;
+        float hCost; 
+        bool isFloat;  
+         
         
         Node currentNode;
-        Vector3 adjustedPosition;
-        List<object[]> pathList;
-        object[] pathObject;
+        Node closestNode = null;
+        Node neighborNode; 
+          
+        List<Node> pathList;
         
         try
         {
@@ -67,42 +64,28 @@ public class PathFindSingleton : MonoBehaviour
                 openList.Sort((A, B) => A.F.CompareTo(B.F)); // sort lowest f to [0] 
                 currentNode = openList[0]; //set lowest f to current
                 openList.RemoveAt(0); //remove current from open list
-
                 closedList.Add(currentNode.Position); //add to closed list
-
-                if (currentNode.Position == endPosition) {
-                    return RetracePath(currentNode); //found condition
-                } 
+                
+                //found condition
+                if (currentNode.Position == endPosition) return RetracePath(currentNode);  
+                
                 foreach (var direction in _directions) //scan each direction
-                {
-                    if (closedList.Count == 500)
-                    {
-                        await Task.Yield(); // Yield control back to the main thread
-                    }  
-
-                    neighborPos = currentNode.Position + direction;
-                    if (closedList.Contains(neighborPos) || !agent.IsValidPosition(neighborPos, direction, currentNode)) {
-                        continue;
-                    }
+                {  
+                    dirPosition = Vector3Int.FloorToInt(currentNode.Position + direction);
+                    if (closedList.Contains(dirPosition) || !agent.IsValidPosition(dirPosition, direction, currentNode)) continue;
                      
-                    isFloat = IsClear(new Vector3Int(neighborPos.x, neighborPos.y -1, neighborPos.z)); // set true if mid air
-                    if (direction.x != 0 && direction.z != 0 && isFloat)
-                    {
-                        gCost = currentNode.G + Vector3Int.Distance(currentNode.Position, neighborPos) + 1;
-                    } else
-                    {
-                        gCost = currentNode.G + Vector3Int.Distance(currentNode.Position, neighborPos);
-                    }
-                    hCost = Vector3Int.Distance(neighborPos, endPosition);
-                    neighborNode = new Node(neighborPos, currentNode, gCost, hCost, isFloat, direction);
+                    isFloat = IsClear(dirPosition + Vector3Int.down); // set true if midair
+                    gCost = currentNode.G + SquaredDistance(currentNode.Position, dirPosition);
+                    if (direction.x != 0 && direction.z != 0 && isFloat) gCost++;  
+                      
+                    //dont add if not the lowest node compared to others
+                    if (openList.Exists(node => node.Position == dirPosition && node.G <= gCost)) continue;   
 
-                    if (openList.Exists(node => node.Position == neighborPos && node.G <= gCost)) {
-                        continue; //dont add if not the lowest node compared to others 
-                    }
-
+                    hCost = SquaredDistance(dirPosition, endPosition); 
+                    neighborNode = new Node(dirPosition, currentNode, gCost, hCost, isFloat, direction);
                     openList.Add(neighborNode);
 
-                    currentDistance = Vector3Int.Distance(neighborPos, endPosition);
+                    currentDistance = SquaredDistance(dirPosition, endPosition);
                     if (currentDistance < closestDistance)
                     {
                         closestDistance = currentDistance;
@@ -111,37 +94,27 @@ public class PathFindSingleton : MonoBehaviour
                 }
             }
 
-            if (closestNode != null)
-            { 
-                return RetracePath(closestNode); // Return the path to the closest node
-            }
+            if (closestNode != null) return RetracePath(closestNode); // Return the path to the closest node
         }
         catch (Exception ex)
         {
-            Debug.LogError($"An error occurred while finding the path: {ex.Message}");
+            Debug.Log($"PATHFIND TASK ERROR: {ex.Message}");
         }
         return null; // No path found
   
  
         
-        List<object[]> RetracePath(Node endNode)
+        List<Node> RetracePath(Node endNode)
         {  
             Node currentNode = endNode;
-            pathList = new List<object[]>();
+            pathList = new List<Node>();
 
-            while (currentNode != null) 
+            while (currentNode != null)
             {
-                // Adjust the node position and add 0.5 to each axis
-                adjustedPosition = new Vector3(
-                    currentNode.Position.x + 0.5f,
-                    currentNode.Position.y,
-                    currentNode.Position.z + 0.5f
-                );
+                currentNode.Position.x += 0.5f;
+                currentNode.Position.z += 0.5f;
 
-                // Create an array with adjustedPosition and currentNode.isFloat
-                pathObject = new object[] { adjustedPosition, currentNode.IsFloat};
-
-                pathList.Add(pathObject);
+                pathList.Add(currentNode);
                 currentNode = currentNode.Parent;
             }
 
@@ -149,14 +122,33 @@ public class PathFindSingleton : MonoBehaviour
             return pathList;
         }
     }
- 
+    
+    public static float SquaredDistance(Vector3 a, Vector3 b)
+    {
+        return (a.x - b.x) * (a.x - b.x) + 
+               (a.y - b.y) * (a.y - b.y) + 
+               (a.z - b.z) * (a.z - b.z);
+    }
+    
+    public static bool IsClear(Vector3Int pos)
+    {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || 
+            pos.x >= WorldSingleton.World.Bounds.x || 
+            pos.z >= WorldSingleton.World.Bounds.z)
+            return false; // Check bounds x and z
 
-    private Vector3Int[] _directions = 
+        // Check bounds y (true even if above max y)
+        if (pos.y >= WorldSingleton.World.Bounds.y)
+            return true;
+
+        // Check air or block
+        return WorldSingleton._boolMap[pos.x, pos.y, pos.z];
+    }
+
+    private static Vector3Int[] _directions = 
     {
         new Vector3Int(1, 0, 0),  //  right
-        new Vector3Int(-1, 0, 0), //  left
-        new Vector3Int(0, 1, 0),  //  up
-        new Vector3Int(0, -1, 0), //  down
+        new Vector3Int(-1, 0, 0), //  left 
         new Vector3Int(0, 0, 1),  //  backward
         new Vector3Int(0, 0, -1), //  forward
 
@@ -165,6 +157,9 @@ public class PathFindSingleton : MonoBehaviour
         new Vector3Int(-1, 0, 1), //  backward-left
         new Vector3Int(1, 0, 1),  //  backward-right 
 
+        new Vector3Int(0, 1, 0),  //  up
+        new Vector3Int(0, -1, 0), //  down
+        
         new Vector3Int(-1, 1, 0), //  up-left 
         new Vector3Int(1, 1, 0),  //  up-right
         new Vector3Int(-1, -1, 0),//  down-left
@@ -184,29 +179,13 @@ public class PathFindSingleton : MonoBehaviour
         new Vector3Int(1, -1, -1),//  down-right-forward
         new Vector3Int(1, -1, 1) //  down-right-backward
     };
-
-    public static bool IsClear(Vector3Int pos)
-    { 
-        bool isClear = ( 
-            pos.x >= 0 
-            && pos.y >= 0 
-            && pos.z >= 0 
-            && pos.x < WorldSingleton.World.Bounds.x 
-            && pos.z < WorldSingleton.World.Bounds.z 
-        ); //check bounds x z 
-        if (isClear)
-        {
-            isClear = pos.y >= WorldSingleton.World.Bounds.y? true : false; //check bounds y (true even if above max y)
-            isClear = isClear || WorldSingleton._boolMap[pos.x, pos.y, pos.z]; //check air or block
-        }
-        return isClear;
-    }
+ 
 }
 
 
 public class Node
 {
-    public Vector3Int Position;
+    public Vector3 Position;
     public Vector3Int Direction;
     public Node Parent;
     public float G;  
@@ -214,7 +193,7 @@ public class Node
     public float F => G + H;  
     public bool IsFloat;  
 
-    public Node(Vector3Int position, Node parent, float g, float h, bool isFloat, Vector3Int direction)
+    public Node(Vector3 position, Node parent, float g, float h, bool isFloat, Vector3Int direction)
     {
         Position = position;
         Parent = parent;

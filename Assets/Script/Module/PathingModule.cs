@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class NPCPathFindAbstract : Module
+public abstract class PathingModule : Module
 {
     // parameters
     protected Transform Target;
@@ -14,26 +14,20 @@ public abstract class NPCPathFindAbstract : Module
     private float _targetReachedInner;
     private float _targetReachedOuter;
     private float _pointReachDistance;
-    private float _pointMissDistance; 
     private float _repathInterval; 
     private int _jumpSkipAmount;
-    private int _scanCount;
     
-    public NPCPathFindAbstract(
+    public PathingModule(
         float targetReachedInner = 1f, 
         float targetReachedOuter = 2f, 
         float pointReachDistance = 0.45f, 
-        float pointMissDistance = 3f, 
         float repathInterval = 0.1f, 
-        int jumpSkipAmount = 1,
-        int scanCount = 7000)
+        int jumpSkipAmount = 1)
     {
         _targetReachedInner = targetReachedInner;
         _targetReachedOuter = targetReachedOuter;
         _pointReachDistance = pointReachDistance;
-        _pointMissDistance = pointMissDistance;
         _repathInterval = repathInterval;
-        _scanCount = scanCount;
         _jumpSkipAmount = jumpSkipAmount;
     }
 
@@ -75,8 +69,8 @@ public abstract class NPCPathFindAbstract : Module
     private bool _targetMoved; 
     private bool _targetReached = false;
     
-    private List<object[]> _path;
-    private List<object[]> _pathQueued; 
+    private List<Node> _path;
+    private List<Node> _pathQueued; 
     private int _nextPoint = 0;
     private int _nextPointQueued = -1;
     
@@ -104,7 +98,7 @@ public abstract class NPCPathFindAbstract : Module
                     _path = _pathQueued; 
                     _nextPoint = _nextPointQueued;
                     _nextPointQueued = -1;
-                } else GetPath();
+                } else Repath();
             } 
             else if (_path != null)
             {  
@@ -112,7 +106,7 @@ public abstract class NPCPathFindAbstract : Module
                 if (Machine.transform && _nextPoint < _path.Count -2)
                 {
                     _nextPoint++;  
-                    Machine.transform.position = Lib.AddToVector((Vector3)_path[_nextPoint][0], 0, 0.1f, 0);
+                    Machine.transform.position = Lib.AddToVector(_path[_nextPoint].Position, 0, 0.1f, 0);
                 } else return;
             }   
             _moveOccupied = false; 
@@ -131,7 +125,7 @@ public abstract class NPCPathFindAbstract : Module
             _selfPositionPrevious = Machine.transform.position;
             _updateEntityPosition = false; 
         }
-        // if (_updateTargetPosition && PlayerMovementStatic.Instance._isGrounded) 
+
         if (_updateTargetPosition) 
         {
             _targetPositionPrevious = GetTargetPosition();
@@ -172,24 +166,24 @@ public abstract class NPCPathFindAbstract : Module
     { 
         if (_nextPoint != _path.Count - 1)
         { 
-            _nextPointDistance = Vector3.Distance(Machine.transform.position,  (Vector3)_path[_nextPoint][0]);
+            _nextPointDistance = Vector3.Distance(Machine.transform.position,  _path[_nextPoint].Position);
             if (_isGrounded && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
             } 
-            else if (_nextPoint < _path.Count - 1 && (bool)_path[_nextPoint][1] 
-            && ((Vector3)_path[_nextPoint][0]).y >= (int)Machine.transform.position.y - 1)
+            else if (_nextPoint < _path.Count - 1 && _path[_nextPoint].IsFloat 
+            && _path[_nextPoint].Position.y >= (int)Machine.transform.position.y - 1)
             {
-                while (_nextPoint < _path.Count - 1 && (bool)_path[_nextPoint][1]
-                && ((Vector3)_path[_nextPoint][0]).y >= (int)Machine.transform.position.y)
+                while (_nextPoint < _path.Count - 1 && _path[_nextPoint].IsFloat
+                && _path[_nextPoint].Position.y >= (int)Machine.transform.position.y)
                 { 
                     _nextPoint++;
                 }
 
                 int potentialSkipPoint = _nextPoint + _jumpSkipAmount;
                 if (potentialSkipPoint < _path.Count - 1 
-                && !(bool)_path[potentialSkipPoint][1] 
-                && Mathf.Approximately(((Vector3)_path[potentialSkipPoint][0]).y, ((Vector3)_path[_nextPoint][0]).y))
+                && !_path[potentialSkipPoint].IsFloat 
+                && Mathf.Approximately(_path[potentialSkipPoint].Position.y, _path[_nextPoint].Position.y))
                 {
                     _nextPoint = potentialSkipPoint;
                 }
@@ -197,16 +191,16 @@ public abstract class NPCPathFindAbstract : Module
             else
             {
                 if (_nextPoint == 0 ||
-                    (((Vector3)_path[_nextPoint][0]).y > (int)Machine.transform.position.y &&
+                    (_path[_nextPoint].Position.y > (int)Machine.transform.position.y &&
                     Vector2.Distance(
-                        new Vector2(((Vector3)_path[_nextPoint][0]).x, ((Vector3)_path[_nextPoint][0]).z), 
+                        new Vector2(_path[_nextPoint].Position.x, _path[_nextPoint].Position.z), 
                         new Vector2(Machine.transform.position.x, Machine.transform.position.z)
                     ) < _pointReachDistance))
                 {
                     _nextPoint++;
                 }
             } 
-            _direction = ((Vector3)_path[_nextPoint][0] - Machine.transform.position).normalized; 
+            _direction = (_path[_nextPoint].Position - Machine.transform.position).normalized; 
         } 
         else
         { 
@@ -227,14 +221,14 @@ public abstract class NPCPathFindAbstract : Module
             // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             if (_targetMoved)
             { 
-                GetPath();  
+                Repath();  
                 _updateTargetPosition = true;//! dont move
                 // _playerPositionPrevious = GetTargetPosition();
             }   
             else if (IsStuck())
             {
                 OnStuck();
-                GetPath();
+                Repath();
             }
         }   
         _updateEntityPosition = true; 
@@ -256,52 +250,51 @@ public abstract class NPCPathFindAbstract : Module
         return false;
     }
 
-    private async void GetPath()
+    protected virtual async Task<List<Node>> GetPath()
+    { 
+        return await PathFindSingleton.FindPath(this, 7000); 
+    }
+    
+    private async void Repath()
     {
         if (_isPathFinding) return;
         _isPathFinding = true;
         try
         {  
-            _pathQueued = await PathFindSingleton.Instance.FindPath(this, _scanCount); 
+            _pathQueued = await GetPath(); 
             if (Machine.transform)
             {
                 _positionWhenPathSearched = Machine.transform.position;
-                await Task.Run(() => {
-                    FindNearestPointEntity(ref _pathQueued);
-                }); 
+                _nextPointQueued = FindNearestPointEntity(ref _pathQueued);
             }
         }
         catch (Exception ex)
         {
-            Lib.Log("GetPath", ex);
             if (ex is not MissingReferenceException && ex is not NullReferenceException )
-            {
                 throw new Exception("An exception occurred in GetPath method.", ex);
-            }
         }
+        _isPathFinding = false; 
     }
         
-    private void FindNearestPointEntity(ref List<object[]> path)
+    private int FindNearestPointEntity(ref List<Node> path)
     { 
-        int nearestPoint;
+        int nearestPoint = 0;
         float distance, nearestDistance;
         if (path != null && path.Count > 0) 
         {
-            nearestPoint = 0;
-            nearestDistance = Vector3.Distance(_positionWhenPathSearched, (Vector3)path[0][0]);
+            nearestDistance = PathFindSingleton.SquaredDistance(Machine.transform.position, path[0].Position);
             for (int i = 1; i < path.Count; i++)
             {
-                distance = Vector3.Distance(_positionWhenPathSearched, (Vector3)path[i][0]);
+                distance = PathFindSingleton.SquaredDistance(Machine.transform.position, path[i].Position);
                 if (distance < nearestDistance)
                 {
                     nearestPoint = i;
                     nearestDistance = distance;
                 } else break; 
             } 
-            if (nearestPoint == 0) nearestPoint = Mathf.Min(nearestPoint + 1, path.Count -1); 
-            _nextPointQueued =  nearestPoint;
-        }  
-        _isPathFinding = false; 
+            if (nearestPoint == 0) nearestPoint = Mathf.Min(1, path.Count -1); 
+        }
+        return nearestPoint;
     }
 
     
@@ -322,24 +315,16 @@ public abstract class NPCPathFindAbstract : Module
     
     
     public void DrawGizmos()
-    {
-        try
+    { 
+        if (_path != null)
         {
-            if (_path != null)
+            for (int i = 0; i < _path.Count - 1; i++)
             {
-                for (int i = 0; i < _path.Count - 1; i++)
-                {
-                    bool isTrue = (bool)_path[i][1];
-                    Gizmos.color = isTrue ? Color.blue : Color.white;
-                    Gizmos.DrawLine((Vector3)_path[i][0], (Vector3)_path[i + 1][0]);
-                }
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere((Vector3)_path[_nextPoint][0], 0.2f); // Adjust the radius as needed
+                Gizmos.color = _path[i].IsFloat ? Color.blue : Color.white;
+                Gizmos.DrawLine(_path[i].Position, _path[i + 1].Position);
             }
-        }
-        catch (Exception )
-        {
-            return;
-        }
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(_path[_nextPoint].Position, 0.2f); // Adjust the radius as needed
+        } 
     }
 }
