@@ -5,10 +5,13 @@ using UnityEngine;
 
 public abstract class PathingModule : Module
 {
-    // parameters
+    // parameters 
+    private bool _isGrounded;
     protected Transform Target;
-    protected Vector3 TargetPosition;
-    private Boolean _isGrounded;
+    public void SetTarget(Transform target)
+    {
+        Target = target; 
+    }
     
     // const
     private float _targetReachedInner;
@@ -31,19 +34,8 @@ public abstract class PathingModule : Module
         _jumpSkipAmount = jumpSkipAmount;
     }
 
-    public virtual bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode)
-    { 
-        return false;
-    } 
-    public virtual Vector3 GetTargetPosition()
-    {
-        return Vector3.zero;
-    } 
-    public virtual void OnStuck() { } 
-    public void SetTarget(Transform target)
-    {
-        Target = target; 
-    }
+    public abstract bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode);
+    public abstract Vector3 GetTargetPosition(); 
      
       
     
@@ -69,7 +61,7 @@ public abstract class PathingModule : Module
     private bool _targetMoved; 
     private bool _targetReached = false;
     
-    private List<Node> _path;
+    protected List<Node> Path;
     private List<Node> _pathQueued; 
     private int _nextPoint = 0;
     private int _nextPointQueued = -1;
@@ -83,7 +75,6 @@ public abstract class PathingModule : Module
     private bool _updateTargetPosition = false;
     private bool _updateEntityPosition = false; 
     
-    private Vector3 _positionWhenPathSearched; 
     private Vector3 _direction; 
 
     public async void PassivePathFollow(float speed)
@@ -91,22 +82,22 @@ public abstract class PathingModule : Module
         if (!_moveOccupied)
         {
             _moveOccupied = true;  
-            if (_path == null || _nextPoint >= _path.Count - 2)
+            if (Path == null || _nextPoint >= Path.Count - 2)
             {
                 if (_nextPointQueued != -1)
                 {
-                    _path = _pathQueued; 
+                    Path = _pathQueued; 
                     _nextPoint = _nextPointQueued;
                     _nextPointQueued = -1;
                 } else Repath();
             } 
-            else if (_path != null)
+            else if (Path != null)
             {  
                 await Task.Delay((int)(1500 / speed)); // Convert seconds to milliseconds
-                if (Machine.transform && _nextPoint < _path.Count -2)
+                if (Machine?.transform && _nextPoint < Path.Count -2)
                 {
                     _nextPoint++;  
-                    Machine.transform.position = Lib.AddToVector(_path[_nextPoint].Position, 0, 0.1f, 0);
+                    Machine.transform.position = Lib.AddToVector(Path[_nextPoint].Position, 0, 0.1f, 0);
                 } else return;
             }   
             _moveOccupied = false; 
@@ -139,51 +130,51 @@ public abstract class PathingModule : Module
         {   
             _targetReached = _targetDistance < _targetReachedInner;
         } else
-        { 
-            _path = null;
+        {
+            Path = null;
             _targetReached = _targetDistance < _targetReachedOuter;
         }
          
-        if (_path != null 
+        if (Path != null 
         && !_targetReached 
-        && _nextPoint < _path.Count)
+        && _nextPoint < Path.Count)
         {
             HandleMovePoint(); 
         }
  
         if (_nextPointQueued != -1)
         {
-            _path = _pathQueued;
+            Path = _pathQueued; 
             _nextPoint = _nextPointQueued;
             _nextPointQueued = -1;
+            _targetPositionPrevious = GetTargetPosition();
         }
- 
 
         return _direction;
     }
     
     private void HandleMovePoint()
     { 
-        if (_nextPoint != _path.Count - 1)
+        if (_nextPoint != Path.Count - 1)
         { 
-            _nextPointDistance = Vector3.Distance(Machine.transform.position,  _path[_nextPoint].Position);
+            _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
             if (_isGrounded && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
             } 
-            else if (_nextPoint < _path.Count - 1 && _path[_nextPoint].IsFloat 
-            && _path[_nextPoint].Position.y >= (int)Machine.transform.position.y - 1)
+            else if (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat 
+            && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y - 1)
             {
-                while (_nextPoint < _path.Count - 1 && _path[_nextPoint].IsFloat
-                && _path[_nextPoint].Position.y >= (int)Machine.transform.position.y)
+                while (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat
+                && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y)
                 { 
                     _nextPoint++;
                 }
 
                 int potentialSkipPoint = _nextPoint + _jumpSkipAmount;
-                if (potentialSkipPoint < _path.Count - 1 
-                && !_path[potentialSkipPoint].IsFloat 
-                && Mathf.Approximately(_path[potentialSkipPoint].Position.y, _path[_nextPoint].Position.y))
+                if (potentialSkipPoint < Path.Count - 1 
+                && !Path[potentialSkipPoint].IsFloat 
+                && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[_nextPoint].Position.y))
                 {
                     _nextPoint = potentialSkipPoint;
                 }
@@ -191,16 +182,16 @@ public abstract class PathingModule : Module
             else
             {
                 if (_nextPoint == 0 ||
-                    (_path[_nextPoint].Position.y > (int)Machine.transform.position.y &&
+                    (Path[_nextPoint].Position.y > (int)Machine.transform.position.y &&
                     Vector2.Distance(
-                        new Vector2(_path[_nextPoint].Position.x, _path[_nextPoint].Position.z), 
+                        new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
                         new Vector2(Machine.transform.position.x, Machine.transform.position.z)
                     ) < _pointReachDistance))
                 {
                     _nextPoint++;
                 }
             } 
-            _direction = (_path[_nextPoint].Position - Machine.transform.position).normalized; 
+            _direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
         } 
         else
         { 
@@ -216,7 +207,7 @@ public abstract class PathingModule : Module
  
         if (_nextPointQueued == -1 && !_targetReached && !_isPathFinding )
         {
-            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > 0.8f;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > 2;  //should be less than inner player near
 
             // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             if (_targetMoved)
@@ -225,9 +216,9 @@ public abstract class PathingModule : Module
                 _updateTargetPosition = true;//! dont move
                 // _playerPositionPrevious = GetTargetPosition();
             }   
-            else if (IsStuck())
+            else if (_nextPoint != 1 && IsStuck())
             {
-                OnStuck();
+                Lib.Log();
                 Repath();
             }
         }   
@@ -252,21 +243,17 @@ public abstract class PathingModule : Module
 
     protected virtual async Task<List<Node>> GetPath()
     { 
-        return await PathFindSingleton.FindPath(this, 7000); 
+        return await PathFind.FindPath(this, 7000); 
     }
     
-    private async void Repath()
+    protected async void Repath()
     {
         if (_isPathFinding) return;
         _isPathFinding = true;
         try
         {  
             _pathQueued = await GetPath(); 
-            if (Machine.transform)
-            {
-                _positionWhenPathSearched = Machine.transform.position;
-                _nextPointQueued = FindNearestPointEntity(ref _pathQueued);
-            }
+            if (Machine.transform) _nextPointQueued = FindNearestPointEntity();
         }
         catch (Exception ex)
         {
@@ -276,23 +263,23 @@ public abstract class PathingModule : Module
         _isPathFinding = false; 
     }
         
-    private int FindNearestPointEntity(ref List<Node> path)
+    private int FindNearestPointEntity()
     { 
         int nearestPoint = 0;
         float distance, nearestDistance;
-        if (path != null && path.Count > 0) 
+        if (_pathQueued != null && _pathQueued.Count > 0) 
         {
-            nearestDistance = PathFindSingleton.SquaredDistance(Machine.transform.position, path[0].Position);
-            for (int i = 1; i < path.Count; i++)
+            nearestDistance = Lib.SquaredDistance(Machine.transform.position, _pathQueued[0].Position);
+            for (int i = 1; i < _pathQueued.Count; i++)
             {
-                distance = PathFindSingleton.SquaredDistance(Machine.transform.position, path[i].Position);
+                distance = Lib.SquaredDistance(Machine.transform.position, _pathQueued[i].Position);
                 if (distance < nearestDistance)
                 {
                     nearestPoint = i;
                     nearestDistance = distance;
                 } else break; 
             } 
-            if (nearestPoint == 0) nearestPoint = Mathf.Min(1, path.Count -1); 
+            if (nearestPoint == 0) nearestPoint = Mathf.Min(1, _pathQueued.Count -1); 
         }
         return nearestPoint;
     }
@@ -316,15 +303,15 @@ public abstract class PathingModule : Module
     
     public void DrawGizmos()
     { 
-        if (_path != null)
+        if (Path != null)
         {
-            for (int i = 0; i < _path.Count - 1; i++)
+            for (int i = 0; i < Path.Count - 1; i++)
             {
-                Gizmos.color = _path[i].IsFloat ? Color.blue : Color.white;
-                Gizmos.DrawLine(_path[i].Position, _path[i + 1].Position);
+                Gizmos.color = Path[i].IsFloat ? Color.blue : Color.white;
+                Gizmos.DrawLine(Path[i].Position, Path[i + 1].Position);
             }
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(_path[_nextPoint].Position, 0.2f); // Adjust the radius as needed
+            Gizmos.DrawSphere(Path[_nextPoint].Position, 0.2f); // Adjust the radius as needed
         } 
     }
 }
