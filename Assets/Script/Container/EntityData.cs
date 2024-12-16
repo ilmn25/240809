@@ -5,29 +5,36 @@ using UnityEngine;
 public class ChunkEntityData
 {
     public string stringID;
-    public Dictionary<string, object> Parameters;
     public SerializableVector3Int position;
-    public ChunkEntityData(string stringID, SerializableVector3Int position)
-    {
-        this.stringID = stringID;
-        this.position = position; 
-    }
+}
+public interface IEntityData
+{
+    Vector3Int Bounds { get; }
+    EntityType Type { get; }
+
+    public ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int position);
 }
 
-public class EntityData
+public class EntityData<T> : IEntityData where T : ChunkEntityData, new()
 {
-    public Dictionary<string, object> Parameters;
-    public Vector3Int Bounds;
-    public EntityType Type;
-    public static EntityData Zero = new EntityData();
-    public static EntityData One = new EntityData(Vector3Int.one);
-    public static EntityData Rigid = new EntityData(type: EntityType.Rigid);
-    public static EntityData Item = new EntityData(type: EntityType.Item);
-    public EntityData(Vector3Int? bounds = null, EntityType type = EntityType.Static, Dictionary<string, object> parameters = null)
+    public Vector3Int Bounds { get; set; }
+    public EntityType Type { get; set; }
+    public static EntityData<ChunkEntityData> Zero = new EntityData<ChunkEntityData>();
+    public static EntityData<ChunkEntityData> One = new EntityData<ChunkEntityData>(bounds: Vector3Int.one);
+    public static EntityData<ChunkEntityData> Item = new EntityData<ChunkEntityData>(type: EntityType.Item);
+
+    public EntityData(Vector3Int? bounds = null, EntityType type = EntityType.Static)
     {
         Bounds = bounds ?? Vector3Int.zero;
-        Parameters = parameters;
         Type = type;
+    }
+
+    public ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int position)
+    {
+        ChunkEntityData data = new T();
+        data.position = position;
+        data.stringID = stringID;
+        return data;
     }
 }
 

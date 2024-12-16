@@ -8,7 +8,7 @@ public class PathFindSingleton : MonoBehaviour
 {
     public static PathFindSingleton Instance { get; private set; }  
 
-    public int MAX_TASK_COUNT = 1;
+    private int MAX_TASK_COUNT = 10;
     private SemaphoreSlim _semaphore;
 
     void Start()

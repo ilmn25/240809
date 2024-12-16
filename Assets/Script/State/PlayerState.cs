@@ -18,6 +18,10 @@ public class PlayerState : State
         
         if (Input.GetKeyDown(KeyCode.O)) 
             EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
+        if (Input.GetKeyDown(KeyCode.M)) 
+            EntitySingleton.SpawnPrefab("megumin", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
+        if (Input.GetKeyDown(KeyCode.L)) 
+            EntitySingleton.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
 } 
 class PlayerActive : State {

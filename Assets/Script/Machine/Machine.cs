@@ -17,6 +17,18 @@ public abstract class Machine : MonoBehaviour
         _states.Add(state); 
     }
     
+    public T GetState<T>() where T : State
+    {
+        foreach (var state in _states)
+        {
+            if (state is T)
+            {
+                return state as T;
+            }
+        }
+        return null;
+    }
+    
     public void AddModule(Module module)
     {
         module.Machine = this;

@@ -1,10 +1,18 @@
  
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class NPCMachine : EntityMachine
+
+[System.Serializable]
+public class NPCCED : ChunkEntityData
 {
+    public string npcStatus = "idle";
+}
+
+public class NPCMachine : EntityMachine
+{ 
     public override void OnInitialize()
     {
         AddState(new NPCState()); 
@@ -13,7 +21,23 @@ public class NPCMachine : EntityMachine
         AddModule(new NPCAnimationModule()); 
         AddModule(new SpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
-    } 
+    }
+
+    public override void UpdateEntityData()
+    {
+        switch (GetState<NPCState>().GetCurrentStateType())
+        {
+            case { } t when t == typeof(NPCIdle):  
+                ((NPCCED) entityData).npcStatus = "idle";
+                break;
+            case { } t when t == typeof(NPCChase):  
+                ((NPCCED) entityData).npcStatus = "chase";
+                break;
+            default: 
+                ((NPCCED) entityData).npcStatus = "roam";
+                break;
+        } 
+    }
 }
 
 public class NPCState : State
@@ -22,9 +46,10 @@ public class NPCState : State
     {
         GUIDialogueSingleton.DialogueAction += DialogueAction; 
         
-        AddState(new NPCIdle(), true);
-        AddState(new NPCChase());
-        AddState(new NPCRoam());
+        string status = ((NPCCED)((EntityMachine)Machine).entityData).npcStatus;
+        AddState(new NPCIdle(), status == "idle");
+        AddState(new NPCChase(), status == "chase");
+        AddState(new NPCRoam(),status == "roam");
         DialogueData dialogueData = new DialogueData();
         dialogueData.Lines.Add("help");
         dialogueData.Lines.Add("I cant fix my raycast ");

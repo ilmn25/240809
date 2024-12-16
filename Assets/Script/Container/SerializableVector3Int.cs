@@ -26,4 +26,11 @@ public class SerializableVector3Int
     {
         return new Vector3Int(x, y, z);
     } 
+    
+    public void Set(Vector3Int vector)
+    {
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
+    }
 }

@@ -71,4 +71,9 @@ public abstract class State
         }
         return null;
     }
+    
+    public Type GetCurrentStateType()
+    {
+        return _stateCurrent?.GetType();
+    }
 }

@@ -1,26 +1,30 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public abstract class EntityMachine : Machine
 { 
-    private ChunkEntityData _entityData;
+    public ChunkEntityData entityData;
     protected override void Awake() { }
     
     public ChunkEntityData GetEntityData()
     {
-        _entityData.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
-        return _entityData;
+        entityData.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
+        UpdateEntityData();
+        return entityData;
     }
- 
+    
+    public virtual void UpdateEntityData() { }
+    
     public void Initialize(ChunkEntityData entityData) { 
-        _entityData = entityData; 
+        this.entityData = entityData; 
         InitializeInteral();
     }
 
     public void WipeEntity()
     {
-        if (EntitySingleton.dictionary[_entityData.stringID].Type == EntityType.Static)
+        if (EntitySingleton.dictionary[entityData.stringID].Type == EntityType.Static)
             EntityStaticLoadSingleton._activeEntities[WorldSingleton.GetChunkCoordinate(transform.position)].Item2
                 .Remove(this);
         else
