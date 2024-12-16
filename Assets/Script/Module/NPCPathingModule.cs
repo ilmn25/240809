@@ -4,49 +4,34 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class NPCPathingModule : PathingModule
-{
+{ 
     public int HEIGHT = 1;
     public int JUMP = 1;
     public int FALL = 15;
     public int AIR = 3;
-    public int ROAM = 20;
+    public int ROAM = 15;
+    public int SCAN = 7000;
     // 1 2 15 6 flea
     public override Vector3 GetTargetPosition()
     {
         if (Target)
             return Target.position;
 
-        if (Vector3.Distance(Machine.transform.position, TargetPosition) < ROAM / 5 || TargetPosition == Vector3.zero)
+        if (Path == null || Vector3.Distance(Machine.transform.position, Path[^1].Position) < 0.3f)
         {
-            ChangeRandomTargetPosition();
-        }
-        return TargetPosition;
+            Lib.Log();
+            Repath();
+        } 
+        
+        return Path == null? Vector3.down : Path[^1].Position;
     }
 
     protected override async Task<List<Node>> GetPath()
     { 
-        return await PathFindSingleton.FindPath(this, 7000); 
-    }
-
-    public void ChangeRandomTargetPosition()
-    { 
-        TargetPosition = Machine.transform.position + new Vector3Int(
-            Random.Range(-ROAM, ROAM),  
-            Random.Range(-2, 2),  
-            Random.Range(-ROAM, ROAM));
-
-        if (!(WorldSingleton.Instance.IsInWorldBounds(TargetPosition) &&
-              WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition)) &&
-              !WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition) + Vector3Int.down)))
-        {
-            ChangeRandomTargetPosition();
-        } 
-    }
-    
-    public override void OnStuck()
-    {
-        if (!Target) ChangeRandomTargetPosition();
-    }
+        if (Target)
+            return await PathFind.FindPath(this, SCAN); 
+        return PathRandom.FindPath(this, ROAM); 
+    } 
     
     public override bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode)
     { 
@@ -54,11 +39,11 @@ public class NPCPathingModule : PathingModule
         bool validity = true;
         for (int height = 0; height < HEIGHT; height++)
         { 
-            if (!PathFindSingleton.IsClear(new Vector3Int(pos.x, pos.y + height, pos.z)))
+            if (!Node.IsAir(new Vector3Int(pos.x, pos.y + height, pos.z)))
             {
                 validity = false;
             }
-            if (!PathFindSingleton.IsClear(Vector3Int.FloorToInt(new Vector3(currentNode.Position.x, currentNode.Position.y + height + dir.y, currentNode.Position.z))))
+            if (!Node.IsAir(Vector3Int.FloorToInt(new Vector3(currentNode.Position.x, currentNode.Position.y + height + dir.y, currentNode.Position.z))))
             {
                 validity = false;
             }
@@ -70,10 +55,10 @@ public class NPCPathingModule : PathingModule
         if (dir.x != 0 && dir.z != 0)
         {  
             // deduct dir from pos because dir is the direction from current node to pos, not from pos to next pos            
-            if (PathFindSingleton.IsClear(new Vector3Int(pos.x - dir.x, pos.y - dir.y, pos.z)) 
-            && PathFindSingleton.IsClear(new Vector3Int(pos.x, pos.y - dir.y, pos.z - dir.z))
-            && PathFindSingleton.IsClear(new Vector3Int(pos.x - dir.x, pos.y, pos.z))
-            && PathFindSingleton.IsClear(new Vector3Int(pos.x, pos.y, pos.z - dir.z)))
+            if (Node.IsAir(new Vector3Int(pos.x - dir.x, pos.y - dir.y, pos.z)) 
+                && Node.IsAir(new Vector3Int(pos.x, pos.y - dir.y, pos.z - dir.z))
+                && Node.IsAir(new Vector3Int(pos.x - dir.x, pos.y, pos.z))
+                && Node.IsAir(new Vector3Int(pos.x, pos.y, pos.z - dir.z)))
             {
                 validity = true;
             }
@@ -96,7 +81,7 @@ public class NPCPathingModule : PathingModule
                 // check if going upward and have floor under to jump off
                 for (int jump = 0; jump < JUMP; jump++) // AGENT = 1 means jump 1 block, 2 means jump two block
                 {
-                    if (!PathFindSingleton.IsClear(new Vector3Int(pos.x, pos.y - jump, pos.z)))
+                    if (!Node.IsAir(new Vector3Int(pos.x, pos.y - jump, pos.z)))
                     {
                         validity = true;
                     }
@@ -136,7 +121,7 @@ public class NPCPathingModule : PathingModule
         {
             for (int fall = 0; fall < FALL; fall++) // AGENT = 1 means cant jump, 2 means jump one block
             {
-                if (!PathFindSingleton.IsClear(new Vector3Int(pos.x, pos.y - fall, pos.z)))
+                if (!Node.IsAir(new Vector3Int(pos.x, pos.y - fall, pos.z)))
                 {
                     validity = true;
                 }

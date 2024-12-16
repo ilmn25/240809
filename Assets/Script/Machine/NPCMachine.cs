@@ -38,6 +38,11 @@ public class NPCMachine : EntityMachine
                 break;
         } 
     }
+
+    public void OnDrawGizmos()
+    {
+        GetModule<NPCPathingModule>().DrawGizmos();
+    }
 }
 
 public class NPCState : State
