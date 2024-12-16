@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public static class SetPiece
 {
@@ -34,15 +35,21 @@ public static class SetPiece
      
     public static void SaveSetPieceFile(SerializableChunkData setPiece, string fileName)
     {
-        string json = JsonUtility.ToJson(setPiece);
+        string json = JsonConvert.SerializeObject(setPiece, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
         string path = Path.Combine(Application.dataPath, "Resources/set", fileName + ".json");
         File.WriteAllText(path, json);
     }
 
     public static SerializableChunkData LoadSetPieceFile(string fileName)
-    {
+    { 
         TextAsset textAsset = Resources.Load<TextAsset>("set/" + fileName);
-        return JsonUtility.FromJson<SerializableChunkData>(textAsset.text);
+        return JsonConvert.DeserializeObject<SerializableChunkData>(textAsset.text, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
     }
     
     public static SerializableChunkData CopySetPiece()
@@ -83,12 +90,12 @@ public static class SetPiece
             }
         }
 
-        foreach (var chunkCoord in scannedChunks)
+        foreach (Vector3Int chunkCoord in scannedChunks)
         {
             ChunkData chunk = WorldSingleton.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
             
             // Check and add static entities
-            foreach (var entity in chunk.StaticEntity)
+            foreach (ChunkEntityData entity in chunk.StaticEntity)
             {
                 if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
@@ -98,7 +105,7 @@ public static class SetPiece
             }
 
             // Check and add dynamic entities
-            foreach (var entity in chunk.DynamicEntity)
+            foreach (ChunkEntityData entity in chunk.DynamicEntity)
             {
                 if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
@@ -114,22 +121,20 @@ public static class SetPiece
     { 
         Vector3Int chunkPos, worldPos, blockPos;
         
-        foreach (var entity in setPiece.StaticEntity)
-        { 
-            worldPos = position + entity.position.ToVector3Int();
-            chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-            blockPos = WorldSingleton.GetBlockCoordinate(worldPos); 
-            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(
-                new ChunkEntityData(entity.stringID, new SerializableVector3Int(blockPos)));
-        }
-
-        foreach (var entity in setPiece.DynamicEntity)
+        foreach (ChunkEntityData entity in setPiece.StaticEntity)
         {
             worldPos = position + entity.position.ToVector3Int();
             chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-            blockPos = WorldSingleton.GetBlockCoordinate(worldPos); 
-            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(
-                new ChunkEntityData(entity.stringID, new SerializableVector3Int(blockPos)));
+            entity.position.Set(WorldSingleton.GetBlockCoordinate(worldPos)); 
+            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
+        }
+
+        foreach (ChunkEntityData entity in setPiece.DynamicEntity)
+        { 
+            worldPos = position + entity.position.ToVector3Int();
+            chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
+            entity.position.Set(WorldSingleton.GetBlockCoordinate(worldPos)); 
+            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
         }
         
         for (int x = 0; x < setPiece.size; x++)

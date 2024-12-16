@@ -14,7 +14,7 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
         if (Target)
             return Target.position;
 
-        if (Vector3.Distance(Machine.transform.position, TargetPosition) < ROAM / 4 || TargetPosition == Vector3.zero)
+        if (Vector3.Distance(Machine.transform.position, TargetPosition) < ROAM / 5 || TargetPosition == Vector3.zero)
         {
             ChangeRandomTargetPosition();
         }
@@ -22,16 +22,18 @@ public class CharNpcPathFindModule : NPCPathFindAbstract
     }
 
     public void ChangeRandomTargetPosition()
-    {
-        do
+    { 
+        TargetPosition = Machine.transform.position + new Vector3Int(
+            Random.Range(-ROAM, ROAM),  
+            Random.Range(-2, 2),  
+            Random.Range(-ROAM, ROAM));
+
+        if (!(WorldSingleton.Instance.IsInWorldBounds(TargetPosition) &&
+              WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition)) &&
+              !WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition) + Vector3Int.down)))
         {
-            TargetPosition = Machine.transform.position + new Vector3Int(
-                Random.Range(-ROAM, ROAM),  
-                Random.Range(-2, 2),  
-                Random.Range(-ROAM, ROAM));
-        } while (!WorldSingleton.Instance.IsInWorldBounds(TargetPosition) && 
-                 !WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition)) && 
-                 WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(TargetPosition) + Vector3Int.down)); 
+            ChangeRandomTargetPosition();
+        } 
     }
     
     public override void OnStuck()

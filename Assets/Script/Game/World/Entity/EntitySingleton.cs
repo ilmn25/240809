@@ -3,30 +3,39 @@ using UnityEngine;
 
 public class EntitySingleton : MonoBehaviour
 {
-        public static Dictionary<string, EntityData> dictionary = new Dictionary<string, EntityData>();
+        public static Dictionary<string, IEntityData> dictionary = new Dictionary<string, IEntityData>();
 
         private void Awake()
         {
-                dictionary.Add("tree", new EntityData( new Vector3Int(1, 3, 1)));
-                dictionary.Add("bush1", EntityData.Zero);
-                dictionary.Add("grass", EntityData.Zero);
-                dictionary.Add("stage_hand", EntityData.One);
-                dictionary.Add("slab", EntityData.Zero);
-                dictionary.Add("snare_flea", EntityData.Rigid);
-                dictionary.Add("chito", EntityData.Rigid);
-                dictionary.Add("megumin", EntityData.Rigid);
-                dictionary.Add("yuuri", EntityData.Rigid);
+                dictionary.Add("tree", new EntityData<ChunkEntityData>(new Vector3Int(1, 3, 1)));
+                dictionary.Add("bush1", EntityData<ChunkEntityData>.Zero);
+                dictionary.Add("grass", EntityData<ChunkEntityData>.Zero);
+                dictionary.Add("stage_hand", EntityData<ChunkEntityData>.One);
+                dictionary.Add("slab", EntityData<ChunkEntityData>.Zero);
+                dictionary.Add("snare_flea", new EntityData<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("chito", new EntityData<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("megumin", new EntityData<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("yuuri", new EntityData<NPCCED>(type: EntityType.Rigid));
         }
 
         public static void AddItem(string stringID)
         {
-                dictionary.Add(stringID, EntityData.Item);
+                dictionary.Add(stringID, EntityData<ChunkEntityData>.Item);
+        }
+        
+        public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)
+        {
+                return dictionary[stringID].GetChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
+        }
+        public static ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int worldPosition)
+        {
+                return dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
         }
         
         public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true)
         {
-                ChunkEntityData entityData = new ChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
-        
+                ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
+
                 GameObject gameObject = EntityPoolSingleton.Instance.GetObject("item");
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
                 gameObject.GetComponent<SpriteRenderer>().sprite = 
@@ -40,7 +49,8 @@ public class EntitySingleton : MonoBehaviour
         
         public static void SpawnPrefab(string stringID, Vector3Int worldPosition)
         {
-                ChunkEntityData entityData = new ChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
+                ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
+                
                 GameObject gameObject = EntityPoolSingleton.Instance.GetObject(stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
         

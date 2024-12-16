@@ -34,7 +34,6 @@ public class EntityPoolSingleton : MonoBehaviour
     public void ReturnObject(GameObject obj)
     { 
         string prefabName = obj.name;
-        // obj.GetComponent<Machine>().TerminateMachine();
         obj.SetActive(false);
         
         if (!_pools.ContainsKey(prefabName))

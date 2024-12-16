@@ -72,6 +72,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
                     break;
 
                 case EntityType.Rigid:
+                    // Lib.Log(((NPCCED)entityData).npcStatus);
                     currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
                     currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
                     break;
