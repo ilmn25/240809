@@ -59,12 +59,13 @@ public class PlayerChunkEditSingleton : MonoBehaviour
         {
             _coordinate = OffsetPosition(false, _position, _direction);
             
-            if (!WorldSingleton.Instance.IsInWorldBounds(_coordinate)) return;
+            if (!World.IsInWorldBounds(_coordinate)) return;
             
             InventorySingleton.Instance.RemoveItem(_blockStringID);
             
-            if (MapLoadSingleton.Instance.GetBlockInChunk(_coordinate) == 0)
-                WorldSingleton.Instance.UpdateMap(_coordinate, BlockSingleton.ConvertID(_blockStringID));
+            AudioSingleton.PlaySFX(Game.DigSound);
+            if (World.GetBlock(_coordinate) == 0)
+                World.SetBlock(_coordinate, BlockSingleton.ConvertID(_blockStringID));
         }
     }
 
@@ -76,8 +77,8 @@ public class PlayerChunkEditSingleton : MonoBehaviour
 
     void BreakBlock()
     { 
-        if (!WorldSingleton.Instance.IsInWorldBounds(_coordinate)) return; 
-        if (MapLoadSingleton.Instance.GetBlockInChunk(_coordinate) != 0)
+        if (!World.IsInWorldBounds(_coordinate)) return; 
+        if (World.GetBlock(_coordinate) != 0)
             MapEditSingleton.Instance.BreakBlock(_coordinate,  _toolData?.Damage ?? 1); 
     }
     

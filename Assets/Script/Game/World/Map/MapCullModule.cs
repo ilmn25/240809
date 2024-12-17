@@ -27,7 +27,7 @@ public class MapCullModule : MonoBehaviour
  
     void Awake()
     {   
-        CULL_DISTANCE= WorldSingleton.CHUNK_SIZE * CULL_DISTANCE;
+        CULL_DISTANCE= World.ChunkSize * CULL_DISTANCE;
         _mesh = new Mesh();    
 
         _meshFilter = GetComponent<MeshFilter>();  
@@ -92,7 +92,7 @@ public class MapCullModule : MonoBehaviour
         try {
             if (MapCullSingleton.Instance._yCheck)
             { 
-                if (_selfChunkPosition.y + WorldSingleton.CHUNK_SIZE < MapCullSingleton.Instance._yThreshold)  // lower chunks
+                if (_selfChunkPosition.y + World.ChunkSize < MapCullSingleton.Instance._yThreshold)  // lower chunks
                 {
                     while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame + 2) await Task.Yield();
                     _meshRenderer.enabled = true;
@@ -184,7 +184,7 @@ public class MapCullModule : MonoBehaviour
         NativeArray<int> count = new NativeArray<int>(_count, Allocator.TempJob);
         var job = new HandleCullMathJob
         { 
-            chunkSize = WorldSingleton.CHUNK_SIZE, 
+            chunkSize = World.ChunkSize, 
             yThreshold = MapCullSingleton.Instance._yThreshold - _selfChunkPosition.y,
 
             mapLoadData = MapLoadData.Create(_selfChunkPosition),

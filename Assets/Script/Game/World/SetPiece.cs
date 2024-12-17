@@ -76,10 +76,10 @@ public static class SetPiece
                 {
                     worldPos = new Vector3Int(x, y, z);
                     localPos = worldPos - min;
-                    chunkPos = WorldSingleton.GetChunkCoordinate(worldPos); 
+                    chunkPos = World.GetChunkCoordinate(worldPos); 
                     blockPos = worldPos - chunkPos; 
 
-                    ChunkData chunk = WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z];
+                    ChunkData chunk = World.world[chunkPos.x, chunkPos.y, chunkPos.z];
                     setPiece[localPos.x, localPos.y, localPos.z] = chunk.Map[blockPos.x, blockPos.y, blockPos.z];
                     
                     if (!scannedChunks.Contains(chunkPos))
@@ -92,7 +92,7 @@ public static class SetPiece
 
         foreach (Vector3Int chunkCoord in scannedChunks)
         {
-            ChunkData chunk = WorldSingleton.World[chunkCoord.x, chunkCoord.y, chunkCoord.z];
+            ChunkData chunk = World.world[chunkCoord.x, chunkCoord.y, chunkCoord.z];
             
             // Check and add static entities
             foreach (ChunkEntityData entity in chunk.StaticEntity)
@@ -124,17 +124,17 @@ public static class SetPiece
         foreach (ChunkEntityData entity in setPiece.StaticEntity)
         {
             worldPos = position + entity.position.ToVector3Int();
-            chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-            entity.position.Set(WorldSingleton.GetBlockCoordinate(worldPos)); 
-            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
+            chunkPos = World.GetChunkCoordinate(worldPos);
+            entity.position.Set(World.GetBlockCoordinate(worldPos)); 
+            World.world[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
         }
 
         foreach (ChunkEntityData entity in setPiece.DynamicEntity)
         { 
             worldPos = position + entity.position.ToVector3Int();
-            chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-            entity.position.Set(WorldSingleton.GetBlockCoordinate(worldPos)); 
-            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
+            chunkPos = World.GetChunkCoordinate(worldPos);
+            entity.position.Set(World.GetBlockCoordinate(worldPos)); 
+            World.world[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
         }
         
         for (int x = 0; x < setPiece.size; x++)
@@ -147,10 +147,10 @@ public static class SetPiece
                     if (blockID != 0)
                     {
                         worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
-                        chunkPos = WorldSingleton.GetChunkCoordinate(worldPos);
-                        blockPos = WorldSingleton.GetBlockCoordinate(worldPos); 
-                        if (WorldSingleton.Instance.IsInWorldBounds(worldPos))
-                            WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[blockPos.x, blockPos.y, blockPos.z] = blockID;
+                        chunkPos = World.GetChunkCoordinate(worldPos);
+                        blockPos = World.GetBlockCoordinate(worldPos); 
+                        if (World.IsInWorldBounds(worldPos))
+                            World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[blockPos.x, blockPos.y, blockPos.z] = blockID;
                     }
                 }
             }

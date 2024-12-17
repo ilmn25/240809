@@ -6,7 +6,7 @@ class StaticIdle : State
 {  
     public override void OnEnterState()
     { 
-        WorldSingleton.MapUpdated += OnMapUpdate;
+        World.MapUpdated += OnMapUpdate;
     }
     public void OnMapUpdate(Vector3Int worldPosition)
     {
@@ -17,6 +17,6 @@ class StaticIdle : State
     }
     public override void OnExitState()
     { 
-        WorldSingleton.MapUpdated -= OnMapUpdate;
+        World.MapUpdated -= OnMapUpdate;
     }
 }

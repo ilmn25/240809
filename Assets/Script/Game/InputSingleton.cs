@@ -59,7 +59,7 @@ public class InputSingleton : MonoBehaviour
             float yThreshold = MapCullSingleton.Instance._yThreshold + 0.05f;
             _thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
             
-            if (!WorldSingleton.Instance.GetBoolInMap(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
+            if (!NavMap.Get(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
             { 
                 _layerMask = Game.MaskMap;
                 _position = Vector3Int.FloorToInt(_thresholdPoint); ;

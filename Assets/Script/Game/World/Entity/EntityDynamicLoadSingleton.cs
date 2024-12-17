@@ -27,12 +27,12 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         Vector3Int entityChunkPosition;
         foreach (var entityMachine in _activeEntities)
         { 
-            entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityMachine.transform.position);
+            entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             
-            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.LOGIC_DISTANCE))
+            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.LogicDistance))
             {
-                if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))
-                    WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityMachine.GetEntityData());
+                if (World.IsInWorldBounds(entityChunkPosition))
+                    World.world[entityChunkPosition].DynamicEntity.Add(entityMachine.GetEntityData());
                 removeList.Add(entityMachine);
                 EntityPoolSingleton.Instance.ReturnObject(entityMachine.gameObject); 
             }
@@ -44,16 +44,16 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     void ScanAndLoad()
     {
         // Collect chunk coordinates within render distance
-        for (int x = -WorldSingleton.LOGIC_RANGE; x <= WorldSingleton.LOGIC_RANGE; x++)
+        for (int x = -WorldSingleton.LogicRange; x <= WorldSingleton.LogicRange; x++)
         {
-            for (int y = -WorldSingleton.LOGIC_RANGE; y <= WorldSingleton.LOGIC_RANGE; y++)
+            for (int y = -WorldSingleton.LogicRange; y <= WorldSingleton.LogicRange; y++)
             {
-                for (int z = -WorldSingleton.LOGIC_RANGE; z <= WorldSingleton.LOGIC_RANGE; z++)
+                for (int z = -WorldSingleton.LogicRange; z <= WorldSingleton.LogicRange; z++)
                 {
                     LoadEntitiesInChunk(new Vector3Int(
-                        WorldSingleton.PlayerChunkPosition.x + x * WorldSingleton.CHUNK_SIZE,
-                        WorldSingleton.PlayerChunkPosition.y + y * WorldSingleton.CHUNK_SIZE,
-                        WorldSingleton.PlayerChunkPosition.z + z * WorldSingleton.CHUNK_SIZE
+                        WorldSingleton.PlayerChunkPosition.x + x * World.ChunkSize,
+                        WorldSingleton.PlayerChunkPosition.y + y * World.ChunkSize,
+                        WorldSingleton.PlayerChunkPosition.z + z * World.ChunkSize
                     ));
                 }
             }
@@ -65,9 +65,9 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         Vector3Int entityChunkPosition;
         foreach (EntityMachine entityHandler in _activeEntities)
         {
-            entityChunkPosition = WorldSingleton.GetChunkCoordinate(entityHandler.transform.position);
-            if (WorldSingleton.Instance.IsInWorldBounds(entityChunkPosition))
-                WorldSingleton.Instance.GetChunk(entityChunkPosition).DynamicEntity.Add(entityHandler.GetEntityData());
+            entityChunkPosition = World.GetChunkCoordinate(entityHandler.transform.position);
+            if (World.IsInWorldBounds(entityChunkPosition))
+                World.world[entityChunkPosition].DynamicEntity.Add(entityHandler.GetEntityData());
             EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
         }
         _activeEntities.Clear();
@@ -77,7 +77,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     { 
         EntityMachine currentEntityMachine;
         GameObject currentInstance = null;
-        List<ChunkEntityData> chunkEntityList = WorldSingleton.World[chunkCoordinate].DynamicEntity;
+        List<ChunkEntityData> chunkEntityList = World.world[chunkCoordinate].DynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
             switch (EntitySingleton.dictionary[entityData.stringID].Type)

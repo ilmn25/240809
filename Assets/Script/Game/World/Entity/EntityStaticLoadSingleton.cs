@@ -41,7 +41,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
     {  
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
-        List<ChunkEntityData> activeEntities = WorldSingleton.World[coordinate].StaticEntity;
+        List<ChunkEntityData> activeEntities = World.world[coordinate].StaticEntity;
         // Find the key once
         if (!_activeEntities.ContainsKey(coordinate))
         {

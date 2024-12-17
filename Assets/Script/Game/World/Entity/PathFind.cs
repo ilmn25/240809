@@ -23,8 +23,8 @@ public class PathFind
         { 
             if (agent.Machine.transform)
             {
-                _startPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
-                _endPosition = WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.GetTargetPosition())); 
+                _startPosition = NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
+                _endPosition = NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.GetTargetPosition())); 
 
                 return await Task.Run(() => FindPathAsync(agent, _startPosition, _endPosition, scanCount));
             } 

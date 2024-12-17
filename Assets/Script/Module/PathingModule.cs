@@ -99,7 +99,7 @@ public abstract class PathingModule : Module
             else if (Path != null)
             {  
                 await Task.Delay((int)(1500 / speed)); // Convert seconds to milliseconds
-                if (Machine?.transform && _nextPoint < Path.Count -2)
+                if (Machine && _nextPoint < Path.Count -2)
                 {
                     _nextPoint++;  
                     Machine.transform.position = Lib.AddToVector(Path[_nextPoint].Position, 0, 0.1f, 0);
