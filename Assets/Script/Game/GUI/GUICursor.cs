@@ -26,11 +26,8 @@ public class GUICursor
 
     public static void Update()
     {
-        if (GUI.GUIBusy)
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  Game.GUICamera,out Vector2 mousePosition);
-            _cursorRect.anchoredPosition = mousePosition;
-        } 
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  Game.GUICamera,out Vector2 mousePosition);
+        _cursorRect.anchoredPosition = mousePosition;
     }
 
     public static void SetInfoPanel(string info = null)
