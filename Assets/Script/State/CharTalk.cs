@@ -15,7 +15,7 @@ public class CharTalk : State {
     
     public override void OnEnterState()
     {
-        GUIDialogueSingleton.Instance.StartDialogue(this);
+        GUIDialogue.StartDialogue(this);
     }
  
 }

@@ -1,37 +1,39 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GUICraftSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+        public string stringID;
+        private CraftData _craftData;
+        
         private Image _image;
         private TextMeshProUGUI _text;
-        public string StringID;
-        public CraftData CraftData;
          
         public void Initialize(string stringID)
         {
-                StringID = stringID;
-                CraftData = Craft.GetItem(stringID);
+                this.stringID = stringID;
+                _craftData = Craft.GetItem(stringID);
                 
                 _image = transform.Find("image").GetComponent<Image>();
                 _text = transform.Find("text").GetComponent<TextMeshProUGUI>();
                 
-                _image.sprite = Resources.Load<Sprite>($"texture/sprite/{StringID}");
+                _image.sprite = Resources.Load<Sprite>($"texture/sprite/{this.stringID}");
                 _image.color = Color.white;
-                _text.text = CraftData.Stack.ToString();
+                _text.text = _craftData.Stack.ToString();
         }
         
         public void OnPointerEnter(PointerEventData eventData)
         {
-                GUICraftingSingleton.Instance.SetInfoPanel(StringID);
+                GUICraft.SetInfoPanel(stringID);
                 ScaleSlot(1.1f);
         }
  
         public void OnPointerExit(PointerEventData eventData)
         {
-                GUICraftingSingleton.Instance.SetInfoPanel();
+                GUICraft.SetInfoPanel();
                 ScaleSlot(1f);
         }
         

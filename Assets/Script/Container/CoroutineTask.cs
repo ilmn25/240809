@@ -150,7 +150,7 @@ class CoroutineManager : MonoBehaviour
 
     public static CoroutineState CreateCoroutine(IEnumerator coroutine)
     {
-        if(singleton == null) {
+        if(!singleton) {
             GameObject go = new GameObject("CoroutineManager");
             singleton = go.AddComponent<CoroutineManager>();
         }

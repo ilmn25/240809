@@ -66,7 +66,7 @@ public class InventorySingleton
         _currentKey = CalculateKey();
         CurrentItem = PlayerInventory[_currentKey];
         SlotUpdate?.Invoke();
-        GUIStorageSingleton.Instance.RefreshCursorSlot();
+        GUIStorage.RefreshCursorSlot();
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)

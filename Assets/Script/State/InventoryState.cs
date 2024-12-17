@@ -27,9 +27,6 @@ public class InventoryState : State
             return;
         }
         
-        Utility.Log(InventorySingleton.CurrentItem);
-        Utility.Log(InventorySingleton.CurrentItem.StringID);
-        Utility.Log(Item.GetItem(InventorySingleton.CurrentItem.StringID));
         switch (Item.GetItem(InventorySingleton.CurrentItem.StringID).Type)
         { 
             case ItemType.Block:

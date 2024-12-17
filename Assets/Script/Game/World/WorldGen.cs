@@ -14,7 +14,7 @@ public class WorldGen
     public const bool SpawnStaticEntity = true;
     public const bool SpawnDynamicEntity = false;
     public const bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(15, 7, 15);
+    public static readonly Vector3Int Size = new Vector3Int(2, 5, 2);
 
     private static float StoneOffsetX;
     private static float StoneOffsetZ;

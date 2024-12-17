@@ -3,23 +3,29 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class GUISingleton : MonoBehaviour
+public class GUI 
 {
-    public static GUISingleton Instance { get; private set; }  
-      
-
-    private CoroutineTask _scaleTask;
-    private float SHOW_DURATION = 0.5f;
-    private float HIDE_DURATION = 0.2f;
+    private const float ShowDuration = 0.5f;
+    private const float HideDuration = 0.2f;
     
-    private void Start()
+    private static CoroutineTask _scaleTask; 
+    
+    public static void Initialize()
     {
-        Instance = this;  
+        GUICraft.Initialize();
+        GUIDialogue.Initialize();
+        GUICursor.Initialize();
+        GUIStorage.Initialize();
     }
  
-    private void Update()
+    public static void Update()
     {
-        if (Game.GUIBusy && Input.GetMouseButtonDown(0)) Audio.PlaySFX(Game.PickUpSound);
+        GUICraft.Update();
+        GUIDialogue.Update();
+        GUICursor.Update();
+        GUIStorage.Update();
+        
+        if (GUIBusy && Input.GetMouseButtonDown(0)) Audio.PlaySFX(Game.PickUpSound);
 
         if (Input.GetKeyDown(KeyCode.Tab))  
         {
@@ -28,8 +34,8 @@ public class GUISingleton : MonoBehaviour
                 if (!Game.GUIInv.activeSelf)
                 { 
                     Game.GUIInv.SetActive(true);
-                    GUIStorageSingleton.Instance.RefreshCursorSlot();
-                    _scaleTask = new CoroutineTask(GUISingleton.Scale(true, SHOW_DURATION, Game.GUIInv, scale : 0.7f));
+                    GUIStorage.RefreshCursorSlot();
+                    _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, scale : 0.7f));
                     _scaleTask.Finished += (bool isManual) => 
                     {
                         _scaleTask = null;
@@ -37,7 +43,7 @@ public class GUISingleton : MonoBehaviour
                 }
                 else
                 {
-                    _scaleTask = new CoroutineTask(GUISingleton.Scale(false, HIDE_DURATION, Game.GUIInv, scale : 0.7f));
+                    _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, scale : 0.7f));
                     _scaleTask.Finished += (bool isManual) => 
                     {
                         _scaleTask = null;
@@ -50,12 +56,12 @@ public class GUISingleton : MonoBehaviour
         
         if (Game.GUIInv.activeSelf)
         { 
-            Game.GUIBusy = true;
+            GUIBusy = true;
             Camera.main.depth = -1;
         }
         else
         {
-            Game.GUIBusy = false;
+            GUIBusy = false;
             Camera.main.depth = 1;
         }  
     }
@@ -100,4 +106,6 @@ public class GUISingleton : MonoBehaviour
 
         target.transform.localScale = targetScale;
     }
+
+    public static bool GUIBusy = false;
 }
