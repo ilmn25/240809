@@ -44,7 +44,7 @@ public class GUICraftingSingleton : MonoBehaviour
             return;
         }
 
-        ItemData itemData = ItemSingleton.GetItem(stringID);
+        ItemData itemData = Item.GetItem(stringID);
         CraftData craftData = Craft.GetItem(stringID);
         
         string text = itemData.Name + " (" + craftData.Stack + ")\n";

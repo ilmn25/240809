@@ -5,21 +5,20 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class EntityStaticLoadSingleton : MonoBehaviour
+public class EntityStaticLoad
 {
-    public static EntityStaticLoadSingleton Instance { get; private set; }  
-     
     public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> _activeEntities = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
 
-    void Awake()
+    public static void ForgetEntity(EntityMachine entity)
     {
-        Instance = this;
+        _activeEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Remove(entity);
     }
- 
-    public static void ForgetEntity(EntityMachine entity) { }
-    public static void InviteEntity(EntityMachine entity) { }
+    public static void InviteEntity(EntityMachine entity) { // not done
+        _activeEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Add(entity);
+        
+    }
     
-    public void UnloadWorld()
+    public static void UnloadWorld()
     {
         foreach (var key in _activeEntities.Keys)
         {
@@ -28,16 +27,16 @@ public class EntityStaticLoadSingleton : MonoBehaviour
         _activeEntities.Clear();
     }
       
-    public void UnloadEntitiesInChunk(Vector3Int key)
+    public static void UnloadEntitiesInChunk(Vector3Int key)
     {
         foreach (EntityMachine entityHandler in _activeEntities[key].Item2)
         { 
             _activeEntities[key].Item1.Add(entityHandler.GetEntityData()); 
-            EntityPoolSingleton.Instance.ReturnObject(entityHandler.gameObject);   
+            ObjectPool.ReturnObject(entityHandler.gameObject);   
         }
     }
 
-    public void LoadEntitiesInChunk(Vector3Int coordinate)
+    public static void LoadEntitiesInChunk(Vector3Int coordinate)
     {  
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
@@ -50,7 +49,7 @@ public class EntityStaticLoadSingleton : MonoBehaviour
 
         foreach (ChunkEntityData entityData in activeEntities)
         { 
-            currentInstance = EntityPoolSingleton.Instance.GetObject(entityData.stringID);
+            currentInstance = ObjectPool.GetObject(entityData.stringID);
             currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
             currentEntityMachine = currentInstance.GetComponent<EntityMachine>();

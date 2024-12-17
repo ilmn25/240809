@@ -12,16 +12,16 @@ public class PlayerState : State
     {
         if (Machine.transform.position.y < -50)
         {
-            MapCullSingleton.Instance.ForceRevertMesh(); 
+            MapCull.ForceRevertMesh(); 
             Machine.transform.position = new Vector3(Game.Player.transform.position.x , World.world.Bounds.y + 40, Game.Player.transform.position.z);
         }
         
         if (Input.GetKeyDown(KeyCode.O)) 
-            EntitySingleton.SpawnPrefab("chito", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
+            Entity.SpawnPrefab("chito", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.M)) 
-            EntitySingleton.SpawnPrefab("megumin", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
+            Entity.SpawnPrefab("megumin", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
-            EntitySingleton.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
+            Entity.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
 } 
 class PlayerActive : State {

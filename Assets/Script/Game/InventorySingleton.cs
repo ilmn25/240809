@@ -33,7 +33,7 @@ public class InventorySingleton
         }
         if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
         {
-            EntitySingleton.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
+            Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
             RemoveItem(CurrentItem.StringID); 
         }
         
@@ -78,7 +78,7 @@ public class InventorySingleton
     
     public static void AddItem(string stringID, int quantity = 1)
     {
-        int maxStackSize = ItemSingleton.GetItem(stringID).StackSize;
+        int maxStackSize = Item.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
         if (PlayerInventory[_currentKey].StringID == stringID && PlayerInventory[_currentKey].Stack < maxStackSize)

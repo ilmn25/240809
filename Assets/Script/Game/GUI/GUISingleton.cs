@@ -19,7 +19,7 @@ public class GUISingleton : MonoBehaviour
  
     private void Update()
     {
-        if (Game.GUIBusy && Input.GetMouseButtonDown(0)) AudioSingleton.PlaySFX(Game.PickUpSound);
+        if (Game.GUIBusy && Input.GetMouseButtonDown(0)) Audio.PlaySFX(Game.PickUpSound);
 
         if (Input.GetKeyDown(KeyCode.Tab))  
         {

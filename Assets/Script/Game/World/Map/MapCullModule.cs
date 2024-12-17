@@ -42,7 +42,7 @@ public class MapCullModule : MonoBehaviour
     void Start() { 
         CreateShadowMesh();
         HandleAssignment();    
-        EntityStaticLoadSingleton.Instance.LoadEntitiesInChunk(_selfChunkPosition);
+        EntityStaticLoad.LoadEntitiesInChunk(_selfChunkPosition);
     }  
     void CreateShadowMesh()
     {  
@@ -53,7 +53,7 @@ public class MapCullModule : MonoBehaviour
         _shadowMeshFilter = shadowObject.AddComponent<MeshFilter>();
         MeshRenderer shadowMeshRenderer = shadowObject.AddComponent<MeshRenderer>();
         shadowMeshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
-        shadowMeshRenderer.material = BlockSingleton.ShadowMeshMaterial; 
+        shadowMeshRenderer.material = Block.ShadowMeshMaterial; 
     }
    
     public void HandleAssignment()
@@ -90,18 +90,18 @@ public class MapCullModule : MonoBehaviour
     { 
         await _semaphoreSlim.WaitAsync();
         try {
-            if (MapCullSingleton.Instance._yCheck)
+            if (MapCull.YCheck)
             { 
-                if (_selfChunkPosition.y + World.ChunkSize < MapCullSingleton.Instance._yThreshold)  // lower chunks
+                if (_selfChunkPosition.y + World.ChunkSize < MapCull.YThreshold)  // lower chunks
                 {
-                    while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame + 2) await Task.Yield();
+                    while (Time.frameCount < MapCull.CullSyncFrame + 2) await Task.Yield();
                     _meshRenderer.enabled = true;
                     _meshFilter.mesh = _meshData;
                     return; 
                 }           
-                if (_selfChunkPosition.y >= MapCullSingleton.Instance._yThreshold) // higher chunks (invis)
+                if (_selfChunkPosition.y >= MapCull.YThreshold) // higher chunks (invis)
                 {
-                    while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame) await Task.Yield();
+                    while (Time.frameCount < MapCull.CullSyncFrame) await Task.Yield();
                     _meshRenderer.enabled = false;
                     // _meshFilter.mesh = _meshData;
                     return;
@@ -145,9 +145,9 @@ public class MapCullModule : MonoBehaviour
         _mesh.SetUVs(0, _culledUVs);
         _mesh.SetNormals(_culledNormals);     
          
-        while (Time.frameCount < MapCullSingleton.Instance._cullSyncFrame) await Task.Yield();
+        while (Time.frameCount < MapCull.CullSyncFrame) await Task.Yield();
         
-        if (MapCullSingleton.Instance._yCheck) _meshFilter.mesh = _mesh; 
+        if (MapCull.YCheck) _meshFilter.mesh = _mesh; 
         await Task.Yield();   //do not remove
         await Task.Yield();   //do not remove
         _meshRenderer.enabled = true;
@@ -185,7 +185,7 @@ public class MapCullModule : MonoBehaviour
         var job = new HandleCullMathJob
         { 
             chunkSize = World.ChunkSize, 
-            yThreshold = MapCullSingleton.Instance._yThreshold - _selfChunkPosition.y,
+            yThreshold = MapCull.YThreshold - _selfChunkPosition.y,
 
             mapLoadData = MapLoadData.Create(_selfChunkPosition),
             vertices = vertices,

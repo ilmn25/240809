@@ -3,15 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemSingleton : MonoBehaviour
+public class Item 
 {
-    public static ItemSingleton Instance { get; private set; }  
-    private static Dictionary<string, ItemData> _dictionary  = new Dictionary<string, ItemData>();
- 
-    public void Awake()
+    private static Dictionary<string, ItemData> Dictionary  = new Dictionary<string, ItemData>();
+    
+    public static void Initialize()
     {
-        Instance = this;
-        
         AddBlockDefinition("brick", "Brick",
             breakCost: 2, breakThreshold: 4, materials: new Dictionary<string, int> { { "stone", 1 } });
         
@@ -46,71 +43,71 @@ public class ItemSingleton : MonoBehaviour
         string description = "", Dictionary<string, int> materials = null, int craftStack = 1,
         string[] modifiers = null, int stackSize = 100, ItemRarity rarity = ItemRarity.Common)
     {
-        EntitySingleton.AddItem(stringID);
-        BlockSingleton.AddBlockDefinition(stringID, breakCost, breakThreshold);
+        Entity.AddItem(stringID);
+        Block.AddBlockDefinition(stringID, breakCost, breakThreshold);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Block
         };
         if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-        _dictionary[stringID] = itemData;
+        Dictionary[stringID] = itemData;
     }
 
     private static void AddToolDefinition(string stringID, string name, int damage = 0, float knockback = 0, int useTime = 0, Dictionary<string, int> materials = null, string description = "", int craftStack = 1, string[] modifiers = null, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
     bool consumable = false)
     {
-        EntitySingleton.AddItem(stringID);
+        Entity.AddItem(stringID);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime)
         {
             Type = ItemType.Tool
         };
         if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-        _dictionary[stringID] = itemData;
+        Dictionary[stringID] = itemData;
     }
 
     private static void AddArmorDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
         string description = "", int defense = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
-        EntitySingleton.AddItem(stringID);
+        Entity.AddItem(stringID);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Armor,
             // Add additional armor-specific properties here if needed
         };
         if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-        _dictionary[stringID] = itemData;
+        Dictionary[stringID] = itemData;
     }
 
     private static void AddAccessoryDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
         string description = "", bool consumable = false, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
-        EntitySingleton.AddItem(stringID);
+        Entity.AddItem(stringID);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, 0, 0, 0)
         {
             Type = ItemType.Accessory
         };
         if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-        _dictionary[stringID] = itemData;
+        Dictionary[stringID] = itemData;
     }
 
     private static void AddFurnitureDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
         string description = "", Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
-        EntitySingleton.AddItem(stringID);
+        Entity.AddItem(stringID);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Furniture
         };
         if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-        _dictionary[stringID] = itemData;
+        Dictionary[stringID] = itemData;
     }
  
 
     public static ItemData GetItem(string stringID)
     {
-        if (_dictionary.ContainsKey(stringID))
+        if (Dictionary.ContainsKey(stringID))
         {
-            return _dictionary[stringID];
+            return Dictionary[stringID];
         }
         return null;
     }

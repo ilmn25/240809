@@ -22,15 +22,14 @@ public abstract class EntityMachine : Machine
         InitializeInteral();
     }
 
-    public void WipeEntity()
+    public void Delete()
     {
-        if (EntitySingleton.dictionary[entityData.stringID].Type == EntityType.Static)
-            EntityStaticLoadSingleton._activeEntities[World.GetChunkCoordinate(transform.position)].Item2
-                .Remove(this);
+        if (Entity.dictionary[entityData.stringID].Type == EntityType.Static)
+            EntityStaticLoad.ForgetEntity(this);
         else
-            EntityDynamicLoadSingleton.ForgetEntity(this);
+            EntityDynamicLoad.ForgetEntity(this);
         
-        EntityPoolSingleton.Instance.ReturnObject(gameObject); 
+        ObjectPool.ReturnObject(gameObject); 
     }  
 }
 

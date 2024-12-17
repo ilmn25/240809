@@ -1,12 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 public class GUIDialogueSingleton : MonoBehaviour
 {  
@@ -48,7 +41,7 @@ public class GUIDialogueSingleton : MonoBehaviour
                     DialogueAction.Invoke();
                 }
                 
-                AudioSingleton.PlaySFX(_textSFX, 0.2f); //sound effect click 
+                Audio.PlaySFX(_textSFX, 0.2f); //sound effect click 
                 
                 if (scrollTask.Running)
                 {
@@ -70,12 +63,12 @@ public class GUIDialogueSingleton : MonoBehaviour
     
     private void HandleScroll()
     {
-        _audioSource = AudioSingleton.PlaySFX(_textSFX, 0.2f, true);
+        _audioSource = Audio.PlaySFX(_textSFX, 0.2f, true);
         
         scrollTask =  new CoroutineTask(GUISingleton.ScrollText(_entityState._dialogueData.Lines[_current_line], Game.GUIDialogueText));
         scrollTask.Finished += (bool isManual) => 
         { 
-            AudioSingleton.StopSFX(_audioSource);
+            Audio.StopSFX(_audioSource);
             _audioSource = null;
         }; 
     }
@@ -88,7 +81,7 @@ public class GUIDialogueSingleton : MonoBehaviour
             return;
         } 
         
-        AudioSingleton.PlaySFX(Game.ChatSound);
+        Audio.PlaySFX(Game.ChatSound);
         _entityState = entityState;
         _current_line = 0;
         Game.GUIDialogue.SetActive(true);

@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public class PlayerData
@@ -14,6 +13,7 @@ public class PlayerData
     public int stamina = 100;  
     public int speed = 100;
 
+    [NonSerialized]
     public static PlayerData playerData;
 
     public PlayerData()
@@ -42,6 +42,7 @@ public class PlayerData
             using (FileStream file = File.Open(Game.PlayerSavePath, FileMode.Open))
             {
                 playerData = (PlayerData)Game.BinaryFormatter.Deserialize(file);
+                Utility.Log();
             }
         }
         else

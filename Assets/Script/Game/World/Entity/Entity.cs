@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntitySingleton : MonoBehaviour
+public class Entity 
 {
         public static Dictionary<string, IEntityData> dictionary = new Dictionary<string, IEntityData>();
 
-        private void Awake()
+        static Entity()
         {
                 dictionary.Add("tree", new EntityData<ChunkEntityData>(new Vector3Int(1, 3, 1)));
                 dictionary.Add("bush1", EntityData<ChunkEntityData>.Zero);
@@ -36,13 +36,13 @@ public class EntitySingleton : MonoBehaviour
         {
                 ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
 
-                GameObject gameObject = EntityPoolSingleton.Instance.GetObject("item");
+                GameObject gameObject = ObjectPool.GetObject("item");
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
                 gameObject.GetComponent<SpriteRenderer>().sprite = 
                         Resources.Load<Sprite>($"texture/sprite/{stringID}"); 
         
                 EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
-                EntityDynamicLoadSingleton.InviteEntity(currentEntityMachine); 
+                EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
                 gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
         }
@@ -51,11 +51,11 @@ public class EntitySingleton : MonoBehaviour
         {
                 ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
                 
-                GameObject gameObject = EntityPoolSingleton.Instance.GetObject(stringID);
+                GameObject gameObject = ObjectPool.GetObject(stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
         
                 EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
-                EntityDynamicLoadSingleton.InviteEntity(currentEntityMachine); 
+                EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
         }
 }

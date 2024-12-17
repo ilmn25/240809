@@ -55,7 +55,7 @@ public class  GUIStorageSingleton : MonoBehaviour
         if (slotData.Stack != 0)
         { 
             GUICursorSingleton.SetInfoPanel(slotData.StringID + " (" + slotData.Stack + ")\n" + 
-                                   ItemSingleton.GetItem(slotData.StringID).Description + "\n" +
+                                   Item.GetItem(slotData.StringID).Description + "\n" +
                                    slotData.Modifier);
         }
         else

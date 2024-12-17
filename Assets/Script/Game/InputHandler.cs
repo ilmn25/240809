@@ -53,7 +53,7 @@ public class InputHandler
         }
         else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
         {
-            MapCullSingleton.Instance.HandleScrollInput(scroll);
+            MapCull.HandleScrollInput(scroll);
         }  
         else
         {
@@ -65,10 +65,10 @@ public class InputHandler
     { 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         
-        if (MapCullSingleton.Instance._yCheck)
+        if (MapCull.YCheck)
         {
             // Calculate the position in the camera's direction where y = yThreshold 
-            float yThreshold = MapCullSingleton.Instance._yThreshold + 0.05f;
+            float yThreshold = MapCull.YThreshold + 0.05f;
             _thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
             
             if (!NavMap.Get(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))

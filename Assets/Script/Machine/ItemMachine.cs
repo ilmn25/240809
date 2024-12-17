@@ -22,9 +22,9 @@ public class ItemMachine : EntityMachine
         { 
             if (pickUp)
             {
-                AudioSingleton.PlaySFX(Game.PickUpSound);
+                Audio.PlaySFX(Game.PickUpSound);
                 InventorySingleton.AddItem(GetEntityData().stringID, 1);
-                WipeEntity();
+                Delete();
             } 
             _wasInRange = true;
         }
@@ -49,7 +49,7 @@ public class ItemState : State
     { 
         if (Machine.transform.position.y < -5)
         { 
-            ((EntityMachine)Machine).WipeEntity();
+            ((EntityMachine)Machine).Delete();
         } else _itemPhysicModule.HandlePhysicsUpdate();
     }
 }

@@ -4,68 +4,56 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
-public class WorldGenSingleton : MonoBehaviour
+public class WorldGen
 {
-    public static WorldGenSingleton Instance { get; private set; }
-    private static System.Random _random = new System.Random();
-    
-    public bool SPAWN_STATIC_ENTITY; 
-    public bool SPAWN_DYNAMIC_ENTITY; 
-    public bool FLAT; 
+    private static readonly System.Random Random = new System.Random();
 
-    // Generate random offsets for Perlin noise
-    private float _stoneOffsetX;
-    private float _stoneOffsetZ;
-    private float _dirtOffsetX;
-    private float _dirtOffsetZ;
-    private float _sandOffsetX;
-    private float _sandOffsetZ;
-    private float _marbleOffsetX;
-    private float _marbleOffsetZ;
-    private float _caveOffset;
-    
-    private int _chunkSize = World.ChunkSize;
-    private int _worldHeight = (Size.y - 2) * World.ChunkSize;
-    
-    private float _stoneScale = 0.01f;
-    private float _dirtScale = 0.005f;
-    private float _sandScale = 0.02f;
-    private float _marbleScale = 0.007f;
-    private float _caveScale = 0.06f; // Scale for cave noise
-    private int _wallHeight = 5;
-    private int _floorHeight = 2;
+    public const bool SpawnStaticEntity = true;
+    public const bool SpawnDynamicEntity = false;
+    public const bool Flat = false;
+    public static readonly Vector3Int Size = new Vector3Int(15, 7, 15);
 
-    private ChunkData _chunkData;
-    private Vector3Int _chunkCoord;
-     
-    private ChunkData _setPiece; 
+    private static float StoneOffsetX;
+    private static float StoneOffsetZ;
+    private static float DirtOffsetX;
+    private static float DirtOffsetZ;
+    private static float SandOffsetX;
+    private static float SandOffsetZ;
+    private static float MarbleOffsetX;
+    private static float MarbleOffsetZ;
+    private static float CaveOffset;
+
+    private const float StoneScale = 0.01f;
+    private const float DirtScale = 0.005f;
+    private const float SandScale = 0.02f;
+    private const float MarbleScale = 0.007f;
+    private const float CaveScale = 0.06f;
+    private const int WallHeight = 5;
+    private const int FloorHeight = 2;
+
+    private static ChunkData _chunkData;
+    private static Vector3Int _chunkCoord; 
+    private static ChunkData _setPiece; 
+    private static readonly int _worldHeight = (Size.y - 2) * World.ChunkSize;
     
-    private void Awake() {
-        Instance = this;
-        _stoneOffsetX = Random.Range(0f, 1000f);
-        _stoneOffsetZ = Random.Range(0f, 1000f);
-        _dirtOffsetX = Random.Range(0f, 1000f);
-        _dirtOffsetZ = Random.Range(0f, 1000f);
-        _sandOffsetX = Random.Range(0f, 1000f);
-        _sandOffsetZ = Random.Range(0f, 1000f);
-        _marbleOffsetX = Random.Range(0f, 1000f);
-        _marbleOffsetZ = Random.Range(0f, 1000f);
-        _caveOffset = Random.Range(0f, 1000f); 
+    public static void Initialize() {
+        StoneOffsetX = UnityEngine.Random.Range(0f, 1000f);
+        StoneOffsetZ = UnityEngine.Random.Range(0f, 1000f);
+        DirtOffsetX = UnityEngine.Random.Range(0f, 1000f);
+        DirtOffsetZ = UnityEngine.Random.Range(0f, 1000f);
+        SandOffsetX = UnityEngine.Random.Range(0f, 1000f);
+        SandOffsetZ = UnityEngine.Random.Range(0f, 1000f);
+        MarbleOffsetX = UnityEngine.Random.Range(0f, 1000f);
+        MarbleOffsetZ = UnityEngine.Random.Range(0f, 1000f);
+        CaveOffset = UnityEngine.Random.Range(0f, 1000f); 
     }
-
-    private void Update()
-    {
-        SetPiece.Update();
-    }
-
-
-    public static Vector3Int Size = new Vector3Int(3, 3, 3);
 
 
     //! debug tools
-    public void Generate()
+    public static void Generate()
     { 
         World.world = new World(Size.x, Size.y, Size.z);
         List<Vector3Int> coordinatesList = new List<Vector3Int>();
@@ -99,19 +87,19 @@ public class WorldGenSingleton : MonoBehaviour
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
+                    if (World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
                         localChunkY + 1 != chunkSize &&
                         World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-                        if (_random.NextDouble() <= 0.0002)
+                        if (Random.NextDouble() <= 0.0002)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+2, z), SetPiece.LoadSetPieceFile("house_stone"));
                         }
-                        else if (_random.NextDouble() <= 0.002)
+                        else if (Random.NextDouble() <= 0.002)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), SetPiece.LoadSetPieceFile("tree_a"));
                         }
-                        else if (_random.NextDouble() <= 0.002)
+                        else if (Random.NextDouble() <= 0.002)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), SetPiece.LoadSetPieceFile("tree_b")); 
                         } 
@@ -122,12 +110,12 @@ public class WorldGenSingleton : MonoBehaviour
  
     }  
 
-    public ChunkData GenerateTestChunk(Vector3Int coordinates)
+    public static ChunkData GenerateTestChunk(Vector3Int coordinates)
     {
         _chunkCoord = coordinates;
         _chunkData = new ChunkData();
 
-        if (FLAT)
+        if (Flat)
         {
             if (coordinates.y == 0)
             {
@@ -149,21 +137,21 @@ public class WorldGenSingleton : MonoBehaviour
         return _chunkData;
     }  
     
-    private void HandleBlockGeneration()
+    private static void HandleBlockGeneration()
     {
         bool wall = new System.Random().NextDouble() < 0.1;
-        bool[,] maze = HandleMazeAlgorithm(_chunkSize, _chunkSize);
+        bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize);
 
         // Calculate the center of the map
         int centerX = World.world.Bounds.x / 3;
         int centerZ = World.world.Bounds.z / 3;
         int craterRadius = 35; // Adjust the radius as needed
     
-        for (int y = 0; y < _chunkSize; y++)
+        for (int y = 0; y < World.ChunkSize; y++)
         {
-            for (int x = 0; x < _chunkSize; x++)
+            for (int x = 0; x < World.ChunkSize; x++)
             {
-                for (int z = 0; z < _chunkSize; z++)
+                for (int z = 0; z < World.ChunkSize; z++)
                 {
                     if (IsWithinCrater(x, y, z, centerX, centerZ, craterRadius))
                     {
@@ -178,7 +166,7 @@ public class WorldGenSingleton : MonoBehaviour
             }
         }
     }
-    private bool IsWithinCrater(int x, int y, int z, int centerX, int centerZ, int craterRadius)
+    private static bool IsWithinCrater(int x, int y, int z, int centerX, int centerZ, int craterRadius)
     {
         int distanceX = Mathf.Abs(centerX - (_chunkCoord.x + x));
         int distanceZ = Mathf.Abs(centerZ - (_chunkCoord.z + z));
@@ -189,62 +177,62 @@ public class WorldGenSingleton : MonoBehaviour
         float taperedRadius = craterRadius * taperFactor;
 
         // Add noise to the crater walls
-        float noiseX = (_chunkCoord.x + x) * _caveScale + _caveOffset;
-        float noiseZ = (_chunkCoord.z + z) * _caveScale + _caveOffset;
+        float noiseX = (_chunkCoord.x + x) * CaveScale + CaveOffset;
+        float noiseZ = (_chunkCoord.z + z) * CaveScale + CaveOffset;
         float wallNoise = Mathf.PerlinNoise(noiseX, noiseZ) * 2.0f - 1.0f; // Noise value between -1 and 1
         taperedRadius += wallNoise;
 
         return distanceFromCenter <= taperedRadius;
     }
     
-    private void GenerateTerrainBlocks(int x, int y, int z)
+    private static void GenerateTerrainBlocks(int x, int y, int z)
     {
-        float stoneX = Mathf.Abs(_chunkCoord.x + x) * _stoneScale + _stoneOffsetX;
-        float stoneZ = Mathf.Abs(_chunkCoord.z + z) * _stoneScale + _stoneOffsetZ;
+        float stoneX = Mathf.Abs(_chunkCoord.x + x) * StoneScale + StoneOffsetX;
+        float stoneZ = Mathf.Abs(_chunkCoord.z + z) * StoneScale + StoneOffsetZ;
         float stoneNoiseValue = Mathf.PerlinNoise(stoneX, stoneZ);
         int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
-        float dirtX = Mathf.Abs(_chunkCoord.x + x) * _dirtScale + _dirtOffsetX;
-        float dirtZ = Mathf.Abs(_chunkCoord.z + z) * _dirtScale + _dirtOffsetZ;  
+        float dirtX = Mathf.Abs(_chunkCoord.x + x) * DirtScale + DirtOffsetX;
+        float dirtZ = Mathf.Abs(_chunkCoord.z + z) * DirtScale + DirtOffsetZ;  
         float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtZ);
         int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
-        float sandX = Mathf.Abs(_chunkCoord.x + x) * _sandScale + _sandOffsetX;
-        float sandZ = Mathf.Abs(_chunkCoord.z + z) * _sandScale + _sandOffsetZ;
+        float sandX = Mathf.Abs(_chunkCoord.x + x) * SandScale + SandOffsetX;
+        float sandZ = Mathf.Abs(_chunkCoord.z + z) * SandScale + SandOffsetZ;
         float sandNoiseValue = Mathf.PerlinNoise(sandX, sandZ);
         int sandHeight = Mathf.FloorToInt(sandNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
-        float marbleX = Mathf.Abs(_chunkCoord.x + x) * _marbleScale + _marbleOffsetX;
-        float marbleZ = Mathf.Abs(_chunkCoord.z + z) * _marbleScale + _marbleOffsetZ;
+        float marbleX = Mathf.Abs(_chunkCoord.x + x) * MarbleScale + MarbleOffsetX;
+        float marbleZ = Mathf.Abs(_chunkCoord.z + z) * MarbleScale + MarbleOffsetZ;
         float marbleNoiseValue = Mathf.PerlinNoise(marbleX, marbleZ);
         int marbleHeight = Mathf.FloorToInt(marbleNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
 
-        if (y + _chunkCoord.y > _wallHeight + _floorHeight)
+        if (y + _chunkCoord.y > WallHeight + FloorHeight)
         {
             if (y + _chunkCoord.y <= marbleHeight - 50)
             {
-                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("marble");
+                _chunkData.Map[x, y, z] = Block.ConvertID("marble");
             } 
             else if (y + _chunkCoord.y <= stoneHeight - 5)
             {
-                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("stone");
+                _chunkData.Map[x, y, z] = Block.ConvertID("stone");
             }
             else if (y + _chunkCoord.y <= dirtHeight)
             {
-                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("dirt");
+                _chunkData.Map[x, y, z] = Block.ConvertID("dirt");
             }
             else if (y + _chunkCoord.y <= sandHeight)
             {
-                _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("sand");
+                _chunkData.Map[x, y, z] = Block.ConvertID("sand");
             }
         }
     }
 
-    private void GenerateCaves(int x, int y, int z)
+    private static void GenerateCaves(int x, int y, int z)
     {
-        float caveX = (_chunkCoord.x + x) * _caveScale + _caveOffset;
-        float caveY = (_chunkCoord.y + y) * _caveScale + _caveOffset;
-        float caveZ = (_chunkCoord.z + z) * _caveScale + _caveOffset;
+        float caveX = (_chunkCoord.x + x) * CaveScale + CaveOffset;
+        float caveY = (_chunkCoord.y + y) * CaveScale + CaveOffset;
+        float caveZ = (_chunkCoord.z + z) * CaveScale + CaveOffset;
         float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
 
         if (caveNoiseValue > 0.35f)
@@ -253,96 +241,96 @@ public class WorldGenSingleton : MonoBehaviour
         }
     }
  
-    private void HandleBackroomGeneration(int x, int y, int z, bool[,] maze)
+    private static void HandleBackroomGeneration(int x, int y, int z, bool[,] maze)
     {
-        if (y + _chunkCoord.y < _floorHeight)
+        if (y + _chunkCoord.y < FloorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Floor
+            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Floor
         }
-        else if (y + _chunkCoord.y == _wallHeight + _floorHeight)
+        else if (y + _chunkCoord.y == WallHeight + FloorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Ceiling
+            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Ceiling
         }
-        else if (maze[x, z] && y + _chunkCoord.y < _wallHeight + _floorHeight)
+        else if (maze[x, z] && y + _chunkCoord.y < WallHeight + FloorHeight)
         {
-            _chunkData.Map[x, y, z] = BlockSingleton.ConvertID("backroom"); // Walls
+            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Walls
         }
     }
  
-    private void HandleEntityGeneration(ChunkData chunkData)
+    private static void HandleEntityGeneration(ChunkData chunkData)
     { 
         ChunkEntityData entityData;
         SerializableVector3Int entityPosition;
         
-        for (int x = 0; x < _chunkSize; x++)
+        for (int x = 0; x < World.ChunkSize; x++)
         {
-            for (int y = 0; y < _chunkSize; y++)
+            for (int y = 0; y < World.ChunkSize; y++)
             {
-                for (int z = 0; z <  _chunkSize; z++)
+                for (int z = 0; z <  World.ChunkSize; z++)
                 {
                     if (
-                        y + 1 < _chunkSize &&
+                        y + 1 < World.ChunkSize &&
                         chunkData.Map[x, y, z] != 0 && 
                         chunkData.Map[x, y + 1, z] == 0) 
                     {
-                        if (SPAWN_STATIC_ENTITY)
+                        if (SpawnStaticEntity)
                         {
-                            if (chunkData.Map[x, y, z] == BlockSingleton.ConvertID("dirt"))
+                            if (chunkData.Map[x, y, z] == Block.ConvertID("dirt"))
                             {
                                 {
-                                    double rng = _random.NextDouble();
+                                    double rng = Random.NextDouble();
                                     if (rng <= 0.03)
                                     {
-                                        entityData = EntitySingleton.GetChunkEntityData("tree", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("tree", new SerializableVector3Int(x, y + 1, z));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
-                                        entityData = EntitySingleton.GetChunkEntityData("bush1", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("bush1", new SerializableVector3Int(x, y + 1, z));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
-                                        entityData = EntitySingleton.GetChunkEntityData("grass", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("grass", new SerializableVector3Int(x, y + 1, z));
                                         chunkData.StaticEntity.Add(entityData);
                                     }
                                 }
                             }
                             else
                             {
-                                if (_random.NextDouble() <= 0.003)
+                                if (Random.NextDouble() <= 0.003)
                                 {
 
-                                    entityData = EntitySingleton.GetChunkEntityData("stage_hand", new SerializableVector3Int(x, y + 1, z));
+                                    entityData = Entity.GetChunkEntityData("stage_hand", new SerializableVector3Int(x, y + 1, z));
                                     chunkData.StaticEntity.Add(entityData);
                                 }
-                                else if (_random.NextDouble() <= 0.03)
+                                else if (Random.NextDouble() <= 0.03)
                                 {
-                                    entityData = EntitySingleton.GetChunkEntityData("slab", new SerializableVector3Int(x, y + 1, z));
+                                    entityData = Entity.GetChunkEntityData("slab", new SerializableVector3Int(x, y + 1, z));
                                     chunkData.StaticEntity.Add(entityData);
                                 }
                             }
  
                         }
-                        if (SPAWN_DYNAMIC_ENTITY && _random.NextDouble() <= 0.003)
+                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.003)
                         {
                             entityPosition = new SerializableVector3Int(x, y + 1, z);
-                            if (_random.NextDouble() <= 0.5)
+                            if (Random.NextDouble() <= 0.5)
                             {
-                                if (_random.NextDouble() <= 0.5)
+                                if (Random.NextDouble() <= 0.5)
                                 {
-                                    entityData = EntitySingleton.GetChunkEntityData("snare_flea", entityPosition);
+                                    entityData = Entity.GetChunkEntityData("snare_flea", entityPosition);
                                 } else
                                 {
-                                    entityData = EntitySingleton.GetChunkEntityData("chito", entityPosition);
+                                    entityData = Entity.GetChunkEntityData("chito", entityPosition);
                                 }
                             } else { 
-                                if (_random.NextDouble() <= 0.5)
+                                if (Random.NextDouble() <= 0.5)
                                 {
-                                    entityData = EntitySingleton.GetChunkEntityData("megumin", entityPosition);
+                                    entityData = Entity.GetChunkEntityData("megumin", entityPosition);
                                 } else
                                 {
-                                    entityData = EntitySingleton.GetChunkEntityData("yuuri", entityPosition);
+                                    entityData = Entity.GetChunkEntityData("yuuri", entityPosition);
                                 }
                             }
                             chunkData.DynamicEntity.Add(entityData); 
@@ -353,7 +341,7 @@ public class WorldGenSingleton : MonoBehaviour
         }
     }
     
-    private bool[,] HandleMazeAlgorithm(int width, int height)
+    private static bool[,] HandleMazeAlgorithm(int width, int height)
     {
         bool[,] maze = new bool[width, height];
         System.Random rand = new System.Random();
