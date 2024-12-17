@@ -19,13 +19,13 @@ class ResourceCollapse : State
         {
             _spriteObject.rotation = CreateRotation(0);
             _rotationProgress = 0;
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
-            EntitySingleton.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            Entity.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            Entity.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            Entity.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            Entity.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
+            Entity.SpawnItem(_item, Vector3Int.FloorToInt(Machine.transform.position)); 
             SetState<StaticIdle>();
-            ((EntityMachine)Machine).WipeEntity();
+            ((EntityMachine)Machine).Delete();
         }
     }
 

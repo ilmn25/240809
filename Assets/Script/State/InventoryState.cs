@@ -27,8 +27,11 @@ public class InventoryState : State
             return;
         }
         
-        switch (ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID).Type)
-        {
+        Utility.Log(InventorySingleton.CurrentItem);
+        Utility.Log(InventorySingleton.CurrentItem.StringID);
+        Utility.Log(Item.GetItem(InventorySingleton.CurrentItem.StringID));
+        switch (Item.GetItem(InventorySingleton.CurrentItem.StringID).Type)
+        { 
             case ItemType.Block:
                 SetState<ItemBlock>();
                 break;
@@ -97,7 +100,7 @@ public class ItemTool : State
         playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
         toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
         toolSprite.gameObject.SetActive(true);
-        PlayerTerraform.ToolData = ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID);
+        PlayerTerraform.ToolData = Item.GetItem(InventorySingleton.CurrentItem.StringID);
     }
 
     public override void OnExitState()

@@ -1,43 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioSingleton : MonoBehaviour
+public class Audio 
 {
-    //TODO 
-    public AudioClip BGM;
-    public AudioClip WIND;
-    public AudioClip NOISE;
-
     private static List<AudioSource> _audioSources;
-    private static AudioSource _BGMSource;
+    private static AudioSource _bgmSource;
 
-    public static float BGMVOLUME = 1f;
-    public static float SFXVOLUME = 1f;
-    public int POOLSIZE = 10;
+    private static readonly float BgmVolume = 1f;
+    private static readonly float SfxVolume = 1f;
+    private static readonly int PoolSize = 12;
 
-    private void Start()
+    public static void Initialize()
     {
-        _BGMSource = gameObject.AddComponent<AudioSource>(); 
+        GameObject audioManager = new GameObject("Audio");
+        _bgmSource = audioManager.AddComponent<AudioSource>(); 
 
-        // Initialize the audio source pool
         _audioSources = new List<AudioSource>();
-        for (int i = 0; i < POOLSIZE; i++)
+        for (int i = 0; i < PoolSize; i++)
         {
-            AudioSource newSource = gameObject.AddComponent<AudioSource>();
+            AudioSource newSource = audioManager.AddComponent<AudioSource>();
             _audioSources.Add(newSource);
         }
         
-        // PlayBGM(BGM, 0.1f);
-        PlaySFX(WIND, 0.2f, true);
-        PlaySFX(NOISE, 0.3f, true);
+        PlayBGM(Resources.Load<AudioClip>("audio/bgm/fairy_fountain"), 0.03f);
+        PlaySFX(Resources.Load<AudioClip>("audio/sfx/wind"), 0.2f, true);
+        PlaySFX(Resources.Load<AudioClip>("audio/sfx/noise"), 0.3f, true);
     }
 
     public static void PlayBGM(AudioClip clip, float volume = 1f, bool loop = true)
     {
-        _BGMSource.clip = clip;
-        _BGMSource.volume = volume * BGMVOLUME;
-        _BGMSource.loop = loop;
-        _BGMSource.Play();
+        _bgmSource.clip = clip;
+        _bgmSource.volume = volume * BgmVolume;
+        _bgmSource.loop = loop;
+        _bgmSource.Play();
     }
 
     public static AudioSource PlaySFX(AudioClip clip, float volume = 1f, bool loop = false)
@@ -46,7 +41,7 @@ public class AudioSingleton : MonoBehaviour
         if (availableSource)
         {
             availableSource.clip = clip;
-            availableSource.volume = volume * SFXVOLUME;
+            availableSource.volume = volume * SfxVolume;
             availableSource.loop = loop;
             availableSource.Play();
         }

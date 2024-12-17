@@ -27,7 +27,7 @@ public class InvSlotData
     public void Add(InvSlotData slotData, int amountToAdd = 0)
     {
         if (slotData.isEmpty()) return;
-        int maxStackSize = ItemSingleton.GetItem(slotData.StringID).StackSize;
+        int maxStackSize = Item.GetItem(slotData.StringID).StackSize;
         int addableAmount;
 
         if (amountToAdd == 0)

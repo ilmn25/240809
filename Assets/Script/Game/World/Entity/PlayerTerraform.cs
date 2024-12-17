@@ -21,21 +21,21 @@ public class PlayerTerraform
     { 
         if (!_block)
         {
-            _block = BlockPreviewSingleton.Create("overlay");
+            _block = BlockPreview.Create("overlay");
             _block.transform.localScale = Vector3.one * 1.04f;
         }
         else if (!string.IsNullOrEmpty(BlockStringID))
         { 
             if (_block.name != BlockStringID)
             {
-                BlockPreviewSingleton.Delete();
-                _block = BlockPreviewSingleton.Create(BlockStringID);
+                BlockPreview.Delete();
+                _block = BlockPreview.Create(BlockStringID);
             } 
         } 
         else if (_block.name != "overlay")
         {
-            BlockPreviewSingleton.Delete();
-            _block = BlockPreviewSingleton.Create("overlay");
+            BlockPreview.Delete();
+            _block = BlockPreview.Create("overlay");
             _block.transform.localScale = Vector3.one * 1.04f;
         }
         
@@ -91,9 +91,9 @@ public class PlayerTerraform
             
             InventorySingleton.RemoveItem(BlockStringID);
             
-            AudioSingleton.PlaySFX(Game.DigSound);
+            Audio.PlaySFX(Game.DigSound);
             if (World.GetBlock(_coordinate) == 0)
-                World.SetBlock(_coordinate, BlockSingleton.ConvertID(BlockStringID));
+                World.SetBlock(_coordinate, Block.ConvertID(BlockStringID));
         }
     }
 
@@ -104,10 +104,8 @@ public class PlayerTerraform
     }
 
     public static void BreakBlock()
-    { 
-        if (!World.IsInWorldBounds(_coordinate)) return; 
-        if (World.GetBlock(_coordinate) != 0)
-            MapEditSingleton.Instance.BreakBlock(_coordinate,  ToolData?.Damage ?? 1); 
+    {  
+        MapEdit.BreakBlock(_coordinate,  ToolData?.Damage ?? 1); 
     } 
 
     public static Vector3Int OffsetPosition(bool isBreak, Vector3 position, Vector3 direction)

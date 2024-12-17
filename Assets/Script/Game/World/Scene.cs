@@ -10,10 +10,8 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 
-public class Scene : MonoBehaviour
+public class Scene 
 { 
-    public static Scene Instance { get; private set; }
-
     public static event Action PlayerChunkTraverse; 
 
     public static Vector3Int PlayerChunkPosition;
@@ -22,28 +20,23 @@ public class Scene : MonoBehaviour
     public static readonly int RenderRange = 2;
     public static readonly int LogicRange = 3; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
-    public static readonly int LogicDistance = LogicRange * World.ChunkSize; 
-    
-    public static bool AlwaysRegenerate = false;
-    public string setPieceName = "tree_a";
-    private void Awake()    
-    {
-        Instance = this;
-    }
- 
-    void Start()
+    public static readonly int LogicDistance = LogicRange * World.ChunkSize;
+
+    private static readonly bool AlwaysRegenerate = false;
+    public const string SetPieceName = "tree_a";
+
+    public static void Initialize()
     { 
-        Instance = this;
  
         if (!File.Exists(World.GetFilePath(0)) || AlwaysRegenerate) 
-            WorldGenSingleton.Instance.Generate();
+            WorldGen.Generate();
         else
             World.Load(0); 
         
         _playerChunkPositionPrevious = World.GetChunkCoordinate(Game.Player.transform.position); 
     }
-          
-    void FixedUpdate()
+
+    public static void Update()
     {
         PlayerChunkPosition = World.GetChunkCoordinate(Game.Player.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
@@ -52,16 +45,7 @@ public class Scene : MonoBehaviour
             _playerChunkPositionPrevious = PlayerChunkPosition; 
         }
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            World.Save(0);
-            Application.Quit();
-        }
-    }
-
+ 
     public static bool InPlayerChunkRange(Vector3 position, float distance)
     {
         return Math.Abs(position.x - PlayerChunkPosition.x) <= distance &&

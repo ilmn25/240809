@@ -48,7 +48,7 @@ public class NavMap
                             int entityY = chunkY + Mathf.FloorToInt(entity.position.y);
                             int entityZ = chunkZ + Mathf.FloorToInt(entity.position.z);
 
-                            Vector3Int bounds = EntitySingleton.dictionary[entity.stringID].Bounds;
+                            Vector3Int bounds = Entity.dictionary[entity.stringID].Bounds;
                             int entityEndX = entityX + bounds.x;
                             int entityEndY = entityY + bounds.y;
                             int entityEndZ = entityZ + bounds.z;

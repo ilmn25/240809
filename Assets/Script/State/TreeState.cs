@@ -36,7 +36,7 @@ public class TreeState : State
 
     public void Hit()
     {
-        AudioSingleton.PlaySFX(Game.DigSound);
+        Audio.PlaySFX(Game.DigSound);
         if (Game.GUIBusy) return;
         _currentHealth--;
         if (_currentHealth != 0) return;

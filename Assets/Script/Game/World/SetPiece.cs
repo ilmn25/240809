@@ -24,12 +24,12 @@ public static class SetPiece
         if (Input.GetKeyDown(KeyCode.Equals))
         {
             Utility.Log("exported to file");
-            SaveSetPieceFile(CopySetPiece(), Scene.Instance.setPieceName);
+            SaveSetPieceFile(CopySetPiece(), Scene.SetPieceName);
         }
         if (Input.GetKeyDown(KeyCode.Minus))
         {
             Utility.Log("imported to world"); 
-            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(Scene.Instance.setPieceName));
+            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(Scene.SetPieceName));
         }
     }
      
@@ -54,8 +54,8 @@ public static class SetPiece
     
     public static SerializableChunkData CopySetPiece()
     {
-        EntityStaticLoadSingleton.Instance.UnloadWorld();
-        EntityDynamicLoadSingleton.Instance.UnloadWorld();
+        EntityStaticLoad.UnloadWorld();
+        EntityDynamicLoad.UnloadWorld();
         int minX = Mathf.Min(_positionA.x, _positionB.x);
         int minY = Mathf.Min(_positionA.y, _positionB.y);
         int minZ = Mathf.Min(_positionA.z, _positionB.z);

@@ -14,18 +14,18 @@ public class SpriteCullModule : Module
     public override void Initialize()
     {
         if (!_sprite) _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
-        MapCullSingleton._signalUpdateSpriteYCull += HandleCull;
+        MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull(); 
     }
 
     public override void Terminate()
     {
-        MapCullSingleton._signalUpdateSpriteYCull -= HandleCull;
+        MapCull.SignalUpdateSpriteYCull -= HandleCull;
     }
  
     void HandleCull()
     {
-        if (MapCullSingleton.Instance._yCheck && Machine.transform.position.y > MapCullSingleton.Instance._yThreshold)
+        if (MapCull.YCheck && Machine.transform.position.y > MapCull.YThreshold)
         {
             _sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
         }

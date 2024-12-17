@@ -12,7 +12,7 @@ class NPCIdle : State {
     }
 
     public override void OnUpdateState() {
-        if (_sprite.isVisible && MapLoadSingleton.Instance._activeChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position)))
+        if (_sprite.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position)))
         {
             _npcMovementModule.HandleMovementUpdate(Vector3.zero);
             _npcAnimationModule.HandleAnimationUpdate();

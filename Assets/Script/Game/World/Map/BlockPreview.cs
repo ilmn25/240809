@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockPreviewSingleton 
+public class BlockPreview 
 { 
     private static readonly float Opacity = 0.45f;
     
@@ -13,7 +13,7 @@ public class BlockPreviewSingleton
     
     public static void Delete()
     {
-        GameObject.Destroy(_meshObject);
+        Object.Destroy(_meshObject);
     }
 
     public static GameObject Create(string blockID)
@@ -38,7 +38,7 @@ public class BlockPreviewSingleton
         MeshFilter meshFilter = _meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = _meshObject.AddComponent<MeshRenderer>();
         meshFilter.mesh = mesh;
-        Material meshMaterial = new(Resources.Load<Material>(BlockSingleton.MESH_MATERIAL_PATH))
+        Material meshMaterial = new(Resources.Load<Material>(Block.MeshMaterialPath))
         {
             mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
         };
@@ -146,12 +146,12 @@ public class BlockPreviewSingleton
         for (int i = 0; i < 4; i++)
             _normals.Add(normal);
 
-        Vector2Int tile = BlockSingleton.GetTileRect(textureIndex); 
+        Vector2Int tile = Block.GetTileRect(textureIndex); 
         Vector2[] spriteUVs = new Vector2[] {
-            new(tile.x / (float)BlockSingleton.textureWidth, tile.y / (float)BlockSingleton.textureHeight),
-            new((tile.x + BlockSingleton.TileSize) / (float)BlockSingleton.textureWidth, tile.y / (float)BlockSingleton.textureHeight),
-            new((tile.x + BlockSingleton.TileSize) / (float)BlockSingleton.textureWidth, (tile.y + BlockSingleton.TileSize) / (float)BlockSingleton.textureHeight),
-            new(tile.x / (float)BlockSingleton.textureWidth, (tile.y + BlockSingleton.TileSize) / (float)BlockSingleton.textureHeight)
+            new(tile.x / (float)Block.TextureWidth, tile.y / (float)Block.TextureHeight),
+            new((tile.x + Block.TileSize) / (float)Block.TextureWidth, tile.y / (float)Block.TextureHeight),
+            new((tile.x + Block.TileSize) / (float)Block.TextureWidth, (tile.y + Block.TileSize) / (float)Block.TextureHeight),
+            new(tile.x / (float)Block.TextureWidth, (tile.y + Block.TileSize) / (float)Block.TextureHeight)
         };
         _uvs.AddRange(spriteUVs);
     }

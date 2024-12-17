@@ -4,8 +4,10 @@ using TMPro;
 using UnityEngine;
  
 public class Game : MonoBehaviour
-{  
+{
+    public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
     public static readonly float MaxDeltaTime = 0.03f;
+    public static readonly Vector3Int WorldSize = new Vector3Int(20, 20, 20);
     private const float FixedUpdateMS = 0.10f;
     public static bool GUIBusy = false;
     public static string DownloadPath;
@@ -39,24 +41,53 @@ public class Game : MonoBehaviour
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 200;
         SetConstants(); 
+        Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
+        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
+        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
     }
 
     private void Start()
     {
+        Player.transform.position = new Vector3( 
+            World.ChunkSize * WorldGen.Size.x / 2,
+            World.ChunkSize * WorldGen.Size.y + 15,
+            World.ChunkSize * WorldGen.Size.z / 2);
+        
+        Item.Initialize();
         PlayerData.Load();
-        PlayerStatus.Initialize();
+        WorldGen.Initialize();
+        Audio.Initialize();
+        PlayerStatus.Initialize(); 
+        Block.Initialize(); 
+        MapCull.Initialize(); 
+        EntityDynamicLoad.Initialize();  
+        MapLoad.Initialize();
+        Scene.Initialize(); 
     }
 
     private void Update()
     { 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            World.Save(0);
+        }
+        
+        SetPiece.Update();
         PlayerStatus.Update();
         InventorySingleton.Update();
         PlayerTerraform.Update();
         InputHandler.Update();
+        MapCull.Update();
+         
+    }
+    private void FixedUpdate()
+    { 
+        Scene.Update(); 
     }
 
     private void OnApplicationQuit()
     {
+        Block.Dispose();
         PlayerData.Save();
     }
 
@@ -75,7 +106,6 @@ public class Game : MonoBehaviour
         DownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PlayerSavePath = $"{DownloadPath}\\PlayerData.dat";
         
-        
         Player = GameObject.Find("player");
         Camera = GameObject.Find("main_camera");
 
@@ -89,11 +119,7 @@ public class Game : MonoBehaviour
         GUICursor = GUI.transform.Find("cursor").Find("cursor").gameObject;
         GUICursorInfo = GUICursor.transform.Find("info").gameObject;
         GUICursorSlot = GUICursor.transform.Find("slot").gameObject;
-        
-        Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
-        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
-        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
+         
     }
-
-    public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
+ 
 }

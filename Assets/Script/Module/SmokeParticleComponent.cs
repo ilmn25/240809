@@ -33,7 +33,7 @@ public class SmokeParticleComponent : MonoBehaviour
         if (this != null)
         {
             transform.position = new Vector3(0, 500, 0);
-            SmokeParticleSingleton.ReturnSmokeParticleToPool(gameObject);
+            SmokeParticleHandler.ReturnSmokeParticleToPool(gameObject);
         }
     }
 }
