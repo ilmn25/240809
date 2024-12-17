@@ -40,7 +40,7 @@ public class PlayerTerraform
         }
         
         
-        if (Game.GUIBusy) return;
+        if (GUI.GUIBusy) return;
   
         if (Input.GetMouseButtonDown(4)) //break top
         {
@@ -81,7 +81,7 @@ public class PlayerTerraform
 
     public static void HandleMapPlace()
     {
-        if (Game.GUIBusy) return;
+        if (GUI.GUIBusy) return;
         
         if (!string.IsNullOrEmpty(BlockStringID)) //place
         {

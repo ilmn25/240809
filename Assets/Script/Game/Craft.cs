@@ -35,9 +35,9 @@ public class Craft
         InvSlotData craftedItem = new InvSlotData();
         
         craftedItem.SetItem(Dictionary[stringID].Stack, stringID, null, false);
-        if (GUICursorSingleton._cursorSlot.isEmpty() || GUICursorSingleton._cursorSlot.isSame(craftedItem))
+        if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem))
         {
-            GUICursorSingleton._cursorSlot.Add(craftedItem);
+            GUICursor.Data.Add(craftedItem);
         }
         
         if (craftedItem.Stack > 0)

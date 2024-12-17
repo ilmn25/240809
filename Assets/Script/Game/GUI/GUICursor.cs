@@ -3,20 +3,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GUICursorSingleton : MonoBehaviour
+public class GUICursor 
 {
-    public static GUICursorSingleton Instance { get; private set; }
-    public static InvSlotData _cursorSlot = new InvSlotData();
+    public static InvSlotData Data = new InvSlotData();
 
     private static TextMeshProUGUI _cursorInfoText; 
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
 
-    private RectTransform _parentRect;
-    private RectTransform _cursorRect;
-    private void Start()
+    private static RectTransform _parentRect;
+    private static RectTransform _cursorRect;
+    
+    public static void Initialize()
     {
-        Instance = this;
         _cursorRect = Game.GUICursor.GetComponent<RectTransform>();
         _parentRect = _cursorRect.parent.GetComponent<RectTransform>();
         
@@ -25,9 +24,9 @@ public class GUICursorSingleton : MonoBehaviour
         _cursorSlotImage = Game.GUICursorSlot.transform.Find("image").GetComponent<Image>();
     }
 
-    private void Update()
+    public static void Update()
     {
-        if (Game.GUIBusy)
+        if (GUI.GUIBusy)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  Game.GUICamera,out Vector2 mousePosition);
             _cursorRect.anchoredPosition = mousePosition;
@@ -47,15 +46,15 @@ public class GUICursorSingleton : MonoBehaviour
     
     public static void UpdateCursorSlot()
     {
-        if (_cursorSlot.Stack == 0)
+        if (Data.Stack == 0)
         {
             Game.GUICursorSlot.SetActive(false);
         }
         else
         {
             Game.GUICursorSlot.SetActive(true);
-            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{GUICursorSingleton._cursorSlot.StringID}");
-            _cursorSlotText.text = _cursorSlot.Stack.ToString();
+            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{GUICursor.Data.StringID}");
+            _cursorSlotText.text = Data.Stack.ToString();
         } 
     } 
 }

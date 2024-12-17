@@ -7,9 +7,8 @@ public class Game : MonoBehaviour
 {
     public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
     public static readonly float MaxDeltaTime = 0.03f;
-    public static readonly Vector3Int WorldSize = new Vector3Int(20, 20, 20);
+    
     private const float FixedUpdateMS = 0.10f;
-    public static bool GUIBusy = false;
     public static string DownloadPath;
     public static string PlayerSavePath;  
     
@@ -52,9 +51,10 @@ public class Game : MonoBehaviour
             World.ChunkSize * WorldGen.Size.x / 2,
             World.ChunkSize * WorldGen.Size.y + 15,
             World.ChunkSize * WorldGen.Size.z / 2);
-        
+          
         Item.Initialize();
-        PlayerData.Load();
+        global::GUI.Initialize();
+        PlayerData.Load(); 
         WorldGen.Initialize();
         Audio.Initialize();
         PlayerStatus.Initialize(); 
@@ -72,6 +72,7 @@ public class Game : MonoBehaviour
             World.Save(0);
         }
         
+        global::GUI.Update();
         SetPiece.Update();
         PlayerStatus.Update();
         InventorySingleton.Update();

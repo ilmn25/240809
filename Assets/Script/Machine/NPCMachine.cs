@@ -49,7 +49,7 @@ public class NPCState : State
 { 
     public override void OnEnterState()
     {
-        GUIDialogueSingleton.DialogueAction += DialogueAction; 
+        GUIDialogue.DialogueAction += DialogueAction; 
         
         string status = ((NPCCED)((EntityMachine)Machine).entityData).npcStatus;
         AddState(new NPCIdle(), status == "idle");
