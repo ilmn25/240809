@@ -36,10 +36,7 @@ class PlayerActive : State {
 
     public override void OnUpdateState() { 
         _playerMovementModule.HandleMovementUpdate();
-        _playerAnimationModule.HandleAnimationUpdate(); 
-        PlayerChunkEditSingleton.Instance.HandleChunkEditInput(); 
-        InventorySingleton.Instance.HandleInventoryUpdate();
-        PlayerStatusSingleton.Instance.HandleStatusUpdate();
+        _playerAnimationModule.HandleAnimationUpdate();  
     }
 }
 

@@ -59,10 +59,10 @@ public class NPCMovementModule : Module
     public void HandleMovementUpdate(Vector3 direction)
     {
         _direction = direction;
-        if (Machine.transform.position.y < -1) Machine.transform.position = Lib.AddToVector(Machine.transform.position, 0, 100, 0);
+        if (Machine.transform.position.y < -1) Machine.transform.position = Utility.AddToVector(Machine.transform.position, 0, 100, 0);
 
         // _deltaTime = GameSystem._deltaTime;
-        _deltaTime = Game.GetDeltaTime();
+        _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;
 
         HandleJump();
@@ -183,7 +183,7 @@ public class NPCMovementModule : Module
         
         if (_direction != Vector3.zero && _previousPosition == Machine.transform.position)
         {
-            Vector3 tempPosition = Lib.AddToVector(Machine.transform.position, 0, 0.1f, 0);
+            Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
             if (IsMovable(tempPosition)) Machine.transform.position = tempPosition;
         }
         _previousPosition = Machine.transform.position;

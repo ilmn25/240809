@@ -29,12 +29,13 @@ public abstract class Machine : MonoBehaviour
         return null;
     }
     
-    public void AddModule(Module module)
+    public T AddModule<T>(T module) where T : Module
     {
         module.Machine = this;
-        _modules[module.GetType()] = module; 
+        _modules[module.GetType()] = module;
+        return module;
     }
-
+    
     public T GetModule<T>() where T : Module
     {
         foreach (var module in _modules.Values)

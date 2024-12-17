@@ -18,7 +18,7 @@ public class ItemPhysicModule : Module
  
     public void HandlePhysicsUpdate()
     { 
-        _deltaTime = Game.GetDeltaTime();
+        _deltaTime = Utility.GetDeltaTime();
 
         if (!IsMovable(Machine.transform.position))
         {

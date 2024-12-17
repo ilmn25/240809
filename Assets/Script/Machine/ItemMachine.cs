@@ -23,7 +23,7 @@ public class ItemMachine : EntityMachine
             if (pickUp)
             {
                 AudioSingleton.PlaySFX(Game.PickUpSound);
-                InventorySingleton.Instance.AddItem(GetEntityData().stringID, 1);
+                InventorySingleton.AddItem(GetEntityData().stringID, 1);
                 WipeEntity();
             } 
             _wasInRange = true;

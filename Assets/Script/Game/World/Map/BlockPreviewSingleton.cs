@@ -1,30 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockPreviewSingleton : MonoBehaviour
+public class BlockPreviewSingleton 
 { 
-    public static BlockPreviewSingleton Instance { get; private set; }  
+    private static readonly float Opacity = 0.45f;
     
-    private float OPACITY = 0.45f;
+    private static GameObject _meshObject;
+    private static List<Vector3> _vertices;
+    private static List<int> _triangles;
+    private static List<Vector2> _uvs;
+    private static List<Vector3> _normals;  
     
-    private GameObject meshObject;
-    private List<Vector3> _vertices;
-    private List<int> _triangles;
-    private List<Vector2> _uvs;
-    private List<Vector3> _normals;  
-    
-    void Start()
+    public static void Delete()
     {
-        Instance = this;
+        GameObject.Destroy(_meshObject);
     }
 
-    public void DeleteBlock()
-    {
-        Destroy(meshObject);
-    }
-
-    public GameObject CreateBlock(string blockID)
+    public static GameObject Create(string blockID)
     {
         GenerateMesh();
         
@@ -36,16 +28,15 @@ public class BlockPreviewSingleton : MonoBehaviour
             normals = _normals.ToArray()  
         };
 
-        meshObject = new(blockID)
+        _meshObject = new(blockID)
         {
             layer = Game.IndexMap
         };
     
-        meshObject.transform.parent = transform; 
-        meshObject.transform.position = Game.Player.transform.position; 
+        _meshObject.transform.position = Game.Player.transform.position; 
 
-        MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = _meshObject.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = _meshObject.AddComponent<MeshRenderer>();
         meshFilter.mesh = mesh;
         Material meshMaterial = new(Resources.Load<Material>(BlockSingleton.MESH_MATERIAL_PATH))
         {
@@ -65,24 +56,17 @@ public class BlockPreviewSingleton : MonoBehaviour
 
         // Set the alpha value to 0.5 for 50% transparency
         Color color = meshMaterial.color;
-        color.a = OPACITY;
+        color.a = Opacity;
         meshMaterial.color = color;
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         
 
         meshRenderer.material = meshMaterial;
 
-        return meshObject;
-        //TODO 
-        // AssetDatabase.CreateAsset(mesh, "Assets/Prefab/YourMesh.asset");
-        // AssetDatabase.CreateAsset(_textureAtlas, "Assets/Prefab/YourTextureAtlas.asset");
-        // AssetDatabase.CreateAsset(meshMaterial, "Assets/Prefab/YourMaterial.asset");
-        // AssetDatabase.SaveAssets();
-        // PrefabUtility.SaveAsPrefabAsset(meshObject, "Assets/Prefab/map.prefab");
- 
+        return _meshObject;
     }
 
-    void GenerateMesh()
+    private static void GenerateMesh()
     {
         _vertices = new List<Vector3>();
         _triangles = new List<int>();
@@ -97,7 +81,7 @@ public class BlockPreviewSingleton : MonoBehaviour
         AddFace(2, 33); // bottem 
     }
 
-    void AddFace(int direction, int textureIndex)
+    private static void AddFace(int direction, int textureIndex)
     { 
         int vertexIndex = _vertices.Count;
         Vector3[] faceVertices = new Vector3[4];
@@ -162,49 +146,14 @@ public class BlockPreviewSingleton : MonoBehaviour
         for (int i = 0; i < 4; i++)
             _normals.Add(normal);
 
-        Vector2Int tile = GetTileRect(textureIndex); 
+        Vector2Int tile = BlockSingleton.GetTileRect(textureIndex); 
         Vector2[] spriteUVs = new Vector2[] {
-            new(tile.x / (float)textureWidth, tile.y / (float)textureHeight),
-            new((tile.x + tileSize) / (float)textureWidth, tile.y / (float)textureHeight),
-            new((tile.x + tileSize) / (float)textureWidth, (tile.y + tileSize) / (float)textureHeight),
-            new(tile.x / (float)textureWidth, (tile.y + tileSize) / (float)textureHeight)
+            new(tile.x / (float)BlockSingleton.textureWidth, tile.y / (float)BlockSingleton.textureHeight),
+            new((tile.x + BlockSingleton.TileSize) / (float)BlockSingleton.textureWidth, tile.y / (float)BlockSingleton.textureHeight),
+            new((tile.x + BlockSingleton.TileSize) / (float)BlockSingleton.textureWidth, (tile.y + BlockSingleton.TileSize) / (float)BlockSingleton.textureHeight),
+            new(tile.x / (float)BlockSingleton.textureWidth, (tile.y + BlockSingleton.TileSize) / (float)BlockSingleton.textureHeight)
         };
         _uvs.AddRange(spriteUVs);
     }
-
-    int textureWidth = 192;
-    int textureHeight = 128;
-    int tileSize = 16;
-    int tilesPerRow = 12;
-    int[] colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
-    int[] rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};
-
-    Vector2Int GetTileRect(int index)
-    { 
-        int targetRow = index / tilesPerRow;
-        int targetCol = index % tilesPerRow;  
-
-        return new Vector2Int(colx[targetCol], rowy[targetRow]);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 
-public class GUIStorageSingleton : MonoBehaviour
+public class  GUIStorageSingleton : MonoBehaviour
 {
     public static GUIStorageSingleton Instance { get; private set; }
     private int _currentSlotKey = -1; 
@@ -22,12 +22,12 @@ public class GUIStorageSingleton : MonoBehaviour
 
     private void Initialize()
     {
-        for (int i = 0; i < InventorySingleton.INVENTORY_SLOT_AMOUNT * InventorySingleton.INVENTORY_ROW_AMOUNT; i++)
+        for (int i = 0; i < InventorySingleton.InventorySlotAmount * InventorySingleton.InventoryRowAmount; i++)
         {
             GameObject slot = Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), Game.GUIInvStorage.transform, false);
     
-            int row = i / InventorySingleton.INVENTORY_SLOT_AMOUNT;
-            int column = i % InventorySingleton.INVENTORY_SLOT_AMOUNT;
+            int row = i / InventorySingleton.InventorySlotAmount;
+            int column = i % InventorySingleton.InventorySlotAmount;
 
             RectTransform slotRectTransform = slot.GetComponent<RectTransform>();
             slotRectTransform.sizeDelta = new Vector2(SLOT_SIZE, SLOT_SIZE);
@@ -51,7 +51,7 @@ public class GUIStorageSingleton : MonoBehaviour
             GUICursorSingleton.SetInfoPanel();
             return;
         }
-        InvSlotData slotData = InventorySingleton._playerInventory[_currentSlotKey];
+        InvSlotData slotData = InventorySingleton.PlayerInventory[_currentSlotKey];
         if (slotData.Stack != 0)
         { 
             GUICursorSingleton.SetInfoPanel(slotData.StringID + " (" + slotData.Stack + ")\n" + 
@@ -72,23 +72,23 @@ public class GUIStorageSingleton : MonoBehaviour
         {
             if (GUICursorSingleton._cursorSlot.isEmpty())
             {
-                GUICursorSingleton._cursorSlot.Add(InventorySingleton._playerInventory[_currentSlotKey]);
+                GUICursorSingleton._cursorSlot.Add(InventorySingleton.PlayerInventory[_currentSlotKey]);
             }
-            else if (InventorySingleton._playerInventory[_currentSlotKey].isSame(GUICursorSingleton._cursorSlot))
+            else if (InventorySingleton.PlayerInventory[_currentSlotKey].isSame(GUICursorSingleton._cursorSlot))
             {
-                InventorySingleton._playerInventory[_currentSlotKey].Add(GUICursorSingleton._cursorSlot);
+                InventorySingleton.PlayerInventory[_currentSlotKey].Add(GUICursorSingleton._cursorSlot);
             } 
             else
             {
-                (InventorySingleton._playerInventory[_currentSlotKey], GUICursorSingleton._cursorSlot) = 
-                    (GUICursorSingleton._cursorSlot, InventorySingleton._playerInventory[_currentSlotKey]);
+                (InventorySingleton.PlayerInventory[_currentSlotKey], GUICursorSingleton._cursorSlot) = 
+                    (GUICursorSingleton._cursorSlot, InventorySingleton.PlayerInventory[_currentSlotKey]);
             } 
             GUICursorSingleton.UpdateCursorSlot();
             RefreshCursorSlot();
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            InvSlotData invSlot = InventorySingleton._playerInventory[_currentSlotKey];
+            InvSlotData invSlot = InventorySingleton.PlayerInventory[_currentSlotKey];
             if (!invSlot.isEmpty())
             {
                 if (GUICursorSingleton._cursorSlot.isEmpty() || invSlot.isSame(GUICursorSingleton._cursorSlot))

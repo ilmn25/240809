@@ -10,9 +10,9 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 
-public class WorldSingleton : MonoBehaviour
+public class Scene : MonoBehaviour
 { 
-    public static WorldSingleton Instance { get; private set; }
+    public static Scene Instance { get; private set; }
 
     public static event Action PlayerChunkTraverse; 
 
@@ -62,10 +62,21 @@ public class WorldSingleton : MonoBehaviour
         }
     }
 
-    public static bool InPlayerRange(Vector3 position, float distance)
+    public static bool InPlayerChunkRange(Vector3 position, float distance)
     {
         return Math.Abs(position.x - PlayerChunkPosition.x) <= distance &&
                Math.Abs(position.y - PlayerChunkPosition.y) <= distance &&
                Math.Abs(position.z - PlayerChunkPosition.z) <= distance;
+    }
+    
+    public static bool InPlayerBlockRange(Vector3 position, float distance)
+    { 
+        if (Mathf.Abs(position.x - Game.Player.transform.position.x) > distance ||
+            Mathf.Abs(position.y - Game.Player.transform.position.y) > distance ||
+            Mathf.Abs(position.z - Game.Player.transform.position.z) > distance)
+        {
+            return false;
+        }
+        return true;
     }
 }

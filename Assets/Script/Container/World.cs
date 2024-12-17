@@ -115,23 +115,23 @@ public class World
         return false;
     }
 
-    public static Vector3Int GetChunkCoordinate(Vector3 blockCoordinate) 
+    public static Vector3Int GetChunkCoordinate(Vector3 coordinate) 
     {
         Vector3Int chunkPosition = new Vector3Int(
-            (int)Mathf.Floor(blockCoordinate.x / ChunkSize) * ChunkSize, 
-            (int)Mathf.Floor(blockCoordinate.y / ChunkSize) * ChunkSize, 
-            (int)Mathf.Floor(blockCoordinate.z / ChunkSize) * ChunkSize);
+            (int)Mathf.Floor(coordinate.x / ChunkSize) * ChunkSize, 
+            (int)Mathf.Floor(coordinate.y / ChunkSize) * ChunkSize, 
+            (int)Mathf.Floor(coordinate.z / ChunkSize) * ChunkSize);
         return chunkPosition;
     }
 
-    public static Vector3Int GetBlockCoordinate(Vector3 blockCoordinate) 
+    public static Vector3Int GetBlockCoordinate(Vector3 coordinate) 
     {
-        Vector3Int chunkPosition = GetChunkCoordinate(blockCoordinate);
+        Vector3Int chunkPosition = GetChunkCoordinate(coordinate);
 
         Vector3 blockPositionInChunk = new Vector3(
-            blockCoordinate.x - chunkPosition.x, 
-            blockCoordinate.y - chunkPosition.y, 
-            blockCoordinate.z - chunkPosition.z);
+            coordinate.x - chunkPosition.x, 
+            coordinate.y - chunkPosition.y, 
+            coordinate.z - chunkPosition.z);
 
         return Vector3Int.FloorToInt(blockPositionInChunk);
     }
@@ -139,7 +139,7 @@ public class World
 
     public static string GetFilePath(int id)
     {
-        return $"{Game.DOWNLOAD_PATH}\\World{id}.dat";
+        return $"{Game.DownloadPath}\\World{id}.dat";
     }
 
     public static async void Save(int id)
@@ -167,7 +167,7 @@ public class World
             } 
             else
             {
-                Lib.Log("doesn't exist, load region fail" + id); 
+                Utility.Log("doesn't exist, load region fail" + id); 
                 world = new World(1,1,1); // if doesn't exist
             }
         }
@@ -196,65 +196,65 @@ public class World
         
         // X-axis checks
         if (blockCoordinate.x == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, 0, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, 0, 0));
         else if (blockCoordinate.x == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, 0, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, 0, 0));
 
         // Y-axis checks
         if (blockCoordinate.y == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, -ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, -ChunkSize, 0));
         else if (blockCoordinate.y == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, ChunkSize, 0));
 
         // Z-axis checks
         if (blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, 0, -ChunkSize));
         else if (blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, 0, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, 0, ChunkSize));
 
         // Edge and Corner checks on X, Y, and Z axes
         if (blockCoordinate.x == 0 && blockCoordinate.y == 0 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == 0 && blockCoordinate.y == 0 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, ChunkSize));
         else if (blockCoordinate.x == 0 && blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == 0 && blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == 0 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == 0 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, ChunkSize));
 
         // Edge checks along X, Y, and Z axes
         if (blockCoordinate.x == 0 && blockCoordinate.y == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, -ChunkSize, 0));
         else if (blockCoordinate.x == 0 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, 0, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, 0, -ChunkSize));
         else if (blockCoordinate.y == 0 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, -ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, -ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, -ChunkSize, 0));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, 0, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, 0, -ChunkSize));
         else if (blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == 0)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, ChunkSize, -ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, ChunkSize, -ChunkSize));
         else if (blockCoordinate.x == 0 && blockCoordinate.y == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, ChunkSize, 0));
         else if (blockCoordinate.x == 0 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, -ChunkSize, 0, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, -ChunkSize, 0, ChunkSize));
         else if (blockCoordinate.y == 0 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, -ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, -ChunkSize, ChunkSize));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.y == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, 0));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, ChunkSize, 0));
         else if (blockCoordinate.x == ChunkSize - 1 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, ChunkSize, 0, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, ChunkSize, 0, ChunkSize));
         else if (blockCoordinate.y == ChunkSize - 1 && blockCoordinate.z == ChunkSize - 1)
-            MapLoadSingleton.Instance.RefreshExistingChunk(Lib.AddToVector(chunkCoordinate, 0, ChunkSize, ChunkSize));
+            MapLoadSingleton.Instance.RefreshExistingChunk(Utility.AddToVector(chunkCoordinate, 0, ChunkSize, ChunkSize));
  
     }
  
