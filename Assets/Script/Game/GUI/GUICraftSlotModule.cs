@@ -13,7 +13,7 @@ public class GUICraftSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerE
         public void Initialize(string stringID)
         {
                 StringID = stringID;
-                CraftData = CraftSingleton.GetItem(stringID);
+                CraftData = Craft.GetItem(stringID);
                 
                 _image = transform.Find("image").GetComponent<Image>();
                 _text = transform.Find("text").GetComponent<TextMeshProUGUI>();

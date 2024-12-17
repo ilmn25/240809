@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public static class Lib
+public static class Utility
 {
     public static Vector3 AddToVector(Vector3 vector, float x, float y, float z)
     {
@@ -25,12 +23,22 @@ public static class Lib
     {
         if (parameters.Length == 0)
         {
-            UnityEngine.Debug.Log("Log");
+            Debug.Log("(uwu) HAI");
         }
         else
         {
             string logMessage = string.Join(" | ", parameters);
-            UnityEngine.Debug.Log(logMessage);
+            Debug.Log(logMessage);
         }
+    }
+
+    public static bool isLayer(int colliderIndex, int targetIndex)
+    {
+        return (colliderIndex & (1 << targetIndex)) != 0;
+    }
+
+    public static float GetDeltaTime()
+    {
+        return (Time.deltaTime < Game.MaxDeltaTime) ? Time.deltaTime : Game.MaxDeltaTime;
     }
 }

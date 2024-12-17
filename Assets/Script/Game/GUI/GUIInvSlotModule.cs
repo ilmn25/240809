@@ -18,7 +18,7 @@ public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnRefreshSlot()
     {
-        InvSlotData slotData = InventorySingleton._playerInventory[SlotNumber];
+        InvSlotData slotData = InventorySingleton.PlayerInventory[SlotNumber];
         if (slotData.Stack != 0)
         {
             _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");

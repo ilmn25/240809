@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class BlockSingleton : MonoBehaviour
@@ -9,10 +10,14 @@ public class BlockSingleton : MonoBehaviour
     private static int _nextBlockID = 1;
  
     
-    public static Dictionary<int, Rect> TextureRectDictionary; // Dictionary to store the ID and corresponding Rect
     public static int TextureAtlasWidth;
     public static int TextureAtlasHeight;
     public static Texture2D TextureAtlas;
+    public static int TileSize;
+    public static int TilesPerRow;
+    public static NativeArray<int> Colx;
+    public static NativeArray<int> Rowy;
+    public static NativeHashMap<int, Rect> TextureRectDictionary;
     
     public static Material MeshMaterial; 
     public static Material ShadowMeshMaterial;
@@ -21,6 +26,14 @@ public class BlockSingleton : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        
+        TileSize = 16;
+        TilesPerRow = 12;
+        int[] colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
+        int[] rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};
+        Colx = new NativeArray<int>(colx, Allocator.Persistent);
+        Rowy = new NativeArray<int>(rowy, Allocator.Persistent);  
+        
         ShadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_shadow"));
         MeshMaterial = new(Resources.Load<Material>(MESH_MATERIAL_PATH));
  
@@ -49,7 +62,7 @@ public class BlockSingleton : MonoBehaviour
         TextureAtlasHeight = TextureAtlas.height;
 
         // Create the dictionary to pair the int ID with the texture rect
-        TextureRectDictionary = new Dictionary<int, Rect>();
+        TextureRectDictionary = new NativeHashMap<int, Rect>(_blockIDMap.InttoString.Count, Allocator.Persistent);
         int index = 0;
         foreach (var kvp in _blockIDMap.InttoString)
         { 
@@ -95,5 +108,16 @@ public class BlockSingleton : MonoBehaviour
     {
         if (id == 0) return null;
         return _blockIDMap.InttoString[id];
+    }
+
+    public static int textureWidth = 192;
+    public static int textureHeight = 128;
+
+    public static Vector2Int GetTileRect(int index)
+    { 
+        int targetRow = index / BlockSingleton.TilesPerRow;
+        int targetCol = index % BlockSingleton.TilesPerRow;  
+
+        return new Vector2Int(BlockSingleton.Colx[targetCol], BlockSingleton.Rowy[targetRow]);
     }
 }

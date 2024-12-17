@@ -14,8 +14,8 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        WorldSingleton.PlayerChunkTraverse += ScanAndUnload; 
-        WorldSingleton.PlayerChunkTraverse += ScanAndLoad; 
+        Scene.PlayerChunkTraverse += ScanAndUnload; 
+        Scene.PlayerChunkTraverse += ScanAndLoad; 
     }
 
     public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
@@ -29,7 +29,7 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
         { 
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             
-            if (!WorldSingleton.InPlayerRange(entityChunkPosition, WorldSingleton.LogicDistance))
+            if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
                 if (World.IsInWorldBounds(entityChunkPosition))
                     World.world[entityChunkPosition].DynamicEntity.Add(entityMachine.GetEntityData());
@@ -44,16 +44,16 @@ public class EntityDynamicLoadSingleton : MonoBehaviour
     void ScanAndLoad()
     {
         // Collect chunk coordinates within render distance
-        for (int x = -WorldSingleton.LogicRange; x <= WorldSingleton.LogicRange; x++)
+        for (int x = -Scene.LogicRange; x <= Scene.LogicRange; x++)
         {
-            for (int y = -WorldSingleton.LogicRange; y <= WorldSingleton.LogicRange; y++)
+            for (int y = -Scene.LogicRange; y <= Scene.LogicRange; y++)
             {
-                for (int z = -WorldSingleton.LogicRange; z <= WorldSingleton.LogicRange; z++)
+                for (int z = -Scene.LogicRange; z <= Scene.LogicRange; z++)
                 {
                     LoadEntitiesInChunk(new Vector3Int(
-                        WorldSingleton.PlayerChunkPosition.x + x * World.ChunkSize,
-                        WorldSingleton.PlayerChunkPosition.y + y * World.ChunkSize,
-                        WorldSingleton.PlayerChunkPosition.z + z * World.ChunkSize
+                        Scene.PlayerChunkPosition.x + x * World.ChunkSize,
+                        Scene.PlayerChunkPosition.y + y * World.ChunkSize,
+                        Scene.PlayerChunkPosition.z + z * World.ChunkSize
                     ));
                 }
             }

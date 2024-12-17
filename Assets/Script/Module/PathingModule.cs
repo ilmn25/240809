@@ -102,7 +102,7 @@ public abstract class PathingModule : Module
                 if (Machine && _nextPoint < Path.Count -2)
                 {
                     _nextPoint++;  
-                    Machine.transform.position = Lib.AddToVector(Path[_nextPoint].Position, 0, 0.1f, 0);
+                    Machine.transform.position = Utility.AddToVector(Path[_nextPoint].Position, 0, 0.1f, 0);
                 } else return;
             }   
             _moveOccupied = false; 
@@ -198,7 +198,7 @@ public abstract class PathingModule : Module
         } 
         else
         { 
-            _direction = (Lib.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
+            _direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
         } 
     }
      
@@ -271,10 +271,10 @@ public abstract class PathingModule : Module
         float distance, nearestDistance;
         if (_pathQueued != null && _pathQueued.Count > 0) 
         {
-            nearestDistance = Lib.SquaredDistance(Machine.transform.position, _pathQueued[0].Position);
+            nearestDistance = Utility.SquaredDistance(Machine.transform.position, _pathQueued[0].Position);
             for (int i = 1; i < _pathQueued.Count; i++)
             {
-                distance = Lib.SquaredDistance(Machine.transform.position, _pathQueued[i].Position);
+                distance = Utility.SquaredDistance(Machine.transform.position, _pathQueued[i].Position);
                 if (distance < nearestDistance)
                 {
                     nearestPoint = i;

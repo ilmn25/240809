@@ -54,7 +54,7 @@ public class PathFind
         Node closestNode = null;
         Node neighborNode; 
          
-        openList.Add(new Node(startPosition, null, 0, Lib.SquaredDistance(startPosition, endPosition), false, new Vector3Int(0, 0, 0)));
+        openList.Add(new Node(startPosition, null, 0, Utility.SquaredDistance(startPosition, endPosition), false, new Vector3Int(0, 0, 0)));
         while (openList.Count > 0 && closedList.Count < scanCount)
         { 
             openList.Sort((A, B) => A.F.CompareTo(B.F)); // sort lowest f to [0] 
@@ -71,18 +71,18 @@ public class PathFind
                 if (closedList.Contains(dirPosition)) continue;
                  
                 isFloat = Node.IsAir(dirPosition + Vector3Int.down); // set true if midair
-                gCost = currentNode.G + Lib.SquaredDistance(currentNode.Position, dirPosition);
+                gCost = currentNode.G + Utility.SquaredDistance(currentNode.Position, dirPosition);
                 if (direction.x != 0 && direction.z != 0 && isFloat) gCost++;  
                   
                 //don't add if not the lowest node compared to others
                 if (openList.Exists(node => node.Position == dirPosition && node.G <= gCost) || 
                     !agent.IsValidPosition(dirPosition, direction, currentNode)) continue;   
 
-                hCost = Lib.SquaredDistance(dirPosition, endPosition); 
+                hCost = Utility.SquaredDistance(dirPosition, endPosition); 
                 neighborNode = new Node(dirPosition, currentNode, gCost, hCost, isFloat, direction);
                 openList.Add(neighborNode);
 
-                currentDistance = Lib.SquaredDistance(dirPosition, endPosition);
+                currentDistance = Utility.SquaredDistance(dirPosition, endPosition);
                 if (currentDistance < closestDistance)
                 {
                     closestDistance = currentDistance;

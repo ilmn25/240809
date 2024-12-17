@@ -20,28 +20,18 @@ public class MapLoadSingleton : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        _colx.Dispose();
-        _rowy.Dispose();
-        _textureRectDictionary.Dispose();
+        BlockSingleton.Colx.Dispose();
+        BlockSingleton.Rowy.Dispose();
+        BlockSingleton.TextureRectDictionary.Dispose();
     }
     
     private async void Start()
     {   
         Instance = this;
-        WorldSingleton.PlayerChunkTraverse += HandleChunkMapTraverse;
+        Scene.PlayerChunkTraverse += HandleChunkMapTraverse;
+ 
 
-        _tileSize = 16;
-        _tilesPerRow = 12;
-        int[] colx = new int[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176};
-        int[] rowy = new int[] {112, 96, 80, 64, 48, 32, 16, 0};
-        _colx = new NativeArray<int>(colx, Allocator.Persistent);
-        _rowy = new NativeArray<int>(rowy, Allocator.Persistent);
-        
-        _textureRectDictionary = new NativeHashMap<int, Rect>(BlockSingleton.TextureRectDictionary.Count, Allocator.Persistent);
-        foreach (var kvp in BlockSingleton.TextureRectDictionary)
-        {
-            _textureRectDictionary[kvp.Key] = kvp.Value;
-        }
+ 
         
         
         
@@ -65,7 +55,7 @@ public class MapLoadSingleton : MonoBehaviour
         foreach (var kvp in _activeChunks)
         {
             _traverseCheckPosition = kvp.Key;
-            if (!WorldSingleton.InPlayerRange(kvp.Key, WorldSingleton.RenderDistance))
+            if (!Scene.InPlayerChunkRange(kvp.Key, Scene.RenderDistance))
             {
                 Destroy(kvp.Value.gameObject, 1);
                 EntityStaticLoadSingleton.Instance.UnloadEntitiesInChunk(kvp.Key); //static entities load in 
@@ -82,16 +72,16 @@ public class MapLoadSingleton : MonoBehaviour
         _destroyList.Clear();
 
         // Collect chunk coordinates within render distance
-        for (int x = -WorldSingleton.RenderRange; x <= WorldSingleton.RenderRange; x++)
+        for (int x = -Scene.RenderRange; x <= Scene.RenderRange; x++)
         {
-            for (int y = -WorldSingleton.RenderRange; y <= WorldSingleton.RenderRange; y++)
+            for (int y = -Scene.RenderRange; y <= Scene.RenderRange; y++)
             {
-                for (int z = -WorldSingleton.RenderRange; z <= WorldSingleton.RenderRange; z++)
+                for (int z = -Scene.RenderRange; z <= Scene.RenderRange; z++)
                 {
                     _traverseCheckPosition = new Vector3Int(
-                        WorldSingleton.PlayerChunkPosition.x + x * World.ChunkSize,
-                        WorldSingleton.PlayerChunkPosition.y + y * World.ChunkSize,
-                        WorldSingleton.PlayerChunkPosition.z + z * World.ChunkSize
+                        Scene.PlayerChunkPosition.x + x * World.ChunkSize,
+                        Scene.PlayerChunkPosition.y + y * World.ChunkSize,
+                        Scene.PlayerChunkPosition.z + z * World.ChunkSize
                     );
                     if (!_activeChunks.ContainsKey(_traverseCheckPosition) && World.IsInWorldBounds(_traverseCheckPosition))
                         _ = LoadChunksOntoScreenAsync(_traverseCheckPosition);
@@ -107,7 +97,7 @@ public class MapLoadSingleton : MonoBehaviour
         await _semaphoreSlim.WaitAsync();
         try
         { 
-            if ((replace || !_activeChunks.ContainsKey(chunkCoord)) && WorldSingleton.InPlayerRange(chunkCoord, WorldSingleton.RenderDistance))
+            if ((replace || !_activeChunks.ContainsKey(chunkCoord)) && Scene.InPlayerChunkRange(chunkCoord, Scene.RenderDistance))
             {
                 _chunkCoordinate = chunkCoord;
                 _chunkData = World.world[chunkCoord.x, chunkCoord.y, chunkCoord.z];
@@ -116,7 +106,7 @@ public class MapLoadSingleton : MonoBehaviour
                     await Task.Run(() => LoadMeshMath()); 
                     await Task.Delay(10);
                     LoadMeshObject(replace);
-                }  else Lib.Log("Chunk in queue is zero");
+                }  else Utility.Log("Chunk in queue is zero");
             }
         }
         catch (Exception ex)
@@ -178,14 +168,7 @@ public class MapLoadSingleton : MonoBehaviour
     }
  
 
-
-
-    // const
-    private int _tileSize;
-    private int _tilesPerRow;
-    private NativeArray<int> _colx;
-    private NativeArray<int> _rowy; 
-    private NativeHashMap<int, Rect> _textureRectDictionary;
+ 
 
     // input
     private Vector3Int _chunkCoordinate;
@@ -207,11 +190,11 @@ public class MapLoadSingleton : MonoBehaviour
             {
                 // const
                 chunkSize = World.ChunkSize,
-                tileSize = _tileSize,
-                tilesPerRow = _tilesPerRow, 
-                colx = _colx,
-                rowy = _rowy,  
-                textureRectDictionary = _textureRectDictionary,
+                tileSize = BlockSingleton.TileSize,
+                tilesPerRow = BlockSingleton.TilesPerRow, 
+                colx = BlockSingleton.Colx,
+                rowy = BlockSingleton.Rowy,  
+                textureRectDictionary = BlockSingleton.TextureRectDictionary,
                 textureAtlasWidth = BlockSingleton.TextureAtlasWidth,
                 textureAtlasHeight = BlockSingleton.TextureAtlasHeight, 
 

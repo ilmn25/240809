@@ -13,23 +13,23 @@ public static class SetPiece
     { 
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
-            Lib.Log("anchor A set");
+            Utility.Log("anchor A set");
             _positionA = Vector3Int.FloorToInt(Game.Player.transform.position);
         }
         if (Input.GetKeyDown(KeyCode.RightBracket))
         {
-            Lib.Log("anchor B set");
+            Utility.Log("anchor B set");
             _positionB = Vector3Int.FloorToInt(Game.Player.transform.position);
         } 
         if (Input.GetKeyDown(KeyCode.Equals))
         {
-            Lib.Log("exported to file");
-            SaveSetPieceFile(CopySetPiece(), WorldSingleton.Instance.setPieceName);
+            Utility.Log("exported to file");
+            SaveSetPieceFile(CopySetPiece(), Scene.Instance.setPieceName);
         }
         if (Input.GetKeyDown(KeyCode.Minus))
         {
-            Lib.Log("imported to world"); 
-            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(WorldSingleton.Instance.setPieceName));
+            Utility.Log("imported to world"); 
+            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(Scene.Instance.setPieceName));
         }
     }
      

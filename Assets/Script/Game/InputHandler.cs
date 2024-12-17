@@ -2,33 +2,45 @@
 using System;
 using UnityEngine;
  
-public class InputSingleton : MonoBehaviour
+public class InputHandler
 {
-    private Vector3 _thresholdPoint;
-    private RaycastHit _targetInfo;
+    private static Vector3 _thresholdPoint;
+    private static RaycastHit _targetInfo;
     
-    private GameObject _gameObject;
-    private Vector3 _direction;
-    private Vector3 _position;
-    private int _layerMask;
-    
-    private int RANGE = 5;
-    
-    private void Update()
+    private static GameObject _gameObject;
+    private static Vector3 _direction;
+    private static Vector3 _position;
+    private static int _layerMask;
+
+    private const int Range = 5;
+
+    public static void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            if (Screen.fullScreen)
+            {
+                Screen.SetResolution(960, 540, false);
+            }
+            else
+            {
+                Screen.SetResolution(1920, 1080, true);
+            }
+        }
+        
         HandleScroll();
         
         if (Game.GUIBusy) return;
+        
         HandleRaycast(); 
-        // if (Input.GetMouseButtonDown(0))
-        //     Lib.Log(_layerMask, _gameObject, _position, IsInRange());
-        if (_layerMask != -1 && IsInRange())
+        
+        if (_layerMask != -1 && Scene.InPlayerBlockRange(_position, Range))
             HandleInput();
     }
 
-    private void HandleScroll()
+    private static void HandleScroll()
     {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0) return;
 
         if (Game.GUIBusy)
@@ -45,11 +57,11 @@ public class InputSingleton : MonoBehaviour
         }  
         else
         {
-            InventorySingleton.Instance.HandleScrollInput(scroll);
+            InventorySingleton.HandleScrollInput(scroll);
         }
     }
     
-    private void HandleRaycast()
+    private static void HandleRaycast()
     { 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         
@@ -76,7 +88,6 @@ public class InputSingleton : MonoBehaviour
 
         if (_targetInfo.collider)
         {
-            // _layerMask = _targetInfo.collider.gameObject.layer;
             _layerMask = _targetInfo.collider.includeLayers;
             _gameObject = _targetInfo.collider.gameObject;
             _position = _targetInfo.point;
@@ -85,30 +96,20 @@ public class InputSingleton : MonoBehaviour
         else
             _layerMask = -1;
     }
-    
-    bool IsInRange()
-    { 
-        if (Mathf.Abs(_position.x - Game.Player.transform.position.x) > RANGE ||
-            Mathf.Abs(_position.y - Game.Player.transform.position.y) > RANGE ||
-            Mathf.Abs(_position.z - Game.Player.transform.position.z) > RANGE)
-        {
-            return false;
-        }
-        return true;
-    }
+ 
 
-    private void HandleInput()
+    private static void HandleInput()
     {
-        if (Game.isLayer(_layerMask, Game.IndexMap))
+        if (Utility.isLayer(_layerMask, Game.IndexMap))
         {
-            PlayerChunkEditSingleton.Instance.HandlePositionInfo(_position,  _direction);
+            PlayerTerraform.HandlePositionInfo(_position,  _direction);
             if (Input.GetMouseButtonDown(0))
             {
-                PlayerChunkEditSingleton.Instance.HandleMapBreak(); 
+                PlayerTerraform.HandleMapBreak(); 
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                PlayerChunkEditSingleton.Instance.HandleMapPlace();
+                PlayerTerraform.HandleMapPlace();
             }
         }
         

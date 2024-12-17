@@ -22,7 +22,7 @@ public class GUICraftingSingleton : MonoBehaviour
     private void Initialize()
     {
         int count = 1;
-        foreach (var recipe in CraftSingleton._craftList)
+        foreach (var recipe in Craft.Dictionary)
         {
             GameObject slot = Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), Game.GUIInvCrafting.transform, false);
      
@@ -45,7 +45,7 @@ public class GUICraftingSingleton : MonoBehaviour
         }
 
         ItemData itemData = ItemSingleton.GetItem(stringID);
-        CraftData craftData = CraftSingleton.GetItem(stringID);
+        CraftData craftData = Craft.GetItem(stringID);
         
         string text = itemData.Name + " (" + craftData.Stack + ")\n";
         foreach (var ingredient in craftData.Ingredients)
@@ -61,7 +61,7 @@ public class GUICraftingSingleton : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && _stringID != null)
         {
-            CraftSingleton.Instance.CraftItem(_stringID);
+            Craft.CraftItem(_stringID);
             GUICursorSingleton.UpdateCursorSlot();
         } 
     }

@@ -3,34 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventorySingleton : MonoBehaviour
+public class InventorySingleton 
 {
-    public static InventorySingleton Instance { get; private set; }
-    public static List<InvSlotData> _playerInventory;
+    public static List<InvSlotData> PlayerInventory;
 
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
     private static int _currentKey = 0;
     public static InvSlotData CurrentItem;
 
-    public static int INVENTORY_ROW_AMOUNT = 3;
-    public static int INVENTORY_SLOT_AMOUNT = 9;
+    public static readonly int InventoryRowAmount = 3;
+    public static readonly int InventorySlotAmount = 9;
 
-    public static event Action SlotUpdate;
-     
+    public static event Action SlotUpdate; 
 
-    void Awake()
+    public static void SetInventory(List<InvSlotData> data)
     {
-        Instance = this; 
-    }
-
-    public void SetInventory(List<InvSlotData> data)
-    {
-        _playerInventory = data;
+        PlayerInventory = data;
         RefreshInventory();
     }
     
-    public void HandleInventoryUpdate()
+    public static void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
         { 
@@ -46,12 +39,12 @@ public class InventorySingleton : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Tilde))
         {
-            _currentRow = (_currentRow + 1) % INVENTORY_ROW_AMOUNT;
+            _currentRow = (_currentRow + 1) % InventoryRowAmount;
             RefreshInventory();
         }
  
 
-        for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
+        for (int i = 0; i < InventorySlotAmount; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {  
@@ -62,16 +55,16 @@ public class InventorySingleton : MonoBehaviour
         }
     }
 
-    public void HandleScrollInput(float input)
+    public static void HandleScrollInput(float input)
     {
-        _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)input, INVENTORY_SLOT_AMOUNT); 
+        _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)input, InventorySlotAmount); 
         RefreshInventory(); 
     }
 
-    public void RefreshInventory()
+    public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = _playerInventory[_currentKey];
+        CurrentItem = PlayerInventory[_currentKey];
         SlotUpdate?.Invoke();
         GUIStorageSingleton.Instance.RefreshCursorSlot();
     }
@@ -79,19 +72,19 @@ public class InventorySingleton : MonoBehaviour
     public static int CalculateKey(int row = -1, int slot = -1)
     {
         if (row == -1)
-            return _currentRow * INVENTORY_SLOT_AMOUNT + _currentSlot;
-        return row * INVENTORY_SLOT_AMOUNT + slot;
+            return _currentRow * InventorySlotAmount + _currentSlot;
+        return row * InventorySlotAmount + slot;
     } 
     
-    public void AddItem(string stringID, int quantity = 1)
+    public static void AddItem(string stringID, int quantity = 1)
     {
         int maxStackSize = ItemSingleton.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
-        if (_playerInventory[_currentKey].StringID == stringID && _playerInventory[_currentKey].Stack < maxStackSize)
+        if (PlayerInventory[_currentKey].StringID == stringID && PlayerInventory[_currentKey].Stack < maxStackSize)
         {
-            int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[_currentKey].Stack);
-            _playerInventory[_currentKey].Stack += addableAmount;
+            int addableAmount = Math.Min(quantity, maxStackSize - PlayerInventory[_currentKey].Stack);
+            PlayerInventory[_currentKey].Stack += addableAmount;
             quantity -= addableAmount;
 
             if (quantity <= 0)
@@ -102,7 +95,7 @@ public class InventorySingleton : MonoBehaviour
         }
 
         // Try to add to existing slots with the same item
-        foreach (var slot in _playerInventory)
+        foreach (var slot in PlayerInventory)
         {
             if (slot.StringID == stringID && slot.Stack < maxStackSize)
             {
@@ -122,23 +115,23 @@ public class InventorySingleton : MonoBehaviour
         while (quantity > 0)
         { 
             int slotID = GetEmptySlot();
-            int addableAmount = Math.Min(quantity, maxStackSize - _playerInventory[slotID].Stack);
-            _playerInventory[slotID].SetItem(_playerInventory[slotID].Stack + addableAmount, stringID, _playerInventory[slotID].Modifier, _playerInventory[slotID].Locked);
+            int addableAmount = Math.Min(quantity, maxStackSize - PlayerInventory[slotID].Stack);
+            PlayerInventory[slotID].SetItem(PlayerInventory[slotID].Stack + addableAmount, stringID, PlayerInventory[slotID].Modifier, PlayerInventory[slotID].Locked);
             quantity -= addableAmount;
         }
 
         RefreshInventory();
     }
     
-    public void RemoveItem(string stringID, int quantity = 1)
+    public static void RemoveItem(string stringID, int quantity = 1)
     {
         // Prioritize current slot
-        if (_playerInventory[_currentKey].StringID == stringID)
+        if (PlayerInventory[_currentKey].StringID == stringID)
         {
-            int removableAmount = Math.Min(quantity, _playerInventory[_currentKey].Stack);
-            _playerInventory[_currentKey].Stack -= removableAmount;
+            int removableAmount = Math.Min(quantity, PlayerInventory[_currentKey].Stack);
+            PlayerInventory[_currentKey].Stack -= removableAmount;
             quantity -= removableAmount;
-            if (_playerInventory[_currentKey].Stack <= 0) _playerInventory[_currentKey].clear();
+            if (PlayerInventory[_currentKey].Stack <= 0) PlayerInventory[_currentKey].clear();
             if (quantity <= 0)
             { 
                 RefreshInventory();
@@ -147,7 +140,7 @@ public class InventorySingleton : MonoBehaviour
         }
 
         // Continue with other slots if necessary
-        foreach (var slot in _playerInventory)
+        foreach (var slot in PlayerInventory)
         {
             if (slot.StringID == stringID)
             {
@@ -171,7 +164,7 @@ public class InventorySingleton : MonoBehaviour
     public static int GetAmount(string stringID)
     {
         int count = 0;
-        foreach (var slot in _playerInventory)
+        foreach (var slot in PlayerInventory)
         {
             if (slot.StringID == stringID)
             { 
@@ -184,7 +177,7 @@ public class InventorySingleton : MonoBehaviour
     private static int GetEmptySlot()
     {
         int slotID = 0;
-        while (_playerInventory[slotID].Stack != 0)
+        while (PlayerInventory[slotID].Stack != 0)
         {
             slotID++;
         }

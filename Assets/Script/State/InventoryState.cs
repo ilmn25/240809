@@ -68,12 +68,12 @@ public class ItemBlock : State
 { 
     public override void OnUpdateState()
     {  
-        PlayerChunkEditSingleton.Instance._blockStringID = InventorySingleton.CurrentItem.StringID;
+        PlayerTerraform.BlockStringID = InventorySingleton.CurrentItem.StringID;
     }
 
     public override void OnExitState()
     {
-        PlayerChunkEditSingleton.Instance._blockStringID = null;
+        PlayerTerraform.BlockStringID = null;
     }
 } 
 public class ItemTool : State
@@ -97,12 +97,12 @@ public class ItemTool : State
         playerSprite = Game.Player.transform.Find("sprite").transform.Find("char");
         toolSprite = Game.Player.transform.Find("sprite").transform.Find("tool"); 
         toolSprite.gameObject.SetActive(true);
-        PlayerChunkEditSingleton.Instance._toolData = ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID);
+        PlayerTerraform.ToolData = ItemSingleton.GetItem(InventorySingleton.CurrentItem.StringID);
     }
 
     public override void OnExitState()
     {
-        PlayerChunkEditSingleton.Instance._toolData = null;
+        PlayerTerraform.ToolData = null;
         toolSprite.gameObject.SetActive(false);
     }
 

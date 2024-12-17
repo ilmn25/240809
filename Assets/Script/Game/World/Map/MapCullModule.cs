@@ -163,7 +163,7 @@ public class MapCullModule : MonoBehaviour
         try
         { 
             //TODO y
-            playerChunkPosition = WorldSingleton.PlayerChunkPosition;
+            playerChunkPosition = Scene.PlayerChunkPosition;
             xDist = Mathf.Abs(playerChunkPosition.x - transform.position.x);
             zDist = Mathf.Abs(playerChunkPosition.z - transform.position.z);   
             xCheck = xDist <= CULL_DISTANCE; 

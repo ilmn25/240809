@@ -67,7 +67,7 @@ public class PlayerMovementModule : Module
     public void HandleMovementUpdate()
     {  
         
-        _deltaTime = Game.GetDeltaTime();
+        _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;
 
         // get input
@@ -78,15 +78,15 @@ public class PlayerMovementModule : Module
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatusSingleton._stamina > 1)
+            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatus.Stamina > 1)
             {
                 _speedTarget = SPEED_RUN;
-                PlayerStatusSingleton._stamina -= 0.1f;
+                PlayerStatus.Stamina -= 0.1f;
             }
             else
             {
                 _speedTarget = SPEED_WALK;
-                PlayerStatusSingleton._stamina += 0.1f;
+                PlayerStatus.Stamina += 0.1f;
             }
             
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
