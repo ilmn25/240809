@@ -37,7 +37,7 @@ public class TreeState : State
     public void Hit()
     {
         Audio.PlaySFX(Game.DigSound);
-        if (GUI.GUIBusy) return;
+        if (GUI.Active) return;
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>();

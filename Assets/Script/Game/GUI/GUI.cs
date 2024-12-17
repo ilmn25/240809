@@ -8,7 +8,9 @@ public class GUI
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
     
-    private static CoroutineTask _scaleTask; 
+    public static bool Active = false;
+    
+    private static CoroutineTask _showTask; 
     
     public static void Initialize()
     {
@@ -20,50 +22,45 @@ public class GUI
  
     public static void Update()
     {
-        GUICraft.Update();
-        GUIDialogue.Update();
-        GUICursor.Update();
-        GUIStorage.Update();
+        Active = Game.GUIInv.activeSelf;
+        Camera.main.depth = Active? -1 : 1;
         
-        if (GUIBusy && Input.GetMouseButtonDown(0)) Audio.PlaySFX(Game.PickUpSound);
+        if (Active)
+        {
+            if (Input.GetMouseButtonDown(0))
+                Audio.PlaySFX(Game.PickUpSound);
+            
+            GUICraft.Update();
+            GUIDialogue.Update();
+            GUICursor.Update();
+            GUIStorage.Update();
+        }
 
         if (Input.GetKeyDown(KeyCode.Tab))  
         {
-            if (_scaleTask == null || (_scaleTask != null && !_scaleTask.Running))
+            if ((_showTask != null && !_showTask.Running) || _showTask == null)
             {
                 if (!Game.GUIInv.activeSelf)
                 { 
                     Game.GUIInv.SetActive(true);
                     GUIStorage.RefreshCursorSlot();
-                    _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, scale : 0.7f));
-                    _scaleTask.Finished += (bool isManual) => 
+                    _showTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, scale : 0.7f));
+                    _showTask.Finished += (bool isManual) => 
                     {
-                        _scaleTask = null;
+                        _showTask = null;
                     };
                 }
                 else
                 {
-                    _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, scale : 0.7f));
-                    _scaleTask.Finished += (bool isManual) => 
+                    _showTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, scale : 0.7f));
+                    _showTask.Finished += (bool isManual) => 
                     {
-                        _scaleTask = null;
+                        _showTask = null;
                         Game.GUIInv.SetActive(false);
                     };
                 }
             } 
         }
-        
-        
-        if (Game.GUIInv.activeSelf)
-        { 
-            GUIBusy = true;
-            Camera.main.depth = -1;
-        }
-        else
-        {
-            GUIBusy = false;
-            Camera.main.depth = 1;
-        }  
     }
 
     public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)
@@ -77,7 +74,6 @@ public class GUI
         }
       
     }
-
 
     public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed = 0.5f, float scale = 1f)
     {
@@ -106,6 +102,5 @@ public class GUI
 
         target.transform.localScale = targetScale;
     }
-
-    public static bool GUIBusy = false;
+ 
 }

@@ -30,7 +30,7 @@ public class InputHandler
         
         HandleScroll();
         
-        if (GUI.GUIBusy) return;
+        if (GUI.Active) return;
         
         HandleRaycast(); 
         
@@ -43,7 +43,7 @@ public class InputHandler
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0) return;
 
-        if (GUI.GUIBusy)
+        if (GUI.Active)
         {
             GUICraft.HandleScrollInput(scroll);
         }

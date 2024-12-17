@@ -42,7 +42,6 @@ public class PlayerData
             using (FileStream file = File.Open(Game.PlayerSavePath, FileMode.Open))
             {
                 playerData = (PlayerData)Game.BinaryFormatter.Deserialize(file);
-                Utility.Log();
             }
         }
         else
