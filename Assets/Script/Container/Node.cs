@@ -24,16 +24,16 @@ public class Node
     public static bool IsAir(Vector3Int pos)
     {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || 
-            pos.x >= WorldSingleton.World.Bounds.x || 
-            pos.z >= WorldSingleton.World.Bounds.z)
+            pos.x >= World.world.Bounds.x || 
+            pos.z >= World.world.Bounds.z)
             return false; // Check bounds x and z
 
         // Check bounds y (true even if above max y)
-        if (pos.y >= WorldSingleton.World.Bounds.y)
+        if (pos.y >= World.world.Bounds.y)
             return true;
 
         // Check air or block
-        return WorldSingleton._boolMap[pos.x, pos.y, pos.z];
+        return NavMap.Get(pos);
     }
     
  

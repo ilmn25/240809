@@ -9,11 +9,11 @@ public class PathRandom
     public static List<Node> FindPath(PathingModule agent, int scanCount)
     {
         Vector3Int startPosition =
-            WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
 
         Vector3Int endPosition =
-            WorldSingleton.Instance.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + 
-                                                        Node.RandomDirection() * 100));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + 
+                                                                     Node.RandomDirection() * 100));
 
         List<Node> openList = new List<Node>(); 
         HashSet<Vector3> closedList = new HashSet<Vector3>();

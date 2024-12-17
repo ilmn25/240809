@@ -26,12 +26,12 @@ public class MapEditSingleton : MonoBehaviour
             // Use existing breakCost and breakThreshold
             breakCost = existingBlockData.breakCost;
             breakThreshold = existingBlockData.breakThreshold;
-            blockNameID = BlockSingleton.ConvertID(MapLoadSingleton.Instance.GetBlockInChunk(coordinate));
+            blockNameID = BlockSingleton.ConvertID(World.GetBlock(coordinate));
         }
         else
         {
             // Check if the block is occupied
-            blockNameID = BlockSingleton.ConvertID(MapLoadSingleton.Instance.GetBlockInChunk(coordinate));
+            blockNameID = BlockSingleton.ConvertID(World.GetBlock(coordinate));
             if (blockNameID == null)
             {
                 return; // Block is not occupied or an error occurred
@@ -56,7 +56,8 @@ public class MapEditSingleton : MonoBehaviour
             if (breakCost <= 0)
             {
                 EntitySingleton.SpawnItem(blockNameID, coordinate);
-                WorldSingleton.Instance.UpdateMap(coordinate, 0);
+                AudioSingleton.PlaySFX(Game.DigSound);
+                World.SetBlock(coordinate, 0);
                 blockDataList.Remove(existingBlockData);
             }
             else

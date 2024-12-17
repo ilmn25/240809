@@ -20,7 +20,7 @@ class NPCChase : State {
     }
     
     public override void OnUpdateState() {
-        if (_sprite.isVisible && MapLoadSingleton.Instance._activeChunks.ContainsKey(WorldSingleton.GetChunkCoordinate(Machine.transform.position)))
+        if (_sprite.isVisible && MapLoadSingleton.Instance._activeChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position)))
         {
             _npcMovementModule.HandleMovementUpdate(_pathingModule.GetNextDirection());
             _npcAnimationModule.HandleAnimationUpdate();

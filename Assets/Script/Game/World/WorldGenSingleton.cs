@@ -26,8 +26,8 @@ public class WorldGenSingleton : MonoBehaviour
     private float _marbleOffsetZ;
     private float _caveOffset;
     
-    private int _chunkSize = WorldSingleton.CHUNK_SIZE;
-    private int _worldHeight = (ySize - 2) * WorldSingleton.CHUNK_SIZE;
+    private int _chunkSize = World.ChunkSize;
+    private int _worldHeight = (Size.y - 2) * World.ChunkSize;
     
     private float _stoneScale = 0.01f;
     private float _dirtScale = 0.005f;
@@ -61,22 +61,20 @@ public class WorldGenSingleton : MonoBehaviour
     }
 
 
-    public static int xSize = 15;
-    public static int ySize = 7;
-    public static int zSize = 15;
+    public static Vector3Int Size = new Vector3Int(3, 3, 3);
 
 
     //! debug tools
-    public void GenerateRandomMapSave()
+    public void Generate()
     { 
-        WorldSingleton.World = new WorldData(xSize, ySize, zSize);
+        World.world = new World(Size.x, Size.y, Size.z);
         List<Vector3Int> coordinatesList = new List<Vector3Int>();
 
-        for (int x = 0; x < xSize * WorldSingleton.CHUNK_SIZE; x += WorldSingleton.CHUNK_SIZE)
+        for (int x = 0; x < Size.x * World.ChunkSize; x += World.ChunkSize)
         {
-            for (int y = 0; y < ySize * WorldSingleton.CHUNK_SIZE; y += WorldSingleton.CHUNK_SIZE)
+            for (int y = 0; y < Size.y * World.ChunkSize; y += World.ChunkSize)
             {
-                for (int z = 0; z < zSize * WorldSingleton.CHUNK_SIZE; z += WorldSingleton.CHUNK_SIZE)
+                for (int z = 0; z < Size.z * World.ChunkSize; z += World.ChunkSize)
                 {
                     coordinatesList.Add(new Vector3Int(x, y, z));
                 }
@@ -85,25 +83,25 @@ public class WorldGenSingleton : MonoBehaviour
         
         foreach (var coordinates in coordinatesList)
         {
-            WorldSingleton.World[coordinates.x, coordinates.y, coordinates.z] = GenerateTestChunk(coordinates); 
+            World.world[coordinates.x, coordinates.y, coordinates.z] = GenerateTestChunk(coordinates); 
         }
 
-        int chunkSize = WorldSingleton.CHUNK_SIZE;
-        for (int x = 0; x < WorldSingleton.World.Bounds.x; x++)
+        int chunkSize = World.ChunkSize;
+        for (int x = 0; x < World.world.Bounds.x; x++)
         {
-            for (int y = 0; y < WorldSingleton.World.Bounds.y - 1; y++)
+            for (int y = 0; y < World.world.Bounds.y - 1; y++)
             {
-                for (int z = 0; z < WorldSingleton.World.Bounds.z; z++)
+                for (int z = 0; z < World.world.Bounds.z; z++)
                 { 
                     Vector3Int worldPos = new Vector3Int(x, y, z);
-                    Vector3Int chunkPos = WorldSingleton.Instance.GetRelativePosition(worldPos);
+                    Vector3Int chunkPos = NavMap.GetRelativePosition(worldPos);
                     int localChunkX = worldPos.x % chunkSize;
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
+                    if (World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == BlockSingleton.ConvertID("dirt") &&
                         localChunkY + 1 != chunkSize &&
-                        WorldSingleton.World[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
+                        World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
                         if (_random.NextDouble() <= 0.0002)
                         {
@@ -133,9 +131,9 @@ public class WorldGenSingleton : MonoBehaviour
         {
             if (coordinates.y == 0)
             {
-                for (int z = 0; z < WorldSingleton.CHUNK_SIZE; z++)
+                for (int z = 0; z < World.ChunkSize; z++)
                 {
-                    for (int x = 0; x < WorldSingleton.CHUNK_SIZE; x++)
+                    for (int x = 0; x < World.ChunkSize; x++)
                     {
                         _chunkData.Map[x, 0, z] = 1;
                     }
@@ -157,8 +155,8 @@ public class WorldGenSingleton : MonoBehaviour
         bool[,] maze = HandleMazeAlgorithm(_chunkSize, _chunkSize);
 
         // Calculate the center of the map
-        int centerX = WorldSingleton.World.Bounds.x / 3;
-        int centerZ = WorldSingleton.World.Bounds.z / 3;
+        int centerX = World.world.Bounds.x / 3;
+        int centerZ = World.world.Bounds.z / 3;
         int craterRadius = 35; // Adjust the radius as needed
     
         for (int y = 0; y < _chunkSize; y++)

@@ -10,8 +10,8 @@ public class PlayerMachine : Machine
         AddState(new InventoryState());  
         AddState(new PlayerState()); 
         transform.position = new Vector3( 
-            WorldSingleton.CHUNK_SIZE * WorldGenSingleton.xSize / 2,
-            WorldSingleton.CHUNK_SIZE * WorldGenSingleton.ySize + 15,
-            WorldSingleton.CHUNK_SIZE * WorldGenSingleton.zSize / 2);
+            World.ChunkSize * WorldGenSingleton.Size.x / 2,
+            World.ChunkSize * WorldGenSingleton.Size.y + 15,
+            World.ChunkSize * WorldGenSingleton.Size.z / 2);
     }
 } 

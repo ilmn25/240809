@@ -1,4 +1,5 @@
 using Unity.Collections;
+using UnityEngine;
 
 [System.Serializable]
 public class Array3D<T>
@@ -16,6 +17,11 @@ public class Array3D<T>
     {
         get => array[x + size * (y + size * z)];
         set => array[x + size * (y + size * z)] = value;
+    }
+    public T this[Vector3Int position]
+    {
+        get => array[position.x + size * (position.y + size * position.z)];
+        set => array[position.x + size * (position.y + size * position.z)] = value;
     }
     public int Size => size; 
 }

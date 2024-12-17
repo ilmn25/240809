@@ -13,11 +13,11 @@ public class ChunkData
     static ChunkData()
     {
         Zero = new ChunkData();
-        for (int x = 0; x < WorldSingleton.CHUNK_SIZE; x++)
+        for (int x = 0; x < World.ChunkSize; x++)
         {
-            for (int y = 0; y < WorldSingleton.CHUNK_SIZE; y++)
+            for (int y = 0; y < World.ChunkSize; y++)
             {
-                for (int z = 0; z < WorldSingleton.CHUNK_SIZE; z++)
+                for (int z = 0; z < World.ChunkSize; z++)
                 {
                     Zero.Map[x, y, z] = 0;
                 }
@@ -28,7 +28,7 @@ public class ChunkData
     public ChunkData(int size = 0)
     {
         Map = new Array3D<int>();
-        Map.Initialize(size == 0 ? WorldSingleton.CHUNK_SIZE : size);
+        Map.Initialize(size == 0 ? World.ChunkSize : size);
         StaticEntity = new List<ChunkEntityData>();
         DynamicEntity = new List<ChunkEntityData>();
     }

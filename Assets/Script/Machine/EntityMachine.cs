@@ -10,7 +10,7 @@ public abstract class EntityMachine : Machine
     
     public ChunkEntityData GetEntityData()
     {
-        entityData.position = new SerializableVector3Int(WorldSingleton.GetBlockCoordinate(transform.position));
+        entityData.position = new SerializableVector3Int(World.GetBlockCoordinate(transform.position));
         UpdateEntityData();
         return entityData;
     }
@@ -25,7 +25,7 @@ public abstract class EntityMachine : Machine
     public void WipeEntity()
     {
         if (EntitySingleton.dictionary[entityData.stringID].Type == EntityType.Static)
-            EntityStaticLoadSingleton._activeEntities[WorldSingleton.GetChunkCoordinate(transform.position)].Item2
+            EntityStaticLoadSingleton._activeEntities[World.GetChunkCoordinate(transform.position)].Item2
                 .Remove(this);
         else
             EntityDynamicLoadSingleton.ForgetEntity(this);
