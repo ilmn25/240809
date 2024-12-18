@@ -138,7 +138,7 @@ public class World
  
     public static int GetBlock(Vector3Int coordinate) //0 = empty, 1 = block, error = out of bounds
     { 
-        return Inst[GetChunkCoordinate(coordinate)].Map[GetBlockCoordinate(coordinate)];
+        return Inst[GetChunkCoordinate(coordinate)][GetBlockCoordinate(coordinate)];
     }
 
     public static void SetBlock(Vector3Int coordinate, int blockID = 0)
@@ -146,7 +146,7 @@ public class World
         Vector3Int blockCoordinate = GetBlockCoordinate(coordinate);
         Vector3Int chunkCoordinate = GetChunkCoordinate(coordinate);
          
-        Inst[chunkCoordinate].Map[blockCoordinate] = blockID;
+        Inst[chunkCoordinate][blockCoordinate] = blockID;
         NavMap.Set(coordinate, blockID == 0);
         
         if (MapUpdated != null) MapUpdated(coordinate);

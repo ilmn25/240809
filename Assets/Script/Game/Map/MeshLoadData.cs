@@ -53,7 +53,7 @@ public class MeshLoadData
                 {
                     for (int z = 0; z < World.ChunkSize; z++)
                     {
-                        map[x, y, z] = chunk.Map[x, y, z];
+                        map[x, y, z] = chunk[x, y, z];
                     }
                 }
             }
@@ -66,7 +66,7 @@ public class MeshLoadData
             {
                 for (int z = 0; z < World.ChunkSize; z++)
                 {
-                    map[World.ChunkSize, y, z] = chunk.Map[0, y, z];
+                    map[World.ChunkSize, y, z] = chunk[0, y, z];
                 }
             }
         }
@@ -78,7 +78,7 @@ public class MeshLoadData
             {
                 for (int z = 0; z < World.ChunkSize; z++)
                 {
-                    map[-1, y, z] = chunk.Map[World.ChunkSize - 1, y, z];
+                    map[-1, y, z] = chunk[World.ChunkSize - 1, y, z];
                 }
             }
         }
@@ -90,7 +90,7 @@ public class MeshLoadData
             {
                 for (int z = 0; z < World.ChunkSize; z++)
                 {
-                    map[x, World.ChunkSize, z] = chunk.Map[x, 0, z];
+                    map[x, World.ChunkSize, z] = chunk[x, 0, z];
                 }
             }
         }
@@ -102,7 +102,7 @@ public class MeshLoadData
             {
                 for (int z = 0; z < World.ChunkSize; z++)
                 {
-                    map[x, -1, z] = chunk.Map[x, World.ChunkSize - 1, z];
+                    map[x, -1, z] = chunk[x, World.ChunkSize - 1, z];
                 }
             }
         }
@@ -114,7 +114,7 @@ public class MeshLoadData
             {
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    map[x, y, World.ChunkSize] = chunk.Map[x, y, 0];
+                    map[x, y, World.ChunkSize] = chunk[x, y, 0];
                 }
             }
         }
@@ -126,7 +126,7 @@ public class MeshLoadData
             {
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    map[x, y, -1] = chunk.Map[x, y, World.ChunkSize - 1];
+                    map[x, y, -1] = chunk[x, y, World.ChunkSize - 1];
                 }
             }
         }
@@ -138,7 +138,7 @@ public class MeshLoadData
                 coordinate.y - World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                map[World.ChunkSize, -1, z] = chunk.Map[0, World.ChunkSize - 1, z];
+                map[World.ChunkSize, -1, z] = chunk[0, World.ChunkSize - 1, z];
             }
         }
 
@@ -148,7 +148,7 @@ public class MeshLoadData
                 coordinate.y + World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                map[World.ChunkSize, World.ChunkSize, z] = chunk.Map[0, 0, z];
+                map[World.ChunkSize, World.ChunkSize, z] = chunk[0, 0, z];
             }
         }
 
@@ -158,7 +158,7 @@ public class MeshLoadData
                 coordinate.z + World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
-                map[World.ChunkSize, y, World.ChunkSize] = chunk.Map[0, y, 0];
+                map[World.ChunkSize, y, World.ChunkSize] = chunk[0, y, 0];
             }
         }
 
@@ -168,7 +168,7 @@ public class MeshLoadData
                 coordinate.z - World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
-                map[World.ChunkSize, y, -1] = chunk.Map[0, y, World.ChunkSize - 1];
+                map[World.ChunkSize, y, -1] = chunk[0, y, World.ChunkSize - 1];
             }
         }
 
@@ -178,7 +178,7 @@ public class MeshLoadData
                 coordinate.y - World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                map[-1, -1, -1] = chunk.Map[World.ChunkSize - 1, World.ChunkSize - 1, z];
+                map[-1, -1, -1] = chunk[World.ChunkSize - 1, World.ChunkSize - 1, z];
             }
         }
 
@@ -188,7 +188,7 @@ public class MeshLoadData
                 coordinate.y + World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                map[-1, World.ChunkSize, z] = chunk.Map[World.ChunkSize - 1, 0, z];
+                map[-1, World.ChunkSize, z] = chunk[World.ChunkSize - 1, 0, z];
             }
         }
 
@@ -198,7 +198,7 @@ public class MeshLoadData
                 coordinate.z + World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
-                map[-1, y, World.ChunkSize] = chunk.Map[World.ChunkSize - 1, y, 0];
+                map[-1, y, World.ChunkSize] = chunk[World.ChunkSize - 1, y, 0];
             }
         }
 
@@ -208,7 +208,7 @@ public class MeshLoadData
                 coordinate.z - World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
-                map[-1, y, -1] = chunk.Map[World.ChunkSize - 1, y, World.ChunkSize - 1];
+                map[-1, y, -1] = chunk[World.ChunkSize - 1, y, World.ChunkSize - 1];
             }
         }
 
@@ -218,7 +218,7 @@ public class MeshLoadData
                 coordinate.z - World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
-                map[x, World.ChunkSize, -1] = chunk.Map[x, 0, World.ChunkSize - 1];
+                map[x, World.ChunkSize, -1] = chunk[x, 0, World.ChunkSize - 1];
             }
         }
 
@@ -228,7 +228,7 @@ public class MeshLoadData
                 coordinate.z + World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
-                map[x, World.ChunkSize, World.ChunkSize] = chunk.Map[x, 0, 0];
+                map[x, World.ChunkSize, World.ChunkSize] = chunk[x, 0, 0];
             }
         }
 
@@ -238,7 +238,7 @@ public class MeshLoadData
                 coordinate.z - World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
-                map[x, -1, -1] = chunk.Map[x, World.ChunkSize - 1, World.ChunkSize - 1];
+                map[x, -1, -1] = chunk[x, World.ChunkSize - 1, World.ChunkSize - 1];
             }
         }
 
@@ -248,7 +248,7 @@ public class MeshLoadData
                 coordinate.z + World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
-                map[x, -1, World.ChunkSize] = chunk.Map[x, World.ChunkSize - 1, 0];
+                map[x, -1, World.ChunkSize] = chunk[x, World.ChunkSize - 1, 0];
             }
         }
 
@@ -257,7 +257,7 @@ public class MeshLoadData
         {
             Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z - World.ChunkSize];
-            map[-1, -1, -1] = chunk.Map[World.ChunkSize - 1, World.ChunkSize - 1,
+            map[-1, -1, -1] = chunk[World.ChunkSize - 1, World.ChunkSize - 1,
                 World.ChunkSize - 1];
         }
 
@@ -266,7 +266,7 @@ public class MeshLoadData
             Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z + World.ChunkSize];
             map[0, -1, World.ChunkSize] =
-                chunk.Map[World.ChunkSize - 1, World.ChunkSize - 1, 0];
+                chunk[World.ChunkSize - 1, World.ChunkSize - 1, 0];
         }
 
         void SetCornerNPN(Vector3Int coordinate)
@@ -274,14 +274,14 @@ public class MeshLoadData
             Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z - World.ChunkSize];
             map[-1, World.ChunkSize, -1] =
-                chunk.Map[World.ChunkSize - 1, 0, World.ChunkSize - 1];
+                chunk[World.ChunkSize - 1, 0, World.ChunkSize - 1];
         }
 
         void SetCornerNPP(Vector3Int coordinate)
         {
             Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z + World.ChunkSize];
-            map[-1, World.ChunkSize, World.ChunkSize] = chunk.Map[World.ChunkSize - 1, 0, 0];
+            map[-1, World.ChunkSize, World.ChunkSize] = chunk[World.ChunkSize - 1, 0, 0];
         }
 
         void SetCornerPNN(Vector3Int coordinate)
@@ -289,28 +289,28 @@ public class MeshLoadData
             Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z - World.ChunkSize];
             map[World.ChunkSize, -1, -1] =
-                chunk.Map[0, World.ChunkSize - 1, World.ChunkSize - 1];
+                chunk[0, World.ChunkSize - 1, World.ChunkSize - 1];
         }
 
         void SetCornerPNP(Vector3Int coordinate)
         {
             Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z + World.ChunkSize];
-            map[World.ChunkSize, -1, World.ChunkSize] = chunk.Map[0, World.ChunkSize - 1, 0];
+            map[World.ChunkSize, -1, World.ChunkSize] = chunk[0, World.ChunkSize - 1, 0];
         }
 
         void SetCornerPPN(Vector3Int coordinate)
         {
             Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z - World.ChunkSize];
-            map[World.ChunkSize, World.ChunkSize, -1] = chunk.Map[0, 0, World.ChunkSize - 1];
+            map[World.ChunkSize, World.ChunkSize, -1] = chunk[0, 0, World.ChunkSize - 1];
         }
 
         void SetCornerPPP(Vector3Int coordinate)
         {
             Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z + World.ChunkSize];
-            map[World.ChunkSize, World.ChunkSize, World.ChunkSize] = chunk.Map[0, 0, 0];
+            map[World.ChunkSize, World.ChunkSize, World.ChunkSize] = chunk[0, 0, 0];
         }
 
     }

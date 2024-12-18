@@ -40,7 +40,7 @@ public class EntityStaticLoad
     {  
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
-        List<ChunkEntityData> activeEntities = World.Inst[coordinate].StaticEntity;
+        List<ChunkEntityData> activeEntities = World.Inst[coordinate].staticEntity;
         // Find the key once
         if (!_activeEntities.ContainsKey(coordinate))
         {
