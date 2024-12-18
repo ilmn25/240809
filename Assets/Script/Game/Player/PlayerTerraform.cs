@@ -42,12 +42,12 @@ public class PlayerTerraform
         
         if (GUI.Active) return;
   
-        if (Input.GetMouseButtonDown(4)) //break top
+        if ( Control.control.DigUp.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.up;
             BreakBlock();
         }
-        else if (Input.GetMouseButtonDown(3)) //break under
+        else if ( Control.control.DigDown.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.down;
             BreakBlock();

@@ -70,7 +70,7 @@ public class Game : MonoBehaviour
 
     private void Update()
     { 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Control.control.Pause.KeyDown())
         {
             World.Save(0);
         }
@@ -80,7 +80,7 @@ public class Game : MonoBehaviour
         PlayerStatus.Update();
         Inventory.Update();
         PlayerTerraform.Update();
-        InputHandler.Update();
+        Control.Update();
         MapCull.Update();
          
     }

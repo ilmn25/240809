@@ -55,11 +55,8 @@ public class ItemFurniture : State
     public string stringID; 
 
     public override void OnUpdateState()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            stringID = Inventory.CurrentItem.StringID;
-        } 
+    { 
+        stringID = Inventory.CurrentItem.StringID;
     }
 }
 
@@ -109,7 +106,9 @@ public class ItemTool : State
     { 
         if (!isSwinging)
         {
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(3) || Input.GetMouseButtonDown(4))
+            if (Control.control.ActionPrimary.KeyDown() || 
+                Control.control.DigUp.KeyDown() ||
+                Control.control.DigDown.KeyDown())
             {
                 isSwinging = true;
                 swingTimer = 0f;

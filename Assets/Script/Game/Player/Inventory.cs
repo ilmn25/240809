@@ -24,34 +24,63 @@ public class Inventory
     }
     
     public static void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        { 
-            AddItem("brick", 100);
-            AddItem("stone", 100);
-            AddItem("dirt", 100);
-        }
-        if (Input.GetKeyDown(KeyCode.R) && CurrentItem != null)
+    { 
+        if (Control.control.Drop.KeyDown() && CurrentItem != null)
         {
             Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
             RemoveItem(CurrentItem.StringID); 
         }
-        
-        if (Input.GetKeyDown(KeyCode.Tilde))
+
+        if (Control.control.Hotbar.KeyDown())
         {
             _currentRow = (_currentRow + 1) % InventoryRowAmount;
             RefreshInventory();
         }
- 
 
-        for (int i = 0; i < InventorySlotAmount; i++)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-            {  
-                _currentSlot = i;
-                RefreshInventory();
-                break;
-            }
+        if (Control.control.Hotbar1.KeyDown())
+        {  
+            _currentSlot = 0;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar2.KeyDown())
+        {  
+            _currentSlot = 1;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar3.KeyDown())
+        {  
+            _currentSlot = 2;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar4.KeyDown())
+        {  
+            _currentSlot = 3;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar5.KeyDown())
+        {  
+            _currentSlot = 4;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar6.KeyDown())
+        {  
+            _currentSlot = 5;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar7.KeyDown())
+        {  
+            _currentSlot = 6;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar8.KeyDown())
+        {  
+            _currentSlot = 7;
+            RefreshInventory();
+        }
+        else if (Control.control.Hotbar9.KeyDown())
+        {  
+            _currentSlot = 8;
+            RefreshInventory();
         }
     }
 

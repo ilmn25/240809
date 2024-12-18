@@ -48,7 +48,7 @@ public class MapCull
     
     public static void Update() 
     {
-        if (Input.GetKeyDown(KeyCode.Z)) {
+        if (Control.control.CullMode.KeyDown()) {
             switch (_currentCullMode)
             {
                 case CullMode.On:

@@ -8,7 +8,7 @@ public class NPCCED : ChunkEntityData
     public string npcStatus = "idle";
 }
 
-public class NPCMachine : EntityMachine , IActionPrimary
+public class NPCMachine : EntityMachine , IActionSecondary
 { 
     public override void OnInitialize()
     {
@@ -20,7 +20,7 @@ public class NPCMachine : EntityMachine , IActionPrimary
         AddModule(new SpriteOrbitModule()); 
     }
 
-    public void OnActionPrimary()
+    public void OnActionSecondary()
     {
         GetState<NPCState>().SetState<CharTalk>();
     }
