@@ -94,7 +94,7 @@ public class MapLoad
             if ((replace || !ActiveChunks.ContainsKey(chunkCoord)) && Scene.InPlayerChunkRange(chunkCoord, Scene.RenderDistance))
             {
                 _chunkCoordinate = chunkCoord;
-                _chunk = World.world[chunkCoord.x, chunkCoord.y, chunkCoord.z];
+                _chunk = World.Inst[chunkCoord.x, chunkCoord.y, chunkCoord.z];
                 if (_chunk != Chunk.Zero)
                 {
                     await Task.Run(() => LoadMeshMath()); 

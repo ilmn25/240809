@@ -1,21 +1,21 @@
 using UnityEngine;
 
 [System.Serializable]
-public class SerializableVector3
+public class SVector3
 {
     public float x;
     public float y;
     public float z;
 
-    public SerializableVector3() {}
-    public SerializableVector3(float x, float y, float z)
+    public SVector3() {}
+    public SVector3(float x, float y, float z)
     {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public SerializableVector3(Vector3 vector)
+    public SVector3(Vector3 vector)
     {
         this.x = vector.x;
         this.y = vector.y;

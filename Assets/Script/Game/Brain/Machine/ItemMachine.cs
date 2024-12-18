@@ -9,9 +9,9 @@ public class ItemMachine : EntityMachine
     
     public override void OnInitialize()
     { 
-        AddState(new ItemState());
-        AddModule(new ItemPhysicModule());
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        AddState(new ItemState());
+        AddModule(new ItemPhysicModule()); 
         AddModule(new SpriteCullModule(spriteRenderer)); 
         AddModule(new SpriteOrbitModule(spriteRenderer)); 
     }
@@ -22,7 +22,7 @@ public class ItemMachine : EntityMachine
         { 
             if (pickUp)
             {
-                Audio.PlaySFX(Game.PickUpSound);
+                Audio.PlaySFX(Game.PickUpSound, 0.4f);
                 Inventory.AddItem(GetEntityData().stringID, 1);
                 Delete();
             } 

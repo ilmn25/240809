@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 
 [System.Serializable]
@@ -25,6 +26,18 @@ public class Chunk
         }
     }
 
+    public int this[int x, int y, int z]
+    {
+        get => Map.array[x + Map.size * (y + Map.size * z)];
+        set => Map.array[x + Map.size * (y + Map.size * z)] = value;
+    }
+    
+    public int this[Vector3Int position]
+    {
+        get => Map.array[position.x + Map.size * (position.y + Map.size * position.z)];
+        set => Map.array[position.x + Map.size * (position.y + Map.size * position.z)] = value;
+    }
+        
     public Chunk(int size = 0)
     {
         Map = new Array3D<int>();

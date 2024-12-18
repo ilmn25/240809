@@ -5,13 +5,10 @@ using UnityEngine;
  
 public class Game : MonoBehaviour
 {
-    public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
     public static readonly float MaxDeltaTime = 0.03f;
     
     private const float FixedUpdateMS = 0.10f;
-    public static string DownloadPath;
-    public static string PlayerSavePath;  
-    
+
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;
     public static LayerMask MaskEntity;
@@ -21,10 +18,11 @@ public class Game : MonoBehaviour
     public static int IndexUI;
     
     public static GameObject Player;
+    public static GameObject ViewPortObject;
     public static GameObject CameraObject;
     public static Camera Camera;
     public static Camera GUICamera;
-    public static GameObject GUI;
+    public static GameObject GUIObject;
     public static GameObject GUIDialogue;
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
@@ -55,8 +53,9 @@ public class Game : MonoBehaviour
             World.ChunkSize * WorldGen.Size.y + 15,
             World.ChunkSize * WorldGen.Size.z / 2);
           
+        Control.Initialize(); 
         Item.Initialize();
-        global::GUI.Initialize();
+        GUI.Initialize();
         PlayerData.Load(); 
         WorldGen.Initialize();
         Audio.Initialize();
@@ -65,23 +64,25 @@ public class Game : MonoBehaviour
         MapCull.Initialize(); 
         EntityDynamicLoad.Initialize();  
         MapLoad.Initialize();
-        Scene.Initialize(); 
+        Scene.Initialize();  
+        ViewPort.Initialize();  
     }
 
     private void Update()
     { 
-        if (Control.control.Pause.KeyDown())
+        if (Control.Inst.Pause.KeyDown())
         {
             World.Save(0);
         }
         
-        global::GUI.Update();
+        GUI.Update();
         SetPiece.Update();
         PlayerStatus.Update();
         Inventory.Update();
         PlayerTerraform.Update();
         Control.Update();
         MapCull.Update();
+        ViewPort.Update(); 
          
     }
     private void FixedUpdate()
@@ -93,6 +94,7 @@ public class Game : MonoBehaviour
     {
         Block.Dispose();
         PlayerData.Save();
+        Control.Save(); 
     }
 
     public static void SetConstants()
@@ -108,22 +110,21 @@ public class Game : MonoBehaviour
         IndexStatic = LayerMask.NameToLayer("Static");
         IndexDynamic = LayerMask.NameToLayer("Dynamic");
         IndexUI = LayerMask.NameToLayer("UI");
-        
-        DownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
-        PlayerSavePath = $"{DownloadPath}\\PlayerData.dat";
+ 
         
         Player = GameObject.Find("player");
+        ViewPortObject = GameObject.Find("viewport");
         CameraObject = GameObject.Find("main_camera");
         Camera = CameraObject.GetComponent<Camera>();
         GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
         
-        GUI = GameObject.Find("gui");
-        GUIDialogue = GUI.transform.Find("dialogue_box").gameObject;
+        GUIObject = GameObject.Find("gui");
+        GUIDialogue = GUIObject.transform.Find("dialogue_box").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        GUIInv = GUI.transform.Find("inventory").gameObject;
+        GUIInv = GUIObject.transform.Find("inventory").gameObject;
         GUIInvCrafting = GUIInv.transform.Find("crafting").gameObject;
         GUIInvStorage = GUIInv.transform.Find("storage").gameObject;
-        GUICursor = GUI.transform.Find("cursor").Find("cursor").gameObject;
+        GUICursor = GUIObject.transform.Find("cursor").Find("cursor").gameObject;
         GUICursorInfo = GUICursor.transform.Find("info").gameObject;
         GUICursorSlot = GUICursor.transform.Find("slot").gameObject;
          

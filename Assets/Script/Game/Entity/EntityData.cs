@@ -5,14 +5,14 @@ using UnityEngine;
 public class ChunkEntityData
 {
     public string stringID;
-    public SerializableVector3Int position;
+    public SVector3Int position;
 }
 public interface IEntityData
 {
     Vector3Int Bounds { get; }
     EntityType Type { get; }
 
-    public ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int position);
+    public ChunkEntityData GetChunkEntityData(string stringID, SVector3Int position);
 }
 
 public class EntityData<T> : IEntityData where T : ChunkEntityData, new()
@@ -29,7 +29,7 @@ public class EntityData<T> : IEntityData where T : ChunkEntityData, new()
         Type = type;
     }
 
-    public ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int position)
+    public ChunkEntityData GetChunkEntityData(string stringID, SVector3Int position)
     {
         ChunkEntityData data = new T();
         data.position = position;

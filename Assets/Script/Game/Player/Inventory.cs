@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Inventory 
 {
-    public static List<InvSlot> PlayerInventory;
+    public static List<InvSlot> Storage;
 
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
@@ -19,65 +19,65 @@ public class Inventory
 
     public static void SetInventory(List<InvSlot> data)
     {
-        PlayerInventory = data;
+        Storage = data;
         RefreshInventory();
     }
     
     public static void Update()
     { 
-        if (Control.control.Drop.KeyDown() && CurrentItem != null)
+        if (Control.Inst.Drop.KeyDown() && CurrentItem != null)
         {
             Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
             RemoveItem(CurrentItem.StringID); 
         }
 
-        if (Control.control.Hotbar.KeyDown())
+        if (Control.Inst.Hotbar.KeyDown())
         {
             _currentRow = (_currentRow + 1) % InventoryRowAmount;
             RefreshInventory();
         }
 
-        if (Control.control.Hotbar1.KeyDown())
+        if (Control.Inst.Hotbar1.KeyDown())
         {  
             _currentSlot = 0;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar2.KeyDown())
+        else if (Control.Inst.Hotbar2.KeyDown())
         {  
             _currentSlot = 1;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar3.KeyDown())
+        else if (Control.Inst.Hotbar3.KeyDown())
         {  
             _currentSlot = 2;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar4.KeyDown())
+        else if (Control.Inst.Hotbar4.KeyDown())
         {  
             _currentSlot = 3;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar5.KeyDown())
+        else if (Control.Inst.Hotbar5.KeyDown())
         {  
             _currentSlot = 4;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar6.KeyDown())
+        else if (Control.Inst.Hotbar6.KeyDown())
         {  
             _currentSlot = 5;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar7.KeyDown())
+        else if (Control.Inst.Hotbar7.KeyDown())
         {  
             _currentSlot = 6;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar8.KeyDown())
+        else if (Control.Inst.Hotbar8.KeyDown())
         {  
             _currentSlot = 7;
             RefreshInventory();
         }
-        else if (Control.control.Hotbar9.KeyDown())
+        else if (Control.Inst.Hotbar9.KeyDown())
         {  
             _currentSlot = 8;
             RefreshInventory();
@@ -93,7 +93,7 @@ public class Inventory
     public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = PlayerInventory[_currentKey];
+        CurrentItem = Storage[_currentKey];
         SlotUpdate?.Invoke();
         GUIStorage.RefreshCursorSlot();
     }
@@ -110,10 +110,10 @@ public class Inventory
         int maxStackSize = Item.GetItem(stringID).StackSize;
 
         // First try to add to the current slot
-        if (PlayerInventory[_currentKey].StringID == stringID && PlayerInventory[_currentKey].Stack < maxStackSize)
+        if (Storage[_currentKey].StringID == stringID && Storage[_currentKey].Stack < maxStackSize)
         {
-            int addableAmount = Math.Min(quantity, maxStackSize - PlayerInventory[_currentKey].Stack);
-            PlayerInventory[_currentKey].Stack += addableAmount;
+            int addableAmount = Math.Min(quantity, maxStackSize - Storage[_currentKey].Stack);
+            Storage[_currentKey].Stack += addableAmount;
             quantity -= addableAmount;
 
             if (quantity <= 0)
@@ -124,7 +124,7 @@ public class Inventory
         }
 
         // Try to add to existing slots with the same item
-        foreach (var slot in PlayerInventory)
+        foreach (var slot in Storage)
         {
             if (slot.StringID == stringID && slot.Stack < maxStackSize)
             {
@@ -144,8 +144,8 @@ public class Inventory
         while (quantity > 0)
         { 
             int slotID = GetEmptySlot();
-            int addableAmount = Math.Min(quantity, maxStackSize - PlayerInventory[slotID].Stack);
-            PlayerInventory[slotID].SetItem(PlayerInventory[slotID].Stack + addableAmount, stringID, PlayerInventory[slotID].Modifier, PlayerInventory[slotID].Locked);
+            int addableAmount = Math.Min(quantity, maxStackSize - Storage[slotID].Stack);
+            Storage[slotID].SetItem(Storage[slotID].Stack + addableAmount, stringID, Storage[slotID].Modifier, Storage[slotID].Locked);
             quantity -= addableAmount;
         }
 
@@ -155,12 +155,12 @@ public class Inventory
     public static void RemoveItem(string stringID, int quantity = 1)
     {
         // Prioritize current slot
-        if (PlayerInventory[_currentKey].StringID == stringID)
+        if (Storage[_currentKey].StringID == stringID)
         {
-            int removableAmount = Math.Min(quantity, PlayerInventory[_currentKey].Stack);
-            PlayerInventory[_currentKey].Stack -= removableAmount;
+            int removableAmount = Math.Min(quantity, Storage[_currentKey].Stack);
+            Storage[_currentKey].Stack -= removableAmount;
             quantity -= removableAmount;
-            if (PlayerInventory[_currentKey].Stack <= 0) PlayerInventory[_currentKey].clear();
+            if (Storage[_currentKey].Stack <= 0) Storage[_currentKey].clear();
             if (quantity <= 0)
             { 
                 RefreshInventory();
@@ -169,7 +169,7 @@ public class Inventory
         }
 
         // Continue with other slots if necessary
-        foreach (var slot in PlayerInventory)
+        foreach (var slot in Storage)
         {
             if (slot.StringID == stringID)
             {
@@ -193,7 +193,7 @@ public class Inventory
     public static int GetAmount(string stringID)
     {
         int count = 0;
-        foreach (var slot in PlayerInventory)
+        foreach (var slot in Storage)
         {
             if (slot.StringID == stringID)
             { 
@@ -206,7 +206,7 @@ public class Inventory
     private static int GetEmptySlot()
     {
         int slotID = 0;
-        while (PlayerInventory[slotID].Stack != 0)
+        while (Storage[slotID].Stack != 0)
         {
             slotID++;
         }

@@ -34,27 +34,27 @@ public class  GUIStorage
     {
         if (_currentSlotKey == -1) return; 
   
-        if (Control.control.ActionPrimary.KeyDown())
+        if (Control.Inst.ActionPrimary.KeyDown())
         {
             if (GUICursor.Data.isEmpty())
             {
-                GUICursor.Data.Add(Inventory.PlayerInventory[_currentSlotKey]);
+                GUICursor.Data.Add(Inventory.Storage[_currentSlotKey]);
             }
-            else if (Inventory.PlayerInventory[_currentSlotKey].isSame(GUICursor.Data))
+            else if (Inventory.Storage[_currentSlotKey].isSame(GUICursor.Data))
             {
-                Inventory.PlayerInventory[_currentSlotKey].Add(GUICursor.Data);
+                Inventory.Storage[_currentSlotKey].Add(GUICursor.Data);
             } 
             else
             {
-                (Inventory.PlayerInventory[_currentSlotKey], GUICursor.Data) = 
-                    (GUICursor.Data, Inventory.PlayerInventory[_currentSlotKey]);
+                (Inventory.Storage[_currentSlotKey], GUICursor.Data) = 
+                    (GUICursor.Data, Inventory.Storage[_currentSlotKey]);
             } 
             GUICursor.UpdateCursorSlot();
             RefreshCursorSlot();
         }
-        else if (Control.control.ActionSecondary.KeyDown())
+        else if (Control.Inst.ActionSecondary.KeyDown())
         {
-            InvSlot invSlot = Inventory.PlayerInventory[_currentSlotKey];
+            InvSlot invSlot = Inventory.Storage[_currentSlotKey];
             if (!invSlot.isEmpty())
             {
                 if (GUICursor.Data.isEmpty() || invSlot.isSame(GUICursor.Data))
@@ -83,7 +83,7 @@ public class  GUIStorage
             GUICursor.SetInfoPanel();
             return;
         }
-        InvSlot slot = Inventory.PlayerInventory[_currentSlotKey];
+        InvSlot slot = Inventory.Storage[_currentSlotKey];
         if (slot.Stack != 0)
         { 
             GUICursor.SetInfoPanel(slot.StringID + " (" + slot.Stack + ")\n" + 

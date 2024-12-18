@@ -28,7 +28,7 @@ public class GUI
         GUIDialogue.Update();
         if (Active)
         {
-            if (Control.control.ActionPrimary.KeyDown())
+            if (Control.Inst.ActionPrimary.KeyDown())
                 Audio.PlaySFX(Game.PickUpSound);
             
             GUICraft.Update(); 
@@ -36,7 +36,7 @@ public class GUI
             GUIStorage.Update();
         }
 
-        if (Control.control.Inv.KeyDown())  
+        if (Control.Inst.Inv.KeyDown())  
         {
             if ((_showTask != null && !_showTask.Running) || _showTask == null)
             {

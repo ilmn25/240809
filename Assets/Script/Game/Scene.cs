@@ -22,17 +22,11 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
-    private static readonly bool AlwaysRegenerate = false;
     public const string SetPieceName = "tree_a";
 
     public static void Initialize()
-    { 
- 
-        if (!File.Exists(World.GetFilePath(0)) || AlwaysRegenerate) 
-            WorldGen.Generate();
-        else
-            World.Load(0); 
-        
+    {  
+        World.Load(0); 
         _playerChunkPositionPrevious = World.GetChunkCoordinate(Game.Player.transform.position); 
     }
 

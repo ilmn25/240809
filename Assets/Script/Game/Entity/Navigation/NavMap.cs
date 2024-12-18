@@ -17,19 +17,19 @@ public class NavMap
     public static void GenerateNavMap()
     {
         Chunk chunk;
-        _bounds = World.world.Bounds.ToVector3Int();
+        _bounds = World.Inst.Bounds.ToVector3Int();
         _bitMap = new BitArray(_bounds.x * _bounds.y * _bounds.z); 
         
-        for (int wx = 0; wx < World.world.Length.x; wx++)
+        for (int wx = 0; wx < World.Inst.Length.x; wx++)
         { 
-            for (int wy = 0; wy < World.world.Length.y; wy++)
+            for (int wy = 0; wy < World.Inst.Length.y; wy++)
             {
-                for (int wz = 0; wz < World.world.Length.z; wz++)
+                for (int wz = 0; wz < World.Inst.Length.z; wz++)
                 {
                     int chunkX = wx * World.ChunkSize;
                     int chunkY = wy * World.ChunkSize;
                     int chunkZ = wz * World.ChunkSize;
-                    chunk = World.world[chunkX, chunkY, chunkZ]; 
+                    chunk = World.Inst[chunkX, chunkY, chunkZ]; 
                     if (chunk != null)
                     { 
                         for (int i = 0; i < World.ChunkSize; i++)

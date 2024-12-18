@@ -14,17 +14,17 @@ public class SpriteOrbitModule : Module
     public override void Initialize()
     {
         if (!_sprite) _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
-        Machine.transform.rotation = CameraHandler._currentRotation;
-        CameraHandler.UpdateOrbitRotate += UpdateOrbit;
+        Machine.transform.rotation = ViewPort.CurrentRotation;
+        ViewPort.UpdateOrbitRotate += UpdateOrbit;
     }
     
     public override void Terminate()
     {
-        CameraHandler.UpdateOrbitRotate -= UpdateOrbit; 
+        ViewPort.UpdateOrbitRotate -= UpdateOrbit; 
     }   
  
     void UpdateOrbit()
     { 
-        if (_sprite.isVisible) Machine.transform.rotation = CameraHandler._currentRotation;
+        Machine.transform.rotation = ViewPort.CurrentRotation;
     }
 }

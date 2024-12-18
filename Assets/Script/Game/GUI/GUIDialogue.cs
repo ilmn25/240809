@@ -28,7 +28,7 @@ public class GUIDialogue
                 if (_scrollTask.Running) _scrollTask.Stop();
             }
             
-            if (Control.control.ActionSecondary.KeyDown() || Control.control.ActionSecondaryNear.KeyDown())
+            if (Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown())
             { 
                 Audio.PlaySFX(_textSfx, 0.2f); //sound effect click 
                 
