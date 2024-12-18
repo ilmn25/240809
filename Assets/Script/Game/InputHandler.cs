@@ -49,7 +49,7 @@ public class InputHandler
         }
         else if (Input.GetMouseButton(1))
         { 
-            CameraSingleton.Instance.HandleScrollInput(scroll); 
+            CameraHandler.Instance.HandleScrollInput(scroll); 
         }
         else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
         {
@@ -57,13 +57,13 @@ public class InputHandler
         }  
         else
         {
-            InventorySingleton.HandleScrollInput(scroll);
+            Inventory.HandleScrollInput(scroll);
         }
     }
     
     private static void HandleRaycast()
     { 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
         
         if (MapCull.YCheck)
         {

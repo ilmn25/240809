@@ -45,9 +45,9 @@ public class GUIDialogue
                 if (_scrollTask.Running)
                 {
                     _scrollTask.Stop(); 
-                    Game.GUIDialogueText.text = _entityState._dialogueData.Lines[_currentLine];
+                    Game.GUIDialogueText.text = _entityState.Dialogue.Lines[_currentLine];
                 }                 
-                else if (_currentLine < _entityState._dialogueData.Lines.Count - 1)
+                else if (_currentLine < _entityState.Dialogue.Lines.Count - 1)
                 {    
                     ++_currentLine; 
                     HandleScroll();
@@ -64,7 +64,7 @@ public class GUIDialogue
     {
         _audioSource = Audio.PlaySFX(_textSfx, 0.2f, true);
         
-        _scrollTask =  new CoroutineTask(GUI.ScrollText(_entityState._dialogueData.Lines[_currentLine], Game.GUIDialogueText));
+        _scrollTask =  new CoroutineTask(GUI.ScrollText(_entityState.Dialogue.Lines[_currentLine], Game.GUIDialogueText));
         _scrollTask.Finished += (bool isManual) => 
         { 
             Audio.StopSFX(_audioSource);

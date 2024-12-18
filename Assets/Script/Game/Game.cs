@@ -20,7 +20,7 @@ public class Game : MonoBehaviour
     
     public static GameObject Player;
     public static GameObject Camera;
-    public static Camera GUICamera;
+    public static UnityEngine.Camera GUICamera;
     public static GameObject GUI;
     public static GameObject GUIDialogue;
     public static TextMeshProUGUI GUIDialogueText;
@@ -75,7 +75,7 @@ public class Game : MonoBehaviour
         global::GUI.Update();
         SetPiece.Update();
         PlayerStatus.Update();
-        InventorySingleton.Update();
+        Inventory.Update();
         PlayerTerraform.Update();
         InputHandler.Update();
         MapCull.Update();
@@ -110,7 +110,7 @@ public class Game : MonoBehaviour
         Player = GameObject.Find("player");
         Camera = GameObject.Find("main_camera");
 
-        GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
+        GUICamera = GameObject.Find("hud_camera").GetComponent<UnityEngine.Camera>();
         GUI = GameObject.Find("gui");
         GUIDialogue = GUI.transform.Find("dialogue_box").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
