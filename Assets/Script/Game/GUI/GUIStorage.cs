@@ -13,12 +13,12 @@ public class  GUIStorage
 
     public static void Initialize()
     {
-        for (int i = 0; i < InventorySingleton.InventorySlotAmount * InventorySingleton.InventoryRowAmount; i++)
+        for (int i = 0; i < Inventory.InventorySlotAmount * Inventory.InventoryRowAmount; i++)
         {
             GameObject slot = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), Game.GUIInvStorage.transform, false);
     
-            int row = i / InventorySingleton.InventorySlotAmount;
-            int column = i % InventorySingleton.InventorySlotAmount;
+            int row = i / Inventory.InventorySlotAmount;
+            int column = i % Inventory.InventorySlotAmount;
 
             RectTransform slotRectTransform = slot.GetComponent<RectTransform>();
             slotRectTransform.sizeDelta = new Vector2(SlotSize, SlotSize);
@@ -26,7 +26,7 @@ public class  GUIStorage
                 column * (SlotSize + Margin.x) - 160,
                 -row * (SlotSize + Margin.y)
             );
-            slot.AddComponent<GUIInvSlotModule>().slotNumber = InventorySingleton.CalculateKey(row, column);
+            slot.AddComponent<GUIInvSlotModule>().slotNumber = Inventory.CalculateKey(row, column);
         }
     }
      
@@ -38,23 +38,23 @@ public class  GUIStorage
         {
             if (GUICursor.Data.isEmpty())
             {
-                GUICursor.Data.Add(InventorySingleton.PlayerInventory[_currentSlotKey]);
+                GUICursor.Data.Add(Inventory.PlayerInventory[_currentSlotKey]);
             }
-            else if (InventorySingleton.PlayerInventory[_currentSlotKey].isSame(GUICursor.Data))
+            else if (Inventory.PlayerInventory[_currentSlotKey].isSame(GUICursor.Data))
             {
-                InventorySingleton.PlayerInventory[_currentSlotKey].Add(GUICursor.Data);
+                Inventory.PlayerInventory[_currentSlotKey].Add(GUICursor.Data);
             } 
             else
             {
-                (InventorySingleton.PlayerInventory[_currentSlotKey], GUICursor.Data) = 
-                    (GUICursor.Data, InventorySingleton.PlayerInventory[_currentSlotKey]);
+                (Inventory.PlayerInventory[_currentSlotKey], GUICursor.Data) = 
+                    (GUICursor.Data, Inventory.PlayerInventory[_currentSlotKey]);
             } 
             GUICursor.UpdateCursorSlot();
             RefreshCursorSlot();
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            InvSlotData invSlot = InventorySingleton.PlayerInventory[_currentSlotKey];
+            InvSlot invSlot = Inventory.PlayerInventory[_currentSlotKey];
             if (!invSlot.isEmpty())
             {
                 if (GUICursor.Data.isEmpty() || invSlot.isSame(GUICursor.Data))
@@ -83,12 +83,12 @@ public class  GUIStorage
             GUICursor.SetInfoPanel();
             return;
         }
-        InvSlotData slotData = InventorySingleton.PlayerInventory[_currentSlotKey];
-        if (slotData.Stack != 0)
+        InvSlot slot = Inventory.PlayerInventory[_currentSlotKey];
+        if (slot.Stack != 0)
         { 
-            GUICursor.SetInfoPanel(slotData.StringID + " (" + slotData.Stack + ")\n" + 
-                                   Item.GetItem(slotData.StringID).Description + "\n" +
-                                   slotData.Modifier);
+            GUICursor.SetInfoPanel(slot.StringID + " (" + slot.Stack + ")\n" + 
+                                   Item.GetItem(slot.StringID).Description + "\n" +
+                                   slot.Modifier);
         }
         else
         {

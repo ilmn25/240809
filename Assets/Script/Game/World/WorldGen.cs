@@ -34,9 +34,9 @@ public class WorldGen
     private const int WallHeight = 5;
     private const int FloorHeight = 2;
 
-    private static ChunkData _chunkData;
+    private static Chunk _chunk;
     private static Vector3Int _chunkCoord; 
-    private static ChunkData _setPiece; 
+    private static Chunk _setPiece; 
     private static readonly int _worldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static void Initialize() {
@@ -110,10 +110,10 @@ public class WorldGen
  
     }  
 
-    public static ChunkData GenerateTestChunk(Vector3Int coordinates)
+    public static Chunk GenerateTestChunk(Vector3Int coordinates)
     {
         _chunkCoord = coordinates;
-        _chunkData = new ChunkData();
+        _chunk = new Chunk();
 
         if (Flat)
         {
@@ -123,7 +123,7 @@ public class WorldGen
                 {
                     for (int x = 0; x < World.ChunkSize; x++)
                     {
-                        _chunkData.Map[x, 0, z] = 1;
+                        _chunk.Map[x, 0, z] = 1;
                     }
                 }
             }
@@ -131,10 +131,10 @@ public class WorldGen
         else
         {
             HandleBlockGeneration();
-            HandleEntityGeneration(_chunkData); 
+            HandleEntityGeneration(_chunk); 
         } 
         
-        return _chunkData;
+        return _chunk;
     }  
     
     private static void HandleBlockGeneration()
@@ -155,7 +155,7 @@ public class WorldGen
                 {
                     if (IsWithinCrater(x, y, z, centerX, centerZ, craterRadius))
                     {
-                        _chunkData.Map[x, y, z] = 0; // Empty space for the crater
+                        _chunk.Map[x, y, z] = 0; // Empty space for the crater
                         continue;
                     }
 
@@ -211,19 +211,19 @@ public class WorldGen
         {
             if (y + _chunkCoord.y <= marbleHeight - 50)
             {
-                _chunkData.Map[x, y, z] = Block.ConvertID("marble");
+                _chunk.Map[x, y, z] = Block.ConvertID("marble");
             } 
             else if (y + _chunkCoord.y <= stoneHeight - 5)
             {
-                _chunkData.Map[x, y, z] = Block.ConvertID("stone");
+                _chunk.Map[x, y, z] = Block.ConvertID("stone");
             }
             else if (y + _chunkCoord.y <= dirtHeight)
             {
-                _chunkData.Map[x, y, z] = Block.ConvertID("dirt");
+                _chunk.Map[x, y, z] = Block.ConvertID("dirt");
             }
             else if (y + _chunkCoord.y <= sandHeight)
             {
-                _chunkData.Map[x, y, z] = Block.ConvertID("sand");
+                _chunk.Map[x, y, z] = Block.ConvertID("sand");
             }
         }
     }
@@ -237,7 +237,7 @@ public class WorldGen
 
         if (caveNoiseValue > 0.35f)
         {
-            _chunkData.Map[x, y, z] = 0; // Empty space for caves
+            _chunk.Map[x, y, z] = 0; // Empty space for caves
         }
     }
  
@@ -245,19 +245,19 @@ public class WorldGen
     {
         if (y + _chunkCoord.y < FloorHeight)
         {
-            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Floor
+            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Floor
         }
         else if (y + _chunkCoord.y == WallHeight + FloorHeight)
         {
-            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Ceiling
+            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Ceiling
         }
         else if (maze[x, z] && y + _chunkCoord.y < WallHeight + FloorHeight)
         {
-            _chunkData.Map[x, y, z] = Block.ConvertID("backroom"); // Walls
+            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Walls
         }
     }
  
-    private static void HandleEntityGeneration(ChunkData chunkData)
+    private static void HandleEntityGeneration(Chunk chunk)
     { 
         ChunkEntityData entityData;
         SerializableVector3Int entityPosition;
@@ -270,29 +270,29 @@ public class WorldGen
                 {
                     if (
                         y + 1 < World.ChunkSize &&
-                        chunkData.Map[x, y, z] != 0 && 
-                        chunkData.Map[x, y + 1, z] == 0) 
+                        chunk.Map[x, y, z] != 0 && 
+                        chunk.Map[x, y + 1, z] == 0) 
                     {
                         if (SpawnStaticEntity)
                         {
-                            if (chunkData.Map[x, y, z] == Block.ConvertID("dirt"))
+                            if (chunk.Map[x, y, z] == Block.ConvertID("dirt"))
                             {
                                 {
                                     double rng = Random.NextDouble();
                                     if (rng <= 0.03)
                                     {
                                         entityData = Entity.GetChunkEntityData("tree", new SerializableVector3Int(x, y + 1, z));
-                                        chunkData.StaticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
                                         entityData = Entity.GetChunkEntityData("bush1", new SerializableVector3Int(x, y + 1, z));
-                                        chunkData.StaticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
                                         entityData = Entity.GetChunkEntityData("grass", new SerializableVector3Int(x, y + 1, z));
-                                        chunkData.StaticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(entityData);
                                     }
                                 }
                             }
@@ -302,12 +302,12 @@ public class WorldGen
                                 {
 
                                     entityData = Entity.GetChunkEntityData("stage_hand", new SerializableVector3Int(x, y + 1, z));
-                                    chunkData.StaticEntity.Add(entityData);
+                                    chunk.StaticEntity.Add(entityData);
                                 }
                                 else if (Random.NextDouble() <= 0.03)
                                 {
                                     entityData = Entity.GetChunkEntityData("slab", new SerializableVector3Int(x, y + 1, z));
-                                    chunkData.StaticEntity.Add(entityData);
+                                    chunk.StaticEntity.Add(entityData);
                                 }
                             }
  
@@ -333,7 +333,7 @@ public class WorldGen
                                     entityData = Entity.GetChunkEntityData("yuuri", entityPosition);
                                 }
                             }
-                            chunkData.DynamicEntity.Add(entityData); 
+                            chunk.DynamicEntity.Add(entityData); 
                         }
                     } 
                 }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GUICursor 
 {
-    public static InvSlotData Data = new InvSlotData();
+    public static InvSlot Data = new InvSlot();
 
     private static TextMeshProUGUI _cursorInfoText; 
     private static TextMeshProUGUI _cursorSlotText;

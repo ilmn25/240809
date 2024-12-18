@@ -19,12 +19,12 @@ public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnRefreshSlot()
     {
-        InvSlotData slotData = InventorySingleton.PlayerInventory[slotNumber];
-        if (slotData.Stack != 0)
+        InvSlot slot = Inventory.PlayerInventory[slotNumber];
+        if (slot.Stack != 0)
         {
-            _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slotData.StringID}");
+            _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slot.StringID}");
             _image.color = Color.white;
-            _text.text = slotData.Stack.ToString();
+            _text.text = slot.Stack.ToString();
         }
         else 
         {

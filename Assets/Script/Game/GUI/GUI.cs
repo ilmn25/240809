@@ -23,7 +23,7 @@ public class GUI
     public static void Update()
     {
         Active = Game.GUIInv.activeSelf;
-        Camera.main.depth = Active? -1 : 1;
+        UnityEngine.Camera.main.depth = Active? -1 : 1;
         
         if (Active)
         {
