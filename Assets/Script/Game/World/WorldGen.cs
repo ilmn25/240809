@@ -72,9 +72,9 @@ public class WorldGen
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
+                    if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
                         localChunkY + 1 != chunkSize &&
-                        World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
+                        World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
                         if (Random.NextDouble() <= 0.0002)
                         {
@@ -107,7 +107,7 @@ public class WorldGen
                 {
                     for (int x = 0; x < World.ChunkSize; x++)
                     {
-                        _chunk.Map[x, 0, z] = 1;
+                        _chunk[x, 0, z] = 1;
                     }
                 }
             }
@@ -138,7 +138,7 @@ public class WorldGen
                 {
                     if (IsWithinCrater(x, y, z, centerX, centerZ, craterRadius))
                     {
-                        _chunk.Map[x, y, z] = 0;  
+                        _chunk[x, y, z] = 0;  
                         continue;
                     }
 
@@ -194,19 +194,19 @@ public class WorldGen
         {
             if (y + _chunkCoord.y <= marbleHeight - 50)
             {
-                _chunk.Map[x, y, z] = Block.ConvertID("marble");
+                _chunk[x, y, z] = Block.ConvertID("marble");
             } 
             else if (y + _chunkCoord.y <= stoneHeight - 5)
             {
-                _chunk.Map[x, y, z] = Block.ConvertID("stone");
+                _chunk[x, y, z] = Block.ConvertID("stone");
             }
             else if (y + _chunkCoord.y <= dirtHeight)
             {
-                _chunk.Map[x, y, z] = Block.ConvertID("dirt");
+                _chunk[x, y, z] = Block.ConvertID("dirt");
             }
             else if (y + _chunkCoord.y <= sandHeight)
             {
-                _chunk.Map[x, y, z] = Block.ConvertID("sand");
+                _chunk[x, y, z] = Block.ConvertID("sand");
             }
         }
     }
@@ -220,7 +220,7 @@ public class WorldGen
 
         if (caveNoiseValue > 0.35f)
         {
-            _chunk.Map[x, y, z] = 0; // Empty space for caves
+            _chunk[x, y, z] = 0; // Empty space for caves
         }
     }
  
@@ -228,15 +228,15 @@ public class WorldGen
     {
         if (y + _chunkCoord.y < FloorHeight)
         {
-            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Floor
+            _chunk[x, y, z] = Block.ConvertID("backroom"); // Floor
         }
         else if (y + _chunkCoord.y == WallHeight + FloorHeight)
         {
-            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Ceiling
+            _chunk[x, y, z] = Block.ConvertID("backroom"); // Ceiling
         }
         else if (maze[x, z] && y + _chunkCoord.y < WallHeight + FloorHeight)
         {
-            _chunk.Map[x, y, z] = Block.ConvertID("backroom"); // Walls
+            _chunk[x, y, z] = Block.ConvertID("backroom"); // Walls
         }
     }
  
@@ -253,29 +253,29 @@ public class WorldGen
                 {
                     if (
                         y + 1 < World.ChunkSize &&
-                        chunk.Map[x, y, z] != 0 && 
-                        chunk.Map[x, y + 1, z] == 0) 
+                        chunk[x, y, z] != 0 && 
+                        chunk[x, y + 1, z] == 0) 
                     {
                         if (SpawnStaticEntity)
                         {
-                            if (chunk.Map[x, y, z] == Block.ConvertID("dirt"))
+                            if (chunk[x, y, z] == Block.ConvertID("dirt"))
                             {
                                 {
                                     double rng = Random.NextDouble();
                                     if (rng <= 0.03)
                                     {
                                         entityData = Entity.GetChunkEntityData("tree", new SVector3Int(x, y + 1, z));
-                                        chunk.StaticEntity.Add(entityData);
+                                        chunk.staticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
                                         entityData = Entity.GetChunkEntityData("bush1", new SVector3Int(x, y + 1, z));
-                                        chunk.StaticEntity.Add(entityData);
+                                        chunk.staticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
                                         entityData = Entity.GetChunkEntityData("grass", new SVector3Int(x, y + 1, z));
-                                        chunk.StaticEntity.Add(entityData);
+                                        chunk.staticEntity.Add(entityData);
                                     }
                                 }
                             }
@@ -285,12 +285,12 @@ public class WorldGen
                                 {
 
                                     entityData = Entity.GetChunkEntityData("stage_hand", new SVector3Int(x, y + 1, z));
-                                    chunk.StaticEntity.Add(entityData);
+                                    chunk.staticEntity.Add(entityData);
                                 }
                                 else if (Random.NextDouble() <= 0.03)
                                 {
                                     entityData = Entity.GetChunkEntityData("slab", new SVector3Int(x, y + 1, z));
-                                    chunk.StaticEntity.Add(entityData);
+                                    chunk.staticEntity.Add(entityData);
                                 }
                             }
  
@@ -316,7 +316,7 @@ public class WorldGen
                                     entityData = Entity.GetChunkEntityData("yuuri", entityPosition);
                                 }
                             }
-                            chunk.DynamicEntity.Add(entityData); 
+                            chunk.dynamicEntity.Add(entityData); 
                         }
                     } 
                 }

@@ -38,11 +38,11 @@ public class NavMap
                             {
                                 for (int k = 0; k < World.ChunkSize; k++)
                                 {
-                                    Set(chunkX + i, chunkY + j, chunkZ + k, chunk.Map[i, j, k] == 0);
+                                    Set(chunkX + i, chunkY + j, chunkZ + k, chunk[i, j, k] == 0);
                                 }
                             }
                         }
-                        foreach (var entity in chunk.StaticEntity)
+                        foreach (var entity in chunk.staticEntity)
                         {
                             int entityX = chunkX + Mathf.FloorToInt(entity.position.x);
                             int entityY = chunkY + Mathf.FloorToInt(entity.position.y);

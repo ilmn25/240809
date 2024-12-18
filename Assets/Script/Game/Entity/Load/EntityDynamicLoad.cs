@@ -30,7 +30,7 @@ public class EntityDynamicLoad
             if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
                 if (World.IsInWorldBounds(entityChunkPosition))
-                    World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.GetEntityData());
+                    World.Inst[entityChunkPosition].dynamicEntity.Add(entityMachine.GetEntityData());
                 removeList.Add(entityMachine);
                 ObjectPool.ReturnObject(entityMachine.gameObject); 
             }
@@ -65,7 +65,7 @@ public class EntityDynamicLoad
         {
             entityChunkPosition = World.GetChunkCoordinate(entityHandler.transform.position);
             if (World.IsInWorldBounds(entityChunkPosition))
-                World.Inst[entityChunkPosition].DynamicEntity.Add(entityHandler.GetEntityData());
+                World.Inst[entityChunkPosition].dynamicEntity.Add(entityHandler.GetEntityData());
             ObjectPool.ReturnObject(entityHandler.gameObject);   
         }
         _activeEntities.Clear();
@@ -75,7 +75,7 @@ public class EntityDynamicLoad
     { 
         EntityMachine currentEntityMachine;
         GameObject currentInstance = null;
-        List<ChunkEntityData> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity;
+        List<ChunkEntityData> chunkEntityList = World.Inst[chunkCoordinate].dynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
             switch (Entity.dictionary[entityData.stringID].Type)

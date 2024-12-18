@@ -8,7 +8,6 @@ public static class SetPiece
     
     private static Vector3Int _positionA;
     private static Vector3Int _positionB;
-    
     public static void Update()
     { 
         if (Input.GetKeyDown(KeyCode.LeftBracket))
@@ -80,7 +79,7 @@ public static class SetPiece
                     blockPos = worldPos - chunkPos; 
 
                     Chunk chunk = World.Inst[chunkPos.x, chunkPos.y, chunkPos.z];
-                    setPiece[localPos.x, localPos.y, localPos.z] = chunk.Map[blockPos.x, blockPos.y, blockPos.z];
+                    setPiece[localPos.x, localPos.y, localPos.z] = chunk[blockPos.x, blockPos.y, blockPos.z];
                     
                     if (!scannedChunks.Contains(chunkPos))
                     {
@@ -95,7 +94,7 @@ public static class SetPiece
             Chunk chunk = World.Inst[chunkCoord.x, chunkCoord.y, chunkCoord.z];
             
             // Check and add static entities
-            foreach (ChunkEntityData entity in chunk.StaticEntity)
+            foreach (ChunkEntityData entity in chunk.staticEntity)
             {
                 if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
@@ -105,7 +104,7 @@ public static class SetPiece
             }
 
             // Check and add dynamic entities
-            foreach (ChunkEntityData entity in chunk.DynamicEntity)
+            foreach (ChunkEntityData entity in chunk.dynamicEntity)
             {
                 if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
                 {
@@ -126,7 +125,7 @@ public static class SetPiece
             worldPos = position + entity.position.ToVector3Int();
             chunkPos = World.GetChunkCoordinate(worldPos);
             entity.position.Set(World.GetBlockCoordinate(worldPos)); 
-            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
+            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
         }
 
         foreach (ChunkEntityData entity in setPiece.DynamicEntity)
@@ -134,7 +133,7 @@ public static class SetPiece
             worldPos = position + entity.position.ToVector3Int();
             chunkPos = World.GetChunkCoordinate(worldPos);
             entity.position.Set(World.GetBlockCoordinate(worldPos)); 
-            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity);
+            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
         }
         
         for (int x = 0; x < setPiece.size; x++)
@@ -150,7 +149,7 @@ public static class SetPiece
                         chunkPos = World.GetChunkCoordinate(worldPos);
                         blockPos = World.GetBlockCoordinate(worldPos); 
                         if (World.IsInWorldBounds(worldPos))
-                            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].Map[blockPos.x, blockPos.y, blockPos.z] = blockID;
+                            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][blockPos.x, blockPos.y, blockPos.z] = blockID;
                     }
                 }
             }

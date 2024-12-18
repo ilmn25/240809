@@ -28,11 +28,12 @@ public abstract class EntityMachine : Machine
             {
                 gameObject.layer = Game.IndexStatic;
                 gameObject.isStatic = true; 
+                if (entity.Bounds == Vector3Int.zero) return;
                 BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
                 boxCollider.size = entity.Bounds;
                 boxCollider.center = new Vector3(0, entity.Bounds.y / 2, 0);
             }
-            else
+            else if (entity.Type == EntityType.Rigid)
             {
                 gameObject.layer = Game.IndexDynamic;
                 gameObject.AddComponent<SphereCollider>();
