@@ -34,7 +34,7 @@ public class  GUIStorage
     {
         if (_currentSlotKey == -1) return; 
   
-        if (Input.GetMouseButtonDown(0))
+        if (Control.control.ActionPrimary.KeyDown())
         {
             if (GUICursor.Data.isEmpty())
             {
@@ -52,7 +52,7 @@ public class  GUIStorage
             GUICursor.UpdateCursorSlot();
             RefreshCursorSlot();
         }
-        else if (Input.GetMouseButtonDown(1))
+        else if (Control.control.ActionSecondary.KeyDown())
         {
             InvSlot invSlot = Inventory.PlayerInventory[_currentSlotKey];
             if (!invSlot.isEmpty())

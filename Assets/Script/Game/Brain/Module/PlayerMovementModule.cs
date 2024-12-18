@@ -6,51 +6,49 @@ using UnityEngine;
 using UnityEngine.AI;
 public class PlayerMovementModule : Module
 { 
-    [HideInInspector] public float _verticalVelocity = 0f; 
-    [HideInInspector] public bool _isGrounded = false;  
-    [HideInInspector] public Vector2 _rawInput;  
+    public float VerticalVelocity = 0f; 
+    public bool IsGrounded = false;  
+    public Vector2 RawInput;  
     private Vector2 _input = Vector2.zero;
-    private List<Vector2> _inputBuffer = new List<Vector2>();
-    [HideInInspector] public float _speedCurrent; 
+    private readonly List<Vector2> _inputBuffer = new List<Vector2>();
+    public float SpeedCurrent; 
     private float _speedTarget;
     private Vector3 _newPosition;  
-    private int _inputBufferCount = 4;
+    private readonly int _inputBufferCount = 4;
     private float _jumpGraceTimer;
     private float _coyoteTimer; 
     private float _deltaTime;  
     private float _speedAdjust;
 
-    [SerializeField] private float SPEED_WALK = 8f;
-    [SerializeField] private float SPEED_RUN = 25f;
-    [SerializeField] private float ACCELERATION_TIME = 0.2f; // time to reach full speed
-    [SerializeField] private float DECELERATION_TIME = 0.08f; // time to stop
-    [SerializeField] private float SLIDE_DEGREE = 0.3f; //degree of slide against walkk when collide
-    [SerializeField] private float GRAVITY = -40f;
-    [SerializeField] private float JUMP_VELOCITY = 12f;
-    [SerializeField] private float HOLD_VELOCITY = 0.05f;
-    [SerializeField] private float CLAMP_VELOCITY = 10f;
-    [SerializeField] private float JUMP_GRACE_TIME = 0.1f; // Time allowed to jump before landing
-    [SerializeField] private float COYOTE_TIME = 0.1f; // Time allowed to jump after leaving ground
- 
+    private float _orbitRotation;
+    private float _cosAngle;
+    private float _sinAngle;
+    
+    private const float SpeedWalk = 8f;
+    private const float SpeedRun = 25f;
+    private const float AccelerationTime = 0.2f; 
+    private const float DecelerationTime = 0.08f; 
+    private const float SlideDegree = 0.3f; 
+    private const float Gravity = -40f;
+    public const float JumpVelocity = 12f;
+    private const float HoldVelocity = 0.05f;
+    private const float ClampVelocity = 10f;
+    private const float JumpGraceTime = 0.1f; 
+    private const float CoyoteTime = 0.1f; 
 
-
-
-    float orbitRotation;
-    float cosAngle;
-    float sinAngle;
     public void HandleInput()
     {
-        _rawInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        if (_rawInput == Vector2.zero)
+        RawInput = Control.GetMovementAxis();
+        if (RawInput == Vector2.zero)
         {
             _input = Vector2.zero;
             return;
         }
-        orbitRotation = Mathf.Deg2Rad * -CameraHandler._orbitRotation;
-        cosAngle = Mathf.Cos(orbitRotation);
-        sinAngle = Mathf.Sin(orbitRotation);
-        _input.x = _rawInput.x * cosAngle - _rawInput.y * sinAngle;
-        _input.y = _rawInput.x * sinAngle + _rawInput.y * cosAngle; 
+        _orbitRotation = Mathf.Deg2Rad * -CameraHandler._orbitRotation;
+        _cosAngle = Mathf.Cos(_orbitRotation);
+        _sinAngle = Mathf.Sin(_orbitRotation);
+        _input.x = RawInput.x * _cosAngle - RawInput.y * _sinAngle;
+        _input.y = RawInput.x * _sinAngle + RawInput.y * _cosAngle; 
     }
   
     public void HandleMovementUpdate()
@@ -67,27 +65,27 @@ public class PlayerMovementModule : Module
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Input.GetKey(KeyCode.LeftShift) && PlayerStatus.Stamina > 1)
+            if (Control.control.Sprint.Key() && PlayerStatus.Stamina > 1)
             {
-                _speedTarget = SPEED_RUN;
+                _speedTarget = SpeedRun;
                 PlayerStatus.Stamina -= 0.1f;
             }
             else
             {
-                _speedTarget = SPEED_WALK;
+                _speedTarget = SpeedWalk;
                 PlayerStatus.Stamina += 0.1f;
             }
             
-            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
+            SpeedCurrent = Mathf.Lerp(SpeedCurrent, _speedTarget, _deltaTime / AccelerationTime);
 
             _speedAdjust = 1f; 
-            if (_rawInput.x != 0 && _rawInput.y != 0)
+            if (RawInput.x != 0 && RawInput.y != 0)
             {
                 _speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
             }
 
-            _newPosition.x += _input.x * _speedCurrent * _deltaTime * _speedAdjust;
-            _newPosition.z += _input.y * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.x += _input.x * SpeedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.z += _input.y * SpeedCurrent * _deltaTime * _speedAdjust;
 
             if (!IsMovable(_newPosition))
             {
@@ -98,17 +96,17 @@ public class PlayerMovementModule : Module
             _inputBuffer.Add(_input); 
             if (_inputBuffer.Count > _inputBufferCount) _inputBuffer.RemoveAt(0);
         }
-        else if (_speedCurrent != 0)
+        else if (SpeedCurrent != 0)
         {
             // slowing down to stop
-            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / DECELERATION_TIME);
+            SpeedCurrent = (SpeedCurrent < 0.05f) ? 0f : Mathf.Lerp(SpeedCurrent, 0, _deltaTime / DecelerationTime);
 
-            _newPosition.x += _inputBuffer[0].x * _speedCurrent * _deltaTime;
-            _newPosition.z += _inputBuffer[0].y * _speedCurrent * _deltaTime;
+            _newPosition.x += _inputBuffer[0].x * SpeedCurrent * _deltaTime;
+            _newPosition.z += _inputBuffer[0].y * SpeedCurrent * _deltaTime;
 
             if (!IsMovable(_newPosition))
             {
-                _speedCurrent /= 2;
+                SpeedCurrent /= 2;
                 _newPosition = Machine.transform.position;
             }
         }
@@ -122,41 +120,41 @@ public class PlayerMovementModule : Module
     private void HandleJump()
     {
         if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
-        if (fly && Input.GetKeyDown(KeyCode.Space))
+        if (fly && Control.control.Jump.KeyDown())
         {
-            _verticalVelocity = JUMP_VELOCITY;
+            VerticalVelocity = JumpVelocity;
         }
         
         
-        if ( _isGrounded)
+        if ( IsGrounded)
         {
-            _coyoteTimer = COYOTE_TIME; // Reset coyote timer when grounded
+            _coyoteTimer = CoyoteTime; // Reset coyote timer when grounded
         }
         else
         {
             _coyoteTimer -= _deltaTime; // Decrease coyote timer when not grounded
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Control.control.Jump.KeyDown())
         {
-            _jumpGraceTimer = JUMP_GRACE_TIME; // Reset jump grace timer when jump key is pressed
+            _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
-        else if (Input.GetKey(KeyCode.Space) && _verticalVelocity > CLAMP_VELOCITY)
+        else if (Control.control.Jump.KeyDown() && VerticalVelocity > ClampVelocity)
         {
-            _verticalVelocity += HOLD_VELOCITY;
+            VerticalVelocity += HoldVelocity;
         }
         else
         {
             _jumpGraceTimer -= _deltaTime; // Decrease jump grace timer
         }
 
-        if ((_isGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
+        if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
-            _verticalVelocity = JUMP_VELOCITY;
+            VerticalVelocity = JumpVelocity;
             //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
-        _isGrounded = _verticalVelocity == 0;
+        IsGrounded = VerticalVelocity == 0;
     }
 
 
@@ -199,19 +197,19 @@ public class PlayerMovementModule : Module
             //! slide against wall if possible
             if (_input.x != 0)
             {
-                testPosition = Machine.transform.position.x + SLIDE_DEGREE * _input.x * _speedCurrent * _deltaTime;
+                testPosition = Machine.transform.position.x + SlideDegree * _input.x * SpeedCurrent * _deltaTime;
                 testPositionA = new Vector3(testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 testPositionB = new Vector3(testPosition, Machine.transform.position.y, Machine.transform.position.z);
-                testPositionA.z += -1 * _speedCurrent * _deltaTime;
-                testPositionB.z += 1 * _speedCurrent * _deltaTime; 
+                testPositionA.z += -1 * SpeedCurrent * _deltaTime;
+                testPositionB.z += 1 * SpeedCurrent * _deltaTime; 
             }
             else
             {
-                testPosition = Machine.transform.position.z + SLIDE_DEGREE * _input.y * _speedCurrent * _deltaTime;
+                testPosition = Machine.transform.position.z + SlideDegree * _input.y * SpeedCurrent * _deltaTime;
                 testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, testPosition);
                 testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, testPosition);
-                testPositionA.x += -1 * _speedCurrent * _deltaTime;
-                testPositionB.x += 1 * _speedCurrent * _deltaTime; 
+                testPositionA.x += -1 * SpeedCurrent * _deltaTime;
+                testPositionB.x += 1 * SpeedCurrent * _deltaTime; 
             }
             
             if (IsMovable(testPositionA) && !IsMovable(testPositionB))
@@ -248,15 +246,15 @@ public class PlayerMovementModule : Module
     Vector3 newPositionY;
     private void HandleMove()
     { 
-        if (_verticalVelocity > GRAVITY) //terminal velocity
+        if (VerticalVelocity > Gravity) //terminal velocity
         {
-            _verticalVelocity += GRAVITY * _deltaTime;
+            VerticalVelocity += Gravity * _deltaTime;
         } 
-        newPositionY = new Vector3(_newPosition.x, _newPosition.y + _verticalVelocity * _deltaTime, _newPosition.z);
+        newPositionY = new Vector3(_newPosition.x, _newPosition.y + VerticalVelocity * _deltaTime, _newPosition.z);
         if (!IsMovable(newPositionY))
         {
-            if (_verticalVelocity < 0) _isGrounded = true;
-            _verticalVelocity = 0;
+            if (VerticalVelocity < 0) IsGrounded = true;
+            VerticalVelocity = 0;
             Machine.transform.position = _newPosition;
         } 
         else 

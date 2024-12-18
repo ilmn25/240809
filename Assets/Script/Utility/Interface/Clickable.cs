@@ -1,21 +1,19 @@
-public interface IActionPrimary
+
+public interface IAction { }
+public interface IActionPrimary : IAction
 { 
     void OnActionPrimary(); 
 }
-
-public interface IHover
-{
-    void OnHover();
-}
-public interface IActionSecondary
+public interface IActionSecondary : IAction
 {
     void OnActionSecondary();  
 }
 
-public interface IInteract
+public interface IHover : IAction
 {
-    void OnInteract();  
-}
+    void OnHover();
+} 
+ 
 
 public interface INearby
 {

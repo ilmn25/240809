@@ -34,7 +34,7 @@ public class GUICraft
     
     public static void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _stringID != null)
+        if (Control.control.ActionPrimary.KeyDown() && _stringID != null)
         {
             Craft.CraftItem(_stringID);
             GUICursor.UpdateCursorSlot();

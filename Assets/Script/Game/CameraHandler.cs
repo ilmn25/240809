@@ -54,7 +54,7 @@ public class CameraHandler : MonoBehaviour
         HandlePlayerFollow(); 
         HandleCameraSway();
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Control.control.OrbitLeft.KeyDown())
         { 
             _orbitRotation += 45;
             if (_orbitRotation >= 180) _orbitRotation = -180;
@@ -62,7 +62,7 @@ public class CameraHandler : MonoBehaviour
             OnOrbitRotate?.Invoke();
  
         }
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (Control.control.OrbitRight.KeyDown())
         {
             _orbitRotation -= 45;
             if (_orbitRotation <= -180) _orbitRotation = 180;

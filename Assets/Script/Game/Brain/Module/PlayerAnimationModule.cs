@@ -4,19 +4,16 @@ using UnityEngine.UIElements;
 
 public class PlayerAnimationModule : Module
 { 
-    private PlayerMovementModule _playerMovementModule;
+    private const float BounceSpeed = 1.65f;
+    private const float BounceRange = 0.15f;
+    private const float TrailFrequency = 0.15f;
+    public const float FlipDuration = 0.05f;
     
+    private PlayerMovementModule _playerMovementModule;
     private Animator _animator;
     private GameObject _sprite;
     private int _flipDirection;
-    private float _nextTrailTimer = 0f; // Time when the next trail should be created
-
-    private float BOUNCE_SPEED = 1.65f; // Speed of the bounce
-    private float BOUNCE_RANGE = 0.15f; // Range of the bounce 
-    // private float TRAIL_DURATION = 0.5f; // Duration of the trail
-    private float TRAIL_FREQUENCY = 0.15f; // Frequency of the trail creation
-    private float FLIP_DURATION = 0.05f; // Duration of the scaling effect 
-
+    private float _nextTrailTimer = 0f;
     private int _currentScaleState = 0;
     private float _flipTimer = 0f;
     private Vector3 _originalScale;
@@ -36,11 +33,6 @@ public class PlayerAnimationModule : Module
 
         CameraHandler.UpdateOrbitRotate += UpdateOrbit;
     }
-
-    public override void Terminate()
-    {
-        CameraHandler.UpdateOrbitRotate -= UpdateOrbit; 
-    }   
  
     void UpdateOrbit()
     { 
@@ -50,24 +42,24 @@ public class PlayerAnimationModule : Module
     public void HandleAnimationUpdate()
     {
         // facing direction 
-        if (_playerMovementModule._rawInput != Vector2.zero){
-            _animator.SetFloat("PosX", _playerMovementModule._rawInput.x);
-            _animator.SetFloat("PosY", _playerMovementModule._rawInput.y);
+        if (_playerMovementModule.RawInput != Vector2.zero){
+            _animator.SetFloat("PosX", _playerMovementModule.RawInput.x);
+            _animator.SetFloat("PosY", _playerMovementModule.RawInput.y);
         } 
 
-        bool isMoving = _playerMovementModule._speedCurrent > 0.35 && _playerMovementModule._isGrounded;
+        bool isMoving = _playerMovementModule.SpeedCurrent > 0.35 && _playerMovementModule.IsGrounded;
         _animator.SetBool("movementFlag", isMoving); // moving or idle
         if (isMoving)
         {
             // bounce 
-            float newY = Mathf.PingPong(Time.time * BOUNCE_SPEED, BOUNCE_RANGE);
+            float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
             _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, newY, _sprite.transform.localPosition.z);
             
             // smoke trail
             if (Time.time >= _nextTrailTimer)
             { 
                 SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, true);
-                _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
+                _nextTrailTimer = Time.time + TrailFrequency;
                 Audio.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }
         } else _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, 0, _sprite.transform.localPosition.z);
@@ -79,7 +71,7 @@ public class PlayerAnimationModule : Module
 
     void HandleFlipCheck()
     {     
-        if ((int)_playerMovementModule._rawInput.x != 0) 
+        if ((int)_playerMovementModule.RawInput.x != 0) 
         {
             if (Mathf.Sign((int)_animator.GetFloat("PosX")) != Mathf.Sign(_targetScale.x))
             {
@@ -107,9 +99,9 @@ public class PlayerAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FLIP_DURATION);
+            _sprite.transform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
-            if (_flipTimer >= FLIP_DURATION)
+            if (_flipTimer >= FlipDuration)
             {
                 _sprite.transform.localScale = _flatScale;
                 _flipTimer = 0f; 
@@ -119,9 +111,9 @@ public class PlayerAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FLIP_DURATION);
+            _sprite.transform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
-            if (_flipTimer >= FLIP_DURATION)
+            if (_flipTimer >= FlipDuration)
             {
                 _sprite.transform.localScale = _targetScale;
                 _currentScaleState = 0;
