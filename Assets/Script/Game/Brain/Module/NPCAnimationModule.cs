@@ -43,7 +43,7 @@ public class NPCAnimationModule : Module
         { 
             _relativeDirection.x = Mathf.Abs(_relativeDirection.x) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.x);
             _relativeDirection.y = Mathf.Abs(_relativeDirection.y) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.y);
-            _relativeDirection = CameraHandler.GetRelativeDirection(_relativeDirection); 
+            _relativeDirection = ViewPort.GetRelativeDirection(_relativeDirection); 
             _animator.SetFloat("PosX", _relativeDirection.x);
             _animator.SetFloat("PosY", _relativeDirection.y);
         }

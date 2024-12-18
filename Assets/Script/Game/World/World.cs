@@ -4,26 +4,41 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class World
 {
     public delegate void Vector3IntEvent(Vector3Int position);
     public static event Vector3IntEvent MapUpdated;
-    
+    [NonSerialized] public static World Inst;
+    [NonSerialized] public static readonly int ChunkSize = 15;
+     
     private Chunk[] _chunks;
-    public readonly SerializableVector3Int Length;
-    public readonly SerializableVector3Int Bounds;
-
-    [NonSerialized]
-    public static World world;
-    [NonSerialized]
-    public static readonly int ChunkSize = 15;
+    public readonly SVector3Int Length;
+    public readonly SVector3Int Bounds;
+    public readonly int Seed;
+ 
 
     public World(int x, int y, int z)
     {
-        Bounds = new SerializableVector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
-        Length = new SerializableVector3Int(x, y, z);
+        Bounds = new SVector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
+        Length = new SVector3Int(x, y, z);
         _chunks = new Chunk[x * y * z];
+        Seed = Environment.TickCount;
+    }
+
+    public static void Save(int id)
+    {
+        EntityStaticLoad.UnloadWorld();
+        EntityDynamicLoad.UnloadWorld();
+
+        Utility.Save(Inst, "World" + id);
+    }
+
+    public static void Load(int id)
+    { 
+        Inst = Utility.Load<World>("World" + id);
+        if (Inst == null)
+            WorldGen.GenerateTestMap();
     }
 
     private int GetIndex(int chunkX, int chunkY, int chunkZ)
@@ -84,18 +99,18 @@ public class World
     
     public static Boolean IsInWorldBounds(Vector3 worldPosition)
     {
-        if (worldPosition.x < world.Bounds.x && worldPosition.x >= 0 &&
-            worldPosition.y < world.Bounds.y && worldPosition.y >= 0 &&
-            worldPosition.z < world.Bounds.z && worldPosition.z >= 0)
+        if (worldPosition.x < Inst.Bounds.x && worldPosition.x >= 0 &&
+            worldPosition.y < Inst.Bounds.y && worldPosition.y >= 0 &&
+            worldPosition.z < Inst.Bounds.z && worldPosition.z >= 0)
             return true;
         return false;
     }
 
     public static Boolean IsInWorldBounds(int x, int y, int z)
     {
-        if (x < world.Bounds.x && x >= 0 &&
-            y < world.Bounds.y && y >= 0 &&
-            z < world.Bounds.z && z >= 0)
+        if (x < Inst.Bounds.x && x >= 0 &&
+            y < Inst.Bounds.y && y >= 0 &&
+            z < Inst.Bounds.z && z >= 0)
             return true;
         return false;
     }
@@ -119,47 +134,11 @@ public class World
             coordinate.z - chunkPosition.z);
 
         return Vector3Int.FloorToInt(blockPositionInChunk);
-    }
-
-    public static string GetFilePath(int id)
-    {
-        return $"{Game.DownloadPath}\\World{id}.dat";
-    }
-
-    public static async void Save(int id)
-    {
-        EntityStaticLoad.UnloadWorld();
-        EntityDynamicLoad.UnloadWorld();
-        await Task.Delay(10);
-        
-        using (FileStream file = File.Create(GetFilePath(id)))
-        {
-            Game.BinaryFormatter.Serialize(file, world);
-        } 
-    }
-
-    public static void Load(int id)
-    { 
-        if (world == null)
-        {
-            if (File.Exists(GetFilePath(id)))
-            { 
-                FileStream file = File.Open(GetFilePath(id), FileMode.Open);
-
-                world = (World)Game.BinaryFormatter.Deserialize(file);
-                file.Close();
-            } 
-            else
-            {
-                Utility.Log("doesn't exist, load region fail" + id); 
-                world = new World(1,1,1); 
-            }
-        }
-    }
-
+    } 
+ 
     public static int GetBlock(Vector3Int coordinate) //0 = empty, 1 = block, error = out of bounds
     { 
-        return world[GetChunkCoordinate(coordinate)].Map[GetBlockCoordinate(coordinate)];
+        return Inst[GetChunkCoordinate(coordinate)].Map[GetBlockCoordinate(coordinate)];
     }
 
     public static void SetBlock(Vector3Int coordinate, int blockID = 0)
@@ -167,7 +146,7 @@ public class World
         Vector3Int blockCoordinate = GetBlockCoordinate(coordinate);
         Vector3Int chunkCoordinate = GetChunkCoordinate(coordinate);
          
-        world[chunkCoordinate].Map[blockCoordinate] = blockID;
+        Inst[chunkCoordinate].Map[blockCoordinate] = blockID;
         NavMap.Set(coordinate, blockID == 0);
         
         if (MapUpdated != null) MapUpdated(coordinate);

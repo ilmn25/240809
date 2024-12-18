@@ -25,9 +25,9 @@ public class Entity
         
         public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)
         {
-                return dictionary[stringID].GetChunkEntityData(stringID, new SerializableVector3Int(worldPosition));
+                return dictionary[stringID].GetChunkEntityData(stringID, new SVector3Int(worldPosition));
         }
-        public static ChunkEntityData GetChunkEntityData(string stringID, SerializableVector3Int worldPosition)
+        public static ChunkEntityData GetChunkEntityData(string stringID, SVector3Int worldPosition)
         {
                 return dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
         }

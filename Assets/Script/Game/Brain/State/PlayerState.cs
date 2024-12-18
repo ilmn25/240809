@@ -13,7 +13,7 @@ public class PlayerState : State
         if (Machine.transform.position.y < -50)
         {
             MapCull.ForceRevertMesh(); 
-            Machine.transform.position = new Vector3(Game.Player.transform.position.x , World.world.Bounds.y + 40, Game.Player.transform.position.z);
+            Machine.transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
         }
         
         if (Input.GetKeyDown(KeyCode.O)) 

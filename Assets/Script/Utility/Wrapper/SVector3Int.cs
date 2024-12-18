@@ -1,21 +1,21 @@
 using UnityEngine;
 
 [System.Serializable]
-public class SerializableVector3Int
+public class SVector3Int
 {
     public int x;
     public int y;
     public int z;
     
-    public SerializableVector3Int() {}
-    public SerializableVector3Int(int x, int y, int z)
+    public SVector3Int() {}
+    public SVector3Int(int x, int y, int z)
     {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public SerializableVector3Int(Vector3Int vector)
+    public SVector3Int(Vector3Int vector)
     {
         this.x = vector.x;
         this.y = vector.y;

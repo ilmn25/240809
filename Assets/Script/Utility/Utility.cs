@@ -1,7 +1,17 @@
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public static class Utility
 {
+    private static readonly string SavePath;
+    private static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
+
+    static Utility()
+    {
+        SavePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
+    }
     public static Vector3 AddToVector(Vector3 vector, float x, float y, float z)
     {
         return new Vector3(vector.x + x, vector.y + y, vector.z + z);
@@ -39,5 +49,26 @@ public static class Utility
     public static float GetDeltaTime()
     {
         return (Time.deltaTime < Game.MaxDeltaTime) ? Time.deltaTime : Game.MaxDeltaTime;
+    }
+ 
+
+    public static void Save<T>(T data, string filePath)
+    {
+        using (FileStream file = File.Create(SavePath + filePath + ".dat"))
+        {
+            BinaryFormatter.Serialize(file, data);
+        }
+    }
+
+    public static T Load<T>(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            using (FileStream file = File.Open(SavePath + filePath + ".dat", FileMode.Open))
+            {
+                return (T)BinaryFormatter.Deserialize(file);
+            }
+        }
+        return default;
     }
 }

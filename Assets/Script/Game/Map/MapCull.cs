@@ -35,7 +35,7 @@ public class MapCull
     public static void Initialize()
     {
         new CoroutineTask(YCheckRoutine());
-        CameraHandler.OnOrbitRotate += HandleObstructionCheck; 
+        ViewPort.OnOrbitRotate += HandleObstructionCheck; 
  
         _chunkPositionPrevious = Scene.PlayerChunkPosition;
 
@@ -48,7 +48,7 @@ public class MapCull
     
     public static void Update() 
     {
-        if (Control.control.CullMode.KeyDown()) {
+        if (Control.Inst.CullMode.KeyDown()) {
             switch (_currentCullMode)
             {
                 case CullMode.On:
@@ -163,7 +163,7 @@ public class MapCull
             return;
         }
         
-        Vector3 cameraPosition = _playerPosition +  (Quaternion.Euler(0, CameraHandler._orbitRotation, 0) * new Vector3(0, CameraHandler.DISTANCE, -CameraHandler.DISTANCE));
+        Vector3 cameraPosition = _playerPosition +  (Quaternion.Euler(0, ViewPort.OrbitRotation, 0) * new Vector3(0, ViewPort.Distance, -ViewPort.Distance));
         if (Physics.Raycast(new Ray(_playerPosition + Vector3.up * 0.9f,  cameraPosition - (_playerPosition + Vector3.up * 0.9f))
                 , out _, Vector3.Distance(_playerPosition + Vector3.up * 0.9f, cameraPosition), Game.MaskMap))
         {

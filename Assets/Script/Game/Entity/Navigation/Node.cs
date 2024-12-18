@@ -24,12 +24,12 @@ public class Node
     public static bool IsAir(Vector3Int pos)
     {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || 
-            pos.x >= World.world.Bounds.x || 
-            pos.z >= World.world.Bounds.z)
+            pos.x >= World.Inst.Bounds.x || 
+            pos.z >= World.Inst.Bounds.z)
             return false; // Check bounds x and z
 
         // Check bounds y (true even if above max y)
-        if (pos.y >= World.world.Bounds.y)
+        if (pos.y >= World.Inst.Bounds.y)
             return true;
 
         // Check air or block

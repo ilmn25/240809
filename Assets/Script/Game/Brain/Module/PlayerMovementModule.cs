@@ -44,7 +44,7 @@ public class PlayerMovementModule : Module
             _input = Vector2.zero;
             return;
         }
-        _orbitRotation = Mathf.Deg2Rad * -CameraHandler._orbitRotation;
+        _orbitRotation = Mathf.Deg2Rad * -ViewPort.OrbitRotation;
         _cosAngle = Mathf.Cos(_orbitRotation);
         _sinAngle = Mathf.Sin(_orbitRotation);
         _input.x = RawInput.x * _cosAngle - RawInput.y * _sinAngle;
@@ -65,7 +65,7 @@ public class PlayerMovementModule : Module
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Control.control.Sprint.Key() && PlayerStatus.Stamina > 1)
+            if (Control.Inst.Sprint.Key() && PlayerStatus.Stamina > 1)
             {
                 _speedTarget = SpeedRun;
                 PlayerStatus.Stamina -= 0.1f;
@@ -120,7 +120,7 @@ public class PlayerMovementModule : Module
     private void HandleJump()
     {
         if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
-        if (fly && Control.control.Jump.KeyDown())
+        if (fly && Control.Inst.Jump.KeyDown())
         {
             VerticalVelocity = JumpVelocity;
         }
@@ -135,11 +135,11 @@ public class PlayerMovementModule : Module
             _coyoteTimer -= _deltaTime; // Decrease coyote timer when not grounded
         }
 
-        if (Control.control.Jump.KeyDown())
+        if (Control.Inst.Jump.KeyDown())
         {
             _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
-        else if (Control.control.Jump.KeyDown() && VerticalVelocity > ClampVelocity)
+        else if (Control.Inst.Jump.KeyDown() && VerticalVelocity > ClampVelocity)
         {
             VerticalVelocity += HoldVelocity;
         }

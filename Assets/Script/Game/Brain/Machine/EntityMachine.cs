@@ -10,7 +10,7 @@ public abstract class EntityMachine : Machine
     protected override void Awake() {  } 
     public ChunkEntityData GetEntityData()
     {
-        entityData.position = new SerializableVector3Int(World.GetBlockCoordinate(transform.position));
+        entityData.position = new SVector3Int(World.GetBlockCoordinate(transform.position));
         UpdateEntityData();
         return entityData;
     }

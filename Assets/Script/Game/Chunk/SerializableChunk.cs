@@ -19,13 +19,4 @@ public class SerializableChunk
         get => map[x + size * (y + size * z)];
         set => map[x + size * (y + size * z)] = value;
     }
-    
-    public Chunk Deserialize()
-    {
-        Chunk data = new Chunk(size);
-        data.Map.array = map;
-        data.StaticEntity = StaticEntity;
-        data.DynamicEntity = DynamicEntity;
-        return data;
-    }
 }

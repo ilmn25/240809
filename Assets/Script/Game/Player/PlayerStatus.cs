@@ -11,12 +11,12 @@ public class PlayerStatus
  
     public static void Initialize()
     {
-        Health = PlayerData.playerData.health;
-        Mana = PlayerData.playerData.mana;
-        Sanity = PlayerData.playerData.sanity;
-        Hunger = PlayerData.playerData.hunger;
-        Stamina = PlayerData.playerData.stamina;
-        Speed = PlayerData.playerData.speed;
+        Health = PlayerData.Inst.health;
+        Mana = PlayerData.Inst.mana;
+        Sanity = PlayerData.Inst.sanity;
+        Hunger = PlayerData.Inst.hunger;
+        Stamina = PlayerData.Inst.stamina;
+        Speed = PlayerData.Inst.speed;
     }
 
     public static void Update()
@@ -27,7 +27,7 @@ public class PlayerStatus
     public static void UpdateHealth(int amount)
     {
         Health += amount;
-        if (Health > PlayerData.playerData.health) Health = PlayerData.playerData.health;
+        if (Health > PlayerData.Inst.health) Health = PlayerData.Inst.health;
         else if (Health < 0) Health = 0;
         Debug.Log("Current Health: " + Health);
     }

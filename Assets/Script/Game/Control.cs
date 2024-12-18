@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
  
+[Serializable]
 public class Control
 {
     private const int Range = 5;
-    public static Control control = new Control();
+    public static Control Inst = new Control();
     
     private static RaycastHit _raycastInfo;
     private static Vector3 _direction;
@@ -39,14 +41,29 @@ public class Control
     public readonly ControlKey Hotbar8 = new (KeyCode.Alpha8);
     public readonly ControlKey Hotbar9 = new (KeyCode.Alpha9);
 
+    public static void Save()
+    {
+        Utility.Save(Inst, "KeyBinds");
+    }
+
+    public static void Load()
+    {
+        Inst = Utility.Load<Control>("KeyBinds");
+    }
+    
     public static Vector2Int GetMovementAxis()
     {
         Vector2Int movement = new Vector2Int();
-        if (control.Up.Key()) movement += Vector2Int.up;
-        if (control.Down.Key()) movement += Vector2Int.down;
-        if (control.Left.Key()) movement += Vector2Int.left;
-        if (control.Right.Key()) movement += Vector2Int.right;
+        if (Inst.Up.Key()) movement += Vector2Int.up;
+        if (Inst.Down.Key()) movement += Vector2Int.down;
+        if (Inst.Left.Key()) movement += Vector2Int.left;
+        if (Inst.Right.Key()) movement += Vector2Int.right;
         return movement;
+    }
+
+    public static void Initialize()
+    {
+        Inst = Utility.Load<Control>("KeyBinds") ?? new Control();
     }
     
     public static void Update()
@@ -73,11 +90,11 @@ public class Control
 
     private static void HandleActionButton()
     {
-        if (control.ActionPrimaryNear.KeyDown())
+        if (Inst.ActionPrimaryNear.KeyDown())
         {
             GetNearestInteractable<IActionPrimary>()?.OnActionPrimary();  
         }
-        else if (control.ActionPrimaryNear.KeyDown())
+        else if (Inst.ActionPrimaryNear.KeyDown())
         { 
             GetNearestInteractable<IActionSecondary>()?.OnActionSecondary(); 
         }
@@ -113,7 +130,7 @@ public class Control
         }
         else if (Input.GetKey(KeyCode.Mouse1))
         { 
-            CameraHandler.Instance.HandleScrollInput(scroll); 
+            ViewPort.HandleScrollInput(scroll); 
         }
         else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
         {
@@ -166,19 +183,19 @@ public class Control
         if (Utility.isLayer(_layerMask, Game.IndexMap))
         {
             PlayerTerraform.HandlePositionInfo(_position,  _direction);
-            if (control.ActionPrimary.KeyDown())
+            if (Inst.ActionPrimary.KeyDown())
             {
                 PlayerTerraform.HandleMapBreak(); 
             }
-            if (control.ActionSecondary.KeyDown())
+            if (Inst.ActionSecondary.KeyDown())
             {
                 PlayerTerraform.HandleMapPlace();
             }
         }
         
-        if (control.ActionPrimary.KeyDown())
+        if (Inst.ActionPrimary.KeyDown())
             _raycastInfo.collider.gameObject.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
-        if (control.ActionSecondary.KeyDown())
+        if (Inst.ActionSecondary.KeyDown())
             _raycastInfo.collider.gameObject.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
     }
       

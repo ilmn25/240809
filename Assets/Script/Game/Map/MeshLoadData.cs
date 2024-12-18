@@ -46,7 +46,7 @@ public class MeshLoadData
 
         void SetMiddle(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y, coordinate.z];
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z];
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int y = 0; y < World.ChunkSize; y++)
@@ -61,7 +61,7 @@ public class MeshLoadData
 
         void SetPX(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize, coordinate.y, coordinate.z];
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize, coordinate.y, coordinate.z];
             for (int y = 0; y < World.ChunkSize; y++)
             {
                 for (int z = 0; z < World.ChunkSize; z++)
@@ -73,7 +73,7 @@ public class MeshLoadData
 
         void SetNX(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize, coordinate.y, coordinate.z];
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize, coordinate.y, coordinate.z];
             for (int y = 0; y < World.ChunkSize; y++)
             {
                 for (int z = 0; z < World.ChunkSize; z++)
@@ -85,7 +85,7 @@ public class MeshLoadData
 
         void SetPY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y + World.ChunkSize, coordinate.z];
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y + World.ChunkSize, coordinate.z];
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int z = 0; z < World.ChunkSize; z++)
@@ -97,7 +97,7 @@ public class MeshLoadData
 
         void SetNY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y - World.ChunkSize, coordinate.z];
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y - World.ChunkSize, coordinate.z];
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int z = 0; z < World.ChunkSize; z++)
@@ -109,7 +109,7 @@ public class MeshLoadData
 
         void SetPZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y, coordinate.z + World.ChunkSize];
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z + World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int y = 0; y < World.ChunkSize; y++)
@@ -121,7 +121,7 @@ public class MeshLoadData
 
         void SetNZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y, coordinate.z - World.ChunkSize];
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z - World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int y = 0; y < World.ChunkSize; y++)
@@ -134,7 +134,7 @@ public class MeshLoadData
         // Methods to set the edges
         void SetEdgePXNY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
@@ -144,7 +144,7 @@ public class MeshLoadData
 
         void SetEdgePXPY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
@@ -154,7 +154,7 @@ public class MeshLoadData
 
         void SetEdgePXPZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize, coordinate.y,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize, coordinate.y,
                 coordinate.z + World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
@@ -164,7 +164,7 @@ public class MeshLoadData
 
         void SetEdgePXNZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize, coordinate.y,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize, coordinate.y,
                 coordinate.z - World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
@@ -174,7 +174,7 @@ public class MeshLoadData
 
         void SetEdgeNXNY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
@@ -184,7 +184,7 @@ public class MeshLoadData
 
         void SetEdgeNXPY(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z];
             for (int z = 0; z < World.ChunkSize; z++)
             {
@@ -194,7 +194,7 @@ public class MeshLoadData
 
         void SetEdgeNXPZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize, coordinate.y,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize, coordinate.y,
                 coordinate.z + World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
@@ -204,7 +204,7 @@ public class MeshLoadData
 
         void SetEdgeNXNZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize, coordinate.y,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize, coordinate.y,
                 coordinate.z - World.ChunkSize];
             for (int y = 0; y < World.ChunkSize; y++)
             {
@@ -214,7 +214,7 @@ public class MeshLoadData
 
         void SetEdgePYNZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y + World.ChunkSize,
                 coordinate.z - World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
@@ -224,7 +224,7 @@ public class MeshLoadData
 
         void SetEdgePYPZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y + World.ChunkSize,
                 coordinate.z + World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
@@ -234,7 +234,7 @@ public class MeshLoadData
 
         void SetEdgeNYNZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y - World.ChunkSize,
                 coordinate.z - World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
@@ -244,7 +244,7 @@ public class MeshLoadData
 
         void SetEdgeNYPZ(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x, coordinate.y - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x, coordinate.y - World.ChunkSize,
                 coordinate.z + World.ChunkSize];
             for (int x = 0; x < World.ChunkSize; x++)
             {
@@ -255,7 +255,7 @@ public class MeshLoadData
         // Methods to set the corners
         void SetCornerNNN(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z - World.ChunkSize];
             map[-1, -1, -1] = chunk.Map[World.ChunkSize - 1, World.ChunkSize - 1,
                 World.ChunkSize - 1];
@@ -263,7 +263,7 @@ public class MeshLoadData
 
         void SetCornerNNP(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z + World.ChunkSize];
             map[0, -1, World.ChunkSize] =
                 chunk.Map[World.ChunkSize - 1, World.ChunkSize - 1, 0];
@@ -271,7 +271,7 @@ public class MeshLoadData
 
         void SetCornerNPN(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z - World.ChunkSize];
             map[-1, World.ChunkSize, -1] =
                 chunk.Map[World.ChunkSize - 1, 0, World.ChunkSize - 1];
@@ -279,14 +279,14 @@ public class MeshLoadData
 
         void SetCornerNPP(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x - World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x - World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z + World.ChunkSize];
             map[-1, World.ChunkSize, World.ChunkSize] = chunk.Map[World.ChunkSize - 1, 0, 0];
         }
 
         void SetCornerPNN(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z - World.ChunkSize];
             map[World.ChunkSize, -1, -1] =
                 chunk.Map[0, World.ChunkSize - 1, World.ChunkSize - 1];
@@ -294,21 +294,21 @@ public class MeshLoadData
 
         void SetCornerPNP(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y - World.ChunkSize, coordinate.z + World.ChunkSize];
             map[World.ChunkSize, -1, World.ChunkSize] = chunk.Map[0, World.ChunkSize - 1, 0];
         }
 
         void SetCornerPPN(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z - World.ChunkSize];
             map[World.ChunkSize, World.ChunkSize, -1] = chunk.Map[0, 0, World.ChunkSize - 1];
         }
 
         void SetCornerPPP(Vector3Int coordinate)
         {
-            Chunk chunk = World.world[coordinate.x + World.ChunkSize,
+            Chunk chunk = World.Inst[coordinate.x + World.ChunkSize,
                 coordinate.y + World.ChunkSize, coordinate.z + World.ChunkSize];
             map[World.ChunkSize, World.ChunkSize, World.ChunkSize] = chunk.Map[0, 0, 0];
         }

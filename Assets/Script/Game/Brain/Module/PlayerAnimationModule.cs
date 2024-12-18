@@ -31,12 +31,12 @@ public class PlayerAnimationModule : Module
         _originalScale = _sprite.transform.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
 
-        CameraHandler.UpdateOrbitRotate += UpdateOrbit;
+        ViewPort.UpdateOrbitRotate += UpdateOrbit;
     }
  
     void UpdateOrbit()
     { 
-        Machine.transform.rotation = CameraHandler._currentRotation;
+        Machine.transform.rotation = ViewPort.CurrentRotation;
     }
 
     public void HandleAnimationUpdate()

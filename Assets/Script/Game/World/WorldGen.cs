@@ -1,31 +1,14 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml.Serialization;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 public class WorldGen
 {
-    private static readonly System.Random Random = new System.Random();
+    private static System.Random Random;
 
-    public const bool SpawnStaticEntity = true;
-    public const bool SpawnDynamicEntity = false;
-    public const bool Flat = false;
+    private static bool SpawnStaticEntity = true;
+    private static bool SpawnDynamicEntity = false;
+    private static bool Flat = false;
     public static readonly Vector3Int Size = new Vector3Int(5, 5, 5);
-
-    private static float StoneOffsetX;
-    private static float StoneOffsetZ;
-    private static float DirtOffsetX;
-    private static float DirtOffsetZ;
-    private static float SandOffsetX;
-    private static float SandOffsetZ;
-    private static float MarbleOffsetX;
-    private static float MarbleOffsetZ;
-    private static float CaveOffset;
-
     private const float StoneScale = 0.01f;
     private const float DirtScale = 0.005f;
     private const float SandScale = 0.02f;
@@ -34,28 +17,30 @@ public class WorldGen
     private const int WallHeight = 5;
     private const int FloorHeight = 2;
 
+    private static float _stoneOffset;
+    private static float _dirtOffset;
+    private static float _sandOffset;
+    private static float _marbleOffset;
+    private static float _caveOffset;
+    
     private static Chunk _chunk;
     private static Vector3Int _chunkCoord; 
     private static Chunk _setPiece; 
-    private static readonly int _worldHeight = (Size.y - 2) * World.ChunkSize;
+    private static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static void Initialize() {
-        StoneOffsetX = UnityEngine.Random.Range(0f, 1000f);
-        StoneOffsetZ = UnityEngine.Random.Range(0f, 1000f);
-        DirtOffsetX = UnityEngine.Random.Range(0f, 1000f);
-        DirtOffsetZ = UnityEngine.Random.Range(0f, 1000f);
-        SandOffsetX = UnityEngine.Random.Range(0f, 1000f);
-        SandOffsetZ = UnityEngine.Random.Range(0f, 1000f);
-        MarbleOffsetX = UnityEngine.Random.Range(0f, 1000f);
-        MarbleOffsetZ = UnityEngine.Random.Range(0f, 1000f);
-        CaveOffset = UnityEngine.Random.Range(0f, 1000f); 
+        Random = new System.Random(1);
+
+        _stoneOffset = (float)Random.NextDouble() * 1000;
+        _dirtOffset = (float)Random.NextDouble() * 1000;
+        _sandOffset = (float)Random.NextDouble() * 1000;
+        _marbleOffset = (float)Random.NextDouble() * 1000;
+        _caveOffset = (float)Random.NextDouble() * 1000;
     }
 
-
-    //! debug tools
-    public static void Generate()
+    public static void GenerateTestMap()
     { 
-        World.world = new World(Size.x, Size.y, Size.z);
+        World.Inst = new World(Size.x, Size.y, Size.z);
         List<Vector3Int> coordinatesList = new List<Vector3Int>();
 
         for (int x = 0; x < Size.x * World.ChunkSize; x += World.ChunkSize)
@@ -71,15 +56,15 @@ public class WorldGen
         
         foreach (var coordinates in coordinatesList)
         {
-            World.world[coordinates.x, coordinates.y, coordinates.z] = GenerateTestChunk(coordinates); 
-        }
+            World.Inst[coordinates] = Generate(coordinates); 
+        }   
 
         int chunkSize = World.ChunkSize;
-        for (int x = 0; x < World.world.Bounds.x; x++)
+        for (int x = 0; x < World.Inst.Bounds.x; x++)
         {
-            for (int y = 0; y < World.world.Bounds.y - 1; y++)
+            for (int y = 0; y < World.Inst.Bounds.y - 1; y++)
             {
-                for (int z = 0; z < World.world.Bounds.z; z++)
+                for (int z = 0; z < World.Inst.Bounds.z; z++)
                 { 
                     Vector3Int worldPos = new Vector3Int(x, y, z);
                     Vector3Int chunkPos = NavMap.GetRelativePosition(worldPos);
@@ -87,9 +72,9 @@ public class WorldGen
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
 
-                    if (World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
+                    if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
                         localChunkY + 1 != chunkSize &&
-                        World.world[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
+                        World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].Map[localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
                         if (Random.NextDouble() <= 0.0002)
                         {
@@ -107,10 +92,9 @@ public class WorldGen
                 }
             }
         }
- 
     }  
 
-    public static Chunk GenerateTestChunk(Vector3Int coordinates)
+    public static Chunk Generate(Vector3Int coordinates)
     {
         _chunkCoord = coordinates;
         _chunk = new Chunk();
@@ -142,10 +126,9 @@ public class WorldGen
         bool wall = new System.Random().NextDouble() < 0.1;
         bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize);
 
-        // Calculate the center of the map
-        int centerX = World.world.Bounds.x / 3;
-        int centerZ = World.world.Bounds.z / 3;
-        int craterRadius = 35; // Adjust the radius as needed
+        int centerX = World.Inst.Bounds.x / 3;
+        int centerZ = World.Inst.Bounds.z / 3;
+        int craterRadius = 35;  
     
         for (int y = 0; y < World.ChunkSize; y++)
         {
@@ -155,7 +138,7 @@ public class WorldGen
                 {
                     if (IsWithinCrater(x, y, z, centerX, centerZ, craterRadius))
                     {
-                        _chunk.Map[x, y, z] = 0; // Empty space for the crater
+                        _chunk.Map[x, y, z] = 0;  
                         continue;
                     }
 
@@ -173,12 +156,12 @@ public class WorldGen
         float distanceFromCenter = Mathf.Sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
         // Calculate the taper factor so that it decreases with depth
-        float taperFactor = (float)(y + _chunkCoord.y) / _worldHeight;
+        float taperFactor = (float)(y + _chunkCoord.y) / WorldHeight;
         float taperedRadius = craterRadius * taperFactor;
 
         // Add noise to the crater walls
-        float noiseX = (_chunkCoord.x + x) * CaveScale + CaveOffset;
-        float noiseZ = (_chunkCoord.z + z) * CaveScale + CaveOffset;
+        float noiseX = (_chunkCoord.x + x) * CaveScale + _caveOffset;
+        float noiseZ = (_chunkCoord.z + z) * CaveScale + _caveOffset;
         float wallNoise = Mathf.PerlinNoise(noiseX, noiseZ) * 2.0f - 1.0f; // Noise value between -1 and 1
         taperedRadius += wallNoise;
 
@@ -187,25 +170,25 @@ public class WorldGen
     
     private static void GenerateTerrainBlocks(int x, int y, int z)
     {
-        float stoneX = Mathf.Abs(_chunkCoord.x + x) * StoneScale + StoneOffsetX;
-        float stoneZ = Mathf.Abs(_chunkCoord.z + z) * StoneScale + StoneOffsetZ;
+        float stoneX = Mathf.Abs(_chunkCoord.x + x) * StoneScale + _stoneOffset;
+        float stoneZ = Mathf.Abs(_chunkCoord.z + z) * StoneScale + _stoneOffset;
         float stoneNoiseValue = Mathf.PerlinNoise(stoneX, stoneZ);
-        int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+        int stoneHeight = Mathf.FloorToInt(stoneNoiseValue * (WorldHeight / 4)) + (WorldHeight * 3 / 4);
 
-        float dirtX = Mathf.Abs(_chunkCoord.x + x) * DirtScale + DirtOffsetX;
-        float dirtZ = Mathf.Abs(_chunkCoord.z + z) * DirtScale + DirtOffsetZ;  
+        float dirtX = Mathf.Abs(_chunkCoord.x + x) * DirtScale + _dirtOffset;
+        float dirtZ = Mathf.Abs(_chunkCoord.z + z) * DirtScale + _dirtOffset;  
         float dirtNoiseValue = Mathf.PerlinNoise(dirtX, dirtZ);
-        int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+        int dirtHeight = Mathf.FloorToInt(dirtNoiseValue * (WorldHeight / 4)) + (WorldHeight * 3 / 4);
 
-        float sandX = Mathf.Abs(_chunkCoord.x + x) * SandScale + SandOffsetX;
-        float sandZ = Mathf.Abs(_chunkCoord.z + z) * SandScale + SandOffsetZ;
+        float sandX = Mathf.Abs(_chunkCoord.x + x) * SandScale + _sandOffset;
+        float sandZ = Mathf.Abs(_chunkCoord.z + z) * SandScale + _sandOffset;
         float sandNoiseValue = Mathf.PerlinNoise(sandX, sandZ);
-        int sandHeight = Mathf.FloorToInt(sandNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+        int sandHeight = Mathf.FloorToInt(sandNoiseValue * (WorldHeight / 4)) + (WorldHeight * 3 / 4);
 
-        float marbleX = Mathf.Abs(_chunkCoord.x + x) * MarbleScale + MarbleOffsetX;
-        float marbleZ = Mathf.Abs(_chunkCoord.z + z) * MarbleScale + MarbleOffsetZ;
+        float marbleX = Mathf.Abs(_chunkCoord.x + x) * MarbleScale + _marbleOffset;
+        float marbleZ = Mathf.Abs(_chunkCoord.z + z) * MarbleScale + _marbleOffset;
         float marbleNoiseValue = Mathf.PerlinNoise(marbleX, marbleZ);
-        int marbleHeight = Mathf.FloorToInt(marbleNoiseValue * (_worldHeight / 4)) + (_worldHeight * 3 / 4);
+        int marbleHeight = Mathf.FloorToInt(marbleNoiseValue * (WorldHeight / 4)) + (WorldHeight * 3 / 4);
 
         if (y + _chunkCoord.y > WallHeight + FloorHeight)
         {
@@ -230,9 +213,9 @@ public class WorldGen
 
     private static void GenerateCaves(int x, int y, int z)
     {
-        float caveX = (_chunkCoord.x + x) * CaveScale + CaveOffset;
-        float caveY = (_chunkCoord.y + y) * CaveScale + CaveOffset;
-        float caveZ = (_chunkCoord.z + z) * CaveScale + CaveOffset;
+        float caveX = (_chunkCoord.x + x) * CaveScale + _caveOffset;
+        float caveY = (_chunkCoord.y + y) * CaveScale + _caveOffset;
+        float caveZ = (_chunkCoord.z + z) * CaveScale + _caveOffset;
         float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
 
         if (caveNoiseValue > 0.35f)
@@ -260,7 +243,7 @@ public class WorldGen
     private static void HandleEntityGeneration(Chunk chunk)
     { 
         ChunkEntityData entityData;
-        SerializableVector3Int entityPosition;
+        SVector3Int entityPosition;
         
         for (int x = 0; x < World.ChunkSize; x++)
         {
@@ -281,17 +264,17 @@ public class WorldGen
                                     double rng = Random.NextDouble();
                                     if (rng <= 0.03)
                                     {
-                                        entityData = Entity.GetChunkEntityData("tree", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("tree", new SVector3Int(x, y + 1, z));
                                         chunk.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.03)
                                     {
-                                        entityData = Entity.GetChunkEntityData("bush1", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("bush1", new SVector3Int(x, y + 1, z));
                                         chunk.StaticEntity.Add(entityData);
                                     }
                                     else if (rng <= 0.2)
                                     {
-                                        entityData = Entity.GetChunkEntityData("grass", new SerializableVector3Int(x, y + 1, z));
+                                        entityData = Entity.GetChunkEntityData("grass", new SVector3Int(x, y + 1, z));
                                         chunk.StaticEntity.Add(entityData);
                                     }
                                 }
@@ -301,12 +284,12 @@ public class WorldGen
                                 if (Random.NextDouble() <= 0.003)
                                 {
 
-                                    entityData = Entity.GetChunkEntityData("stage_hand", new SerializableVector3Int(x, y + 1, z));
+                                    entityData = Entity.GetChunkEntityData("stage_hand", new SVector3Int(x, y + 1, z));
                                     chunk.StaticEntity.Add(entityData);
                                 }
                                 else if (Random.NextDouble() <= 0.03)
                                 {
-                                    entityData = Entity.GetChunkEntityData("slab", new SerializableVector3Int(x, y + 1, z));
+                                    entityData = Entity.GetChunkEntityData("slab", new SVector3Int(x, y + 1, z));
                                     chunk.StaticEntity.Add(entityData);
                                 }
                             }
@@ -314,7 +297,7 @@ public class WorldGen
                         }
                         if (SpawnDynamicEntity && Random.NextDouble() <= 0.003)
                         {
-                            entityPosition = new SerializableVector3Int(x, y + 1, z);
+                            entityPosition = new SVector3Int(x, y + 1, z);
                             if (Random.NextDouble() <= 0.5)
                             {
                                 if (Random.NextDouble() <= 0.5)

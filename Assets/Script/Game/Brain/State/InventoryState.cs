@@ -106,9 +106,9 @@ public class ItemTool : State
     { 
         if (!isSwinging)
         {
-            if (Control.control.ActionPrimary.KeyDown() || 
-                Control.control.DigUp.KeyDown() ||
-                Control.control.DigDown.KeyDown())
+            if (Control.Inst.ActionPrimary.KeyDown() || 
+                Control.Inst.DigUp.KeyDown() ||
+                Control.Inst.DigDown.KeyDown())
             {
                 isSwinging = true;
                 swingTimer = 0f;

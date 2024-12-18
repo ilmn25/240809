@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-[System.Serializable]
+[Serializable]
 public class PlayerData
 {
     public List<InvSlot> inventory;
@@ -14,7 +14,7 @@ public class PlayerData
     public int speed = 100;
 
     [NonSerialized]
-    public static PlayerData playerData;
+    public static PlayerData Inst;
 
     public PlayerData()
     {
@@ -28,27 +28,14 @@ public class PlayerData
     
     public static void Save()
     { 
-        using (FileStream file = File.Create(Game.PlayerSavePath))
-        {
-            playerData.inventory = Inventory.PlayerInventory;
-            Game.BinaryFormatter.Serialize(file, playerData);
-        }
+        Inst.inventory = Inventory.Storage;
+        Utility.Save(Inst, "player");
     }
 
     public static void Load()
     {
-        if (File.Exists(Game.PlayerSavePath))
-        {
-            using (FileStream file = File.Open(Game.PlayerSavePath, FileMode.Open))
-            {
-                playerData = (PlayerData)Game.BinaryFormatter.Deserialize(file);
-            }
-        }
-        else
-        {
-            playerData = new PlayerData(); 
-        }
-        Inventory.SetInventory(playerData.inventory);
+        Inst = Utility.Load<PlayerData>("player") ?? new PlayerData();
+        Inventory.SetInventory(Inst.inventory);
     }
 
 } 

@@ -1,40 +1,42 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
+[Serializable]
 public class ControlKey
 {
-    public KeyCode Primary;
-    public KeyCode Secondary;
-    public readonly KeyCode[] Modifier;
+    private KeyCode _primary;
+    private KeyCode _secondary;
+    private readonly KeyCode[] _modifier;
 
     public ControlKey(KeyCode primary = KeyCode.None, KeyCode secondary = KeyCode.None, KeyCode[] modifier = null)
     {
-        Primary = primary;
-        Secondary = secondary;
-        Modifier = modifier ?? Array.Empty<KeyCode>();
+        this._primary = primary;
+        _secondary = secondary;
+        _modifier = modifier ?? Array.Empty<KeyCode>();
     }
 
     public bool KeyDown()
     {
         return ModifierActive() && 
-               (Input.GetKeyDown(Primary) || Input.GetKeyDown(Secondary));
+               (Input.GetKeyDown(_primary) || Input.GetKeyDown(_secondary));
     }
 
     public bool Key()
     {
         return ModifierActive() && 
-               (Input.GetKey(Primary) || Input.GetKey(Secondary));
+               (Input.GetKey(_primary) || Input.GetKey(_secondary));
     }
 
     public bool KeyUp()
     {
         return ModifierActive() && 
-               (Input.GetKeyUp(Primary) || Input.GetKeyUp(Secondary));
+               (Input.GetKeyUp(_primary) || Input.GetKeyUp(_secondary));
     }
 
     public bool ModifierActive()
     {
-        foreach (KeyCode keyCode in Modifier)
+        foreach (KeyCode keyCode in _modifier)
         {
             if (!Input.GetKey(keyCode)) return false;
         }
