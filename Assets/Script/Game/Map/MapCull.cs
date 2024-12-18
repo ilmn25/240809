@@ -41,7 +41,7 @@ public class MapCull
 
         LightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
         LightSelf = Game.Player.transform.Find("light_self").gameObject;   
-        Volume = Game.Camera.gameObject.GetComponent<Volume>();
+        Volume = Game.CameraObject.gameObject.GetComponent<Volume>();
         
         HandleLight(false); 
     }

@@ -12,15 +12,18 @@ public class Game : MonoBehaviour
     public static string DownloadPath;
     public static string PlayerSavePath;  
     
-    public static LayerMask MaskMap; // just map
-    public static LayerMask MaskMapAndCollision;
+    public static LayerMask MaskMap;  
+    public static LayerMask MaskStatic;
+    public static LayerMask MaskEntity;
     public static int IndexMap;
+    public static int IndexStatic;
+    public static int IndexDynamic;
     public static int IndexUI;
-    public static int IndexEntity;
     
     public static GameObject Player;
-    public static GameObject Camera;
-    public static UnityEngine.Camera GUICamera;
+    public static GameObject CameraObject;
+    public static Camera Camera;
+    public static Camera GUICamera;
     public static GameObject GUI;
     public static GameObject GUIDialogue;
     public static TextMeshProUGUI GUIDialogueText;
@@ -36,13 +39,13 @@ public class Game : MonoBehaviour
     public static AudioClip ChatSound;
     
     public void Awake()
-    {
+    { 
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 200;
         SetConstants(); 
-        Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
-        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
-        Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
+        // Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
+        // Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
+        // Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
     }
 
     private void Start()
@@ -99,18 +102,21 @@ public class Game : MonoBehaviour
         ChatSound = Resources.Load<AudioClip>("audio/sfx/chat"); 
         
         MaskMap  = LayerMask.GetMask("Map"); 
-        MaskMapAndCollision  = LayerMask.GetMask("Collision", "Map"); 
+        MaskStatic  = LayerMask.GetMask("Static", "Map"); 
+        MaskEntity = LayerMask.GetMask("Static", "Dynamic");
         IndexMap = LayerMask.NameToLayer("Map");
+        IndexStatic = LayerMask.NameToLayer("Static");
+        IndexDynamic = LayerMask.NameToLayer("Dynamic");
         IndexUI = LayerMask.NameToLayer("UI");
-        IndexEntity = LayerMask.NameToLayer("Entity");
         
         DownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
         PlayerSavePath = $"{DownloadPath}\\PlayerData.dat";
         
         Player = GameObject.Find("player");
-        Camera = GameObject.Find("main_camera");
-
-        GUICamera = GameObject.Find("hud_camera").GetComponent<UnityEngine.Camera>();
+        CameraObject = GameObject.Find("main_camera");
+        Camera = CameraObject.GetComponent<Camera>();
+        GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
+        
         GUI = GameObject.Find("gui");
         GUIDialogue = GUI.transform.Find("dialogue_box").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();

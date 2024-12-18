@@ -17,8 +17,7 @@ public static class Utility
         return (a.x - b.x) * (a.x - b.x) + 
                (a.y - b.y) * (a.y - b.y) + 
                (a.z - b.z) * (a.z - b.z);
-    }
-    
+    } 
     public static void Log(params object[] parameters)
     {
         if (parameters.Length == 0)

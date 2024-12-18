@@ -50,7 +50,6 @@ public class ItemEmpty : State
     }
 }
 
-
 public class ItemFurniture : State
 {
     public string stringID; 

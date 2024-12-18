@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class RockMachine : EntityMachine, ILeftClick
+public class RockMachine : EntityMachine, IActionPrimary
 {
     public event Action Hit;
     public override void OnInitialize()
@@ -12,7 +12,7 @@ public class RockMachine : EntityMachine, ILeftClick
         AddModule(new SpriteOrbitModule(spriteRenderer)); 
     }
 
-    public void OnLeftClick()
+    public void OnActionPrimary()
     {
         Hit?.Invoke();
     }
