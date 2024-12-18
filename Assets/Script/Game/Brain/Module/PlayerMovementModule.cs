@@ -31,18 +31,7 @@ public class PlayerMovementModule : Module
     [SerializeField] private float CLAMP_VELOCITY = 10f;
     [SerializeField] private float JUMP_GRACE_TIME = 0.1f; // Time allowed to jump before landing
     [SerializeField] private float COYOTE_TIME = 0.1f; // Time allowed to jump after leaving ground
-
-    BoxCollider boxCollider;
-
-    public override void Initialize()
-    {
-        boxCollider = Machine.GetComponent<BoxCollider>(); 
-        boxCollider.enabled = false;
-        boxColliderSize = boxCollider.size / 2; // Recalculate halfSize here
-
-    }
-
-
+ 
 
 
 
@@ -275,15 +264,15 @@ public class PlayerMovementModule : Module
             Machine.transform.position = newPositionY;
         }
     }
-         
-    Collider[] tempCollisionArray = new Collider[1];
-    Vector3 boxColliderSize; // Recalculate halfSize here
-    int collisionCount;
-    private bool IsMovable(Vector3 _newPosition)
+
+    private readonly Collider[] _tempCollisionArray = new Collider[1];
+    private readonly Vector3 _colliderSize = new Vector3(0.35f, 0.35f, 0.25f);  
+    private readonly Vector3 _colliderCenter = new Vector3(0, 0.35f, 0); 
+    private bool IsMovable(Vector3 position)
     {
-        // Define an array to store the results  
-        collisionCount = Physics.OverlapBoxNonAlloc(_newPosition + boxCollider.center, boxColliderSize, tempCollisionArray, Quaternion.identity, Game.MaskMapAndCollision);
-        return !(collisionCount > 0);
+        return !(Physics.OverlapBoxNonAlloc(position + _colliderCenter, 
+            _colliderSize, _tempCollisionArray, Quaternion.identity, 
+            Game.MaskStatic) > 0);
     }
  
 }

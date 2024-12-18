@@ -1,15 +1,15 @@
-public interface ILeftClick
+public interface IActionPrimary
 { 
-    void OnLeftClick(); 
+    void OnActionPrimary(); 
 }
 
 public interface IHover
 {
     void OnHover();
 }
-public interface IRightClick
+public interface IActionSecondary
 {
-    void OnRightClick();  
+    void OnActionSecondary();  
 }
 
 public interface IInteract

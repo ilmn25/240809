@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class CharTalk : State {
     public Dialogue Dialogue; 
 
@@ -17,5 +15,4 @@ public class CharTalk : State {
     {
         GUIDialogue.StartDialogue(this);
     }
- 
 }

@@ -18,7 +18,7 @@ public class MapLoad
     private static List<Vector3Int> _destroyList = new List<Vector3Int>();
     
     private static Mesh _mesh; 
-    private static GameObject _meshObject;
+    private static GameObject _gameObject;
     private static MeshRenderer _meshRenderer;
     private static MapCullComponent _mapCullComponent;
     
@@ -124,15 +124,16 @@ public class MapLoad
  
         if (!replace)
         {
-            _meshObject = new("chunk");
-            _meshObject.layer = Game.IndexMap;
-            _meshObject.transform.position = _chunkCoordinate; 
+            _gameObject = new("chunk");
+            _gameObject.isStatic = true; 
+            _gameObject.layer = Game.IndexMap;
+            _gameObject.transform.position = _chunkCoordinate; 
 
-            _meshObject.AddComponent<MeshFilter>();
-            _meshRenderer = _meshObject.AddComponent<MeshRenderer>();  
+            _gameObject.AddComponent<MeshFilter>();
+            _meshRenderer = _gameObject.AddComponent<MeshRenderer>();  
             _meshRenderer.material = Block.MeshMaterial; 
 
-            _mapCullComponent = _meshObject.AddComponent<MapCullComponent>();  
+            _mapCullComponent = _gameObject.AddComponent<MapCullComponent>();  
             _mapCullComponent._meshData = _mesh;
             _mapCullComponent._verticesShadow = _verticesShadow;
             _mapCullComponent._count = _count;
@@ -140,11 +141,11 @@ public class MapLoad
         } 
         else 
         {
-            _meshObject = ActiveChunks[_chunkCoordinate].gameObject;
-            _meshRenderer = _meshObject.GetComponent<MeshRenderer>(); 
+            _gameObject = ActiveChunks[_chunkCoordinate].gameObject;
+            _meshRenderer = _gameObject.GetComponent<MeshRenderer>(); 
             _meshRenderer.material = Block.MeshMaterial; 
 
-            _mapCullComponent = _meshObject.GetComponent<MapCullComponent>();  
+            _mapCullComponent = _gameObject.GetComponent<MapCullComponent>();  
             _mapCullComponent._meshData = _mesh;
             _mapCullComponent._verticesShadow = _verticesShadow;
             _mapCullComponent._count = _count;

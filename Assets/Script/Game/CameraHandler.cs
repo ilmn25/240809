@@ -12,7 +12,6 @@ public class CameraHandler : MonoBehaviour
     public static event Action UpdateOrbitRotate;
     public static event Action OnOrbitRotate;
     private Coroutine _orbitCoroutine; 
-    private UnityEngine.Camera _camera;
     
     private float _screenWidth;
     private float _screenHeight; 
@@ -38,12 +37,11 @@ public class CameraHandler : MonoBehaviour
     {  
         Instance = this;
 
-        _camera = Game.Camera.GetComponent<UnityEngine.Camera>();
-        _camera.transparencySortMode = TransparencySortMode.CustomAxis; 
+        Game.Camera.transparencySortMode = TransparencySortMode.CustomAxis; 
         _screenWidth = Screen.width;
         _screenHeight = Screen.height;
-        _targetRotation = Game.Camera.transform.rotation;
-        _targetPosition = Game.Camera.transform.localPosition; 
+        _targetRotation = Game.CameraObject.transform.rotation;
+        _targetPosition = Game.CameraObject.transform.localPosition; 
 
         UpdateOrbit();
     }
@@ -51,7 +49,7 @@ public class CameraHandler : MonoBehaviour
     void Update()
     {   
         
-        _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
+        Game.Camera.fieldOfView = Mathf.Lerp(Game.Camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
         
         HandlePlayerFollow(); 
         HandleCameraSway();
@@ -121,7 +119,7 @@ public class CameraHandler : MonoBehaviour
         int xAxis = (_orbitRotation > 0) ? 1 : -1;
 
         // CustomLibrary.Log(_orbitRotation, zAxis, xAxis);
-        Game.Camera.GetComponent<UnityEngine.Camera>().transparencySortAxis = new Vector3(xAxis, 0, zAxis);
+        Game.CameraObject.GetComponent<UnityEngine.Camera>().transparencySortAxis = new Vector3(xAxis, 0, zAxis);
     }
 
     void HandleCameraSway()
@@ -138,8 +136,8 @@ public class CameraHandler : MonoBehaviour
         _targetRotation = Quaternion.Euler(45 - newRotationX, newRotationY , 0); 
         _targetPosition = new Vector3(newRotationY * PAN_DEGREE, DISTANCE, -DISTANCE); 
 
-        Game.Camera.transform.localRotation = Quaternion.Lerp(Game.Camera.transform.localRotation, _targetRotation, Time.deltaTime * TILT_SPEED);
-        Game.Camera.transform.localPosition = Vector3.Lerp(Game.Camera.transform.localPosition, _targetPosition, Time.deltaTime * TILT_SPEED);
+        Game.CameraObject.transform.localRotation = Quaternion.Lerp(Game.CameraObject.transform.localRotation, _targetRotation, Time.deltaTime * TILT_SPEED);
+        Game.CameraObject.transform.localPosition = Vector3.Lerp(Game.CameraObject.transform.localPosition, _targetPosition, Time.deltaTime * TILT_SPEED);
     } 
 
     void HandlePlayerFollow()

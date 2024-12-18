@@ -23,15 +23,15 @@ public class GUI
     public static void Update()
     {
         Active = Game.GUIInv.activeSelf;
-        UnityEngine.Camera.main.depth = Active? -1 : 1;
+        Camera.main.depth = Active? -1 : 1;
         
+        GUIDialogue.Update();
         if (Active)
         {
             if (Input.GetMouseButtonDown(0))
                 Audio.PlaySFX(Game.PickUpSound);
             
-            GUICraft.Update();
-            GUIDialogue.Update();
+            GUICraft.Update(); 
             GUICursor.Update();
             GUIStorage.Update();
         }

@@ -1,7 +1,4 @@
  
-using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -11,7 +8,7 @@ public class NPCCED : ChunkEntityData
     public string npcStatus = "idle";
 }
 
-public class NPCMachine : EntityMachine
+public class NPCMachine : EntityMachine , IActionPrimary
 { 
     public override void OnInitialize()
     {
@@ -21,6 +18,11 @@ public class NPCMachine : EntityMachine
         AddModule(new NPCAnimationModule()); 
         AddModule(new SpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
+    }
+
+    public void OnActionPrimary()
+    {
+        GetState<NPCState>().SetState<CharTalk>();
     }
 
     public override void UpdateEntityData()
@@ -49,8 +51,6 @@ public class NPCState : State
 { 
     public override void OnEnterState()
     {
-        GUIDialogue.DialogueAction += DialogueAction; 
-        
         string status = ((NPCCED)((EntityMachine)Machine).entityData).npcStatus;
         AddState(new NPCIdle(), status == "idle");
         AddState(new NPCChase(), status == "chase");
@@ -61,14 +61,7 @@ public class NPCState : State
         dialogue.Lines.Add("im about to kms rahhhhhhh");
         AddState(new CharTalk(dialogue));
     }
-
-    private void DialogueAction()
-    {
-        if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 1.4f)
-        {
-            SetState<CharTalk>();
-        }
-    }
+ 
  
     public override void OnUpdateState()
     {

@@ -6,26 +6,41 @@ public class InputHandler
 {
     private static Vector3 _thresholdPoint;
     private static RaycastHit _targetInfo;
-    
-    private static GameObject _gameObject;
+
     private static Vector3 _direction;
     private static Vector3 _position;
     private static int _layerMask;
 
     private const int Range = 5;
-
+ 
+    
     public static void Update()
     {
         if (Input.GetKeyDown(KeyCode.F11))
         {
             if (Screen.fullScreen)
-            {
                 Screen.SetResolution(960, 540, false);
-            }
             else
-            {
                 Screen.SetResolution(1920, 1080, true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Collider[] hitColliders = Physics.OverlapBox(Game.Player.transform.position, Vector3.one * Range, Quaternion.identity, Game.MaskEntity);
+            float distance, nearestDistance = Range * Range;
+            IActionPrimary target, nearTarget = null;
+            foreach (Collider collider in hitColliders)
+            {
+                target = collider.gameObject.GetComponent<IActionPrimary>();
+                if (target == null) continue;
+                distance = Utility.SquaredDistance(collider.transform.position, Game.Player.transform.position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearTarget = target;
+                }
             }
+            nearTarget?.OnActionPrimary(); 
         }
         
         HandleScroll();
@@ -63,7 +78,7 @@ public class InputHandler
     
     private static void HandleRaycast()
     { 
-        Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Game.Camera.ScreenPointToRay(Input.mousePosition);
         
         if (MapCull.YCheck)
         {
@@ -88,8 +103,7 @@ public class InputHandler
 
         if (_targetInfo.collider)
         {
-            _layerMask = _targetInfo.collider.includeLayers;
-            _gameObject = _targetInfo.collider.gameObject;
+            _layerMask = _targetInfo.collider.includeLayers; 
             _position = _targetInfo.point;
             _direction = ray.direction;
         }
@@ -114,9 +128,9 @@ public class InputHandler
         }
         
         if (Input.GetMouseButtonDown(0))
-            _targetInfo.collider.gameObject.GetComponent<ILeftClick>()?.OnLeftClick(); 
+            _targetInfo.collider.gameObject.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
         if (Input.GetMouseButtonDown(1))
-            _targetInfo.collider.gameObject.GetComponent<IRightClick>()?.OnRightClick(); 
+            _targetInfo.collider.gameObject.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
     }
       
 }
