@@ -71,7 +71,12 @@ public abstract class State
         }
         return null;
     }
-    
+
+    public T GetModule<T>() where T : Module
+    {
+        return Machine.GetModule<T>();
+    }
+
     public Type GetCurrentStateType()
     {
         return _stateCurrent?.GetType();
