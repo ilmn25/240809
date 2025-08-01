@@ -5,7 +5,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AI;
 public class PlayerMovementModule : Module
-{ 
+{
+    private bool _fly = false;
     public float VerticalVelocity = 0f; 
     public bool IsGrounded = false;  
     public Vector2 RawInput;  
