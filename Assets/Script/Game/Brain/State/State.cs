@@ -77,3 +77,7 @@ public abstract class State
         return _stateCurrent?.GetType();
     }
 }
+
+class StateEmpty : State
+{
+}

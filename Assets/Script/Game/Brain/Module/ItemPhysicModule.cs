@@ -8,12 +8,12 @@ public class ItemPhysicModule : Module
     
     private float GRAVITY = 35;  
     private float BOUNCE_FACTOR = 0.3f;  
-    private int SLIDE_RANGE = 3;   
+    private int SLIDE_RANGE = 2;   
     private float COLLISION_RANGE = 0.3f;  
  
     public void PopItem() //spawn velocity 
     {
-        _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 7, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
+        _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 0, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
     }
  
     public void HandlePhysicsUpdate()

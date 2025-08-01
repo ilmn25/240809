@@ -26,9 +26,16 @@ public abstract class EntityMachine : Machine
             IEntityData entity = Entity.dictionary[entityData.stringID];
             if (entity.Type == EntityType.Static)
             {
-                gameObject.layer = Game.IndexStatic;
-                gameObject.isStatic = true; 
-                if (entity.Bounds == Vector3Int.zero) return;
+                if (entity.Bounds == Vector3Int.zero)
+                {
+                    gameObject.layer = Game.IndexDynamic;
+                    gameObject.isStatic = false;  
+                }
+                else
+                {
+                    gameObject.layer = Game.IndexStatic;
+                    gameObject.isStatic = true;  
+                } 
                 BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
                 boxCollider.size = entity.Bounds;
                 boxCollider.center = new Vector3(0, entity.Bounds.y / 2, 0);
@@ -36,6 +43,7 @@ public abstract class EntityMachine : Machine
             else if (entity.Type == EntityType.Rigid)
             {
                 gameObject.layer = Game.IndexDynamic;
+                gameObject.isStatic = false;  
                 gameObject.AddComponent<SphereCollider>();
             }  
         } 

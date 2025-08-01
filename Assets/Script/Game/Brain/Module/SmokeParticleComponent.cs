@@ -14,6 +14,7 @@ public class SmokeParticleComponent : MonoBehaviour
     public void SpawnSmoke(Vector3 position)
     {
         transform.position = position;
+        transform.rotation = ViewPort.CurrentRotation;
         _animator.Play(0, 0, 0);
         CheckFinish();
     }

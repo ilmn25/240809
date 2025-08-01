@@ -56,13 +56,15 @@ public class NPCState : State
         AddState(new NPCChase(), status == "chase");
         AddState(new NPCRoam(),status == "roam");
         Dialogue dialogue = new Dialogue();
-        dialogue.Lines.Add("help");
-        dialogue.Lines.Add("I cant fix my raycast ");
-        dialogue.Lines.Add("im about to kms rahhhhhhh");
+        dialogue.Lines.Add("when i was in primary school");
+        dialogue.Lines.Add("i used to piss out the bathroom window off the building for fun");
+        dialogue.Lines.Add("but one time my mom caught me because she saw the piss stream from the kitchen window");
+        dialogue.Lines.Add("after that");
+        dialogue.Lines.Add("i pissed out the window again, but i locked the bathroom door so she couldnt stop me");
         AddState(new CharTalk(dialogue));
     }
  
- 
+    
     public override void OnUpdateState()
     {
         if (Input.GetKeyDown(KeyCode.Y))

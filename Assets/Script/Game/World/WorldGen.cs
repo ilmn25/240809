@@ -8,7 +8,7 @@ public class WorldGen
     private static bool SpawnStaticEntity = true;
     private static bool SpawnDynamicEntity = false;
     private static bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(5, 5, 5);
+    public static readonly Vector3Int Size = new Vector3Int(15, 7, 15);
     private const float StoneScale = 0.01f;
     private const float DirtScale = 0.005f;
     private const float SandScale = 0.02f;
@@ -92,9 +92,9 @@ public class WorldGen
                 }
             }
         }
-    }  
+    }
 
-    public static Chunk Generate(Vector3Int coordinates)
+    private static Chunk Generate(Vector3Int coordinates)
     {
         _chunkCoord = coordinates;
         _chunk = new Chunk();
@@ -126,8 +126,8 @@ public class WorldGen
         bool wall = new System.Random().NextDouble() < 0.1;
         bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize);
 
-        int centerX = World.Inst.Bounds.x / 3;
-        int centerZ = World.Inst.Bounds.z / 3;
+        int centerX = World.Inst.Bounds.x / 4;
+        int centerZ = World.Inst.Bounds.z / 4;
         int craterRadius = 35;  
     
         for (int y = 0; y < World.ChunkSize; y++)

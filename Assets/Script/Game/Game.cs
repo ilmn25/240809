@@ -2,13 +2,23 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
 using UnityEngine;
- 
+public enum GameState {
+    MainMenu,
+    Loading,
+    Playing,
+    Paused,
+    Inventory,
+    GameOver
+}
+
 public class Game : MonoBehaviour
 {
     public static readonly float MaxDeltaTime = 0.03f;
     
     private const float FixedUpdateMS = 0.10f;
-
+    
+    public static GameState GameState = GameState.Loading;
+    
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;
     public static LayerMask MaskEntity;
@@ -50,7 +60,7 @@ public class Game : MonoBehaviour
     {
         Player.transform.position = new Vector3( 
             World.ChunkSize * WorldGen.Size.x / 2,
-            World.ChunkSize * WorldGen.Size.y + 15,
+            World.ChunkSize * WorldGen.Size.y-1,
             World.ChunkSize * WorldGen.Size.z / 2);
           
         Control.Initialize(); 
