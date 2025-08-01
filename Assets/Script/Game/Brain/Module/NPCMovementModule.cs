@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class NPCMovementModule : Module
 {
-    [SerializeField] public float SPEED_WALK = 6f;
+    [SerializeField] public float SPEED_WALK = 3.5f;
     [SerializeField] private float SPEED_RUN = 8f;
     [SerializeField] private float ACCELERATION_TIME = 0.3f;  
     [SerializeField] private float DECELERATION_TIME = 0.08f; 

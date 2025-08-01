@@ -49,6 +49,7 @@ public class MapLoad
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
 
+ 
     static void HandleChunkMapTraverse()
     {
         foreach (var kvp in ActiveChunks)
@@ -85,10 +86,10 @@ public class MapLoad
             }
         } 
     }
- 
+    public static CancellationTokenSource CancellationTokenSourceKillGame = new CancellationTokenSource();
     private static async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)
     { 
-        await _semaphoreSlim.WaitAsync();
+        await _semaphoreSlim.WaitAsync(CancellationTokenSourceKillGame.Token);
         try
         { 
             if ((replace || !ActiveChunks.ContainsKey(chunkCoord)) && Scene.InPlayerChunkRange(chunkCoord, Scene.RenderDistance))

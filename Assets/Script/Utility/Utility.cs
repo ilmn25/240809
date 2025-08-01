@@ -62,13 +62,14 @@ public static class Utility
 
     public static T Load<T>(string filePath)
     {
-        if (File.Exists(filePath))
+        if (File.Exists(SavePath + filePath + ".dat"))
         {
             using (FileStream file = File.Open(SavePath + filePath + ".dat", FileMode.Open))
             {
                 return (T)BinaryFormatter.Deserialize(file);
             }
         }
+        // Debug.LogWarning("File " + filePath + " does not exist");
         return default;
     }
 }
