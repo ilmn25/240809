@@ -94,7 +94,7 @@ public class Control
         {
             GetNearestInteractable<IActionPrimary>()?.OnActionPrimary();  
         }
-        else if (Inst.ActionPrimaryNear.KeyDown())
+        else if (Inst.ActionSecondaryNear.KeyDown())
         { 
             GetNearestInteractable<IActionSecondary>()?.OnActionSecondary(); 
         }

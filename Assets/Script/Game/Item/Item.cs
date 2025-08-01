@@ -10,26 +10,26 @@ public class Item
     public static void Initialize()
     {
         AddBlockDefinition("brick", "Brick",
-            breakCost: 2, breakThreshold: 4, materials: new Dictionary<string, int> { { "stone", 1 } });
+            breakCost: 15, breakThreshold: 4, materials: new Dictionary<string, int> { { "stone", 1 } });
         
         AddBlockDefinition("marble", "Marble",
-            breakCost: 2 ,breakThreshold: 4, materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } },
+            breakCost: 20 ,breakThreshold: 4, materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } },
             craftStack: 2);
         
         AddBlockDefinition("dirt", "Dirt",
-            breakCost: 1, breakThreshold: 1);
+            breakCost: 4, breakThreshold: 1);
         
         AddBlockDefinition("sand", "Sand",
-            breakCost: 1, breakThreshold: 1, materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);  
+            breakCost: 4, breakThreshold: 1, materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);  
         
         AddBlockDefinition("backroom", "Backroom",
-            breakCost: 2, breakThreshold: 3, materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
+            breakCost: 10, breakThreshold: 3, materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
         
         AddBlockDefinition("stone", "Stone",
-            breakCost: 1, breakThreshold: 2, description: "A basic stone.");
+            breakCost: 8, breakThreshold: 2, description: "A basic stone.");
         
         AddBlockDefinition("wood", "Wood",
-            breakCost: 1, breakThreshold: 2, description: "A basic wood.");
+            breakCost: 6, breakThreshold: 2, description: "A basic wood.");
          
         AddToolDefinition("sword", "Sword", 10, 2, 20,
             new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } });

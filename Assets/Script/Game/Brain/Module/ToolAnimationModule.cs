@@ -47,7 +47,7 @@ public class ToolAnimationModule : Module
         float windUpProgress = Mathf.Clamp01(swingTimer / windUpDuration);
         float toolSwingProgress = Mathf.Clamp01((swingTimer - windUpDuration - TOOL_DELAY) / toolSwingDuration);
         float playerSwingProgress = Mathf.Clamp01((swingTimer - windUpDuration) / playerSwingDuration);
-
+    
         if (swingTimer < windUpDuration)
         {
             // Wind-up phase: rotate player slightly in the opposite direction

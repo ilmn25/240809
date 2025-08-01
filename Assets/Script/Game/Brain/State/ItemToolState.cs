@@ -1,4 +1,4 @@
-using UnityEngine;
+ 
 
 public class ItemToolState : State
 { 
@@ -9,14 +9,12 @@ public class ItemToolState : State
     }
 
     public override void OnEnterState()
-    { 
+    {
         _toolAnimationModule.ShowTool(true);
-        PlayerTerraform.ToolData = Item.GetItem(Inventory.CurrentItem.StringID);
     }
 
     public override void OnExitState()
     {
-        PlayerTerraform.ToolData = null;
         _toolAnimationModule.ShowTool(false);
     }
 
