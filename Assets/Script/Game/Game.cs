@@ -49,7 +49,7 @@ public class Game : MonoBehaviour
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
-        Application.targetFrameRate = 200;
+        Application.targetFrameRate = 160;
         SetConstants(); 
         // Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
         // Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
@@ -105,6 +105,7 @@ public class Game : MonoBehaviour
         Block.Dispose();
         PlayerData.Save();
         Control.Save(); 
+        MapLoad.CancellationTokenSourceKillGame.Cancel();
     }
 
     public static void SetConstants()

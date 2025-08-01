@@ -38,18 +38,20 @@ public class ItemMachine : EntityMachine
 public class ItemState : State
 {
     private ItemPhysicModule _itemPhysicModule; 
+    SpriteRenderer _sprite;
 
     public override void OnEnterState()
     {
         _itemPhysicModule = Machine.GetModule<ItemPhysicModule>();
         _itemPhysicModule.PopItem();
+        _sprite = Machine.transform.GetComponent<SpriteRenderer>();
     }
 
     public override void OnUpdateState()
     { 
         if (Machine.transform.position.y < -5)
-        { 
             ((EntityMachine)Machine).Delete();
-        } else _itemPhysicModule.HandlePhysicsUpdate();
+        else if (_sprite.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) 
+            _itemPhysicModule.HandlePhysicsUpdate();
     }
 }

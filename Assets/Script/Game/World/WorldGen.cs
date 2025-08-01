@@ -29,7 +29,7 @@ public class WorldGen
     private static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static void Initialize() {
-        Random = new System.Random(1);
+        Random = new System.Random(World.Seed);
 
         _stoneOffset = (float)Random.NextDouble() * 1000;
         _dirtOffset = (float)Random.NextDouble() * 1000;

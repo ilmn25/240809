@@ -15,7 +15,7 @@ public class World
     private Chunk[] _chunks;
     public readonly SVector3Int Length;
     public readonly SVector3Int Bounds;
-    public readonly int Seed;
+    public static int Seed;
  
 
     public World(int x, int y, int z)
@@ -37,8 +37,7 @@ public class World
     public static void Load(int id)
     { 
         Inst = Utility.Load<World>("World" + id);
-        if (Inst == null)
-            WorldGen.GenerateTestMap();
+        if (Inst == null) WorldGen.GenerateTestMap();
     }
 
     private int GetIndex(int chunkX, int chunkY, int chunkZ)
