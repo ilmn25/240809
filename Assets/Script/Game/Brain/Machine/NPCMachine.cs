@@ -8,7 +8,7 @@ public class NPCCED : ChunkEntityData
     public string npcStatus = "idle";
 }
 
-public class NPCMachine : EntityMachine , IActionSecondary
+public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
 { 
     public override void OnInitialize()
     {
@@ -23,8 +23,12 @@ public class NPCMachine : EntityMachine , IActionSecondary
     public void OnActionSecondary()
     {
         GetState<NPCState>().SetState<CharTalk>();
+    } 
+    public void OnActionPrimary()
+    {
+        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, 12, true);
     }
-
+    
     public override void UpdateEntityData()
     {
         switch (GetState<NPCState>().GetCurrentStateType())
@@ -45,6 +49,7 @@ public class NPCMachine : EntityMachine , IActionSecondary
     {
         GetModule<NPCPathingModule>().DrawGizmos();
     }
+ 
 }
 
 public class NPCState : State
@@ -79,6 +84,7 @@ public class NPCState : State
         {
             Machine.transform.position = Game.Player.transform.position;
         }
+         
  
     }
 } 

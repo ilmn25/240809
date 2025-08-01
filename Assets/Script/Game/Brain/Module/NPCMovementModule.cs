@@ -44,7 +44,7 @@ public class NPCMovementModule : Module
     private Vector3 _direction = Vector3.zero;
     private Vector3 _directionBuffer = Vector3.zero;
     
-    private float _verticalVelocity = 0f;
+    private Vector3 _velocity = Vector3.zero;
     
     private float _deltaTime; 
     
@@ -52,10 +52,15 @@ public class NPCMovementModule : Module
     private Vector3 _testPositionA;
     private Vector3 _testPositionB;
 
-    private Vector3 _newPositionY;
+    private Vector3 _tempPosition;
     
     private Collider[] _colliderArray = new Collider[1];
     
+    public void KnockBack(Vector3 position, float force, bool isAway)
+    {
+        _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
+    }
+
     public void HandleMovementUpdate(Vector3 direction)
     {
         _direction = direction;
@@ -106,12 +111,11 @@ public class NPCMovementModule : Module
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
         if (_isGrounded && _direction.y > 0)
         {
-            _verticalVelocity = JUMP_VELOCITY; 
+            _velocity.y = JUMP_VELOCITY; 
             _isGrounded = false;
-        }  
-        // _isGrounded = _verticalVelocity == 0;
+        }
     }
-  
+ 
     private void HandleObstacle(Vector3 position)
     {
         _newPosition = Machine.transform.position;
@@ -164,20 +168,36 @@ public class NPCMovementModule : Module
     
     private void HandleMove()
     { 
-        if (_verticalVelocity > GRAVITY) //terminal velocity
+        if (_velocity.y > GRAVITY) //terminal velocity
         {
-            _verticalVelocity += GRAVITY * _deltaTime;
+            _velocity.y += GRAVITY * _deltaTime;
         } 
-        _newPositionY = new Vector3(_newPosition.x, _newPosition.y + _verticalVelocity * _deltaTime, _newPosition.z);
-        if (!IsMovable(_newPositionY))
+        
+        _tempPosition = new Vector3(_newPosition.x + _velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        if (!IsMovable(_tempPosition))
+            _velocity.x = 0; 
+        else
+            _newPosition = _tempPosition;
+        
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + _velocity.z * _deltaTime);
+        if (!IsMovable(_tempPosition))
+            _velocity.z = 0; 
+        else
+            _newPosition = _tempPosition;
+        
+        _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 30 * Time.deltaTime);
+        _velocity.z = Mathf.MoveTowards(_velocity.z, 0f, 30 * Time.deltaTime);
+        
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
+        if (!IsMovable(_tempPosition))
         { 
-            if (_verticalVelocity < 0) _isGrounded = true;
-            _verticalVelocity = 0;
+            if (_velocity.y < 0) _isGrounded = true;
+            _velocity.y = 0;
             Machine.transform.position = _newPosition;
         } 
         else
         {
-            Machine.transform.position = _newPositionY;
+            Machine.transform.position = _tempPosition;
         } 
         
         

@@ -109,6 +109,7 @@ public class Control
         {
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
+            Debug.Log(collider.gameObject.name);
             distance = Utility.SquaredDistance(collider.transform.position, Game.Player.transform.position);
             if (distance < nearestDistance)
             {
