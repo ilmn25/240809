@@ -25,7 +25,6 @@ public class InventoryState : State
             SetState<ItemEmptyState>();
             return;
         }
-        
         switch (Item.GetItem(Inventory.CurrentItem.StringID).Type)
         { 
             case ItemType.Block:

@@ -9,7 +9,6 @@ public class PlayerTerraform
 {
     private static GameObject _block;
     public static string BlockStringID = null; 
-    public static ItemData ToolData;
     
     private static Vector3 _position;
     private static Vector3 _direction;
@@ -105,7 +104,8 @@ public class PlayerTerraform
 
     public static void BreakBlock()
     {  
-        MapEdit.BreakBlock(_coordinate,  ToolData?.Damage ?? 1); 
+        int damage = Inventory.CurrentItemData?.Damage > 0 ? Inventory.CurrentItemData.Damage : 1;
+        MapEdit.BreakBlock(_coordinate, damage);
     } 
 
     public static Vector3Int OffsetPosition(bool isBreak, Vector3 position, Vector3 direction)
