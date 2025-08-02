@@ -7,7 +7,7 @@ public class ChunkEntityData
     public string stringID;
     public SVector3Int position;
 }
-public interface IEntityData
+public interface IEntity
 {
     Vector3Int Bounds { get; }
     EntityType Type { get; }
@@ -15,15 +15,15 @@ public interface IEntityData
     public ChunkEntityData GetChunkEntityData(string stringID, SVector3Int position);
 }
 
-public class EntityData<T> : IEntityData where T : ChunkEntityData, new()
+public partial class Entity<T> : IEntity where T : ChunkEntityData, new()
 {
     public Vector3Int Bounds { get; set; }
     public EntityType Type { get; set; }
-    public static EntityData<ChunkEntityData> Zero = new EntityData<ChunkEntityData>();
-    public static EntityData<ChunkEntityData> One = new EntityData<ChunkEntityData>(bounds: Vector3Int.one);
-    public static EntityData<ChunkEntityData> Item = new EntityData<ChunkEntityData>(type: EntityType.Item);
+    public static Entity<ChunkEntityData> Zero = new Entity<ChunkEntityData>();
+    public static Entity<ChunkEntityData> One = new Entity<ChunkEntityData>(bounds: Vector3Int.one);
+    public static Entity<ChunkEntityData> Item = new Entity<ChunkEntityData>(type: EntityType.Item);
 
-    public EntityData(Vector3Int? bounds = null, EntityType type = EntityType.Static)
+    public Entity(Vector3Int? bounds = null, EntityType type = EntityType.Static)
     {
         Bounds = bounds ?? Vector3Int.zero;
         Type = type;

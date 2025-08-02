@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
-public class Block 
+public partial class Block 
 {
-    private static Dictionary<int, BlockData> _dictionary  = new Dictionary<int, BlockData>();
+    private static Dictionary<int, Block> _dictionary  = new Dictionary<int, Block>();
     private static IntStringMap<int, string> _blockIDMap = new IntStringMap<int, string>();
     private static int _nextBlockID = 1;
     
@@ -74,17 +74,17 @@ public class Block
     public static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost)
     {
         int id = _nextBlockID++;
-        BlockData blockData = new BlockData(stringID, breakThreshold, breakCost);
+        Block blockData = new Block(stringID, breakThreshold, breakCost);
         _dictionary[id] = blockData;
         _blockIDMap.Add(id, stringID);
     }
 
-    public static BlockData GetBlock(int id)
+    public static Block GetBlock(int id)
     {
         return _dictionary.GetValueOrDefault(id);
     }
 
-    public static BlockData GetBlock(string stringID)
+    public static Block GetBlock(string stringID)
     {
         return _dictionary.GetValueOrDefault(_blockIDMap.StringtoInt[stringID]);
     }

@@ -51,8 +51,8 @@ public class GUICraft
             return;
         }
 
-        ItemData itemData = Item.GetItem(stringID);
-        CraftData craftData = Craft.GetItem(stringID);
+        Item itemData = Item.GetItem(stringID);
+        Craft craftData = Craft.GetItem(stringID);
         
         string text = itemData.Name + " (" + craftData.Stack + ")\n";
         foreach (var ingredient in craftData.Ingredients)

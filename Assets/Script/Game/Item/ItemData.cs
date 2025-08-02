@@ -2,7 +2,7 @@
 
 public enum ItemRarity{ Common, Rare, Epic, Legendary }
 public enum ItemType{ Tool, Armor, Accessory, Block, Furniture }
-public class ItemData
+public partial class Item
 {
     public string StringID { get; set; }
     public ItemType Type { get; set; }
@@ -15,7 +15,7 @@ public class ItemData
     public string Description { get; set; }
     public bool IsConsumable { get; set; }
 
-    public ItemData(string stringID, string name, int stackSize, ItemRarity rarity, string description, bool isConsumable, int damage, float knockback, int useTime )
+    public Item(string stringID, string name, int stackSize, ItemRarity rarity, string description, bool isConsumable, int damage, float knockback, int useTime )
     {
         StringID = stringID;
         Name = name;

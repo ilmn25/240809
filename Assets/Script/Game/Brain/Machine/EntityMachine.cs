@@ -23,7 +23,7 @@ public abstract class EntityMachine : Machine
         if (!_awake)
         {
             _awake = true;
-            IEntityData entity = Entity.dictionary[entityData.stringID];
+            IEntity entity = Entity.dictionary[entityData.stringID];
             if (entity.Type == EntityType.Static)
             {
                 if (entity.Bounds == Vector3Int.zero)

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-public class CraftData
+public partial class Craft
 {
     public int Stack;
     public Dictionary<string, int> Ingredients;
     public string[] Modifiers;
 
-    public CraftData(Dictionary<string, int> ingredients, int stack, string[] modifiers)
+    public Craft(Dictionary<string, int> ingredients, int stack, string[] modifiers)
     {
         Stack = stack;
         Ingredients = ingredients;

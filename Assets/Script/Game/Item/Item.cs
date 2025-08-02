@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item 
+public partial class Item 
 {
-    private static Dictionary<string, ItemData> Dictionary  = new Dictionary<string, ItemData>();
+    private static Dictionary<string, Item> Dictionary  = new Dictionary<string, Item>();
     
     public static void Initialize()
     {
@@ -45,7 +45,7 @@ public class Item
     {
         Entity.AddItem(stringID);
         Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Block
         };
@@ -57,7 +57,7 @@ public class Item
     bool consumable = false)
     {
         Entity.AddItem(stringID);
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, damage, knockback, useTime)
         {
             Type = ItemType.Tool
         };
@@ -69,7 +69,7 @@ public class Item
         string description = "", int defense = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Armor,
             // Add additional armor-specific properties here if needed
@@ -82,7 +82,7 @@ public class Item
         string description = "", bool consumable = false, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, consumable, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, 0, 0, 0)
         {
             Type = ItemType.Accessory
         };
@@ -94,7 +94,7 @@ public class Item
         string description = "", Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Furniture
         };
@@ -103,7 +103,7 @@ public class Item
     }
  
 
-    public static ItemData GetItem(string stringID)
+    public static Item GetItem(string stringID)
     {
         if (Dictionary.ContainsKey(stringID))
         {
