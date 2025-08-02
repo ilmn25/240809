@@ -31,7 +31,7 @@ public class MapEdit
             }
 
             // Get the block value
-            BlockData targetBlockData = Block.GetBlock(blockNameID);
+            Block targetBlockData = Block.GetBlock(blockNameID);
             breakCost = targetBlockData.BreakCost;
             breakThreshold = targetBlockData.BreakThreshold;
             

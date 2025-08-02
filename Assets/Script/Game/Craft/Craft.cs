@@ -1,17 +1,17 @@
 using System.Collections.Generic;
  
-public class Craft 
+public partial class Craft 
 {
-    public static Dictionary<string, CraftData> Dictionary = new Dictionary<string, CraftData>();
+    public static Dictionary<string, Craft> Dictionary = new Dictionary<string, Craft>();
 
-    public static CraftData GetItem(string stringID)
+    public static Craft GetItem(string stringID)
     {
         return Dictionary[stringID];
     }
     
     public static void AddCraftingDefinition(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
     {
-        Dictionary.Add(stringID, new CraftData(ingredients, stack, modifiers));
+        Dictionary.Add(stringID, new Craft(ingredients, stack, modifiers));
     }
 
     private static bool IsCraftable (string stringID)

@@ -11,7 +11,7 @@ public class Inventory
     private static int _currentSlot = 0;
     private static int _currentKey = 0;
     public static InvSlot CurrentItem;
-    public static ItemData CurrentItemData;
+    public static Item CurrentItemData;
 
     public static readonly int InventoryRowAmount = 3;
     public static readonly int InventorySlotAmount = 9;

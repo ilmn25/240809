@@ -1,26 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Entity 
+public partial class Entity 
 {
-        public static Dictionary<string, IEntityData> dictionary = new Dictionary<string, IEntityData>();
+        public static Dictionary<string, IEntity> dictionary = new Dictionary<string, IEntity>();
 
         static Entity()
         {
-                dictionary.Add("tree", new EntityData<ChunkEntityData>(new Vector3Int(1, 3, 1)));
-                dictionary.Add("bush1", EntityData<ChunkEntityData>.Zero);
-                dictionary.Add("grass", EntityData<ChunkEntityData>.Zero);
-                dictionary.Add("stage_hand", EntityData<ChunkEntityData>.One);
-                dictionary.Add("slab", EntityData<ChunkEntityData>.Zero);
-                dictionary.Add("snare_flea", new EntityData<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("chito", new EntityData<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("megumin", new EntityData<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("yuuri", new EntityData<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("tree", new Entity<ChunkEntityData>(new Vector3Int(1, 3, 1)));
+                dictionary.Add("bush1", Entity<ChunkEntityData>.Zero);
+                dictionary.Add("grass", Entity<ChunkEntityData>.Zero);
+                dictionary.Add("stage_hand", Entity<ChunkEntityData>.One);
+                dictionary.Add("slab", Entity<ChunkEntityData>.Zero);
+                dictionary.Add("snare_flea", new Entity<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("chito", new Entity<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("megumin", new Entity<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("yuuri", new Entity<NPCCED>(type: EntityType.Rigid));
         }
 
         public static void AddItem(string stringID)
         {
-                dictionary.Add(stringID, EntityData<ChunkEntityData>.Item);
+                dictionary.Add(stringID, Entity<ChunkEntityData>.Item);
         }
         
         public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)

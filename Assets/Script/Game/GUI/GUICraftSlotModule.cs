@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GUICraftSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
         public string stringID;
-        private CraftData _craftData;
+        private Craft _craftData;
         
         private Image _image;
         private TextMeshProUGUI _text;
