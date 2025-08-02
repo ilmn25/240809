@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class PlayerMovementModule : Module
 {
     private bool _fly = false;
-    public float VerticalVelocity = 0f; 
+    private Vector3 _velocity = Vector3.zero; 
     public bool IsGrounded = false;  
     public Vector2 RawInput;  
     private Vector2 _input = Vector2.zero;
@@ -37,6 +37,11 @@ public class PlayerMovementModule : Module
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
 
+    public void KnockBack(Vector3 position, float force, bool isAway)
+    {
+        _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
+    }
+    
     public void HandleInput()
     {
         RawInput = Control.GetMovementAxis();
@@ -123,7 +128,7 @@ public class PlayerMovementModule : Module
         if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
         if (fly && Control.Inst.Jump.KeyDown())
         {
-            VerticalVelocity = JumpVelocity;
+            _velocity.y = JumpVelocity;
         }
         
         
@@ -140,9 +145,9 @@ public class PlayerMovementModule : Module
         {
             _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
-        else if (Control.Inst.Jump.KeyDown() && VerticalVelocity > ClampVelocity)
+        else if (Control.Inst.Jump.KeyDown() && _velocity.y > ClampVelocity)
         {
-            VerticalVelocity += HoldVelocity;
+            _velocity.y += HoldVelocity;
         }
         else
         {
@@ -151,11 +156,11 @@ public class PlayerMovementModule : Module
 
         if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
-            VerticalVelocity = JumpVelocity;
+            _velocity.y = JumpVelocity;
             //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
-        IsGrounded = VerticalVelocity == 0;
+        IsGrounded = _velocity.y == 0;
     }
 
 
@@ -244,23 +249,39 @@ public class PlayerMovementModule : Module
 
 
 
-    Vector3 newPositionY;
+    Vector3 _tempPosition;
     private void HandleMove()
     { 
-        if (VerticalVelocity > Gravity) //terminal velocity
+        if (_velocity.y > Gravity) //terminal velocity
         {
-            VerticalVelocity += Gravity * _deltaTime;
+            _velocity.y += Gravity * _deltaTime;
         } 
-        newPositionY = new Vector3(_newPosition.x, _newPosition.y + VerticalVelocity * _deltaTime, _newPosition.z);
-        if (!IsMovable(newPositionY))
+        
+        _tempPosition = new Vector3(_newPosition.x + _velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        if (!IsMovable(_tempPosition))
+            _velocity.x = 0; 
+        else
+            _newPosition = _tempPosition;
+        
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + _velocity.z * _deltaTime);
+        if (!IsMovable(_tempPosition))
+            _velocity.z = 0; 
+        else
+            _newPosition = _tempPosition;
+        
+        _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 30 * Time.deltaTime);
+        _velocity.z = Mathf.MoveTowards(_velocity.z, 0f, 30 * Time.deltaTime);
+        
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
+        if (!IsMovable(_tempPosition))
         {
-            if (VerticalVelocity < 0) IsGrounded = true;
-            VerticalVelocity = 0;
+            if (_velocity.y < 0) IsGrounded = true;
+            _velocity.y = 0;
             Machine.transform.position = _newPosition;
         } 
         else 
         {
-            Machine.transform.position = newPositionY;
+            Machine.transform.position = _tempPosition;
         }
     }
 

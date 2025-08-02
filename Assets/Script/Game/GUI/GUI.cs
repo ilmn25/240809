@@ -15,7 +15,6 @@ public class GUI
     public static void Initialize()
     {
         GUICraft.Initialize();
-        GUIDialogue.Initialize();
         GUICursor.Initialize();
         GUIStorage.Initialize();
     }
@@ -29,7 +28,7 @@ public class GUI
         if (Active)
         {
             if (Control.Inst.ActionPrimary.KeyDown())
-                Audio.PlaySFX(Game.PickUpSound);
+                Audio.PlaySFX("pick_up", 0.6f);
             
             GUICraft.Update(); 
             GUICursor.Update();

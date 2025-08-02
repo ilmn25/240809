@@ -90,7 +90,7 @@ public class PlayerTerraform
             
             Inventory.RemoveItem(BlockStringID);
             
-            Audio.PlaySFX(Game.DigSound);
+            Audio.PlaySFX("dig_sand");
             if (World.GetBlock(_coordinate) == 0)
                 World.SetBlock(_coordinate, Block.ConvertID(BlockStringID));
         }
@@ -104,7 +104,8 @@ public class PlayerTerraform
 
     public static void BreakBlock()
     {  
-        int damage = Inventory.CurrentItemData?.Damage > 0 ? Inventory.CurrentItemData.Damage : 1;
+        int damage = Inventory.CurrentItemData?.Damage ?? 1;
+        if (damage == 0) damage = 1;
         MapEdit.BreakBlock(_coordinate, damage);
     } 
 

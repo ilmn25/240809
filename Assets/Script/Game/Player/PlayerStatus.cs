@@ -8,9 +8,10 @@ public class PlayerStatus
     public static float Hunger;
     public static float Stamina;
     public static float Speed;
- 
+    private static PlayerMachine _playerMachine;
     public static void Initialize()
     {
+        _playerMachine = Game.Player.transform.GetComponent<PlayerMachine>();
         Health = PlayerData.Inst.health;
         Mana = PlayerData.Inst.mana;
         Sanity = PlayerData.Inst.sanity;
@@ -22,6 +23,12 @@ public class PlayerStatus
     public static void Update()
     {
         if (Hunger > 0) Hunger -= 0.01f;
+        if (Health == 0)
+        {
+            Audio.PlaySFX("player_die",0.5f);
+            Health = 100;
+            Game.Player.transform.position = new Vector3(100, 200, 100);
+        }
     }
 
     public static void UpdateHealth(int amount)
@@ -30,6 +37,13 @@ public class PlayerStatus
         if (Health > PlayerData.Inst.health) Health = PlayerData.Inst.health;
         else if (Health < 0) Health = 0;
         Debug.Log("Current Health: " + Health);
+    }
+
+    public static void hit(int dmg, int knockback, Vector3 position)
+    {
+        UpdateHealth(-dmg);
+        _playerMachine.GetModule<PlayerMovementModule>().KnockBack(position, knockback, true);
+        Audio.PlaySFX("player_hurt",0.4f);
     }
 
     // void OnGUI()

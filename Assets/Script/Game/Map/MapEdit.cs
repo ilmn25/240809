@@ -41,7 +41,7 @@ public class MapEdit
 
         // Check if the break value is above the threshold
         if (breakValue >= breakThreshold)
-        {
+        { 
             // Deduct the break cost
             breakCost -= breakValue;
 
@@ -49,12 +49,13 @@ public class MapEdit
             if (breakCost <= 0)
             {
                 Entity.SpawnItem(blockNameID, coordinate);
-                Audio.PlaySFX(Game.DigSound);
+                Audio.PlaySFX("dig_stone");
                 World.SetBlock(coordinate, 0);
                 _blockDataList.Remove(existingBlockData);
             }
             else
             {
+                Audio.PlaySFX("dig_dirt", 0.5f);
                 // Update the block data in the list
                 _blockDataList.Remove(existingBlockData);
                 _blockDataList.Add((coordinate, breakCost, breakThreshold));

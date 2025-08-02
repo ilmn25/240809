@@ -41,10 +41,7 @@ public class Game : MonoBehaviour
     public static GameObject GUICursor;
     public static GameObject GUICursorInfo;
     public static GameObject GUICursorSlot;
-    
-    public static AudioClip DigSound;
-    public static AudioClip PickUpSound;
-    public static AudioClip ChatSound;
+     
     
     public void Awake()
     { 
@@ -109,10 +106,7 @@ public class Game : MonoBehaviour
     }
 
     public static void SetConstants()
-    {
-        DigSound = Resources.Load<AudioClip>("audio/sfx/dig/stone");
-        PickUpSound = Resources.Load<AudioClip>("audio/sfx/pick_up");
-        ChatSound = Resources.Load<AudioClip>("audio/sfx/chat"); 
+    { 
         
         MaskMap  = LayerMask.GetMask("Map"); 
         MaskStatic  = LayerMask.GetMask("Static", "Map"); 
