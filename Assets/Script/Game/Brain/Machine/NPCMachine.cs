@@ -10,10 +10,8 @@ public class NPCCED : ChunkEntityData
 
 public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
 { 
-    AudioClip _audioClipDamage;
     public override void OnInitialize()
     {
-        _audioClipDamage = Resources.Load<AudioClip>("audio/sfx/damage");
         AddState(new NPCState()); 
         AddModule(new NPCMovementModule());
         AddModule(new NPCPathingModule());
@@ -29,7 +27,7 @@ public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
     public void OnActionPrimary()
     {
         GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, 12, true);
-        Audio.PlaySFX(_audioClipDamage);
+        Audio.PlaySFX("damage", 0.8f);
     }
     
     public override void UpdateEntityData()
@@ -87,7 +85,10 @@ public class NPCState : State
         {
             Machine.transform.position = Game.Player.transform.position;
         }
-         
- 
+
+        if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 0.7f)
+        {
+            PlayerStatus.hit(10, 8, Machine.transform.position);
+        }
     }
 } 

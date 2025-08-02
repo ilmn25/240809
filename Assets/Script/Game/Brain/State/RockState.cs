@@ -24,7 +24,7 @@ public class RockState : State
  
     public void Hit()
     {
-        Audio.PlaySFX(Game.DigSound);
+        Audio.PlaySFX("dig_metal");
         _currentHealth--;
         if (_currentHealth != 0) return;
         SetState<ResourceCollapse>(); 

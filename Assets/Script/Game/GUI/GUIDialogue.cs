@@ -7,19 +7,13 @@ public class GUIDialogue
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
 
-    private static AudioClip _textSfx;
     
     private static int _currentLine = 0;
     private static CoroutineTask _scrollTask;
     private static CharTalk _entityState;
     private static CoroutineTask _scaleTask;
     private static AudioSource _audioSource;
-     
-    public static void Initialize()
-    {
-        _textSfx = Resources.Load<AudioClip>("audio/sfx/text");
-    }
- 
+      
     public static void Update()
     { 
         if (_entityState != null){ 
@@ -30,7 +24,7 @@ public class GUIDialogue
             
             if (Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown())
             { 
-                Audio.PlaySFX(_textSfx, 0.2f); //sound effect click 
+                Audio.PlaySFX("text", 0.2f); //sound effect click 
                 
                 if (_scrollTask.Running)
                 {
@@ -52,7 +46,7 @@ public class GUIDialogue
     
     private static void HandleScroll()
     {
-        _audioSource = Audio.PlaySFX(_textSfx, 0.2f, true);
+        _audioSource = Audio.PlaySFX("text", 0.2f, true);
         
         _scrollTask =  new CoroutineTask(GUI.ScrollText(_entityState.Dialogue.Lines[_currentLine], Game.GUIDialogueText));
         _scrollTask.Finished += (bool isManual) => 
@@ -70,7 +64,7 @@ public class GUIDialogue
             return;
         }
 
-        Audio.PlaySFX(Game.ChatSound);
+        Audio.PlaySFX("chat");
         _entityState = entityState;
         _currentLine = 0;
         Game.GUIDialogue.SetActive(true);

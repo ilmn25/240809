@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Audio 
+public class Audio
 {
     private static List<AudioSource> _audioSources;
     private static AudioSource _bgmSource;
@@ -10,10 +10,12 @@ public class Audio
     private static readonly float SfxVolume = 1f;
     private static readonly int PoolSize = 12;
 
+    private static Dictionary<string, AudioClip> _clipCache = new Dictionary<string, AudioClip>();
+
     public static void Initialize()
     {
         GameObject audioManager = new GameObject("Audio");
-        _bgmSource = audioManager.AddComponent<AudioSource>(); 
+        _bgmSource = audioManager.AddComponent<AudioSource>();
 
         _audioSources = new List<AudioSource>();
         for (int i = 0; i < PoolSize; i++)
@@ -21,22 +23,28 @@ public class Audio
             AudioSource newSource = audioManager.AddComponent<AudioSource>();
             _audioSources.Add(newSource);
         }
-        
-        PlayBGM(Resources.Load<AudioClip>("audio/bgm/fairy_fountain"), 0.03f);
-        PlaySFX(Resources.Load<AudioClip>("audio/sfx/wind"), 0.2f, true);
-        PlaySFX(Resources.Load<AudioClip>("audio/sfx/noise"), 0.3f, true);
+
+        PlayBGM("fairy_fountain", 0.03f);
+        PlaySFX("wind", 0.2f, true);
+        PlaySFX("noise", 0.3f, true);
     }
 
-    public static void PlayBGM(AudioClip clip, float volume = 1f, bool loop = true)
+    public static void PlayBGM(string id, float volume = 1f, bool loop = true)
     {
+        AudioClip clip = LoadClip($"audio/bgm/{id}");
+        if (clip == null) return;
+
         _bgmSource.clip = clip;
         _bgmSource.volume = volume * BgmVolume;
         _bgmSource.loop = loop;
         _bgmSource.Play();
     }
 
-    public static AudioSource PlaySFX(AudioClip clip, float volume = 1f, bool loop = false)
+    public static AudioSource PlaySFX(string id, float volume = 1f, bool loop = false)
     {
+        AudioClip clip = LoadClip($"audio/sfx/{id}");
+        if (clip == null) return null;
+
         AudioSource availableSource = GetAvailableAudioSource();
         if (availableSource)
         {
@@ -59,7 +67,6 @@ public class Audio
 
     private static AudioSource GetAvailableAudioSource()
     {
-        //! return first avalible source
         foreach (AudioSource source in _audioSources)
         {
             if (!source.isPlaying)
@@ -68,5 +75,25 @@ public class Audio
             }
         }
         return null;
+    }
+
+    private static AudioClip LoadClip(string path)
+    {
+        if (_clipCache.TryGetValue(path, out AudioClip cachedClip))
+        {
+            return cachedClip;
+        }
+
+        AudioClip clip = Resources.Load<AudioClip>(path);
+        if (clip != null)
+        {
+            _clipCache[path] = clip;
+        }
+        else
+        {
+            Debug.LogWarning($"AudioClip not found at path: {path}");
+        }
+
+        return clip;
     }
 }

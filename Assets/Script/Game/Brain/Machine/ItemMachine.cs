@@ -22,7 +22,7 @@ public class ItemMachine : EntityMachine
         { 
             if (pickUp)
             {
-                Audio.PlaySFX(Game.PickUpSound, 0.4f);
+                Audio.PlaySFX("pick_up", 0.4f);
                 Inventory.AddItem(GetEntityData().stringID, 1);
                 Delete();
             } 

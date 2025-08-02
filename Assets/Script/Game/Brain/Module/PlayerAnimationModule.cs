@@ -60,7 +60,7 @@ public class PlayerAnimationModule : Module
             { 
                 SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, true);
                 _nextTrailTimer = Time.time + TrailFrequency;
-                Audio.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
+                Audio.PlaySFX($"footstep_{Random.Range(1, 3)}", 0.3f);
             }
         } else _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, 0, _sprite.transform.localPosition.z);
 

@@ -17,10 +17,10 @@ public class Item
             craftStack: 2);
         
         AddBlockDefinition("dirt", "Dirt",
-            breakCost: 4, breakThreshold: 1);
+            breakCost: 5, breakThreshold: 2);
         
         AddBlockDefinition("sand", "Sand",
-            breakCost: 4, breakThreshold: 1, materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);  
+            breakCost: 5, breakThreshold: 2, materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);  
         
         AddBlockDefinition("backroom", "Backroom",
             breakCost: 10, breakThreshold: 3, materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
@@ -44,7 +44,7 @@ public class Item
         string[] modifiers = null, int stackSize = 100, ItemRarity rarity = ItemRarity.Common)
     {
         Entity.AddItem(stringID);
-        Block.AddBlockDefinition(stringID, breakCost, breakThreshold);
+        Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
         ItemData itemData = new ItemData(stringID, name, stackSize, rarity, description, false, 0, 0, 0)
         {
             Type = ItemType.Block
