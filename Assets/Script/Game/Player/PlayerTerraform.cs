@@ -103,10 +103,11 @@ public class PlayerTerraform
     }
 
     public static void BreakBlock()
-    {  
-        int damage = Inventory.CurrentItemData?.Damage ?? 1;
-        if (damage == 0) damage = 1;
-        MapEdit.BreakBlock(_coordinate, damage);
+    {
+        int miningPower = 0;
+        if (Inventory.CurrentItemData == null || Inventory.CurrentItemData.Type == ItemType.Block) miningPower = 1;
+        else if (Inventory.CurrentItemData.Type == ItemType.Tool ) miningPower = Inventory.CurrentItemData.MiningPower;
+        MapEdit.BreakBlock(_coordinate, miningPower);
     } 
 
     public static Vector3Int OffsetPosition(bool isBreak, Vector3 position, Vector3 direction)

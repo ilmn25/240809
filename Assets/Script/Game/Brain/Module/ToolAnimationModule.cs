@@ -24,6 +24,8 @@ public class ToolAnimationModule : Module
     public void ShowTool(bool show)
     {
         toolSprite.gameObject.SetActive(show);
+        toolSprite.GetComponent<SpriteRenderer>().sprite = 
+            Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}");  
     }
     public override void Initialize()
     { 

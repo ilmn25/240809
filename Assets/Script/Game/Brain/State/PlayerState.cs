@@ -13,6 +13,9 @@ public class PlayerState : State
     {
         if (Game.GameState == GameState.Playing)
             SetState<PlayerActive>();
+        else
+            SetState<StateEmpty>();
+        
         if (Machine.transform.position.y < -50)
         {
             MapCull.ForceRevertMesh(); 

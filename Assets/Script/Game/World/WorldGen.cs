@@ -6,12 +6,12 @@ public class WorldGen
     private static System.Random Random;
 
     private static bool SpawnStaticEntity = true;
-    private static bool SpawnDynamicEntity = false;
+    private static bool SpawnDynamicEntity = true;
     private static bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(15, 7, 15);
+    public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
     private const float StoneScale = 0.01f;
-    private const float DirtScale = 0.005f;
-    private const float SandScale = 0.02f;
+    private const float DirtScale = 0.1f;
+    private const float SandScale = 0.05f;
     private const float MarbleScale = 0.007f;
     private const float CaveScale = 0.06f;
     private const int WallHeight = 5;

@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 public class PlayerMovementModule : Module
 {
-    private bool _fly = false;
-    private Vector3 _velocity = Vector3.zero; 
+    public static PlayerMovementModule inst { get; private set; }
+    public Vector3 _velocity = Vector3.zero; 
     public bool IsGrounded = false;  
     public Vector2 RawInput;  
     private Vector2 _input = Vector2.zero;
@@ -56,7 +57,12 @@ public class PlayerMovementModule : Module
         _input.x = RawInput.x * _cosAngle - RawInput.y * _sinAngle;
         _input.y = RawInput.x * _sinAngle + RawInput.y * _cosAngle; 
     }
-  
+
+    public override void Initialize()
+    {
+        inst = this;
+    }
+
     public void HandleMovementUpdate()
     {  
         
@@ -121,15 +127,15 @@ public class PlayerMovementModule : Module
     }
 
 
-    private bool fly;
+    // private bool fly;
 
     private void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
-        if (fly && Control.Inst.Jump.KeyDown())
-        {
-            _velocity.y = JumpVelocity;
-        }
+        // if (Input.GetKeyDown(KeyCode.I)) fly = !fly;
+        // if (fly && Control.Inst.Jump.KeyDown())
+        // {
+        //     _velocity.y = JumpVelocity;
+        // }
         
         
         if ( IsGrounded)
@@ -275,8 +281,8 @@ public class PlayerMovementModule : Module
         _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         {
-            if (_velocity.y < 0) IsGrounded = true;
-            _velocity.y = 0;
+            if (_velocity.y < 0) IsGrounded = true; 
+            _velocity.y = 0; 
             Machine.transform.position = _newPosition;
         } 
         else 

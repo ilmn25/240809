@@ -10,6 +10,7 @@ public class NPCCED : ChunkEntityData
 
 public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
 { 
+    int health = 100;
     public override void OnInitialize()
     {
         AddState(new NPCState()); 
@@ -27,7 +28,17 @@ public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
     public void OnActionPrimary()
     {
         GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, 12, true);
-        Audio.PlaySFX("damage", 0.8f);
+        health -= Inventory.CurrentItemData.Damage;
+        if (health <= 0)
+        {
+            Audio.PlaySFX("player_die", 0.8f);
+            Entity.SpawnItem("sand", Vector3Int.FloorToInt(transform.position));
+            Delete();
+        }
+        else
+        {
+            Audio.PlaySFX("npc_hurt", 0.8f);
+        }
     }
     
     public override void UpdateEntityData()
