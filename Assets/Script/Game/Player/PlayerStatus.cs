@@ -56,7 +56,6 @@ public class PlayerStatus
         Health += amount;
         if (Health > PlayerData.Inst.health) Health = PlayerData.Inst.health;
         else if (Health < 0) Health = 0;
-        Debug.Log("Current Health: " + Health);
     }
 
     public static void hit(float dmg, float knockback, Vector3 position)

@@ -1,9 +1,12 @@
 public enum ItemRarity { Common, Rare, Epic, Legendary }
 public enum ItemType { Tool, Armor, Accessory, Block, Furniture }
+
+public enum ItemGesture { Swing, Poke, Cast}
 public partial class Item
 {
     public string StringID { get; set; }
     public ItemType Type { get; set; }
+    public ItemGesture Gesture { get; set; }
     public string Name { get; set; }
     public int StackSize { get; set; }
     public ItemRarity Rarity { get; set; }

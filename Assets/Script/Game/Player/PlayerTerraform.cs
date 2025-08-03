@@ -1,44 +1,55 @@
-using System;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Profiling;
-using UnityEngine.Serialization;
 
-public class PlayerTerraform
+public class PlayerTerraform : Module
 {
     private static GameObject _block;
-    public static string BlockStringID = null; 
-    
     private static Vector3 _position;
     private static Vector3 _direction;
     private static Vector3Int _coordinate;
 
-    public static readonly int PreviewSpeed = 10; 
+    public static readonly int PreviewSpeed = 10;
+    public override void Initialize()
+    {
+        Inventory.SlotUpdate += EventSlotUpdate;
+    }
 
-    public static void Update()
-    { 
-        if (!_block)
+    private static void EventSlotUpdate()
+    {
+        if (Inventory.CurrentItemData == null)
         {
-            _block = BlockPreview.Create("overlay");
-            _block.transform.localScale = Vector3.one * 1.04f;
+            if (_block)
+                BlockPreview.Delete();
         }
-        else if (!string.IsNullOrEmpty(BlockStringID))
-        { 
-            if (_block.name != BlockStringID)
+        else if (Inventory.CurrentItemData.Type == ItemType.Block)
+        {
+            if (!_block)
+            {
+                _block = BlockPreview.Create(Inventory.CurrentItemData.StringID);
+            }
+            else if (_block.name != Inventory.CurrentItemData.StringID)
             {
                 BlockPreview.Delete();
-                _block = BlockPreview.Create(BlockStringID);
-            } 
+                _block = BlockPreview.Create(Inventory.CurrentItemData.StringID);
+            }  
         } 
-        else if (_block.name != "overlay")
+        else if (Inventory.CurrentItemData.MiningPower != 0)
         {
-            BlockPreview.Delete();
-            _block = BlockPreview.Create("overlay");
-            _block.transform.localScale = Vector3.one * 1.04f;
+            if (!_block)
+            {
+                _block = BlockPreview.Create("overlay");
+                _block.transform.localScale = Vector3.one * 1.04f;
+            }
+            else if (_block.name != "overlay")
+            {
+                BlockPreview.Delete(); 
+                _block = BlockPreview.Create("overlay");
+                _block.transform.localScale = Vector3.one * 1.04f;
+            } 
         }
-        
-        
+    }
+    
+    public static void Update()
+    {  
         if (GUI.Active) return;
   
         if ( Control.Inst.DigUp.KeyDown())
@@ -59,7 +70,7 @@ public class PlayerTerraform
         _direction = direction;
         if (_block)
         {
-            if (!string.IsNullOrEmpty(BlockStringID))
+            if (_block.name != "overlay")
             {
                 _coordinate = OffsetPosition(false, _position, _direction);
                 if (position != Vector3.down)
@@ -80,20 +91,14 @@ public class PlayerTerraform
 
     public static void HandleMapPlace()
     {
-        if (GUI.Active) return;
+        _coordinate = OffsetPosition(false, _position, _direction);
         
-        if (!string.IsNullOrEmpty(BlockStringID)) //place
-        {
-            _coordinate = OffsetPosition(false, _position, _direction);
-            
-            if (!World.IsInWorldBounds(_coordinate)) return;
-            
-            Inventory.RemoveItem(BlockStringID);
-            
-            Audio.PlaySFX("dig_sand");
-            if (World.GetBlock(_coordinate) == 0)
-                World.SetBlock(_coordinate, Block.ConvertID(BlockStringID));
-        }
+        if (!World.IsInWorldBounds(_coordinate)) return; 
+        
+        Audio.PlaySFX("dig_sand");
+        // if (World.GetBlock(_coordinate) == 0)
+        World.SetBlock(_coordinate, Block.ConvertID(_block.name));
+        Inventory.RemoveItem(_block.name);
     }
 
     public static void HandleMapBreak()

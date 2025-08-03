@@ -1,59 +1,93 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
+public class EquipIdleState : State { }
+
 public class EquipState : State
 {
-    public Transform PlayerSprite;
-    public Transform ToolSprite;
-    EquipSwingState _equipSwingState;
-    public void Action()
-    {
-        
-    }
+    private Transform _toolSprite; 
     public override void OnInitialize()
     {
         Inventory.SlotUpdate += EventSlotUpdate;
-        PlayerSprite = Machine.transform.Find("sprite").transform.Find("char");
-        ToolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
-        AddState(new EquipSwingState(), true);
-        _equipSwingState = GetState<EquipSwingState>();
+        _toolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
+        AddState(new EquipIdleState(), true);
+        AddState(new EquipSwingState());
     }
 
     public override void OnUpdateState()
     {
-        if (!PlayerStatus.IsBusy)
+        if (!PlayerStatus.IsBusy && !GUI.Active)
         {
-            if (Control.Inst.ActionPrimary.KeyDown() || 
-                Control.Inst.DigUp.KeyDown() ||
-                Control.Inst.DigDown.KeyDown())
+            switch (Inventory.CurrentItemData?.Type)
             {
-                _equipSwingState.Use();
-            }
+                case ItemType.Tool:
+                    if (Control.Inst.ActionPrimary.KeyDown() ||
+                        Control.Inst.DigUp.KeyDown() ||
+                        Control.Inst.DigDown.KeyDown())
+                    {
+                        Animate();
+                        Attack();
+                    }
+
+                    if (Inventory.CurrentItemData.MiningPower != 0 && 
+                        Utility.isLayer(Control.LayerMask, Game.IndexMap) &&
+                        Scene.InPlayerBlockRange(Control.Position, PlayerStatus.GetRange()))
+                    {
+                        PlayerTerraform.HandlePositionInfo(Control.Position,  Control.Direction); 
+                        if (Control.Inst.ActionPrimary.KeyDown()) PlayerTerraform.HandleMapBreak(); 
+                    } 
+                    break;
+                
+                case ItemType.Block:
+                    if (GUI.Active) return;
+                    if (Utility.isLayer(Control.LayerMask, Game.IndexMap) &&
+                        Scene.InPlayerBlockRange(Control.Position, PlayerStatus.GetRange()))
+                    {
+                        PlayerTerraform.HandlePositionInfo(Control.Position, Control.Direction);
+                        if (Control.Inst.ActionSecondary.KeyDown())
+                        {
+                            Animate();
+                            PlayerTerraform.HandleMapPlace();
+                        }
+                    }
+                    break;
+            } 
         }  
     }
 
+    private void Animate()
+    {
+        switch (Inventory.CurrentItemData.Gesture)
+        {
+            case ItemGesture.Swing:
+                SetState<EquipSwingState>();
+                break;
+        }
+    }
+
+    private void Attack()
+    {
+        if (Inventory.CurrentItemData.Type != ItemType.Tool) return;
+        
+        Collider[] hitColliders = Physics.OverlapBox(Machine.transform.position, Vector3.one * PlayerStatus.GetRange(), Quaternion.identity, Game.MaskEntity);
+        IHitBox target;
+        foreach (Collider collider in hitColliders)
+        {
+            target = collider.gameObject.GetComponent<IHitBox>();
+            if (target == null) continue;
+            target.OnHit(); 
+        }
+    }
+    
     public void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
-        {
-            Utility.Log("Current item is null");
-            ToolSprite.gameObject.SetActive(false);
-        } 
-        
-        if (Inventory.CurrentItemData != null && Inventory.CurrentItemData.Type == ItemType.Block)
-            PlayerTerraform.BlockStringID = Inventory.CurrentItem.StringID;
-        else 
-            PlayerTerraform.BlockStringID = null;
-
-        if (Inventory.CurrentItemData != null && Inventory.CurrentItemData.Type == ItemType.Tool)
-        {
-            ToolSprite.gameObject.SetActive(true);
-            ToolSprite.GetComponent<SpriteRenderer>().sprite = 
-                Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}");
-        }
+            _toolSprite.gameObject.SetActive(false);
         else
         {
-            ToolSprite.gameObject.SetActive(false);
+            _toolSprite.gameObject.SetActive(true);
+            _toolSprite.GetComponent<SpriteRenderer>().sprite = 
+                Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
         } 
     }
 }
