@@ -8,6 +8,8 @@ public class PlayerStatus
     public static float Hunger;
     public static float Stamina;
     public static float Speed;
+    public static float AirTime;
+    
     private static PlayerMachine _playerMachine;
     public static void Initialize()
     {
@@ -22,16 +24,29 @@ public class PlayerStatus
 
     public static void Update()
     {
+        if (!PlayerMovementModule.inst.IsGrounded && PlayerMovementModule.inst._velocity.y < -10) AirTime += 1;
+        else {
+            if (AirTime > 75)
+            {
+                UpdateHealth(-AirTime/8);
+                Audio.PlaySFX("player_hurt",0.4f);
+            }
+
+            AirTime = 0;
+        }
+        
+        Utility.Log(AirTime);
         if (Hunger > 0) Hunger -= 0.01f;
         if (Health == 0)
         {
             Audio.PlaySFX("player_die",0.5f);
             Health = 100;
-            Game.Player.transform.position = new Vector3(100, 200, 100);
+            Game.Player.transform.position = Utility.AddToVector(Game.Player.transform.position, 0,70, 0);
+            Game.GameState = GameState.Loading;
         }
     }
 
-    public static void UpdateHealth(int amount)
+    public static void UpdateHealth(float amount)
     {
         Health += amount;
         if (Health > PlayerData.Inst.health) Health = PlayerData.Inst.health;
@@ -39,10 +54,10 @@ public class PlayerStatus
         Debug.Log("Current Health: " + Health);
     }
 
-    public static void hit(int dmg, int knockback, Vector3 position)
+    public static void hit(float dmg, int knockback, Vector3 position)
     {
         UpdateHealth(-dmg);
-        _playerMachine.GetModule<PlayerMovementModule>().KnockBack(position, knockback, true);
+        PlayerMovementModule.inst.KnockBack(position, knockback, true);
         Audio.PlaySFX("player_hurt",0.4f);
     }
 

@@ -55,7 +55,7 @@ public class MapEdit
             }
             else
             {
-                Audio.PlaySFX("dig_dirt", 0.5f);
+                Audio.PlaySFX("dig_sand", 0.5f);
                 // Update the block data in the list
                 _blockDataList.Remove(existingBlockData);
                 _blockDataList.Add((coordinate, breakCost, breakThreshold));
