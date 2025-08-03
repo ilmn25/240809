@@ -32,7 +32,7 @@ public abstract class State
                 _statePrevious.OnExitState();
                 _statePrevious = _stateCurrent;
             }
-            _stateCurrent.OnUpdateState();
+            _stateCurrent.OnUpdateInternal();
         } 
     }
 

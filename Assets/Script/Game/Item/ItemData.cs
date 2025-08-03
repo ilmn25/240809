@@ -1,6 +1,5 @@
 public enum ItemRarity { Common, Rare, Epic, Legendary }
 public enum ItemType { Tool, Armor, Accessory, Block, Furniture }
-
 public partial class Item
 {
     public string StringID { get; set; }
@@ -11,7 +10,8 @@ public partial class Item
     public int Damage { get; set; }
     public float Knockback { get; set; }
     public int CritChance { get; set; }
-    public int UseTime { get; set; }
+    public float Speed { get; set; }
+    public float Range { get; set; }  
     public int MiningPower { get; set; }
     public string Description { get; set; }
     public bool IsConsumable { get; set; }
@@ -28,7 +28,8 @@ public partial class Item
         int damage,
         float knockback,
         int critChance,
-        int useTime,
+        float speed,
+        float range,  
         int miningPower,
         int healHP,
         int healMana
@@ -41,7 +42,8 @@ public partial class Item
         Damage = damage;
         Knockback = knockback;
         CritChance = critChance;
-        UseTime = useTime;
+        Speed = speed;
+        Range = range;  
         MiningPower = miningPower;
         Description = description;
         IsConsumable = isConsumable;
