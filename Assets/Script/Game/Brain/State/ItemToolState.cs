@@ -1,34 +1,50 @@
  
 
+using UnityEngine;
+
 public class ItemToolState : State
 { 
-    ToolAnimationModule _toolAnimationModule;
+    public bool IsBusy = false;
+    ToolSwingState _toolSwingState;
+    public Transform PlayerSprite;
+    public Transform ToolSprite;
+    
     public override void OnInitialize()
     {
-        _toolAnimationModule = GetModule<ToolAnimationModule>();
+        AddState(new ToolSwingState(), true);
+        _toolSwingState = GetState<ToolSwingState>();
+        PlayerSprite = Machine.transform.Find("sprite").transform.Find("char");
+        ToolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
     }
-
+    
+    private void OnSlotUpdate() { 
+        ToolSprite.GetComponent<SpriteRenderer>().sprite = 
+            Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}");  
+    }
     public override void OnEnterState()
-    {
-        _toolAnimationModule.ShowTool(true);
-    }
-
+    { 
+        ToolSprite.gameObject.SetActive(true);
+        ToolSprite.GetComponent<SpriteRenderer>().sprite = 
+            Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
+        Inventory.SlotUpdate += OnSlotUpdate;
+    } 
     public override void OnExitState()
     {
-        _toolAnimationModule.ShowTool(false);
-    }
+        Inventory.SlotUpdate -= OnSlotUpdate;
+        ToolSprite.gameObject.SetActive(false);
+    } 
 
     public override void OnUpdateState()
     { 
-        if (!_toolAnimationModule.IsBusy())
+        if (!IsBusy)
         {
             if (Control.Inst.ActionPrimary.KeyDown() || 
                 Control.Inst.DigUp.KeyDown() ||
                 Control.Inst.DigDown.KeyDown())
             {
-                _toolAnimationModule.StartAnimation();
+                _toolSwingState.StartAnimation();
             }
         } 
-        _toolAnimationModule.HandleAnimationUpdate();
+        _toolSwingState.HandleAnimationUpdate();
     }
 }
