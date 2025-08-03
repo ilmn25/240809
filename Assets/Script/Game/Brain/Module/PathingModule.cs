@@ -21,8 +21,8 @@ public abstract class PathingModule : Module
     private int _jumpSkipAmount;
     
     public PathingModule(
-        float targetReachedInner = 1f, 
-        float targetReachedOuter = 2f, 
+        float targetReachedInner = 0.5f, 
+        float targetReachedOuter = 1.5f, 
         float pointReachDistance = 0.45f, 
         float repathInterval = 0.1f, 
         int jumpSkipAmount = 1)

@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class Control
 {
-    private const int Range = 5;
+    private const int Range = 3;
     public static Control Inst = new Control();
     
     private static RaycastHit _raycastInfo;

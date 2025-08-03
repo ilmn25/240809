@@ -7,7 +7,6 @@ public class PlayerMachine : Machine
     {
         AddModule(new PlayerMovementModule());
         AddModule(new PlayerAnimationModule()); 
-        AddModule(new ToolAnimationModule()); 
         AddState(new InventoryState());  
         AddState(new PlayerState());  
     }
