@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerTerraform : Module
+public class PlayerTerraformModule : Module
 {
     private static GameObject _block;
     private static Vector3 _position;
@@ -48,7 +48,7 @@ public class PlayerTerraform : Module
         }
     }
     
-    public static void Update()
+    public void Update()
     {  
         if (GUI.Active) return;
   

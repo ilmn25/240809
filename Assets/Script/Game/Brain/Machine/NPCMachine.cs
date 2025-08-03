@@ -28,7 +28,7 @@ public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
     public void OnHit()
     {
         GetState<NPCState>().SetState<NPCChase>();
-        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, PlayerStatus.GetKnockback(), true);
+        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, PlayerStatusModule.GetKnockback(), true);
         health -= Inventory.CurrentItemData.Damage;
         if (health <= 0)
         {
@@ -100,7 +100,7 @@ public class NPCState : State
 
         if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 0.7f)
         {
-            PlayerStatus.hit(10, 20, Machine.transform.position);
+            PlayerStatusModule.hit(10, 20, Machine.transform.position);
         }
     }
 } 

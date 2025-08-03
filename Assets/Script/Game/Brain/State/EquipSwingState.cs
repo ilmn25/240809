@@ -23,14 +23,14 @@ public class EquipSwingState : State
 
     public override void OnEnterState()
     {
-        PlayerStatus.IsBusy = true; 
+        PlayerStatusModule.IsBusy = true; 
         _swingTimer = 0f; 
-        _speedMultiplier = PlayerStatus.GetSpeed();
+        _speedMultiplier = PlayerStatusModule.GetSpeed();
     }
     
     public override void OnUpdateState()
     { 
-        if (!PlayerStatus.IsBusy) return;
+        if (!PlayerStatusModule.IsBusy) return;
  
         _swingTimer += Time.deltaTime;
 
@@ -88,7 +88,7 @@ public class EquipSwingState : State
         {
             PlayerSprite.transform.rotation = Quaternion.Euler(0, PlayerSprite.transform.rotation.eulerAngles.y, InitialZRotation);
             ToolSprite.transform.rotation = Quaternion.Euler(0, ToolSprite.transform.rotation.eulerAngles.y, InitialZRotation);
-            PlayerStatus.IsBusy = false;
+            PlayerStatusModule.IsBusy = false;
             Parent.SetState<EquipIdleState>();
         }
     }
