@@ -4,13 +4,13 @@ using UnityEngine;
 [Serializable]
 public class Control
 {
-    private const int Range = 3;
+    private const int InteractRange = 3;
     public static Control Inst = new Control();
     
     private static RaycastHit _raycastInfo;
-    private static Vector3 _direction;
-    private static Vector3 _position;
-    private static int _layerMask;
+    public static Vector3 Direction;
+    public static Vector3 Position;
+    public static int LayerMask; 
     
     public readonly ControlKey Inv = new (KeyCode.Tab);
     public readonly ControlKey Pause = new (KeyCode.Escape);
@@ -84,8 +84,7 @@ public class Control
         
         HandleRaycast(); 
         
-        if (_layerMask != -1 && Scene.InPlayerBlockRange(_position, Range))
-            HandleInput();
+        HandleInput();
     }
 
     private static void HandleActionButton()
@@ -102,8 +101,8 @@ public class Control
 
     private static T GetNearestInteractable<T>() where T : class, IAction
     {
-        Collider[] hitColliders = Physics.OverlapBox(Game.Player.transform.position, Vector3.one * Range, Quaternion.identity, Game.MaskEntity);
-        float distance, nearestDistance = Range * Range;
+        Collider[] hitColliders = Physics.OverlapBox(Game.Player.transform.position, Vector3.one * InteractRange, Quaternion.identity, Game.MaskEntity);
+        float distance, nearestDistance = InteractRange * InteractRange;
         T target, nearTarget = null;
         foreach (Collider collider in hitColliders)
         {
@@ -143,6 +142,16 @@ public class Control
         }
     }
     
+    private static void HandleInput()
+    {
+        if (LayerMask != -1 && Vector3.Distance(Position, Game.Player.transform.position) < InteractRange)
+        {
+            if (Inst.ActionPrimary.KeyDown())
+                _raycastInfo.collider.gameObject.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
+            if (Inst.ActionSecondary.KeyDown())
+                _raycastInfo.collider.gameObject.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
+        } 
+    }
     private static void HandleRaycast()
     { 
         Ray ray = Game.Camera.ScreenPointToRay(Input.mousePosition);
@@ -155,9 +164,9 @@ public class Control
             
             if (!NavMap.Get(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
             { 
-                _layerMask = Game.MaskMap;
-                _position = Vector3Int.FloorToInt(_thresholdPoint); ;
-                _direction = Vector3.down;
+                LayerMask = Game.MaskMap;
+                Position = Vector3Int.FloorToInt(_thresholdPoint); ;
+                Direction = Vector3.down;
                 return;
             }
             ray = new Ray(_thresholdPoint, ray.direction);
@@ -170,34 +179,14 @@ public class Control
 
         if (_raycastInfo.collider)
         {
-            _layerMask = _raycastInfo.collider.includeLayers; 
-            _position = _raycastInfo.point;
-            _direction = ray.direction;
+            LayerMask = _raycastInfo.collider.includeLayers; 
+            Position = _raycastInfo.point;
+            Direction = ray.direction;
         }
         else
-            _layerMask = -1;
+            LayerMask = -1;
     }
  
-
-    private static void HandleInput()
-    { 
-        if (Utility.isLayer(_layerMask, Game.IndexMap))
-        {
-            PlayerTerraform.HandlePositionInfo(_position,  _direction);
-            if (Inst.ActionPrimary.KeyDown())
-            {
-                PlayerTerraform.HandleMapBreak(); 
-            }
-            if (Inst.ActionSecondary.KeyDown())
-            {
-                PlayerTerraform.HandleMapPlace();
-            }
-        }
-        
-        if (Inst.ActionPrimary.KeyDown())
-            _raycastInfo.collider.gameObject.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
-        if (Inst.ActionSecondary.KeyDown())
-            _raycastInfo.collider.gameObject.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
-    }
+ 
       
 }

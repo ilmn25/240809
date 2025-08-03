@@ -20,20 +20,25 @@ public abstract class State
     {
         Tags = tags;
     }
+
+    public void OnEnterInternal()
+    {
+        if (_stateCurrent != null)
+            _stateCurrent.OnEnterInternal();
+        OnEnterState();
+    }
+    public void OnExitInternal()
+    {
+        if (_stateCurrent != null)
+            _stateCurrent.OnExitInternal();
+        OnExitState();
+    }
     
     public void OnUpdateInternal()
     {
         OnUpdateState();
-        if (_stateCurrent != null)
-        { 
-            if (_stateCurrent != _statePrevious)
-            {
-                _stateCurrent.OnEnterState();
-                _statePrevious.OnExitState();
-                _statePrevious = _stateCurrent;
-            }
-            _stateCurrent.OnUpdateInternal();
-        } 
+        if (_stateCurrent != null)        
+            _stateCurrent.OnUpdateInternal(); 
     }
 
     public void OnTerminate()
@@ -50,14 +55,22 @@ public abstract class State
         state.OnInitialize();
         if (current)
         {
-            _stateCurrent = state;
-            _statePrevious = state;
-            _stateCurrent.OnEnterState();
+            _stateCurrent = state; 
+            _stateCurrent.OnEnterInternal();
+            _statePrevious = _stateCurrent;
         }
     }
+    
     public void SetState<T>() where T : State
     {
         _stateCurrent = GetState<T>();
+        
+        if (_stateCurrent != _statePrevious)
+        {
+            _stateCurrent.OnEnterInternal();
+            _statePrevious.OnExitInternal();
+            _statePrevious = _stateCurrent;
+        } 
     }
     
     public T GetState<T>() where T : State

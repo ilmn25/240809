@@ -27,6 +27,7 @@ public class FPSLogger : MonoBehaviour
         style.normal.textColor = Color.white;
 
         // Display FPS on the screen
-        UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), "FPS: " + Mathf.Ceil(fps), style);
+        UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
+            "FPS: " + Mathf.Ceil(fps) + "\n HP: " + PlayerStatus.Health, style);
     }
 }
