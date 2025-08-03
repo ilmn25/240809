@@ -1,10 +1,9 @@
-
 using UnityEngine;
 
-public class ToolSwingState : State
+public class EquipSwingState : State
 {
     private const float ToolDelay = 0.05f; // Constant delay for tool swing
-    private ItemToolState _parent;
+    private EquipState _parent;
     private float _swingTimer = 0f;
     private const float WindUpDuration = 0.1f; // Duration of the wind-up in seconds
     private const float ToolSwingDuration = 0.2f; // Duration of the tool swing in seconds
@@ -16,18 +15,18 @@ public class ToolSwingState : State
 
     public override void OnInitialize()
     {
-        _parent = (ItemToolState)Parent;
+        _parent = (EquipState)Parent;
     }
   
     public void Use()
     {
-        PlayerStatus.IsBusy = true;
+        PlayerStatus.IsBusy = true; 
         _swingTimer = 0f;
         Attack();
     } 
     
     public override void OnUpdateState()
-    {
+    { 
         if (!PlayerStatus.IsBusy) return;
 
         float speedMultiplier = PlayerStatus.GetSpeed();  
