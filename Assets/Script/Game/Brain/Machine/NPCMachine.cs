@@ -8,7 +8,7 @@ public class NPCCED : ChunkEntityData
     public string npcStatus = "idle";
 }
 
-public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
+public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
 { 
     int health = 100;
     public override void OnInitialize()
@@ -25,13 +25,14 @@ public class NPCMachine : EntityMachine , IActionSecondary, IActionPrimary
     {
         GetState<NPCState>().SetState<CharTalk>();
     } 
-    public void OnActionPrimary()
+    public void OnHit()
     {
-        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, 12, true);
+        GetState<NPCState>().SetState<NPCChase>();
+        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, PlayerStatus.GetKnockback(), true);
         health -= Inventory.CurrentItemData.Damage;
         if (health <= 0)
         {
-            Audio.PlaySFX("player_die", 0.8f);
+            Audio.PlaySFX("player_die", 0.4f);
             Entity.SpawnItem("sand", Vector3Int.FloorToInt(transform.position));
             Delete();
         }
@@ -99,7 +100,7 @@ public class NPCState : State
 
         if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 0.7f)
         {
-            PlayerStatus.hit(10, 8, Machine.transform.position);
+            PlayerStatus.hit(10, 20, Machine.transform.position);
         }
     }
 } 

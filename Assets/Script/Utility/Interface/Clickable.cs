@@ -13,9 +13,8 @@ public interface IHover : IAction
 {
     void OnHover();
 } 
- 
 
-public interface INearby
+public interface IHitBox : IAction
 {
-    void OnInteract();  
+    void OnHit();  
 }

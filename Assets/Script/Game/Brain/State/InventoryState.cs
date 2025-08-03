@@ -2,6 +2,10 @@ using Unity.VisualScripting;
 
 public class InventoryState : State
 {
+    public void Action()
+    {
+        
+    }
     public override void OnInitialize()
     {
         Inventory.SlotUpdate += HandleItemUpdate;

@@ -7,7 +7,7 @@ public class Audio
     private static AudioSource _bgmSource;
 
     private static readonly float BgmVolume = 1f;
-    private static readonly float SfxVolume = 1f;
+    private static readonly float SfxVolume = 0.5f;
     private static readonly int PoolSize = 12;
 
     private static Dictionary<string, AudioClip> _clipCache = new Dictionary<string, AudioClip>();

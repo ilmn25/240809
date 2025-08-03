@@ -9,6 +9,10 @@ public class PlayerStatus
     public static float Stamina;
     public static float Speed;
     public static float AirTime;
+    public static bool IsBusy = false;
+    public static bool Invincibility = false;
+    public static float CurrentIframes = 40;
+    public static float Iframes = 40;
     
     private static PlayerMachine _playerMachine;
     public static void Initialize()
@@ -24,6 +28,7 @@ public class PlayerStatus
 
     public static void Update()
     {
+        if (CurrentIframes > 0) CurrentIframes--;
         if (!PlayerMovementModule.inst.IsGrounded && PlayerMovementModule.inst._velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
@@ -35,13 +40,13 @@ public class PlayerStatus
             AirTime = 0;
         }
         
-        Utility.Log(AirTime);
+        // Utility.Log(AirTime);
         if (Hunger > 0) Hunger -= 0.01f;
         if (Health == 0)
         {
             Audio.PlaySFX("player_die",0.5f);
             Health = 100;
-            Game.Player.transform.position = Utility.AddToVector(Game.Player.transform.position, 0,70, 0);
+            Game.Player.transform.position = Utility.AddToVector(Game.Player.transform.position, 0,7, 0);
             Game.GameState = GameState.Loading;
         }
     }
@@ -54,11 +59,27 @@ public class PlayerStatus
         Debug.Log("Current Health: " + Health);
     }
 
-    public static void hit(float dmg, int knockback, Vector3 position)
+    public static void hit(float dmg, float knockback, Vector3 position)
     {
+        if (CurrentIframes != 0) return;
+        CurrentIframes = Iframes;
         UpdateHealth(-dmg);
         PlayerMovementModule.inst.KnockBack(position, knockback, true);
         Audio.PlaySFX("player_hurt",0.4f);
+    }
+    
+    // for later passive effects boosts
+    public static float GetRange()
+    {
+        return 1 * Inventory.CurrentItemData.Range;
+    }
+    public static float GetSpeed()
+    {
+        return 1 * Inventory.CurrentItemData.Speed;
+    }
+    public static float GetKnockback()
+    {
+        return 1 * Inventory.CurrentItemData.Knockback;
     }
 
     // void OnGUI()
@@ -77,5 +98,5 @@ public class PlayerStatus
     //         $"Stamina: {_stamina}\n" +
     //         $"Speed: {_speed}", 
     //         style);
-    // }
+    // } 
 }

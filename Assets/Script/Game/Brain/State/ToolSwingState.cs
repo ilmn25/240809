@@ -19,36 +19,42 @@ public class ToolSwingState : State
         _parent = (ItemToolState)Parent;
     }
   
-    public void StartAnimation()
+    public void Use()
     {
-        if (_parent.IsBusy) return;
-        
-        _parent.IsBusy = true;
-        _swingTimer = 0f; 
-    }
+        PlayerStatus.IsBusy = true;
+        _swingTimer = 0f;
+        Attack();
+    } 
     
-    public void HandleAnimationUpdate()
-    { 
-        if (!_parent.IsBusy) return;
-        
+    public override void OnUpdateState()
+    {
+        if (!PlayerStatus.IsBusy) return;
+
+        float speedMultiplier = PlayerStatus.GetSpeed();  
         _swingTimer += Time.deltaTime;
-        float windUpProgress = Mathf.Clamp01(_swingTimer / WindUpDuration);
-        float toolSwingProgress = Mathf.Clamp01((_swingTimer - WindUpDuration - ToolDelay) / ToolSwingDuration);
-        float playerSwingProgress = Mathf.Clamp01((_swingTimer - WindUpDuration) / PlayerSwingDuration);
-    
-        if (_swingTimer < WindUpDuration)
+
+        // Adjusted durations based on speed
+        float windUpDuration = WindUpDuration / speedMultiplier;
+        float toolSwingDuration = ToolSwingDuration / speedMultiplier;
+        float playerSwingDuration = PlayerSwingDuration / speedMultiplier;
+        float toolDelay = ToolDelay / speedMultiplier;
+
+        float windUpProgress = Mathf.Clamp01(_swingTimer / windUpDuration);
+        float toolSwingProgress = Mathf.Clamp01((_swingTimer - windUpDuration - toolDelay) / toolSwingDuration);
+        float playerSwingProgress = Mathf.Clamp01((_swingTimer - windUpDuration) / playerSwingDuration);
+
+        // Wind-up phase
+        if (_swingTimer < windUpDuration)
         {
-            // Wind-up phase: rotate player slightly in the opposite direction
             float playerZRotation = Mathf.Lerp(InitialZRotation, WindUpZRotation, windUpProgress);
             _parent.PlayerSprite.transform.rotation = Quaternion.Euler(0, _parent.PlayerSprite.transform.rotation.eulerAngles.y, playerZRotation);
-            
-            // Tool also performs a wind-up
+
             float toolZRotation = Mathf.Lerp(InitialZRotation, WindUpZRotation, windUpProgress);
             _parent.ToolSprite.transform.rotation = Quaternion.Euler(0, _parent.ToolSprite.transform.rotation.eulerAngles.y, toolZRotation);
         }
         else
         {
-            // Swing phase for player
+            // Player swing phase
             if (playerSwingProgress < 0.5f)
             {
                 float playerZRotation = Mathf.Lerp(WindUpZRotation, PlayerTargetZRotation, playerSwingProgress * 2);
@@ -60,8 +66,8 @@ public class ToolSwingState : State
                 _parent.PlayerSprite.transform.rotation = Quaternion.Euler(0, _parent.PlayerSprite.transform.rotation.eulerAngles.y, playerZRotation);
             }
 
-            // Swing phase for tool, starts and ends later
-            if (_swingTimer >= WindUpDuration + ToolDelay)
+            // Tool swing phase
+            if (_swingTimer >= windUpDuration + toolDelay)
             {
                 if (toolSwingProgress < 0.5f)
                 {
@@ -76,12 +82,25 @@ public class ToolSwingState : State
             }
         }
 
-        if (_swingTimer >= WindUpDuration + PlayerSwingDuration + ToolSwingDuration + ToolDelay)
+        // Reset when complete
+        if (_swingTimer >= windUpDuration + playerSwingDuration + toolSwingDuration + toolDelay)
         {
-            // Swing complete for both
             _parent.PlayerSprite.transform.rotation = Quaternion.Euler(0, _parent.PlayerSprite.transform.rotation.eulerAngles.y, InitialZRotation);
             _parent.ToolSprite.transform.rotation = Quaternion.Euler(0, _parent.ToolSprite.transform.rotation.eulerAngles.y, InitialZRotation);
-            _parent.IsBusy = false;
+            PlayerStatus.IsBusy = false;
+        }
+    }
+
+
+    private void Attack()
+    {
+        Collider[] hitColliders = Physics.OverlapBox(Machine.transform.position, Vector3.one * PlayerStatus.GetRange(), Quaternion.identity, Game.MaskEntity);
+        IHitBox target;
+        foreach (Collider collider in hitColliders)
+        {
+            target = collider.gameObject.GetComponent<IHitBox>();
+            if (target == null) continue;
+            target.OnHit(); 
         }
     }
 }
