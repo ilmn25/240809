@@ -83,7 +83,7 @@ public abstract class Machine : MonoBehaviour
         foreach (State state in _states)
         {
             state.OnInitialize(); 
-            state.OnEnterState(); 
+            state.OnEnterInternal(); 
         }
     }
     
@@ -96,7 +96,7 @@ public abstract class Machine : MonoBehaviour
     {
         OnUpdate(); 
         foreach (State state in _states)
-        {
+        { 
             state.OnUpdateInternal();
         } 
     }

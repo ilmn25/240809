@@ -62,11 +62,9 @@ public class Game : MonoBehaviour
           
         Control.Initialize(); 
         Item.Initialize();
-        GUI.Initialize();
-        PlayerData.Load(); 
+        GUI.Initialize(); 
         WorldGen.Initialize();
         Audio.Initialize();
-        PlayerStatus.Initialize(); 
         Block.Initialize(); 
         MapCull.Initialize(); 
         EntityDynamicLoad.Initialize();  
@@ -84,9 +82,7 @@ public class Game : MonoBehaviour
         
         GUI.Update();
         SetPiece.Update();
-        PlayerStatus.Update();
         Inventory.Update();
-        PlayerTerraform.Update();
         Control.Update();
         MapCull.Update();
         ViewPort.Update(); 

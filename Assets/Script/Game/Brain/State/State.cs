@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public abstract class State
 {
@@ -36,7 +37,7 @@ public abstract class State
     
     public void OnUpdateInternal()
     {
-        OnUpdateState();
+        OnUpdateState(); 
         if (_stateCurrent != null)        
             _stateCurrent.OnUpdateInternal(); 
     }

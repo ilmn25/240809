@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerStatus
+public class PlayerStatusModule : Module
 {
     public static float Health;
     public static float Mana;
@@ -14,10 +14,9 @@ public class PlayerStatus
     public static float CurrentIframes = 40;
     public static float Iframes = 40;
     
-    private static PlayerMachine _playerMachine;
-    public static void Initialize()
+    public override void Initialize() 
     {
-        _playerMachine = Game.Player.transform.GetComponent<PlayerMachine>();
+        PlayerData.Load(); 
         Health = PlayerData.Inst.health;
         Mana = PlayerData.Inst.mana;
         Sanity = PlayerData.Inst.sanity;
@@ -26,7 +25,7 @@ public class PlayerStatus
         Speed = PlayerData.Inst.speed;
     }
 
-    public static void Update()
+    public void Update()
     {
         if (CurrentIframes > 0) CurrentIframes--;
         if (!PlayerMovementModule.inst.IsGrounded && PlayerMovementModule.inst._velocity.y < -10) AirTime += 1;
@@ -36,11 +35,9 @@ public class PlayerStatus
                 UpdateHealth(-AirTime/8);
                 Audio.PlaySFX("player_hurt",0.4f);
             }
-
             AirTime = 0;
         }
         
-        // Utility.Log(AirTime);
         if (Hunger > 0) Hunger -= 0.01f;
         if (Health == 0)
         {

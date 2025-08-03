@@ -77,15 +77,15 @@ public class PlayerMovementModule : Module
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Control.Inst.Sprint.Key() && PlayerStatus.Stamina > 1)
+            if (Control.Inst.Sprint.Key() && PlayerStatusModule.Stamina > 1)
             {
                 _speedTarget = SpeedRun;
-                PlayerStatus.Stamina -= 0.1f;
+                PlayerStatusModule.Stamina -= 0.1f;
             }
             else
             {
                 _speedTarget = SpeedWalk;
-                PlayerStatus.Stamina += 0.1f;
+                PlayerStatusModule.Stamina += 0.1f;
             }
             
             SpeedCurrent = Mathf.Lerp(SpeedCurrent, _speedTarget, _deltaTime / AccelerationTime);
