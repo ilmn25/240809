@@ -7,7 +7,8 @@ using UnityEngine;
 using UnityEngine.AI;
 public class PlayerMovementModule : Module
 {
-    public static PlayerMovementModule inst { get; private set; }
+    
+    private PlayerStatusModule _playerStatusModule; 
     public Vector3 _velocity = Vector3.zero; 
     public bool IsGrounded = false;  
     public Vector2 RawInput;  
@@ -60,7 +61,7 @@ public class PlayerMovementModule : Module
 
     public override void Initialize()
     {
-        inst = this;
+        _playerStatusModule = Machine.GetModule<PlayerStatusModule>(); 
     }
 
     public void HandleMovementUpdate()
@@ -77,15 +78,15 @@ public class PlayerMovementModule : Module
         if (_input != Vector2.zero)
         {
             // speeding up to start
-            if (Control.Inst.Sprint.Key() && PlayerStatusModule.Stamina > 1)
+            if (Control.Inst.Sprint.Key() && _playerStatusModule.Stamina > 1)
             {
                 _speedTarget = SpeedRun;
-                PlayerStatusModule.Stamina -= 0.1f;
+                _playerStatusModule.Stamina -= 0.1f;
             }
             else
             {
                 _speedTarget = SpeedWalk;
-                PlayerStatusModule.Stamina += 0.1f;
+                _playerStatusModule.Stamina += 0.1f;
             }
             
             SpeedCurrent = Mathf.Lerp(SpeedCurrent, _speedTarget, _deltaTime / AccelerationTime);

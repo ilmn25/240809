@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class EquipSwingState : State
 {
+    private PlayerStatusModule _playerStatusModule;
     private const float ToolDelay = 0.05f; // Constant delay for tool swing
     private float _speedMultiplier; 
     private float _swingTimer = 0f;
@@ -17,20 +18,21 @@ public class EquipSwingState : State
     
     public override void OnInitialize()
     {
+        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         PlayerSprite = Machine.transform.Find("sprite").transform.Find("char");
         ToolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
     }
 
     public override void OnEnterState()
     {
-        PlayerStatusModule.IsBusy = true; 
+        _playerStatusModule.IsBusy = true; 
         _swingTimer = 0f; 
         _speedMultiplier = PlayerStatusModule.GetSpeed();
     }
     
     public override void OnUpdateState()
     { 
-        if (!PlayerStatusModule.IsBusy) return;
+        if (!_playerStatusModule.IsBusy) return;
  
         _swingTimer += Time.deltaTime;
 
@@ -88,7 +90,7 @@ public class EquipSwingState : State
         {
             PlayerSprite.transform.rotation = Quaternion.Euler(0, PlayerSprite.transform.rotation.eulerAngles.y, InitialZRotation);
             ToolSprite.transform.rotation = Quaternion.Euler(0, ToolSprite.transform.rotation.eulerAngles.y, InitialZRotation);
-            PlayerStatusModule.IsBusy = false;
+            _playerStatusModule.IsBusy = false;
             Parent.SetState<EquipIdleState>();
         }
     }
