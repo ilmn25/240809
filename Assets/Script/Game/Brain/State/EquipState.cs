@@ -2,7 +2,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class EquipIdleState : State { }
 
 public class EquipState : State
 {
@@ -13,7 +12,7 @@ public class EquipState : State
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         Inventory.SlotUpdate += EventSlotUpdate;
         _toolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
-        AddState(new EquipIdleState(), true);
+        AddState(new StateEmpty(), true);
         AddState(new EquipSwingState());
     }
 
@@ -72,7 +71,7 @@ public class EquipState : State
     private void Attack()
     {
         Projectile.Spawn(Machine.transform.position, Control.Position, 
-            Inventory.CurrentItemData.ProjectileInfo, ProjectileTarget.Passive);
+            Inventory.CurrentItemData.ProjectileInfo, HitboxType.Passive);
     }
     
     public void EventSlotUpdate()

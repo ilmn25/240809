@@ -14,7 +14,4 @@ public interface IHover : IAction
     void OnHover();
 } 
 
-public interface IHitBox : IAction
-{
-    void OnHit(Projectile projectile);  
-}
+public interface IHitBox : IAction { }
