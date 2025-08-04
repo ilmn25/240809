@@ -3,7 +3,7 @@ using UnityEngine;
 public class NPCState : State
 {
     private readonly ProjectileInfo _projectileInfo = 
-        new SwingProjectileInfo(10, 20, 3, 1.1f, 1.5f);
+        new SwingProjectileInfo(10, 10, 3, 1.1f, 1.5f);
     public override void OnEnterState()
     {
         string status = ((NPCCED)((EntityMachine)Machine).entityData).npcStatus;
@@ -32,7 +32,7 @@ public class NPCState : State
         if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 0.7f)
         {
             Projectile.Spawn(Machine.transform.position,Game.Player.transform.position,
-                _projectileInfo, ProjectileTarget.Ally);
+                _projectileInfo, HitboxType.Friendly);
             // PlayerStatusModule.hit(10, 20, Machine.transform.position);
         }
     }

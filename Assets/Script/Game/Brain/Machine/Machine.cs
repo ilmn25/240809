@@ -98,7 +98,11 @@ public abstract class Machine : MonoBehaviour
         foreach (State state in _states)
         { 
             state.OnUpdateInternal();
-        } 
+        }
+        foreach (Module module in _modules.Values)
+        {
+            module.Update();
+        }
     }
  
 }

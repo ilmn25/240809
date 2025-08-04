@@ -21,8 +21,8 @@ public partial class Item
             stringID: "sword",
             gesture: ItemGesture.Swing,
             speed: 1.1f,
-            range: 1.5f,
-            projectileInfo: new SwingProjectileInfo(10, 10, 10, 1.1f, 1.5f),
+            range: 2f,
+            projectileInfo: new SwingProjectileInfo(10, 15, 10, 1.1f, 2f),
             miningPower: 0,
             materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
         );
@@ -30,9 +30,9 @@ public partial class Item
         AddToolDefinition(
             stringID: "axe",
             gesture: ItemGesture.Swing, 
-            speed: 0.7f,
+            speed: 1.3f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo(3, 10, 10, 1.1f, 1.5f),
+            projectileInfo: new SwingProjectileInfo(3, 15, 10, 1.3f, 2f),
             miningPower: 5,
             materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } }
         );

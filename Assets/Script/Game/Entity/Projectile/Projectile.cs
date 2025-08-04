@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ProjectileTarget {Ally, Enemy, Passive, All}
+public enum HitboxType {Friendly, Enemy, Passive, All}
 public partial class Projectile : MonoBehaviour
 {
     public ProjectileInfo Info;
     public int LifeSpan;
-    public ProjectileTarget Target;
+    public HitboxType Target;
     public Vector3 Destination;
     private void Update()
     {
@@ -27,7 +27,7 @@ public partial class Projectile
     private static readonly List<Projectile> ProjectilePool = new List<Projectile>();
     private static int _poolSize = 100;
     
-    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, ProjectileTarget target)
+    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target)
     {
         Projectile projectile = GetObject();
         if (!projectile) return;

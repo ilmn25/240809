@@ -10,10 +10,10 @@ public class NPCCED : ChunkEntityData
 
 public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
 { 
-    private float _health = 100;
     public override void OnInitialize()
     {
         AddState(new NPCState()); 
+        AddModule(new NPCStatusModule(HitboxType.Enemy,100,1));
         AddModule(new NPCMovementModule());
         AddModule(new NPCPathingModule());
         AddModule(new NPCAnimationModule()); 
@@ -24,24 +24,7 @@ public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
     public void OnActionSecondary()
     {
         GetState<NPCState>().SetState<CharTalk>();
-    } 
-    public void OnHit(Projectile projectile)
-    {
-        if (projectile.Target == ProjectileTarget.Ally) return;
-        GetState<NPCState>().SetState<NPCChase>();
-        GetModule<NPCMovementModule>().KnockBack(projectile.transform.position, projectile.Info.Knockback, true);
-        _health -= projectile.Info.GetDamage();  
-        if (_health <= 0)
-        {
-            Audio.PlaySFX("player_die", 0.4f);
-            Entity.SpawnItem("sand", Vector3Int.FloorToInt(transform.position));
-            Delete();
-        }
-        else
-        {
-            Audio.PlaySFX("npc_hurt", 0.8f);
-        }
-    }
+    }   
     
     public override void UpdateEntityData()
     {

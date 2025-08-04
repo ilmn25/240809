@@ -3,89 +3,90 @@ using UnityEngine;
 
 public class NPCAnimationModule : Module
 {
-    private Animator _animator;
     private GameObject _sprite;
     private NPCMovementModule _npcMovementModule;
     private int _flipDirection;
-    private float _nextTrailTimer = 0f; // Time when the next trail should be created
-    private Vector2 _relativeDirection;
+    private float _nextTrailTimer = 0f;
+    private Vector2Int _animDirection = Vector2Int.zero;
 
-    private float BOUNCE_SPEED = 1; // Speed of the bounce
-    private float BOUNCE_RANGE = 0.12f; // Range of the bounce  
-    private float TRAIL_FREQUENCY = 0.5f; // Frequency of the trail creation
-    private float FLIP_DURATION = 0.06f; // Duration of the scaling effect 
+    private const float BOUNCE_SPEED = 1f;
+    private const float BOUNCE_RANGE = 0.12f;
+    private const float TRAIL_FREQUENCY = 0.5f;
+    private const float FLIP_DURATION = 0.06f;
 
     private int _currentScaleState = 0;
     private float _flipTimer = 0f;
     private Vector3 _originalScale;
     private Vector3 _flatScale;
-    private Vector3 _targetScale; 
+    private Vector3 _targetScale;
 
     public override void Initialize()
     {
         _sprite = Machine.transform.Find("sprite").gameObject;
         _npcMovementModule = Machine.GetModule<NPCMovementModule>();
-        _animator = _sprite.GetComponent<Animator>();
-        
-        _targetScale = _sprite.transform.localScale; 
+
+        _targetScale = _sprite.transform.localScale;
         _originalScale = _sprite.transform.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
     }
-    
-    bool isMoving;
-    float newY;
+
     public void HandleAnimationUpdate()
     {
-        // facing _relativeDirection 
-        _relativeDirection = new Vector2(_npcMovementModule.GetDirection().x, _npcMovementModule.GetDirection().z);  
-        _relativeDirection.Normalize(); 
-        if (_relativeDirection != Vector2.zero)
-        { 
-            _relativeDirection.x = Mathf.Abs(_relativeDirection.x) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.x);
-            _relativeDirection.y = Mathf.Abs(_relativeDirection.y) < 0.1f ? 0 : Mathf.Sign(_relativeDirection.y);
-            _relativeDirection = ViewPort.GetRelativeDirection(_relativeDirection); 
-            _animator.SetFloat("PosX", _relativeDirection.x);
-            _animator.SetFloat("PosY", _relativeDirection.y);
-        }
+        UpdateDirection();
+        HandleBounceAndTrail();
+        HandleFlipCheck();
+        HandleScaling();
+    }
 
-        isMoving = _npcMovementModule.GetSpeed() > 0.35 && _npcMovementModule.IsGrounded();
-        _animator.SetBool("movementFlag", isMoving); // moving or idle
+    void UpdateDirection()
+    {
+        Vector2 rawDirection = new Vector2(_npcMovementModule.GetDirection().x, _npcMovementModule.GetDirection().z);
+        rawDirection.Normalize();
+
+        if (rawDirection != Vector2.zero)
+        {
+            rawDirection.x = Mathf.Abs(rawDirection.x) < 0.1f ? 0 : Mathf.Sign(rawDirection.x);
+            rawDirection.y = Mathf.Abs(rawDirection.y) < 0.1f ? 0 : Mathf.Sign(rawDirection.y);
+            rawDirection = ViewPort.GetRelativeDirection(rawDirection);
+
+            _animDirection = new Vector2Int((int)rawDirection.x, (int)rawDirection.y);
+        }
+    }
+
+    void HandleBounceAndTrail()
+    {
+        bool isMoving = _npcMovementModule.GetSpeed() > 0.35f && _npcMovementModule.IsGrounded();
+
         if (isMoving)
         {
-            // bounce 
-            newY = Mathf.PingPong(Time.time * BOUNCE_SPEED, BOUNCE_RANGE);
+            float newY = Mathf.PingPong(Time.time * BOUNCE_SPEED, BOUNCE_RANGE);
             _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, newY, _sprite.transform.localPosition.z);
-            
-            // smoke trail
+
             if (Time.time >= _nextTrailTimer)
             {
                 SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, false);
                 _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
                 // AudioSystem.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }
-        } 
-        else 
+        }
+        else
         {
             _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, 0, _sprite.transform.localPosition.z);
         }
-
-        // flip
-        HandleFlipCheck();
-        HandleScaling();
     }
 
     void HandleFlipCheck()
-    {     
-        if ((int)_relativeDirection.x != 0) 
+    {
+        if (_animDirection.x != 0)
         {
-            if (Mathf.Sign((int)_animator.GetFloat("PosX")) != Mathf.Sign(_targetScale.x))
+            if (Mathf.Sign(_animDirection.x) != Mathf.Sign(_targetScale.x))
             {
-                _flipDirection = (int)_animator.GetFloat("PosX");  
+                _flipDirection = _animDirection.x;
                 _targetScale = new Vector3(Mathf.Sign(_flipDirection), _originalScale.y, _originalScale.z);
                 _flipTimer = 0f;
                 _currentScaleState = 1;
-            }   
-        } 
+            }
+        }
     }
 
     void HandleScaling()
@@ -98,7 +99,7 @@ public class NPCAnimationModule : Module
             if (_flipTimer >= FLIP_DURATION)
             {
                 _sprite.transform.localScale = _flatScale;
-                _flipTimer = 0f; 
+                _flipTimer = 0f;
                 _currentScaleState = 2;
             }
         }
