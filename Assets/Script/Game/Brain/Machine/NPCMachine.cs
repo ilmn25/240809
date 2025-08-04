@@ -10,7 +10,7 @@ public class NPCCED : ChunkEntityData
 
 public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
 { 
-    int health = 100;
+    private float _health = 100;
     public override void OnInitialize()
     {
         AddState(new NPCState()); 
@@ -25,12 +25,13 @@ public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
     {
         GetState<NPCState>().SetState<CharTalk>();
     } 
-    public void OnHit()
+    public void OnHit(Projectile projectile)
     {
+        if (projectile.Target == ProjectileTarget.Ally) return;
         GetState<NPCState>().SetState<NPCChase>();
-        GetModule<NPCMovementModule>().KnockBack(Game.Player.transform.position, PlayerStatusModule.GetKnockback(), true);
-        health -= Inventory.CurrentItemData.Damage;
-        if (health <= 0)
+        GetModule<NPCMovementModule>().KnockBack(projectile.transform.position, projectile.Info.Knockback, true);
+        _health -= projectile.Info.GetDamage();  
+        if (_health <= 0)
         {
             Audio.PlaySFX("player_die", 0.4f);
             Entity.SpawnItem("sand", Vector3Int.FloorToInt(transform.position));
@@ -62,45 +63,4 @@ public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
     {
         GetModule<NPCPathingModule>().DrawGizmos();
     }
- 
 }
-
-public class NPCState : State
-{ 
-    public override void OnEnterState()
-    {
-        string status = ((NPCCED)((EntityMachine)Machine).entityData).npcStatus;
-        AddState(new NPCIdle(), status == "idle");
-        AddState(new NPCChase(), status == "chase");
-        AddState(new NPCRoam(),status == "roam");
-        Dialogue dialogue = new Dialogue();
-        dialogue.Lines.Add("when i was in primary school");
-        dialogue.Lines.Add("i used to piss out the bathroom window off the building for fun");
-        dialogue.Lines.Add("but one time my mom caught me because she saw the piss stream from the kitchen window");
-        dialogue.Lines.Add("after that");
-        dialogue.Lines.Add("i pissed out the window again, but i locked the bathroom door so she couldnt stop me");
-        AddState(new CharTalk(dialogue));
-    }
- 
-    
-    public override void OnUpdateState()
-    {
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            SetState<NPCChase>();
-        }
-        else if (Input.GetKeyDown(KeyCode.T))
-        {
-            SetState<NPCRoam>();
-        }
-        else if (Input.GetKeyDown(KeyCode.U))
-        {
-            Machine.transform.position = Game.Player.transform.position;
-        }
-
-        if (Vector3.Distance(Machine.transform.position, Game.Player.transform.position) < 0.7f)
-        {
-            PlayerStatusModule.hit(10, 20, Machine.transform.position);
-        }
-    }
-} 

@@ -17,8 +17,25 @@ public partial class Item
         AddBlockDefinition("stone", breakCost: 8, breakThreshold: 2);
         AddBlockDefinition("wood", breakCost: 6, breakThreshold: 2);
 
-        AddToolDefinition("sword", ItemGesture.Swing, damage: 10, knockback: 10, critChance: 5, speed: 1.1f, range: 1.5f, miningPower: 0, materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } });
-        AddToolDefinition("axe", ItemGesture.Swing, damage: 3, knockback: 10, critChance: 3, speed: 0.7f, range: 4f, miningPower: 5, materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } });
+        AddToolDefinition(
+            stringID: "sword",
+            gesture: ItemGesture.Swing,
+            speed: 1.1f,
+            range: 1.5f,
+            projectileInfo: new SwingProjectileInfo(10, 10, 10, 1.1f, 1.5f),
+            miningPower: 0,
+            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
+        );
+
+        AddToolDefinition(
+            stringID: "axe",
+            gesture: ItemGesture.Swing, 
+            speed: 0.7f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo(3, 10, 10, 1.1f, 1.5f),
+            miningPower: 5,
+            materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } }
+        );
     }
 
     private static void AddBlockDefinition(string stringID, string name = "", int breakCost = 1, int breakThreshold = 1, string description = "", Dictionary<string, int> materials = null, int craftStack = 1,
@@ -27,7 +44,7 @@ public partial class Item
         if (name == "") name = stringID;
         Entity.AddItem(stringID);
         Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
-        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0, 2, 5, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false,  2, 5, null,0, 0, 0)
         {
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing
@@ -36,14 +53,14 @@ public partial class Item
         Dictionary[stringID] = itemData;
     }
 
-    private static void AddToolDefinition(string stringID, ItemGesture gesture, string name = "", int damage = 0, float knockback = 0, int critChance = 0, float speed = 0,
-        float range = 1, int miningPower = 0, Dictionary<string, int> materials = null, string description = "", int craftStack = 1,
+    private static void AddToolDefinition(string stringID, ItemGesture gesture, string name = "", float speed = 0,
+        float range = 1, ProjectileInfo projectileInfo = null, int miningPower = 0, Dictionary<string, int> materials = null, string description = "", int craftStack = 1,
         string[] modifiers = null, int stackSize = 1, ItemRarity rarity = ItemRarity.Common, bool consumable = false,
         int healHp = 0, int healMana = 0)
     {
         if (name == "") name = stringID;
         Entity.AddItem(stringID);
-        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, damage, knockback, critChance, speed, range, miningPower, healHp, healMana)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, speed, range, projectileInfo, miningPower, healHp, healMana)
         {
             Type = ItemType.Tool,
             Gesture = gesture
@@ -56,7 +73,7 @@ public partial class Item
         string description = "", int defense = 0, int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0, speed, range, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, speed, range, null,0, 0, 0)
         {
             Type = ItemType.Armor
         };
@@ -68,7 +85,7 @@ public partial class Item
         string description = "", bool consumable = false, int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, 0, 0, 0, speed, range, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, speed, range, null, 0, 0, 0)
         {
             Type = ItemType.Accessory
         };
@@ -80,7 +97,7 @@ public partial class Item
         string description = "", int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
     {
         Entity.AddItem(stringID);
-        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, 0, 0, 0, speed, range, 0, 0, 0)
+        Item itemData = new Item(stringID, name, stackSize, rarity, description, false, speed, range, null, 0, 0, 0)
         {
             Type = ItemType.Furniture
         };

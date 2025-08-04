@@ -5,14 +5,14 @@ public class PlayerState : State
 {
     public override void OnEnterState()
     {
-        AddState(new PlayerActive(), false); 
+        AddState(new PlayerActiveState(), false); 
         AddState(new StateEmpty(), true); 
     }
 
     public override void OnUpdateState()
     {
         if (Game.GameState == GameState.Playing)
-            SetState<PlayerActive>();
+            SetState<PlayerActiveState>();
         else
             SetState<StateEmpty>();
         
@@ -29,20 +29,4 @@ public class PlayerState : State
         if (Input.GetKeyDown(KeyCode.L)) 
             Entity.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
-}  
-class PlayerActive : State {
-    PlayerAnimationModule _playerAnimationModule;
-    PlayerMovementModule _playerMovementModule;
-    
-    public override void OnInitialize()
-    {
-        _playerMovementModule = Machine.GetModule<PlayerMovementModule>();
-        _playerAnimationModule = Machine.GetModule<PlayerAnimationModule>();
-    }
-
-    public override void OnUpdateState() { 
-        _playerMovementModule.HandleMovementUpdate();
-        _playerAnimationModule.HandleAnimationUpdate();  
-    }
 }
-
