@@ -42,8 +42,8 @@ public class NPCMachine : EntityMachine , IActionSecondary, IHitBox
         } 
     }
 
-    public void OnDrawGizmos()
-    {
-        GetModule<NPCPathingModule>().DrawGizmos();
-    }
+    // public void OnDrawGizmos()
+    // {
+    //     GetModule<NPCPathingModule>().DrawGizmos();
+    // }
 }
