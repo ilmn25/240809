@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class EquipIdleState : State { }
 
@@ -67,16 +68,8 @@ public class EquipState : State
 
     private void Attack()
     {
-        if (Inventory.CurrentItemData.Type != ItemType.Tool) return;
-        
-        Collider[] hitColliders = Physics.OverlapBox(Machine.transform.position, Vector3.one * PlayerStatusModule.GetRange(), Quaternion.identity, Game.MaskEntity);
-        IHitBox target;
-        foreach (Collider collider in hitColliders)
-        {
-            target = collider.gameObject.GetComponent<IHitBox>();
-            if (target == null) continue;
-            target.OnHit(); 
-        }
+        Projectile.Spawn(Machine.transform.position, Control.Position, 
+            Inventory.CurrentItemData.ProjectileInfo, ProjectileTarget.Passive);
     }
     
     public void EventSlotUpdate()

@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class PlayerMachine : Machine
+public class PlayerMachine : Machine, IHitBox
 {
     public override void OnInitialize()
     {
@@ -17,5 +17,11 @@ public class PlayerMachine : Machine
     { 
         GetModule<PlayerTerraformModule>().Update();
         GetModule<PlayerStatusModule>().Update();
+    }
+
+    public void OnHit(Projectile projectile)
+    {
+        if (projectile.Target == ProjectileTarget.Enemy || projectile.Target == ProjectileTarget.Passive) return;
+        PlayerStatusModule.hit(projectile.Info.GetDamage(), projectile.Info.Knockback, projectile.transform.position);
     }
 } 

@@ -9,12 +9,10 @@ public partial class Item
     public ItemGesture Gesture { get; set; }
     public string Name { get; set; }
     public int StackSize { get; set; }
-    public ItemRarity Rarity { get; set; }
-    public int Damage { get; set; }
-    public float Knockback { get; set; }
-    public int CritChance { get; set; }
+    public ItemRarity Rarity { get; set; } 
     public float Speed { get; set; }
-    public float Range { get; set; }  
+    public float Range { get; set; }
+    public ProjectileInfo ProjectileInfo;
     public int MiningPower { get; set; }
     public string Description { get; set; }
     public bool IsConsumable { get; set; }
@@ -28,29 +26,25 @@ public partial class Item
         ItemRarity rarity,
         string description,
         bool isConsumable,
-        int damage,
-        float knockback,
-        int critChance,
         float speed,
         float range,  
+        ProjectileInfo projectileInfo,
         int miningPower,
-        int healHP,
+        int healHp,
         int healMana
     )
     {
         StringID = stringID;
         Name = name;
         StackSize = stackSize;
-        Rarity = rarity;
-        Damage = damage;
-        Knockback = knockback;
-        CritChance = critChance;
+        Rarity = rarity; 
         Speed = speed;
         Range = range;  
+        ProjectileInfo = projectileInfo;
         MiningPower = miningPower;
         Description = description;
         IsConsumable = isConsumable;
-        HealHP = healHP;
+        HealHP = healHp;
         HealMana = healMana;
     }
 }

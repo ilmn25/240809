@@ -8,9 +8,9 @@ public class Control
     public static Control Inst = new Control();
     
     private static RaycastHit _raycastInfo;
-    public static Vector3 Direction;
-    public static Vector3 Position;
-    public static int LayerMask; 
+    public static Vector3 Direction; //direction of ray from camera to mouse target 
+    public static Vector3 Position; //position of mouse target 
+    public static int LayerMask; // -1 means void
     
     public readonly ControlKey Inv = new (KeyCode.Tab);
     public readonly ControlKey Pause = new (KeyCode.Escape);
