@@ -7,6 +7,7 @@ public class ProjectileInfo
     public float Damage;
     public float Knockback;
     public float CritChance;
+    public string Effects;
     public ProjectileClass CLass; 
 
     public virtual void AI(Projectile projectile) { }

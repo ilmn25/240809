@@ -9,7 +9,7 @@ public class PlayerMovementModule : Module
 {
     
     private PlayerStatusModule _playerStatusModule; 
-    public Vector3 _velocity = Vector3.zero; 
+    public Vector3 Velocity = Vector3.zero; 
     public bool IsGrounded = false;  
     public Vector2 RawInput;  
     private Vector2 _input = Vector2.zero;
@@ -41,7 +41,7 @@ public class PlayerMovementModule : Module
 
     public void KnockBack(Vector3 position, float force, bool isAway)
     {
-        _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
+        Velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
     }
     
     public void HandleInput()
@@ -152,9 +152,9 @@ public class PlayerMovementModule : Module
         {
             _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
-        else if (Control.Inst.Jump.KeyDown() && _velocity.y > ClampVelocity)
+        else if (Control.Inst.Jump.KeyDown() && Velocity.y > ClampVelocity)
         {
-            _velocity.y += HoldVelocity;
+            Velocity.y += HoldVelocity;
         }
         else
         {
@@ -163,11 +163,11 @@ public class PlayerMovementModule : Module
 
         if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
-            _velocity.y = JumpVelocity;
+            Velocity.y = JumpVelocity;
             //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
-        IsGrounded = _velocity.y == 0;
+        IsGrounded = Velocity.y == 0;
     }
 
 
@@ -259,31 +259,31 @@ public class PlayerMovementModule : Module
     Vector3 _tempPosition;
     private void HandleMove()
     { 
-        if (_velocity.y > Gravity) //terminal velocity
+        if (Velocity.y > Gravity) //terminal velocity
         {
-            _velocity.y += Gravity * _deltaTime;
+            Velocity.y += Gravity * _deltaTime;
         } 
         
-        _tempPosition = new Vector3(_newPosition.x + _velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x + Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
         if (!IsMovable(_tempPosition))
-            _velocity.x = 0; 
+            Velocity.x = 0; 
         else
             _newPosition = _tempPosition;
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + _velocity.z * _deltaTime);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + Velocity.z * _deltaTime);
         if (!IsMovable(_tempPosition))
-            _velocity.z = 0; 
+            Velocity.z = 0; 
         else
             _newPosition = _tempPosition;
         
-        _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 30 * Time.deltaTime);
-        _velocity.z = Mathf.MoveTowards(_velocity.z, 0f, 30 * Time.deltaTime);
+        Velocity.x = Mathf.MoveTowards(Velocity.x, 0f, 30 * Time.deltaTime);
+        Velocity.z = Mathf.MoveTowards(Velocity.z, 0f, 30 * Time.deltaTime);
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + Velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         {
-            if (_velocity.y < 0) IsGrounded = true; 
-            _velocity.y = 0; 
+            if (Velocity.y < 0) IsGrounded = true; 
+            Velocity.y = 0; 
             Machine.transform.position = _newPosition;
         } 
         else 
@@ -296,7 +296,7 @@ public class PlayerMovementModule : Module
     private readonly Vector3 _colliderSize = new Vector3(0.35f, 0.35f, 0.25f);  
     private readonly Vector3 _colliderCenter = new Vector3(0, 0.35f, 0); 
     private bool IsMovable(Vector3 position)
-    {
+    { 
         return !(Physics.OverlapBoxNonAlloc(position + _colliderCenter, 
             _colliderSize, _tempCollisionArray, Quaternion.identity, 
             Game.MaskStatic) > 0);

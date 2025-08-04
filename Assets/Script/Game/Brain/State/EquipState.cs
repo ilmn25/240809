@@ -83,6 +83,7 @@ public class EquipState : State
             _toolSprite.gameObject.SetActive(true);
             _toolSprite.GetComponent<SpriteRenderer>().sprite = 
                 Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
+            _toolSprite.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
         } 
     }
 }

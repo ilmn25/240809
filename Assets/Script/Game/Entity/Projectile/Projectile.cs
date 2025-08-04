@@ -20,6 +20,11 @@ public partial class Projectile : MonoBehaviour
         gameObject.SetActive(false);
         ProjectilePool.Add(this);
     }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.3f);
+    }
 }
 
 public partial class Projectile 
@@ -47,6 +52,8 @@ public partial class Projectile
                 _poolSize--; 
                 GameObject gameObject = new GameObject("projectile");
                 projectile = gameObject.AddComponent<Projectile>();
+                SpriteRenderer spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+                spriteRenderer.sprite = Resources.Load<Sprite>("texture/sprite/sand");
                 return projectile;
             } 
             return null;

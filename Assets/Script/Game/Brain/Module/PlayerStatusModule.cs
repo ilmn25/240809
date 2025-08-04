@@ -31,25 +31,26 @@ public class StatusModule : Module
         }
     }
     
-    public void OnHitInternal(Projectile projectile)
+    public bool OnHitInternal(Projectile projectile)
     {
-        if (_iframesCurrent != 0) return;
+        if (_iframesCurrent != 0) return false;
         switch (projectile.Target)
         {
             case HitboxType.Friendly: // enemy kill friendly 
-                if (HitBoxType == HitboxType.Enemy) return;
+                if (HitBoxType == HitboxType.Enemy) return false;
                 break;
             case HitboxType.Enemy: // player only kill enemy
-                if (HitBoxType == HitboxType.Friendly) return;
-                if (HitBoxType == HitboxType.Passive) return;
+                if (HitBoxType == HitboxType.Friendly) return false;
+                if (HitBoxType == HitboxType.Passive) return false;
                 break;
             case HitboxType.Passive: // friendly hit enemy and passive 
-                if (HitBoxType == HitboxType.Friendly) return;
+                if (HitBoxType == HitboxType.Friendly) return false;
                 break;
         }
         _iframesCurrent = Iframes;
         OnHit(projectile);
         Health -= projectile.Info.GetDamage() - Defense;
+        return true;
     }
      
 }
@@ -82,7 +83,7 @@ public class PlayerStatusModule : StatusModule
 
     protected override void OnUpdate()
     {
-        if (!_PlayerMovementModule.IsGrounded && _PlayerMovementModule._velocity.y < -10) AirTime += 1;
+        if (!_PlayerMovementModule.IsGrounded && _PlayerMovementModule.Velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
             {

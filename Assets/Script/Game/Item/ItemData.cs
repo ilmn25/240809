@@ -18,6 +18,8 @@ public partial class Item
     public bool IsConsumable { get; set; }
     public int HealHP { get; set; }
     public int HealMana { get; set; }
+    
+    public float Scale { get; set; }
 
     public Item(
         string stringID,
@@ -31,7 +33,8 @@ public partial class Item
         ProjectileInfo projectileInfo,
         int miningPower,
         int healHp,
-        int healMana
+        int healMana,
+        float scale
     )
     {
         StringID = stringID;
@@ -46,5 +49,6 @@ public partial class Item
         IsConsumable = isConsumable;
         HealHP = healHp;
         HealMana = healMana;
+        Scale = scale;
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class MeleeProjectileInfo : ProjectileInfo
 { 
     public float Speed;
-    public float Radius;
+    public float Range;
 
     protected MeleeProjectileInfo()
     {
@@ -12,25 +12,31 @@ public class MeleeProjectileInfo : ProjectileInfo
 }
 public class SwingProjectileInfo : MeleeProjectileInfo
 {
-    public SwingProjectileInfo(float damage, float knockback, float critChance, float speed, float radius)
+    public SwingProjectileInfo(float damage, float knockback, float critChance, float speed, float range)
     {
         Damage = damage;
         Knockback = knockback;
         CritChance = critChance;
         Speed = speed;
-        Radius = radius;
+        Range = range;
     }
 
     public override void AI(Projectile projectile)
-    {  
-        Collider[] hitColliders = Physics.OverlapBox(projectile.transform.position, Vector3.one * Radius, Quaternion.identity, Game.MaskEntity);
-        IHitBox target;
+    {
+        Vector3 direction = (projectile.Destination - projectile.transform.position).normalized;
+        Vector3 boxCenter = projectile.transform.position + direction * (Range * 0.5f);
+        Vector3 boxSize = Vector3.one * (Range * 0.5f);
+
+        Collider[] hitColliders = Physics.OverlapBox(boxCenter, boxSize, Quaternion.identity, Game.MaskEntity);
         foreach (Collider collider in hitColliders)
         {
-            target = collider.gameObject.GetComponent<IHitBox>();
+            IHitBox target = collider.gameObject.GetComponent<IHitBox>();
             if (target == null) continue;
-            ((Machine)target).GetModule<StatusModule>().OnHitInternal(projectile); 
+
+            ((Machine)target).GetModule<StatusModule>().OnHitInternal(projectile);
         }
+
         projectile.Delete();
     }
+
 }
