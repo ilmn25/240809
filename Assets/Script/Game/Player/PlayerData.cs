@@ -37,5 +37,4 @@ public class PlayerData
         Inst = Utility.Load<PlayerData>("player") ?? new PlayerData();
         Inventory.SetInventory(Inst.inventory);
     }
-
 } 

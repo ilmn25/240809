@@ -5,6 +5,13 @@ public class FPSLogger : MonoBehaviour
     private float fps = 0.0f;
     private int frameCount = 0;
     private float elapsedTime = 0.0f;
+    
+    private PlayerStatusModule _playerStatusModule;
+
+    void Start()
+    {
+        _playerStatusModule = Game.Player.GetComponent<PlayerMachine>().GetModule<PlayerStatusModule>();
+    }
 
     void Update()
     {
@@ -28,6 +35,6 @@ public class FPSLogger : MonoBehaviour
 
         // Display FPS on the screen
         UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-            "FPS: " + Mathf.Ceil(fps) + "\n HP: " + PlayerStatusModule.Health, style);
+            "FPS: " + Mathf.Ceil(fps) + "\n HP: " + _playerStatusModule.Health, style);
     }
 }

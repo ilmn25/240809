@@ -2,20 +2,23 @@ using UnityEngine;
 
 public class PlayerStatusModule : Module
 {
-    public static float Health;
-    public static float Mana;
-    public static float Sanity;
-    public static float Hunger;
-    public static float Stamina;
-    public static float Speed;
-    public static float AirTime;
-    public static bool IsBusy = false;
-    public static bool Invincibility = false;
-    public static float CurrentIframes = 40;
-    public static float Iframes = 120;
+    public float Health;
+    public float Mana;
+    public float Sanity;
+    public float Hunger;
+    public float Stamina;
+    public float Speed;
+    public float AirTime;
+    public bool IsBusy = false;
+    public bool Invincibility = false;
+    public float CurrentIframes = 40;
+    public float Iframes = 120;
     
-    public override void Initialize() 
+    public static PlayerMovementModule _PlayerMovementModule;
+    
+    public override void Initialize()
     {
+        _PlayerMovementModule = Machine.GetModule<PlayerMovementModule>();
         PlayerData.Load(); 
         Health = PlayerData.Inst.health;
         Mana = PlayerData.Inst.mana;
@@ -28,7 +31,7 @@ public class PlayerStatusModule : Module
     public void Update()
     {
         if (CurrentIframes > 0) CurrentIframes--;
-        if (!PlayerMovementModule.inst.IsGrounded && PlayerMovementModule.inst._velocity.y < -10) AirTime += 1;
+        if (!_PlayerMovementModule.IsGrounded && _PlayerMovementModule._velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
             {
@@ -48,19 +51,19 @@ public class PlayerStatusModule : Module
         }
     }
 
-    public static void UpdateHealth(float amount)
+    public void UpdateHealth(float amount)
     {
         Health += amount;
         if (Health > PlayerData.Inst.health) Health = PlayerData.Inst.health;
         else if (Health < 0) Health = 0;
     }
 
-    public static void hit(float dmg, float knockback, Vector3 position)
+    public void hit(float dmg, float knockback, Vector3 position)
     {
         if (CurrentIframes != 0) return;
         CurrentIframes = Iframes;
         UpdateHealth(-dmg);
-        PlayerMovementModule.inst.KnockBack(position, knockback, true);
+        _PlayerMovementModule.KnockBack(position, knockback, true);
         Audio.PlaySFX("player_hurt",0.4f);
     }
     
@@ -72,9 +75,5 @@ public class PlayerStatusModule : Module
     public static float GetSpeed()
     {
         return 1 * Inventory.CurrentItemData.Speed;
-    }
-    public static float GetKnockback()
-    {
-        return 1 * Inventory.CurrentItemData.ProjectileInfo.Knockback;
-    }
+    } 
 }

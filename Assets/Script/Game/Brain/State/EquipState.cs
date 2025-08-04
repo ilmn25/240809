@@ -6,9 +6,11 @@ public class EquipIdleState : State { }
 
 public class EquipState : State
 {
+    private PlayerStatusModule _playerStatusModule;
     private Transform _toolSprite; 
     public override void OnInitialize()
     {
+        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         Inventory.SlotUpdate += EventSlotUpdate;
         _toolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
         AddState(new EquipIdleState(), true);
@@ -17,35 +19,36 @@ public class EquipState : State
 
     public override void OnUpdateState()
     { 
-        if (!PlayerStatusModule.IsBusy && !GUI.Active)
+        if (!GUI.Active)
         {
             switch (Inventory.CurrentItemData?.Type)
             {
                 case ItemType.Tool:
-                    if (Control.Inst.ActionPrimary.KeyDown() ||
-                        Control.Inst.DigUp.KeyDown() ||
-                        Control.Inst.DigDown.KeyDown())
-                    {
-                        Animate();
-                        Attack();
-                    }
-
                     if (Inventory.CurrentItemData.MiningPower != 0 && 
                         Utility.isLayer(Control.LayerMask, Game.IndexMap) &&
                         Scene.InPlayerBlockRange(Control.Position, PlayerStatusModule.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.Position,  Control.Direction); 
-                        if (Control.Inst.ActionPrimary.KeyDown()) PlayerTerraformModule.HandleMapBreak(); 
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionPrimary.KeyDown()) 
+                            PlayerTerraformModule.HandleMapBreak(); 
                     } 
+                    if (!_playerStatusModule.IsBusy && 
+                        (Control.Inst.ActionPrimary.KeyDown() ||
+                         Control.Inst.DigUp.KeyDown() ||
+                         Control.Inst.DigDown.KeyDown()))
+                    {
+                        Animate();
+                        Attack();
+                    }
+ 
                     break;
                 
-                case ItemType.Block:
-                    if (GUI.Active) return;
+                case ItemType.Block: 
                     if (Utility.isLayer(Control.LayerMask, Game.IndexMap) &&
                         Scene.InPlayerBlockRange(Control.Position, PlayerStatusModule.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.Position, Control.Direction);
-                        if (Control.Inst.ActionSecondary.KeyDown())
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionSecondary.KeyDown())
                         {
                             Animate();
                             PlayerTerraformModule.HandleMapPlace();
