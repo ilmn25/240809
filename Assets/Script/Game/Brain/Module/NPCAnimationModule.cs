@@ -9,10 +9,10 @@ public class NPCAnimationModule : Module
     private float _nextTrailTimer = 0f;
     private Vector2Int _animDirection = Vector2Int.zero;
 
-    private const float BOUNCE_SPEED = 1f;
-    private const float BOUNCE_RANGE = 0.12f;
-    private const float TRAIL_FREQUENCY = 0.5f;
-    private const float FLIP_DURATION = 0.06f;
+    private const float BounceSpeed = 1f;
+    private const float BounceRange = 0.12f;
+    private const float TrailFrequency = 0.5f;
+    private const float FlipDuration = 0.06f;
 
     private int _currentScaleState = 0;
     private float _flipTimer = 0f;
@@ -59,13 +59,13 @@ public class NPCAnimationModule : Module
 
         if (isMoving)
         {
-            float newY = Mathf.PingPong(Time.time * BOUNCE_SPEED, BOUNCE_RANGE);
+            float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
             _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, newY, _sprite.transform.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
             {
                 SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, false);
-                _nextTrailTimer = Time.time + TRAIL_FREQUENCY;
+                _nextTrailTimer = Time.time + TrailFrequency;
                 // AudioSystem.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
             }
         }
@@ -94,9 +94,9 @@ public class NPCAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FLIP_DURATION);
+            _sprite.transform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
-            if (_flipTimer >= FLIP_DURATION)
+            if (_flipTimer >= FlipDuration)
             {
                 _sprite.transform.localScale = _flatScale;
                 _flipTimer = 0f;
@@ -106,9 +106,9 @@ public class NPCAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FLIP_DURATION);
+            _sprite.transform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
-            if (_flipTimer >= FLIP_DURATION)
+            if (_flipTimer >= FlipDuration)
             {
                 _sprite.transform.localScale = _targetScale;
                 _currentScaleState = 0;
