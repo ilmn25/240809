@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 public abstract class EntityMachine : Machine
 { 
     public ChunkEntityData entityData;
-    private bool _awake;
+    private bool _awake; 
     protected override void Awake() {  } 
     public ChunkEntityData GetEntityData()
     {

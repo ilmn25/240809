@@ -62,6 +62,7 @@ public class Game : MonoBehaviour
           
         Control.Initialize(); 
         Item.Initialize();
+        Loot.Initialize();
         GUI.Initialize(); 
         WorldGen.Initialize();
         Audio.Initialize();
