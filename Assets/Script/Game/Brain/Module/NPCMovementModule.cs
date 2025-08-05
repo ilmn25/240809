@@ -6,15 +6,33 @@ using UnityEngine;
 
 public class NPCMovementModule : Module
 {
-    [SerializeField] public float SPEED_WALK = 4f;
-    [SerializeField] private float SPEED_RUN = 8f;
-    [SerializeField] private float ACCELERATION_TIME = 0.3f;  
-    [SerializeField] private float DECELERATION_TIME = 0.08f; 
-    [SerializeField] private float SLIDE_DEGREE = 0.3f; //against wall
-    [SerializeField] private float GRAVITY = -40f;
-    [SerializeField] private float JUMP_VELOCITY = 12f;
-    [SerializeField] private float COLLISION_RADIUS = 0.3f; 
-     
+    public readonly float SpeedWalk;
+    private readonly float _speedRun;
+    private readonly float _accelerationTime;
+    private readonly float _decelerationTime;
+    private readonly float _slideDegree; //against wall
+    private readonly float _gravity;
+    private readonly float _jumpVelocity;
+    private readonly float _collisionRadius; 
+    public NPCMovementModule(
+        float speedWalk = 4f,
+        float speedRun = 8f,
+        float accelerationTime = 0.3f,
+        float decelerationTime = 0.08f,
+        float slideDegree = 0.3f,
+        float gravity = -40f,
+        float jumpVelocity = 12f,
+        float collisionRadius = 0.3f)
+    {
+        SpeedWalk = speedWalk;
+        _speedRun = speedRun;
+        _accelerationTime = accelerationTime;
+        _decelerationTime = decelerationTime;
+        _slideDegree = slideDegree;
+        _gravity = gravity;
+        _jumpVelocity = jumpVelocity;
+        _collisionRadius = collisionRadius;
+    }
     public Vector3 GetDirection()
     {
         return _direction;
@@ -75,8 +93,8 @@ public class NPCMovementModule : Module
         if (_direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = _isGrounded ? SPEED_WALK : SPEED_RUN;
-            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / ACCELERATION_TIME);
+            _speedTarget = _isGrounded ? SpeedWalk : _speedRun;
+            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / _accelerationTime);
             _speedAdjust = (_direction.x != 0 && _direction.z != 0) ? 1 / 1.25f : 1; 
 
             _newPosition.x += _direction.x * _speedCurrent * _deltaTime * _speedAdjust;
@@ -91,7 +109,7 @@ public class NPCMovementModule : Module
         else if (_speedCurrent != 0)
         {
             //! slowing down to stop
-            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / DECELERATION_TIME);
+            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / _decelerationTime);
 
             _newPosition.x += _directionBuffer.x * _speedCurrent * _deltaTime;
             _newPosition.z += _directionBuffer.z * _speedCurrent * _deltaTime;
@@ -111,7 +129,7 @@ public class NPCMovementModule : Module
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
         if (_isGrounded && _direction.y > 0)
         {
-            _velocity.y = JUMP_VELOCITY; 
+            _velocity.y = _jumpVelocity; 
             _isGrounded = false;
         }
     }
@@ -133,7 +151,7 @@ public class NPCMovementModule : Module
             //! slide against wall if possible
             if (_direction.x != 0)
             {
-                _testPosition = Machine.transform.position.x + SLIDE_DEGREE * _direction.x * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.x + _slideDegree * _direction.x * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionA.z += -1 * _speedCurrent * _deltaTime;
@@ -149,7 +167,7 @@ public class NPCMovementModule : Module
             }
             else
             {
-                _testPosition = Machine.transform.position.z + SLIDE_DEGREE * _direction.z * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.z + _slideDegree * _direction.z * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionA.x += -1 * _speedCurrent * _deltaTime;
@@ -168,9 +186,9 @@ public class NPCMovementModule : Module
     
     private void HandleMove()
     { 
-        if (_velocity.y > GRAVITY) //terminal velocity
+        if (_velocity.y > _gravity) //terminal velocity
         {
-            _velocity.y += GRAVITY * _deltaTime;
+            _velocity.y += _gravity * _deltaTime;
         } 
         
         _tempPosition = new Vector3(_newPosition.x + _velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
@@ -213,7 +231,7 @@ public class NPCMovementModule : Module
     {
         _colliderArray = new Collider[1];
 
-        Vector3 halfExtents = new Vector3(COLLISION_RADIUS, COLLISION_RADIUS, COLLISION_RADIUS);
+        Vector3 halfExtents = new Vector3(_collisionRadius, _collisionRadius, _collisionRadius);
 
         return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.MaskStatic) > 0);
     } 

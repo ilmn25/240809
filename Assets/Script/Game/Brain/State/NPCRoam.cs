@@ -27,7 +27,7 @@ class NPCRoam : State {
         }
         else
         {  
-            _pathingModule.PassivePathFollow(_npcMovementModule.SPEED_WALK); 
+            _pathingModule.PassivePathFollow(_npcMovementModule.SpeedWalk); 
         }
     }
 }
