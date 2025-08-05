@@ -40,6 +40,7 @@ public class Audio
 
     public static AudioSource PlaySFX(string id, float volume = 1f, bool loop = false)
     {
+        if (id == "") return null;
         AudioClip clip = Cache.LoadAudioClip($"sfx/{id}");
         if (clip == null) return null;
 

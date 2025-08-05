@@ -124,7 +124,6 @@ public partial class Item
     )
     {
         if (name == "") name = stringID;
-        if (sfx == "") sfx = "text";
         Entity.AddItem(stringID);
 
         Item itemData = new Item()
