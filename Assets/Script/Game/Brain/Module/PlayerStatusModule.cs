@@ -6,7 +6,7 @@ public class StatusModule : Module
     public float Health;
     public float Defense;
     private int _iframesCurrent;
-    private const int Iframes = 50;
+    private const int Iframes = 15;
 
     public StatusModule(HitboxType hitBoxType, float health, float defense)
     {

@@ -10,8 +10,6 @@ public class Audio
     private static readonly float SfxVolume = 0.5f;
     private static readonly int PoolSize = 12;
 
-    private static Dictionary<string, AudioClip> _clipCache = new Dictionary<string, AudioClip>();
-
     public static void Initialize()
     {
         GameObject audioManager = new GameObject("Audio");
@@ -31,7 +29,7 @@ public class Audio
 
     public static void PlayBGM(string id, float volume = 1f, bool loop = true)
     {
-        AudioClip clip = LoadClip($"audio/bgm/{id}");
+        AudioClip clip = Cache.LoadAudioClip($"audio/bgm/{id}");
         if (clip == null) return;
 
         _bgmSource.clip = clip;
@@ -42,7 +40,7 @@ public class Audio
 
     public static AudioSource PlaySFX(string id, float volume = 1f, bool loop = false)
     {
-        AudioClip clip = LoadClip($"audio/sfx/{id}");
+        AudioClip clip = Cache.LoadAudioClip($"sfx/{id}");
         if (clip == null) return null;
 
         AudioSource availableSource = GetAvailableAudioSource();
@@ -75,25 +73,5 @@ public class Audio
             }
         }
         return null;
-    }
-
-    private static AudioClip LoadClip(string path)
-    {
-        if (_clipCache.TryGetValue(path, out AudioClip cachedClip))
-        {
-            return cachedClip;
-        }
-
-        AudioClip clip = Resources.Load<AudioClip>(path);
-        if (clip != null)
-        {
-            _clipCache[path] = clip;
-        }
-        else
-        {
-            Debug.LogWarning($"AudioClip not found at path: {path}");
-        }
-
-        return clip;
     }
 }

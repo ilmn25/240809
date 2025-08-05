@@ -95,8 +95,7 @@ public class PlayerTerraformModule : Module
         
         if (!World.IsInWorldBounds(_coordinate)) return; 
         
-        Audio.PlaySFX("dig_sand");
-        // if (World.GetBlock(_coordinate) == 0)
+        Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         World.SetBlock(_coordinate, Block.ConvertID(_block.name));
         Inventory.RemoveItem(_block.name);
     }

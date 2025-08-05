@@ -1,0 +1,42 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Cache
+{
+    private static readonly Dictionary<string, AudioClip> AudioClipCache = new Dictionary<string, AudioClip>();
+    private static readonly Dictionary<string, Sprite> SpriteCache = new Dictionary<string, Sprite>();
+
+    public static AudioClip LoadAudioClip(string path)
+    {
+        string fullPath = "audio/" + path;
+        if (AudioClipCache.TryGetValue(fullPath, out AudioClip cachedClip))
+        {
+            return cachedClip;
+        }
+
+        AudioClip clip = Resources.Load<AudioClip>(fullPath);
+        if (clip)
+        {
+            AudioClipCache[fullPath] = clip;
+        } 
+
+        return clip;
+    }
+
+    public static Sprite LoadSprite(string path)
+    {
+        string fullPath = "texture/" + path;
+        if (SpriteCache.TryGetValue(fullPath, out Sprite cachedSprite))
+        {
+            return cachedSprite;
+        }
+
+        Sprite sprite = Resources.Load<Sprite>(fullPath);
+        if (sprite)
+        {
+            SpriteCache[fullPath] = sprite;
+        } 
+
+        return sprite;
+    }
+}
