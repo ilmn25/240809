@@ -31,6 +31,7 @@ public class EquipSwingState : State
         {
             if (stateInfo.IsName("EquipSwing"))
             {
+                Audio.PlaySFX(Inventory.CurrentItemData.Sfx, 0.5f);
                 _animator.speed = _cooldownSpeed;
                 _animator.Play("EquipSwingCooldown", 0, 0f);
             }

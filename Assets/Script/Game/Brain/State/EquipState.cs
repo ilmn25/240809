@@ -7,13 +7,16 @@ public class EquipState : State
 {
     private PlayerStatusModule _playerStatusModule;
     private Transform _toolSprite; 
+    private Transform _toolTip; 
     public override void OnInitialize()
     {
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         Inventory.SlotUpdate += EventSlotUpdate;
         _toolSprite = Machine.transform.Find("sprite").transform.Find("tool");  
+        _toolTip = _toolSprite.transform.Find("tip");  
         AddState(new StateEmpty(), true);
         AddState(new EquipSwingState());
+        AddState(new EquipShootState());
     }
 
     public override void OnUpdateState()
@@ -36,8 +39,8 @@ public class EquipState : State
                          Control.Inst.DigUp.KeyDown() ||
                          Control.Inst.DigDown.KeyDown()))
                     {
-                        Animate();
                         Attack();
+                        Animate(); 
                     }
  
                     break;
@@ -65,12 +68,15 @@ public class EquipState : State
             case ItemGesture.Swing:
                 SetState<EquipSwingState>();
                 break;
+            case ItemGesture.Shoot:
+                SetState<EquipShootState>();
+                break;
         }
     }
 
     private void Attack()
     {
-        Projectile.Spawn(Machine.transform.position, Control.Position, 
+        Projectile.Spawn(_toolTip.transform.position, Control.Position, 
             Inventory.CurrentItemData.ProjectileInfo, HitboxType.Passive);
     }
     

@@ -18,6 +18,7 @@ public class RangedProjectileInfo : ProjectileInfo
         Radius = radius;
         Penetration = penetration;
         Self = self;
+        Sprite = Cache.LoadSprite("sprite/bullet");
     }
 
     // Reusable buffer for collision detection
@@ -37,9 +38,15 @@ public class RangedProjectileInfo : ProjectileInfo
         projectile.transform.position += direction * (Speed * Time.deltaTime);
 
         // Check for collision using non-alloc
-        int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer, Game.MaskEntity);
+        int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
         for (int i = 0; i < hitCount; i++)
         {
+            if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskStatic))
+            {
+                projectile.Delete();
+                break;
+            } 
+            
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
