@@ -32,19 +32,23 @@ public partial class Entity
                 return dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
         }
         
-        public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true)
+        public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true, int count = 1)
         {
-                ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
+                for (int i = 0; i < count; i++)
+                {
+                        ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
 
-                GameObject gameObject = ObjectPool.GetObject("item");
-                gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
-                gameObject.GetComponent<SpriteRenderer>().sprite = 
-                        Resources.Load<Sprite>($"texture/sprite/{stringID}"); 
+                        GameObject gameObject = ObjectPool.GetObject("item");
+                        gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
+                        gameObject.GetComponent<SpriteRenderer>().sprite = 
+                                Resources.Load<Sprite>($"texture/sprite/{stringID}"); 
         
-                EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
-                EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                currentEntityMachine.Initialize(entityData);
-                gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
+                        EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
+                        EntityDynamicLoad.InviteEntity(currentEntityMachine); 
+                        currentEntityMachine.Initialize(entityData);
+                        gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
+                        
+                } 
         }
         
         public static void SpawnPrefab(string stringID, Vector3Int worldPosition)

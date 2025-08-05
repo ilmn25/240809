@@ -52,13 +52,13 @@ public class EquipState : State
                         Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
-                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionPrimary.KeyDown()) 
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionPrimary.Key()) 
                             PlayerTerraformModule.HandleMapBreak(); 
                     } 
                     if (!_playerStatusModule.IsBusy && 
                         (Control.Inst.ActionPrimary.Key() ||
-                         Control.Inst.DigUp.KeyDown() ||
-                         Control.Inst.DigDown.KeyDown()))
+                         Control.Inst.DigUp.Key() ||
+                         Control.Inst.DigDown.Key()))
                     {
                         Attack();
                         Animate(); 
@@ -71,7 +71,7 @@ public class EquipState : State
                         Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
-                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionSecondary.KeyDown())
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionSecondary.Key())
                         {
                             Animate();
                             PlayerTerraformModule.HandleMapPlace();

@@ -33,7 +33,7 @@ public class SwingProjectileInfo : MeleeProjectileInfo
             IHitBox target = collider.gameObject.GetComponent<IHitBox>();
             if (target == null) continue;
 
-            ((Machine)target).GetModule<StatusModule>().OnHitInternal(projectile);
+            ((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile);
         }
 
         projectile.Delete();

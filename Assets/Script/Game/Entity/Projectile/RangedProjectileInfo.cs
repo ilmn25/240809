@@ -39,7 +39,7 @@ public class RangedProjectileInfo : ProjectileInfo
         int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
         for (int i = 0; i < hitCount; i++)
         {
-            if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskStatic))
+            if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskMap))
             {
                 Audio.PlaySFX("dig_stone");
                 projectile.Delete();
@@ -49,7 +49,7 @@ public class RangedProjectileInfo : ProjectileInfo
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
-            if (((Machine)target).GetModule<StatusModule>().OnHitInternal(projectile))
+            if (((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile))
             {
                 projectile.Delete();
                 break;
