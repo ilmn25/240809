@@ -27,15 +27,13 @@ public class RangedProjectileInfo : ProjectileInfo
     public override void AI(Projectile projectile)
     {
         // Check lifespan
-        if (projectile.LifeSpan > LifeSpan || Vector3.Distance(projectile.transform.position, projectile.Destination) < Radius)
-        {
-            projectile.Delete();
+        if (projectile.LifeSpan > LifeSpan)
+        { 
+            projectile.Delete(); 
             return;
         }
-
-        // Move toward destination
-        Vector3 direction = (projectile.Destination - projectile.transform.position).normalized;
-        projectile.transform.position += direction * (Speed * Time.deltaTime);
+ 
+        projectile.transform.position += projectile.Direction * (Speed * Time.deltaTime);
 
         // Check for collision using non-alloc
         int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
@@ -43,8 +41,9 @@ public class RangedProjectileInfo : ProjectileInfo
         {
             if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskStatic))
             {
+                Audio.PlaySFX("dig_stone");
                 projectile.Delete();
-                break;
+                break;  
             } 
             
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();

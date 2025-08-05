@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour
     public int LifeSpan;
     public HitboxType Target;
     public Vector3 Destination;
+    public Vector3 Direction;
     
     private void Update()
     {
@@ -32,9 +33,10 @@ public class Projectile : MonoBehaviour
         projectile.Info = info; 
         projectile.Target = target; 
         projectile.Destination = dest;
+        projectile.Direction = (dest - origin).normalized;
         projectile.transform.rotation = ViewPort.CurrentRotation; 
         projectile.spriteRenderer.sprite = info.Sprite;
-        projectile.Info.OnSpawn(projectile);
+        projectile.Info.OnSpawn(projectile); 
     }
  
 } 

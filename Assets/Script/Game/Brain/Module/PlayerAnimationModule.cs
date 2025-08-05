@@ -50,21 +50,21 @@ public class PlayerAnimationModule : Module
 
     void UpdateDirection()
     {
-        if (!_playerStatusModule.IsBusy)
-        {
-            if (_playerMovementModule.RawInput != Vector2.zero)
-            {
-                _animDirection = new Vector2Int(
-                    Mathf.RoundToInt(_playerMovementModule.RawInput.x),
-                    Mathf.RoundToInt(_playerMovementModule.RawInput.y)
-                );
-            }
-        }
-        else
-        {
+        // if (!_playerStatusModule.IsBusy)
+        // {
+        //     if (_playerMovementModule.RawInput != Vector2.zero)
+        //     {
+        //         _animDirection = new Vector2Int(
+        //             Mathf.RoundToInt(_playerMovementModule.RawInput.x),
+        //             Mathf.RoundToInt(_playerMovementModule.RawInput.y)
+        //         );
+        //     }
+        // }
+        // else
+        // {
             float directionX = Input.mousePosition.x >= Screen.width / 2 ? 1f : -1f;
             _animDirection = new Vector2Int((int)Mathf.Sign(directionX), 0);
-        }
+        // }
     }
 
     void HandleBounceAndTrail()

@@ -40,16 +40,18 @@ public partial class Item
             stringID: "minigun",
             gesture: ItemGesture.Shoot,
             speed: 2f,
-            projectileInfo: new RangedProjectileInfo(5, 5, 10, 10000, 50, 0.1f, 1),
-            materials: new Dictionary<string, int> { { "wood", 2 } }
+            projectileInfo: new RangedProjectileInfo(20, 5, 10, 10000, 50, 0.1f, 1),
+            materials: new Dictionary<string, int> { { "wood", 2 } },
+            holdOutOffset: 1.54f
         );
 
         AddToolDefinition(
             stringID: "pistol",
             gesture: ItemGesture.Shoot,
             speed: 0.3f,
-            projectileInfo: new RangedProjectileInfo(25, 5, 10, 10000, 24, 0.1f, 1),
-            materials: new Dictionary<string, int> { { "wood", 2 } }
+            projectileInfo: new RangedProjectileInfo(25, 10, 10, 10000, 24, 0.1f, 1),
+            materials: new Dictionary<string, int> { { "wood", 2 } },
+            holdOutOffset: 1.016f
         );
     }
 
@@ -84,10 +86,10 @@ public partial class Item
 
             Speed = 3,
             Range = 5,
-            ProjectileInfo = null,
-            MiningPower = 0,
-            Durability = 0,
-            StatusEffect = null,
+            // ProjectileInfo = null,
+            // MiningPower = 0,
+            // Durability = 0,
+            // StatusEffect = null,
 
             Name = name,
             Description = description
@@ -113,6 +115,7 @@ public partial class Item
         int miningPower = 0,
         int durability = 0,
         StatusEffect statusEffect = null,
+        float holdOutOffset = 0,
 
         string description = "",
         Dictionary<string, int> materials = null,
@@ -142,6 +145,7 @@ public partial class Item
             MiningPower = miningPower,
             Durability = durability,
             StatusEffect = statusEffect,
+            HoldoutOffset = holdOutOffset,
 
             Name = name,
             Description = description

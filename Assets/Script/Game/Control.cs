@@ -7,10 +7,11 @@ public class Control
     private const int InteractRange = 3;
     public static Control Inst = new Control();
     
-    private static RaycastHit _raycastInfo;
-    public static Vector3 Direction; //direction of ray from camera to mouse target 
-    public static Vector3 Position; //position of mouse target 
-    public static int LayerMask; // -1 means void
+    private static RaycastHit _mouseRaycastInfo;
+    public static Vector3 MouseDirection; //direction of ray from camera to mouse target 
+    public static Vector3 MousePosition; //position of mouse target 
+    public static Transform MouseTarget;
+    public static int MouseLayer; // -1 means void
     
     public readonly ControlKey Inv = new (KeyCode.Tab);
     public readonly ControlKey Pause = new (KeyCode.Escape);
@@ -144,12 +145,18 @@ public class Control
     
     private static void HandleInput()
     {
-        if (LayerMask != -1 && Vector3.Distance(Position, Game.Player.transform.position) < InteractRange)
+        if (MouseLayer != -1 && MouseLayer != Game.MaskMap)
+        {
+            MouseTarget = _mouseRaycastInfo.collider.transform;
+        }
+        else MouseTarget = null;
+        
+        if (MouseTarget && Vector3.Distance(MousePosition, Game.Player.transform.position) < InteractRange)
         {
             if (Inst.ActionPrimary.KeyDown())
-                _raycastInfo.collider.gameObject.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
+                MouseTarget.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
             if (Inst.ActionSecondary.KeyDown())
-                _raycastInfo.collider.gameObject.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
+                MouseTarget.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
         } 
     }
     private static void HandleRaycast()
@@ -160,31 +167,31 @@ public class Control
         {
             // Calculate the position in the camera's direction where y = yThreshold 
             float yThreshold = MapCull.YThreshold + 0.05f;
-            Vector3 _thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
+            Vector3 thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
             
-            if (!NavMap.Get(Vector3Int.FloorToInt(_thresholdPoint) + Vector3Int.down))
+            if (!NavMap.Get(Vector3Int.FloorToInt(thresholdPoint) + Vector3Int.down))
             { 
-                LayerMask = Game.MaskMap;
-                Position = Vector3Int.FloorToInt(_thresholdPoint); ;
-                Direction = Vector3.down;
+                MouseLayer = Game.MaskMap;
+                MousePosition = Vector3Int.FloorToInt(thresholdPoint); ;
+                MouseDirection = Vector3.down;
                 return;
             }
-            ray = new Ray(_thresholdPoint, ray.direction);
-            Physics.Raycast(ray, out _raycastInfo);
+            ray = new Ray(thresholdPoint, ray.direction);
+            Physics.Raycast(ray, out _mouseRaycastInfo);
         }
         else
         {
-            Physics.Raycast(ray, out _raycastInfo);
+            Physics.Raycast(ray, out _mouseRaycastInfo);
         }
 
-        if (_raycastInfo.collider)
+        if (_mouseRaycastInfo.collider)
         {
-            LayerMask = _raycastInfo.collider.includeLayers; 
-            Position = _raycastInfo.point;
-            Direction = ray.direction;
+            MouseLayer = _mouseRaycastInfo.collider.includeLayers; 
+            MousePosition = _mouseRaycastInfo.point;
+            MouseDirection = ray.direction;
         }
         else
-            LayerMask = -1;
+            MouseLayer = -1;
     }
  
  
