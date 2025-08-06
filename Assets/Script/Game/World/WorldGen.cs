@@ -5,12 +5,12 @@ public class WorldGen
 {
     private static System.Random Random;
 
-    private static bool SpawnStaticEntity = true;
-    private static bool SpawnDynamicEntity = true;
-    private static bool Flat = false;
+    private static readonly bool SpawnStaticEntity = true;
+    private static readonly bool SpawnDynamicEntity = true;
+    private static readonly bool Flat = false;
     public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
     private const float StoneScale = 0.01f;
-    private const float DirtScale = 0.1f;
+    private const float DirtScale = 0.05f;
     private const float SandScale = 0.05f;
     private const float MarbleScale = 0.007f;
     private const float CaveScale = 0.06f;
@@ -76,7 +76,7 @@ public class WorldGen
                         localChunkY + 1 != chunkSize &&
                         World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-                        if (Random.NextDouble() <= 0.0002)
+                        if (Random.NextDouble() <= 0.002)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+2, z), SetPiece.LoadSetPieceFile("house_stone"));
                         }
@@ -262,17 +262,17 @@ public class WorldGen
                             {
                                 {
                                     double rng = Random.NextDouble();
-                                    if (rng <= 0.03)
+                                    if (rng <= 0.02)
                                     {
                                         entityData = Entity.GetChunkEntityData("tree", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);
                                     }
-                                    else if (rng <= 0.03)
+                                    else if (rng <= 0.02)
                                     {
                                         entityData = Entity.GetChunkEntityData("bush1", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);
                                     }
-                                    else if (rng <= 0.2)
+                                    else if (rng <= 0.03)
                                     {
                                         entityData = Entity.GetChunkEntityData("grass", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);
@@ -295,7 +295,7 @@ public class WorldGen
                             }
  
                         }
-                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.003)
+                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.0002)
                         {
                             entityPosition = new SVector3Int(x, y + 1, z);
                             if (Random.NextDouble() <= 0.5)

@@ -3,68 +3,24 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+public enum PathingStatus {Pathing, Reached, Stuck}
+
 public abstract class PathingModule : Module
 {
     // parameters 
-    private NPCMovementModule _npcMovementModule;
-    protected Transform Target;
-    public void SetTarget(Transform target)
-    {
-        Target = target; 
-    }
-    
+    protected Transform Target; 
+    protected MobStatusModule MobStatusModule;
     // const
-    private float _targetReachedInner;
-    private float _targetReachedOuter;
-    private float _pointReachDistance;
-    private float _repathInterval; 
-    private int _jumpSkipAmount;
-    
-    public PathingModule(
-        float targetReachedInner = 0.5f, 
-        float targetReachedOuter = 1.5f, 
-        float pointReachDistance = 0.45f, 
-        float repathInterval = 0.1f, 
-        int jumpSkipAmount = 1)
-    { 
-        _targetReachedInner = targetReachedInner;
-        _targetReachedOuter = targetReachedOuter;
-        _pointReachDistance = pointReachDistance;
-        _repathInterval = repathInterval;
-        _jumpSkipAmount = jumpSkipAmount;
-    }
-
-    public override void Initialize()
-    {
-        _npcMovementModule = Machine.GetModule<NPCMovementModule>();
-    }
-
-    public abstract bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode);
-    public abstract Vector3 GetTargetPosition(); 
-     
-      
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    private readonly float _targetReachDistance = 1.5f;
+    private readonly float _pointReachDistance = 0.45f;
+    private readonly float _pointLostDistance = 5;
+    private readonly float _repathInterval = 0.5f; 
+    private readonly int _jumpSkipAmount = 1; 
     
     // variables
     private bool _repathRoutine = false; 
     private bool _isPathFinding = false; 
-    private bool _moveOccupied = false;
-    private bool _targetMoved; 
-    private bool _targetReached = false;
+    private bool _targetMoved;  
     
     protected List<Node> Path;
     private List<Node> _pathQueued; 
@@ -78,82 +34,70 @@ public abstract class PathingModule : Module
     private Vector3 _selfPositionPrevious; 
     
     private bool _updateTargetPosition = false;
-    private bool _updateEntityPosition = false; 
+    private bool _updateSelfPosition = false;
+
+    protected int StuckCount;   
+    protected int RepathCount;   
     
-    private Vector3 _direction; 
+    public void SetTarget(Transform target)
+    {
+        Target = target; 
+        Path = null;
+        _nextPointQueued = -1;
+        MobStatusModule.PathingStatus = PathingStatus.Pathing;
+        MobStatusModule.Direction = Vector3.zero;
+        RepathCount = 0;
+        StuckCount = 0;
+        Repath();
+    }
 
-    public async void PassivePathFollow(float speed)
-    {  
-        if (!_moveOccupied)
+    public abstract bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode);
+    public abstract Vector3 GetTargetPosition(); 
+    public abstract void OnStuck(); 
+     
+    public override void Initialize()
+    {
+        MobStatusModule = Machine.GetModule<MobStatusModule>();
+    }
+
+    public override void Update()
+    {
+        if (MobStatusModule.PathingStatus == PathingStatus.Pathing)
         {
-            _moveOccupied = true;  
-            if (Path == null || _nextPoint >= Path.Count - 2)
+            if (!_repathRoutine) CheckRepathRoutine();
+
+            if (_updateSelfPosition)
             {
-                if (_nextPointQueued != -1)
-                {
-                    Path = _pathQueued; 
-                    _nextPoint = _nextPointQueued;
-                    _nextPointQueued = -1;
-                } else Repath();
-            } 
-            else if (Path != null)
-            {  
-                await Task.Delay((int)(1500 / speed)); // Convert seconds to milliseconds
-                if (Machine && _nextPoint < Path.Count -2)
-                {
-                    _nextPoint++;  
-                    Machine.transform.position = Utility.AddToVector(Path[_nextPoint].Position, 0, 0.1f, 0);
-                } else return;
-            }   
-            _moveOccupied = false; 
-        }
-    } 
+                _selfPositionPrevious = Machine.transform.position;
+                _updateSelfPosition = false;
+            }
 
-    public Vector3 GetNextDirection()
-    { 
-        
-        if (!_repathRoutine) CheckRepathRoutine();
- 
-        if (_updateEntityPosition)
-        { 
-            _selfPositionPrevious = Machine.transform.position;
-            _updateEntityPosition = false; 
-        }
+            if (_updateTargetPosition)
+            {
+                _targetPositionPrevious = GetTargetPosition();
+                _updateTargetPosition = false;
+            }
 
-        if (_updateTargetPosition) 
-        {
-            _targetPositionPrevious = GetTargetPosition();
-            _updateTargetPosition = false;
-        }
-        
-        _direction = Vector3.zero; 
+            _targetDistance = Vector3.Distance(Machine.transform.position, GetTargetPosition());
+            if (_targetDistance < _targetReachDistance)
+            {
+                MobStatusModule.PathingStatus = PathingStatus.Reached; 
+            }
 
-        _targetDistance = Vector3.Distance(Machine.transform.position, GetTargetPosition());
-        if (!_targetReached)
-        {   
-            _targetReached = _targetDistance < _targetReachedInner;
-        } else
-        {
-            Path = null;
-            _targetReached = _targetDistance < _targetReachedOuter;
-        }
-         
-        if (Path != null 
-        && !_targetReached 
-        && _nextPoint < Path.Count)
-        {
-            HandleMovePoint(); 
-        }
- 
-        if (_nextPointQueued != -1)
-        {
-            Path = _pathQueued; 
-            _nextPoint = _nextPointQueued;
-            _nextPointQueued = -1;
-            _targetPositionPrevious = GetTargetPosition();
-        }
+            if (Path != null 
+                && _nextPoint < Path.Count)
+            {
+                HandleMovePoint();
+            }
 
-        return _direction;
+            if (_nextPointQueued != -1)
+            {
+                Path = _pathQueued;
+                _nextPoint = _nextPointQueued;
+                _nextPointQueued = -1;
+                _targetPositionPrevious = GetTargetPosition();
+            }
+        }
     }
     
     private void HandleMovePoint()
@@ -161,7 +105,7 @@ public abstract class PathingModule : Module
         if (_nextPoint != Path.Count - 1)
         { 
             _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
-            if (_npcMovementModule.IsGrounded() && _nextPointDistance < _pointReachDistance)
+            if (MobStatusModule.IsGrounded && _nextPointDistance < _pointReachDistance)
             {
                 _nextPoint++;
             } 
@@ -194,21 +138,20 @@ public abstract class PathingModule : Module
                     _nextPoint++;
                 }
             } 
-            _direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
+            MobStatusModule.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
         } 
         else
         { 
-            _direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
+            MobStatusModule.Direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
         } 
     }
-     
  
     private async void CheckRepathRoutine()
     { 
         _repathRoutine = true;
         await Task.Delay((int)_repathInterval * 1000); 
  
-        if (_nextPointQueued == -1 && !_targetReached && !_isPathFinding )
+        if (_nextPointQueued == -1 && MobStatusModule.PathingStatus == PathingStatus.Pathing && !_isPathFinding )
         {
             _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > 2;  //should be less than inner player near
 
@@ -219,27 +162,38 @@ public abstract class PathingModule : Module
                 _updateTargetPosition = true;//! dont move
                 // _playerPositionPrevious = GetTargetPosition();
             }   
-            else if (_nextPoint != 1 && IsStuck())
+            else if (IsStuck())
             {
-                Repath();
+                OnStuck();
             }
         }   
-        _updateEntityPosition = true; 
+        _updateSelfPosition = true; 
         // _selfPositionPrevious = Machine.transform.position; 
 
         _repathRoutine = false;  
     }
- 
-    
+  
     private bool IsStuck()
-    { 
+    {
+        if (Path != null && Vector3.Distance(Machine.transform.position, Path[_nextPoint].Position) > _pointLostDistance)
+        {
+            return true;
+        }
         _selfMoveDistance = Vector2.Distance(
             new Vector2(_selfPositionPrevious.x, _selfPositionPrevious.z), 
             new Vector2(Machine.transform.position.x, Machine.transform.position.z)); 
-        if (_selfMoveDistance < 0.001f)
+        if (_selfMoveDistance < 0.002f)
         { 
-            return true;
+            StuckCount++;
+            if (StuckCount > 300)
+            { 
+                StuckCount = 0;
+                return true;
+            } 
+            return false;
         }
+
+        StuckCount = 0;
         return false;
     }
 
@@ -255,7 +209,7 @@ public abstract class PathingModule : Module
         try
         {  
             _pathQueued = await GetPath(); 
-            if (Machine.transform) _nextPointQueued = FindNearestPointEntity();
+            if (Machine.transform) _nextPointQueued = GetNeartestPoint();
         }
         catch (Exception ex)
         {
@@ -265,7 +219,7 @@ public abstract class PathingModule : Module
         _isPathFinding = false; 
     }
         
-    private int FindNearestPointEntity()
+    private int GetNeartestPoint()
     { 
         int nearestPoint = 0;
         float distance, nearestDistance;

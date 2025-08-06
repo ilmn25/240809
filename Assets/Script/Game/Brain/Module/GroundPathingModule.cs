@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class NPCPathingModule : PathingModule
+public class GroundPathingModule : PathingModule
 {
     private readonly int _height;
     private readonly int _jump;
@@ -12,25 +12,8 @@ public class NPCPathingModule : PathingModule
     private readonly int _roam;
     private readonly int _scan;
 
-    // 1 2 15 6 flea
-    public NPCPathingModule(
-        int height = 1,
-        int jump = 1,
-        int fall = 15,
-        int air = 3,
-        int roam = 15,
-        int scan = 7000,
-        float targetReachedInner = 0.5f, 
-        float targetReachedOuter = 1.5f, 
-        float pointReachDistance = 0.45f, 
-        float repathInterval = 0.1f, 
-        int jumpSkipAmount = 1)
-        : base(
-        targetReachedInner, 
-        targetReachedOuter, 
-        pointReachDistance, 
-        repathInterval, 
-        jumpSkipAmount)
+    // 1 2 15 6 flea 7k scans
+    public GroundPathingModule(int height = 1, int jump = 1, int fall = 15, int air = 3, int roam = 10, int scan = 500)
     {
         _height = height;
         _jump = jump;
@@ -44,11 +27,34 @@ public class NPCPathingModule : PathingModule
     {
         if (Target)
             return Target.position;
-
-        if (Path == null || Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
-            Repath();
         
         return Path == null? Vector3.down : Path[^1].Position;
+    }
+
+    public override void OnStuck()
+    {
+        if (Target)
+        {
+            RepathCount++;
+            if (RepathCount == 5)
+            {
+                MobStatusModule.PathingStatus = PathingStatus.Stuck;
+                MobStatusModule.Direction = Vector3.zero;
+                RepathCount = 0;
+            }
+            else if (MobStatusModule.Target == Target)
+                Repath();
+            else
+            {
+                MobStatusModule.PathingStatus = PathingStatus.Reached;
+                MobStatusModule.Direction = Vector3.zero;
+            }
+        }
+        else
+        {
+            MobStatusModule.PathingStatus = PathingStatus.Stuck;
+            MobStatusModule.Direction = Vector3.zero;
+        } 
     }
 
     protected override async Task<List<Node>> GetPath()

@@ -1,10 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-public class NPCAnimationModule : Module
+public class GroundAnimationModule : Module
 {
-    private GameObject _sprite;
-    private NPCMovementModule _npcMovementModule;
+    private Transform _spriteTransform;
+    private SpriteRenderer _spriteRenderer;
+    private MobStatusModule _mobStatusModule;
     private int _flipDirection;
     private float _nextTrailTimer = 0f;
     private Vector2Int _animDirection = Vector2Int.zero;
@@ -22,25 +23,29 @@ public class NPCAnimationModule : Module
 
     public override void Initialize()
     {
-        _sprite = Machine.transform.Find("sprite").gameObject;
-        _npcMovementModule = Machine.GetModule<NPCMovementModule>();
+        _spriteTransform = Machine.transform.Find("sprite");
+        _spriteRenderer = _spriteTransform.GetComponent<SpriteRenderer>();
+        _mobStatusModule = Machine.GetModule<MobStatusModule>();
 
-        _targetScale = _sprite.transform.localScale;
-        _originalScale = _sprite.transform.localScale;
+        _targetScale = _spriteTransform.localScale;
+        _originalScale = _spriteTransform.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
     }
 
-    public void HandleAnimationUpdate()
+    public override void Update()
     {
-        UpdateDirection();
-        HandleBounceAndTrail();
-        HandleFlipCheck();
-        HandleScaling();
-    }
+        if (_spriteRenderer.isVisible)
+        {
+            UpdateDirection();
+            HandleBounceAndTrail();
+            HandleFlipCheck();
+            HandleScaling();
+        } 
+    } 
 
     void UpdateDirection()
     {
-        Vector2 rawDirection = new Vector2(_npcMovementModule.GetDirection().x, _npcMovementModule.GetDirection().z);
+        Vector2 rawDirection = new Vector2(_mobStatusModule.Direction.x, _mobStatusModule.Direction.z);
         rawDirection.Normalize();
 
         if (rawDirection != Vector2.zero)
@@ -55,12 +60,12 @@ public class NPCAnimationModule : Module
 
     void HandleBounceAndTrail()
     {
-        bool isMoving = _npcMovementModule.GetSpeed() > 0.35f && _npcMovementModule.IsGrounded();
+        bool isMoving = _mobStatusModule.Direction != Vector3.zero;
 
         if (isMoving)
         {
             float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
-            _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, newY, _sprite.transform.localPosition.z);
+            _spriteTransform.localPosition = new Vector3(_spriteTransform.localPosition.x, newY, _spriteTransform.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
             {
@@ -71,7 +76,7 @@ public class NPCAnimationModule : Module
         }
         else
         {
-            _sprite.transform.localPosition = new Vector3(_sprite.transform.localPosition.x, 0, _sprite.transform.localPosition.z);
+            _spriteTransform.localPosition = new Vector3(_spriteTransform.localPosition.x, 0, _spriteTransform.localPosition.z);
         }
     }
 
@@ -94,11 +99,11 @@ public class NPCAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
+            _spriteTransform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _sprite.transform.localScale = _flatScale;
+                _spriteTransform.localScale = _flatScale;
                 _flipTimer = 0f;
                 _currentScaleState = 2;
             }
@@ -106,11 +111,11 @@ public class NPCAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _sprite.transform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
+            _spriteTransform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _sprite.transform.localScale = _targetScale;
+                _spriteTransform.localScale = _targetScale;
                 _currentScaleState = 0;
             }
         }

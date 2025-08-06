@@ -12,10 +12,10 @@ public partial class Entity
                 dictionary.Add("grass", Entity<ChunkEntityData>.Zero);
                 dictionary.Add("stage_hand", Entity<ChunkEntityData>.One);
                 dictionary.Add("slab", Entity<ChunkEntityData>.Zero);
-                dictionary.Add("snare_flea", new Entity<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("chito", new Entity<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("megumin", new Entity<NPCCED>(type: EntityType.Rigid));
-                dictionary.Add("yuuri", new Entity<NPCCED>(type: EntityType.Rigid));
+                dictionary.Add("snare_flea", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                dictionary.Add("chito", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                dictionary.Add("megumin", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                dictionary.Add("yuuri", new Entity<ChunkEntityData>(type: EntityType.Rigid));
         }
 
         public static void AddItem(string stringID)

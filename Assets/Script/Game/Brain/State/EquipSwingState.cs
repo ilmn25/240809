@@ -4,8 +4,8 @@ public class EquipSwingState : State
 {
     private PlayerStatusModule _playerStatusModule;
     private float _cooldownSpeed;
-    private Animator _animator;
-    
+    private string _sfx;
+    private Animator _animator; 
     public override void OnInitialize()
     {
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
@@ -16,7 +16,7 @@ public class EquipSwingState : State
     {
         _playerStatusModule.IsBusy = true;  
         _cooldownSpeed = PlayerStatusModule.GetSpeed();
-
+        _sfx = Inventory.CurrentItemData.Sfx;
         _animator.speed = 1f; // Reset speed for initial swing
         _animator.Play("EquipSwing", 0, 0f); // Play from beginning
     }
@@ -31,7 +31,7 @@ public class EquipSwingState : State
         {
             if (stateInfo.IsName("EquipSwing"))
             {
-                Audio.PlaySFX(Inventory.CurrentItemData.Sfx, 0.5f);
+                Audio.PlaySFX(_sfx, 0.5f);
                 _animator.speed = _cooldownSpeed;
                 _animator.Play("EquipSwingCooldown", 0, 0f);
             }

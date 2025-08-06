@@ -10,10 +10,10 @@ public class PathRandom
     {
         Vector3Int startPosition =
             NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
-
+        Vector3Int a = Node.RandomDirection(scanCount);
+        // Utility.Log(a);
         Vector3Int endPosition =
-            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + 
-                                                                     Node.RandomDirection() * 100));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + a));
 
         List<Node> openList = new List<Node>(); 
         HashSet<Vector3> closedList = new HashSet<Vector3>();
