@@ -89,12 +89,12 @@ public abstract class State
     public T GetModule<T>() where T : Module
     {
         return Machine.GetModule<T>();
+    } 
+    public bool IsCurrentState<T>() where T : State
+    {
+        return _stateCurrent is T;
     }
 
-    public Type GetCurrentStateType()
-    {
-        return _stateCurrent?.GetType();
-    }
 }
 
 class StateEmpty : State

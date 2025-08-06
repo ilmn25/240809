@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class NPCMovementModule : Module
+public class GroundMovementModule : Module
 {
-    public readonly float SpeedWalk;
+    private readonly float _speedWalk;
     private readonly float _speedRun;
     private readonly float _accelerationTime;
     private readonly float _decelerationTime;
@@ -14,7 +14,7 @@ public class NPCMovementModule : Module
     private readonly float _gravity;
     private readonly float _jumpVelocity;
     private readonly float _collisionRadius; 
-    public NPCMovementModule(
+    public GroundMovementModule(
         float speedWalk = 4f,
         float speedRun = 8f,
         float accelerationTime = 0.3f,
@@ -24,7 +24,7 @@ public class NPCMovementModule : Module
         float jumpVelocity = 12f,
         float collisionRadius = 0.3f)
     {
-        SpeedWalk = speedWalk;
+        _speedWalk = speedWalk;
         _speedRun = speedRun;
         _accelerationTime = accelerationTime;
         _decelerationTime = decelerationTime;
@@ -33,25 +33,14 @@ public class NPCMovementModule : Module
         _jumpVelocity = jumpVelocity;
         _collisionRadius = collisionRadius;
     }
-    public Vector3 GetDirection()
+
+    public override void Initialize()
     {
-        return _direction;
+        _mobStatusModule = Machine.GetModule<MobStatusModule>();
     }
-    public float GetSpeed()
-    {
-        return _speedCurrent;
-    }
-    public Boolean IsGrounded()
-    {
-        return _isGrounded;
-    }
-    
-    
-    
-    
-    // variables
-    private bool _isGrounded = false;
-    
+ 
+    private MobStatusModule _mobStatusModule;
+     
     private float _speedCurrent;
     private float _speedTarget;
     private float _speedAdjust;
@@ -59,7 +48,6 @@ public class NPCMovementModule : Module
     private Vector3 _newPosition;
     private Vector3 _previousPosition;
     
-    private Vector3 _direction = Vector3.zero;
     private Vector3 _directionBuffer = Vector3.zero;
     
     private Vector3 _velocity = Vector3.zero;
@@ -79,32 +67,33 @@ public class NPCMovementModule : Module
         _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
     }
 
-    public void HandleMovementUpdate(Vector3 direction)
-    {
-        _direction = direction;
+    public override void Update()
+    { 
         if (Machine.transform.position.y < -1) Machine.transform.position = Utility.AddToVector(Machine.transform.position, 0, 100, 0);
-
+        
+        if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) return;
+        
         // _deltaTime = GameSystem._deltaTime;
         _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;
 
         HandleJump();
 
-        if (_direction != Vector3.zero)
+        if (_mobStatusModule.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = _isGrounded ? SpeedWalk : _speedRun;
+            _speedTarget = _mobStatusModule.IsGrounded ? _speedWalk : _speedRun;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / _accelerationTime);
-            _speedAdjust = (_direction.x != 0 && _direction.z != 0) ? 1 / 1.25f : 1; 
+            _speedAdjust = (_mobStatusModule.Direction.x != 0 && _mobStatusModule.Direction.z != 0) ? 1 / 1.25f : 1; 
 
-            _newPosition.x += _direction.x * _speedCurrent * _deltaTime * _speedAdjust;
-            _newPosition.z += _direction.z * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.x += _mobStatusModule.Direction.x * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.z += _mobStatusModule.Direction.z * _speedCurrent * _deltaTime * _speedAdjust;
 
             if (!IsMovable(_newPosition))
             {
                 HandleObstacle(_newPosition);
             } 
-            _directionBuffer = _direction;
+            _directionBuffer = _mobStatusModule.Direction;
         }
         else if (_speedCurrent != 0)
         {
@@ -121,16 +110,16 @@ public class NPCMovementModule : Module
             }
         }
  
-        HandleMove(); 
+        HandleMove();  
     } 
 
     private void HandleJump()
     { 
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
-        if (_isGrounded && _direction.y > 0)
+        if (_mobStatusModule.IsGrounded && _mobStatusModule.Direction.y > 0)
         {
             _velocity.y = _jumpVelocity; 
-            _isGrounded = false;
+            _mobStatusModule.IsGrounded = false;
         }
     }
  
@@ -138,20 +127,20 @@ public class NPCMovementModule : Module
     {
         _newPosition = Machine.transform.position;
         //! go any possible direction when going diagonally against a wall
-        if (_direction.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
+        if (_mobStatusModule.Direction.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
         {
             _newPosition = new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z);
         }
-        else if (_direction.z != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
+        else if (_mobStatusModule.Direction.z != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
         {
             _newPosition = new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z);
         }
         else
         {
             //! slide against wall if possible
-            if (_direction.x != 0)
+            if (_mobStatusModule.Direction.x != 0)
             {
-                _testPosition = Machine.transform.position.x + _slideDegree * _direction.x * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.x + _slideDegree * _mobStatusModule.Direction.x * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionA.z += -1 * _speedCurrent * _deltaTime;
@@ -167,7 +156,7 @@ public class NPCMovementModule : Module
             }
             else
             {
-                _testPosition = Machine.transform.position.z + _slideDegree * _direction.z * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.z + _slideDegree * _mobStatusModule.Direction.z * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionA.x += -1 * _speedCurrent * _deltaTime;
@@ -209,7 +198,7 @@ public class NPCMovementModule : Module
         _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         { 
-            if (_velocity.y < 0) _isGrounded = true;
+            if (_velocity.y < 0) _mobStatusModule.IsGrounded = true;
             _velocity.y = 0;
             Machine.transform.position = _newPosition;
         } 
@@ -219,7 +208,7 @@ public class NPCMovementModule : Module
         } 
         
         
-        if (_direction != Vector3.zero && _previousPosition == Machine.transform.position)
+        if (_mobStatusModule.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
         {
             Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
             if (IsMovable(tempPosition)) Machine.transform.position = tempPosition;

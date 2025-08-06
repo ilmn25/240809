@@ -90,13 +90,19 @@ public class Node
         new (1, -1, 1) //  down-right-backward
     };
     
-    public static Vector3 RandomDirection()
+    public static Vector3Int RandomDirection(int dist)
     {
-        bool isX = Random.Range(0, 2) == 0; // true or false
-
-        float x = isX ? Random.Range(0, 2) * 2 - 1 : Random.Range(-1f, 1f);  
-        float z = !isX ? Random.Range(0, 2) * 2 - 1 : Random.Range(-1f, 1f); 
-
-        return new Vector3(x, -1, z);
+        if (Random.value > 0.5f)
+        {
+            if (Random.value > 0.5f)
+                return new Vector3Int(dist, -1, Random.Range(-dist, dist+1));
+            
+            return new Vector3Int(-dist, -1, Random.Range(-dist, dist+1));   
+        }
+        
+        if (Random.value > 0.5f)
+            return new Vector3Int(Random.Range(-dist, dist+1), -1, dist);
+        
+        return new Vector3Int(Random.Range(-dist, dist+1), -1, -dist);   
     }
 }
