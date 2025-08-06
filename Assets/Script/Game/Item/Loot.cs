@@ -21,6 +21,15 @@ public class Loot
         loot.Add(1, "wood");
         loot.Add(0.5f, "wood");
         loot.Add(0.5f, "wood");
+        
+        loot = CreateTable("megumin");
+        loot.Add(1, "marble"); 
+        loot = CreateTable("chito");
+        loot.Add(1, "marble"); 
+        loot = CreateTable("snare_flea");
+        loot.Add(1, "marble"); 
+        loot = CreateTable("yuuri");
+        loot.Add(1, "marble"); 
     }
 
     public static Loot CreateTable(string id)

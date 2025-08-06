@@ -15,7 +15,7 @@ public interface IEntity
     public ChunkEntityData GetChunkEntityData(string stringID, SVector3Int position);
 }
 
-public partial class Entity<T> : IEntity where T : ChunkEntityData, new()
+public class Entity<T> : IEntity where T : ChunkEntityData, new()
 {
     public Vector3Int Bounds { get; set; }
     public EntityType Type { get; set; }

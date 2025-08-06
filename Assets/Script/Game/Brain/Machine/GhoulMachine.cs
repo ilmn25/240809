@@ -12,9 +12,9 @@ public class NPCCED : ChunkEntityData
 public class GhoulMachine : EntityMachine, IHitBox
 { 
     public override void OnInitialize()
-    {
+    {   
         AddState(new GhoulState()); 
-        AddModule(new MobStatusModule(HitboxType.Enemy,100,1));
+        AddModule(new MobStatusModule(HitboxType.Enemy,100,1, "npc_hurt", "player_death"));
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule()); 

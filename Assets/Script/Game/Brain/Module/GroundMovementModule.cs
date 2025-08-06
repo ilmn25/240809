@@ -6,29 +6,45 @@ using UnityEngine;
 
 public class GroundMovementModule : Module
 {
-    private readonly float _speedWalk;
-    private readonly float _speedRun;
+    private readonly float _speed;
+    private readonly float _speedAir;
     private readonly float _accelerationTime;
-    private readonly float _decelerationTime;
-    private readonly float _slideDegree; //against wall
+    private readonly float _decelerationTime; 
     private readonly float _gravity;
     private readonly float _jumpVelocity;
-    private readonly float _collisionRadius; 
+    private readonly float _collisionRadius;  
+    private const float SlideDegree = 0.3f;
+    
+    private MobStatusModule _mobStatusModule;
+     
+    private float _speedCurrent;
+    private float _speedTarget;
+    private float _speedAdjust;
+    private Vector3 _newPosition;
+    private Vector3 _previousPosition;
+    private Vector3 _directionBuffer = Vector3.zero;
+    private Vector3 _velocity = Vector3.zero;
+    private float _deltaTime; 
+    private float _testPosition;
+    private Vector3 _testPositionA;
+    private Vector3 _testPositionB;
+    private Vector3 _tempPosition;
+    
+    private Collider[] _colliderArray = new Collider[1];
+    
     public GroundMovementModule(
-        float speedWalk = 4f,
-        float speedRun = 8f,
+        float speed = 3f,
+        float speedAir = 7f,
         float accelerationTime = 0.3f,
         float decelerationTime = 0.08f,
-        float slideDegree = 0.3f,
         float gravity = -40f,
-        float jumpVelocity = 12f,
+        float jumpVelocity = 10f,
         float collisionRadius = 0.3f)
     {
-        _speedWalk = speedWalk;
-        _speedRun = speedRun;
+        _speed = speed;
+        _speedAir = speedAir;
         _accelerationTime = accelerationTime;
         _decelerationTime = decelerationTime;
-        _slideDegree = slideDegree;
         _gravity = gravity;
         _jumpVelocity = jumpVelocity;
         _collisionRadius = collisionRadius;
@@ -38,30 +54,7 @@ public class GroundMovementModule : Module
     {
         _mobStatusModule = Machine.GetModule<MobStatusModule>();
     }
- 
-    private MobStatusModule _mobStatusModule;
-     
-    private float _speedCurrent;
-    private float _speedTarget;
-    private float _speedAdjust;
-    
-    private Vector3 _newPosition;
-    private Vector3 _previousPosition;
-    
-    private Vector3 _directionBuffer = Vector3.zero;
-    
-    private Vector3 _velocity = Vector3.zero;
-    
-    private float _deltaTime; 
-    
-    private float _testPosition;
-    private Vector3 _testPositionA;
-    private Vector3 _testPositionB;
 
-    private Vector3 _tempPosition;
-    
-    private Collider[] _colliderArray = new Collider[1];
-    
     public void KnockBack(Vector3 position, float force, bool isAway)
     {
         _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
@@ -82,7 +75,7 @@ public class GroundMovementModule : Module
         if (_mobStatusModule.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = _mobStatusModule.IsGrounded ? _speedWalk : _speedRun;
+            _speedTarget = _mobStatusModule.IsGrounded ? _speed : _speedAir;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / _accelerationTime);
             _speedAdjust = (_mobStatusModule.Direction.x != 0 && _mobStatusModule.Direction.z != 0) ? 1 / 1.25f : 1; 
 
@@ -140,7 +133,7 @@ public class GroundMovementModule : Module
             //! slide against wall if possible
             if (_mobStatusModule.Direction.x != 0)
             {
-                _testPosition = Machine.transform.position.x + _slideDegree * _mobStatusModule.Direction.x * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.x + SlideDegree * _mobStatusModule.Direction.x * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionA.z += -1 * _speedCurrent * _deltaTime;
@@ -156,7 +149,7 @@ public class GroundMovementModule : Module
             }
             else
             {
-                _testPosition = Machine.transform.position.z + _slideDegree * _mobStatusModule.Direction.z * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.z + SlideDegree * _mobStatusModule.Direction.z * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionA.x += -1 * _speedCurrent * _deltaTime;

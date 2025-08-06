@@ -15,8 +15,8 @@ public class GroundAnimationModule : Module
     private const float TrailFrequency = 0.5f;
     private const float FlipDuration = 0.06f;
 
-    private int _currentScaleState = 0;
-    private float _flipTimer = 0f;
+    private int _currentScaleState;
+    private float _flipTimer;
     private Vector3 _originalScale;
     private Vector3 _flatScale;
     private Vector3 _targetScale;

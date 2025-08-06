@@ -13,7 +13,13 @@ public class GroundPathingModule : PathingModule
     private readonly int _scan;
 
     // 1 2 15 6 flea 7k scans
-    public GroundPathingModule(int height = 1, int jump = 1, int fall = 15, int air = 3, int roam = 10, int scan = 500)
+    public GroundPathingModule(
+        int height = 1, 
+        int jump = 1,
+        int fall = 15, 
+        int air = 3, 
+        int roam = 10,
+        int scan = 500)
     {
         _height = height;
         _jump = jump;
@@ -36,7 +42,7 @@ public class GroundPathingModule : PathingModule
         if (Target)
         {
             RepathCount++;
-            if (RepathCount == 5)
+            if (RepathCount == MaxRepathCount)
             {
                 MobStatusModule.PathingStatus = PathingStatus.Stuck;
                 MobStatusModule.Direction = Vector3.zero;

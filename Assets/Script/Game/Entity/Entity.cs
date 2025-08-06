@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public partial class Entity 
+public class Entity 
 {
         public static Dictionary<string, IEntity> dictionary = new Dictionary<string, IEntity>();
 

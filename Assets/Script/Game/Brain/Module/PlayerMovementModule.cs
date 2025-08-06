@@ -27,13 +27,13 @@ public class PlayerMovementModule : Module
     private float _cosAngle;
     private float _sinAngle;
     
-    private const float SpeedWalk = 4f;
-    private const float SpeedRun = 8f;
+    private const float SpeedWalk = 3f;
+    private const float SpeedRun = 5f;
     private const float AccelerationTime = 0.2f; 
     private const float DecelerationTime = 0.08f; 
     private const float SlideDegree = 0.3f; 
     private const float Gravity = -40f;
-    public const float JumpVelocity = 12f;
+    private const float JumpVelocity = 12f;
     private const float HoldVelocity = 0.05f;
     private const float ClampVelocity = 10f;
     private const float JumpGraceTime = 0.1f; 
