@@ -9,9 +9,9 @@ public class WorldGen
     private static readonly bool SpawnDynamicEntity = true;
     private static readonly bool Flat = false;
     public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
-    private const float StoneScale = 0.01f;
-    private const float DirtScale = 0.05f;
-    private const float SandScale = 0.05f;
+    private const float StoneScale = 0.02f;
+    private const float DirtScale = 0.1f;
+    private const float SandScale = 0.1f;
     private const float MarbleScale = 0.007f;
     private const float CaveScale = 0.06f;
     private const int WallHeight = 5;
@@ -76,15 +76,15 @@ public class WorldGen
                         localChunkY + 1 != chunkSize &&
                         World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-                        if (Random.NextDouble() <= 0.002)
+                        if (Random.NextDouble() <= 0.0002)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+2, z), SetPiece.LoadSetPieceFile("house_stone"));
                         }
-                        else if (Random.NextDouble() <= 0.002)
+                        else if (Random.NextDouble() <= 0.001)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), SetPiece.LoadSetPieceFile("tree_a"));
                         }
-                        else if (Random.NextDouble() <= 0.002)
+                        else if (Random.NextDouble() <= 0.001)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), SetPiece.LoadSetPieceFile("tree_b")); 
                         } 

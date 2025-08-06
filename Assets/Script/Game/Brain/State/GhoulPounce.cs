@@ -5,7 +5,7 @@ public class GhoulPounce : State
 {
     private MobStatusModule _mobStatusModule;
     private readonly ProjectileInfo _projectileInfo = 
-        new SwingProjectileInfo(10, 18, 3, 1.1f, 1.5f);
+        new SwingProjectileInfo(10, 18, 3, 1.1f, 0.5f);
 
     private int _delay = 0;
     public override void OnInitialize()

@@ -18,30 +18,13 @@ public class EquipState : State
         AddState(new StateEmpty(), true);
         AddState(new EquipSwingState());
         AddState(new EquipShootState());
+        AddState(new EquipSelectState());
     }
 
     public override void OnUpdateState()
-    { 
-        Vector3 mousePos = Input.mousePosition;
-        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
-        Vector2 direction = mousePos - screenCenter;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    {
+        TrackMouse();
 
-        if (angle > 90)
-            angle = 180 - angle;
-        else if (angle < -90)
-            angle = -angle - 180;
-
-        float z = Mathf.Lerp(-0.45f, 0.45f, (angle + 90) / 180);
-        if (z is > 0f and <= 0.12f)
-            z = 0.12f;
-        else if (z is < 0f and >= -0.11f)
-            z = -0.11f;
-        // float angleX = (Mathf.Lerp(0, 90, Math.Abs(angle) / 45) + 360) % 360;
-        // Normalize angle to 0–360
-        _toolTrack.localPosition = new Vector3(0, 0.3f, z);
-        _toolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
-        
         if (!GUI.Active)
         {
             switch (Inventory.CurrentItemData?.Type)
@@ -79,7 +62,30 @@ public class EquipState : State
                     }
                     break;
             } 
-        }  
+        }
+    }
+
+    private void TrackMouse()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
+        Vector2 direction = mousePos - screenCenter;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        if (angle > 90)
+            angle = 180 - angle;
+        else if (angle < -90)
+            angle = -angle - 180;
+
+        float z = Mathf.Lerp(-0.45f, 0.45f, (angle + 90) / 180);
+        if (z is > 0f and <= 0.12f)
+            z = 0.12f;
+        else if (z is < 0f and >= -0.11f)
+            z = -0.11f;
+        // float angleX = (Mathf.Lerp(0, 90, Math.Abs(angle) / 45) + 360) % 360;
+        // Normalize angle to 0–360
+        _toolTrack.localPosition = new Vector3(0, 0.3f, z);
+        _toolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
     }
 
     private void Animate()
@@ -97,6 +103,9 @@ public class EquipState : State
 
     private void Attack()
     {
+        if (Inventory.CurrentItemData.Ammo != null && 
+            Inventory.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
+        
         Vector3 dest = Control.MouseTarget ?
             Control.MouseTarget.transform.position + Vector3.up * 0.55f :
             Control.MousePosition + Vector3.up * 0.15f;
@@ -113,6 +122,8 @@ public class EquipState : State
             dest,
             Inventory.CurrentItemData.ProjectileInfo,
             HitboxType.Passive);
+        
+        Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);
     }
 
     
@@ -126,6 +137,7 @@ public class EquipState : State
             _toolSprite.GetComponent<SpriteRenderer>().sprite = 
                 Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
             _toolSprite.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
+            SetState<EquipSelectState>();
         } 
     }
 }

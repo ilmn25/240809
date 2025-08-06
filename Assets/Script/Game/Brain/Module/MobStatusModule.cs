@@ -6,12 +6,20 @@ public class MobStatusModule : StatusModule
     public PathingStatus PathingStatus = PathingStatus.Pathing;
     public Vector3 Direction = Vector3.zero;
     public bool IsGrounded = false;
-    
-    public MobStatusModule(HitboxType hitBoxType, float health, float defense) : base(hitBoxType, health, defense) { }
+
+    private readonly string _hurtSfx;
+    private readonly string _deathSfx;
+
+    public MobStatusModule(HitboxType hitBoxType, float health, float defense, string hurtSfx, string deathSfx) : base(
+        hitBoxType, health, defense)
+    {
+        _hurtSfx = hurtSfx;
+        _deathSfx = deathSfx;
+    }
 
     protected override void OnHit(Projectile projectile)
     {
-        Audio.PlaySFX("npc_hurt", 0.8f);
+        Audio.PlaySFX(_hurtSfx, 0.4f);
         Target = Game.Player.transform;
         PathingStatus = PathingStatus.Reached;
         Machine.GetModule<GroundMovementModule>().KnockBack(projectile.transform.position, projectile.Info.Knockback, true);
@@ -19,8 +27,8 @@ public class MobStatusModule : StatusModule
 
     protected override void OnDeath()
     {
-        Audio.PlaySFX("player_die", 0.4f);
-        Entity.SpawnItem("sand", Vector3Int.FloorToInt(Machine.transform.position));
+        Audio.PlaySFX(_deathSfx, 0.8f);
+        Loot.Gettable(((EntityMachine)Machine).entityData.stringID).Spawn(Machine.transform.position);
         ((EntityMachine)Machine).Delete();
     }
 }

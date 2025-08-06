@@ -7,24 +7,23 @@ public enum PathingStatus {Pathing, Reached, Stuck}
 
 public abstract class PathingModule : Module
 {
-    // parameters 
     protected Transform Target; 
     protected MobStatusModule MobStatusModule;
-    // const
-    private readonly float _targetReachDistance = 1.5f;
-    private readonly float _pointReachDistance = 0.45f;
-    private readonly float _pointLostDistance = 5;
-    private readonly float _repathInterval = 0.5f; 
-    private readonly int _jumpSkipAmount = 1; 
-    
-    // variables
-    private bool _repathRoutine = false; 
-    private bool _isPathFinding = false; 
+
+    private const float TargetReachDistance = 1.5f;
+    private const float PointReachDistance = 0.45f;
+    private const float PointLostDistance = 5;
+    private const float RepathInterval = 0.5f;
+    private const int JumpSkipAmount = 1;
+    private const float SelfMovedDistance = 0.002f;
+
+    private bool _repathRoutine; 
+    private bool _isPathFinding; 
     private bool _targetMoved;  
     
     protected List<Node> Path;
     private List<Node> _pathQueued; 
-    private int _nextPoint = 0;
+    private int _nextPoint;
     private int _nextPointQueued = -1;
     
     private float _nextPointDistance; 
@@ -33,12 +32,16 @@ public abstract class PathingModule : Module
     private Vector3 _targetPositionPrevious;
     private Vector3 _selfPositionPrevious; 
     
-    private bool _updateTargetPosition = false;
-    private bool _updateSelfPosition = false;
+    private bool _updateTargetPosition;
+    private bool _updateSelfPosition;
 
-    protected int StuckCount;   
-    protected int RepathCount;   
-    
+    private int _stuckCount;   
+    protected int RepathCount;
+ 
+ 
+
+    protected const int MaxRepathCount = 5;   
+    private const int MaxStuckCount = 250;    
     public void SetTarget(Transform target)
     {
         Target = target; 
@@ -47,7 +50,7 @@ public abstract class PathingModule : Module
         MobStatusModule.PathingStatus = PathingStatus.Pathing;
         MobStatusModule.Direction = Vector3.zero;
         RepathCount = 0;
-        StuckCount = 0;
+        _stuckCount = 0;
         Repath();
     }
 
@@ -79,7 +82,7 @@ public abstract class PathingModule : Module
             }
 
             _targetDistance = Vector3.Distance(Machine.transform.position, GetTargetPosition());
-            if (_targetDistance < _targetReachDistance)
+            if (_targetDistance < TargetReachDistance)
             {
                 MobStatusModule.PathingStatus = PathingStatus.Reached; 
             }
@@ -105,7 +108,7 @@ public abstract class PathingModule : Module
         if (_nextPoint != Path.Count - 1)
         { 
             _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
-            if (MobStatusModule.IsGrounded && _nextPointDistance < _pointReachDistance)
+            if (MobStatusModule.IsGrounded && _nextPointDistance < PointReachDistance)
             {
                 _nextPoint++;
             } 
@@ -118,7 +121,7 @@ public abstract class PathingModule : Module
                     _nextPoint++;
                 }
 
-                int potentialSkipPoint = _nextPoint + _jumpSkipAmount;
+                int potentialSkipPoint = _nextPoint + JumpSkipAmount;
                 if (potentialSkipPoint < Path.Count - 1 
                 && !Path[potentialSkipPoint].IsFloat 
                 && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[_nextPoint].Position.y))
@@ -133,7 +136,7 @@ public abstract class PathingModule : Module
                     Vector2.Distance(
                         new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
                         new Vector2(Machine.transform.position.x, Machine.transform.position.z)
-                    ) < _pointReachDistance))
+                    ) < PointReachDistance))
                 {
                     _nextPoint++;
                 }
@@ -149,11 +152,11 @@ public abstract class PathingModule : Module
     private async void CheckRepathRoutine()
     { 
         _repathRoutine = true;
-        await Task.Delay((int)_repathInterval * 1000); 
+        await Task.Delay((int)RepathInterval * 1000); 
  
         if (_nextPointQueued == -1 && MobStatusModule.PathingStatus == PathingStatus.Pathing && !_isPathFinding )
         {
-            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > 2;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > TargetReachDistance;  //should be less than inner player near
 
             // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             if (_targetMoved)
@@ -175,25 +178,25 @@ public abstract class PathingModule : Module
   
     private bool IsStuck()
     {
-        if (Path != null && Vector3.Distance(Machine.transform.position, Path[_nextPoint].Position) > _pointLostDistance)
+        if (Path != null && Vector3.Distance(Machine.transform.position, Path[_nextPoint].Position) > PointLostDistance)
         {
             return true;
         }
         _selfMoveDistance = Vector2.Distance(
             new Vector2(_selfPositionPrevious.x, _selfPositionPrevious.z), 
             new Vector2(Machine.transform.position.x, Machine.transform.position.z)); 
-        if (_selfMoveDistance < 0.002f)
+        if (_selfMoveDistance < SelfMovedDistance)
         { 
-            StuckCount++;
-            if (StuckCount > 300)
+            _stuckCount++;
+            if (_stuckCount > MaxStuckCount)
             { 
-                StuckCount = 0;
+                _stuckCount = 0;
                 return true;
             } 
             return false;
         }
 
-        StuckCount = 0;
+        _stuckCount = 0;
         return false;
     }
 
