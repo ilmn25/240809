@@ -10,7 +10,7 @@ public class ProjectileInfo
     public float CritChance;
     public string Effects;
     public ProjectileClass CLass; 
-    public Sprite Sprite = null;
+    public string Sprite;
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }

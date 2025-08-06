@@ -34,7 +34,7 @@ public class GroundMovementModule : Module
     
     public GroundMovementModule(
         float speed = 3f,
-        float speedAir = 7f,
+        float speedAir = 5f,
         float accelerationTime = 0.3f,
         float decelerationTime = 0.08f,
         float gravity = -40f,

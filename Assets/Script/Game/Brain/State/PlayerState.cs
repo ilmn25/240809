@@ -1,20 +1,24 @@
-
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
+
 
 public class PlayerState : State
 {
-    public override void OnEnterState()
+    private PlayerStatusModule _playerStatusModule;
+    public override void OnInitialize()
     {
-        AddState(new PlayerActiveState(), false); 
-        AddState(new StateEmpty(), true); 
+        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
+        Inventory.SlotUpdate += EventSlotUpdate;
+        AddState(new StateEmpty(), true);
+        AddState(new EquipSwingState());
+        AddState(new EquipShootState());
+        AddState(new EquipSelectState());
     }
 
-    public override void OnUpdateState()
+    private void HandleInput()
     {
-        if (Game.GameState == GameState.Playing)
-            SetState<PlayerActiveState>();
-        else
-            SetState<StateEmpty>();
         
         if (Machine.transform.position.y < -50)
         {
@@ -29,4 +33,100 @@ public class PlayerState : State
         if (Input.GetKeyDown(KeyCode.L)) 
             Entity.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
     }
+    
+    public override void OnUpdateState()
+    {
+        HandleInput(); 
+        if (!GUI.Active)
+        {
+            switch (Inventory.CurrentItemData?.Type)
+            {
+                case ItemType.Tool:
+                    if (Inventory.CurrentItemData.MiningPower != 0 && 
+                        Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                        Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
+                    {
+                        PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionPrimary.Key()) 
+                            PlayerTerraformModule.HandleMapBreak(); 
+                    } 
+                    if (!_playerStatusModule.IsBusy && 
+                        (Control.Inst.ActionPrimary.Key() ||
+                         Control.Inst.DigUp.Key() ||
+                         Control.Inst.DigDown.Key()))
+                    {
+                        if (Inventory.CurrentItemData.Ammo != null && 
+                            Inventory.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
+                        Attack();
+                        Animate(); 
+                        if (Inventory.CurrentItemData.Ammo != null) Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);
+                    }
+ 
+                    break;
+                
+                case ItemType.Block: 
+                    if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                        Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
+                    {
+                        PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
+                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionSecondary.Key())
+                        {
+                            Animate();
+                            PlayerTerraformModule.HandleMapPlace();
+                        }
+                    }
+                    break;
+            } 
+        }
+    }
+ 
+
+    private void Animate()
+    {
+        switch (Inventory.CurrentItemData.Gesture)
+        {
+            case ItemGesture.Swing:
+                SetState<EquipSwingState>();
+                break;
+            case ItemGesture.Shoot:
+                SetState<EquipShootState>();
+                break;
+        }
+    }
+
+    private void Attack()
+    { 
+        Vector3 dest = Control.MouseTarget ?
+            Control.MouseTarget.transform.position + Vector3.up * 0.55f :
+            Control.MousePosition + Vector3.up * 0.15f;
+        
+        // Use ToolTrack's global facing direction, flattened to horizontal
+        Vector3 direction = _playerStatusModule.SpriteToolTrack.right;
+        if (_playerStatusModule.SpriteToolTrack.lossyScale.x < 0f) 
+            direction *= -1;
+        direction.y = 0;
+        direction.Normalize();
+        
+        // Offset the spawn origin based on that direction
+        Projectile.Spawn(_playerStatusModule.SpriteToolTrack.position + 
+                         direction * Inventory.CurrentItemData.HoldoutOffset,
+            dest,
+            Inventory.CurrentItemData.ProjectileInfo,
+            HitboxType.Passive);
+    }
+    
+    public void EventSlotUpdate()
+    {
+        if (Inventory.CurrentItemData == null)
+            _playerStatusModule.SpriteTool.gameObject.SetActive(false);
+        else
+        {
+            _playerStatusModule.SpriteTool.gameObject.SetActive(true);
+            _playerStatusModule.SpriteToolRenderer.sprite = 
+                Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
+            _playerStatusModule.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
+            SetState<EquipSelectState>();
+        } 
+    }
 }
+  

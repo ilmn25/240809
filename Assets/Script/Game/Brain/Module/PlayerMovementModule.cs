@@ -27,7 +27,7 @@ public class PlayerMovementModule : Module
     private float _cosAngle;
     private float _sinAngle;
     
-    private const float SpeedWalk = 3f;
+    private const float SpeedWalk = 4f;
     private const float SpeedRun = 5f;
     private const float AccelerationTime = 0.2f; 
     private const float DecelerationTime = 0.08f; 
@@ -64,8 +64,9 @@ public class PlayerMovementModule : Module
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>(); 
     }
 
-    public void HandleMovementUpdate()
+    public override void Update()
     {  
+        if (Game.GameState != GameState.Playing) return;
         
         _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;

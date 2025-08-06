@@ -95,10 +95,10 @@ public class Inventory
     { 
         _currentKey = CalculateKey();
         CurrentItem = Storage[_currentKey];
-
+        Item itemData = CurrentItemData;
         CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
-        
-        SlotUpdate?.Invoke();
+        if (itemData != CurrentItemData)
+            SlotUpdate?.Invoke();
         GUIStorage.RefreshCursorSlot();
     }
 

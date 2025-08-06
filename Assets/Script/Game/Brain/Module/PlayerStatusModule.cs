@@ -10,10 +10,17 @@ public class PlayerStatusModule : StatusModule
     public float AirTime;
     public bool IsBusy = false;
     public bool Invincibility = false;
-    
+     
+    public Vector3 TargetScreenDir;
+    public Transform Sprite;
+    public Transform SpriteChar;
+    public SpriteRenderer SpriteCharRenderer;
+    public Transform SpriteToolTrack;
+    public Transform SpriteTool;
+    public SpriteRenderer SpriteToolRenderer; 
     public static PlayerMovementModule _PlayerMovementModule;
 
-    public PlayerStatusModule(HitboxType hitBoxType) : base(hitBoxType, PlayerData.Inst.health, 0)
+    public PlayerStatusModule() : base(HitboxType.Friendly, PlayerData.Inst.health, 0)
     { 
         Mana = PlayerData.Inst.mana;
         Sanity = PlayerData.Inst.sanity;
@@ -24,11 +31,20 @@ public class PlayerStatusModule : StatusModule
 
     public override void Initialize()
     {
+        Sprite = Machine.transform.Find("sprite");
+        SpriteChar = Sprite.Find("char");
+        SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
+        SpriteToolTrack = Sprite.transform.Find("tool_track");
+        SpriteTool = SpriteToolTrack.Find("tool");
+        SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>();
+        
         _PlayerMovementModule = Machine.GetModule<PlayerMovementModule>();
     }
 
     protected override void OnUpdate()
     {
+        TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+        
         if (!_PlayerMovementModule.IsGrounded && _PlayerMovementModule.Velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)

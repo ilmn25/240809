@@ -29,13 +29,18 @@ public class Projectile : MonoBehaviour
         if (!projectile.spriteRenderer)
             projectile.spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         
-        projectile.transform.position = origin;
+        projectile.transform.position = origin; 
         projectile.Info = info; 
         projectile.Target = target; 
         projectile.Destination = dest;
-        projectile.Direction = (dest - origin).normalized;
-        projectile.transform.rotation = ViewPort.CurrentRotation; 
-        projectile.spriteRenderer.sprite = info.Sprite;
+        projectile.Direction = (dest - origin).normalized; 
+        
+        Vector3 direction =  projectile.Direction;
+        direction.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
+        projectile.transform.rotation = rotation * Quaternion.Euler(90, -90, 0); 
+
+        projectile.spriteRenderer.sprite = Cache.LoadSprite("sprite/" + info.Sprite);
         projectile.Info.OnSpawn(projectile); 
     }
  

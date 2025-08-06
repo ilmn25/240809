@@ -16,6 +16,7 @@ public partial class Item
         AddBlockDefinition("backroom",10,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
         AddBlockDefinition("stone",  8, 2, "dig_stone"); 
         AddBlockDefinition("wood", 6, 2, "dig_stone");
+        AddBlockDefinition("bullet", 6, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
 
         AddToolDefinition(
             stringID: "sword",
@@ -37,10 +38,21 @@ public partial class Item
         );
 
         AddToolDefinition(
+            stringID: "spear",
+            gesture: ItemGesture.Swing,
+            speed: 0.3f,
+            projectileInfo: new RangedProjectileInfo("spear",25, 10, 10, 10000, 130, 0.1f, 1),
+            ammo: "spear",
+            materials: new Dictionary<string, int> { { "wood", 1 } },
+            holdOutOffset: 1.016f,
+            stackSize: 20
+        );
+        
+        AddToolDefinition(
             stringID: "minigun",
             gesture: ItemGesture.Shoot,
             speed: 2f,
-            projectileInfo: new RangedProjectileInfo(10, 5, 10, 10000, 50, 0.1f, 1),
+            projectileInfo: new RangedProjectileInfo("bullet",10, 5, 10, 10000, 50, 0.1f, 1),
             materials: new Dictionary<string, int> { { "wood", 2 } },
             holdOutOffset: 1.54f
         );
@@ -49,8 +61,8 @@ public partial class Item
             stringID: "pistol",
             gesture: ItemGesture.Shoot,
             speed: 0.3f,
-            projectileInfo: new RangedProjectileInfo(25, 10, 10, 10000, 130, 0.1f, 1),
-            ammo: "pistol",
+            projectileInfo: new RangedProjectileInfo("bullet",25, 10, 10, 10000, 130, 0.1f, 1),
+            ammo: "bullet",
             materials: new Dictionary<string, int> { { "wood", 2 } },
             holdOutOffset: 1.016f
         );

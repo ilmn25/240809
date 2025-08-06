@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class GhoulPounce : State
+public class MobAttackPounce : MobAttack
 {
     private MobStatusModule _mobStatusModule;
     private readonly ProjectileInfo _projectileInfo = 
