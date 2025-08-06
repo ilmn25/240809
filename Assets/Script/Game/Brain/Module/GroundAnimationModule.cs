@@ -3,17 +3,15 @@ using UnityEngine;
 
 public class GroundAnimationModule : Module
 {
-    private Transform _spriteTransform;
-    private SpriteRenderer _spriteRenderer;
+    private const float BounceSpeed = 1f;
+    private const float BounceRange = 0.12f;
+    private const float TrailFrequency = 0.5f;
+    private const float FlipDuration = 0.06f; 
+    
     private MobStatusModule _mobStatusModule;
     private int _flipDirection;
     private float _nextTrailTimer = 0f;
     private Vector2Int _animDirection = Vector2Int.zero;
-
-    private const float BounceSpeed = 1f;
-    private const float BounceRange = 0.12f;
-    private const float TrailFrequency = 0.5f;
-    private const float FlipDuration = 0.06f;
 
     private int _currentScaleState;
     private float _flipTimer;
@@ -23,27 +21,53 @@ public class GroundAnimationModule : Module
 
     public override void Initialize()
     {
-        _spriteTransform = Machine.transform.Find("sprite");
-        _spriteRenderer = _spriteTransform.GetComponent<SpriteRenderer>();
         _mobStatusModule = Machine.GetModule<MobStatusModule>();
-
-        _targetScale = _spriteTransform.localScale;
-        _originalScale = _spriteTransform.localScale;
+ 
+        _targetScale = _mobStatusModule.Sprite.localScale;
+        _originalScale = _mobStatusModule.Sprite.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
     }
 
     public override void Update()
     {
-        if (_spriteRenderer.isVisible)
+        if (_mobStatusModule.SpriteCharRenderer.isVisible)
         {
-            UpdateDirection();
+            if (_mobStatusModule.Target)
+            {
+                _animDirection = new Vector2Int((int)Mathf.Sign(_mobStatusModule.TargetScreenDir.x), 0);
+                EquipTrackTarget();
+            } 
+            else
+                SetDirectionToMovement();
             HandleBounceAndTrail();
             HandleFlipCheck();
             HandleScaling();
         } 
-    } 
+    }
+ 
+    public void EquipTrackTarget()
+    {
+        if(!_mobStatusModule.Target) return;
+         
+        float angle = Mathf.Atan2(_mobStatusModule.TargetScreenDir.y, _mobStatusModule.TargetScreenDir.x) * Mathf.Rad2Deg;
 
-    void UpdateDirection()
+        if (angle > 90)
+            angle = 180 - angle;
+        else if (angle < -90)
+            angle = -angle - 180;
+
+        float z = Mathf.Lerp(-0.45f, 0.45f, (angle + 90) / 180);
+        if (z is > 0f and <= 0.12f)
+            z = 0.12f;
+        else if (z is < 0f and >= -0.11f)
+            z = -0.11f;
+        // float angleX = (Mathf.Lerp(0, 90, Math.Abs(angle) / 45) + 360) % 360;
+        // Normalize angle to 0–360
+        _mobStatusModule.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
+        _mobStatusModule.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
+    }
+    
+    void SetDirectionToMovement()
     {
         Vector2 rawDirection = new Vector2(_mobStatusModule.Direction.x, _mobStatusModule.Direction.z);
         rawDirection.Normalize();
@@ -65,7 +89,7 @@ public class GroundAnimationModule : Module
         if (isMoving)
         {
             float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
-            _spriteTransform.localPosition = new Vector3(_spriteTransform.localPosition.x, newY, _spriteTransform.localPosition.z);
+            _mobStatusModule.Sprite.localPosition = new Vector3(_mobStatusModule.Sprite.localPosition.x, newY, _mobStatusModule.Sprite.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
             {
@@ -76,7 +100,7 @@ public class GroundAnimationModule : Module
         }
         else
         {
-            _spriteTransform.localPosition = new Vector3(_spriteTransform.localPosition.x, 0, _spriteTransform.localPosition.z);
+            _mobStatusModule.Sprite.localPosition = new Vector3(_mobStatusModule.Sprite.localPosition.x, 0, _mobStatusModule.Sprite.localPosition.z);
         }
     }
 
@@ -99,11 +123,11 @@ public class GroundAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _spriteTransform.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
+            _mobStatusModule.Sprite.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _spriteTransform.localScale = _flatScale;
+                _mobStatusModule.Sprite.localScale = _flatScale;
                 _flipTimer = 0f;
                 _currentScaleState = 2;
             }
@@ -111,11 +135,11 @@ public class GroundAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _spriteTransform.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
+            _mobStatusModule.Sprite.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _spriteTransform.localScale = _targetScale;
+                _mobStatusModule.Sprite.localScale = _targetScale;
                 _currentScaleState = 0;
             }
         }

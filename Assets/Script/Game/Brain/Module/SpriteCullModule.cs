@@ -1,10 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public class MobSpriteCullModule : SpriteCullModule
+{ 
+    public override void Initialize()
+    {
+        _sprite = Machine.transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>();
+        MapCull.SignalUpdateSpriteYCull += HandleCull;
+        HandleCull(); 
+    }
+}
 public class SpriteCullModule : Module
 {
-    private SpriteRenderer _sprite;
+    protected SpriteRenderer _sprite;
 
     public SpriteCullModule(SpriteRenderer sprite = null)
     {
@@ -23,7 +31,7 @@ public class SpriteCullModule : Module
         MapCull.SignalUpdateSpriteYCull -= HandleCull;
     }
  
-    void HandleCull()
+    protected void HandleCull()
     {
         if (MapCull.YCheck && Machine.transform.position.y > MapCull.YThreshold)
         {

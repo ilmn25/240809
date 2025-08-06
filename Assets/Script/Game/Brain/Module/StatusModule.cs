@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class StatusModule : HitboxModule
 {
     private readonly HitboxType _hitBoxType;

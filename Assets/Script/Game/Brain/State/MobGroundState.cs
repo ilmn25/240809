@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
- 
-public class GhoulState : State
+
+public class MobGroundState : State
 { 
     MobStatusModule _mobStatusModule;
     public override void OnEnterState()
@@ -11,7 +11,6 @@ public class GhoulState : State
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
-        AddState(new GhoulPounce());
     }
     
     public override void OnUpdateState()
@@ -23,7 +22,7 @@ public class GhoulState : State
             if (_mobStatusModule.Target)
             {
                 if (Vector3.Distance(_mobStatusModule.Target.transform.position, Machine.transform.position) < 3)
-                    SetState<GhoulPounce>();
+                    SetState<MobAttack>();
                 else if (_mobStatusModule.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();

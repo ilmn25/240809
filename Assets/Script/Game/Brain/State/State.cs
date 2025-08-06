@@ -48,7 +48,7 @@ public abstract class State
         _stateCurrent?.OnTerminate();
     }
     
-    protected void AddState(State state, Boolean current = false)
+    public void AddState(State state, Boolean current = false)
     {
         state.Machine = Machine;
         state.Parent = this;

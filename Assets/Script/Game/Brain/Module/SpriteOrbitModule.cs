@@ -1,10 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+public class MobSpriteOrbitModule : SpriteOrbitModule
+{
+    public override void Initialize()
+    {
+        _sprite = Machine.transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>();
+        Machine.transform.rotation = ViewPort.CurrentRotation;
+        ViewPort.UpdateOrbitRotate += UpdateOrbit;
+    }
+}
 public class SpriteOrbitModule : Module
 {
-    private SpriteRenderer _sprite;
+    protected SpriteRenderer _sprite;
 
     public SpriteOrbitModule(SpriteRenderer sprite = null)
     {
@@ -23,7 +31,7 @@ public class SpriteOrbitModule : Module
         ViewPort.UpdateOrbitRotate -= UpdateOrbit; 
     }   
  
-    void UpdateOrbit()
+    protected void UpdateOrbit()
     { 
         Machine.transform.rotation = ViewPort.CurrentRotation;
     }

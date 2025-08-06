@@ -8,7 +8,7 @@ public class RangedProjectileInfo : ProjectileInfo
     public int Penetration; // ignored for now
     public bool Self = true;
 
-    public RangedProjectileInfo(float damage, float knockback, float critChance, int lifeSpan, float speed, float radius, int penetration, bool self = false)
+    public RangedProjectileInfo(string sprite, float damage, float knockback, float critChance, int lifeSpan, float speed, float radius, int penetration, bool self = false)
     {
         Damage = damage;
         Knockback = knockback;
@@ -18,7 +18,7 @@ public class RangedProjectileInfo : ProjectileInfo
         Radius = radius;
         Penetration = penetration;
         Self = self;
-        Sprite = Cache.LoadSprite("sprite/bullet");
+        Sprite = sprite;
     }
 
     // Reusable buffer for collision detection
