@@ -1,20 +1,18 @@
 using UnityEngine;
 
 public class EquipSwingState : State
-{
-    private PlayerStatusModule _playerStatusModule;
+{ 
     private float _cooldownSpeed;
     private string _sfx;
     private Animator _animator; 
-    public override void OnInitialize()
-    {
-        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
-        _animator = Machine.transform.Find("sprite").GetComponent<Animator>();
+    public override void Initialize()
+    { 
+        _animator = Module<StatusModule>().Animator;
     }
 
     public override void OnEnterState()
     {
-        _playerStatusModule.IsBusy = true;  
+        Module<PlayerStatusModule>().IsBusy = true;  
         _cooldownSpeed = PlayerStatusModule.GetSpeed();
         _sfx = Inventory.CurrentItemData.Sfx;
         _animator.speed = 1f; // Reset speed for initial swing
@@ -23,7 +21,7 @@ public class EquipSwingState : State
     
     public override void OnUpdateState()
     { 
-        if (!_playerStatusModule.IsBusy) return;
+        if (!Module<PlayerStatusModule>().IsBusy) return;
 
         AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
 
@@ -39,8 +37,8 @@ public class EquipSwingState : State
             {
                 _animator.speed = 1f;
                 _animator.Play("EquipIdle", 0, 0f);
-                _playerStatusModule.IsBusy = false; 
-                Parent.SetState<StateEmpty>();
+                Module<PlayerStatusModule>().IsBusy = false; 
+                Machine.SetState<DefaultState>();
             }
         } 
     }

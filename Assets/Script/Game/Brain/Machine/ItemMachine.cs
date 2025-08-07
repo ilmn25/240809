@@ -7,13 +7,13 @@ public class ItemMachine : EntityMachine
     public bool pickUp = true;
     private bool _wasInRange;
     
-    public override void OnInitialize()
+    public override void OnStart()
     { 
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        AddState(new ItemState());
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>(); 
         AddModule(new ItemPhysicModule()); 
         AddModule(new SpriteCullModule(spriteRenderer)); 
         AddModule(new SpriteOrbitModule(spriteRenderer)); 
+        AddState(new ItemState(),true);
     }
 
     public override void OnUpdate()

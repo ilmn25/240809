@@ -5,9 +5,13 @@ public enum ProjectileClass {Melee, Ranged, Magic, Summon}
 
 public class ProjectileInfo 
 { 
+    protected static readonly Collider[] HitBuffer = new Collider[50];
+    
     public float Damage;
     public float Knockback;
     public float CritChance;
+    public float Radius;  
+    public float Speed; 
     public string Effects;
     public ProjectileClass CLass; 
     public string Sprite;

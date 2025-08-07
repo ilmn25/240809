@@ -1,36 +1,26 @@
 using UnityEngine;
-
-public class MeleeProjectileInfo : ProjectileInfo
+ 
+public class SwingProjectileInfo : ProjectileInfo
 { 
-    public float Speed;
-    public float Range;
-
-    protected MeleeProjectileInfo()
-    {
-        CLass = ProjectileClass.Melee;
-    }
-}
-public class SwingProjectileInfo : MeleeProjectileInfo
-{
-    public SwingProjectileInfo(float damage, float knockback, float critChance, float speed, float range)
+    public SwingProjectileInfo(float damage, float knockback, float critChance, float speed, float radius)
     {
         Damage = damage;
         Knockback = knockback;
         CritChance = critChance;
         Speed = speed;
-        Range = range;
+        Radius = radius;
+        CLass = ProjectileClass.Melee;
     }
 
     public override void AI(Projectile projectile)
     {
         Vector3 direction = (projectile.Destination - projectile.transform.position).normalized;
-        Vector3 boxCenter = projectile.transform.position + direction * (Range * 0.5f);
-        Vector3 boxSize = Vector3.one * (Range * 0.5f);
+        Vector3 center = projectile.transform.position + direction * (Radius * 0.5f);
+        int hitCount = Physics.OverlapSphereNonAlloc(center, Radius / 2, HitBuffer, Game.MaskEntity);
 
-        Collider[] hitColliders = Physics.OverlapBox(boxCenter, boxSize, Quaternion.identity, Game.MaskEntity);
-        foreach (Collider collider in hitColliders)
+        for (int i = 0; i < hitCount; i++)
         {
-            IHitBox target = collider.gameObject.GetComponent<IHitBox>();
+            IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
             ((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile);
@@ -38,5 +28,33 @@ public class SwingProjectileInfo : MeleeProjectileInfo
 
         projectile.Delete();
     }
+}
 
+public class ContactDamageProjectileInfo : ProjectileInfo
+{
+    public ContactDamageProjectileInfo(float damage, float knockback, float critChance, float radius)
+    {
+        Damage = damage;
+        Knockback = knockback;
+        CritChance = critChance;
+        Radius = radius;
+        CLass = ProjectileClass.Melee;
+    }
+
+    public override void AI(Projectile projectile)
+    {
+        Collider[] _hitBuffer = new Collider[16];
+        int hitCount =
+            Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, _hitBuffer, Game.MaskEntity);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            IHitBox target = _hitBuffer[i].GetComponent<IHitBox>();
+            if (target == null) continue;
+
+            ((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile);
+        }
+
+        projectile.Delete();
+    }
 }

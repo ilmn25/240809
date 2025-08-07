@@ -15,6 +15,7 @@ public class DestructableModule : HitboxModule
 
     public override bool OnHitInternal(Projectile projectile)
     {
+        if (projectile.Target != HitboxType.Enemy) return false;
         _health -= projectile.Info.GetDamage();
         if (_health <= 0)
         {

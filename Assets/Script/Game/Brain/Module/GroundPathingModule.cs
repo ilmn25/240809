@@ -4,83 +4,48 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class GroundPathingModule : PathingModule
-{
-    private readonly int _height;
-    private readonly int _jump;
-    private readonly int _fall;
-    private readonly int _air;
-    private readonly int _roam;
-    private readonly int _scan;
-
-    // 1 2 15 6 flea 7k scans
-    public GroundPathingModule(
-        int height = 1, 
-        int jump = 1,
-        int fall = 15, 
-        int air = 3, 
-        int roam = 10,
-        int scan = 500)
-    {
-        _height = height;
-        _jump = jump;
-        _fall = fall;
-        _air = air;
-        _roam = roam;
-        _scan = scan;
-    }
- 
-    public override Vector3 GetTargetPosition()
-    {
-        if (Target)
-            return Target.position;
-        
-        return Path == null? Vector3.down : Path[^1].Position;
-    }
+{  
 
     public override void OnStuck()
     {
-        if (Target)
+        if (PathingTarget == PathingTarget.Target || PathingTarget == PathingTarget.Escape)
         {
             RepathCount++;
             if (RepathCount == MaxRepathCount)
             {
-                MobStatusModule.PathingStatus = PathingStatus.Stuck;
-                MobStatusModule.Direction = Vector3.zero;
+                Status.PathingStatus = PathingStatus.Stuck;
+                Status.Direction = Vector3.zero;
                 RepathCount = 0;
             }
-            else if (MobStatusModule.Target == Target)
+            else 
                 Repath();
-            else
-            {
-                MobStatusModule.PathingStatus = PathingStatus.Reached;
-                MobStatusModule.Direction = Vector3.zero;
-            }
         }
         else
         {
-            MobStatusModule.PathingStatus = PathingStatus.Stuck;
-            MobStatusModule.Direction = Vector3.zero;
+            Status.PathingStatus = PathingStatus.Stuck;
+            Status.Direction = Vector3.zero;
         } 
     }
 
     protected override async Task<List<Node>> GetPath()
     {
-        if (Target)
+        if (PathingTarget == PathingTarget.Target)
         {
-            while (Node.IsAir(Vector3Int.FloorToInt(Target.position) + Vector3Int.down * _jump))
+            while (Node.IsAir(Vector3Int.FloorToInt(Status.Target.position) + Vector3Int.down * Status.PathJump))
             {
                 await Task.Delay(100); // Yield control back to the caller and continue checking
             }
-            return await PathFind.FindPath(this, _scan); 
-        } 
-        return PathRandom.FindPath(this, _roam); 
+
+            return await PathFind.FindPath(this, Status.PathAmount);
+        }
+        return PathRandom.FindPath(this);
     } 
     
     public override bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode)
     { 
         //! check character size
         bool validity = true;
-        for (int height = 0; height < _height; height++)
+        for (int height = 0; height < Status.PathHeight; height++)
         { 
             if (!Node.IsAir(new Vector3Int(pos.x, pos.y + height, pos.z)))
             {
@@ -111,7 +76,7 @@ public class GroundPathingModule : PathingModule
         if (!validity) return false;
         
         //! check jump and air time
-        if (_jump == 0) {
+        if (Status.PathJump == 0) {
             if (dir.y != 0) {
                 return false;
             }
@@ -122,7 +87,7 @@ public class GroundPathingModule : PathingModule
             if (dir.y >= 0) //only check if is jumping
             {
                 // check if going upward and have floor under to jump off
-                for (int jump = 0; jump < _jump; jump++) // AGENT = 1 means jump 1 block, 2 means jump two block
+                for (int jump = 0; jump < Status.PathJump; jump++) // AGENT = 1 means jump 1 block, 2 means jump two block
                 {
                     if (!Node.IsAir(new Vector3Int(pos.x, pos.y - jump, pos.z)))
                     {
@@ -133,16 +98,16 @@ public class GroundPathingModule : PathingModule
                 // check air time if not jumping currently
                 if (!validity)
                 {
-                    if (_air == -1)
+                    if (Status.PathAir == -1)
                     {
                         validity = true;
                     }
                     else 
                     {
                         Node current = currentNode;
-                        for (int i = 0; i < _air && current != null; i++)
+                        for (int i = 0; i < Status.PathAir && current != null; i++)
                         {
-                            if ((dir.y == 0 || _jump > i) && !current.IsFloat)//TODO check if correct, air time if horizontal or double jump and not float more than jumps
+                            if ((dir.y == 0 || Status.PathJump > i) && !current.IsFloat)//TODO check if correct, air time if horizontal or double jump and not float more than jumps
                             {
                                 validity = true;
                                 break;
@@ -162,7 +127,7 @@ public class GroundPathingModule : PathingModule
         validity = false;
         if (dir.y == -1) //only check if is falling
         {
-            for (int fall = 0; fall < _fall; fall++) // AGENT = 1 means cant jump, 2 means jump one block
+            for (int fall = 0; fall < Status.PathFall; fall++) // AGENT = 1 means cant jump, 2 means jump one block
             {
                 if (!Node.IsAir(new Vector3Int(pos.x, pos.y - fall, pos.z)))
                 {

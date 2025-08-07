@@ -24,8 +24,8 @@ public class PlayerMovementModule : MovementModule
     private float _cosAngle;
     private float _sinAngle;
     
-    private const float SpeedWalk = 4f;
-    private const float SpeedRun = 5f;
+    private const float SpeedWalk = 5f;
+    private const float SpeedRun = 6f;
     private const float AccelerationTime = 0.2f; 
     private const float DecelerationTime = 0.08f; 
     private const float SlideDegree = 0.3f; 
@@ -145,9 +145,9 @@ public class PlayerMovementModule : MovementModule
         {
             _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
-        else if (Control.Inst.Jump.KeyDown() && Velocity.y > ClampVelocity)
+        else if (Control.Inst.Jump.KeyDown() && StatusModule.Velocity.y > ClampVelocity)
         {
-            Velocity.y += HoldVelocity;
+            StatusModule.Velocity.y += HoldVelocity;
         }
         else
         {
@@ -156,11 +156,11 @@ public class PlayerMovementModule : MovementModule
 
         if ((_playerStatusModule.IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
-            Velocity.y = JumpVelocity;
+            StatusModule.Velocity.y = JumpVelocity;
             //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
-        _playerStatusModule.IsGrounded = Velocity.y == 0;
+        _playerStatusModule.IsGrounded = StatusModule.Velocity.y == 0;
     }
 
 
@@ -252,31 +252,31 @@ public class PlayerMovementModule : MovementModule
     Vector3 _tempPosition;
     private void HandleMove()
     { 
-        if (Velocity.y > Gravity) //terminal velocity
+        if (StatusModule.Velocity.y > Gravity) //terminal velocity
         {
-            Velocity.y += Gravity * _deltaTime;
+            StatusModule.Velocity.y += Gravity * _deltaTime;
         } 
         
-        _tempPosition = new Vector3(_newPosition.x + Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x + StatusModule.Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
         if (!IsMovable(_tempPosition))
-            Velocity.x = 0; 
+            StatusModule.Velocity.x = 0; 
         else
             _newPosition = _tempPosition;
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + Velocity.z * _deltaTime);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + StatusModule.Velocity.z * _deltaTime);
         if (!IsMovable(_tempPosition))
-            Velocity.z = 0; 
+            StatusModule.Velocity.z = 0; 
         else
             _newPosition = _tempPosition;
         
-        Velocity.x = Mathf.MoveTowards(Velocity.x, 0f, 30 * Time.deltaTime);
-        Velocity.z = Mathf.MoveTowards(Velocity.z, 0f, 30 * Time.deltaTime);
+        StatusModule.Velocity.x = Mathf.MoveTowards(StatusModule.Velocity.x, 0f, 30 * Time.deltaTime);
+        StatusModule.Velocity.z = Mathf.MoveTowards(StatusModule.Velocity.z, 0f, 30 * Time.deltaTime);
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + Velocity.y * _deltaTime, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + StatusModule.Velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         {
-            if (Velocity.y < 0) _playerStatusModule.IsGrounded = true; 
-            Velocity.y = 0; 
+            if (StatusModule.Velocity.y < 0) _playerStatusModule.IsGrounded = true; 
+            StatusModule.Velocity.y = 0; 
             Machine.transform.position = _newPosition;
         } 
         else 

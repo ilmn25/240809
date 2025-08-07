@@ -6,14 +6,33 @@ using UnityEngine;
 
 public class PathRandom
 {  
-    public static List<Node> FindPath(PathingModule agent, int scanCount)
+    public static List<Node> FindPath(PathingModule agent)
     {
+        int scanCount; 
+        Vector3Int offset;
+        if (agent.PathingTarget == PathingTarget.Roam)
+        {
+            scanCount = agent.Status.DistRoam;
+            offset = Node.RandomDirection(scanCount);
+        } 
+        else if(agent.PathingTarget == PathingTarget.Strafe)
+        {
+            scanCount = agent.Status.DistStrafe;
+            offset = Node.RandomDirection(scanCount);
+        } 
+        else // if (agent.PathingTarget == PathingTarget.Escape)
+        {
+            scanCount = agent.PathingTarget == PathingTarget.Evade ? agent.Status.DistStrafe : agent.Status.DistEscape;
+            
+            Vector3 dest = agent.Machine.transform.position - agent.Status.Target.position;
+            dest.y = 0;
+            offset = Vector3Int.FloorToInt(dest.normalized * scanCount); 
+        } 
+        
         Vector3Int startPosition =
             NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
-        Vector3Int a = Node.RandomDirection(scanCount);
-        // Utility.Log(a);
         Vector3Int endPosition =
-            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + a));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + offset));
 
         List<Node> openList = new List<Node>(); 
         HashSet<Vector3> closedList = new HashSet<Vector3>();
