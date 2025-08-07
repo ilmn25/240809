@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class GroundMovementModule : Module
+public class GroundMovementModule : MovementModule
 {
     private readonly float _speed;
     private readonly float _speedAir;
@@ -22,8 +22,7 @@ public class GroundMovementModule : Module
     private float _speedAdjust;
     private Vector3 _newPosition;
     private Vector3 _previousPosition;
-    private Vector3 _directionBuffer = Vector3.zero;
-    private Vector3 _velocity = Vector3.zero;
+    private Vector3 _directionBuffer = Vector3.zero; 
     private float _deltaTime; 
     private float _testPosition;
     private Vector3 _testPositionA;
@@ -53,11 +52,6 @@ public class GroundMovementModule : Module
     public override void Initialize()
     {
         _mobStatusModule = Machine.GetModule<MobStatusModule>();
-    }
-
-    public void KnockBack(Vector3 position, float force, bool isAway)
-    {
-        _velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
     }
 
     public override void Update()
@@ -111,7 +105,7 @@ public class GroundMovementModule : Module
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
         if (_mobStatusModule.IsGrounded && _mobStatusModule.Direction.y > 0)
         {
-            _velocity.y = _jumpVelocity; 
+            Velocity.y = _jumpVelocity; 
             _mobStatusModule.IsGrounded = false;
         }
     }
@@ -168,31 +162,31 @@ public class GroundMovementModule : Module
     
     private void HandleMove()
     { 
-        if (_velocity.y > _gravity) //terminal velocity
+        if (Velocity.y > _gravity) //terminal velocity
         {
-            _velocity.y += _gravity * _deltaTime;
+            Velocity.y += _gravity * _deltaTime;
         } 
         
-        _tempPosition = new Vector3(_newPosition.x + _velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x + Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
         if (!IsMovable(_tempPosition))
-            _velocity.x = 0; 
+            Velocity.x = 0; 
         else
             _newPosition = _tempPosition;
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + _velocity.z * _deltaTime);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + Velocity.z * _deltaTime);
         if (!IsMovable(_tempPosition))
-            _velocity.z = 0; 
+            Velocity.z = 0; 
         else
             _newPosition = _tempPosition;
         
-        _velocity.x = Mathf.MoveTowards(_velocity.x, 0f, 30 * Time.deltaTime);
-        _velocity.z = Mathf.MoveTowards(_velocity.z, 0f, 30 * Time.deltaTime);
+        Velocity.x = Mathf.MoveTowards(Velocity.x, 0f, 30 * Time.deltaTime);
+        Velocity.z = Mathf.MoveTowards(Velocity.z, 0f, 30 * Time.deltaTime);
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + _velocity.y * _deltaTime, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + Velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         { 
-            if (_velocity.y < 0) _mobStatusModule.IsGrounded = true;
-            _velocity.y = 0;
+            if (Velocity.y < 0) _mobStatusModule.IsGrounded = true;
+            Velocity.y = 0;
             Machine.transform.position = _newPosition;
         } 
         else

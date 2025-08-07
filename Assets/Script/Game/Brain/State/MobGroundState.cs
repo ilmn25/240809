@@ -1,16 +1,15 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-public class MobGroundState : State
+public class MobGroundState : MobState
 { 
-    MobStatusModule _mobStatusModule;
     public override void OnEnterState()
     {
-        _mobStatusModule = Machine.GetModule<MobStatusModule>();
         AddState(new StateEmpty(), true);
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
+        AddState(new MobAttackPounce());
     }
     
     public override void OnUpdateState()
@@ -19,11 +18,11 @@ public class MobGroundState : State
 
         if (IsCurrentState<StateEmpty>())
         {
-            if (_mobStatusModule.Target)
+            if (Status.Target)
             {
-                if (Vector3.Distance(_mobStatusModule.Target.transform.position, Machine.transform.position) < 3)
+                if (Vector3.Distance(Status.Target.transform.position, Machine.transform.position) < Status.AttackDistance)
                     SetState<MobAttack>();
-                else if (_mobStatusModule.PathingStatus == PathingStatus.Stuck)
+                else if (Status.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();
                 }
@@ -45,9 +44,9 @@ public class MobGroundState : State
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
-            _mobStatusModule.Target = Game.Player.transform;
+            Status.Target = Game.Player.transform;
         else if (Input.GetKeyDown(KeyCode.T))
-            _mobStatusModule.Target = null;
+            Status.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))
             Machine.transform.position = Game.Player.transform.position;
     }

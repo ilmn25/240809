@@ -1,6 +1,6 @@
-using UnityEngine;
-
 public class MobState : State
 {
-    public Transform Target; 
+    private MobStatusModule _mobStatusModule;
+    protected MobStatusModule Status =>
+        _mobStatusModule ??= Machine.GetModule<MobStatusModule>();
 }

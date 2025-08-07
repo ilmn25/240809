@@ -40,7 +40,7 @@ public class PlayerAnimationModule : Module
 
     public override void Update()
     {
-        if (Game.GameState != GameState.Playing) return;
+        if (_playerStatusModule.PlayerStatus != PlayerStatus.Active) return;
         UpdateDirection();
         HandleBounceAndTrail();
         HandleFlipCheck();
@@ -87,7 +87,7 @@ public class PlayerAnimationModule : Module
     
     void HandleBounceAndTrail()
     {
-        bool isMoving = _playerMovementModule.SpeedCurrent > 0.35 && _playerMovementModule.IsGrounded;
+        bool isMoving = _playerMovementModule.SpeedCurrent > 0.35 && _playerStatusModule.IsGrounded;
 
         if (isMoving)
         {
