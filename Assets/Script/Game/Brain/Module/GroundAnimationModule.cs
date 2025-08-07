@@ -26,6 +26,17 @@ public class GroundAnimationModule : Module
         _targetScale = _mobStatusModule.Sprite.localScale;
         _originalScale = _mobStatusModule.Sprite.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
+
+        if (_mobStatusModule.Equipment != null)
+        {
+            _mobStatusModule.SpriteTool.gameObject.SetActive(true);
+            _mobStatusModule.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + _mobStatusModule.Equipment.StringID);
+            _mobStatusModule.SpriteToolTrack.transform.localScale = Vector3.one * _mobStatusModule.Equipment.Scale;
+        }
+        else
+        {
+            _mobStatusModule.SpriteTool.gameObject.SetActive(false);
+        }
     }
 
     public override void Update()
@@ -35,10 +46,14 @@ public class GroundAnimationModule : Module
             if (_mobStatusModule.Target)
             {
                 _animDirection = new Vector2Int((int)Mathf.Sign(_mobStatusModule.TargetScreenDir.x), 0);
-                EquipTrackTarget();
-            } 
+
+                if (_mobStatusModule.Equipment != null)
+                    EquipTrackTarget();
+            }
             else
+            { 
                 SetDirectionToMovement();
+            } 
             HandleBounceAndTrail();
             HandleFlipCheck();
             HandleScaling();

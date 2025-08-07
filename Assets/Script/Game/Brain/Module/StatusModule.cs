@@ -1,26 +1,43 @@
 using UnityEngine;
 
 public class StatusModule : HitboxModule
-{
-    private readonly HitboxType _hitBoxType;
-    public float Health;
-    private readonly float _defense;
+{ 
+    
+    public HitboxType HitboxType;
+    public string HurtSfx;
+    public string DeathSfx; 
     public float KnockBackResistance;
     
+    public float Defense; 
+    public float Health;
+    public float HealthMax;
+    
+    public Transform Sprite;
+    public Transform SpriteChar;
+    public SpriteRenderer SpriteCharRenderer;
+    public Transform SpriteToolTrack;
+    public Transform SpriteTool;
+    public SpriteRenderer SpriteToolRenderer; 
+    
     private const int Iframes = 4;
-    private int _iframesCurrent; 
-
-    public StatusModule(HitboxType hitBoxType, float health, float defense)
-    {
-        _hitBoxType = hitBoxType;
-        Health = health;
-        _defense = defense;
-    }
+    private int _iframesCurrent;  
+    public bool IsGrounded = false;
 
     protected virtual void OnHit(Projectile projectile) { }
     protected virtual void OnDeath() { } 
     protected virtual void OnUpdate() { } 
 
+    public override void Initialize()
+    { 
+        Sprite = Machine.transform.Find("sprite");
+        SpriteChar = Sprite.Find("char");
+        SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
+        SpriteToolTrack = Sprite.transform.Find("tool_track");
+        SpriteTool = SpriteToolTrack.Find("tool");
+        SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>();
+        
+        Health = HealthMax;
+    }
     public override void Update()
     { 
         OnUpdate();
@@ -29,7 +46,8 @@ public class StatusModule : HitboxModule
         if (Health <= 0)
         {
             OnDeath();
-            Health = 100;
+            Audio.PlaySFX(DeathSfx, 0.8f);
+            Health = HealthMax;
         }
     }
     
@@ -39,19 +57,22 @@ public class StatusModule : HitboxModule
         switch (projectile.Target)
         {
             case HitboxType.Friendly: // enemy kill friendly 
-                if (_hitBoxType == HitboxType.Enemy) return false;
+                if (HitboxType == HitboxType.Enemy) return false;
                 break;
             case HitboxType.Enemy: // player only kill enemy
-                if (_hitBoxType == HitboxType.Friendly) return false;
-                if (_hitBoxType == HitboxType.Passive) return false;
+                if (HitboxType == HitboxType.Friendly) return false;
+                if (HitboxType == HitboxType.Passive) return false;
                 break;
             case HitboxType.Passive: // friendly hit enemy and passive 
-                if (_hitBoxType == HitboxType.Friendly) return false;
+                if (HitboxType == HitboxType.Friendly) return false;
                 break;
         }
         _iframesCurrent = Iframes;
         OnHit(projectile);
-        Health -= projectile.Info.GetDamage() - _defense;
+        Audio.PlaySFX(HurtSfx, 0.4f);
+        Health -= projectile.Info.GetDamage() - Defense;
+        Machine.GetModule<GroundMovementModule>().KnockBack(projectile.transform.position, 
+            projectile.Info.Knockback * KnockBackResistance, true);
         return true;
     }
 }

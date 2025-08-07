@@ -1,23 +1,14 @@
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
-using UnityEngine;
-public enum GameState {
-    MainMenu,
-    Loading,
-    Playing,
-    Paused,
-    Inventory,
-    GameOver
-}
+using UnityEngine; 
 
 public class Game : MonoBehaviour
 {
     public static readonly float MaxDeltaTime = 0.03f;
     
     private const float FixedUpdateMS = 0.10f;
-    
-    public static GameState GameState = GameState.Loading;
+     
     
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;

@@ -10,7 +10,6 @@ public abstract class PathingModule : Module
     protected Transform Target; 
     protected MobStatusModule MobStatusModule;
 
-    private const float TargetReachDistance = 1.5f;
     private const float PointReachDistance = 0.45f;
     private const float PointLostDistance = 5;
     private const float RepathInterval = 0.5f;
@@ -82,7 +81,7 @@ public abstract class PathingModule : Module
             }
 
             _targetDistance = Vector3.Distance(Machine.transform.position, GetTargetPosition());
-            if (_targetDistance < TargetReachDistance)
+            if (_targetDistance < MobStatusModule.AttackDistance)
             {
                 MobStatusModule.PathingStatus = PathingStatus.Reached; 
             }
@@ -156,7 +155,7 @@ public abstract class PathingModule : Module
  
         if (_nextPointQueued == -1 && MobStatusModule.PathingStatus == PathingStatus.Pathing && !_isPathFinding )
         {
-            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > TargetReachDistance;  //should be less than inner player near
+            _targetMoved = Vector3.Distance(_targetPositionPrevious, GetTargetPosition()) > MobStatusModule.AttackDistance;  //should be less than inner player near
 
             // if (PlayerMovementStatic.Instance._isGrounded && _targetMoved)
             if (_targetMoved)

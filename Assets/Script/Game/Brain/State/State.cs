@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Tag
+{
+    Busy, Alert, Angry
+}
 public abstract class State
 {
-    public String[] Tags;
+    public Tag[] Tags;
     public Machine Machine;
     public State Parent;
 
@@ -16,11 +20,7 @@ public abstract class State
     public virtual void OnEnterState() {}
     public virtual void OnUpdateState() {}
     public virtual void OnExitState() {}
- 
-    protected State(string[] tags = null)
-    {
-        Tags = tags;
-    }
+  
 
     public void OnEnterInternal()
     {

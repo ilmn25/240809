@@ -5,12 +5,9 @@ using System.Text.RegularExpressions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
-public class PlayerMovementModule : Module
+public class PlayerMovementModule : MovementModule
 {
-    
     private PlayerStatusModule _playerStatusModule; 
-    public Vector3 Velocity = Vector3.zero; 
-    public bool IsGrounded = false;  
     public Vector2 RawInput;  
     private Vector2 _input = Vector2.zero;
     private readonly List<Vector2> _inputBuffer = new List<Vector2>();
@@ -38,11 +35,6 @@ public class PlayerMovementModule : Module
     private const float ClampVelocity = 10f;
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
-
-    public void KnockBack(Vector3 position, float force, bool isAway)
-    {
-        Velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
-    }
     
     public void HandleInput()
     {
@@ -66,7 +58,7 @@ public class PlayerMovementModule : Module
 
     public override void Update()
     {  
-        if (Game.GameState != GameState.Playing) return;
+        if (_playerStatusModule.PlayerStatus != PlayerStatus.Active) return;
         
         _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;
@@ -140,7 +132,7 @@ public class PlayerMovementModule : Module
         // }
         
         
-        if ( IsGrounded)
+        if (_playerStatusModule.IsGrounded)
         {
             _coyoteTimer = CoyoteTime; // Reset coyote timer when grounded
         }
@@ -162,13 +154,13 @@ public class PlayerMovementModule : Module
             _jumpGraceTimer -= _deltaTime; // Decrease jump grace timer
         }
 
-        if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
+        if ((_playerStatusModule.IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
             Velocity.y = JumpVelocity;
             //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
-        IsGrounded = Velocity.y == 0;
+        _playerStatusModule.IsGrounded = Velocity.y == 0;
     }
 
 
@@ -283,7 +275,7 @@ public class PlayerMovementModule : Module
         _tempPosition = new Vector3(_newPosition.x, _newPosition.y + Velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         {
-            if (Velocity.y < 0) IsGrounded = true; 
+            if (Velocity.y < 0) _playerStatusModule.IsGrounded = true; 
             Velocity.y = 0; 
             Machine.transform.position = _newPosition;
         } 

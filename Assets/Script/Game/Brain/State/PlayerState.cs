@@ -27,7 +27,7 @@ public class PlayerState : State
         }
          
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Space))
-            Game.GameState = GameState.Playing; 
+            _playerStatusModule.PlayerStatus = PlayerStatus.Active; 
         if (Input.GetKeyDown(KeyCode.M)) 
             Entity.SpawnPrefab("megumin", Vector3Int.FloorToInt(Machine.transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
@@ -123,7 +123,7 @@ public class PlayerState : State
         {
             _playerStatusModule.SpriteTool.gameObject.SetActive(true);
             _playerStatusModule.SpriteToolRenderer.sprite = 
-                Resources.Load<Sprite>($"texture/sprite/{Inventory.CurrentItemData.StringID}"); 
+            _playerStatusModule.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Inventory.CurrentItemData.StringID);
             _playerStatusModule.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
             SetState<EquipSelectState>();
         } 
