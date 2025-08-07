@@ -10,35 +10,22 @@ public class PlayerStatusModule : StatusModule
     public float Mana;
     public float Sanity;
     public float Hunger;
-    public float Stamina;
-    public float Speed;
-    public float AirTime;
+    public float Stamina; 
     public bool IsBusy = false;
     public bool Invincibility = false;
     public PlayerStatus PlayerStatus = PlayerStatus.Freeze;
     
-    public Vector3 TargetScreenDir; 
-    private static MovementModule _movementModule;
 
     public override void Initialize()
     { 
         base.Initialize();
-        _movementModule = Machine.GetModule<MovementModule>();
+        Iframes = 45;
     }
 
     protected override void OnUpdate()
     {
         TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
-        
-        if (!IsGrounded && _movementModule.Velocity.y < -10) AirTime += 1;
-        else {
-            if (AirTime > 75)
-            {
-                Health -= AirTime/8;
-                Audio.PlaySFX("player_hurt",0.4f);
-            }
-            AirTime = 0;
-        }
+         
         
         if (Hunger > 0) Hunger -= 0.01f; 
     }

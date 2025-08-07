@@ -6,7 +6,7 @@ public class EquipShootState : State
     private float _cooldownSpeed;
     private Animator _animator;
     
-    public override void OnInitialize()
+    public override void Initialize()
     {
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         _animator = Machine.transform.Find("sprite").GetComponent<Animator>();
@@ -29,7 +29,7 @@ public class EquipShootState : State
             _animator.speed = 1f;
             _animator.Play("EquipIdle", 0, 0f);
             _playerStatusModule.IsBusy = false; 
-            Parent.SetState<StateEmpty>();
+            Machine.SetState<DefaultState>();
         } 
     }
 }

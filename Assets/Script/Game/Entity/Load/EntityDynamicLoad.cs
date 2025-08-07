@@ -32,10 +32,9 @@ public class EntityDynamicLoad
                 if (World.IsInWorldBounds(entityChunkPosition))
                     World.Inst[entityChunkPosition].dynamicEntity.Add(entityMachine.GetEntityData());
                 removeList.Add(entityMachine);
-                ObjectPool.ReturnObject(entityMachine.gameObject); 
             }
         }
-        foreach (var entityMachine in removeList) _activeEntities.Remove(entityMachine);
+        foreach (var entityMachine in removeList) entityMachine.Delete();
     }
 
 
@@ -60,15 +59,16 @@ public class EntityDynamicLoad
       
     public static void UnloadWorld()
     {
+        List<EntityMachine> removeList = new List<EntityMachine>();
         Vector3Int entityChunkPosition;
-        foreach (EntityMachine entityHandler in _activeEntities)
+        foreach (EntityMachine entityMachine in _activeEntities)
         {
-            entityChunkPosition = World.GetChunkCoordinate(entityHandler.transform.position);
+            entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             if (World.IsInWorldBounds(entityChunkPosition))
-                World.Inst[entityChunkPosition].dynamicEntity.Add(entityHandler.GetEntityData());
-            ObjectPool.ReturnObject(entityHandler.gameObject);   
+                World.Inst[entityChunkPosition].dynamicEntity.Add(entityMachine.GetEntityData());
+            removeList.Add(entityMachine);
         }
-        _activeEntities.Clear();
+        foreach (var entityMachine in removeList) entityMachine.Delete();
     }
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)

@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class RangedProjectileInfo : ProjectileInfo
 {
-    public int LifeSpan;
-    public float Speed;
-    public float Radius;  
+    public int LifeSpan; 
     public int Penetration; // ignored for now
     public bool Self = true;
 
@@ -20,9 +18,6 @@ public class RangedProjectileInfo : ProjectileInfo
         Self = self;
         Sprite = sprite;
     }
-
-    // Reusable buffer for collision detection
-    private static readonly Collider[] HitBuffer = new Collider[8]; // Adjust size as needed
 
     public override void AI(Projectile projectile)
     {

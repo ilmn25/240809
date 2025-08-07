@@ -4,7 +4,7 @@ public class MobAttackShoot : MobAttack
 {
     private Animator _animator;
     private MobStatusModule _mobStatusModule;
-    public override void OnInitialize()
+    public override void Initialize()
     {
         _animator = Machine.transform.Find("sprite").GetComponent<Animator>();
         _mobStatusModule = Machine.GetModule<MobStatusModule>();
@@ -34,7 +34,7 @@ public class MobAttackShoot : MobAttack
         {
             _animator.speed = 1f;
             _animator.Play("EquipIdle", 0, 0f);
-            Parent.SetState<StateEmpty>();
+            Machine.SetState<DefaultState>();
         } 
     }
 }

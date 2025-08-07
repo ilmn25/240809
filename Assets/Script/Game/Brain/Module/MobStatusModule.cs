@@ -2,13 +2,24 @@ using UnityEngine;
 
 public class MobStatusModule : StatusModule
 { 
-    public float AttackDistance;
-    public Item Equipment; 
+    public int DistAttack = 2;
+    public int DistAlert = 10;
+    public int DistDisengage = 20; 
+    
+    public int DistEscape = 20;
+    public int DistRoam = 10;
+    public int DistStrafe = 2;
+    
+    public int PathJump = 1;
+    public int PathHeight = 1;
+    public int PathFall = 15;
+    public int PathAir = 3;
+    public int PathAmount = 500;
+    
+    public Item Equipment;
      
-    public Transform Target = null;
-    public Vector3 TargetScreenDir; 
-    public PathingStatus PathingStatus = PathingStatus.Pathing;
-    public Vector3 Direction = Vector3.zero; 
+    public Transform Target; 
+    public PathingStatus PathingStatus = PathingStatus.Pending; 
     
     protected override void OnUpdate()
     {

@@ -29,11 +29,13 @@ public class EntityStaticLoad
       
     public static void UnloadEntitiesInChunk(Vector3Int key)
     {
-        foreach (EntityMachine entityHandler in _activeEntities[key].Item2)
+        List<EntityMachine> removeList = new List<EntityMachine>();
+        foreach (EntityMachine entityMachine in _activeEntities[key].Item2)
         { 
-            _activeEntities[key].Item1.Add(entityHandler.GetEntityData()); 
-            ObjectPool.ReturnObject(entityHandler.gameObject);   
+            _activeEntities[key].Item1.Add(entityMachine.GetEntityData()); 
+            removeList.Add(entityMachine);
         }
+        foreach (var entityMachine in removeList) entityMachine.Delete();
     }
 
     public static void LoadEntitiesInChunk(Vector3Int coordinate)

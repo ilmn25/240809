@@ -10,7 +10,7 @@ public class DestructableMachine : EntityMachine, IHitBox
         _health = health;
     }
 
-    public override void OnInitialize()
+    public override void OnStart()
     { 
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         AddModule(new SpriteCullModule(spriteRenderer));  

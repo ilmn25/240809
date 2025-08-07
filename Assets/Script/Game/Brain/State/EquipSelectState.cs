@@ -6,7 +6,7 @@ public class EquipSelectState : State
     private float _cooldownSpeed;
     private string _sfx;
     private Animator _animator; 
-    public override void OnInitialize()
+    public override void Initialize()
     {
         _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         _animator = Machine.transform.Find("sprite").GetComponent<Animator>();
@@ -26,7 +26,7 @@ public class EquipSelectState : State
         if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
             _playerStatusModule.IsBusy = false; 
-            Parent.SetState<StateEmpty>();
+            Machine.SetState<DefaultState>();
             _animator.Play("EquipIdle", 0, 0f); 
         } 
     }

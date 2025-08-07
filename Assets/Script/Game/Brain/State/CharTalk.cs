@@ -8,7 +8,7 @@ public class CharTalk : State {
  
     public void OnEndDialogue()
     {
-        Parent.SetState<MobChase>();
+        Machine.SetState<MobChase>();
     }
     
     public override void OnEnterState()

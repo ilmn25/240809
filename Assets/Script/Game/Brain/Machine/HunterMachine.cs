@@ -3,66 +3,59 @@ using Unity.VisualScripting;
 using UnityEngine; 
 
 public class HunterMachine : EntityMachine, IHitBox
-{ 
-    public override void OnInitialize()
+{   
+    private int _ammo;
+    private const int AmmoMax = 5;
+    public override void OnStart()
     {
+        _ammo = AmmoMax; 
         AddModule(new MobStatusModule
         {
             HitboxType = HitboxType.Enemy,
             HealthMax = 100,
             Defense = 1,
-            Equipment = Item.GetItem("minigun"),
-            AttackDistance = 5,
+            Equipment = Item.GetItem("pistol"),
+            DistAttack = 16,
             HurtSfx = "npc_hurt", 
-            DeathSfx = "player_die"
+            DeathSfx = "player_die",
+            SpeedGround = 2.8f
         });
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule()); 
-        AddModule(new MobSpriteCullModule()); 
-        AddModule(new MobSpriteOrbitModule()); 
-        AddState(new HunterState());
-    }
-
-    public void OnDrawGizmos()
-    {
-        GetModule<GroundPathingModule>().DrawGizmos();
-    }
-}
-
-public class HunterState : MobState
-{
-    private int _ammo;
-    private const int AmmoMax = 5;
-
-    public override void OnEnterState()
-    {
-        AddState(new StateEmpty(), true);
+        AddModule(new MobSpriteCullModule());
+        AddModule(new MobSpriteOrbitModule());
+        
+        AddState(new DefaultState(), true);
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
+        AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
-        _ammo = AmmoMax;
     } 
-    public override void OnUpdateState()
+    
+    public override void OnUpdate()
     {
         HandleInput();
 
-        if (IsCurrentState<StateEmpty>())
+        if (IsCurrentState<DefaultState>())
         {
             if (Status.Target)
             {
-                if (Vector3.Distance(Status.Target.transform.position, Machine.transform.position) <
-                    Status.AttackDistance)
+                if (Vector3.Distance(Status.Target.transform.position, transform.position) < Status.DistAttack 
+                    // Physics.Raycast(transform.position, toTarget.normalized, out RaycastHit hit, distanceToTarget, Game.MaskEntity) &&
+                    // hit.collider.transform == Status.Target &&
+                    // hit.distance <= 1f
+                    )
                 {
                     if (_ammo != 0)
                     {
                         _ammo--;
-                        SetState<MobAttack>();
+                        SetState<MobAttackShoot>();
                     }
                     else
                     {
-                        SetState<MobReload>();
+                        SetState<MobAttackReload>();
                         _ammo = AmmoMax;
                     }
                 } 
@@ -92,6 +85,10 @@ public class HunterState : MobState
         else if (Input.GetKeyDown(KeyCode.T))
             Status.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))
-            Machine.transform.position = Game.Player.transform.position;
+            transform.position = Game.Player.transform.position;
+    }
+    public void OnDrawGizmos()
+    {
+        GetModule<GroundPathingModule>().DrawGizmos();
     }
 } 

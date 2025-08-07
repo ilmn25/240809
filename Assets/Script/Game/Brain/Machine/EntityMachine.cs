@@ -5,24 +5,29 @@ using UnityEngine.Serialization;
 
 public abstract class EntityMachine : Machine
 { 
+    public MobStatusModule Status => GetModule<MobStatusModule>();
     public ChunkEntityData entityData;
-    private bool _awake; 
-    protected override void Awake() {  } 
+    private bool _initialSetup;  
     public ChunkEntityData GetEntityData()
     {
         entityData.position = new SVector3Int(World.GetBlockCoordinate(transform.position));
         UpdateEntityData();
         return entityData;
-    }
+    } 
     
     public virtual void UpdateEntityData() { }
     
-    public void Initialize(ChunkEntityData entityData) { 
-        this.entityData = entityData; 
-        InitializeInteral();
-        if (!_awake)
+    public void Initialize(ChunkEntityData data) { 
+        entityData = data;   
+        
+        Modules.Clear();
+        States.Clear();
+        StateCurrent = null;
+        StartInternal();
+        
+        if (!_initialSetup)
         {
-            _awake = true;
+            _initialSetup = true;
             IEntity entity = Entity.dictionary[entityData.stringID];
             if (entity.Type == EntityType.Static)
             {
@@ -50,12 +55,11 @@ public abstract class EntityMachine : Machine
     }
 
     public void Delete()
-    {
+    { 
         if (Entity.dictionary[entityData.stringID].Type == EntityType.Static)
             EntityStaticLoad.ForgetEntity(this);
         else
-            EntityDynamicLoad.ForgetEntity(this);
-        
+            EntityDynamicLoad.ForgetEntity(this);  
         ObjectPool.ReturnObject(gameObject); 
     }  
 }
