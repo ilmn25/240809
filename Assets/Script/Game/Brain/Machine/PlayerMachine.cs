@@ -16,9 +16,9 @@ public class PlayerMachine : BasicMachine, IHitBox
             Sanity = PlayerData.Inst.sanity,
             Hunger = PlayerData.Inst.hunger,
             Stamina = PlayerData.Inst.stamina,
-            SpeedGround = PlayerData.Inst.speed,
+            SpeedGround = 6,
             DeathSfx = "player_die",
-            HurtSfx = "player_hurt"
+            HurtSfx = "player_hurt", 
         });
         AddModule(new PlayerMovementModule()); 
         AddModule(new PlayerAnimationModule()); 
@@ -41,13 +41,20 @@ public class PlayerMachine : BasicMachine, IHitBox
         }
          
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Space))
-            Info.PlayerStatus = PlayerStatus.Active; 
+            Info.PlayerStatus = PlayerStatus.Active;
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position),true, 200);
+        }
         if (Input.GetKeyDown(KeyCode.M)) 
             Entity.SpawnPrefab("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
             Entity.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(transform.position + Vector3.up));
-        if (Input.GetKeyDown(KeyCode.K)) 
+        if (Input.GetKeyDown(KeyCode.K))
+        {
             Entity.SpawnPrefab("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.SpawnPrefab("yuuri", Vector3Int.FloorToInt(transform.position + Vector3.up));
+        } 
     }
     
     public override void OnUpdate()

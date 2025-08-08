@@ -1,43 +1,86 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum EntityType { Item, Static, Rigid }
 public partial class Entity
 { 
-        Vector3Int Bounds { get; }
-        EntityType Type { get; }
-
+        public Vector3Int Bounds;
+        public string PrefabName;
+        public Type Machine;
+        public bool Collision;
+        public bool StaticLoad;
+         
+        private static Entity Item = new Entity
+        {
+                Bounds = Vector3Int.zero,
+                Collision = false,
+                PrefabName = "item",
+                Machine = typeof(ItemMachine),
+                StaticLoad = false
+        }; 
 }
 public partial class Entity 
 {
-        public static readonly Dictionary<string, IEntity> Dictionary = new Dictionary<string, IEntity>();
+        public static readonly Dictionary<string, Entity> Dictionary = new Dictionary<string, Entity>();
 
-        static Entity()
+        public static void Initialize()
         {
-                Dictionary.Add("tree", new Entity<ChunkEntityData>(new Vector3Int(1, 3, 1)));
-                Dictionary.Add("bush1", Entity<ChunkEntityData>.Zero);
-                Dictionary.Add("grass", Entity<ChunkEntityData>.Zero);
-                Dictionary.Add("stage_hand", Entity<ChunkEntityData>.One);
-                Dictionary.Add("slab", Entity<ChunkEntityData>.Zero);
-                Dictionary.Add("snare_flea", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                Dictionary.Add("chito", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                Dictionary.Add("megumin", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                Dictionary.Add("yuuri", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), true);
+                AddStructure<DecorMachine>("stage_hand", Vector3Int.one, true);
+                AddStructure<DecorMachine>("bush1", Vector3Int.zero, false);
+                AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 
+                AddStructure<SlabMachine>("slab", Vector3Int.one, false);
+                
+                AddMob<HunterMachine>("chito"); 
+                AddMob<HunterMachine>("yuuri");
+                AddMob<BugMachine>("snare_flea"); 
+                AddMob<GhoulMachine>("megumin");
+        }
+
+        private static void AddMob<T>(string stringID) where T : EntityMachine
+        {
+                Dictionary.Add(stringID, new Entity
+                {
+                        Bounds = Vector3Int.one,
+                        Collision = false,
+                        PrefabName = "mob",
+                        Machine = typeof(T),
+                        StaticLoad = false,
+                });
+        }
+
+        private static void AddStructure<T>(string stringID, Vector3Int bounds, bool collision) where T : EntityMachine
+        {
+                Dictionary.Add(stringID, new Entity
+                {
+                        Bounds = bounds,
+                        Collision = collision,
+                        PrefabName = "structure",
+                        Machine = typeof(T),
+                        StaticLoad = true,
+                });
         }
 
         public static void AddItem(string stringID)
         {
-                Dictionary.Add(stringID, Entity<ChunkEntityData>.Item);
+                Dictionary.Add(stringID, Item); 
         }
         
         public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)
         {
-                return Dictionary[stringID].GetChunkEntityData(stringID, new SVector3Int(worldPosition));
+                return new ChunkEntityData()
+                {
+                        stringID = stringID,
+                        position = new SVector3Int(worldPosition),
+                };
         }
         public static ChunkEntityData GetChunkEntityData(string stringID, SVector3Int worldPosition)
         {
-                return Dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
+                return new ChunkEntityData()
+                {
+                        stringID = stringID,
+                        position = worldPosition,
+                }; 
         }
         
         public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true, int count = 1)
@@ -47,11 +90,10 @@ public partial class Entity
                         ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
 
                         GameObject gameObject = ObjectPool.GetObject("item");
-                        gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);
-                        gameObject.GetComponent<SpriteRenderer>().sprite = 
-                                Resources.Load<Sprite>($"texture/sprite/{stringID}"); 
+                        gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f); 
         
-                        EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
+                        EntityMachine currentEntityMachine = (EntityMachine)
+                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
                         EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                         currentEntityMachine.Initialize(entityData);
                         gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
@@ -63,10 +105,11 @@ public partial class Entity
         {
                 ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
                 
-                GameObject gameObject = ObjectPool.GetObject(stringID);
+                GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
         
-                EntityMachine currentEntityMachine = gameObject.GetComponent<EntityMachine>();
+                EntityMachine currentEntityMachine = (EntityMachine)
+                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
                 EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
         }

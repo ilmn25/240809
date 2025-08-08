@@ -7,12 +7,18 @@ public class DynamicInfo : Info
     public string HurtSfx;
     public string DeathSfx; 
     public float KnockBackResistance = 1;
+     
+    public float SpeedGround = 5;
+    public float SpeedAir = 6;
+    public float AccelerationTime = 0.3f;
+    public float DecelerationTime = 0.08f;
+    public float Gravity = -40f;
+    public float JumpVelocity = 10f; 
     
-    public float Defense; 
-    public float SpeedGround;
-    public float SpeedAir;
     public float Health; 
     public float HealthMax;
+    public float Defense; 
+    public float CollisionRadius = 0.3f;
     
     public Transform Sprite;
     public Animator Animator;

@@ -22,7 +22,7 @@ public class Audio
             _audioSources.Add(newSource);
         }
 
-        PlayBGM("fairy_fountain", 0.03f);
+        PlayBGM("fairy_fountain", 0.4f);
         PlaySFX("wind", 0.2f, true);
         PlaySFX("noise", 0.3f, true);
     }

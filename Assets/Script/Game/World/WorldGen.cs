@@ -82,7 +82,7 @@ public class WorldGen
                         localChunkY + 1 != chunkSize &&
                         World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-                        if (Random.NextDouble() <= 0.0003)
+                        if (Random.NextDouble() <= 0.0015)
                         {
                             SetPiece.PasteSetPiece(new Vector3Int(x, y+2, z), SetPiece.LoadSetPieceFile("house_stone"));
                         }
@@ -273,12 +273,12 @@ public class WorldGen
                                         entityData = Entity.GetChunkEntityData("tree", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);
                                     }
-                                    else if (rng <= 0.02)
+                                    else if (rng <= 0.04)
                                     {
                                         entityData = Entity.GetChunkEntityData("bush1", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);
                                     }
-                                    else if (rng <= 0.03)
+                                    else if (rng <= 0.08)
                                     {
                                         entityData = Entity.GetChunkEntityData("grass", new SVector3Int(x, y + 1, z));
                                         chunk.staticEntity.Add(entityData);

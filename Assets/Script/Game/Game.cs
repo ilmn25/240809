@@ -14,8 +14,8 @@ public class Game : MonoBehaviour
     public static LayerMask MaskStatic;
     public static LayerMask MaskEntity;
     public static int IndexMap;
-    public static int IndexStatic;
-    public static int IndexDynamic;
+    public static int IndexCollide;
+    public static int IndexNoCollide;
     public static int IndexUI;
     
     public static GameObject Player;
@@ -53,6 +53,7 @@ public class Game : MonoBehaviour
           
         Control.Initialize(); 
         Item.Initialize();
+        Entity.Initialize();
         Loot.Initialize();
         GUI.Initialize(); 
         WorldGen.Initialize();
@@ -100,8 +101,8 @@ public class Game : MonoBehaviour
         MaskStatic  = LayerMask.GetMask("Static", "Map"); 
         MaskEntity = LayerMask.GetMask("Static", "Dynamic");
         IndexMap = LayerMask.NameToLayer("Map");
-        IndexStatic = LayerMask.NameToLayer("Static");
-        IndexDynamic = LayerMask.NameToLayer("Dynamic");
+        IndexCollide = LayerMask.NameToLayer("Static");
+        IndexNoCollide = LayerMask.NameToLayer("Dynamic");
         IndexUI = LayerMask.NameToLayer("UI");
  
         

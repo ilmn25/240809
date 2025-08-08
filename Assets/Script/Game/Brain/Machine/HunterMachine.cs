@@ -2,10 +2,11 @@
 using Unity.VisualScripting;
 using UnityEngine; 
 
-public class HunterMachine : EntityMachine, IHitBox
+public class HunterMachine : MobMachine
 {   
     private int _ammo;
-    private const int AmmoMax = 5;
+    private const int AmmoMax = 5; 
+
     public override void OnStart()
     {
         _ammo = AmmoMax; 
