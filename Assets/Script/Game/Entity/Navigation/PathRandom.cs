@@ -61,6 +61,7 @@ public class PathRandom
             {  
                 dirPosition = Vector3Int.FloorToInt(currentNode.Position + direction);
                 if (closedList.Contains(dirPosition)) continue;
+                if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(dirPosition), Scene.LogicDistance)) continue;  
                  
                 isFloat = Node.IsAir(dirPosition + Vector3Int.down); // set true if midair
                 gCost = currentNode.G + Utility.SquaredDistance(currentNode.Position, dirPosition);
