@@ -5,10 +5,8 @@ using UnityEngine;
 
 public enum PathingStatus {Pending, Reached, Stuck}
 public enum PathingTarget {None, Target, Strafe, Evade, Escape, Roam}
-public abstract class PathingModule : Module
-{
-    private MobStatusModule _statusModule; 
-    public MobStatusModule Status => _statusModule ??= Machine.GetModule<MobStatusModule>();
+public abstract class PathingModule : MobModule
+{ 
     public PathingTarget PathingTarget = PathingTarget.None;  
     
     private const float PointReachDistance = 0.45f;
@@ -39,15 +37,15 @@ public abstract class PathingModule : Module
  
  
 
-    protected const int MaxRepathCount = 5;   
+    protected const int MaxRepathCount = 4;   
     private const int MaxStuckCount = 250;    
     public void SetTarget(PathingTarget pathingTarget)
     {
         PathingTarget = pathingTarget;
         Path = null;
         _nextPointQueued = -1;
-        Status.PathingStatus = PathingStatus.Pending;
-        Status.Direction = Vector3.zero;
+        Info.PathingStatus = PathingStatus.Pending;
+        Info.Direction = Vector3.zero;
         RepathCount = 0;
         _stuckCount = 0;
         Repath();
@@ -58,28 +56,29 @@ public abstract class PathingModule : Module
 
     public void IsTargetReached()
     {
-        if (PathingTarget == PathingTarget.Target)
+        if (PathingTarget != PathingTarget.Target)
         {
-            if (Vector3.Distance(Machine.transform.position, Status.Target.position) < Status.DistAttack)
-                Status.PathingStatus = PathingStatus.Reached; 
-        }
-        if (Path == null) return;
+            if (Path == null) return;
         
-        if (Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
-            Status.PathingStatus = PathingStatus.Reached; 
+            if (Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
+                Info.PathingStatus = PathingStatus.Reached;  
+            return;
+        }
+        if (Vector3.Distance(Machine.transform.position, Info.Target.position) < 1)
+            Info.PathingStatus = PathingStatus.Reached; 
     }
     
     public Vector3 GetTargetPosition()
     {
         if (PathingTarget == PathingTarget.Target)
-            return Status.Target.position;
+            return Info.Target.position;
         
         return Path == null? Vector3.down : Path[^1].Position;
     }
      
     public override void Update()
     {
-        if (Status.PathingStatus != PathingStatus.Pending || PathingTarget == PathingTarget.None) return;
+        if (Info.PathingStatus != PathingStatus.Pending || PathingTarget == PathingTarget.None) return;
             
         if (!_repathRoutine) CheckRepathRoutine();
 
@@ -91,7 +90,7 @@ public abstract class PathingModule : Module
 
         if (_updateTargetPosition)
         {
-            _targetPositionPrevious = Status.Target.position;
+            _targetPositionPrevious = Info.Target.position;
             _updateTargetPosition = false;
         }
 
@@ -117,7 +116,7 @@ public abstract class PathingModule : Module
         if (_nextPoint != Path.Count - 1)
         { 
             _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
-            if (Status.IsGrounded && _nextPointDistance < PointReachDistance)
+            if (Info.IsGrounded && _nextPointDistance < PointReachDistance)
             {
                 _nextPoint++;
             } 
@@ -150,11 +149,11 @@ public abstract class PathingModule : Module
                     _nextPoint++;
                 }
             } 
-            Status.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
+            Info.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
         } 
         else
         { 
-            Status.Direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
+            Info.Direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
         } 
     }
  
@@ -163,10 +162,10 @@ public abstract class PathingModule : Module
         _repathRoutine = true;
         await Task.Delay((int)RepathInterval * 1000); 
  
-        if (_nextPointQueued == -1 && Status.PathingStatus == PathingStatus.Pending && !_isPathFinding )
+        if (_nextPointQueued == -1 && Info.PathingStatus == PathingStatus.Pending && !_isPathFinding )
         {
             if (PathingTarget == PathingTarget.Target &&
-                Vector3.Distance(_targetPositionPrevious, Status.Target.position) > Status.DistAttack)
+                Vector3.Distance(_targetPositionPrevious, Info.Target.position) > Info.DistAttack)
             {
                 Repath();  
                 _updateTargetPosition = true;//! dont move

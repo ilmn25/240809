@@ -18,7 +18,7 @@ public class PlayerTerraformModule : Module
         if (Inventory.CurrentItemData == null)
         {
             if (_block)
-                BlockPreview.Delete();
+                BlockPreview.Delete(_block);
         }
         else if (Inventory.CurrentItemData.Type == ItemType.Block)
         {
@@ -28,7 +28,7 @@ public class PlayerTerraformModule : Module
             }
             else if (_block.name != Inventory.CurrentItemData.StringID)
             {
-                BlockPreview.Delete();
+                BlockPreview.Delete(_block);
                 _block = BlockPreview.Create(Inventory.CurrentItemData.StringID);
             }  
         } 
@@ -41,10 +41,15 @@ public class PlayerTerraformModule : Module
             }
             else if (_block.name != "overlay")
             {
-                BlockPreview.Delete(); 
+                BlockPreview.Delete(_block);
                 _block = BlockPreview.Create("overlay");
                 _block.transform.localScale = Vector3.one * 1.04f;
             } 
+        }
+        else
+        {
+            if (_block)
+                BlockPreview.Delete(_block);
         }
     }
     

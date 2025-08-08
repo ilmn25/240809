@@ -14,7 +14,7 @@ public class GhoulMachine : EntityMachine, IHitBox
 
     public override void OnStart()
     {
-        AddModule(new MobStatusModule
+        AddModule(new MobInfo
         {
             HitboxType = HitboxType.Enemy,
             HealthMax = 100,
@@ -31,7 +31,6 @@ public class GhoulMachine : EntityMachine, IHitBox
         AddModule(new MobSpriteCullModule());
         AddModule(new MobSpriteOrbitModule());
 
-        AddState(new DefaultState(), true);
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
@@ -45,16 +44,16 @@ public class GhoulMachine : EntityMachine, IHitBox
 
         if (IsCurrentState<DefaultState>())
         {
-            if (Status.Target)
+            if (Info.Target)
             {
-                if (Vector3.Distance(Status.Target.transform.position, transform.position) < Status.DistAttack)
+                if (Vector3.Distance(Info.Target.transform.position, transform.position) < Info.DistAttack)
                 {
                     if (Random.value < 0.7f)
                         SetState<MobAttackSwing>();
                     else
                         SetState<MobEvade>();
                 }
-                else if (Status.PathingStatus == PathingStatus.Stuck)
+                else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();
                 }
@@ -76,9 +75,9 @@ public class GhoulMachine : EntityMachine, IHitBox
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
-            Status.Target = Game.Player.transform;
+            Info.Target = Game.Player.transform;
         else if (Input.GetKeyDown(KeyCode.T))
-            Status.Target = null;
+            Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))
             transform.position = Game.Player.transform.position;
     }

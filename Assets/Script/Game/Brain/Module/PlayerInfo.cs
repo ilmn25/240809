@@ -5,7 +5,7 @@ public enum PlayerStatus {
     Dead,
     Freeze
 }
-public class PlayerStatusModule : StatusModule
+public class PlayerInfo : DynamicInfo
 { 
     public float Mana;
     public float Sanity;
@@ -37,11 +37,11 @@ public class PlayerStatusModule : StatusModule
     }
  
     // for later passive effects boosts
-    public static float GetRange()
+    public float GetRange()
     {
         return 1 * Inventory.CurrentItemData.Range;
     }
-    public static float GetSpeed()
+    public float GetSpeed()
     {
         return 1 * Inventory.CurrentItemData.Speed;
     } 

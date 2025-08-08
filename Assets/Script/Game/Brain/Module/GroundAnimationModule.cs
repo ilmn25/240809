@@ -1,14 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
-public class GroundAnimationModule : Module
+public class GroundAnimationModule : MobModule
 {
     private const float BounceSpeed = 1f;
     private const float BounceRange = 0.12f;
     private const float TrailFrequency = 0.5f;
     private const float FlipDuration = 0.06f; 
     
-    private MobStatusModule _mobStatusModule;
     private int _flipDirection;
     private float _nextTrailTimer = 0f;
     private Vector2Int _animDirection = Vector2Int.zero;
@@ -21,33 +20,31 @@ public class GroundAnimationModule : Module
 
     public override void Initialize()
     {
-        _mobStatusModule = Machine.GetModule<MobStatusModule>();
- 
-        _targetScale = _mobStatusModule.Sprite.localScale;
-        _originalScale = _mobStatusModule.Sprite.localScale;
+        _targetScale = Info.Sprite.localScale;
+        _originalScale = Info.Sprite.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
 
-        if (_mobStatusModule.Equipment != null)
+        if (Info.Equipment != null)
         {
-            _mobStatusModule.SpriteTool.gameObject.SetActive(true);
-            _mobStatusModule.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + _mobStatusModule.Equipment.StringID);
-            _mobStatusModule.SpriteToolTrack.transform.localScale = Vector3.one * _mobStatusModule.Equipment.Scale;
+            Info.SpriteTool.gameObject.SetActive(true);
+            Info.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Info.Equipment.StringID);
+            Info.SpriteToolTrack.transform.localScale = Vector3.one * Info.Equipment.Scale;
         }
         else
         {
-            _mobStatusModule.SpriteTool.gameObject.SetActive(false);
+            Info.SpriteTool.gameObject.SetActive(false);
         }
     }
 
     public override void Update()
     {
-        if (_mobStatusModule.SpriteCharRenderer.isVisible)
+        if (Info.SpriteCharRenderer.isVisible)
         {
-            if (_mobStatusModule.Target)
+            if (Info.Target)
             {
-                _animDirection = new Vector2Int((int)Mathf.Sign(_mobStatusModule.TargetScreenDir.x), 0);
+                _animDirection = new Vector2Int((int)Mathf.Sign(Info.TargetScreenDir.x), 0);
 
-                if (_mobStatusModule.Equipment != null)
+                if (Info.Equipment != null)
                     EquipTrackTarget();
             }
             else
@@ -62,9 +59,9 @@ public class GroundAnimationModule : Module
  
     public void EquipTrackTarget()
     {
-        if(!_mobStatusModule.Target) return;
+        if(!Info.Target) return;
          
-        float angle = Mathf.Atan2(_mobStatusModule.TargetScreenDir.y, _mobStatusModule.TargetScreenDir.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(Info.TargetScreenDir.y, Info.TargetScreenDir.x) * Mathf.Rad2Deg;
 
         if (angle > 90)
             angle = 180 - angle;
@@ -78,13 +75,13 @@ public class GroundAnimationModule : Module
             z = -0.11f;
         // float angleX = (Mathf.Lerp(0, 90, Math.Abs(angle) / 45) + 360) % 360;
         // Normalize angle to 0–360
-        _mobStatusModule.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
-        _mobStatusModule.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
+        Info.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
+        Info.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
     }
     
     void SetDirectionToMovement()
     {
-        Vector2 rawDirection = new Vector2(_mobStatusModule.Direction.x, _mobStatusModule.Direction.z);
+        Vector2 rawDirection = new Vector2(Info.Direction.x, Info.Direction.z);
         rawDirection.Normalize();
 
         if (rawDirection != Vector2.zero)
@@ -99,12 +96,12 @@ public class GroundAnimationModule : Module
 
     void HandleBounceAndTrail()
     {
-        bool isMoving = _mobStatusModule.Direction != Vector3.zero;
+        bool isMoving = Info.Direction != Vector3.zero;
 
         if (isMoving)
         {
             float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
-            _mobStatusModule.Sprite.localPosition = new Vector3(_mobStatusModule.Sprite.localPosition.x, newY, _mobStatusModule.Sprite.localPosition.z);
+            Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, newY, Info.Sprite.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
             {
@@ -115,7 +112,7 @@ public class GroundAnimationModule : Module
         }
         else
         {
-            _mobStatusModule.Sprite.localPosition = new Vector3(_mobStatusModule.Sprite.localPosition.x, 0, _mobStatusModule.Sprite.localPosition.z);
+            Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, 0, Info.Sprite.localPosition.z);
         }
     }
 
@@ -138,11 +135,11 @@ public class GroundAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _mobStatusModule.Sprite.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
+            Info.Sprite.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _mobStatusModule.Sprite.localScale = _flatScale;
+                Info.Sprite.localScale = _flatScale;
                 _flipTimer = 0f;
                 _currentScaleState = 2;
             }
@@ -150,11 +147,11 @@ public class GroundAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _mobStatusModule.Sprite.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
+            Info.Sprite.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _mobStatusModule.Sprite.localScale = _targetScale;
+                Info.Sprite.localScale = _targetScale;
                 _currentScaleState = 0;
             }
         }

@@ -23,7 +23,7 @@ public class SwingProjectileInfo : ProjectileInfo
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
-            ((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile);
+            ((Machine)target).GetModule<Info>().OnHitInternal(projectile);
         }
 
         projectile.Delete();
@@ -52,7 +52,7 @@ public class ContactDamageProjectileInfo : ProjectileInfo
             IHitBox target = _hitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
-            ((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile);
+            ((Machine)target).GetModule<Info>().OnHitInternal(projectile);
         }
 
         projectile.Delete();

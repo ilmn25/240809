@@ -44,7 +44,7 @@ public class RangedProjectileInfo : ProjectileInfo
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
-            if (((Machine)target).GetModule<HitboxModule>().OnHitInternal(projectile))
+            if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
             {
                 projectile.Delete();
                 break;
