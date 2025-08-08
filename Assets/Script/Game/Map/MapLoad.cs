@@ -58,7 +58,7 @@ public class MapLoad
             {
                 Object.Destroy(kvp.Value.gameObject, 1);
                 EntityStaticLoad.UnloadEntitiesInChunk(kvp.Key); //static entities load in 
-                EntityStaticLoad._activeEntities.Remove(kvp.Key);
+                EntityStaticLoad.ActiveEntities.Remove(kvp.Key);
                 _destroyList.Add(kvp.Key);
             }
         }

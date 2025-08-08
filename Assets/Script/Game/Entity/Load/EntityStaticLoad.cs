@@ -7,32 +7,32 @@ using UnityEngine;
 
 public class EntityStaticLoad
 {
-    public static Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> _activeEntities = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
+    public static readonly Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> ActiveEntities = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
 
     public static void ForgetEntity(EntityMachine entity)
     {
-        _activeEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Remove(entity);
+        ActiveEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Remove(entity);
     }
     public static void InviteEntity(EntityMachine entity) { // not done
-        _activeEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Add(entity);
+        ActiveEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Add(entity);
         
     }
     
     public static void UnloadWorld()
     {
-        foreach (var key in _activeEntities.Keys)
+        foreach (var key in ActiveEntities.Keys)
         {
             UnloadEntitiesInChunk(key);
         }
-        _activeEntities.Clear();
+        ActiveEntities.Clear();
     }
       
     public static void UnloadEntitiesInChunk(Vector3Int key)
     {
         List<EntityMachine> removeList = new List<EntityMachine>();
-        foreach (EntityMachine entityMachine in _activeEntities[key].Item2)
+        foreach (EntityMachine entityMachine in ActiveEntities[key].Item2)
         { 
-            _activeEntities[key].Item1.Add(entityMachine.GetEntityData()); 
+            ActiveEntities[key].Item1.Add(entityMachine.GetEntityData()); 
             removeList.Add(entityMachine);
         }
         foreach (var entityMachine in removeList) entityMachine.Delete();
@@ -44,9 +44,9 @@ public class EntityStaticLoad
         GameObject currentInstance;
         List<ChunkEntityData> activeEntities = World.Inst[coordinate].staticEntity;
         // Find the key once
-        if (!_activeEntities.ContainsKey(coordinate))
+        if (!ActiveEntities.ContainsKey(coordinate))
         {
-            _activeEntities[coordinate] = (activeEntities, new List<EntityMachine>());
+            ActiveEntities[coordinate] = (activeEntities, new List<EntityMachine>());
         }
 
         foreach (ChunkEntityData entityData in activeEntities)
@@ -55,7 +55,7 @@ public class EntityStaticLoad
             currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
 
             currentEntityMachine = currentInstance.GetComponent<EntityMachine>();
-            _activeEntities[coordinate].Item2.Add(currentEntityMachine);  
+            ActiveEntities[coordinate].Item2.Add(currentEntityMachine);  
             currentEntityMachine.Initialize(entityData);
         }
         activeEntities.Clear();

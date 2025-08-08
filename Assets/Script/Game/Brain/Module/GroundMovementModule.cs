@@ -199,8 +199,9 @@ public class GroundMovementModule : MovementModule
     
     private bool IsMovable(Vector3 newPosition)
     {
+        // if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(newPosition), Scene.LogicDistance)) return false;  
         _colliderArray = new Collider[1];
-
+        
         Vector3 halfExtents = new Vector3(_collisionRadius, _collisionRadius, _collisionRadius);
 
         return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.MaskStatic) > 0);

@@ -39,22 +39,27 @@ public class Scene
             _playerChunkPositionPrevious = PlayerChunkPosition; 
         }
     }
- 
+    
     public static bool InPlayerChunkRange(Vector3 position, float distance)
     {
-        return Math.Abs(position.x - PlayerChunkPosition.x) <= distance &&
-               Math.Abs(position.y - PlayerChunkPosition.y) <= distance &&
-               Math.Abs(position.z - PlayerChunkPosition.z) <= distance;
+        return position.x >= PlayerChunkPosition.x - distance &&
+               position.x <= PlayerChunkPosition.x + distance + 1 &&
+               position.y >= PlayerChunkPosition.y - distance &&
+               position.y <= PlayerChunkPosition.y + distance + 1 &&
+               position.z >= PlayerChunkPosition.z - distance &&
+               position.z <= PlayerChunkPosition.z + distance + 1;
     }
-    
+
     public static bool InPlayerBlockRange(Vector3 position, float distance)
-    { 
-        if (Mathf.Abs(position.x - Game.Player.transform.position.x) > distance ||
-            Mathf.Abs(position.y - Game.Player.transform.position.y) > distance ||
-            Mathf.Abs(position.z - Game.Player.transform.position.z) > distance)
-        {
-            return false;
-        }
-        return true;
+    {
+        Vector3 playerPos = Game.Player.transform.position;
+
+        return position.x >= playerPos.x - distance &&
+               position.x <= playerPos.x + distance &&
+               position.y >= playerPos.y - distance &&
+               position.y <= playerPos.y + distance &&
+               position.z >= playerPos.z - distance &&
+               position.z <= playerPos.z + distance;
     }
+
 }
