@@ -36,12 +36,5 @@ public class Entity<T> : IEntity where T : ChunkEntityData, new()
         data.stringID = stringID;
         return data;
     }
-}
-
-public enum EntityType
-{
-    Item,
-    Static,
-    Rigid
-}
+} 
     

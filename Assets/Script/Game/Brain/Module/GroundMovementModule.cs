@@ -14,7 +14,6 @@ public class GroundMovementModule : MovementModule
     private readonly float _jumpVelocity;
     private readonly float _collisionRadius;  
     private const float SlideDegree = 0.3f;
-    
      
     private float _speedCurrent;
     private float _speedTarget;
@@ -61,21 +60,21 @@ public class GroundMovementModule : MovementModule
 
         HandleJump();
 
-        if (StatusModule.Direction != Vector3.zero)
+        if (Info.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = StatusModule.IsGrounded ? _speed : _speedAir;
+            _speedTarget = Info.IsGrounded ? _speed : _speedAir;
             _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / _accelerationTime);
-            _speedAdjust = (StatusModule.Direction.x != 0 && StatusModule.Direction.z != 0) ? 1 / 1.25f : 1; 
+            _speedAdjust = (Info.Direction.x != 0 && Info.Direction.z != 0) ? 1 / 1.25f : 1; 
 
-            _newPosition.x += StatusModule.Direction.x * _speedCurrent * _deltaTime * _speedAdjust;
-            _newPosition.z += StatusModule.Direction.z * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.x += Info.Direction.x * _speedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.z += Info.Direction.z * _speedCurrent * _deltaTime * _speedAdjust;
 
             if (!IsMovable(_newPosition))
             {
                 HandleObstacle(_newPosition);
             } 
-            _directionBuffer = StatusModule.Direction;
+            _directionBuffer = Info.Direction;
         }
         else if (_speedCurrent != 0)
         {
@@ -98,10 +97,10 @@ public class GroundMovementModule : MovementModule
     private void HandleJump()
     { 
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
-        if (StatusModule.IsGrounded && StatusModule.Direction.y > 0)
+        if (Info.IsGrounded && Info.Direction.y > 0)
         {
-            StatusModule.Velocity.y = _jumpVelocity; 
-            StatusModule.IsGrounded = false;
+            Info.Velocity.y = _jumpVelocity; 
+            Info.IsGrounded = false;
         }
     }
  
@@ -109,20 +108,20 @@ public class GroundMovementModule : MovementModule
     {
         _newPosition = Machine.transform.position;
         //! go any possible direction when going diagonally against a wall
-        if (StatusModule.Direction.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
+        if (Info.Direction.x != 0 && IsMovable(new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z)))
         {
             _newPosition = new Vector3(position.x, Machine.transform.position.y, Machine.transform.position.z);
         }
-        else if (StatusModule.Direction.z != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
+        else if (Info.Direction.z != 0 && IsMovable(new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z)))
         {
             _newPosition = new Vector3(Machine.transform.position.x, Machine.transform.position.y, position.z);
         }
         else
         {
             //! slide against wall if possible
-            if (StatusModule.Direction.x != 0)
+            if (Info.Direction.x != 0)
             {
-                _testPosition = Machine.transform.position.x + SlideDegree * StatusModule.Direction.x * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.x + SlideDegree * Info.Direction.x * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionA.z += -1 * _speedCurrent * _deltaTime;
@@ -138,7 +137,7 @@ public class GroundMovementModule : MovementModule
             }
             else
             {
-                _testPosition = Machine.transform.position.z + SlideDegree * StatusModule.Direction.z * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.z + SlideDegree * Info.Direction.z * _speedCurrent * _deltaTime;
                 _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionA.x += -1 * _speedCurrent * _deltaTime;
@@ -157,31 +156,31 @@ public class GroundMovementModule : MovementModule
     
     private void HandleMove()
     { 
-        if (StatusModule.Velocity.y > _gravity) //terminal velocity
+        if (Info.Velocity.y > _gravity) //terminal velocity
         {
-            StatusModule.Velocity.y += _gravity * _deltaTime;
+            Info.Velocity.y += _gravity * _deltaTime;
         } 
         
-        _tempPosition = new Vector3(_newPosition.x + StatusModule.Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x + Info.Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
         if (!IsMovable(_tempPosition))
-            StatusModule.Velocity.x = 0; 
+            Info.Velocity.x = 0; 
         else
             _newPosition = _tempPosition;
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + StatusModule.Velocity.z * _deltaTime);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y, _newPosition.z + Info.Velocity.z * _deltaTime);
         if (!IsMovable(_tempPosition))
-            StatusModule.Velocity.z = 0; 
+            Info.Velocity.z = 0; 
         else
             _newPosition = _tempPosition;
         
-        StatusModule.Velocity.x = Mathf.MoveTowards(StatusModule.Velocity.x, 0f, 30 * Time.deltaTime);
-        StatusModule.Velocity.z = Mathf.MoveTowards(StatusModule.Velocity.z, 0f, 30 * Time.deltaTime);
+        Info.Velocity.x = Mathf.MoveTowards(Info.Velocity.x, 0f, 30 * Time.deltaTime);
+        Info.Velocity.z = Mathf.MoveTowards(Info.Velocity.z, 0f, 30 * Time.deltaTime);
         
-        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + StatusModule.Velocity.y * _deltaTime, _newPosition.z);
+        _tempPosition = new Vector3(_newPosition.x, _newPosition.y + Info.Velocity.y * _deltaTime, _newPosition.z);
         if (!IsMovable(_tempPosition))
         { 
-            if (StatusModule.Velocity.y < 0) StatusModule.IsGrounded = true;
-            StatusModule.Velocity.y = 0;
+            if (Info.Velocity.y < 0) Info.IsGrounded = true;
+            Info.Velocity.y = 0;
             Machine.transform.position = _newPosition;
         } 
         else
@@ -190,7 +189,7 @@ public class GroundMovementModule : MovementModule
         } 
         
         
-        if (StatusModule.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
+        if (Info.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
         {
             Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
             if (IsMovable(tempPosition)) Machine.transform.position = tempPosition;

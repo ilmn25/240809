@@ -1,15 +1,15 @@
 using UnityEngine;
 
 class MobAttackSwing : State {
-    private MobStatusModule MobStatusModule => Machine.GetModule<MobStatusModule>();
-    private Animator Animator => MobStatusModule.Animator;
+    private MobInfo MobInfo => Machine.GetModule<MobInfo>();
+    private Animator Animator => MobInfo.Animator;
 
     public override void OnEnterState()
     {
         Animator.speed = 1f; 
         Animator.Play("EquipSwing", 0, 0f);  
-        Projectile.Spawn(Machine.transform.position,Module<MobStatusModule>().Target.transform.position,
-            MobStatusModule.Equipment.ProjectileInfo, HitboxType.Friendly);
+        Projectile.Spawn(Machine.transform.position,Module<MobInfo>().Target.transform.position,
+            MobInfo.Equipment.ProjectileInfo, HitboxType.Friendly);
     }
     
     public override void OnUpdateState() {
@@ -18,8 +18,8 @@ class MobAttackSwing : State {
         {
             if (stateInfo.IsName("EquipSwing"))
             {
-                Audio.PlaySFX(MobStatusModule.Equipment.Sfx, 0.5f);
-                Animator.speed = MobStatusModule.Equipment.Speed;
+                Audio.PlaySFX(MobInfo.Equipment.Sfx, 0.5f);
+                Animator.speed = MobInfo.Equipment.Speed;
                 Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))

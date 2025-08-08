@@ -11,9 +11,9 @@ public class BlockPreview
     private static List<Vector2> _uvs;
     private static List<Vector3> _normals;  
     
-    public static void Delete()
+    public static void Delete(GameObject gameObject)
     {
-        Object.Destroy(_meshObject);
+        Object.Destroy(gameObject);
     }
 
     public static GameObject Create(string blockID)

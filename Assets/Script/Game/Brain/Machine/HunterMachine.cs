@@ -9,13 +9,13 @@ public class HunterMachine : EntityMachine, IHitBox
     public override void OnStart()
     {
         _ammo = AmmoMax; 
-        AddModule(new MobStatusModule
+        AddModule(new MobInfo
         {
             HitboxType = HitboxType.Enemy,
             HealthMax = 100,
             Defense = 1,
             Equipment = Item.GetItem("pistol"),
-            DistAttack = 16,
+            DistAttack = 18,
             HurtSfx = "npc_hurt", 
             DeathSfx = "player_die",
             SpeedGround = 2.8f
@@ -26,9 +26,8 @@ public class HunterMachine : EntityMachine, IHitBox
         AddModule(new MobSpriteCullModule());
         AddModule(new MobSpriteOrbitModule());
         
-        AddState(new DefaultState(), true);
         AddState(new MobIdle());
-        AddState(new MobChase());
+        AddState(new MobChaseAim());
         AddState(new MobRoam());
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
@@ -37,16 +36,12 @@ public class HunterMachine : EntityMachine, IHitBox
     public override void OnUpdate()
     {
         HandleInput();
-
+        
         if (IsCurrentState<DefaultState>())
         {
-            if (Status.Target)
+            if (Info.Target)
             {
-                if (Vector3.Distance(Status.Target.transform.position, transform.position) < Status.DistAttack 
-                    // Physics.Raycast(transform.position, toTarget.normalized, out RaycastHit hit, distanceToTarget, Game.MaskEntity) &&
-                    // hit.collider.transform == Status.Target &&
-                    // hit.distance <= 1f
-                    )
+                if (InRangeAndVisible())
                 {
                     if (_ammo != 0)
                     {
@@ -59,13 +54,13 @@ public class HunterMachine : EntityMachine, IHitBox
                         _ammo = AmmoMax;
                     }
                 } 
-                else if (Status.PathingStatus == PathingStatus.Stuck)
+                else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();
                 }
                 else
                 {
-                    SetState<MobChase>();
+                    SetState<MobChaseAim>();
                 }
             }
             else
@@ -75,15 +70,34 @@ public class HunterMachine : EntityMachine, IHitBox
                 else
                     SetState<MobIdle>();
             }
+
+
+            bool InRangeAndVisible()
+            {
+                Vector3 origin = transform.position + Vector3.up * 0.3f; 
+                float distance = Vector3.Distance(origin, Info.Target.transform.position);
+
+                // Debug.DrawRay(origin, direction * distance, Color.red, 0.1f); // Lasts 0.1 seconds
+
+                if (distance > Info.DistAttack) return false;
+
+                if (Physics.Raycast(origin, (Info.Target.transform.position - origin).normalized,
+                        out RaycastHit hit, distance, Game.MaskMap))
+                {
+                    return hit.distance >= distance - 0.2f;
+                }
+        
+                return true;
+            }
         }
     }
     
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
-            Status.Target = Game.Player.transform;
+            Info.Target = Game.Player.transform;
         else if (Input.GetKeyDown(KeyCode.T))
-            Status.Target = null;
+            Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))
             transform.position = Game.Player.transform.position;
     }

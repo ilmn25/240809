@@ -1,33 +1,23 @@
 using UnityEngine;
 
-public class EquipSelectState : State
+public class EquipSelectState : PlayerState
 {
-    private PlayerStatusModule _playerStatusModule;
-    private float _cooldownSpeed;
-    private string _sfx;
-    private Animator _animator; 
-    public override void Initialize()
-    {
-        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
-        _animator = Machine.transform.Find("sprite").GetComponent<Animator>();
-    }
-
     public override void OnEnterState()
     {
-        _playerStatusModule.IsBusy = true;   
-        _animator.speed = 1f;
-        _animator.Play("EquipSelect", 0, 0f); // Play from beginning
+        Info.IsBusy = true;   
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipSelect", 0, 0f); // Play from beginning
     }
     
     public override void OnUpdateState()
     { 
-        if (!_playerStatusModule.IsBusy) return;
+        if (!Info.IsBusy) return;
 
-        if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+        if (Info.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
-            _playerStatusModule.IsBusy = false; 
+            Info.IsBusy = false; 
             Machine.SetState<DefaultState>();
-            _animator.Play("EquipIdle", 0, 0f); 
+            Info.Animator.Play("EquipIdle", 0, 0f); 
         } 
     }
 }

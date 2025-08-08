@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class StatusModule : HitboxModule
+public class DynamicInfo : Info
 { 
-    
     public HitboxType HitboxType;
+    public string CharSprite;
     public string HurtSfx;
     public string DeathSfx; 
     public float KnockBackResistance = 1;
@@ -21,14 +21,14 @@ public class StatusModule : HitboxModule
     public Transform SpriteToolTrack;
     public Transform SpriteTool;
     public SpriteRenderer SpriteToolRenderer; 
-    
-    public Vector3 TargetScreenDir; 
+     
     protected int Iframes = 15;
     private int _iframesCurrent;  
     public float AirTime;
     public Vector3 Velocity = Vector3.zero;
     public bool IsGrounded = false;
     public Vector3 Direction = Vector3.zero; 
+    public Vector3 TargetScreenDir; 
 
     protected virtual void OnHit(Projectile projectile) { }
     protected virtual void OnDeath() { } 

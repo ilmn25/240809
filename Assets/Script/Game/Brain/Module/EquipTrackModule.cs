@@ -1,20 +1,18 @@
 using UnityEngine;
 
-public class EquipTrackModule : Module
+public class EquipTrackModule : MobModule
 {
-    private Transform _toolTrack; 
-    private MobStatusModule _mobStatusModule;
+    private Transform _toolTrack;  
     public override void Initialize()
     {
         _toolTrack = Machine.transform.Find("sprite").transform.Find("tool_track"); 
-        _mobStatusModule = Machine.GetModule<MobStatusModule>();
     }
 
     public override void Update()
     {
-        if(!_mobStatusModule.Target) return;
+        if(!Info.Target) return;
         
-        Vector3 targetPos = Camera.main.WorldToScreenPoint(_mobStatusModule.Target.transform.position);
+        Vector3 targetPos = Camera.main.WorldToScreenPoint(Info.Target.transform.position);
         Vector3 selfPos = Camera.main.WorldToScreenPoint(Machine.transform.position);
         Vector2 direction = targetPos - selfPos;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

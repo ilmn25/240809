@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 public abstract class EntityMachine : Machine
 { 
-    public MobStatusModule Status => GetModule<MobStatusModule>();
+    public new MobInfo Info => GetModule<MobInfo>();
     public ChunkEntityData entityData;
     private bool _initialSetup;  
     public ChunkEntityData GetEntityData()
@@ -22,13 +22,16 @@ public abstract class EntityMachine : Machine
         
         Modules.Clear();
         States.Clear();
-        StateCurrent = null;
+        StateCurrent = State.DefaultState;
+        StatePrevious = State.DefaultState;
+        base.Info = null;
+         
         StartInternal();
         
         if (!_initialSetup)
         {
             _initialSetup = true;
-            IEntity entity = Entity.dictionary[entityData.stringID];
+            IEntity entity = Entity.Dictionary[entityData.stringID];
             if (entity.Type == EntityType.Static)
             {
                 if (entity.Bounds == Vector3Int.zero)
@@ -56,7 +59,7 @@ public abstract class EntityMachine : Machine
 
     public void Delete()
     { 
-        if (Entity.dictionary[entityData.stringID].Type == EntityType.Static)
+        if (Entity.Dictionary[entityData.stringID].Type == EntityType.Static)
             EntityStaticLoad.ForgetEntity(this);
         else
             EntityDynamicLoad.ForgetEntity(this);  

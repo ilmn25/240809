@@ -12,19 +12,19 @@ public class PathRandom
         Vector3Int offset;
         if (agent.PathingTarget == PathingTarget.Roam)
         {
-            scanCount = agent.Status.DistRoam;
+            scanCount = agent.Info.DistRoam;
             offset = Node.RandomDirection(scanCount);
         } 
         else if(agent.PathingTarget == PathingTarget.Strafe)
         {
-            scanCount = agent.Status.DistStrafe;
+            scanCount = agent.Info.DistStrafe;
             offset = Node.RandomDirection(scanCount);
         } 
         else // if (agent.PathingTarget == PathingTarget.Escape)
         {
-            scanCount = agent.PathingTarget == PathingTarget.Evade ? agent.Status.DistStrafe : agent.Status.DistEscape;
+            scanCount = agent.PathingTarget == PathingTarget.Evade ? agent.Info.DistStrafe : agent.Info.DistEscape;
             
-            Vector3 dest = agent.Machine.transform.position - agent.Status.Target.position;
+            Vector3 dest = agent.Machine.transform.position - agent.Info.Target.position;
             dest.y = 0;
             offset = Vector3Int.FloorToInt(dest.normalized * scanCount); 
         } 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MobStatusModule : StatusModule
+public class MobInfo : DynamicInfo
 { 
     public int DistAttack = 2;
     public int DistAlert = 10;

@@ -9,8 +9,8 @@ public class PlayerAnimationModule : Module
     private const float TrailFrequency = 0.15f;
     public const float FlipDuration = 0.05f;
 
-    private PlayerMovementModule _playerMovementModule;
-    private PlayerStatusModule _playerStatusModule;
+    private PlayerMovementModule PlayerMovementModule => GetModule<PlayerMovementModule>();
+    private PlayerInfo Info => (PlayerInfo) Machine.Info;
     private int _flipDirection;
     private float _nextTrailTimer = 0f;
     private int _currentScaleState = 0;
@@ -23,11 +23,9 @@ public class PlayerAnimationModule : Module
 
     public override void Initialize()
     {
-        _playerMovementModule = Machine.GetModule<PlayerMovementModule>();
-        _playerStatusModule = Machine.GetModule<PlayerStatusModule>();
         
-        _targetScale = _playerStatusModule.Sprite.localScale; 
-        _originalScale = _playerStatusModule.Sprite.localScale;
+        _targetScale = Info.Sprite.localScale; 
+        _originalScale = Info.Sprite.localScale;
         _flatScale = new Vector3(0, _originalScale.y, 1);
 
         ViewPort.UpdateOrbitRotate += UpdateOrbit;
@@ -40,7 +38,7 @@ public class PlayerAnimationModule : Module
 
     public override void Update()
     {
-        if (_playerStatusModule.PlayerStatus != PlayerStatus.Active) return;
+        if (Info.PlayerStatus != PlayerStatus.Active) return;
         UpdateDirection();
         HandleBounceAndTrail();
         HandleFlipCheck();
@@ -51,16 +49,16 @@ public class PlayerAnimationModule : Module
     {
         if (Inventory.CurrentItemData != null)
         {
-            _animDirection = new Vector2Int((int)Mathf.Sign(_playerStatusModule.TargetScreenDir.x), 0);
+            _animDirection = new Vector2Int((int)Mathf.Sign(Info.TargetScreenDir.x), 0);
             TrackMouse();
         }
         else
         {
-            if (_playerMovementModule.RawInput != Vector2.zero)
+            if (PlayerMovementModule.RawInput != Vector2.zero)
             {
                 _animDirection = new Vector2Int(
-                    Mathf.RoundToInt(_playerMovementModule.RawInput.x),
-                    Mathf.RoundToInt(_playerMovementModule.RawInput.y)
+                    Mathf.RoundToInt(PlayerMovementModule.RawInput.x),
+                    Mathf.RoundToInt(PlayerMovementModule.RawInput.y)
                 );
             } 
         }
@@ -68,8 +66,8 @@ public class PlayerAnimationModule : Module
 
     private void TrackMouse()
     {
-        float angle = Mathf.Atan2(_playerStatusModule.TargetScreenDir.y, 
-            _playerStatusModule.TargetScreenDir.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(Info.TargetScreenDir.y, 
+            Info.TargetScreenDir.x) * Mathf.Rad2Deg;
 
         if (angle > 90)
             angle = 180 - angle;
@@ -81,18 +79,18 @@ public class PlayerAnimationModule : Module
             z = 0.12f;
         else if (z is < 0f and >= -0.11f)
             z = -0.11f; 
-        _playerStatusModule.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
-        _playerStatusModule.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
+        Info.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
+        Info.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
     }
     
     void HandleBounceAndTrail()
     {
-        bool isMoving = _playerMovementModule.SpeedCurrent > 0.35 && _playerStatusModule.IsGrounded;
+        bool isMoving = PlayerMovementModule.SpeedCurrent > 0.35 && Info.IsGrounded;
 
         if (isMoving)
         {
             float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
-            _playerStatusModule.Sprite.localPosition = new Vector3(_playerStatusModule.Sprite.localPosition.x, newY, _playerStatusModule.Sprite.localPosition.z);
+            Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, newY, Info.Sprite.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
             {
@@ -103,7 +101,7 @@ public class PlayerAnimationModule : Module
         }
         else
         {
-            _playerStatusModule.Sprite.localPosition = new Vector3(_playerStatusModule.Sprite.localPosition.x, 0, _playerStatusModule.Sprite.localPosition.z);
+            Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, 0, Info.Sprite.localPosition.z);
         }
     }
 
@@ -138,11 +136,11 @@ public class PlayerAnimationModule : Module
         if (_currentScaleState == 1)
         {
             _flipTimer += Time.deltaTime;
-            _playerStatusModule.Sprite.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
+            Info.Sprite.localScale = Vector3.Lerp(_originalScale, _flatScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _playerStatusModule.Sprite.localScale = _flatScale;
+                Info.Sprite.localScale = _flatScale;
                 _flipTimer = 0f;
                 _currentScaleState = 2;
             }
@@ -150,11 +148,11 @@ public class PlayerAnimationModule : Module
         else if (_currentScaleState == 2)
         {
             _flipTimer += Time.deltaTime;
-            _playerStatusModule.Sprite.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
+            Info.Sprite.localScale = Vector3.Lerp(_flatScale, _targetScale, _flipTimer / FlipDuration);
 
             if (_flipTimer >= FlipDuration)
             {
-                _playerStatusModule.Sprite.localScale = _targetScale;
+                Info.Sprite.localScale = _targetScale;
                 _currentScaleState = 0;
             }
         }

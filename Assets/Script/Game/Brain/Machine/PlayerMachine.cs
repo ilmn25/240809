@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class PlayerMachine : BasicMachine, IHitBox
 {
-    private PlayerStatusModule _playerStatusModule;
+    private new PlayerInfo Info;
     public override void OnStart()
     { 
         PlayerData.Load(); 
-        AddModule(new PlayerStatusModule()
+        AddModule(new PlayerInfo()
         {
             HitboxType = HitboxType.Friendly,
             HealthMax = PlayerData.Inst.health,
@@ -24,9 +24,8 @@ public class PlayerMachine : BasicMachine, IHitBox
         AddModule(new PlayerAnimationModule()); 
         AddModule(new PlayerTerraformModule());  
         
-        _playerStatusModule = GetModule<PlayerStatusModule>();
+        Info = GetModule<PlayerInfo>();
         Inventory.SlotUpdate += EventSlotUpdate;
-        AddState(new DefaultState(), true);
         AddState(new EquipSwingState());
         AddState(new EquipShootState());
         AddState(new EquipSelectState());
@@ -42,7 +41,7 @@ public class PlayerMachine : BasicMachine, IHitBox
         }
          
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Space))
-            _playerStatusModule.PlayerStatus = PlayerStatus.Active; 
+            Info.PlayerStatus = PlayerStatus.Active; 
         if (Input.GetKeyDown(KeyCode.M)) 
             Entity.SpawnPrefab("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
@@ -61,13 +60,13 @@ public class PlayerMachine : BasicMachine, IHitBox
                 case ItemType.Tool:
                     if (Inventory.CurrentItemData.MiningPower != 0 && 
                         Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
+                        Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
-                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionPrimary.Key()) 
+                        if (!Info.IsBusy && Control.Inst.ActionPrimary.Key()) 
                             PlayerTerraformModule.HandleMapBreak(); 
                     } 
-                    if (!_playerStatusModule.IsBusy && 
+                    if (!Info.IsBusy && 
                         (Control.Inst.ActionPrimary.Key() ||
                          Control.Inst.DigUp.Key() ||
                          Control.Inst.DigDown.Key()))
@@ -83,10 +82,10 @@ public class PlayerMachine : BasicMachine, IHitBox
                 
                 case ItemType.Block: 
                     if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, PlayerStatusModule.GetRange()))
+                        Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
-                        if (!_playerStatusModule.IsBusy && Control.Inst.ActionSecondary.Key())
+                        if (!Info.IsBusy && Control.Inst.ActionSecondary.Key())
                         {
                             Animate();
                             PlayerTerraformModule.HandleMapPlace();
@@ -118,14 +117,14 @@ public class PlayerMachine : BasicMachine, IHitBox
             Control.MousePosition + Vector3.up * 0.15f;
         
         // Use ToolTrack's global facing direction, flattened to horizontal
-        Vector3 direction = _playerStatusModule.SpriteToolTrack.right;
-        if (_playerStatusModule.SpriteToolTrack.lossyScale.x < 0f) 
+        Vector3 direction = Info.SpriteToolTrack.right;
+        if (Info.SpriteToolTrack.lossyScale.x < 0f) 
             direction *= -1;
         direction.y = 0;
         direction.Normalize();
         
         // Offset the spawn origin based on that direction
-        Projectile.Spawn(_playerStatusModule.SpriteToolTrack.position + 
+        Projectile.Spawn(Info.SpriteToolTrack.position + 
                          direction * Inventory.CurrentItemData.HoldoutOffset,
             dest,
             Inventory.CurrentItemData.ProjectileInfo,
@@ -135,13 +134,13 @@ public class PlayerMachine : BasicMachine, IHitBox
     public void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
-            _playerStatusModule.SpriteTool.gameObject.SetActive(false);
+            Info.SpriteTool.gameObject.SetActive(false);
         else
         {
-            _playerStatusModule.SpriteTool.gameObject.SetActive(true);
-            _playerStatusModule.SpriteToolRenderer.sprite = 
-            _playerStatusModule.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Inventory.CurrentItemData.StringID);
-            _playerStatusModule.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
+            Info.SpriteTool.gameObject.SetActive(true);
+            Info.SpriteToolRenderer.sprite = 
+            Info.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Inventory.CurrentItemData.StringID);
+            Info.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
             SetState<EquipSelectState>();
         } 
     }

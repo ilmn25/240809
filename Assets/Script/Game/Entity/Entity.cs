@@ -1,35 +1,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Entity 
+
+public enum EntityType { Item, Static, Rigid }
+public partial class Entity
+{ 
+        Vector3Int Bounds { get; }
+        EntityType Type { get; }
+
+}
+public partial class Entity 
 {
-        public static Dictionary<string, IEntity> dictionary = new Dictionary<string, IEntity>();
+        public static readonly Dictionary<string, IEntity> Dictionary = new Dictionary<string, IEntity>();
 
         static Entity()
         {
-                dictionary.Add("tree", new Entity<ChunkEntityData>(new Vector3Int(1, 3, 1)));
-                dictionary.Add("bush1", Entity<ChunkEntityData>.Zero);
-                dictionary.Add("grass", Entity<ChunkEntityData>.Zero);
-                dictionary.Add("stage_hand", Entity<ChunkEntityData>.One);
-                dictionary.Add("slab", Entity<ChunkEntityData>.Zero);
-                dictionary.Add("snare_flea", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                dictionary.Add("chito", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                dictionary.Add("megumin", new Entity<ChunkEntityData>(type: EntityType.Rigid));
-                dictionary.Add("yuuri", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                Dictionary.Add("tree", new Entity<ChunkEntityData>(new Vector3Int(1, 3, 1)));
+                Dictionary.Add("bush1", Entity<ChunkEntityData>.Zero);
+                Dictionary.Add("grass", Entity<ChunkEntityData>.Zero);
+                Dictionary.Add("stage_hand", Entity<ChunkEntityData>.One);
+                Dictionary.Add("slab", Entity<ChunkEntityData>.Zero);
+                Dictionary.Add("snare_flea", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                Dictionary.Add("chito", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                Dictionary.Add("megumin", new Entity<ChunkEntityData>(type: EntityType.Rigid));
+                Dictionary.Add("yuuri", new Entity<ChunkEntityData>(type: EntityType.Rigid));
         }
 
         public static void AddItem(string stringID)
         {
-                dictionary.Add(stringID, Entity<ChunkEntityData>.Item);
+                Dictionary.Add(stringID, Entity<ChunkEntityData>.Item);
         }
         
         public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)
         {
-                return dictionary[stringID].GetChunkEntityData(stringID, new SVector3Int(worldPosition));
+                return Dictionary[stringID].GetChunkEntityData(stringID, new SVector3Int(worldPosition));
         }
         public static ChunkEntityData GetChunkEntityData(string stringID, SVector3Int worldPosition)
         {
-                return dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
+                return Dictionary[stringID].GetChunkEntityData(stringID, worldPosition);
         }
         
         public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true, int count = 1)

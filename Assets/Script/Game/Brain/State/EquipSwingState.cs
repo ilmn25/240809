@@ -1,43 +1,35 @@
 using UnityEngine;
 
-public class EquipSwingState : State
+public class EquipSwingState : PlayerState
 { 
     private float _cooldownSpeed;
-    private string _sfx;
-    private Animator _animator; 
-    public override void Initialize()
-    { 
-        _animator = Module<StatusModule>().Animator;
-    }
-
     public override void OnEnterState()
     {
-        Module<PlayerStatusModule>().IsBusy = true;  
-        _cooldownSpeed = PlayerStatusModule.GetSpeed();
-        _sfx = Inventory.CurrentItemData.Sfx;
-        _animator.speed = 1f; // Reset speed for initial swing
-        _animator.Play("EquipSwing", 0, 0f); // Play from beginning
+        Info.IsBusy = true;  
+        _cooldownSpeed = Info.GetSpeed();
+        Audio.PlaySFX(Inventory.CurrentItemData.Sfx, 0.5f);
+        Info.Animator.speed = 1f; // Reset speed for initial swing
+        Info.Animator.Play("EquipSwing", 0, 0f); // Play from beginning
     }
     
     public override void OnUpdateState()
     { 
-        if (!Module<PlayerStatusModule>().IsBusy) return;
+        if (!Module<PlayerInfo>().IsBusy) return;
 
-        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
 
         if (stateInfo.normalizedTime >= 1f)
         {
             if (stateInfo.IsName("EquipSwing"))
-            {
-                Audio.PlaySFX(_sfx, 0.5f);
-                _animator.speed = _cooldownSpeed;
-                _animator.Play("EquipSwingCooldown", 0, 0f);
+            { 
+                Info.Animator.speed = _cooldownSpeed;
+                Info.Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))
             {
-                _animator.speed = 1f;
-                _animator.Play("EquipIdle", 0, 0f);
-                Module<PlayerStatusModule>().IsBusy = false; 
+                Info.Animator.speed = 1f;
+                Info.Animator.Play("EquipIdle", 0, 0f);
+                Module<PlayerInfo>().IsBusy = false; 
                 Machine.SetState<DefaultState>();
             }
         } 

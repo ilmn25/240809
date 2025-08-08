@@ -78,7 +78,7 @@ public class EntityDynamicLoad
         List<ChunkEntityData> chunkEntityList = World.Inst[chunkCoordinate].dynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
-            switch (Entity.dictionary[entityData.stringID].Type)
+            switch (Entity.Dictionary[entityData.stringID].Type)
             {
                 case EntityType.Item: 
                     currentInstance = ObjectPool.GetObject("item"); 

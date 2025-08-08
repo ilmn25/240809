@@ -15,6 +15,6 @@ public class DestructableMachine : EntityMachine, IHitBox
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         AddModule(new SpriteCullModule(spriteRenderer));  
         AddModule(new SpriteOrbitModule(spriteRenderer)); 
-        AddModule(new DestructableModule(_health, entityData.stringID, _sfx)); 
+        AddModule(new StaticInfo(_health, entityData.stringID, _sfx)); 
     } 
 }

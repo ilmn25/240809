@@ -1,11 +1,11 @@
-public class DestructableModule : HitboxModule
+public class StaticInfo : Info
 {
     private float _health;
     private string _sfxHit;
     private string _sfxDestroy;
     private string _loot;
     
-    public DestructableModule(float health, string loot, string sfxHit, string sfxDestroy = "")
+    public StaticInfo(float health, string loot, string sfxHit, string sfxDestroy = "")
     {
         _health = health;
         _loot = loot;

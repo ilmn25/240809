@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HitboxModule : Module 
+public class Info : Module 
 {
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
 }

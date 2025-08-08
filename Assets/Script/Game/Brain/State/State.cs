@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum Tag
@@ -8,9 +9,11 @@ public enum Tag
 }
 public abstract class State
 {
+    public static DefaultState DefaultState = new DefaultState();
     public Tag[] Tags;
     public Machine Machine;
     public State Parent;
+    public Info Info => (Info) Machine.Info;
  
     public virtual void Initialize() {}
     public virtual void OnEnterState() {}
@@ -23,6 +26,13 @@ public abstract class State
     }
 }
 
-class DefaultState : State
+public class DefaultState : State { }
+
+public class MobState : State
 {
+    public new MobInfo Info => (MobInfo) Machine.Info;
+}
+public class PlayerState : State
+{
+    public new PlayerInfo Info => (PlayerInfo) Machine.Info;
 }
