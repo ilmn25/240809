@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class BugMachine : EntityMachine, IHitBox
+public class BugMachine : MobMachine
 {   
     public override void OnStart()
     {
@@ -14,9 +14,12 @@ public class BugMachine : EntityMachine, IHitBox
             HurtSfx = "npc_hurt",
             DeathSfx = "player_die",
             PathJump = 2,
-            PathAir = 6
+            PathAir = 6,
+            SpeedGround = 14,
+            SpeedAir = 10,
+            JumpVelocity = 12,
         });
-        AddModule(new GroundMovementModule(speed: 14, speedAir: 10, jumpVelocity: 12f));
+        AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());

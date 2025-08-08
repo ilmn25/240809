@@ -6,19 +6,19 @@ public class ObjectPool
 {
     private static Dictionary<string, Queue<GameObject>> _pools = new Dictionary<string, Queue<GameObject>>();
     
-    public static GameObject GetObject(string prefabName)
+    public static GameObject GetObject(string prefabName, string stringID = null)
     {
-        GameObject obj;
-         
-        if (_pools.ContainsKey(prefabName) && _pools[prefabName].Count > 0)
-        {
-            obj = _pools[prefabName].Dequeue();
+        GameObject obj;  
+        stringID ??= prefabName;
+        if (_pools.ContainsKey(stringID) && _pools[stringID].Count > 0)
+        { 
+            obj = _pools[stringID].Dequeue();
             obj.SetActive(true);
         }
         else
         {
             obj = Object.Instantiate(Resources.Load<GameObject>($"prefab/{prefabName}"));
-            obj.name = prefabName;
+            obj.name = stringID;
         } 
 
         return obj;

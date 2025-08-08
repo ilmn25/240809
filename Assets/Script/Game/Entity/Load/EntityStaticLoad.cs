@@ -38,24 +38,26 @@ public class EntityStaticLoad
         foreach (var entityMachine in removeList) entityMachine.Delete();
     }
 
-    public static void LoadEntitiesInChunk(Vector3Int coordinate)
+    public static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
     {  
+        Entity entity;
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
-        List<ChunkEntityData> activeEntities = World.Inst[coordinate].staticEntity;
+        List<ChunkEntityData> activeEntities = World.Inst[chunkCoordinate].staticEntity;
         // Find the key once
-        if (!ActiveEntities.ContainsKey(coordinate))
+        if (!ActiveEntities.ContainsKey(chunkCoordinate))
         {
-            ActiveEntities[coordinate] = (activeEntities, new List<EntityMachine>());
+            ActiveEntities[chunkCoordinate] = (activeEntities, new List<EntityMachine>());
         }
 
         foreach (ChunkEntityData entityData in activeEntities)
-        { 
-            currentInstance = ObjectPool.GetObject(entityData.stringID);
-            currentInstance.transform.position = coordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
-
-            currentEntityMachine = currentInstance.GetComponent<EntityMachine>();
-            ActiveEntities[coordinate].Item2.Add(currentEntityMachine);  
+        {
+            entity = Entity.Dictionary[entityData.stringID];
+            currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
+            currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
+            currentEntityMachine = (EntityMachine)
+                (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
+            ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  
             currentEntityMachine.Initialize(entityData);
         }
         activeEntities.Clear();

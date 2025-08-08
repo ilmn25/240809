@@ -1,10 +1,13 @@
+using UnityEngine;
+
 public class StaticInfo : Info
 {
     private float _health;
     private string _sfxHit;
     private string _sfxDestroy;
     private string _loot;
-    
+    private BoxCollider _boxCollider;
+    public Vector3Int Bounds;
     public StaticInfo(float health, string loot, string sfxHit, string sfxDestroy = "")
     {
         _health = health;
@@ -12,10 +15,11 @@ public class StaticInfo : Info
         _sfxHit = sfxHit;
         _sfxDestroy = sfxDestroy == ""? sfxHit : sfxDestroy;
     }
+ 
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.Target != HitboxType.Enemy) return false;
+        if (projectile.Target != HitboxType.Passive) return false;
         _health -= projectile.Info.GetDamage();
         if (_health <= 0)
         {

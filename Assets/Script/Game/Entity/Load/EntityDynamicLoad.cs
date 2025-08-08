@@ -72,30 +72,22 @@ public class EntityDynamicLoad
     }
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
-    { 
+    {
+        Entity entity;
         EntityMachine currentEntityMachine;
         GameObject currentInstance = null;
         List<ChunkEntityData> chunkEntityList = World.Inst[chunkCoordinate].dynamicEntity;
         foreach (ChunkEntityData entityData in chunkEntityList)
         {   
-            switch (Entity.Dictionary[entityData.stringID].Type)
-            {
-                case EntityType.Item: 
-                    currentInstance = ObjectPool.GetObject("item"); 
-                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
-        
-                    currentInstance.GetComponent<SpriteRenderer>().sprite = 
-                        Resources.Load<Sprite>($"texture/sprite/{entityData.stringID}"); 
-                    break;
+            entity = Entity.Dictionary[entityData.stringID];
+            if (entity.PrefabName == "item")
+                currentInstance = ObjectPool.GetObject(entity.PrefabName);
+            else                
+                currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
 
-                case EntityType.Rigid:
-                    // Lib.Log(((NPCCED)entityData).npcStatus);
-                    currentInstance = ObjectPool.GetObject(entityData.stringID);
-                    currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
-                    break;
-            }
-            
-            currentEntityMachine = currentInstance.GetComponent<EntityMachine>();
+            currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
+            currentEntityMachine = (EntityMachine)
+                (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine)); 
             _activeEntities.Add(currentEntityMachine); 
             currentEntityMachine.Initialize(entityData);
         }

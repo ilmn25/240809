@@ -9,7 +9,16 @@ public class NPCCED : ChunkEntityData
 }
 
 
-public class GhoulMachine : EntityMachine, IHitBox
+public class MobMachine : EntityMachine, IHitBox
+{
+    public override void OnSetup()
+    {
+        transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>().sprite =
+            Cache.LoadSprite("character/" + entityData.stringID);
+    }
+}
+
+public class GhoulMachine : MobMachine
 {  
 
     public override void OnStart()

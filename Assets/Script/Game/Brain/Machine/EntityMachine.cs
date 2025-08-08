@@ -7,6 +7,7 @@ public abstract class EntityMachine : Machine
 { 
     public new MobInfo Info => GetModule<MobInfo>();
     public ChunkEntityData entityData;
+    public Entity Entity;
     private bool _initialSetup;  
     public ChunkEntityData GetEntityData()
     {
@@ -15,54 +16,38 @@ public abstract class EntityMachine : Machine
         return entityData;
     } 
     
+    public virtual void OnSetup() {}
     public virtual void UpdateEntityData() { }
     
     public void Initialize(ChunkEntityData data) { 
         entityData = data;   
-        
+        if (!_initialSetup)
+        { 
+            _initialSetup = true;
+            Entity = Entity.Dictionary[entityData.stringID]; 
+            gameObject.layer = Entity.Collision? Game.IndexCollide : Game.IndexNoCollide;
+            if (Entity.Bounds != Vector3Int.zero)
+            {
+                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+                boxCollider.size = Entity.Bounds;
+                boxCollider.center = new Vector3(0, Entity.Bounds.y / 2, 0); 
+            } 
+            OnSetup();
+        } 
         Modules.Clear();
         States.Clear();
         StateCurrent = State.DefaultState;
         StatePrevious = State.DefaultState;
         base.Info = null;
-         
         StartInternal();
-        
-        if (!_initialSetup)
-        {
-            _initialSetup = true;
-            IEntity entity = Entity.Dictionary[entityData.stringID];
-            if (entity.Type == EntityType.Static)
-            {
-                if (entity.Bounds == Vector3Int.zero)
-                {
-                    gameObject.layer = Game.IndexDynamic;
-                    gameObject.isStatic = false;  
-                }
-                else
-                {
-                    gameObject.layer = Game.IndexStatic;
-                    gameObject.isStatic = true;  
-                } 
-                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-                boxCollider.size = entity.Bounds;
-                boxCollider.center = new Vector3(0, entity.Bounds.y / 2, 0);
-            }
-            else if (entity.Type == EntityType.Rigid)
-            {
-                gameObject.layer = Game.IndexDynamic;
-                gameObject.isStatic = false;  
-                gameObject.AddComponent<SphereCollider>();
-            }  
-        } 
     }
 
     public void Delete()
     { 
-        if (Entity.Dictionary[entityData.stringID].Type == EntityType.Static)
+        if (Entity.StaticLoad)
             EntityStaticLoad.ForgetEntity(this);
-        else
-            EntityDynamicLoad.ForgetEntity(this);  
+        else 
+            EntityDynamicLoad.ForgetEntity(this);
         ObjectPool.ReturnObject(gameObject); 
     }  
 }

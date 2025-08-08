@@ -19,8 +19,8 @@ public class MobInfo : DynamicInfo
     public Item Equipment;
      
     public Transform Target; 
-    public PathingStatus PathingStatus = PathingStatus.Pending; 
-    
+    public PathingStatus PathingStatus = PathingStatus.Pending;
+
     protected override void OnUpdate()
     {
         if (Target)
@@ -41,4 +41,5 @@ public class MobInfo : DynamicInfo
         Loot.Gettable(((EntityMachine)Machine).entityData.stringID).Spawn(Machine.transform.position);
         ((EntityMachine)Machine).Delete();
     }
+    
 }

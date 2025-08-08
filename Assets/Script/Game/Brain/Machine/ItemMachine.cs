@@ -6,13 +6,19 @@ public class ItemMachine : EntityMachine
 {
     public bool pickUp = true;
     private bool _wasInRange;
+    private SpriteRenderer _spriteRenderer;
     
+    public override void OnSetup()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>(); 
+    }
+
     public override void OnStart()
-    { 
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>(); 
+    {  
+        _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + entityData.stringID);
         AddModule(new ItemPhysicModule()); 
-        AddModule(new SpriteCullModule(spriteRenderer)); 
-        AddModule(new SpriteOrbitModule(spriteRenderer)); 
+        AddModule(new SpriteCullModule(_spriteRenderer)); 
+        AddModule(new SpriteOrbitModule(_spriteRenderer)); 
         AddState(new ItemState(),true);
     }
 

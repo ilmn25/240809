@@ -5,14 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class GroundMovementModule : MovementModule
-{
-    private readonly float _speed;
-    private readonly float _speedAir;
-    private readonly float _accelerationTime;
-    private readonly float _decelerationTime; 
-    private readonly float _gravity;
-    private readonly float _jumpVelocity;
-    private readonly float _collisionRadius;  
+{ 
     private const float SlideDegree = 0.3f;
      
     private float _speedCurrent;
@@ -27,26 +20,7 @@ public class GroundMovementModule : MovementModule
     private Vector3 _testPositionB;
     private Vector3 _tempPosition;
     
-    private Collider[] _colliderArray = new Collider[1];
-    
-    public GroundMovementModule(
-        float speed = 5f,
-        float speedAir = 6f,
-        float accelerationTime = 0.3f,
-        float decelerationTime = 0.08f,
-        float gravity = -40f,
-        float jumpVelocity = 10f,
-        float collisionRadius = 0.3f)
-    {
-        _speed = speed;
-        _speedAir = speedAir;
-        _accelerationTime = accelerationTime;
-        _decelerationTime = decelerationTime;
-        _gravity = gravity;
-        _jumpVelocity = jumpVelocity;
-        _collisionRadius = collisionRadius;
-    }
-
+    private static Collider[] _colliderArray = new Collider[1];
 
     public override void Update()
     { 
@@ -63,8 +37,8 @@ public class GroundMovementModule : MovementModule
         if (Info.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = Info.IsGrounded ? _speed : _speedAir;
-            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / _accelerationTime);
+            _speedTarget = Info.IsGrounded ? Info.SpeedGround : Info.SpeedAir;
+            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / Info.AccelerationTime);
             _speedAdjust = (Info.Direction.x != 0 && Info.Direction.z != 0) ? 1 / 1.25f : 1; 
 
             _newPosition.x += Info.Direction.x * _speedCurrent * _deltaTime * _speedAdjust;
@@ -79,7 +53,7 @@ public class GroundMovementModule : MovementModule
         else if (_speedCurrent != 0)
         {
             //! slowing down to stop
-            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / _decelerationTime);
+            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / Info.DecelerationTime);
 
             _newPosition.x += _directionBuffer.x * _speedCurrent * _deltaTime;
             _newPosition.z += _directionBuffer.z * _speedCurrent * _deltaTime;
@@ -99,7 +73,7 @@ public class GroundMovementModule : MovementModule
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
         if (Info.IsGrounded && Info.Direction.y > 0)
         {
-            Info.Velocity.y = _jumpVelocity; 
+            Info.Velocity.y = Info.JumpVelocity; 
             Info.IsGrounded = false;
         }
     }
@@ -156,9 +130,9 @@ public class GroundMovementModule : MovementModule
     
     private void HandleMove()
     { 
-        if (Info.Velocity.y > _gravity) //terminal velocity
+        if (Info.Velocity.y > Info.Gravity) //terminal velocity
         {
-            Info.Velocity.y += _gravity * _deltaTime;
+            Info.Velocity.y += Info.Gravity * _deltaTime;
         } 
         
         _tempPosition = new Vector3(_newPosition.x + Info.Velocity.x * _deltaTime, _newPosition.y, _newPosition.z);
@@ -200,11 +174,8 @@ public class GroundMovementModule : MovementModule
     private bool IsMovable(Vector3 newPosition)
     {
         // if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(newPosition), Scene.LogicDistance)) return false;  
-        _colliderArray = new Collider[1];
         
-        Vector3 halfExtents = new Vector3(_collisionRadius, _collisionRadius, _collisionRadius);
-
-        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), halfExtents, _colliderArray, Quaternion.identity, Game.MaskStatic) > 0);
+        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), Vector3.one * Info.CollisionRadius, _colliderArray, Quaternion.identity, Game.MaskStatic) > 0);
     } 
 } 
 

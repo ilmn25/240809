@@ -18,7 +18,6 @@ public class PlayerAnimationModule : Module
     private Vector3 _originalScale;
     private Vector3 _flatScale;
     private Vector3 _targetScale; 
-    private float _previousY = 1;
     private Vector2Int _animDirection = Vector2Int.zero;
 
     public override void Initialize()
@@ -117,18 +116,6 @@ public class PlayerAnimationModule : Module
                 _currentScaleState = 1;
             }
         }
-        else
-        {
-            if (_animDirection.y != (int)_previousY && Mathf.Sign(_animDirection.y) != Mathf.Sign(_targetScale.x))
-            {
-                _flipDirection = _animDirection.y;
-                _targetScale = new Vector3(Mathf.Sign(_flipDirection), _originalScale.y, _originalScale.z);
-                _flipTimer = 0f;
-                _currentScaleState = 1;
-            }
-        }
-
-        _previousY = _animDirection.y;
     }
 
     void HandleScaling()

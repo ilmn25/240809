@@ -15,7 +15,6 @@ public class PlayerInfo : DynamicInfo
     public bool Invincibility = false;
     public PlayerStatus PlayerStatus = PlayerStatus.Freeze;
     
-
     public override void Initialize()
     { 
         base.Initialize();
@@ -25,8 +24,7 @@ public class PlayerInfo : DynamicInfo
     protected override void OnUpdate()
     {
         TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
-         
-        
+
         if (Hunger > 0) Hunger -= 0.01f; 
     }
 
