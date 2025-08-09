@@ -49,7 +49,7 @@ public class GUIDialogue
     {
         _audioSource = Audio.PlaySFX("text", 0.2f, true);
         
-        _scrollTask =  new CoroutineTask(GUI.ScrollText(_entityState.Dialogue.Lines[_currentLine], Game.GUIDialogueText));
+        _scrollTask =  new CoroutineTask(GUIMain.ScrollText(_entityState.Dialogue.Lines[_currentLine], Game.GUIDialogueText));
         _scrollTask.Finished += (bool isManual) => 
         { 
             Audio.StopSFX(_audioSource);
@@ -71,17 +71,17 @@ public class GUIDialogue
         Game.GUIDialogue.SetActive(true);
         Game.GUIImage.SetActive(true);
         HandleScroll(); 
-        _slideTask = new CoroutineTask(GUI.Slide(true, 0.2f, Game.GUIImage, 
+        _slideTask = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
             new Vector3(220, -95, 203), EaseSpeed));
-        _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIDialogue, 
+        _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
             0.9f, EaseSpeed)); 
     }
  
     private static void HideDialogue()
     { 
-        _slideTask = new CoroutineTask(GUI.Slide(false, 0.1f, Game.GUIImage, 
+        _slideTask = new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
             new Vector3(450, -95, 203), EaseSpeed));
-        _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIDialogue, 
+        _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
             0, EaseSpeed));  
         _scaleTask.Finished += (bool isManual) => 
         {

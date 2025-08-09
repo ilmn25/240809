@@ -30,6 +30,7 @@ public partial class Entity
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, false);
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 
                 AddStructure<SlabMachine>("slab", Vector3Int.one, false);
+                AddStructure<ChestMachine>("chest", Vector3Int.one, true);
                 
                 AddMob<HunterMachine>("chito"); 
                 AddMob<HunterMachine>("yuuri");

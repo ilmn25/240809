@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class  GUIStorage 
+public class  GUIStorage : GUI
 {  
     public EventHandler OnRefreshSlot;
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
     
-    public List<InvSlot> Storage; 
+    public List<ItemSlot> Storage; 
     public int RowAmount = 3;
     public int SlotAmount = 9;
     public Vector2 Position;
@@ -19,7 +19,6 @@ public class  GUIStorage
     private RectTransform _storageRect;
     private RectTransform _parentRect; 
     private GameObject _shadow;
-    public bool IsHover;
     public bool IsDrag;
     private Vector2 _dragOffset;
  
@@ -29,7 +28,7 @@ public class  GUIStorage
         _storageObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
             Game.GUIInv.transform);
         _storageObject.name = "gui_storage";
-        _storageObject.GetComponent<GUIStorageModule>().GUIStorage = this;
+        _storageObject.GetComponent<HoverModule>().GUI = this;
         _storageRect = _storageObject.GetComponent<RectTransform>();
         _storageRect.anchoredPosition = Position;
         _parentRect = _storageRect.parent.GetComponent<RectTransform>();
@@ -48,9 +47,9 @@ public class  GUIStorage
                 column * (SlotSize + _margin.x) - 160,
                 -row * (SlotSize + _margin.y)
             );
-            GUIItemSlot guiItemSlot = slot.AddComponent<GUIItemSlot>();
-            guiItemSlot.slotNumber = row * SlotAmount + column;
-            guiItemSlot.GUIStorage = this;
+            GUIStorageSlot guiStorageSlot = slot.AddComponent<GUIStorageSlot>();
+            guiStorageSlot.slotNumber = row * SlotAmount + column;
+            guiStorageSlot.GUIStorage = this;
         }
     }
 
@@ -117,7 +116,7 @@ public class  GUIStorage
             GUICursor.SetInfoPanel();
             return;
         }
-        InvSlot slot = Storage[currentSlotKey];
+        ItemSlot slot = Storage[currentSlotKey];
         if (slot.Stack != 0)
         { 
             GUICursor.SetInfoPanel(slot.StringID + " (" + slot.Stack + ")\n" + 
@@ -148,7 +147,7 @@ public class GUIChest : GUIStorage
         } 
         else
         {
-            (Inventory.Storage[CurrentSlotKey], GUICursor.Data) = 
+            (Storage[CurrentSlotKey], GUICursor.Data) = 
                 (GUICursor.Data, Storage[CurrentSlotKey]);
         } 
         GUICursor.UpdateCursorSlot();
@@ -156,15 +155,15 @@ public class GUIChest : GUIStorage
 
     protected override void ActionSecondary()
     {
-        InvSlot invSlot = Storage[CurrentSlotKey];
-        if (!invSlot.isEmpty())
+        ItemSlot itemSlot = Storage[CurrentSlotKey];
+        if (!itemSlot.isEmpty())
         {
-            if (GUICursor.Data.isEmpty() || invSlot.isSame(GUICursor.Data))
+            if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
                 if (Input.GetKey(KeyCode.LeftShift))
-                    GUICursor.Data.Add(invSlot, invSlot.Stack/2);
+                    GUICursor.Data.Add(itemSlot, itemSlot.Stack/2);
                 else 
-                    GUICursor.Data.Add(invSlot, 1);
+                    GUICursor.Data.Add(itemSlot, 1);
                         
                 GUICursor.UpdateCursorSlot();
             }

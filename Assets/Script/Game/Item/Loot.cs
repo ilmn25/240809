@@ -69,5 +69,19 @@ public class Loot
             }
         }
     }
- 
+    
+    public void AddToContainer(Storage storage)
+    { 
+        foreach (var entry in Table)
+        {
+            float chance = entry.Key;
+            List<string> items = entry.Value;
+
+            if (Random.value <= chance && items.Count > 0)
+            {
+                string itemID = items[Random.Range(0, items.Count)];
+                storage.AddItem(itemID);
+            }
+        }
+    }
 }

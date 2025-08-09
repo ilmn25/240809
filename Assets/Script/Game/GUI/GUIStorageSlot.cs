@@ -2,10 +2,9 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class GUIItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private Image _image;
     private TextMeshProUGUI _text;
@@ -21,7 +20,7 @@ public class GUIItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void OnRefreshSlot(object sender, EventArgs e)
     {
-        InvSlot slot = Inventory.Storage[slotNumber];
+        ItemSlot slot = Inventory.Storage[slotNumber];
         if (slot.Stack != 0)
         {
             _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slot.StringID}");

@@ -59,7 +59,8 @@ public class PlayerMachine : BasicMachine, IHitBox
     
     public override void OnUpdate()
     {
-        HandleInput(); 
+        HandleInput();
+        if (GUIMain.IsHover) return;
         switch (Inventory.CurrentItemData?.Type)
         {
             case ItemType.Tool:

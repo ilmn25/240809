@@ -17,11 +17,26 @@ public class StructureInfo : Info
             Audio.PlaySFX(SfxDestroy); 
             ((EntityMachine)Machine).Delete();
             global::Loot.Gettable(Loot).Spawn(Machine.transform.position);
+            OnHit();
         }
         else
         {
             Audio.PlaySFX(SfxHit); 
+            OnDestroy();
         }
         return true;
+    }
+
+    public virtual void OnHit() { }
+    public virtual void OnDestroy() { }
+}
+
+
+public class ContainerInfo : StructureInfo
+{
+    public Storage Storage;
+    public override void OnDestroy()
+    {
+        Storage.Explode(Machine.transform.position);
     }
 }
