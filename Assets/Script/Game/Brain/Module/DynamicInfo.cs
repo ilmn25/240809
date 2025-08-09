@@ -9,7 +9,7 @@ public class DynamicInfo : Info
     public float KnockBackResistance = 1;
      
     public float SpeedGround = 5;
-    public float SpeedAir = 6;
+    public float SpeedAir = 10;
     public float AccelerationTime = 0.3f;
     public float DecelerationTime = 0.08f;
     public float Gravity = -40f;
@@ -18,7 +18,8 @@ public class DynamicInfo : Info
     public float Health; 
     public float HealthMax;
     public float Defense; 
-    public float CollisionRadius = 0.3f;
+    public float MapCollisionRadius = 0.3f;
+    public float EntityCollisionRadius = 0.15f;
     
     public Transform Sprite;
     public Animator Animator;
@@ -36,9 +37,23 @@ public class DynamicInfo : Info
     public Vector3 Direction = Vector3.zero; 
     public Vector3 TargetScreenDir; 
 
+    private static readonly Collider[] ColliderArray = new Collider[3];
+    
     protected virtual void OnHit(Projectile projectile) { }
     protected virtual void OnDeath() { } 
-    protected virtual void OnUpdate() { } 
+    protected virtual void OnUpdate() { 
+        int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Game.MaskEntity);
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider col = ColliderArray[i];
+
+            if (col.gameObject == Machine.gameObject)
+                continue;
+
+            KnockBack(col.transform.position, 0.4f, true);
+            break; 
+        }
+    } 
 
     public override void Initialize()
     { 

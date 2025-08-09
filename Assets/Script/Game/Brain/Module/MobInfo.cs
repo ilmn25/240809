@@ -14,20 +14,22 @@ public class MobInfo : DynamicInfo
     public int PathHeight = 1;
     public int PathFall = 15;
     public int PathAir = 3;
-    public int PathAmount = 500;
+    public int PathAmount = 5000;
     
     public Item Equipment;
      
     public Transform Target; 
-    public PathingStatus PathingStatus = PathingStatus.Pending;
+    public PathingStatus PathingStatus = PathingStatus.Pending; 
 
     protected override void OnUpdate()
     {
+        base.OnUpdate();
         if (Target)
         {
             TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.transform.position) - 
                               Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
-        } 
+        }
+ 
     }
 
     protected override void OnHit(Projectile projectile)
