@@ -8,8 +8,6 @@ public class GUI
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
     
-    public static bool Active = false;
-    
     private static CoroutineTask _showTask; 
     private static GUIStorage _inventory;
     private static GUIStorage _storage;
@@ -37,20 +35,12 @@ public class GUI
  
     public static void Update()
     {
-        Active = Game.GUIInv.activeSelf;
-        Camera.main.depth = Active? -1 : 1;
         
         GUIDialogue.Update();
-        if (Active)
-        {
-            if (Control.Inst.ActionPrimary.KeyDown())
-                Audio.PlaySFX("pick_up", 0.6f);
-            
-            GUICraft.Update(); 
-            GUICursor.Update();
-            _inventory.Update();
-            _storage.Update();
-        }
+        GUICraft.Update(); 
+        GUICursor.Update();
+        _inventory.Update();
+        _storage.Update();
 
         if (Control.Inst.Inv.KeyDown())  
         {
