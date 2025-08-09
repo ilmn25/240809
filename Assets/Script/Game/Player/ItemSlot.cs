@@ -1,7 +1,7 @@
 using System;
 
 [System.Serializable]
-public class InvSlot
+public class ItemSlot
 {
     public int Stack = 0;
     public string StringID;
@@ -24,7 +24,7 @@ public class InvSlot
         Locked = false;
     }
  
-    public void Add(InvSlot slot, int amountToAdd = 0)
+    public void Add(ItemSlot slot, int amountToAdd = 0)
     {
         if (slot.isEmpty()) return;
         int maxStackSize = Item.GetItem(slot.StringID).StackSize;
@@ -48,7 +48,7 @@ public class InvSlot
         if (slot.Stack == 0) slot.clear();
     }
 
-    public bool isSame(InvSlot slot)
+    public bool isSame(ItemSlot slot)
     {
         return slot.StringID == StringID && slot.Modifier == Modifier;
     }

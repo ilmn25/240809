@@ -55,7 +55,7 @@ public class Game : MonoBehaviour
         Item.Initialize();
         Entity.Initialize();
         Loot.Initialize();
-        GUI.Initialize(); 
+        GUIMain.Initialize(); 
         WorldGen.Initialize();
         Audio.Initialize();
         Block.Initialize(); 
@@ -73,7 +73,7 @@ public class Game : MonoBehaviour
             World.Save(0);
         }
         
-        GUI.Update();
+        GUIMain.Update();
         SetPiece.Update();
         Inventory.Update();
         Control.Update();

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GUICursor 
 {
-    public static InvSlot Data = new InvSlot();
+    public static ItemSlot Data = new ItemSlot();
 
     private static TextMeshProUGUI _cursorInfoText; 
     private static TextMeshProUGUI _cursorSlotText;
@@ -43,7 +43,7 @@ public class GUICursor
     
     public static void UpdateCursorSlot()
     {
-        GUI.RefreshStorage();
+        GUIMain.RefreshStorage();
         if (Data.Stack == 0)
         {
             Game.GUICursorSlot.SetActive(false);

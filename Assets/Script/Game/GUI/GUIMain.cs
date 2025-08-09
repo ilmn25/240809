@@ -3,14 +3,20 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class GUI 
+public class GUI
 {
+    public bool IsHover;
+} 
+public class GUIMain 
+{ 
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
     
     private static CoroutineTask _showTask; 
     private static GUIStorage _inventory;
-    private static GUIStorage _storage;
+    public static GUIStorage Storage;
+    
+    public static bool IsHover;
     public static void Initialize()
     {
         GUICraft.Initialize();
@@ -23,14 +29,14 @@ public class GUI
             Position = new Vector2(0, 166), 
         };
         _inventory.Initialize();
-        _storage = new GUIInventory()
+        Storage = new GUIInventory()
         {
             Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -19), 
         };
-        _storage.Initialize();
+        Storage.Initialize();
     }
  
     public static void Update()
@@ -40,7 +46,7 @@ public class GUI
         GUICraft.Update(); 
         GUICursor.Update();
         _inventory.Update();
-        _storage.Update();
+        Storage.Update();
 
         if (Control.Inst.Inv.KeyDown())  
         {
@@ -50,7 +56,7 @@ public class GUI
                 { 
                     Game.GUIInv.SetActive(true); 
                     RefreshStorage();
-                    _showTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, 0.7f));
+                    _showTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIInv, 0.7f));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -58,7 +64,7 @@ public class GUI
                 }
                 else
                 {
-                    _showTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, 0));
+                    _showTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIInv, 0));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -72,7 +78,7 @@ public class GUI
     public static void RefreshStorage()
     {
         _inventory.OnRefreshSlot?.Invoke(_inventory, null);
-        _storage.OnRefreshSlot?.Invoke(_storage, null);
+        Storage.OnRefreshSlot?.Invoke(Storage, null);
     }
 
     public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)

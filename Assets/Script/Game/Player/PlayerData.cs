@@ -5,7 +5,7 @@ using System.IO;
 [Serializable]
 public class PlayerData
 {
-    public List<InvSlot> inventory;
+    public List<ItemSlot> inventory;
     public int health = 1000;
     public int mana = 100;
     public int sanity = 100;
@@ -19,12 +19,12 @@ public class PlayerData
     public PlayerData()
     {
         int totalSlots = Inventory.InventorySlotAmount * Inventory.InventoryRowAmount;
-        inventory = new List<InvSlot>(totalSlots);
+        inventory = new List<ItemSlot>(totalSlots);
         for (int i = 0; i < totalSlots; i++)
         {
-            inventory.Add(new InvSlot());
+            inventory.Add(new ItemSlot());
         }
-    } 
+    }
     
     public static void Save()
     { 
