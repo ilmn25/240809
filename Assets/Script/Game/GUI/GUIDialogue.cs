@@ -25,7 +25,7 @@ public class GUIDialogue
             
             if (Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown())
             { 
-                Audio.PlaySFX("text", 0.2f); //sound effect click 
+                Audio.PlaySFX("text", 0.2f); 
                 
                 if (_scrollTask.Running)
                 {
@@ -71,15 +71,15 @@ public class GUIDialogue
         Game.GUIDialogue.SetActive(true);
         Game.GUIImage.SetActive(true);
         HandleScroll(); 
-        _slideTask = new CoroutineTask(GUI.Slide(true, ShowDuration, Game.GUIImage, 
-            new Vector3(165, -95, 203), EaseSpeed));
+        _slideTask = new CoroutineTask(GUI.Slide(true, 0.2f, Game.GUIImage, 
+            new Vector3(220, -95, 203), EaseSpeed));
         _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIDialogue, 
             0.9f, EaseSpeed)); 
     }
  
     private static void HideDialogue()
     { 
-        _slideTask = new CoroutineTask(GUI.Slide(false, HideDuration, Game.GUIImage, 
+        _slideTask = new CoroutineTask(GUI.Slide(false, 0.1f, Game.GUIImage, 
             new Vector3(450, -95, 203), EaseSpeed));
         _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIDialogue, 
             0, EaseSpeed));  

@@ -29,12 +29,12 @@ public class PlayerData
     public static void Save()
     { 
         Inst.inventory = Inventory.Storage;
-        Utility.Save(Inst, "player");
+        Utility.FileSave(Inst, "player");
     }
 
     public static void Load()
     {
-        Inst = Utility.Load<PlayerData>("player") ?? new PlayerData();
+        Inst = Utility.FileLoad<PlayerData>("player") ?? new PlayerData();
         Inventory.SetInventory(Inst.inventory);
     }
 } 

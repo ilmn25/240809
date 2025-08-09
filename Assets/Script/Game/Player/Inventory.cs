@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class Inventory 
 {
-    public static List<InvSlot> Storage;
+    public static List<InvSlot> Storage; 
 
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
     private static int _currentKey = 0;
-    public static InvSlot CurrentItem;
+    public static InvSlot CurrentInv;
     public static Item CurrentItemData;
 
     public static readonly int InventoryRowAmount = 3;
@@ -26,10 +26,10 @@ public class Inventory
     
     public static void Update()
     { 
-        if (Control.Inst.Drop.KeyDown() && CurrentItem != null)
+        if (Control.Inst.Drop.KeyDown() && CurrentInv != null)
         {
-            Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
-            RemoveItem(CurrentItem.StringID); 
+            Entity.SpawnItem(CurrentInv.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
+            RemoveItem(CurrentInv.StringID); 
         }
 
         if (Control.Inst.Hotbar.KeyDown())
@@ -94,12 +94,11 @@ public class Inventory
     public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = Storage[_currentKey];
+        CurrentInv = Storage[_currentKey];
         Item itemData = CurrentItemData;
-        CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
+        CurrentItemData = CurrentInv.Stack == 0 ? null : Item.GetItem(CurrentInv.StringID);
         if (itemData != CurrentItemData)
-            SlotUpdate?.Invoke();
-        GUIStorage.RefreshCursorSlot();
+            SlotUpdate?.Invoke(); 
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)

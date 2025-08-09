@@ -1,14 +1,16 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class GUIItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private Image _image;
     private TextMeshProUGUI _text;
     public int slotNumber;
+    public GUIStorage GUIStorage;
     
     private void Awake()
     {
@@ -17,7 +19,7 @@ public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExi
         _text = transform.Find("text").GetComponent<TextMeshProUGUI>();
     }
 
-    public void OnRefreshSlot()
+    private void OnRefreshSlot(object sender, EventArgs e)
     {
         InvSlot slot = Inventory.Storage[slotNumber];
         if (slot.Stack != 0)
@@ -32,11 +34,13 @@ public class GUIInvSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExi
             _text.text = "";
         } 
     }
+ 
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        GUIStorage.SetInfoPanel(slotNumber);
-        ScaleSlot(1.1f);
+        if (GUIStorage.IsDrag) return;
+            GUIStorage.SetInfoPanel(slotNumber);
+            ScaleSlot(1.1f);
     }
  
     public void OnPointerExit(PointerEventData eventData)
