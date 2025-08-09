@@ -55,7 +55,7 @@ public class PlayerTerraformModule : Module
     
     public override void Update()
     {  
-        if (GUI.Active) return;
+        // if (GUI.Active) return;
   
         if ( Control.Inst.DigUp.KeyDown())
         {

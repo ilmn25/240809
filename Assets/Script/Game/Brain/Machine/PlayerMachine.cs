@@ -60,47 +60,44 @@ public class PlayerMachine : BasicMachine, IHitBox
     public override void OnUpdate()
     {
         HandleInput(); 
-        if (!GUI.Active)
+        switch (Inventory.CurrentItemData?.Type)
         {
-            switch (Inventory.CurrentItemData?.Type)
-            {
-                case ItemType.Tool:
-                    if (Inventory.CurrentItemData.MiningPower != 0 && 
-                        Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
+            case ItemType.Tool:
+                if (Inventory.CurrentItemData.MiningPower != 0 && 
+                    Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                    Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
+                {
+                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
+                    if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
+                        PlayerTerraformModule.HandleMapBreak(); 
+                } 
+                if (!_info.IsBusy && 
+                    (Control.Inst.ActionPrimary.Key() ||
+                     Control.Inst.DigUp.Key() ||
+                     Control.Inst.DigDown.Key()))
+                {
+                    if (Inventory.CurrentItemData.Ammo != null && 
+                        Inventory.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
+                    Attack();
+                    Animate(); 
+                    if (Inventory.CurrentItemData.Ammo != null) Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);
+                }
+
+                break;
+            
+            case ItemType.Block: 
+                if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                    Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
+                {
+                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
+                    if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
                     {
-                        PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
-                        if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
-                            PlayerTerraformModule.HandleMapBreak(); 
-                    } 
-                    if (!_info.IsBusy && 
-                        (Control.Inst.ActionPrimary.Key() ||
-                         Control.Inst.DigUp.Key() ||
-                         Control.Inst.DigDown.Key()))
-                    {
-                        if (Inventory.CurrentItemData.Ammo != null && 
-                            Inventory.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
-                        Attack();
-                        Animate(); 
-                        if (Inventory.CurrentItemData.Ammo != null) Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);
+                        Animate();
+                        PlayerTerraformModule.HandleMapPlace();
                     }
- 
-                    break;
-                
-                case ItemType.Block: 
-                    if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
-                    {
-                        PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
-                        if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
-                        {
-                            Animate();
-                            PlayerTerraformModule.HandleMapPlace();
-                        }
-                    }
-                    break;
-            } 
-        }
+                }
+                break;
+        } 
     }
  
 

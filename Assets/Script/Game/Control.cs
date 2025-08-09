@@ -81,8 +81,6 @@ public class Control
         
         HandleScroll();
         
-        if (GUI.Active) return;
-        
         HandleRaycast(); 
         
         HandleInput();
@@ -125,11 +123,8 @@ public class Control
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0) return;
 
-        if (GUI.Active)
-        {
-            GUICraft.HandleScrollInput(scroll);
-        }
-        else if (Input.GetKey(KeyCode.Mouse1))
+        // GUICraft.HandleScrollInput(scroll);
+        if (Input.GetKey(KeyCode.Mouse1))
         { 
             ViewPort.HandleScrollInput(scroll); 
         }

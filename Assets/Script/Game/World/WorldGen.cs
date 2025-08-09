@@ -5,15 +5,15 @@ public class WorldGen
 {
     private static System.Random Random;
 
-    // private static readonly bool SpawnStaticEntity = true;
-    // private static readonly bool SpawnDynamicEntity = true;
-    // private static readonly bool Flat = false;
-    // public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
+    private static readonly bool SpawnStaticEntity = true;
+    private static readonly bool SpawnDynamicEntity = true;
+    private static readonly bool Flat = false;
+    public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
     
-    private static readonly bool SpawnStaticEntity = false;
-    private static readonly bool SpawnDynamicEntity = false;
-    private static readonly bool Flat = true;
-    public static readonly Vector3Int Size = new Vector3Int(10, 2, 10);
+    // private static readonly bool SpawnStaticEntity = false;
+    // private static readonly bool SpawnDynamicEntity = false;
+    // private static readonly bool Flat = true;
+    // public static readonly Vector3Int Size = new Vector3Int(10, 2, 10);
     
     private const float StoneScale = 0.02f;
     private const float DirtScale = 0.05f;
