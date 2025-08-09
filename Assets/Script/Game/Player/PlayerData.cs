@@ -6,7 +6,7 @@ using System.IO;
 public class PlayerData
 {
     public List<InvSlot> inventory;
-    public int health = 100;
+    public int health = 1000;
     public int mana = 100;
     public int sanity = 100;
     public int hunger = 100;

@@ -47,7 +47,7 @@ public class DynamicInfo : Info
         {
             Collider col = ColliderArray[i];
 
-            if (col.gameObject == Machine.gameObject)
+            if (col.gameObject == Machine.gameObject || Machine.gameObject.isStatic)
                 continue;
 
             KnockBack(col.transform.position, 0.4f, true);

@@ -12,6 +12,7 @@ public class GUIDialogue
     private static CoroutineTask _scrollTask;
     private static CharTalk _entityState;
     private static CoroutineTask _scaleTask;
+    private static CoroutineTask _slideTask;
     private static AudioSource _audioSource;
       
     public static void Update()
@@ -68,17 +69,25 @@ public class GUIDialogue
         _entityState = entityState;
         _currentLine = 0;
         Game.GUIDialogue.SetActive(true);
+        Game.GUIImage.SetActive(true);
         HandleScroll(); 
-        _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIDialogue, EaseSpeed, 0.9f)); 
+        _slideTask = new CoroutineTask(GUI.Slide(true, ShowDuration, Game.GUIImage, 
+            new Vector3(165, -95, 203), EaseSpeed));
+        _scaleTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIDialogue, 
+            0.9f, EaseSpeed)); 
     }
  
     private static void HideDialogue()
     { 
-        _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIDialogue, EaseSpeed, 0.9f));
+        _slideTask = new CoroutineTask(GUI.Slide(false, HideDuration, Game.GUIImage, 
+            new Vector3(450, -95, 203), EaseSpeed));
+        _scaleTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIDialogue, 
+            0, EaseSpeed));  
         _scaleTask.Finished += (bool isManual) => 
         {
             _entityState.OnEndDialogue(); 
             Game.GUIDialogue.SetActive(false);
+            Game.GUIImage.SetActive(false);
             _entityState = null;
         }; 
     }

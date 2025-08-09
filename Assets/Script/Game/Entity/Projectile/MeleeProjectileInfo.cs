@@ -2,15 +2,7 @@ using UnityEngine;
  
 public class SwingProjectileInfo : ProjectileInfo
 { 
-    public SwingProjectileInfo(float damage, float knockback, float critChance, float speed, float radius)
-    {
-        Damage = damage;
-        Knockback = knockback;
-        CritChance = critChance;
-        Speed = speed;
-        Radius = radius;
-        CLass = ProjectileClass.Melee;
-    }
+    public SwingProjectileInfo() { Class = ProjectileClass.Melee; }
 
     public override void AI(Projectile projectile)
     {
@@ -31,16 +23,7 @@ public class SwingProjectileInfo : ProjectileInfo
 }
 
 public class ContactDamageProjectileInfo : ProjectileInfo
-{
-    public ContactDamageProjectileInfo(float damage, float knockback, float critChance, float radius)
-    {
-        Damage = damage;
-        Knockback = knockback;
-        CritChance = critChance;
-        Radius = radius;
-        CLass = ProjectileClass.Melee;
-    }
-
+{ 
     public override void AI(Projectile projectile)
     {
         Collider[] _hitBuffer = new Collider[16];

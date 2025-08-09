@@ -43,7 +43,7 @@ public class GUI
                 { 
                     Game.GUIInv.SetActive(true);
                     GUIStorage.RefreshCursorSlot();
-                    _showTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, scale : 0.7f));
+                    _showTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, 0.7f));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -51,7 +51,7 @@ public class GUI
                 }
                 else
                 {
-                    _showTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, scale : 0.7f));
+                    _showTask = new CoroutineTask(GUI.Scale(false, HideDuration, Game.GUIInv, 0));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -74,12 +74,11 @@ public class GUI
       
     }
 
-    public static IEnumerator Scale(bool show, float duration, GameObject target, float easeSpeed = 0.5f, float scale = 1f)
-    {
-        Vector3 targetScale = show ? Vector3.one * scale : Vector3.zero;
-        Vector3 initialScale = show ? Vector3.zero : Vector3.one * scale;
+    public static IEnumerator Scale(bool show, float duration, GameObject target, float scale, float easeSpeed = 0.5f)
+    { 
+        Vector3 initialScale = target.transform.localScale;
+        Vector3 targetScale = Vector3.one * scale;
         float elapsedTime = 0f;
-        target.transform.localScale = initialScale;  
 
         while (elapsedTime < duration)
         {
@@ -101,5 +100,31 @@ public class GUI
 
         target.transform.localScale = targetScale;
     }
- 
+    
+    public static IEnumerator Slide(bool show, float duration, GameObject target, Vector3 position, float easeSpeed = 0.5f)
+    {
+        Vector3 initialPos = target.transform.localPosition;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+
+            if (show)
+            {
+                t = Mathf.SmoothStep(0f, 1f, Mathf.Pow(t, easeSpeed)); // Ease-out
+            }
+            else
+            {
+                t = Mathf.Lerp(0f, 1f, t); // Linear for hiding
+            }
+
+            target.transform.localPosition = Vector3.Lerp(initialPos, position, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        target.transform.localPosition = position;
+    }
+
 }

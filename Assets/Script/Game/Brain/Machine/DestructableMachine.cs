@@ -25,7 +25,12 @@ public class DestructableMachine : StructureMachine, IHitBox
     { 
         AddModule(new SpriteCullModule(SpriteRenderer));  
         AddModule(new SpriteOrbitModule(SpriteRenderer)); 
-        AddModule(new StaticInfo(_health, entityData.stringID, _sfx)); 
+        AddModule(new StructureInfo {
+            Health = _health,
+            Loot = entityData.stringID,
+            SfxHit = _sfx,
+            SfxDestroy = _sfx,
+        }); 
     }
  
 }
