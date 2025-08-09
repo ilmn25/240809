@@ -20,7 +20,7 @@ public class GroundMovementModule : MovementModule
     private Vector3 _testPositionB;
     private Vector3 _tempPosition;
     
-    private static Collider[] _colliderArray = new Collider[1];
+    private static readonly Collider[] ColliderArray = new Collider[1];
 
     public override void Update()
     { 
@@ -175,7 +175,7 @@ public class GroundMovementModule : MovementModule
     {
         // if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(newPosition), Scene.LogicDistance)) return false;  
         
-        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), Vector3.one * Info.CollisionRadius, _colliderArray, Quaternion.identity, Game.MaskStatic) > 0);
+        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), Vector3.one * Info.MapCollisionRadius, ColliderArray, Quaternion.identity, Game.MaskStatic) > 0);
     } 
 } 
 
