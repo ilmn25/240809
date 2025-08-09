@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerMachine : BasicMachine, IHitBox
 {
-    private new PlayerInfo Info;
+    private PlayerInfo _info;
     public override void OnStart()
     { 
         PlayerData.Load(); 
@@ -24,7 +24,7 @@ public class PlayerMachine : BasicMachine, IHitBox
         AddModule(new PlayerAnimationModule()); 
         AddModule(new PlayerTerraformModule());  
         
-        Info = GetModule<PlayerInfo>();
+        _info = GetModule<PlayerInfo>();
         Inventory.SlotUpdate += EventSlotUpdate;
         AddState(new EquipSwingState());
         AddState(new EquipShootState());
@@ -41,7 +41,7 @@ public class PlayerMachine : BasicMachine, IHitBox
         }
          
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Space))
-            Info.PlayerStatus = PlayerStatus.Active;
+            _info.PlayerStatus = PlayerStatus.Active;
         if (Input.GetKeyDown(KeyCode.N))
         {
             Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position),true, 200);
@@ -67,13 +67,13 @@ public class PlayerMachine : BasicMachine, IHitBox
                 case ItemType.Tool:
                     if (Inventory.CurrentItemData.MiningPower != 0 && 
                         Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
+                        Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
-                        if (!Info.IsBusy && Control.Inst.ActionPrimary.Key()) 
+                        if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
                             PlayerTerraformModule.HandleMapBreak(); 
                     } 
-                    if (!Info.IsBusy && 
+                    if (!_info.IsBusy && 
                         (Control.Inst.ActionPrimary.Key() ||
                          Control.Inst.DigUp.Key() ||
                          Control.Inst.DigDown.Key()))
@@ -89,10 +89,10 @@ public class PlayerMachine : BasicMachine, IHitBox
                 
                 case ItemType.Block: 
                     if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                        Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
+                        Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
                     {
                         PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
-                        if (!Info.IsBusy && Control.Inst.ActionSecondary.Key())
+                        if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
                         {
                             Animate();
                             PlayerTerraformModule.HandleMapPlace();
@@ -124,14 +124,14 @@ public class PlayerMachine : BasicMachine, IHitBox
             Control.MousePosition + Vector3.up * 0.15f;
         
         // Use ToolTrack's global facing direction, flattened to horizontal
-        Vector3 direction = Info.SpriteToolTrack.right;
-        if (Info.SpriteToolTrack.lossyScale.x < 0f) 
+        Vector3 direction = _info.SpriteToolTrack.right;
+        if (_info.SpriteToolTrack.lossyScale.x < 0f) 
             direction *= -1;
         direction.y = 0;
         direction.Normalize();
         
         // Offset the spawn origin based on that direction
-        Projectile.Spawn(Info.SpriteToolTrack.position + 
+        Projectile.Spawn(_info.SpriteToolTrack.position + 
                          direction * Inventory.CurrentItemData.HoldoutOffset,
             dest,
             Inventory.CurrentItemData.ProjectileInfo,
@@ -141,13 +141,13 @@ public class PlayerMachine : BasicMachine, IHitBox
     public void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
-            Info.SpriteTool.gameObject.SetActive(false);
+            _info.SpriteTool.gameObject.SetActive(false);
         else
         {
-            Info.SpriteTool.gameObject.SetActive(true);
-            Info.SpriteToolRenderer.sprite = 
-            Info.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Inventory.CurrentItemData.StringID);
-            Info.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
+            _info.SpriteTool.gameObject.SetActive(true);
+            _info.SpriteToolRenderer.sprite = 
+            _info.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Inventory.CurrentItemData.StringID);
+            _info.SpriteToolTrack.transform.localScale = Vector3.one * Inventory.CurrentItemData.Scale;
             SetState<EquipSelectState>();
         } 
     }

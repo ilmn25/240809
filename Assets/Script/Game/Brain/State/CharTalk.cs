@@ -1,4 +1,6 @@
-public class CharTalk : State {
+using UnityEngine;
+
+public class CharTalk : MobState {
     public Dialogue Dialogue; 
 
     public CharTalk(Dialogue dialogue)
@@ -8,11 +10,13 @@ public class CharTalk : State {
  
     public void OnEndDialogue()
     {
-        Machine.SetState<MobChase>();
+        Machine.SetState<DefaultState>();
     }
     
     public override void OnEnterState()
     {
+        Info.PathingStatus = PathingStatus.Reached;
+        Info.Direction = Vector3.zero;
         GUIDialogue.StartDialogue(this);
     }
 }

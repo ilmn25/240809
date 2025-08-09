@@ -1,11 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AI;
 public class PlayerMovementModule : MovementModule
 {
     private new PlayerInfo Info => (PlayerInfo) Machine.Info; 
@@ -281,13 +275,13 @@ public class PlayerMovementModule : MovementModule
         }
     }
 
-    private readonly Collider[] _tempCollisionArray = new Collider[1];
+    private static readonly Collider[] TempCollisionArray = new Collider[1];
     private readonly Vector3 _colliderSize = new Vector3(0.35f, 0.35f, 0.25f);  
     private readonly Vector3 _colliderCenter = new Vector3(0, 0.35f, 0); 
     private bool IsMovable(Vector3 position)
     { 
         return !(Physics.OverlapBoxNonAlloc(position + _colliderCenter, 
-            _colliderSize, _tempCollisionArray, Quaternion.identity, 
+            _colliderSize, TempCollisionArray, Quaternion.identity, 
             Game.MaskStatic) > 0);
     }
  

@@ -23,7 +23,13 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.3f,
             range: 1,
-            projectileInfo: new SwingProjectileInfo(10, 15, 10, 1.3f, 2f),
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 25,
+                Knockback = 15,
+                CritChance = 10,
+                Speed = 1.3f,
+                Radius = 2f,
+            },
             materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
         );
 
@@ -32,7 +38,14 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo(3, 10, 10, 2f, 2f),
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 8,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 2,
+                Radius = 2,
+                Mining = 5,
+            },
             miningPower: 5,
             materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } }
         );
@@ -41,7 +54,16 @@ public partial class Item
             stringID: "spear",
             gesture: ItemGesture.Swing,
             speed: 0.3f,
-            projectileInfo: new RangedProjectileInfo("spear",25, 10, 10, 10000, 130, 0.1f, 1),
+            projectileInfo: new RangedProjectileInfo {
+                Sprite = "spear", 
+                Damage = 25, 
+                Knockback = 10, 
+                CritChance = 10, 
+                LifeSpan = 10000, 
+                Speed = 130, 
+                Radius = 0.1f,
+                Penetration = 1,
+            },
             ammo: "spear",
             materials: new Dictionary<string, int> { { "wood", 1 } },
             holdOutOffset: 1.016f,
@@ -52,7 +74,16 @@ public partial class Item
             stringID: "minigun",
             gesture: ItemGesture.Shoot,
             speed: 2f,
-            projectileInfo: new RangedProjectileInfo("bullet",10, 5, 10, 10000, 50, 0.1f, 1),
+            projectileInfo: new RangedProjectileInfo {
+                Sprite = "bullet",
+                Damage = 10,
+                Knockback = 5,
+                CritChance = 10,
+                LifeSpan = 10000,
+                Speed = 50,
+                Radius = 0.1f,
+                Penetration = 1,
+            },
             materials: new Dictionary<string, int> { { "wood", 2 } },
             holdOutOffset: 1.54f
         );
@@ -61,7 +92,16 @@ public partial class Item
             stringID: "pistol",
             gesture: ItemGesture.Shoot,
             speed: 0.6f,
-            projectileInfo: new RangedProjectileInfo("bullet",25, 10, 10, 10000, 12, 0.1f, 1),
+            projectileInfo: new RangedProjectileInfo {
+                Sprite = "bullet",
+                Damage = 25,
+                Knockback = 6,
+                CritChance = 10,
+                LifeSpan = 10000,
+                Speed = 12,
+                Radius = 0.1f,
+                Penetration = 1
+            },
             ammo: "bullet",
             materials: new Dictionary<string, int> { { "wood", 2 } },
             holdOutOffset: 1.016f

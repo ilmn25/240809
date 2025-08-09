@@ -1,4 +1,4 @@
 public class TreeMachine : DestructableMachine
 {
-    public TreeMachine() : base("dig_grass", 100) { }
+    public TreeMachine() : base("dig_stone", 30) { }
 }

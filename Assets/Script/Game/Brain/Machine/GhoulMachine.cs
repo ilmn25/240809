@@ -1,5 +1,4 @@
  
-using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
@@ -18,11 +17,13 @@ public class MobMachine : EntityMachine, IHitBox
     }
 }
 
-public class GhoulMachine : MobMachine
-{  
-
+public class GhoulMachine : MobMachine, IActionSecondary
+{   
     public override void OnStart()
     {
+        Dialogue dialogue = new Dialogue();
+        dialogue.Lines.Add("hello");
+        dialogue.Lines.Add("are u buying or not");
         AddModule(new MobInfo
         {
             HitboxType = HitboxType.Enemy,
@@ -45,8 +46,14 @@ public class GhoulMachine : MobMachine
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobAttackSwing());
+        AddState(new CharTalk(dialogue));
     }
 
+    public void OnActionSecondary()
+    {
+        if (Info.Target) return;
+        SetState<CharTalk>();
+    }
     public override void OnUpdate()
     {
         HandleInput();
@@ -95,4 +102,5 @@ public class GhoulMachine : MobMachine
     {
         GetModule<GroundPathingModule>().DrawGizmos();
     }
+ 
 } 

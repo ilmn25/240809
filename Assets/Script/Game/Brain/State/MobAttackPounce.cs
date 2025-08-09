@@ -3,8 +3,12 @@ using UnityEngine;
 
 public class MobAttackPounce : MobState
 { 
-    private readonly ProjectileInfo _projectileInfo = 
-        new ContactDamageProjectileInfo(10, 15, 3, 1.1f);
+    private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
+            Damage = 10,
+            Knockback = 15,
+            CritChance = 0.1f,
+            Radius = 1.1f,
+        };
 
     private int _delay = 0;
 

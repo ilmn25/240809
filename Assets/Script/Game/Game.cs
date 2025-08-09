@@ -25,6 +25,7 @@ public class Game : MonoBehaviour
     public static Camera GUICamera;
     public static GameObject GUIObject;
     public static GameObject GUIDialogue;
+    public static GameObject GUIImage;
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
     public static GameObject GUIInvCrafting;
@@ -115,6 +116,7 @@ public class Game : MonoBehaviour
         GUIObject = GameObject.Find("gui");
         GUIDialogue = GUIObject.transform.Find("dialogue_box").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        GUIImage = GUIObject.transform.Find("image").gameObject;
         GUIInv = GUIObject.transform.Find("inventory").gameObject;
         GUIInvCrafting = GUIInv.transform.Find("crafting").gameObject;
         GUIInvStorage = GUIInv.transform.Find("storage").gameObject;

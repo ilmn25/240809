@@ -11,9 +11,10 @@ public class ProjectileInfo
     public float Knockback;
     public float CritChance;
     public float Radius;  
-    public float Speed; 
+    public float Speed;
+    public float Mining = 0;
     public string Effects;
-    public ProjectileClass CLass; 
+    public ProjectileClass Class; 
     public string Sprite;
 
     public virtual void AI(Projectile projectile) { }

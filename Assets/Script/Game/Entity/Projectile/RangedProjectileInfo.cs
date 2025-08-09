@@ -5,19 +5,7 @@ public class RangedProjectileInfo : ProjectileInfo
     public int LifeSpan; 
     public int Penetration; // ignored for now
     public bool Self = true;
-
-    public RangedProjectileInfo(string sprite, float damage, float knockback, float critChance, int lifeSpan, float speed, float radius, int penetration, bool self = false)
-    {
-        Damage = damage;
-        Knockback = knockback;
-        CritChance = critChance;
-        LifeSpan = lifeSpan;
-        Speed = speed;
-        Radius = radius;
-        Penetration = penetration;
-        Self = self;
-        Sprite = sprite;
-    }
+ 
 
     public override void AI(Projectile projectile)
     {
