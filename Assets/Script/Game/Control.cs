@@ -44,12 +44,12 @@ public class Control
 
     public static void Save()
     {
-        Utility.Save(Inst, "KeyBinds");
+        Utility.FileSave(Inst, "KeyBinds");
     }
 
     public static void Load()
     {
-        Inst = Utility.Load<Control>("KeyBinds");
+        Inst = Utility.FileLoad<Control>("KeyBinds");
     }
     
     public static Vector2Int GetMovementAxis()
@@ -64,7 +64,7 @@ public class Control
 
     public static void Initialize()
     {
-        Inst = Utility.Load<Control>("KeyBinds") ?? new Control();
+        Inst = Utility.FileLoad<Control>("KeyBinds") ?? new Control();
     }
     
     public static void Update()

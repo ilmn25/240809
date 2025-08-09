@@ -52,7 +52,7 @@ public static class Utility
     }
  
 
-    public static void Save<T>(T data, string filePath)
+    public static void FileSave<T>(T data, string filePath)
     {
         using (FileStream file = File.Create(SavePath + filePath + ".dat"))
         {
@@ -60,7 +60,7 @@ public static class Utility
         }
     }
 
-    public static T Load<T>(string filePath)
+    public static T FileLoad<T>(string filePath)
     {
         if (File.Exists(SavePath + filePath + ".dat"))
         {

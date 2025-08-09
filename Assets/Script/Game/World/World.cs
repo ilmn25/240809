@@ -31,12 +31,12 @@ public class World
         EntityStaticLoad.UnloadWorld();
         EntityDynamicLoad.UnloadWorld();
 
-        Utility.Save(Inst, "World" + id);
+        Utility.FileSave(Inst, "World" + id);
     }
 
     public static void Load(int id)
     { 
-        Inst = Utility.Load<World>("World" + id);
+        Inst = Utility.FileLoad<World>("World" + id);
         if (Inst == null) WorldGen.GenerateTestMap();
     }
 

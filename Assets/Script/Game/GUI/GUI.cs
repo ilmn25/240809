@@ -11,12 +11,28 @@ public class GUI
     public static bool Active = false;
     
     private static CoroutineTask _showTask; 
-    
+    private static GUIStorage _inventory;
+    private static GUIStorage _storage;
     public static void Initialize()
     {
         GUICraft.Initialize();
         GUICursor.Initialize();
-        GUIStorage.Initialize();
+        _inventory = new GUIInventory()
+        {
+            Storage = Inventory.Storage,
+            RowAmount = Inventory.InventoryRowAmount,
+            SlotAmount = Inventory.InventorySlotAmount,
+            Position = new Vector2(0, 166), 
+        };
+        _inventory.Initialize();
+        _storage = new GUIInventory()
+        {
+            Storage = Inventory.Storage,
+            RowAmount = Inventory.InventoryRowAmount,
+            SlotAmount = Inventory.InventorySlotAmount,
+            Position = new Vector2(0, -19), 
+        };
+        _storage.Initialize();
     }
  
     public static void Update()
@@ -32,7 +48,8 @@ public class GUI
             
             GUICraft.Update(); 
             GUICursor.Update();
-            GUIStorage.Update();
+            _inventory.Update();
+            _storage.Update();
         }
 
         if (Control.Inst.Inv.KeyDown())  
@@ -41,8 +58,8 @@ public class GUI
             {
                 if (!Game.GUIInv.activeSelf)
                 { 
-                    Game.GUIInv.SetActive(true);
-                    GUIStorage.RefreshCursorSlot();
+                    Game.GUIInv.SetActive(true); 
+                    RefreshStorage();
                     _showTask = new CoroutineTask(GUI.Scale(true, ShowDuration, Game.GUIInv, 0.7f));
                     _showTask.Finished += (bool isManual) => 
                     {
@@ -60,6 +77,12 @@ public class GUI
                 }
             } 
         }
+    }
+
+    public static void RefreshStorage()
+    {
+        _inventory.OnRefreshSlot?.Invoke(_inventory, null);
+        _storage.OnRefreshSlot?.Invoke(_storage, null);
     }
 
     public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)

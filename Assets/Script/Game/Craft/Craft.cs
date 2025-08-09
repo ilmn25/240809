@@ -32,15 +32,15 @@ public partial class Craft
             Inventory.RemoveItem(ingredient.Key, ingredient.Value);
         }
         
-        InvSlot craftedItem = new InvSlot();
+        InvSlot craftedInv = new InvSlot();
         
-        craftedItem.SetItem(Dictionary[stringID].Stack, stringID, null, false);
-        if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem))
+        craftedInv.SetItem(Dictionary[stringID].Stack, stringID, null, false);
+        if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedInv))
         {
-            GUICursor.Data.Add(craftedItem);
+            GUICursor.Data.Add(craftedInv);
         }
         
-        if (craftedItem.Stack > 0)
+        if (craftedInv.Stack > 0)
         { 
             Inventory.AddItem(stringID);
         } 
