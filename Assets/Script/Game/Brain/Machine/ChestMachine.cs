@@ -4,7 +4,7 @@ public class ChestMachine : StructureMachine, IActionSecondary
     public override void OnStart()
     {
         _storage = new Storage(27);
-        Loot.Gettable("slab").AddToContainer(_storage);
+        Loot.Gettable("chest").AddToContainer(_storage);
         AddModule(new ContainerInfo()
         {
             Health = 500,
@@ -18,7 +18,7 @@ public class ChestMachine : StructureMachine, IActionSecondary
     public void OnActionSecondary()
     {
         Audio.PlaySFX("text", 0.5f);
-        GUIMain.Storage.Storage = _storage.List;
+        GUIMain.Storage.Storage = _storage;
         GUIMain.RefreshStorage();
     }
 }

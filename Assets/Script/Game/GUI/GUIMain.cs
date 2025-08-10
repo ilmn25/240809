@@ -27,14 +27,17 @@ public class GUIMain
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, 166), 
+            Name = "Inventory",
         };
         _inventory.Initialize();
+        Debug.Log(_inventory.Storage);
         Storage = new GUIInventory()
         {
             Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -19), 
+            Name = "Storage",
         };
         Storage.Initialize();
     }

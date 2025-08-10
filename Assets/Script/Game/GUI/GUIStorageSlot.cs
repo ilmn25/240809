@@ -20,10 +20,10 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnRefreshSlot(object sender, EventArgs e)
     {
-        ItemSlot slot = Inventory.Storage[slotNumber];
+        ItemSlot slot = GUIStorage.Storage.List[slotNumber];
         if (slot.Stack != 0)
         {
-            _image.sprite = Resources.Load<Sprite>($"texture/sprite/{slot.StringID}");
+            _image.sprite =Cache.LoadSprite("sprite/" + slot.StringID);
             _image.color = Color.white;
             _text.text = slot.Stack.ToString();
         }

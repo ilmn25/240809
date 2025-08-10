@@ -26,7 +26,7 @@ public partial class Entity
         public static void Initialize()
         {
                 AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), true);
-                AddStructure<DecorMachine>("stage_hand", Vector3Int.one, true);
+                AddStructure<ChestMachine>("stage_hand", Vector3Int.one, true);
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, false);
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 
                 AddStructure<SlabMachine>("slab", Vector3Int.one, false);

@@ -39,6 +39,7 @@ public class Game : MonoBehaviour
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 160;
         SetConstants(); 
+        PlayerData.Load(); 
         // Physics.IgnoreLayerCollision(Game.IndexEntity, Game.IndexMap);
         // Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexMap);
         // Physics.IgnoreLayerCollision(Game.IndexUI, Game.IndexEntity);
