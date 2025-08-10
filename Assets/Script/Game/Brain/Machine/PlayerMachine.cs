@@ -102,6 +102,9 @@ public class PlayerMachine : BasicMachine, IHitBox
                     }
                 }
                 break;
+            
+            case ItemType.Furniture:
+                break;
         } 
     }
  

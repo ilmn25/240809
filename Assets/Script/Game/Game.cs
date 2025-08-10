@@ -29,6 +29,7 @@ public class Game : MonoBehaviour
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
     public static GameObject GUIInvCrafting;
+    public static GameObject GUIInfoPanel;
     public static GameObject GUICursor;
     public static GameObject GUICursorInfo;
     public static GameObject GUICursorSlot;
@@ -111,10 +112,10 @@ public class Game : MonoBehaviour
         GUIImage = GUIObject.transform.Find("image").gameObject;
         GUIInv = GUIObject.transform.Find("inventory").gameObject;
         GUIInvCrafting = GUIInv.transform.Find("crafting").gameObject;
+        GUIInfoPanel = GUIInv.transform.Find("info").gameObject;
         GUICursor = GUIObject.transform.Find("cursor").Find("cursor").gameObject;
         GUICursorInfo = GUICursor.transform.Find("info").gameObject;
         GUICursorSlot = GUICursor.transform.Find("slot").gameObject;
-         
     }
  
 }

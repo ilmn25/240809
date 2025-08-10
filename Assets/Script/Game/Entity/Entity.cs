@@ -4,29 +4,27 @@ using UnityEngine;
 
 public partial class Entity
 { 
+        public static readonly Dictionary<string, Entity> Dictionary = new Dictionary<string, Entity>();
+        
         public Vector3Int Bounds;
         public string PrefabName;
         public Type Machine;
         public bool Collision;
         public bool StaticLoad;
          
-        private static Entity Item = new Entity
+        private static readonly Entity Item = new Entity
         {
                 Bounds = Vector3Int.zero,
                 Collision = false,
                 PrefabName = "item",
                 Machine = typeof(ItemMachine),
                 StaticLoad = false
-        }; 
-}
-public partial class Entity 
-{
-        public static readonly Dictionary<string, Entity> Dictionary = new Dictionary<string, Entity>();
-
+        };  
+        
         public static void Initialize()
         {
                 AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), true);
-                AddStructure<DecorMachine>("stage_hand", Vector3Int.one, true);
+                AddStructure<WorkBenchMachine>("stage_hand", Vector3Int.one, true);
                 AddStructure<ChestMachine>("chest", Vector3Int.one, true);
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, false);
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 

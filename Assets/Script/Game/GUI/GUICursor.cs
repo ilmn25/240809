@@ -3,42 +3,42 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GUICursor 
+public class GUICursor : GUI
 {
     public static ItemSlot Data = new ItemSlot();
 
     private static TextMeshProUGUI _cursorInfoText; 
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
-
-    private static RectTransform _parentRect;
-    private static RectTransform _cursorRect;
     
-    public static void Initialize()
+    public new void Initialize()
     {
-        _cursorRect = Game.GUICursor.GetComponent<RectTransform>();
-        _parentRect = _cursorRect.parent.GetComponent<RectTransform>();
+        ShowSpeed = 0.25f;
+        HideSpeed = 0.1f;
         
+        Rect = Game.GUICursor.GetComponent<RectTransform>();
+        GameObject = Game.GUICursorInfo;
+        base.Initialize();        
         _cursorInfoText = Game.GUICursorInfo.transform.Find("text").GetComponent<TextMeshProUGUI>(); 
         _cursorSlotText = Game.GUICursorSlot.transform.Find("text").GetComponent<TextMeshProUGUI>();
         _cursorSlotImage = Game.GUICursorSlot.transform.Find("image").GetComponent<Image>();
     }
 
-    public static void Update()
+    public void Update()
     {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(ParentRect, Input.mousePosition,  
             Game.GUICamera,out Vector2 mousePosition);
-        _cursorRect.anchoredPosition = mousePosition;
+        Rect.anchoredPosition = mousePosition;
     }
 
-    public static void SetInfoPanel(string info = null)
+    public void Set(string info = null)
     {
         if (info == null)
         {
-            Game.GUICursorInfo.SetActive(false);
+            Show(false);
             return;
         }
-        Game.GUICursorInfo.SetActive(true);
+        Show(true);
         _cursorInfoText.text = info;
     }
     
@@ -52,7 +52,7 @@ public class GUICursor
         else
         {
             Game.GUICursorSlot.SetActive(true);
-            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{GUICursor.Data.StringID}");
+            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.StringID}");
             _cursorSlotText.text = Data.Stack.ToString();
         } 
     } 

@@ -16,8 +16,8 @@ public class Scene
     public static Vector3Int PlayerChunkPosition;
     private static Vector3Int _playerChunkPositionPrevious;
 
-    public static readonly int RenderRange = 1;
-    public static readonly int LogicRange = 1; 
+    public static readonly int RenderRange = 2;
+    public static readonly int LogicRange = 2; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
