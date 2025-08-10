@@ -22,6 +22,7 @@ public class  GUIStorage : GUI
     private GameObject _shadow;
     public bool IsDrag;
     private Vector2 _dragOffset;
+    private static CoroutineTask _scaleTask;
  
  
     public void Initialize()
@@ -55,9 +56,31 @@ public class  GUIStorage : GUI
         }
     }
 
+    private bool _show = true;
+    public void Show(bool isShow)
+    {
+        if (isShow)
+        {
+            if (!_show)
+            {
+                _scaleTask?.Stop();
+                _scaleTask = new CoroutineTask(GUIMain.Scale(true, 0.5f, _storageObject, 0.9f));
+                _show = true;
+            }
+        }
+        else
+        {
+            if (_show)
+            {
+                _scaleTask?.Stop();
+                _scaleTask = new CoroutineTask(GUIMain.Scale(false, 0.2f, _storageObject, 0));
+                _show = false;
+            }
+        } 
+    }
+    
     public void Update()
     {
-        // Storage = Inventory.Storage;
         if (CurrentSlotKey == -1 || IsDrag)
         {
             if (IsHover || IsDrag)

@@ -289,8 +289,12 @@ public class WorldGen
                             {
                                 if (Random.NextDouble() <= 0.003)
                                 {
-
                                     entityData = Entity.GetChunkEntityData("stage_hand", new SVector3Int(x, y + 1, z));
+                                    chunk.staticEntity.Add(entityData);
+                                }
+                                else if (Random.NextDouble() <= 0.001)
+                                {
+                                    entityData = Entity.GetChunkEntityData("chest", new SVector3Int(x, y + 1, z));
                                     chunk.staticEntity.Add(entityData);
                                 }
                                 else if (Random.NextDouble() <= 0.03)
