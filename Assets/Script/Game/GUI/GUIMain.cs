@@ -40,6 +40,8 @@ public class GUIMain
         };
         Storage.Initialize();
         Storage.Show(false);
+        
+        GUIDialogue.Show(false);
     }
  
     public static void Update()

@@ -41,8 +41,7 @@ public class InContainerState : State
 
     public override void OnUpdateState()
     {
-        if (Vector3.Distance(Game.Player.transform.position, Machine.transform.position) > 5)
-        {
+        if (Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

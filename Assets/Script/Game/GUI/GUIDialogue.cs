@@ -9,17 +9,45 @@ public class GUIDialogue
 
     private static int _currentLine = 0;
     private static CoroutineTask _scrollTask;
-    private static CharTalk _entityState;
+    public static Dialogue Dialogue;
+    public static bool Showing = true;
     private static CoroutineTask _scaleTask; 
     private static AudioSource _audioSource;
-      
+
+    public static void Show(bool isShow)
+    {
+        if (isShow)
+        {
+            if (!Showing)
+            {
+                Showing = true;
+                _currentLine = 0; 
+                HandleScroll(); 
+                new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
+                    new Vector3(220, -95, 203), EaseSpeed));
+                _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
+                    0.9f, EaseSpeed)); 
+            }
+        }
+        else
+        {
+            if (Showing)
+            {
+                Showing = false;
+                new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
+                    new Vector3(450, -95, 203), EaseSpeed));
+                _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
+                    0, EaseSpeed));
+                _scaleTask.Finished += (bool isManual) =>
+                {
+                    if (_scrollTask != null && _scrollTask.Running) _scrollTask.Stop();
+                };
+            }
+        }
+    }
     public static void Update()
     { 
-        if (_entityState != null){ 
-            if (!_scaleTask.Running && Utility.SquaredDistance(Game.Player.transform.position, _entityState.Machine.transform.position) > 5*5) { //walk away from npc
-                HideDialogue();
-                if (_scrollTask.Running) _scrollTask.Stop();
-            }
+        if (Showing){  
             
             if (Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown())
             { 
@@ -28,17 +56,17 @@ public class GUIDialogue
                 if (_scrollTask.Running)
                 {
                     _scrollTask.Stop(); 
-                    Game.GUIDialogueText.text = _entityState.Dialogue.Lines[_currentLine];
+                    Game.GUIDialogueText.text = Dialogue.Lines[_currentLine];
                 }                 
-                else if (_currentLine < _entityState.Dialogue.Lines.Count - 1)
+                else if (_currentLine < Dialogue.Lines.Count - 1)
                 {    
                     ++_currentLine; 
                     HandleScroll();
                 }
-                else if (!_scaleTask.Running)
+                else
                 {
-                    HideDialogue();
-                } 
+                    Show(false);
+                }
             }
         }
     }
@@ -47,48 +75,15 @@ public class GUIDialogue
     {
         _audioSource = Audio.PlaySFX("text", 0.2f, true);
         
-        _scrollTask =  new CoroutineTask(GUIMain.ScrollText(_entityState.Dialogue.Lines[_currentLine], Game.GUIDialogueText));
+        _scrollTask =  new CoroutineTask(GUIMain.ScrollText(Dialogue.Lines[_currentLine], Game.GUIDialogueText));
         _scrollTask.Finished += (bool isManual) => 
         { 
             Audio.StopSFX(_audioSource);
             _audioSource = null;
         }; 
     }
-
-    public static void StartDialogue(CharTalk entityState)
-    {
-        if (_entityState != null)
-        {
-            entityState.OnEndDialogue(); 
-            return;
-        }
-
-        Audio.PlaySFX("chat");
-        _entityState = entityState;
-        _currentLine = 0;
-        Game.GUIDialogue.SetActive(true);
-        Game.GUIImage.SetActive(true);
-        HandleScroll(); 
-        new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
-            new Vector3(220, -95, 203), EaseSpeed));
-        _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
-            0.9f, EaseSpeed)); 
-    }
  
-    private static void HideDialogue()
-    { 
-        new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
-            new Vector3(450, -95, 203), EaseSpeed));
-        _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
-            0, EaseSpeed));  
-        _scaleTask.Finished += (bool isManual) => 
-        {
-            _entityState.OnEndDialogue(); 
-            Game.GUIDialogue.SetActive(false);
-            Game.GUIImage.SetActive(false);
-            _entityState = null;
-        }; 
-    }
+  
 }
 
 

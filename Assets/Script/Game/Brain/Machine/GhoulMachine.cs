@@ -46,13 +46,13 @@ public class GhoulMachine : MobMachine, IActionSecondary
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobAttackSwing());
-        AddState(new CharTalk(dialogue));
+        AddState(new DialogueState(dialogue));
     }
 
     public void OnActionSecondary()
     {
         if (Info.Target) return;
-        SetState<CharTalk>();
+        SetState<DialogueState>();
     }
     public override void OnUpdate()
     {
