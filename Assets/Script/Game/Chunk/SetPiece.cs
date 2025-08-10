@@ -123,17 +123,23 @@ public static class SetPiece
         foreach (ChunkEntityData entity in setPiece.StaticEntity)
         {
             worldPos = position + entity.position.ToVector3Int();
-            chunkPos = World.GetChunkCoordinate(worldPos);
-            entity.position.Set(World.GetBlockCoordinate(worldPos)); 
-            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
+            if (World.IsInWorldBounds(worldPos))
+            {
+                chunkPos = World.GetChunkCoordinate(worldPos);
+                entity.position.Set(World.GetBlockCoordinate(worldPos)); 
+                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].staticEntity.Add(entity);
+            } 
         }
 
         foreach (ChunkEntityData entity in setPiece.DynamicEntity)
         { 
             worldPos = position + entity.position.ToVector3Int();
-            chunkPos = World.GetChunkCoordinate(worldPos);
-            entity.position.Set(World.GetBlockCoordinate(worldPos)); 
-            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
+            if (World.IsInWorldBounds(worldPos))
+            { 
+                chunkPos = World.GetChunkCoordinate(worldPos);
+                entity.position.Set(World.GetBlockCoordinate(worldPos));
+                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
+            }  
         }
         
         for (int x = 0; x < setPiece.size; x++)

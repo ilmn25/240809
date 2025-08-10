@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GUICraftSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
         public string stringID;
-        private Craft _craftData;
+        private ItemRecipe _itemRecipeData;
         
         private Image _image;
         private TextMeshProUGUI _text;
@@ -15,14 +15,14 @@ public class GUICraftSlotModule : MonoBehaviour, IPointerEnterHandler, IPointerE
         public void Initialize(string stringID)
         {
                 this.stringID = stringID;
-                _craftData = Craft.GetItem(stringID);
+                _itemRecipeData = ItemRecipe.GetRecipe(stringID);
                 
                 _image = transform.Find("image").GetComponent<Image>();
                 _text = transform.Find("text").GetComponent<TextMeshProUGUI>();
                 
                 _image.sprite = Resources.Load<Sprite>($"texture/sprite/{this.stringID}");
                 _image.color = Color.white;
-                _text.text = _craftData.Stack.ToString();
+                _text.text = _itemRecipeData.Stack.ToString();
         }
         
         public void OnPointerEnter(PointerEventData eventData)

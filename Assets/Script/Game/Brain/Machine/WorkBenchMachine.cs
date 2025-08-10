@@ -1,11 +1,13 @@
-using UnityEngine;
-
-public class ChestMachine : StructureMachine, IActionSecondary
+public class WorkBenchMachine: StructureMachine, IActionSecondary
 {
     public override void OnStart()
     {
         Storage storage = new Storage(27);
-        Loot.Gettable("chest").AddToContainer(storage);
+        storage.AddItem("brick");
+        storage.AddItem("axe");
+        storage.AddItem("pistol");
+        storage.AddItem("spear");
+        storage.AddItem("minigun");
         AddModule(new ContainerInfo()
         {
             Health = 500,
@@ -16,39 +18,39 @@ public class ChestMachine : StructureMachine, IActionSecondary
         });
         AddModule(new SpriteCullModule(SpriteRenderer)); 
         AddModule(new SpriteOrbitModule()); 
-        AddState(new InContainerState());
+        AddState(new InCraftingState());
     }
     
 
     public void OnActionSecondary()
     {
         if (IsCurrentState<DefaultState>())
-            SetState<InContainerState>();
+            SetState<InCraftingState>();
         else 
             SetState<DefaultState>();
     }
 }
 
-public class InContainerState : State
+public class InCraftingState : State
 {
     public override void OnEnterState()
     {
         Audio.PlaySFX("text", 0.5f);
-        GUIMain.Storage.Storage = ((ContainerInfo)Info).Storage;
+        GUIMain.Crafting.Storage = ((ContainerInfo)Info).Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
-        GUIMain.Storage.Show(true, !GUIMain.Showing);
+        GUIMain.Crafting.Show(true, !GUIMain.Showing);
     }
 
     public override void OnUpdateState()
     {
-        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 36) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
 
     public override void OnExitState()
     {
-        GUIMain.Storage.Show(false);
+        GUIMain.Crafting.Show(false);
     }
 }

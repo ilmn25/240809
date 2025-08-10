@@ -20,7 +20,7 @@ public class GUICraft
         _craftRect = Game.GUIInvCrafting.GetComponent<RectTransform>();
         
         int count = 1;
-        foreach (var recipe in Craft.Dictionary)
+        foreach (var recipe in ItemRecipe.Dictionary)
         {
             GameObject slot = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"), Game.GUIInvCrafting.transform, false);
      
@@ -36,7 +36,7 @@ public class GUICraft
     {
         if (Control.Inst.ActionPrimary.KeyDown() && _stringID != null)
         {
-            Craft.CraftItem(_stringID);
+            ItemRecipe.CraftItem(_stringID);
             GUICursor.UpdateCursorSlot();
         } 
     }
@@ -47,21 +47,21 @@ public class GUICraft
         
         if (stringID == null)
         {  
-            GUICursor.SetInfoPanel(); 
+            GUIMain.Cursor.Set(); 
             return;
         }
 
         Item itemData = Item.GetItem(stringID);
-        Craft craftData = Craft.GetItem(stringID);
+        ItemRecipe itemRecipeData = ItemRecipe.GetRecipe(stringID);
         
-        string text = itemData.Name + " (" + craftData.Stack + ")\n";
-        foreach (var ingredient in craftData.Ingredients)
+        string text = itemData.Name + " (" + itemRecipeData.Stack + ")\n";
+        foreach (var ingredient in itemRecipeData.Ingredients)
         {
             text += $"{ingredient.Key} ({ingredient.Value})\n";
         }
         text += itemData.Description + "\n";
         
-        GUICursor.SetInfoPanel(text);
+        GUIMain.Cursor.Set(text);
     }
  
     public static void HandleScrollInput(float input)

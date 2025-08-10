@@ -80,8 +80,9 @@ public class EntityDynamicLoad
                 currentInstance = ObjectPool.GetObject(entity.PrefabName);
             else                
                 currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
-
+            
             currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
+            // Utility.Log(chunkCoordinate, entityData.position.ToVector3Int(), currentInstance.transform.position);
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine)); 
             _activeEntities.Add(currentEntityMachine); 

@@ -1,17 +1,26 @@
 using System.Collections.Generic;
  
-public partial class Craft 
+public partial class ItemRecipe 
 {
-    public static Dictionary<string, Craft> Dictionary = new Dictionary<string, Craft>();
+    public static Dictionary<string, ItemRecipe> Dictionary = new Dictionary<string, ItemRecipe>();
 
-    public static Craft GetItem(string stringID)
+    public int Stack;
+    public Dictionary<string, int> Ingredients;
+    public string[] Modifiers;
+ 
+    public static ItemRecipe GetRecipe(string stringID)
     {
         return Dictionary[stringID];
     }
     
-    public static void AddCraftingDefinition(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
+    public static void AddRecipe(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
     {
-        Dictionary.Add(stringID, new Craft(ingredients, stack, modifiers));
+        Dictionary.Add(stringID, new ItemRecipe()
+        {
+            Stack = stack,
+            Ingredients = ingredients,
+            Modifiers = modifiers,
+        });
     }
 
     private static bool IsCraftable (string stringID)

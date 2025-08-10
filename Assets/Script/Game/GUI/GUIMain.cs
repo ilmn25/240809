@@ -3,10 +3,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class GUI
-{
-    public bool IsHover;
-} 
 public class GUIMain 
 { 
     private const float ShowDuration = 0.5f;
@@ -15,14 +11,20 @@ public class GUIMain
     private static CoroutineTask _showTask; 
     private static GUIStorage _inventory;
     public static GUIStorage Storage; 
-    
+    public static GUIStorage Crafting;
+    public static GUIInfoPanel InfoPanel;
+    public static GUICursor Cursor;
+
     public static bool Showing = true;
     public static bool IsHover;
     public static void Initialize()
     {
         GUICraft.Initialize();
-        GUICursor.Initialize();
-        _inventory = new GUIInventory()
+        Cursor = new GUICursor();
+        Cursor.Initialize();
+        Cursor.Show(false);
+        
+        _inventory = new GUIChest()
         {
             Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
@@ -31,7 +33,8 @@ public class GUIMain
             Name = "Inventory",
         };
         _inventory.Initialize();
-        Storage = new GUIInventory()
+        
+        Storage = new GUIChest()
         {
             Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
@@ -42,6 +45,21 @@ public class GUIMain
         Storage.Initialize();
         Storage.Show(false);
         
+        Crafting = new GUICrafting()
+        {
+            Storage = Inventory.Storage,
+            RowAmount = Inventory.InventoryRowAmount,
+            SlotAmount = Inventory.InventorySlotAmount,
+            Position = new Vector2(0, -50), 
+            Name = "Crafting",
+        };
+        Crafting.Initialize();
+        Crafting.Show(false);
+        
+        InfoPanel = new GUIInfoPanel();
+        InfoPanel.Initialize();
+        InfoPanel.Show(false);
+        
         GUIDialogue.Show(false);
         Show(false);
     }
@@ -50,9 +68,11 @@ public class GUIMain
     {
         GUIDialogue.Update();
         GUICraft.Update(); 
-        GUICursor.Update();
+        Cursor.Update();
         _inventory.Update();
         Storage.Update();
+        Crafting.Update();
+        InfoPanel.UpdateDrag();
 
         if (Control.Inst.Inv.KeyDown())
         { 
@@ -94,6 +114,7 @@ public class GUIMain
     {
         _inventory.OnRefreshSlot?.Invoke(_inventory, null);
         Storage.OnRefreshSlot?.Invoke(Storage, null);
+        Crafting.OnRefreshSlot?.Invoke(Storage, null);
     }
 
     public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)

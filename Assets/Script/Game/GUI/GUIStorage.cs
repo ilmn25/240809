@@ -13,33 +13,23 @@ public class  GUIStorage : GUI
     public Storage Storage; 
     public int RowAmount = 3;
     public int SlotAmount = 9;
-    public Vector2 Position;
     public string Name;
-    protected int CurrentSlotKey = -1;
-    private GameObject _storageObject;
-    private RectTransform _storageRect;
-    private RectTransform _parentRect; 
-    private GameObject _shadow;
-    public bool IsDrag;
-    private Vector2 _dragOffset;
-    private static CoroutineTask _scaleTask;
+    protected int CurrentSlotKey = -1; 
  
  
-    public void Initialize()
+    public new void Initialize()
     { 
-        _storageObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
+        GameObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
             Game.GUIInv.transform);
-        _storageObject.name = Name;
-        _storageObject.transform.Find("text").GetComponent<TextMeshProUGUI>().text = Name;
-        _storageObject.GetComponent<HoverModule>().GUI = this;
-        _storageRect = _storageObject.GetComponent<RectTransform>();
-        _storageRect.anchoredPosition = Position;
-        _parentRect = _storageRect.parent.GetComponent<RectTransform>();
-            
+        GameObject.name = Name;
+        GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>().text = Name;
+        GameObject.GetComponent<HoverModule>().GUI = this;
+        Rect = GameObject.GetComponent<RectTransform>();
+        base.Initialize();
         for (int i = 0; i < SlotAmount * RowAmount; i++)
         {
             GameObject slot = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"),
-                _storageObject.transform, false);
+                GameObject.transform, false);
 
             int row = i / SlotAmount;
             int column = i % SlotAmount;
@@ -55,65 +45,13 @@ public class  GUIStorage : GUI
             guiStorageSlot.GUIStorage = this;
         }
     }
-
-    private bool _show = true;
-    public void Show(bool isShow)
-    {
-        if (isShow)
-        {
-            if (!_show)
-            {
-                _scaleTask?.Stop();
-                _scaleTask = new CoroutineTask(GUIMain.Scale(true, 0.5f, _storageObject, 0.9f));
-                _show = true;
-            }
-        }
-        else
-        {
-            if (_show)
-            {
-                _scaleTask?.Stop();
-                _scaleTask = new CoroutineTask(GUIMain.Scale(false, 0.2f, _storageObject, 0));
-                _show = false;
-            }
-        } 
-    }
+ 
     
     public void Update()
     {
         if (CurrentSlotKey == -1 || IsDrag)
         {
-            if (IsHover || IsDrag)
-            { 
-                if (Control.Inst.ActionPrimary.KeyDown())
-                {
-                    Position = _storageRect.anchoredPosition;
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                        _parentRect,
-                        Input.mousePosition,
-                        Game.GUICamera,
-                        out _dragOffset
-                    );
-                    IsDrag = true;
-                }
-                
-                if (IsDrag && Control.Inst.ActionPrimary.Key())
-                {
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                        _parentRect,
-                        Input.mousePosition,
-                        Game.GUICamera,
-                        out Vector2 mousePosition
-                    );
-
-                    _storageRect.anchoredPosition = mousePosition - _dragOffset + Position;
-                }
-                
-                if (Control.Inst.ActionPrimary.KeyUp())
-                {
-                    IsDrag = false;
-                }
-            }
+            UpdateDrag();
         } 
         else
         {
@@ -131,31 +69,51 @@ public class  GUIStorage : GUI
     protected virtual void ActionPrimary() {}
     protected virtual void ActionSecondary() {} 
     public void SetInfoPanel(int currentSlotKey = -1)
-    {
-        SetSidePanel(currentSlotKey);
+    { 
         CurrentSlotKey = currentSlotKey;
         
         if (currentSlotKey == -1)
         {
-            GUICursor.SetInfoPanel();
+            GUIMain.Cursor.Set();
+            GUIMain.InfoPanel.Set();
             return;
-        }
+        } 
         ItemSlot slot = Storage.List[currentSlotKey];
         if (slot.Stack != 0)
         { 
-            GUICursor.SetInfoPanel(slot.StringID + " (" + slot.Stack + ")\n" + 
-                                   Item.GetItem(slot.StringID).Description + "\n" +
-                                   slot.Modifier);
+            SetInfoPanel(slot);
+            return;
         }
-        else
-        {
-            GUICursor.SetInfoPanel();
-        }
+        GUIMain.Cursor.Set();
+        GUIMain.InfoPanel.Set();
     }
-    protected virtual void SetSidePanel(int currentSlotKey = -1) { }
+    protected virtual void SetInfoPanel(ItemSlot itemSlot) { }
 }
 
-public class GUIInventory : GUIChest { }
+public class GUICrafting : GUIStorage
+{
+    protected override void ActionPrimary()
+    {
+        ItemRecipe.CraftItem(Storage.List[CurrentSlotKey].StringID);
+        GUICursor.UpdateCursorSlot();
+    }
+
+    protected override void SetInfoPanel(ItemSlot itemSlot)
+    {
+        Item itemData = Item.GetItem(itemSlot.StringID);
+        ItemRecipe itemRecipeData = ItemRecipe.GetRecipe(itemSlot.StringID);
+        
+        string text = itemData.Name + " (" + itemRecipeData.Stack + ")\n";
+        foreach (var ingredient in itemRecipeData.Ingredients)
+        {
+            text += $"{ingredient.Key} ({ingredient.Value})\n";
+        }
+        text += itemData.Description + "\n";
+        
+        GUIMain.InfoPanel.Set(text);
+    }
+}
+
 
 public class GUIChest : GUIStorage
 {
@@ -192,5 +150,12 @@ public class GUIChest : GUIStorage
                 GUICursor.UpdateCursorSlot();
             }
         }
+    }
+
+    protected override void SetInfoPanel(ItemSlot itemSlot)
+    {
+        GUIMain.Cursor.Set(itemSlot.StringID + " (" + itemSlot.Stack + ")\n" + 
+                                       Item.GetItem(itemSlot.StringID).Description + "\n" +
+                                       itemSlot.Modifier);
     }
 }

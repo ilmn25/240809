@@ -149,7 +149,7 @@ public partial class Item
         };
 
         if (materials != null)
-            Craft.AddCraftingDefinition(stringID, materials, craftStack, null);
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, null);
 
         Dictionary[stringID] = itemData;
     }
@@ -206,7 +206,7 @@ public partial class Item
         };
 
         if (materials != null)
-            Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, modifiers);
 
         Dictionary[stringID] = itemData;
     }
