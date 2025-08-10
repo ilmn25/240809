@@ -5,8 +5,7 @@ public class PlayerMachine : BasicMachine, IHitBox
 {
     private PlayerInfo _info;
     public override void OnStart()
-    { 
-        PlayerData.Load(); 
+    {  
         AddModule(new PlayerInfo()
         {
             HitboxType = HitboxType.Friendly,
@@ -78,7 +77,7 @@ public class PlayerMachine : BasicMachine, IHitBox
                      Control.Inst.DigDown.Key()))
                 {
                     if (Inventory.CurrentItemData.Ammo != null && 
-                        Inventory.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
+                        Inventory.Storage.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
                     Attack();
                     Animate(); 
                     if (Inventory.CurrentItemData.Ammo != null) Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);

@@ -18,7 +18,7 @@ public partial class Craft
     {
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            if (Inventory.GetAmount(ingredient.Key) < ingredient.Value) return false;
+            if (Inventory.Storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
         } 
         return true;
     }

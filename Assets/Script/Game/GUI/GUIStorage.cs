@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,12 +10,12 @@ public class  GUIStorage : GUI
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
     
-    public List<ItemSlot> Storage; 
+    public Storage Storage; 
     public int RowAmount = 3;
     public int SlotAmount = 9;
     public Vector2 Position;
+    public string Name;
     protected int CurrentSlotKey = -1;
-
     private GameObject _storageObject;
     private RectTransform _storageRect;
     private RectTransform _parentRect; 
@@ -27,7 +28,8 @@ public class  GUIStorage : GUI
     { 
         _storageObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
             Game.GUIInv.transform);
-        _storageObject.name = "gui_storage";
+        _storageObject.name = Name;
+        _storageObject.transform.Find("text").GetComponent<TextMeshProUGUI>().text = Name;
         _storageObject.GetComponent<HoverModule>().GUI = this;
         _storageRect = _storageObject.GetComponent<RectTransform>();
         _storageRect.anchoredPosition = Position;
@@ -55,12 +57,11 @@ public class  GUIStorage : GUI
 
     public void Update()
     {
-        Storage = Inventory.Storage;
+        // Storage = Inventory.Storage;
         if (CurrentSlotKey == -1 || IsDrag)
         {
             if (IsHover || IsDrag)
             { 
-
                 if (Control.Inst.ActionPrimary.KeyDown())
                 {
                     Position = _storageRect.anchoredPosition;
@@ -116,7 +117,7 @@ public class  GUIStorage : GUI
             GUICursor.SetInfoPanel();
             return;
         }
-        ItemSlot slot = Storage[currentSlotKey];
+        ItemSlot slot = Storage.List[currentSlotKey];
         if (slot.Stack != 0)
         { 
             GUICursor.SetInfoPanel(slot.StringID + " (" + slot.Stack + ")\n" + 
@@ -139,23 +140,23 @@ public class GUIChest : GUIStorage
     {
         if (GUICursor.Data.isEmpty())
         {
-            GUICursor.Data.Add(Storage[CurrentSlotKey]);
+            GUICursor.Data.Add(Storage.List[CurrentSlotKey]);
         }
-        else if (Storage[CurrentSlotKey].isSame(GUICursor.Data))
+        else if (Storage.List[CurrentSlotKey].isSame(GUICursor.Data))
         {
-            Storage[CurrentSlotKey].Add(GUICursor.Data);
+            Storage.List[CurrentSlotKey].Add(GUICursor.Data);
         } 
         else
         {
-            (Storage[CurrentSlotKey], GUICursor.Data) = 
-                (GUICursor.Data, Storage[CurrentSlotKey]);
+            (Storage.List[CurrentSlotKey], GUICursor.Data) = 
+                (GUICursor.Data, Storage.List[CurrentSlotKey]);
         } 
         GUICursor.UpdateCursorSlot();
     }
 
     protected override void ActionSecondary()
     {
-        ItemSlot itemSlot = Storage[CurrentSlotKey];
+        ItemSlot itemSlot = Storage.List[CurrentSlotKey];
         if (!itemSlot.isEmpty())
         {
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))

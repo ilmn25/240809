@@ -1,34 +1,54 @@
 using UnityEngine;
 using System.Collections.Generic;
+public class LootEntry
+{
+    public float Chance;
+    public float Amount;
+    public List<string> ItemIDs;
+
+    public LootEntry(float chance, int amount, params string[] itemIDs)
+    {
+        Chance = chance;
+        Amount = amount;
+        ItemIDs = new List<string>(itemIDs);
+    }
+}
 
 public class Loot
 { 
     private static readonly Dictionary<string, Loot> Dictionary = new Dictionary<string, Loot>();
+    private readonly List<LootEntry> _table = new List<LootEntry>();
     public static void Initialize()
     {
-        Loot loot = CreateTable("slab");
-        loot.Add(1, "stone");
-        loot.Add(1, "stone");
-        loot.Add(1, "stone");
-        loot.Add(0.5f, "stone");
-        loot.Add(0.5f, "marble");
-        loot.Add(0.5f, "marble", "sand"); 
+        Loot loot = CreateTable("chest");
+        loot.Add(1, 1, "stone");
+        loot.Add(0.5f, 2, "stone");
+        loot.Add(1, 7, "brick"); 
+        loot.Add(0.5f, 2, "brick");
+        loot.Add(0.5f, 5, "marble");  
+        loot.Add(1, 1, "sword", "axe"); 
+        loot.Add(0.5f, 1, "minigun"); 
+        
+        loot = CreateTable("slab");
+        loot.Add(1, 3, "stone"); 
+        loot.Add(0.5f, 1, "stone");
+        loot.Add(0.5f, 1, "marble");
+        loot.Add(0.5f, 1, "marble", "sand"); 
         
         loot = CreateTable("tree");
-        loot.Add(1, "wood");
-        loot.Add(1, "wood");
-        loot.Add(1, "wood");
-        loot.Add(0.5f, "wood");
-        loot.Add(0.5f, "wood");
+        loot.Add(1, 3, "wood");
+        loot.Add(0.5f, 2, "wood"); 
         
         loot = CreateTable("megumin");
-        loot.Add(1, "marble"); 
+        loot.Add(0.1f, 1, "sword", "axe"); 
         loot = CreateTable("chito");
-        loot.Add(1, "marble"); 
+        loot.Add(0.7f, 10, "bullet"); 
+        loot.Add(0.1f, 1, "pistol"); 
         loot = CreateTable("snare_flea");
-        loot.Add(1, "marble"); 
+        loot.Add(0.5f, 6, "wood"); 
         loot = CreateTable("yuuri");
-        loot.Add(1, "marble"); 
+        loot.Add(0.7f, 10, "bullet");  
+        loot.Add(0.1f, 1, "pistol"); 
     }
 
     public static Loot CreateTable(string id)
@@ -42,46 +62,44 @@ public class Loot
     {
         return Dictionary[id];
     }
-    
-    public readonly Dictionary<float, List<string>> Table = new Dictionary<float, List<string>>();
-    public void Add(float chance, params string[] itemIDs)
+     
+    public void Add(float chance, int amount, params string[] itemIDs)
     {
-        if (!Table.ContainsKey(chance))
-        {
-            Table[chance] = new List<string>();
-        }
-        Table[chance].AddRange(itemIDs);
+        _table.Add(new LootEntry(chance, amount, itemIDs));
     }
 
     public void Spawn(Vector3 position)
     {
         Vector3Int worldPosition = Vector3Int.FloorToInt(position);
 
-        foreach (var entry in Table)
+        foreach (var entry in _table)
         {
-            float chance = entry.Key;
-            List<string> items = entry.Value;
+            List<string> items = entry.ItemIDs;
 
-            if (Random.value <= chance && items.Count > 0)
+            for (int i = 0; i <  entry.Amount; i++)
             {
-                string itemID = items[Random.Range(0, items.Count)];
-                Entity.SpawnItem(itemID, worldPosition);
+                if (Random.value <= entry.Chance)
+                {
+                    string itemID = items[Random.Range(0, items.Count)];
+                    Entity.SpawnItem(itemID, worldPosition);
+                }
             }
         }
     }
     
     public void AddToContainer(Storage storage)
     { 
-        foreach (var entry in Table)
+        foreach (var entry in _table)
         {
-            float chance = entry.Key;
-            List<string> items = entry.Value;
-
-            if (Random.value <= chance && items.Count > 0)
+            List<string> items = entry.ItemIDs;
+            for (int i = 0; i < entry.Amount; i++)
             {
-                string itemID = items[Random.Range(0, items.Count)];
-                storage.AddItem(itemID);
-            }
+                if (Random.value <= entry.Chance)
+                {
+                    string itemID = items[Random.Range(0, items.Count)];
+                    storage.AddItem(itemID);
+                }
+            } 
         }
     }
 }

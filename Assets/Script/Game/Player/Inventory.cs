@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Inventory 
 {
-    public static List<ItemSlot> Storage; 
+    public static Storage Storage; 
     
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
@@ -18,9 +18,9 @@ public class Inventory
 
     public static event Action SlotUpdate; 
 
-    public static void SetInventory(List<ItemSlot> data)
+    public static void SetInventory(Storage storage)
     {
-        Storage = data;
+        Storage = storage;
         RefreshInventory();
     }
     
@@ -94,7 +94,7 @@ public class Inventory
     public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = Storage[_currentKey];
+        CurrentItem = Storage.List[_currentKey];
         Item itemData = CurrentItemData;
         CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
         if (itemData != CurrentItemData)
@@ -109,140 +109,14 @@ public class Inventory
     } 
     
     public static void AddItem(string stringID, int quantity = 1)
-    {
-        int maxStackSize = Item.GetItem(stringID).StackSize;
-
-        // First try to add to the current slot
-        if (Storage[_currentKey].StringID == stringID && Storage[_currentKey].Stack < maxStackSize)
-        {
-            int addableAmount = Math.Min(quantity, maxStackSize - Storage[_currentKey].Stack);
-            Storage[_currentKey].Stack += addableAmount;
-            quantity -= addableAmount;
-
-            if (quantity <= 0)
-            {
-                RefreshInventory();
-                return;
-            }
-        }
-
-        // Try to add to existing slots with the same item
-        foreach (var slot in Storage)
-        {
-            if (slot.StringID == stringID && slot.Stack < maxStackSize)
-            {
-                int addableAmount = Math.Min(quantity, maxStackSize - slot.Stack);
-                slot.Stack += addableAmount;
-                quantity -= addableAmount;
-
-                if (quantity <= 0)
-                { 
-                    RefreshInventory();
-                    return;
-                }
-            }
-        }
-
-        // If there's still quantity left, find new slots
-        while (quantity > 0)
-        { 
-            int slotID = GetEmptySlot();
-            int addableAmount = Math.Min(quantity, maxStackSize - Storage[slotID].Stack);
-            Storage[slotID].SetItem(Storage[slotID].Stack + addableAmount, stringID, Storage[slotID].Modifier, Storage[slotID].Locked);
-            quantity -= addableAmount;
-        }
-
-        RefreshInventory();
+    {  
+        Storage.AddItem(stringID, quantity, _currentKey);
+        // RefreshInventory();
     }
     
     public static void RemoveItem(string stringID, int quantity = 1)
     {
-        // Prioritize current slot
-        if (Storage[_currentKey].StringID == stringID)
-        {
-            int removableAmount = Math.Min(quantity, Storage[_currentKey].Stack);
-            Storage[_currentKey].Stack -= removableAmount;
-            quantity -= removableAmount;
-            if (Storage[_currentKey].Stack <= 0) Storage[_currentKey].clear();
-            if (quantity <= 0)
-            { 
-                RefreshInventory();
-                return;
-            }
-        }
-
-        // Continue with other slots if necessary
-        foreach (var slot in Storage)
-        {
-            if (slot.StringID == stringID)
-            {
-                int removableAmount = Math.Min(quantity, slot.Stack);
-                slot.Stack -= removableAmount;
-                quantity -= removableAmount;
-                if (slot.Stack <= 0)
-                {
-                    slot.clear();
-                }
-                if (quantity <= 0)
-                {
-                    RefreshInventory();
-                    return;
-                }
-            }
-        } 
-        RefreshInventory();
-    }
-    
-    public static int GetAmount(string stringID)
-    {
-        int count = 0;
-        foreach (var slot in Storage)
-        {
-            if (slot.StringID == stringID)
-            { 
-                count += slot.Stack;
-            }
-        }
-        return count;
-    }
-
-    private static int GetEmptySlot()
-    {
-        int slotID = 0;
-        while (Storage[slotID].Stack != 0)
-        {
-            slotID++;
-        }
-        return slotID;
-    }
-    
-    // void OnGUI()
-    // {
-    //     GUIStyle style = new GUIStyle();
-    //     style.fontSize = 25;
-    //     style.normal.textColor = Color.white;
-    //     style.alignment = TextAnchor.UpperRight;
-    //
-    //     // Starting position for the labels
-    //     float startX = Screen.width - 300;
-    //     float startY = 10;
-    //
-    //     string rowText = $"Row {_currentRow}\n";
-    //     for (int i = 0; i < INVENTORY_SLOT_AMOUNT; i++)
-    //     {
-    //         int key = CalculateKey(_currentRow, i);
-    //         if (key == _currentKey) rowText += ">";
-    //         if (_playerInventory.TryGetValue(key, out InvSlotData slot))
-    //         {
-    //             rowText += $"{slot.StringID} {slot.Stack}\n";
-    //         }
-    //         else
-    //         {
-    //             rowText += "Empty\n";
-    //         }
-    //     }
-    //
-    //     Rect rect = new Rect(startX, startY, 290, Screen.height - 20); // Adjusting position and size for the row display
-    //     GUI.Label(rect, rowText, style);
-    // }
+        Storage.RemoveItem(stringID, quantity, _currentKey);
+        // RefreshInventory();
+    }   
 }
