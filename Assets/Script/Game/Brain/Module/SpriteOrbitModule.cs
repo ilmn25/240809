@@ -1,28 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-public class MobSpriteOrbitModule : SpriteOrbitModule
-{
-    public override void Initialize()
-    {
-        _sprite = Machine.transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>();
-        Machine.transform.rotation = ViewPort.CurrentRotation;
-        ViewPort.UpdateOrbitRotate += UpdateOrbit;
-    }
-}
+
 public class SpriteOrbitModule : Module
 {
-    protected SpriteRenderer _sprite;
+    private Transform _sprite;
 
-    public SpriteOrbitModule(SpriteRenderer sprite = null)
+    public SpriteOrbitModule(Transform sprite = null)
     {
         _sprite = sprite;
     }
-    
+
     public override void Initialize()
-    {
-        if (!_sprite) _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
-        Machine.transform.rotation = ViewPort.CurrentRotation;
+    { 
+        if (!_sprite) _sprite = Machine.transform.Find("sprite");
+        _sprite.rotation = ViewPort.CurrentRotation;
         ViewPort.UpdateOrbitRotate += UpdateOrbit;
     }
     
@@ -31,8 +21,8 @@ public class SpriteOrbitModule : Module
         ViewPort.UpdateOrbitRotate -= UpdateOrbit; 
     }   
  
-    protected void UpdateOrbit()
+    private void UpdateOrbit()
     { 
-        Machine.transform.rotation = ViewPort.CurrentRotation;
+        _sprite.rotation = ViewPort.CurrentRotation;
     }
 }

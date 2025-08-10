@@ -43,12 +43,7 @@ public class Game : MonoBehaviour
     }
 
     private void Start()
-    {
-        Player.transform.position = new Vector3( 
-            World.ChunkSize * WorldGen.Size.x / 2,
-            World.ChunkSize * WorldGen.Size.y-25,
-            World.ChunkSize * WorldGen.Size.z / 2);
-          
+    { 
         Control.Initialize(); 
         Item.Initialize();
         Entity.Initialize();

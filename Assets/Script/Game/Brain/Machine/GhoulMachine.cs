@@ -39,7 +39,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());
-        AddModule(new MobSpriteOrbitModule());
+        AddModule(new SpriteOrbitModule());
 
         AddState(new MobIdle());
         AddState(new MobChase());

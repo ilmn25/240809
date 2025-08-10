@@ -23,7 +23,7 @@ public class BugMachine : MobMachine
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());
-        AddModule(new MobSpriteOrbitModule());
+        AddModule(new SpriteOrbitModule());
 
         AddState(new MobIdle());
         AddState(new MobChase());

@@ -15,7 +15,7 @@ public class ChestMachine : StructureMachine, IActionSecondary
             Storage = storage
         });
         AddModule(new SpriteCullModule(SpriteRenderer)); 
-        AddModule(new SpriteOrbitModule(SpriteRenderer)); 
+        AddModule(new SpriteOrbitModule()); 
         AddState(new InContainerState());
     }
     
@@ -37,11 +37,12 @@ public class InContainerState : State
         GUIMain.Storage.Storage = ((ContainerInfo)Info).Storage;
         GUIMain.RefreshStorage();
         GUIMain.Storage.Show(true);
+        GUIMain.Show(true);
     }
 
     public override void OnUpdateState()
     {
-        if (Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
