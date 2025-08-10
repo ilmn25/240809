@@ -26,7 +26,8 @@ public class GUICursor
 
     public static void Update()
     {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  Game.GUICamera,out Vector2 mousePosition);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(_parentRect, Input.mousePosition,  
+            Game.GUICamera,out Vector2 mousePosition);
         _cursorRect.anchoredPosition = mousePosition;
     }
 

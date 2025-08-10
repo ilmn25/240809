@@ -14,7 +14,7 @@ public class GUIMain
     
     private static CoroutineTask _showTask; 
     private static GUIStorage _inventory;
-    public static GUIStorage Storage;
+    public static GUIStorage Storage; 
     
     public static bool IsHover;
     public static void Initialize()
@@ -30,7 +30,6 @@ public class GUIMain
             Name = "Inventory",
         };
         _inventory.Initialize();
-        Debug.Log(_inventory.Storage);
         Storage = new GUIInventory()
         {
             Storage = Inventory.Storage,
@@ -40,11 +39,11 @@ public class GUIMain
             Name = "Storage",
         };
         Storage.Initialize();
+        Storage.Show(false);
     }
  
     public static void Update()
     {
-        
         GUIDialogue.Update();
         GUICraft.Update(); 
         GUICursor.Update();
@@ -59,7 +58,7 @@ public class GUIMain
                 { 
                     Game.GUIInv.SetActive(true); 
                     RefreshStorage();
-                    _showTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIInv, 0.7f));
+                    _showTask = new CoroutineTask(Scale(true, ShowDuration, Game.GUIInv, 0.7f));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -67,7 +66,7 @@ public class GUIMain
                 }
                 else
                 {
-                    _showTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIInv, 0));
+                    _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
                     _showTask.Finished += (bool isManual) => 
                     {
                         _showTask = null;
@@ -148,5 +147,4 @@ public class GUIMain
 
         target.transform.localPosition = position;
     }
-
 }

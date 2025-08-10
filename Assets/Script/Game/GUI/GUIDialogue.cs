@@ -7,12 +7,10 @@ public class GUIDialogue
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
 
-    
     private static int _currentLine = 0;
     private static CoroutineTask _scrollTask;
     private static CharTalk _entityState;
-    private static CoroutineTask _scaleTask;
-    private static CoroutineTask _slideTask;
+    private static CoroutineTask _scaleTask; 
     private static AudioSource _audioSource;
       
     public static void Update()
@@ -71,7 +69,7 @@ public class GUIDialogue
         Game.GUIDialogue.SetActive(true);
         Game.GUIImage.SetActive(true);
         HandleScroll(); 
-        _slideTask = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
+        new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
             new Vector3(220, -95, 203), EaseSpeed));
         _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
             0.9f, EaseSpeed)); 
@@ -79,7 +77,7 @@ public class GUIDialogue
  
     private static void HideDialogue()
     { 
-        _slideTask = new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
+        new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
             new Vector3(450, -95, 203), EaseSpeed));
         _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
             0, EaseSpeed));  
