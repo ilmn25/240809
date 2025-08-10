@@ -11,7 +11,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public int slotNumber;
     public GUIStorage GUIStorage;
     
-    private void Awake()
+    private void Start()
     {
         GUIStorage.OnRefreshSlot += OnRefreshSlot;
         _image = transform.Find("image").GetComponent<Image>();

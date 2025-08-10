@@ -16,6 +16,7 @@ public class GUIMain
     private static GUIStorage _inventory;
     public static GUIStorage Storage; 
     
+    public static bool Showing = true;
     public static bool IsHover;
     public static void Initialize()
     {
@@ -42,6 +43,7 @@ public class GUIMain
         Storage.Show(false);
         
         GUIDialogue.Show(false);
+        Show(false);
     }
  
     public static void Update()
@@ -52,30 +54,39 @@ public class GUIMain
         _inventory.Update();
         Storage.Update();
 
-        if (Control.Inst.Inv.KeyDown())  
+        if (Control.Inst.Inv.KeyDown())
+        { 
+            if (Showing)
+                Show(false);
+            else
+                Show(true);
+        }
+    }
+
+    public static void Show(bool isShow)
+    {
+        if (isShow)
         {
-            if ((_showTask != null && !_showTask.Running) || _showTask == null)
+            if (!Showing)
             {
-                if (!Game.GUIInv.activeSelf)
-                { 
-                    Game.GUIInv.SetActive(true); 
-                    RefreshStorage();
-                    _showTask = new CoroutineTask(Scale(true, ShowDuration, Game.GUIInv, 0.7f));
-                    _showTask.Finished += (bool isManual) => 
-                    {
-                        _showTask = null;
-                    };
-                }
-                else
-                {
-                    _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
-                    _showTask.Finished += (bool isManual) => 
-                    {
-                        _showTask = null;
-                        Game.GUIInv.SetActive(false);
-                    };
-                }
-            } 
+                Showing = true;
+                 RefreshStorage();
+                _showTask?.Stop();
+                _showTask = new CoroutineTask(Scale(true, ShowDuration, Game.GUIInv, 0.7f));
+            }
+        }
+        else
+        {
+            if (Showing)
+            {
+                Showing = false;
+                _showTask?.Stop();
+                _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
+                // _showTask.Finished += (bool isManual) => 
+                // {
+                //     Game.GUIInv.SetActive(false);
+                // };
+            }
         }
     }
 
@@ -103,7 +114,7 @@ public class GUIMain
         Vector3 targetScale = Vector3.one * scale;
         float elapsedTime = 0f;
 
-        while (elapsedTime < duration)
+        while (elapsedTime < duration * 0.98f)
         {
             float t = elapsedTime / duration;
             if (show)

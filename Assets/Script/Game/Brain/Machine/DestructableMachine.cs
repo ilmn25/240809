@@ -6,7 +6,7 @@ public class StructureMachine : EntityMachine
     protected SpriteRenderer SpriteRenderer;
     public override void OnSetup()
     {
-        SpriteRenderer = GetComponent<SpriteRenderer>();
+        SpriteRenderer = transform.Find("sprite").GetComponent<SpriteRenderer>();
         SpriteRenderer.sprite = Cache.LoadSprite("sprite/" + entityData.stringID);
     }
 }
@@ -24,7 +24,7 @@ public class DestructableMachine : StructureMachine, IHitBox
     public override void OnStart()
     { 
         AddModule(new SpriteCullModule(SpriteRenderer));  
-        AddModule(new SpriteOrbitModule(SpriteRenderer)); 
+        AddModule(new SpriteOrbitModule()); 
         AddModule(new StructureInfo {
             Health = _health,
             Loot = entityData.stringID,

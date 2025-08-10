@@ -16,7 +16,7 @@ public class ItemMachine : EntityMachine
         _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + entityData.stringID);
         AddModule(new ItemPhysicModule()); 
         AddModule(new SpriteCullModule(_spriteRenderer)); 
-        AddModule(new SpriteOrbitModule(_spriteRenderer)); 
+        AddModule(new SpriteOrbitModule(transform)); 
         AddState(new ItemState(),true);
     }
 

@@ -24,7 +24,7 @@ public class HunterMachine : MobMachine
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule()); 
         AddModule(new MobSpriteCullModule());
-        AddModule(new MobSpriteOrbitModule());
+        AddModule(new SpriteOrbitModule());
         
         AddState(new MobIdle());
         AddState(new MobChaseAim());

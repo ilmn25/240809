@@ -6,6 +6,11 @@ public class PlayerMachine : BasicMachine, IHitBox
     private PlayerInfo _info;
     public override void OnStart()
     {  
+        transform.position = new Vector3( 
+            World.ChunkSize * WorldGen.Size.x / 2,
+            World.ChunkSize * WorldGen.Size.y - 5,
+            World.ChunkSize * WorldGen.Size.z / 2);
+        
         AddModule(new PlayerInfo()
         {
             HitboxType = HitboxType.Friendly,
