@@ -8,7 +8,6 @@ public class GroundMovementModule : MovementModule
 { 
     private const float SlideDegree = 0.3f;
      
-    private float _speedCurrent;
     private float _speedTarget;
     private float _speedAdjust;
     private Vector3 _newPosition;
@@ -24,6 +23,7 @@ public class GroundMovementModule : MovementModule
 
     public override void Update()
     { 
+        if (Info.Health <= 0) return;
         if (Machine.transform.position.y < -1) Machine.transform.position = Utility.AddToVector(Machine.transform.position, 0, 100, 0);
         
         if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) return;
@@ -37,12 +37,14 @@ public class GroundMovementModule : MovementModule
         if (Info.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            _speedTarget = Info.IsGrounded ? Info.SpeedGround : Info.SpeedAir;
-            _speedCurrent = Mathf.Lerp(_speedCurrent, _speedTarget, _deltaTime / Info.AccelerationTime);
-            _speedAdjust = (Info.Direction.x != 0 && Info.Direction.z != 0) ? 1 / 1.25f : 1; 
+            Info.SpeedCurrent = Mathf.Lerp(Info.SpeedCurrent, Info.SpeedTarget, _deltaTime / Info.AccelerationTime);
 
-            _newPosition.x += Info.Direction.x * _speedCurrent * _deltaTime * _speedAdjust;
-            _newPosition.z += Info.Direction.z * _speedCurrent * _deltaTime * _speedAdjust;
+            if (Info.Direction.x != 0 && Info.Direction.z != 0)
+            {
+                _speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
+            }
+            _newPosition.x += Info.Direction.x * Info.SpeedCurrent * _deltaTime * _speedAdjust;
+            _newPosition.z += Info.Direction.z * Info.SpeedCurrent * _deltaTime * _speedAdjust;
 
             if (!IsMovable(_newPosition))
             {
@@ -50,17 +52,17 @@ public class GroundMovementModule : MovementModule
             } 
             _directionBuffer = Info.Direction;
         }
-        else if (_speedCurrent != 0)
+        else if (Info.SpeedCurrent != 0)
         {
             //! slowing down to stop
-            _speedCurrent = (_speedCurrent < 0.05f) ? 0f : Mathf.Lerp(_speedCurrent, 0, _deltaTime / Info.DecelerationTime);
+            Info.SpeedCurrent = (Info.SpeedCurrent < 0.05f) ? 0f : Mathf.Lerp(Info.SpeedCurrent, 0, _deltaTime / Info.DecelerationTime);
 
-            _newPosition.x += _directionBuffer.x * _speedCurrent * _deltaTime;
-            _newPosition.z += _directionBuffer.z * _speedCurrent * _deltaTime;
+            _newPosition.x += _directionBuffer.x * Info.SpeedCurrent * _deltaTime;
+            _newPosition.z += _directionBuffer.z * Info.SpeedCurrent * _deltaTime;
 
             if (!IsMovable(_newPosition))
             {
-                _speedCurrent /= 2;
+                Info.SpeedCurrent /= 2;
                 _newPosition = Machine.transform.position;
             }
         }
@@ -95,11 +97,11 @@ public class GroundMovementModule : MovementModule
             //! slide against wall if possible
             if (Info.Direction.x != 0)
             {
-                _testPosition = Machine.transform.position.x + SlideDegree * Info.Direction.x * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.x + SlideDegree * Info.Direction.x * Info.SpeedCurrent * _deltaTime;
                 _testPositionA = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
                 _testPositionB = new Vector3(_testPosition, Machine.transform.position.y, Machine.transform.position.z);
-                _testPositionA.z += -1 * _speedCurrent * _deltaTime;
-                _testPositionB.z += 1 * _speedCurrent * _deltaTime;
+                _testPositionA.z += -1 * Info.SpeedCurrent * _deltaTime;
+                _testPositionB.z += 1 * Info.SpeedCurrent * _deltaTime;
                 if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
                 {
                     _newPosition = _testPositionA;
@@ -111,11 +113,11 @@ public class GroundMovementModule : MovementModule
             }
             else
             {
-                _testPosition = Machine.transform.position.z + SlideDegree * Info.Direction.z * _speedCurrent * _deltaTime;
+                _testPosition = Machine.transform.position.z + SlideDegree * Info.Direction.z * Info.SpeedCurrent * _deltaTime;
                 _testPositionA = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
                 _testPositionB = new Vector3(Machine.transform.position.x, Machine.transform.position.y, _testPosition);
-                _testPositionA.x += -1 * _speedCurrent * _deltaTime;
-                _testPositionB.x += 1 * _speedCurrent * _deltaTime;
+                _testPositionA.x += -1 * Info.SpeedCurrent * _deltaTime;
+                _testPositionB.x += 1 * Info.SpeedCurrent * _deltaTime;
                 if (IsMovable(_testPositionA) && !IsMovable(_testPositionB))
                 {
                     _newPosition = _testPositionA;
@@ -163,19 +165,24 @@ public class GroundMovementModule : MovementModule
         } 
         
         
-        if (Info.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
-        {
-            Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
-            if (IsMovable(tempPosition)) Machine.transform.position = tempPosition;
-        }
-        _previousPosition = Machine.transform.position;
+        // if (Info.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
+        // {
+        //     Debug.Log("aaa");
+        //     Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
+        //     if (IsMovable(tempPosition)) Machine.transform.position = tempPosition; 
+        // }
+        // _previousPosition = Machine.transform.position;
     }
     
+    private readonly Vector3 _colliderSize = new Vector3(0.35f, 0.35f, 0.25f);  
+    private readonly Vector3 _colliderCenter = new Vector3(0, 0.35f, 0);  
     private bool IsMovable(Vector3 newPosition)
     {
         // if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(newPosition), Scene.LogicDistance)) return false;  
         
-        return !(Physics.OverlapBoxNonAlloc(newPosition + new Vector3(0, 0.15f, 0), Vector3.one * Info.MapCollisionRadius, ColliderArray, Quaternion.identity, Game.MaskStatic) > 0);
+        return !(Physics.OverlapBoxNonAlloc(newPosition + _colliderCenter, 
+            _colliderSize, ColliderArray, Quaternion.identity, 
+            Game.MaskStatic) > 0);
     } 
 } 
 

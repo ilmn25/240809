@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class GroundAnimationModule : MobModule
 {
-    private const float BounceSpeed = 1f;
-    private const float BounceRange = 0.12f;
+    private const float BounceSpeed = 1.65f;
+    private const float BounceRange = 0.15f;
+    // private const float BounceSpeed = 1f;
+    // private const float BounceRange = 0.12f;
     private const float TrailFrequency = 0.5f;
     private const float FlipDuration = 0.06f; 
     
@@ -40,7 +42,7 @@ public class GroundAnimationModule : MobModule
     {
         if (Info.SpriteCharRenderer.isVisible)
         {
-            if (Info.Target)
+            if (Info.FaceTarget)
             {
                 _animDirection = new Vector2Int((int)Mathf.Sign(Info.TargetScreenDir.x), 0);
 
@@ -59,8 +61,6 @@ public class GroundAnimationModule : MobModule
  
     public void EquipTrackTarget()
     {
-        if(!Info.Target) return;
-         
         float angle = Mathf.Atan2(Info.TargetScreenDir.y, Info.TargetScreenDir.x) * Mathf.Rad2Deg;
 
         if (angle > 90)
@@ -88,15 +88,14 @@ public class GroundAnimationModule : MobModule
         {
             rawDirection.x = Mathf.Abs(rawDirection.x) < 0.1f ? 0 : Mathf.Sign(rawDirection.x);
             rawDirection.y = Mathf.Abs(rawDirection.y) < 0.1f ? 0 : Mathf.Sign(rawDirection.y);
-            rawDirection = ViewPort.GetRelativeDirection(rawDirection);
-
+            rawDirection = ViewPort.GetRelativeDirection(rawDirection); 
             _animDirection = new Vector2Int((int)rawDirection.x, (int)rawDirection.y);
         }
     }
 
     void HandleBounceAndTrail()
     {
-        bool isMoving = Info.Direction != Vector3.zero;
+        bool isMoving = Info.SpeedCurrent > 0.35 && Info.IsGrounded;
 
         if (isMoving)
         {
@@ -105,9 +104,9 @@ public class GroundAnimationModule : MobModule
 
             if (Time.time >= _nextTrailTimer)
             {
-                SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, false);
+                SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, Info.IsPlayer);
                 _nextTrailTimer = Time.time + TrailFrequency;
-                // AudioSystem.PlaySFX(Resources.Load<AudioClip>($"audio/sfx/footstep/footstep{Random.Range(1, 3)}"), 0.3f);
+                if (Info.IsPlayer) Audio.PlaySFX($"footstep_{Random.Range(1, 3)}", 0.3f);
             }
         }
         else
@@ -120,7 +119,7 @@ public class GroundAnimationModule : MobModule
     {
         if (_animDirection.x != 0)
         {
-            if (Mathf.Sign(_animDirection.x) != Mathf.Sign(_targetScale.x))
+            if (!Mathf.Approximately(Mathf.Sign(_animDirection.x), Mathf.Sign(_targetScale.x)))
             {
                 _flipDirection = _animDirection.x;
                 _targetScale = new Vector3(Mathf.Sign(_flipDirection), _originalScale.y, _originalScale.z);

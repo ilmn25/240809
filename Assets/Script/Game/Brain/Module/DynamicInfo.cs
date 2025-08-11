@@ -10,6 +10,7 @@ public class DynamicInfo : Info
      
     public float SpeedGround = 5;
     public float SpeedAir = 10;
+    public float SpeedTarget = 10;
     public float AccelerationTime = 0.3f;
     public float DecelerationTime = 0.08f;
     public float Gravity = -40f;
@@ -18,8 +19,7 @@ public class DynamicInfo : Info
     public float Health; 
     public float HealthMax;
     public float Defense; 
-    public float MapCollisionRadius = 0.3f;
-    public float EntityCollisionRadius = 0.15f;
+    public readonly float EntityCollisionRadius = 0.15f;
     
     public Transform Sprite;
     public Animator Animator;
@@ -30,12 +30,13 @@ public class DynamicInfo : Info
     public SpriteRenderer SpriteToolRenderer; 
      
     protected int Iframes = 15;
-    private int _iframesCurrent;  
+    protected int IframesCurrent;  
     public float AirTime;
     public Vector3 Velocity = Vector3.zero;
     public bool IsGrounded = false;
     public Vector3 Direction = Vector3.zero; 
-    public Vector3 TargetScreenDir; 
+    public Vector3 TargetScreenDir;
+    public float SpeedCurrent;
 
     private static readonly Collider[] ColliderArray = new Collider[3];
     
@@ -50,7 +51,7 @@ public class DynamicInfo : Info
             if (col.gameObject == Machine.gameObject || Machine.gameObject.isStatic)
                 continue;
 
-            KnockBack(col.transform.position, 0.4f, true);
+            KnockBack(col.transform.position, 0.5f, true);
             break; 
         }
     } 
@@ -70,7 +71,7 @@ public class DynamicInfo : Info
     public override void Update()
     { 
         OnUpdate();
-        if (_iframesCurrent > 0) _iframesCurrent--;
+        if (IframesCurrent > 0) IframesCurrent--;
 
         if (!IsGrounded && Velocity.y < -10) AirTime += 1;
         else {
@@ -92,7 +93,7 @@ public class DynamicInfo : Info
     
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (_iframesCurrent != 0) return false;
+        if (IframesCurrent != 0) return false;
         switch (projectile.Target)
         {
             case HitboxType.Friendly: // enemy kill friendly 
@@ -106,7 +107,7 @@ public class DynamicInfo : Info
                 if (HitboxType == HitboxType.Friendly) return false;
                 break;
         }
-        _iframesCurrent = Iframes;
+        IframesCurrent = Iframes;
         OnHit(projectile);
         Audio.PlaySFX(HurtSfx, 0.4f);
         Health -= projectile.Info.GetDamage() - Defense;

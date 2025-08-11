@@ -71,13 +71,25 @@ public class ViewPort
         _targetFOV -= input * FOVChangeSpeed;
         _targetFOV = Mathf.Clamp(_targetFOV, 10, FOV);
     }
-    public static Vector2 GetRelativeDirection(Vector2 direction) 
+    
+    public static Vector2 GetRelativeDirection(Vector2 direction)
     {
-        Vector2 rotated = new Vector3();
-        rotated.x = direction.x * _cosAngle - direction.y * _sinAngle;
-        rotated.y = direction.x * _sinAngle + direction.y * _cosAngle; 
+        // Normalize input to avoid scaling issues
+        direction.Normalize();
+
+        // Rotate the vector counter-clockwise by orbitRotation
+        float rotatedX = direction.x * _cosAngle - direction.y * _sinAngle;
+        float rotatedY = direction.x * _sinAngle + direction.y * _cosAngle;
+
+        Vector2 rotated = new Vector2(rotatedX, rotatedY);
+
+        // Optional: Snap to cardinal directions if needed
+        rotated.x = Mathf.Abs(rotated.x) < 0.1f ? 0 : Mathf.Sign(rotated.x);
+        rotated.y = Mathf.Abs(rotated.y) < 0.1f ? 0 : Mathf.Sign(rotated.y);
+
         return rotated;
     }
+
 
  
 

@@ -5,6 +5,11 @@ public class MobAttackShoot : MobState
 
     public override void OnEnterState()
     {
+        if (Info.Equipment.ProjectileInfo == null)
+        {
+            Machine.SetState<DefaultState>();
+            return;
+        } 
         Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
         Info.Animator.speed = Info.Equipment.Speed; 
         Info.Animator.Play("EquipShoot", 0, 0f);  
@@ -15,10 +20,11 @@ public class MobAttackShoot : MobState
         direction.y = 0;
         direction.Normalize();
         
+        // + 0.3f * Vector3.up
         Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.ProjectileOffset,
-            Info.Target.transform.position + 0.3f * Vector3.up,
+            Info.AimPosition,
             Info.Equipment.ProjectileInfo,
-            HitboxType.Friendly);
+            Info.TargetHitboxType, Machine);
     }
  
     public override void OnUpdateState()

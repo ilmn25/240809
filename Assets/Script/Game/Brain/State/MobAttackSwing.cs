@@ -1,31 +1,34 @@
 using UnityEngine;
 
-class MobAttackSwing : State {
-    private MobInfo MobInfo => Machine.GetModule<MobInfo>();
-    private Animator Animator => MobInfo.Animator;
+class MobAttackSwing : MobState {
 
     public override void OnEnterState()
     {
-        Animator.speed = 1f; 
-        Animator.Play("EquipSwing", 0, 0f);  
-        Projectile.Spawn(Machine.transform.position,Module<MobInfo>().Target.transform.position,
-            MobInfo.Equipment.ProjectileInfo, HitboxType.Friendly);
+        if (Info.Equipment.ProjectileInfo == null)
+        {
+            Machine.SetState<DefaultState>();
+            return;
+        } 
+        Info.Animator.speed = 1f; 
+        Info.Animator.Play("EquipSwing", 0, 0f);   
+        Projectile.Spawn(Info.SpriteToolTrack.transform.position, Info.AimPosition,
+            Info.Equipment.ProjectileInfo, Info.TargetHitboxType, Machine); 
     }
     
     public override void OnUpdateState() {
-        AnimatorStateInfo stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
+        AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
         if (stateInfo.normalizedTime >= 1f)
         {
             if (stateInfo.IsName("EquipSwing"))
-            {
-                Audio.PlaySFX(MobInfo.Equipment.Sfx, 0.5f);
-                Animator.speed = MobInfo.Equipment.Speed;
-                Animator.Play("EquipSwingCooldown", 0, 0f);
+            { 
+                Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
+                Info.Animator.speed = Info.Equipment.Speed;
+                Info.Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))
             {
-                Animator.speed = 1f;
-                Animator.Play("EquipIdle", 0, 0f);
+                Info.Animator.speed = 1f;
+                Info.Animator.Play("EquipIdle", 0, 0f);
                 Machine.SetState<DefaultState>();
             }
         } 

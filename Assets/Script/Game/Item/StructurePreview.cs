@@ -7,7 +7,7 @@ public class StructurePreviewMachine : BasicMachine
                 AddModule(new SpriteOrbitModule(transform));
                 AddState(new DefaultState());
                 AddState(new StructurePreviewState());
-                transform.localScale *= 2;
+                transform.localScale = new Vector3(1, 1.414f, 1);
         }
 
         public override void OnUpdate()

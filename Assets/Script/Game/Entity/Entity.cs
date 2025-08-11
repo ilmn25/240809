@@ -31,6 +31,14 @@ public partial class Entity
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 
                 AddStructure<SlabMachine>("slab", Vector3Int.one, false);
                 
+                Dictionary.Add("player", new Entity
+                {
+                        Bounds = Vector3Int.one,
+                        Collision = false,
+                        PrefabName = "player",
+                        Machine = typeof(PlayerMachine),
+                        StaticLoad = false,
+                });
                 AddMob<HunterMachine>("chito"); 
                 AddMob<HunterMachine>("yuuri");
                 AddMob<BugMachine>("snare_flea"); 
@@ -41,7 +49,7 @@ public partial class Entity
         {
                 Dictionary.Add(stringID, new Entity
                 {
-                        Bounds = Vector3Int.zero,
+                        Bounds = Vector3Int.one,
                         Collision = false,
                         PrefabName = "mob",
                         Machine = typeof(T),

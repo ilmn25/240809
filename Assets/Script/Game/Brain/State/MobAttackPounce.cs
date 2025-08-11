@@ -19,7 +19,7 @@ public class MobAttackPounce : MobState
 
     public override void OnEnterState()
     { 
-        Vector3 dir = Info.Target.transform.position - Machine.transform.position;
+        Vector3 dir = Info.AimPosition - Machine.transform.position;
         dir.y = 0;
         dir = dir.normalized;
         dir.y = 0.5f;
@@ -36,8 +36,8 @@ public class MobAttackPounce : MobState
         }
         else if (_delay > 30)
         {
-            Projectile.Spawn(Machine.transform.position,Info.Target.transform.position,
-                _projectileInfo, HitboxType.Friendly);
+            Projectile.Spawn(Info.SpriteToolTrack.position,Info.AimPosition,
+                _projectileInfo, Info.TargetHitboxType, Machine);
         } 
     }
 }
