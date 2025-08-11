@@ -17,12 +17,16 @@ public class MobInfo : DynamicInfo
     public int PathAmount = 5000;
     
     public Item Equipment;
-     
-    public Transform Target; 
+
+    public bool IsPlayer = false;
+    public Transform Target;
+    public bool FaceTarget;
+    public Vector3 AimPosition;
+    public HitboxType TargetHitboxType;
     public PathingStatus PathingStatus = PathingStatus.Pending; 
 
     protected override void OnUpdate()
-    {
+    { 
         base.OnUpdate();
         if (Target)
         {
@@ -31,10 +35,22 @@ public class MobInfo : DynamicInfo
         }
  
     }
+ 
+    
+}
+
+public class EnemyInfo : MobInfo
+{
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        FaceTarget = Target;
+        SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
+    }
 
     protected override void OnHit(Projectile projectile)
     { 
-        Target = Game.Player.transform;
+        Target = projectile.Source.transform;
         PathingStatus = PathingStatus.Reached; 
     }
 
@@ -43,5 +59,4 @@ public class MobInfo : DynamicInfo
         Loot.Gettable(((EntityMachine)Machine).entityData.stringID).Spawn(Machine.transform.position);
         ((EntityMachine)Machine).Delete();
     }
-    
 }

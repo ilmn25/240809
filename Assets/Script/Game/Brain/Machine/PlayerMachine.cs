@@ -1,51 +1,53 @@
  
 using UnityEngine;
 
-public class PlayerMachine : BasicMachine, IHitBox
+public class PlayerMachine : EntityMachine, IHitBox
 {
     private PlayerInfo _info;
     public override void OnStart()
-    {  
-        transform.position = new Vector3( 
-            World.ChunkSize * WorldGen.Size.x / 2,
-            World.ChunkSize * WorldGen.Size.y - 5,
-            World.ChunkSize * WorldGen.Size.z / 2);
+    {   
         
         AddModule(new PlayerInfo()
-        {
+        { 
+            Equipment = Inventory.CurrentItemData,
             HitboxType = HitboxType.Friendly,
+            TargetHitboxType = HitboxType.Passive,
             HealthMax = PlayerData.Inst.health,
             Defense = 0,
             Mana = PlayerData.Inst.mana,
             Sanity = PlayerData.Inst.sanity,
             Hunger = PlayerData.Inst.hunger,
             Stamina = PlayerData.Inst.stamina,
-            SpeedGround = 6,
+            SpeedGround = 4,
+            SpeedAir = 6,
+            AccelerationTime = 0.2f,
+            DecelerationTime = 0.08f,
+            Gravity = -40f,
+            JumpVelocity = 12f,
             DeathSfx = "player_die",
             HurtSfx = "player_hurt", 
         });
-        AddModule(new PlayerMovementModule()); 
-        AddModule(new PlayerAnimationModule()); 
+        AddModule(new SpriteOrbitModule(transform)); 
+        AddModule(new GroundAnimationModule()); 
+        AddModule(new GroundMovementModule()); 
         AddModule(new PlayerTerraformModule());  
         
         _info = GetModule<PlayerInfo>();
         Inventory.SlotUpdate += EventSlotUpdate;
-        AddState(new EquipSwingState());
-        AddState(new EquipShootState());
+        AddState(new MobAttackSwing());
+        AddState(new MobAttackShoot());
         AddState(new EquipSelectState());
     }
 
     private void HandleInput()
     {
-        
+        // Debug.Log(Info.SpeedCurrent);
         if (transform.position.y < -50)
         {
             MapCull.ForceRevertMesh(); 
             transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
         }
-         
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Space))
-            _info.PlayerStatus = PlayerStatus.Active;
+          
         if (Input.GetKeyDown(KeyCode.N))
         {
             Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position), 200);
@@ -64,7 +66,8 @@ public class PlayerMachine : BasicMachine, IHitBox
     public override void OnUpdate()
     {
         HandleInput();
-        if (GUIMain.IsHover) return;
+        if (GUIMain.IsHover || !IsCurrentState<DefaultState>()) return;
+        if (Inventory.CurrentItemData != null) Info.Equipment = Inventory.CurrentItemData;
         switch (Inventory.CurrentItemData?.Type)
         {
             case ItemType.Tool:
@@ -75,17 +78,31 @@ public class PlayerMachine : BasicMachine, IHitBox
                     PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
                     if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
                         PlayerTerraformModule.HandleMapBreak(); 
+                     
                 } 
                 if (!_info.IsBusy && 
                     (Control.Inst.ActionPrimary.Key() ||
                      Control.Inst.DigUp.Key() ||
                      Control.Inst.DigDown.Key()))
                 {
-                    if (Inventory.CurrentItemData.Ammo != null && 
-                        Inventory.Storage.GetAmount(Inventory.CurrentItemData.Ammo) == 0) return;
-                    Attack();
-                    Animate(); 
-                    if (Inventory.CurrentItemData.Ammo != null) Inventory.RemoveItem(Inventory.CurrentItemData.Ammo);
+                    if (Info.Equipment.Ammo != null && 
+                        Inventory.Storage.GetAmount(Info.Equipment.Ammo) == 0) return;
+                    
+                    Info.AimPosition = Control.MouseTarget ?
+                        Control.MouseTarget.transform.position + Vector3.up * 0.55f :
+                        Control.MousePosition + Vector3.up * 0.15f; 
+                    
+                    switch (Info.Equipment.Gesture)
+                    {
+                        case ItemGesture.Swing:
+                            SetState<MobAttackSwing>();
+                            break;
+                        case ItemGesture.Shoot:
+                            SetState<MobAttackShoot>();
+                            break;
+                    }
+                    
+                    if (Info.Equipment.Ammo != null) Inventory.RemoveItem(Info.Equipment.Ammo);
                 }
 
                 break;
@@ -97,7 +114,7 @@ public class PlayerMachine : BasicMachine, IHitBox
                     PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
                     if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
                     {
-                        Animate();
+                        SetState<MobAttackSwing>();
                         PlayerTerraformModule.HandleMapPlace();
                     }
                 }
@@ -105,41 +122,8 @@ public class PlayerMachine : BasicMachine, IHitBox
              
         } 
     }
+  
  
-
-    private void Animate()
-    {
-        switch (Inventory.CurrentItemData.Gesture)
-        {
-            case ItemGesture.Swing:
-                SetState<EquipSwingState>();
-                break;
-            case ItemGesture.Shoot:
-                SetState<EquipShootState>();
-                break;
-        }
-    }
-
-    private void Attack()
-    { 
-        Vector3 dest = Control.MouseTarget ?
-            Control.MouseTarget.transform.position + Vector3.up * 0.55f :
-            Control.MousePosition + Vector3.up * 0.15f;
-        
-        // Use ToolTrack's global facing direction, flattened to horizontal
-        Vector3 direction = _info.SpriteToolTrack.right;
-        if (_info.SpriteToolTrack.lossyScale.x < 0f) 
-            direction *= -1;
-        direction.y = 0;
-        direction.Normalize();
-        
-        // Offset the spawn origin based on that direction
-        Projectile.Spawn(_info.SpriteToolTrack.position + 
-                         direction * Inventory.CurrentItemData.ProjectileOffset,
-            dest,
-            Inventory.CurrentItemData.ProjectileInfo,
-            HitboxType.Passive);
-    }
     
     public void EventSlotUpdate()
     {

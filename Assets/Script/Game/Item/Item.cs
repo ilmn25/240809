@@ -251,7 +251,6 @@ public partial class Item
             StackSize = 1,
             Rarity = ItemRarity.Common,
 
-            Scale = 0.6f,
             Sfx = sfx,
 
             Type = ItemType.Structure,

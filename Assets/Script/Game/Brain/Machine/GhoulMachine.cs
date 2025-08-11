@@ -24,9 +24,10 @@ public class GhoulMachine : MobMachine, IActionSecondary
         Dialogue dialogue = new Dialogue();
         dialogue.Lines.Add("hello");
         dialogue.Lines.Add("are u buying or not");
-        AddModule(new MobInfo
+        AddModule(new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
+            TargetHitboxType = HitboxType.Friendly,
             HealthMax = 100,
             Defense = 1,
             Equipment = Item.GetItem("sword"),
@@ -65,7 +66,10 @@ public class GhoulMachine : MobMachine, IActionSecondary
                 if (Vector3.Distance(Info.Target.transform.position, transform.position) < Info.DistAttack)
                 {
                     if (Random.value < 0.7f)
+                    {
+                        Info.AimPosition = Info.Target.transform.position;
                         SetState<MobAttackSwing>();
+                    } 
                     else
                         SetState<MobEvade>();
                 }

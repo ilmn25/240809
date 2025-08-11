@@ -5,9 +5,10 @@ public class BugMachine : MobMachine
 {   
     public override void OnStart()
     {
-        AddModule(new MobInfo
+        AddModule(new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
+            TargetHitboxType = HitboxType.Friendly,
             HealthMax = 100,
             Defense = 1,
             DistAttack = 8,
@@ -45,7 +46,10 @@ public class BugMachine : MobMachine
                     if (Random.value < 0.2f)
                         SetState<MobStrafe>();
                     else
+                    {
+                        Info.AimPosition = Info.Target.transform.position;
                         SetState<MobAttackPounce>();
+                    } 
                 }
                 else if (Info.PathingStatus == PathingStatus.Stuck)
                 {

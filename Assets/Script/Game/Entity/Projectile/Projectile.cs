@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     public HitboxType Target;
     public Vector3 Destination;
     public Vector3 Direction;
-    
+    public Machine Source;
     private void Update()
     {
         Info.AI(this);
@@ -22,13 +22,13 @@ public class Projectile : MonoBehaviour
         ObjectPool.ReturnObject(gameObject);
     } 
     
-    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target)
+    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target, Machine source)
     {
         GameObject gameObject = ObjectPool.GetObject("projectile");
         Projectile projectile = gameObject.GetComponent<Projectile>();
         if (!projectile.spriteRenderer)
             projectile.spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        
+        projectile.Source = source;
         projectile.transform.position = origin; 
         projectile.Info = info; 
         projectile.Target = target; 

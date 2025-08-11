@@ -9,9 +9,10 @@ public class HunterMachine : MobMachine
     public override void OnStart()
     {
         _ammo = AmmoMax; 
-        AddModule(new MobInfo
+        AddModule(new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
+            TargetHitboxType = HitboxType.Friendly,
             HealthMax = 100,
             Defense = 1,
             Equipment = Item.GetItem("pistol"),
@@ -46,6 +47,7 @@ public class HunterMachine : MobMachine
                     if (_ammo != 0)
                     {
                         _ammo--;
+                        Info.AimPosition = Info.Target.transform.position + 0.3f * Vector3.up;
                         SetState<MobAttackShoot>();
                     }
                     else

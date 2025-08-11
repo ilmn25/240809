@@ -47,12 +47,17 @@ public class Game : MonoBehaviour
     { 
         Control.Initialize(); 
         Item.Initialize();
-        Entity.Initialize();
+        Entity.Initialize(); 
         Loot.Initialize();
         GUIMain.Initialize(); 
-        WorldGen.Initialize();
+        WorldGen.Initialize(); 
         Audio.Initialize();
-        Block.Initialize(); 
+        Block.Initialize();  
+        Entity.Spawn("player", Vector3Int.FloorToInt( new Vector3( 
+            World.ChunkSize * WorldGen.Size.x / 2,
+            World.ChunkSize * WorldGen.Size.y - 5,
+            World.ChunkSize * WorldGen.Size.z / 2)));
+        Player = GameObject.Find("player");
         MapCull.Initialize(); 
         EntityDynamicLoad.Initialize();  
         MapLoad.Initialize();
@@ -100,8 +105,7 @@ public class Game : MonoBehaviour
         IndexNoCollide = LayerMask.NameToLayer("Dynamic");
         IndexUI = LayerMask.NameToLayer("UI");
  
-        
-        Player = GameObject.Find("player");
+         
         ViewPortObject = GameObject.Find("viewport");
         CameraObject = GameObject.Find("main_camera");
         Camera = CameraObject.GetComponent<Camera>();
