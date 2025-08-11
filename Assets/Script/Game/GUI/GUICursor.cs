@@ -43,8 +43,7 @@ public class GUICursor : GUI
     }
     
     public static void UpdateCursorSlot()
-    {
-        GUIMain.RefreshStorage();
+    { 
         if (Data.Stack == 0)
         {
             Game.GUICursorSlot.SetActive(false);

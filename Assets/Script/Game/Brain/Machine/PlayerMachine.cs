@@ -48,16 +48,16 @@ public class PlayerMachine : BasicMachine, IHitBox
             _info.PlayerStatus = PlayerStatus.Active;
         if (Input.GetKeyDown(KeyCode.N))
         {
-            Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position),true, 200);
+            Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position), 200);
         }
         if (Input.GetKeyDown(KeyCode.M)) 
-            Entity.SpawnPrefab("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
-            Entity.SpawnPrefab("snare_flea", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn("snare_flea", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.K))
         {
-            Entity.SpawnPrefab("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
-            Entity.SpawnPrefab("yuuri", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn("yuuri", Vector3Int.FloorToInt(transform.position + Vector3.up));
         } 
     }
     
@@ -102,9 +102,7 @@ public class PlayerMachine : BasicMachine, IHitBox
                     }
                 }
                 break;
-            
-            case ItemType.Furniture:
-                break;
+             
         } 
     }
  
@@ -137,7 +135,7 @@ public class PlayerMachine : BasicMachine, IHitBox
         
         // Offset the spawn origin based on that direction
         Projectile.Spawn(_info.SpriteToolTrack.position + 
-                         direction * Inventory.CurrentItemData.HoldoutOffset,
+                         direction * Inventory.CurrentItemData.ProjectileOffset,
             dest,
             Inventory.CurrentItemData.ProjectileInfo,
             HitboxType.Passive);

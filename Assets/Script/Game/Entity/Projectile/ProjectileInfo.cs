@@ -12,7 +12,7 @@ public class ProjectileInfo
     public float CritChance;
     public float Radius;  
     public float Speed;
-    public float Mining = 0;
+    public float Breaking = 0;
     public string Effects;
     public ProjectileClass Class; 
     public string Sprite;

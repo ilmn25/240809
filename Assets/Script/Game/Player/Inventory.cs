@@ -28,7 +28,7 @@ public class Inventory
     { 
         if (Control.Inst.Drop.KeyDown() && CurrentItem != null)
         {
-            Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position), false);
+            Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position));
             RemoveItem(CurrentItem.StringID); 
         }
 
@@ -99,6 +99,7 @@ public class Inventory
         CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
         if (itemData != CurrentItemData)
             SlotUpdate?.Invoke(); 
+        
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)
@@ -111,12 +112,12 @@ public class Inventory
     public static void AddItem(string stringID, int quantity = 1)
     {  
         Storage.AddItem(stringID, quantity, _currentKey);
-        // RefreshInventory();
+        RefreshInventory();
     }
     
     public static void RemoveItem(string stringID, int quantity = 1)
     {
         Storage.RemoveItem(stringID, quantity, _currentKey);
-        // RefreshInventory();
+        RefreshInventory();
     }   
 }

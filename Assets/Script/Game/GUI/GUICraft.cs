@@ -5,6 +5,30 @@ using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+public class GUIHandCrafting : GUIStorage
+{
+    protected override void ActionPrimary()
+    {
+        if (Storage.List[CurrentSlotKey].Stack == 0) return;
+        Item item = Item.GetItem(Storage.List[CurrentSlotKey].StringID);
+
+        if (item.Type == ItemType.Structure && StructureRecipe.IsCraftable(item.StringID))
+        {
+            StructureRecipe.Target =  StructureRecipe.Dictionary[item.StringID];
+        } 
+        else if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
+        {
+             ItemRecipe.CraftItem(item.StringID);
+        }
+    } 
+
+    protected override void SetInfoPanel(ItemSlot itemSlot)
+    { 
+        GUIMain.Cursor.Set(itemSlot.StringID);
+        GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(true));
+    }
+}
+
 public class GUICraft 
 {
     private static string _stringID;
@@ -36,8 +60,7 @@ public class GUICraft
     {
         if (Control.Inst.ActionPrimary.KeyDown() && _stringID != null)
         {
-            ItemRecipe.CraftItem(_stringID);
-            GUICursor.UpdateCursorSlot();
+            ItemRecipe.CraftItem(_stringID); 
         } 
     }
     

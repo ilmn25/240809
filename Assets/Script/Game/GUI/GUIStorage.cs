@@ -90,27 +90,35 @@ public class  GUIStorage : GUI
     protected virtual void SetInfoPanel(ItemSlot itemSlot) { }
 }
 
-public class GUICrafting : GUIStorage
+public class GUIBuilding : GUIStorage
 {
     protected override void ActionPrimary()
     {
-        ItemRecipe.CraftItem(Storage.List[CurrentSlotKey].StringID);
-        GUICursor.UpdateCursorSlot();
+        if (Storage.List[CurrentSlotKey].Stack == 0) return;
+        if (StructureRecipe.IsCraftable(Storage.List[CurrentSlotKey].StringID))
+            StructureRecipe.Target =  StructureRecipe.Dictionary[Storage.List[CurrentSlotKey].StringID];
+    }
+
+    protected override void SetInfoPanel(ItemSlot itemSlot)
+    {  
+        GUIMain.Cursor.Set(itemSlot.StringID);
+        GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(true));
+    }
+}
+
+public class GUICrafting : GUIStorage
+{
+    protected override void ActionPrimary()
+    { 
+        if (Storage.List[CurrentSlotKey].Stack == 0) return;
+        if (!ItemRecipe.IsCraftable(Storage.List[CurrentSlotKey].StringID)) return;
+        ItemRecipe.CraftItem(Storage.List[CurrentSlotKey].StringID); 
     }
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        Item itemData = Item.GetItem(itemSlot.StringID);
-        ItemRecipe itemRecipeData = ItemRecipe.GetRecipe(itemSlot.StringID);
-        
-        string text = itemData.Name + " (" + itemRecipeData.Stack + ")\n";
-        foreach (var ingredient in itemRecipeData.Ingredients)
-        {
-            text += $"{ingredient.Key} ({ingredient.Value})\n";
-        }
-        text += itemData.Description + "\n";
-        
-        GUIMain.InfoPanel.Set(text);
+        GUIMain.Cursor.Set(itemSlot.StringID);
+        GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(true));
     }
 }
 
@@ -132,7 +140,7 @@ public class GUIChest : GUIStorage
             (Storage.List[CurrentSlotKey], GUICursor.Data) = 
                 (GUICursor.Data, Storage.List[CurrentSlotKey]);
         } 
-        GUICursor.UpdateCursorSlot();
+        GUIMain.RefreshStorage();
     }
 
     protected override void ActionSecondary()
@@ -147,15 +155,14 @@ public class GUIChest : GUIStorage
                 else 
                     GUICursor.Data.Add(itemSlot, 1);
                         
-                GUICursor.UpdateCursorSlot();
+                GUIMain.RefreshStorage();
             }
         }
     }
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.Set(itemSlot.StringID + " (" + itemSlot.Stack + ")\n" + 
-                                       Item.GetItem(itemSlot.StringID).Description + "\n" +
-                                       itemSlot.Modifier);
+        GUIMain.Cursor.Set(itemSlot.StringID);
+        GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
     }
 }

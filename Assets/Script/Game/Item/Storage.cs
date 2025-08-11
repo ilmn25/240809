@@ -23,8 +23,7 @@ public class Storage
                 foreach (ItemSlot itemSlot in List)
                 {
                         if (itemSlot.Stack == 0) continue;
-                        Entity.SpawnItem(itemSlot.StringID, Vector3Int.FloorToInt(position), 
-                                true, itemSlot.Stack);
+                        Entity.SpawnItem(itemSlot.StringID, Vector3Int.FloorToInt(position), itemSlot.Stack);
                 }
                 Dictionary.Remove(ID);
         }

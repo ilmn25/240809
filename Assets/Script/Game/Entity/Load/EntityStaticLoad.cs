@@ -11,7 +11,6 @@ public class EntityStaticLoad
     }
     public static void InviteEntity(EntityMachine entity) { // not done
         ActiveEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Add(entity);
-        
     }
     
     public static void UnloadWorld()

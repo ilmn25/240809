@@ -14,7 +14,7 @@ public partial class Entity
          
         private static readonly Entity Item = new Entity
         {
-                Bounds = Vector3Int.zero,
+                Bounds = Vector3Int.one,
                 Collision = false,
                 PrefabName = "item",
                 Machine = typeof(ItemMachine),
@@ -24,7 +24,8 @@ public partial class Entity
         public static void Initialize()
         {
                 AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), true);
-                AddStructure<WorkBenchMachine>("stage_hand", Vector3Int.one, true);
+                AddStructure<WorkBenchMachine>("workbench", Vector3Int.one, true);
+                AddStructure<StationMachine>("station", Vector3Int.one, true);
                 AddStructure<ChestMachine>("chest", Vector3Int.one, true);
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, false);
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, false); 
@@ -40,7 +41,7 @@ public partial class Entity
         {
                 Dictionary.Add(stringID, new Entity
                 {
-                        Bounds = Vector3Int.one,
+                        Bounds = Vector3Int.zero,
                         Collision = false,
                         PrefabName = "mob",
                         Machine = typeof(T),
@@ -82,7 +83,7 @@ public partial class Entity
                 }; 
         }
         
-        public static void SpawnItem(string stringID, Vector3Int worldPosition, bool pickUp = true, int count = 1)
+        public static void SpawnItem(string stringID, Vector3Int worldPosition, int count = 1)
         {
                 for (int i = 0; i < count; i++)
                 {
@@ -95,21 +96,24 @@ public partial class Entity
                                 (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
                         EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                         currentEntityMachine.Initialize(entityData);
-                        gameObject.transform.GetComponent<ItemMachine>().pickUp = pickUp;
                         
                 } 
         }
         
-        public static void SpawnPrefab(string stringID, Vector3Int worldPosition)
+        public static void Spawn(string stringID, Vector3Int worldPosition)
         {
                 ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
                 
                 GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
-                gameObject.transform.position = worldPosition + new Vector3(0.5f, 0.5f, 0.5f);   
+                gameObject.transform.position = worldPosition + new Vector3(0.5f, 0, 0.5f);   
         
                 EntityMachine currentEntityMachine = (EntityMachine)
                         (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
-                EntityDynamicLoad.InviteEntity(currentEntityMachine); 
+                
+                if (Dictionary[stringID].StaticLoad)
+                        EntityStaticLoad.InviteEntity(currentEntityMachine); 
+                else
+                        EntityDynamicLoad.InviteEntity(currentEntityMachine); 
                 currentEntityMachine.Initialize(entityData);
         }
 }

@@ -6,7 +6,7 @@ public class WorldGen
     private static System.Random Random;
 
     private static readonly bool SpawnStaticEntity = true;
-    private static readonly bool SpawnDynamicEntity = true;
+    private static readonly bool SpawnDynamicEntity = false;
     private static readonly bool Flat = false;
     public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
     
@@ -287,17 +287,12 @@ public class WorldGen
                             }
                             else
                             {
-                                if (Random.NextDouble() <= 0.003)
-                                {
-                                    entityData = Entity.GetChunkEntityData("stage_hand", new SVector3Int(x, y + 1, z));
-                                    chunk.staticEntity.Add(entityData);
-                                }
-                                else if (Random.NextDouble() <= 0.001)
+                                if (Random.NextDouble() <= 0.0004)
                                 {
                                     entityData = Entity.GetChunkEntityData("chest", new SVector3Int(x, y + 1, z));
                                     chunk.staticEntity.Add(entityData);
-                                }
-                                else if (Random.NextDouble() <= 0.03)
+                                } 
+                                else if (Random.NextDouble() <= 0.02)
                                 {
                                     entityData = Entity.GetChunkEntityData("slab", new SVector3Int(x, y + 1, z));
                                     chunk.staticEntity.Add(entityData);

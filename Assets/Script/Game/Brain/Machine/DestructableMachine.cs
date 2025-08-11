@@ -23,7 +23,7 @@ public class DestructableMachine : StructureMachine, IHitBox
 
     public override void OnStart()
     { 
-        AddModule(new SpriteCullModule(SpriteRenderer));  
+        AddModule(new StructureSpriteCullModule());  
         AddModule(new SpriteOrbitModule()); 
         AddModule(new StructureInfo {
             Health = _health,

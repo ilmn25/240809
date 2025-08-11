@@ -4,9 +4,78 @@ using System;
 public class ItemSlot
 {
     public int Stack = 0;
+    public int Durability;
     public string StringID;
     public string Modifier;
-    public bool Locked; 
+    public bool Locked;
+
+    public string GetItemInfo(bool ingredients)
+    {
+        Item item = Item.GetItem(StringID);
+        string text = item.Name;
+        if (item.Type == ItemType.Structure)
+        {
+            text += "\n Structure";
+            StructureRecipe recipe = StructureRecipe.Dictionary[StringID];
+            text += " \n \nbuild time: " + recipe.Time + "s";
+            text += " \ningredients: ";
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                text += "\n" + ingredient.Key + " x " + ingredient.Value;
+            }
+            text += "\n \n" + item.Description;
+        }
+        else 
+        if (item.Type == ItemType.Block)
+        { 
+            text += " x " + Stack;
+
+            if (ingredients)
+            {
+                ItemRecipe recipe = ItemRecipe.GetRecipe(StringID);
+                if (recipe != null)
+                {
+                    text += " \n \ningredients: ";
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        text += "\n" + ingredient.Key + " x " + ingredient.Value;
+                    }
+                }
+            }
+
+            text += "\n \n" + item.Description;
+        }
+        else if (item.Type == ItemType.Tool)
+        { 
+            text += " " + Durability + "%"; 
+            text += " \n \n" + item.ProjectileInfo.Damage + " damage";
+            text += " \n" + item.ProjectileInfo.Knockback + " knockback\n";
+            if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
+            if (item.ProjectileInfo.Breaking != 0) text += " \nbreaking power: " + item.ProjectileInfo.Breaking;  
+            // text += " \nattack cooldown: " + item.Speed;
+            // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
+            // else text += " \nrange: " + item.ProjectileInfo.Radius;
+            // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
+            if (item.Ammo != null) text += " \n \nammo: " + item.Ammo;
+
+
+            if (ingredients)
+            {
+                text += " \n \ningredients: ";
+                ItemRecipe recipe = ItemRecipe.Dictionary[StringID];
+                if (recipe != null)
+                {
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        text += "\n" + ingredient.Key + " x " + ingredient.Value;
+                    }
+                }
+            }
+
+            text += "\n \n" + item.Description;
+        }
+        return text;
+    }
     
     public void SetItem(int stack, string stringID, string modifier, bool locked)
     {

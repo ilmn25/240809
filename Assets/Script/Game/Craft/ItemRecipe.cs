@@ -10,7 +10,9 @@ public partial class ItemRecipe
  
     public static ItemRecipe GetRecipe(string stringID)
     {
-        return Dictionary[stringID];
+        if (Dictionary.ContainsKey(stringID))
+            return Dictionary[stringID];
+        return null;
     }
     
     public static void AddRecipe(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
@@ -23,7 +25,7 @@ public partial class ItemRecipe
         });
     }
 
-    private static bool IsCraftable (string stringID)
+    public static bool IsCraftable (string stringID)
     {
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
@@ -33,9 +35,7 @@ public partial class ItemRecipe
     }
     
     public static void CraftItem(string stringID)
-    {
-        if (!IsCraftable(stringID)) return;
-
+    { 
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             Inventory.RemoveItem(ingredient.Key, ingredient.Value);
@@ -53,5 +53,6 @@ public partial class ItemRecipe
         { 
             Inventory.AddItem(stringID);
         } 
+        GUIMain.RefreshStorage();
     }
 }
