@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum ItemRarity { Common, Rare, Epic, Legendary }
-public enum ItemType { Tool, Armor, Accessory, Block, Furniture }
+public enum ItemType { Tool, Armor, Accessory, Block, Structure }
 
 public enum ItemGesture { Swing, Poke, Cast, Shoot}
 public partial class Item
@@ -23,6 +23,7 @@ public partial class Item
     public int MiningPower; 
     public int Durability;
     public StatusEffect StatusEffect; 
+    public float ProjectileOffset;
     public float HoldoutOffset;
      
     public string Name; 

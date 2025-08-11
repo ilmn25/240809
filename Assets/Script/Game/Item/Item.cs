@@ -9,7 +9,7 @@ public partial class Item
 
     public static void Initialize()
     {
-        AddBlockDefinition("brick", 15, 4, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 } });
+        AddBlockDefinition("brick", 15, 4, "dig_metal", materials: new Dictionary<string, int> { { "stone", 3} });
         AddBlockDefinition("marble", 20, 4, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } }, craftStack: 2);
         AddBlockDefinition("dirt", 5, 1, "dig_stone");
         AddBlockDefinition("sand", 5, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
@@ -17,7 +17,11 @@ public partial class Item
         AddBlockDefinition("stone",  8, 2, "dig_stone"); 
         AddBlockDefinition("wood", 6, 2, "dig_stone");
         AddBlockDefinition("bullet", 6, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
-
+        
+        AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
+        AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
+        AddStructureDefinition("workbench", new Dictionary<string, int> {{ "stone", 15 }}, 200);
+        
         AddToolDefinition(
             stringID: "sword",
             gesture: ItemGesture.Swing,
@@ -36,7 +40,7 @@ public partial class Item
         AddToolDefinition(
             stringID: "axe",
             gesture: ItemGesture.Swing,
-            speed: 2f,
+            speed: 1.4f,
             range: 4f,
             projectileInfo: new SwingProjectileInfo {
                 Damage = 8,
@@ -44,12 +48,29 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Mining = 5,
+                Breaking = 0,
             },
             miningPower: 5,
             materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } }
         );
-
+        
+        AddToolDefinition(
+            stringID: "hammer",
+            gesture: ItemGesture.Swing,
+            speed: 1.8f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 8,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 2,
+                Radius = 2,
+                Breaking = 1,
+            },
+            miningPower: 0,
+            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
+        );
+        
         AddToolDefinition(
             stringID: "spear",
             gesture: ItemGesture.Swing,
@@ -137,7 +158,7 @@ public partial class Item
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing,
 
-            Speed = 6,
+            Speed = 1.5f,
             Range = 5,
             // ProjectileInfo = null,
             // MiningPower = 0,
@@ -199,7 +220,7 @@ public partial class Item
             MiningPower = miningPower,
             Durability = durability,
             StatusEffect = statusEffect,
-            HoldoutOffset = holdOutOffset,
+            ProjectileOffset = holdOutOffset,
 
             Name = name,
             Description = description
@@ -210,43 +231,41 @@ public partial class Item
 
         Dictionary[stringID] = itemData;
     }
+  
+    private static void AddStructureDefinition(
+        string stringID, 
+        Dictionary<string, int> materials,
+        int time = 200,
+        // int breakCost = 1,
+        // int breakThreshold = 1,  
+        string sfx = "",
+        string name = "",  
+        string description = "")
+    {
+        if (name == "") name = stringID;
+        if (sfx == "") sfx = "dig_sand";
+        
+        Item itemData = new Item()
+        {
+            StringID = stringID,
+            StackSize = 1,
+            Rarity = ItemRarity.Common,
 
+            Scale = 0.6f,
+            Sfx = sfx,
 
-    // private static void AddArmorDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
-    //     string description = "", int defense = 0, int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
-    // {
-    //     Entity.AddItem(stringID);
-    //     Item itemData = new Item(stringID, name, stackSize, rarity, description, false, speed, range, null,0, 0, 0,0.8f)
-    //     {
-    //         Type = ItemType.Armor
-    //     };
-    //     if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-    //     Dictionary[stringID] = itemData;
-    // }
-    //
-    // private static void AddAccessoryDefinition(string stringID, string name, int stackSize = 1, ItemRarity rarity = ItemRarity.Common,
-    //     string description = "", bool consumable = false, int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
-    // {
-    //     Entity.AddItem(stringID);
-    //     Item itemData = new Item(stringID, name, stackSize, rarity, description, consumable, speed, range, null, 0, 0, 0,0.8f)
-    //     {
-    //         Type = ItemType.Accessory
-    //     };
-    //     if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-    //     Dictionary[stringID] = itemData;
-    // }
+            Type = ItemType.Structure,
+            Gesture = ItemGesture.Swing,
 
-    // private static void AddFurnitureDefinition(string stringID, string name, int stackSize = 20, ItemRarity rarity = ItemRarity.Common,
-    //     string description = "", int speed = 0, int range = 0, Dictionary<string, int> materials = null, int craftStack = 1, string[] modifiers = null)
-    // {
-    //     Entity.AddItem(stringID);
-    //     Item itemData = new Item(stringID, name, stackSize, rarity, description, false, speed, range, null, 0, 0, 0, 1)
-    //     {
-    //         Type = ItemType.Furniture
-    //     };
-    //     if (materials != null) Craft.AddCraftingDefinition(stringID, materials, craftStack, modifiers);
-    //     Dictionary[stringID] = itemData;
-    // }
+            Speed = 1,
+            Range = 5,  
+
+            Name = name,
+            Description = description
+        };
+        if (materials != null) StructureRecipe.AddRecipe(stringID, time, materials);
+        Dictionary[stringID] = itemData;
+    }
 
     public static Item GetItem(string stringID)
     {

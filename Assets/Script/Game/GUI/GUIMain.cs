@@ -11,7 +11,9 @@ public class GUIMain
     private static CoroutineTask _showTask; 
     private static GUIStorage _inventory;
     public static GUIStorage Storage; 
+    public static GUIStorage HandCrafting;
     public static GUIStorage Crafting;
+    public static GUIStorage Building;
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
 
@@ -44,6 +46,20 @@ public class GUIMain
         };
         Storage.Initialize();
         Storage.Show(false);
+
+        Storage storage = new Storage(18);
+        storage.AddItem("station");
+        storage.AddItem("hammer");
+        storage.AddItem("spear");
+        HandCrafting = new GUIHandCrafting()
+        {
+            Storage = storage,
+            RowAmount = 2,
+            SlotAmount = 9,
+            Position = new Vector2(-100, -50), 
+            Name = "Crafting",
+        };
+        HandCrafting.Initialize();
         
         Crafting = new GUICrafting()
         {
@@ -51,10 +67,21 @@ public class GUIMain
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -50), 
-            Name = "Crafting",
+            Name = "Crafting Station",
         };
         Crafting.Initialize();
         Crafting.Show(false);
+        
+        Building = new GUIBuilding()
+        {
+            Storage = Inventory.Storage,
+            RowAmount = Inventory.InventoryRowAmount,
+            SlotAmount = Inventory.InventorySlotAmount,
+            Position = new Vector2(0, -100), 
+            Name = "Building Station",
+        };
+        Building.Initialize();
+        Building.Show(false);
         
         InfoPanel = new GUIInfoPanel();
         InfoPanel.Initialize();
@@ -71,7 +98,9 @@ public class GUIMain
         Cursor.Update();
         _inventory.Update();
         Storage.Update();
+        HandCrafting.Update();
         Crafting.Update();
+        Building.Update();
         InfoPanel.UpdateDrag();
 
         if (Control.Inst.Inv.KeyDown())
@@ -114,7 +143,10 @@ public class GUIMain
     {
         _inventory.OnRefreshSlot?.Invoke(_inventory, null);
         Storage.OnRefreshSlot?.Invoke(Storage, null);
-        Crafting.OnRefreshSlot?.Invoke(Storage, null);
+        HandCrafting.OnRefreshSlot?.Invoke(HandCrafting, null);
+        Crafting.OnRefreshSlot?.Invoke(Crafting, null);
+        Building.OnRefreshSlot?.Invoke(Building, null);
+        GUICursor.UpdateCursorSlot();
     }
 
     public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)

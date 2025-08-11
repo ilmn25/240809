@@ -5,26 +5,38 @@ public class MobSpriteCullModule : SpriteCullModule
 { 
     public override void Initialize()
     {
-        _sprite = Machine.transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>();
+        MobInfo mobInfo = (MobInfo)Machine.Info;
+        Sprites.Add(mobInfo.SpriteCharRenderer);
+        Sprites.Add(mobInfo.SpriteToolRenderer);
         MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull(); 
     }
 }
-public class SpriteCullModule : Module
-{
-    protected SpriteRenderer _sprite;
 
-    public SpriteCullModule(SpriteRenderer sprite = null)
-    {
-        _sprite = sprite;
-    }
-    
+public class StructureSpriteCullModule : SpriteCullModule
+{
     public override void Initialize()
     {
-        if (!_sprite) _sprite = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
+        Sprites.Add(Machine.transform.Find("sprite").GetComponent<SpriteRenderer>());
         MapCull.SignalUpdateSpriteYCull += HandleCull;
-        HandleCull(); 
+        HandleCull();
     }
+}
+
+
+public class ItemSpriteCullModule : SpriteCullModule
+{
+    public override void Initialize()
+    {
+        Sprites.Add(Machine.GetComponent<SpriteRenderer>());
+        MapCull.SignalUpdateSpriteYCull += HandleCull;
+        HandleCull();
+    }
+}
+public class SpriteCullModule : Module
+{ 
+    protected List<SpriteRenderer> Sprites = new List<SpriteRenderer>();
+     
 
     public override void Terminate()
     {
@@ -35,11 +47,17 @@ public class SpriteCullModule : Module
     {
         if (MapCull.YCheck && Machine.transform.position.y > MapCull.YThreshold)
         {
-            _sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            foreach (SpriteRenderer sprite in Sprites )
+            {
+                sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            } 
         }
         else
         {
-            _sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            foreach (SpriteRenderer sprite in Sprites )
+            {
+                sprite.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            } 
         } 
     }
 }

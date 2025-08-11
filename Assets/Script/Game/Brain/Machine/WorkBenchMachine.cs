@@ -5,6 +5,7 @@ public class WorkBenchMachine: StructureMachine, IActionSecondary
         Storage storage = new Storage(27);
         storage.AddItem("brick");
         storage.AddItem("axe");
+        storage.AddItem("hammer");
         storage.AddItem("pistol");
         storage.AddItem("spear");
         storage.AddItem("minigun");
@@ -16,7 +17,7 @@ public class WorkBenchMachine: StructureMachine, IActionSecondary
             SfxDestroy = "dig_stone",
             Storage = storage
         });
-        AddModule(new SpriteCullModule(SpriteRenderer)); 
+        AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
         AddState(new InCraftingState());
     }

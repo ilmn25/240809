@@ -15,7 +15,7 @@ public class MobAttackShoot : MobState
         direction.y = 0;
         direction.Normalize();
         
-        Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.HoldoutOffset,
+        Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.ProjectileOffset,
             Info.Target.transform.position + 0.3f * Vector3.up,
             Info.Equipment.ProjectileInfo,
             HitboxType.Friendly);

@@ -10,8 +10,8 @@ public class StructureInfo : Info
  
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.Info.Mining == 0 || projectile.Target != HitboxType.Passive) return false;
-        Health -= projectile.Info.Mining;
+        if (projectile.Info.Breaking == 0 || projectile.Target != HitboxType.Passive) return false;
+        Health -= projectile.Info.Breaking;
         if (Health <= 0)
         {
             Audio.PlaySFX(SfxDestroy); 

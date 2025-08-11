@@ -130,11 +130,7 @@ public class PlayerTerraformModule : Module
         {
             adjustedPoint = position - direction * 0.1f;
         }
-
-        Vector3Int coordinate = new Vector3Int();
-        coordinate.x = Mathf.FloorToInt(adjustedPoint.x);
-        coordinate.y = Mathf.FloorToInt(adjustedPoint.y);
-        coordinate.z = Mathf.FloorToInt(adjustedPoint.z);
-        return coordinate;
+ 
+        return Vector3Int.FloorToInt(adjustedPoint);
     }
 }

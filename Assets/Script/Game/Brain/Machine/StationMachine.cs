@@ -1,11 +1,10 @@
-using UnityEngine;
-
-public class ChestMachine : StructureMachine, IActionSecondary
+public class StationMachine: StructureMachine, IActionSecondary
 {
     public override void OnStart()
     {
         Storage storage = new Storage(27);
-        Loot.Gettable("chest").AddToContainer(storage);
+        storage.AddItem("chest"); 
+        storage.AddItem("workbench"); 
         AddModule(new ContainerInfo()
         {
             Health = 500,
@@ -16,39 +15,39 @@ public class ChestMachine : StructureMachine, IActionSecondary
         });
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
-        AddState(new InContainerState());
+        AddState(new InBuildingState());
     }
     
 
     public void OnActionSecondary()
     {
         if (IsCurrentState<DefaultState>())
-            SetState<InContainerState>();
+            SetState<InBuildingState>();
         else 
             SetState<DefaultState>();
     }
 }
 
-public class InContainerState : State
+public class InBuildingState : State
 {
     public override void OnEnterState()
     {
         Audio.PlaySFX("text", 0.5f);
-        GUIMain.Storage.Storage = ((ContainerInfo)Info).Storage;
+        GUIMain.Building.Storage = ((ContainerInfo)Info).Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
-        GUIMain.Storage.Show(true, !GUIMain.Showing);
+        GUIMain.Building.Show(true, !GUIMain.Showing);
     }
 
     public override void OnUpdateState()
     {
-        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 49) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
 
     public override void OnExitState()
     {
-        GUIMain.Storage.Show(false);
+        GUIMain.Building.Show(false);
     }
 }

@@ -1,20 +1,14 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class StructureRecipe
 {
         public static Dictionary<string, StructureRecipe> Dictionary = new Dictionary<string, StructureRecipe>();
+        public static StructureRecipe Target;
         
         public string StringID;
         public int Time;
         public Dictionary<string, int> Ingredients;
-
-        static StructureRecipe()
-        {
-                AddRecipe("chest", 100, new Dictionary<string, int>()
-                {
-                        {"wood", 15},
-                });
-        }
         
         public static void AddRecipe(string stringID, int time, Dictionary<string, int> ingredients)
         {
@@ -26,12 +20,22 @@ public class StructureRecipe
                 });
         }
         
-        private static bool IsCraftable (string stringID)
+        public static bool IsCraftable (string stringID)
         {
                 foreach (var ingredient in Dictionary[stringID].Ingredients)
                 {
                         if (Inventory.Storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
                 } 
                 return true;
+        }
+
+        public static void Build(Vector3Int position)
+        {
+                Entity.Spawn(Target!.StringID, position); 
+                foreach (var ingredient in Target.Ingredients)
+                {
+                        Inventory.RemoveItem(ingredient.Key, ingredient.Value);
+                } 
+                GUIMain.RefreshStorage();
         }
 }
