@@ -25,7 +25,7 @@ public abstract class EntityMachine : Machine
         { 
             _initialSetup = true;
             Entity = Entity.Dictionary[entityData.stringID]; 
-            gameObject.layer = Entity.Collision? Game.IndexCollide : Game.IndexNoCollide;
+            gameObject.layer = Entity.Collision;
             if (Entity.Bounds != Vector3Int.zero)
             {
                 BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();

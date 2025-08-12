@@ -2,7 +2,7 @@
 public interface IAction { }
 public interface IActionPrimary : IAction
 { 
-    void OnActionPrimary(); 
+    void OnActionPrimary(EntityMachine entityMachine); 
 }
 public interface IActionSecondary : IAction
 {

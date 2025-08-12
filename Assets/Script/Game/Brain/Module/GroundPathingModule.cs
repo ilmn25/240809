@@ -31,10 +31,11 @@ public class GroundPathingModule : PathingModule
     {
         if (PathingTarget == PathingTarget.Target)
         {
-            while (Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down * Info.PathJump))
-            {
-                await Task.Delay(100); // Yield control back to the caller and continue checking
-            }
+            // while (Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down * Info.PathJump))
+            // while (!Info.IsGrounded)
+            // {
+            //     await Task.Delay(100); // Yield control back to the caller and continue checking
+            // }
 
             return await PathFind.FindPath(this, Info.PathAmount);
         }

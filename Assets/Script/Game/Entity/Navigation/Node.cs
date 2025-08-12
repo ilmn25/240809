@@ -38,22 +38,32 @@ public class Node
     
  
     public List<Node> GetPathList()
-    {  
+    {
         Node currentNode = this;
         List<Node> pathList = new List<Node>();
 
         while (currentNode != null)
         {
+            // Center the node position
             currentNode.Position.x += 0.5f;
             currentNode.Position.z += 0.5f;
+
+            // Check for jump condition
+            if (currentNode.IsFloat || currentNode.Parent is { IsFloat: true })
+            { 
+                // Apply 0.4f offset in that direction
+                currentNode.Parent.Position.x += currentNode.Direction.x * 0.35f;
+                currentNode.Parent.Position.z += currentNode.Direction.z * 0.35f;     
+            }
 
             pathList.Add(currentNode);
             currentNode = currentNode.Parent;
         }
 
-        pathList.Reverse();  
+        pathList.Reverse();
         return pathList;
     }
+
     
     public static readonly Vector3Int[] Directions = 
     {

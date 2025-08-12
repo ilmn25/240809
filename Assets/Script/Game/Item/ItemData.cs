@@ -24,7 +24,7 @@ public partial class Item
     public int Durability;
     public StatusEffect StatusEffect; 
     public float ProjectileOffset;
-    public float HoldoutOffset;
+    public Vector2 HoldoutOffset;
      
     public string Name; 
     public string Description;  

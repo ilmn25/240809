@@ -61,6 +61,7 @@ public abstract class Machine : MonoBehaviour
     {
         module.Machine = this;
         Modules.Add(module);
+        module.Initialize();
         if (module is Info) Info = module as Info;
         return module;
     }
@@ -80,15 +81,7 @@ public abstract class Machine : MonoBehaviour
     public void StartInternal()
     { 
         States.Add(State.DefaultState);
-        OnStart();
-        foreach (var module in Modules)
-        {
-            module.Initialize();
-        }
-        foreach (State state in States)
-        {
-            state.Initialize();
-        }
+        OnStart(); 
     }
     
     public virtual void Update()

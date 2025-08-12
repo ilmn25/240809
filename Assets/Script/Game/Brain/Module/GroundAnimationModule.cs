@@ -24,20 +24,10 @@ public class GroundAnimationModule : MobModule
     {
         _targetScale = Info.Sprite.localScale;
         _originalScale = Info.Sprite.localScale;
-        _flatScale = new Vector3(0, _originalScale.y, 1);
-
-        if (Info.Equipment != null)
-        {
-            Info.SpriteTool.gameObject.SetActive(true);
-            Info.SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Info.Equipment.StringID);
-            Info.SpriteToolTrack.transform.localScale = Vector3.one * Info.Equipment.Scale;
-        }
-        else
-        {
-            Info.SpriteTool.gameObject.SetActive(false);
-        }
+        _flatScale = new Vector3(0, _originalScale.y, 1); 
     }
 
+ 
     public override void Update()
     {
         if (Info.SpriteCharRenderer.isVisible)

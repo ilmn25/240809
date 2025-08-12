@@ -16,6 +16,7 @@ public class Game : MonoBehaviour
     public static int IndexMap;
     public static int IndexCollide;
     public static int IndexNoCollide;
+    public static int IndexSemiCollide;
     public static int IndexUI;
     
     public static GameObject Player;
@@ -98,11 +99,12 @@ public class Game : MonoBehaviour
     { 
         
         MaskMap  = LayerMask.GetMask("Map"); 
-        MaskStatic  = LayerMask.GetMask("Static", "Map"); 
-        MaskEntity = LayerMask.GetMask("Static", "Dynamic");
+        MaskStatic  = LayerMask.GetMask("Collide", "Map"); 
+        MaskEntity = LayerMask.GetMask("Collide", "NoCollide", "SemiCollide");
         IndexMap = LayerMask.NameToLayer("Map");
-        IndexCollide = LayerMask.NameToLayer("Static");
-        IndexNoCollide = LayerMask.NameToLayer("Dynamic");
+        IndexCollide = LayerMask.NameToLayer("Collide");
+        IndexNoCollide = LayerMask.NameToLayer("NoCollide");
+        IndexSemiCollide = LayerMask.NameToLayer("SemiCollide");
         IndexUI = LayerMask.NameToLayer("UI");
  
          
