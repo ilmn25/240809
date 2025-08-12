@@ -13,8 +13,8 @@ public class MobInfo : DynamicInfo
     public int PathJump = 1;
     public int PathHeight = 1;
     public int PathFall = 15;
-    public int PathAir = 3;
-    public int PathAmount = 5000;
+    public int PathAir = 4;
+    public int PathAmount = 7000;
     
     public Item Equipment;
 
@@ -33,10 +33,25 @@ public class MobInfo : DynamicInfo
             TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.transform.position) - 
                               Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
         }
- 
-    }
- 
+    }    
     
+    public void SetEquipment(Item item)
+    { 
+        if (item != null)
+        {
+            Equipment = item;
+            SpriteTool.gameObject.SetActive(true);
+            SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
+            SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + item.StringID);
+            SpriteToolTrack.transform.localScale = Vector3.one * item.Scale;
+            Machine.SetState<EquipSelectState>();
+        }
+        else
+        {
+            Equipment = null;
+            SpriteTool.gameObject.SetActive(false);
+        }
+    }
 }
 
 public class EnemyInfo : MobInfo

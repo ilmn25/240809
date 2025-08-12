@@ -26,9 +26,9 @@ public class Inventory
     
     public static void Update()
     { 
-        if (Control.Inst.Drop.KeyDown() && CurrentItem != null)
+        if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
         {
-            Entity.SpawnItem(CurrentItem.StringID, Vector3Int.FloorToInt(Game.Player.transform.position));
+            Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position);
             RemoveItem(CurrentItem.StringID); 
         }
 
@@ -95,11 +95,8 @@ public class Inventory
     { 
         _currentKey = CalculateKey();
         CurrentItem = Storage.List[_currentKey];
-        Item itemData = CurrentItemData;
         CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
-        if (itemData != CurrentItemData)
-            SlotUpdate?.Invoke(); 
-        
+        SlotUpdate?.Invoke(); 
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)
@@ -111,7 +108,7 @@ public class Inventory
     
     public static void AddItem(string stringID, int quantity = 1)
     {  
-        Storage.AddItem(stringID, quantity, _currentKey);
+        Storage.AddItem(stringID, quantity, _currentKey, Game.Player.transform.position);
         RefreshInventory();
     }
     

@@ -21,17 +21,17 @@ public class ItemMachine : EntityMachine, IActionPrimary
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
         transform.localScale = Vector3.one * Item.GetItem(entityData.stringID).Scale;
         _itemPhysicModule = GetModule<ItemPhysicModule>();
-        _itemPhysicModule.PopItem();
+        _itemPhysicModule.PopItem(); 
     }
 
     public override void OnUpdate()
-    {
+    { 
         if (transform.position.y < -5) Delete();
         else if (_spriteRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(transform.position))) 
             _itemPhysicModule.HandlePhysicsUpdate();
     }
 
-    public void OnActionPrimary()
+    public void OnActionPrimary(EntityMachine entityMachine)
     {        
         if (Vector3.Distance(transform.position, Game.Player.transform.position) < 3f) 
         { 

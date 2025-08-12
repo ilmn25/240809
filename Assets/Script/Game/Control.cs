@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class Control
 {
-    private const int InteractRange = 3;
+    private const int InteractRange = 16;
     public static Control Inst = new Control();
     
     private static RaycastHit _mouseRaycastInfo;
@@ -90,7 +90,8 @@ public class Control
     {
         if (Inst.ActionPrimaryNear.KeyDown())
         {
-            GetNearestInteractable<IActionPrimary>()?.OnActionPrimary();  
+            Game.Player.GetComponent<PlayerMachine>().Info.Target =
+                ((Machine)GetNearestInteractable<IActionPrimary>()).transform; // null error fix later
         }
         else if (Inst.ActionSecondaryNear.KeyDown())
         { 
@@ -148,8 +149,10 @@ public class Control
         
         if (MouseTarget && Vector3.Distance(MousePosition, Game.Player.transform.position) < InteractRange)
         {
-            if (Inst.ActionPrimary.KeyDown())
-                MouseTarget.GetComponent<IActionPrimary>()?.OnActionPrimary(); 
+            if (Inst.ActionPrimary.KeyDown() && MouseTarget.GetComponent<IActionPrimary>() != null)
+            {
+                Game.Player.GetComponent<PlayerMachine>().Info.Target = MouseTarget;
+            }
             if (Inst.ActionSecondary.KeyDown())
                 MouseTarget.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
         } 

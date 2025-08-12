@@ -92,6 +92,9 @@ public class BugMachine : MobMachine
 
     public void OnDrawGizmos()
     {
+        if (Camera.current != Camera.main)
+            return;
+
         GetModule<GroundPathingModule>().DrawGizmos();
     }
 } 

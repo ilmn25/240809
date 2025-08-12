@@ -14,17 +14,16 @@ public class HunterMachine : MobMachine
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
             HealthMax = 100,
-            Defense = 1,
-            Equipment = Item.GetItem("pistol"),
+            Defense = 1, 
             DistAttack = 18,
             HurtSfx = "npc_hurt", 
             DeathSfx = "player_die",
             SpeedGround = 2.8f
-        });
+        }); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule()); 
-        AddModule(new MobSpriteCullModule());
+        AddModule(new MobSpriteCullModule()); 
         AddModule(new SpriteOrbitModule());
         
         AddState(new MobIdle());
@@ -32,6 +31,8 @@ public class HunterMachine : MobMachine
         AddState(new MobRoam());
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
+        AddState(new EquipSelectState());
+        Info.SetEquipment(Item.GetItem("pistol"));
     } 
     
     public override void OnUpdate()
@@ -105,6 +106,9 @@ public class HunterMachine : MobMachine
     }
     public void OnDrawGizmos()
     {
+        if (Camera.current != Camera.main)
+            return;
+
         GetModule<GroundPathingModule>().DrawGizmos();
     }
 } 

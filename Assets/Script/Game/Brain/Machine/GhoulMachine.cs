@@ -29,13 +29,12 @@ public class GhoulMachine : MobMachine, IActionSecondary
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
             HealthMax = 100,
-            Defense = 1,
-            Equipment = Item.GetItem("sword"),
+            Defense = 1, 
             DistAttack = 1,
             HurtSfx = "npc_hurt",
             DeathSfx = "player_die",
             DistRoam = 7,
-        });
+        }); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -47,7 +46,9 @@ public class GhoulMachine : MobMachine, IActionSecondary
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobAttackSwing());
+        AddState(new EquipSelectState());
         AddState(new DialogueState(dialogue));
+        Info.SetEquipment(Item.GetItem("sword"));
     }
 
     public void OnActionSecondary()
@@ -104,6 +105,9 @@ public class GhoulMachine : MobMachine, IActionSecondary
 
     public void OnDrawGizmos()
     {
+        if (Camera.current != Camera.main)
+            return;
+
         GetModule<GroundPathingModule>().DrawGizmos();
     }
  

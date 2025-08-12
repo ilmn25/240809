@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
 
 public enum PathingStatus {Pending, Reached, Stuck}
@@ -115,40 +116,52 @@ public abstract class PathingModule : MobModule
     { 
         if (_nextPoint != Path.Count - 1)
         { 
-            _nextPointDistance = Vector3.Distance(Machine.transform.position,  Path[_nextPoint].Position);
-            if (Info.IsGrounded && _nextPointDistance < PointReachDistance)
+            if (_nextPoint == 0 ||
+                 (((!Path[_nextPoint].IsFloat 
+                    && math.distance(Path[_nextPoint].Position.y, Machine.transform.position.y) < 0.04f)
+                   || Path[_nextPoint].IsFloat) &&
+                  Vector2.Distance(
+                      new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
+                      new Vector2(Machine.transform.position.x, Machine.transform.position.z)
+                  ) < PointReachDistance/3))
             {
-                _nextPoint++;
-            } 
-            else if (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat 
-            && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y - 1)
-            {
-                while (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat
-                && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y)
-                { 
-                    _nextPoint++;
-                }
+                _nextPoint++; 
+                if (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat 
+                && Path[_nextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
+                (Path[_nextPoint + 1].Direction.x == Path[_nextPoint].Direction.x ||
+                 Path[_nextPoint + 1].Direction.z == Path[_nextPoint].Direction.z))
+                {
+                    Node initialNode = Path[_nextPoint];
+                    while (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat
+                    && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y &&
+                    (Path[_nextPoint + 1].Direction.x == initialNode.Direction.x ||
+                     Path[_nextPoint + 1].Direction.z == initialNode.Direction.z))
+                    {  
+                        _nextPoint++;
+                    }
 
-                int potentialSkipPoint = _nextPoint + JumpSkipAmount;
-                if (potentialSkipPoint < Path.Count - 1 
-                && !Path[potentialSkipPoint].IsFloat 
-                && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[_nextPoint].Position.y))
-                {
-                    _nextPoint = potentialSkipPoint;
-                }
-            } 
-            else
-            {
-                if (_nextPoint == 0 ||
-                    (Path[_nextPoint].Position.y > (int)Machine.transform.position.y &&
-                    Vector2.Distance(
-                        new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
-                        new Vector2(Machine.transform.position.x, Machine.transform.position.z)
-                    ) < PointReachDistance))
-                {
-                    _nextPoint++;
-                }
-            } 
+                    int potentialSkipPoint = _nextPoint + JumpSkipAmount;
+                    if (potentialSkipPoint < Path.Count - 1 
+                    && !Path[potentialSkipPoint].IsFloat 
+                    && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[_nextPoint].Position.y))
+                    {
+                        _nextPoint = potentialSkipPoint;
+                    }
+                } 
+                // else
+                // {
+                //     if (_nextPoint == 0 ||
+                //         (Path[_nextPoint].Position.y > (int)Machine.transform.position.y &&
+                //         Vector2.Distance(
+                //             new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
+                //             new Vector2(Machine.transform.position.x, Machine.transform.position.z)
+                //         ) < PointReachDistance))
+                //     {
+                //         _nextPoint++;
+                //     }
+                // } 
+            }  
+                
             Info.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
         } 
         else

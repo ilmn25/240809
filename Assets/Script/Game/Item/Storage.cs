@@ -66,10 +66,10 @@ public class Storage
                 // RefreshInventory();
         }
 
-        public void AddItem(string stringID, int quantity = 1, int priority = 0)
+        public void AddItem(string stringID, int quantity = 1, int priority = 0, Vector3 position = default)
         {   
                 int maxStackSize = Item.GetItem(stringID).StackSize;
-
+                
                 // First try to add to the current slot
                 if (List[priority].StringID == stringID && List[priority].Stack < maxStackSize)
                 {
@@ -105,6 +105,11 @@ public class Storage
                 while (quantity > 0)
                 { 
                         int slotID = GetEmptySlot();
+                        if (slotID == -1)
+                        {
+                                Entity.SpawnItem(stringID, position, quantity);
+                                break;
+                        }
                         int addableAmount = Math.Min(quantity, maxStackSize - List[slotID].Stack);
                         List[slotID].SetItem(List[slotID].Stack + addableAmount, stringID, List[slotID].Modifier, List[slotID].Locked);
                         quantity -= addableAmount;
@@ -132,6 +137,8 @@ public class Storage
                 while (List[slotID].Stack != 0)
                 {
                         slotID++;
+                        if (slotID == List.Count)
+                                return -1;
                 }
                 return slotID;
         }

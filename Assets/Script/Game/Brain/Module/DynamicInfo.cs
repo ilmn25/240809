@@ -48,7 +48,7 @@ public class DynamicInfo : Info
         {
             Collider col = ColliderArray[i];
 
-            if (col.gameObject == Machine.gameObject || Machine.gameObject.isStatic)
+            if (col.gameObject == Machine.gameObject || col.gameObject.layer != Game.IndexSemiCollide)
                 continue;
 
             KnockBack(col.transform.position, 0.5f, true);
@@ -63,7 +63,7 @@ public class DynamicInfo : Info
         SpriteChar = Sprite.Find("char");
         SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
         SpriteToolTrack = Sprite.transform.Find("tool_track");
-        SpriteTool = SpriteToolTrack.Find("tool");
+        SpriteTool = SpriteToolTrack.Find("tool").Find("tool_offset");
         SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>();
         
         Health = HealthMax;

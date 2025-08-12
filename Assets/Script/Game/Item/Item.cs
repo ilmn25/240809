@@ -34,7 +34,8 @@ public partial class Item
                 Speed = 1.3f,
                 Radius = 2f,
             },
-            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
+            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
+            holdoutOffset: new Vector2(0.6f, 0)
         );
 
         AddToolDefinition(
@@ -51,7 +52,8 @@ public partial class Item
                 Breaking = 0,
             },
             miningPower: 5,
-            materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } }
+            materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } },
+            holdoutOffset: new Vector2(0.65f, 0)
         );
         
         AddToolDefinition(
@@ -68,7 +70,8 @@ public partial class Item
                 Breaking = 1,
             },
             miningPower: 0,
-            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } }
+            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
+            holdoutOffset: new Vector2(0.65f, 0)
         );
         
         AddToolDefinition(
@@ -87,8 +90,9 @@ public partial class Item
             },
             ammo: "spear",
             materials: new Dictionary<string, int> { { "wood", 1 } },
-            holdOutOffset: 1.016f,
-            stackSize: 20
+            projectileOffset: 1.016f,
+            stackSize: 20,
+            holdoutOffset: new Vector2(0.65f, 0)
         );
         
         AddToolDefinition(
@@ -106,7 +110,8 @@ public partial class Item
                 Penetration = 1,
             },
             materials: new Dictionary<string, int> { { "wood", 2 } },
-            holdOutOffset: 1.54f
+            projectileOffset: 1.54f,
+            holdoutOffset: new Vector2(0.4f, 0)
         );
 
         AddToolDefinition(
@@ -125,7 +130,8 @@ public partial class Item
             },
             ammo: "bullet",
             materials: new Dictionary<string, int> { { "wood", 2 } },
-            holdOutOffset: 1.016f
+            projectileOffset: 1.016f,
+            holdoutOffset: new Vector2(0.4f, 0)
         );
     }
 
@@ -164,6 +170,7 @@ public partial class Item
             // MiningPower = 0,
             // Durability = 0,
             // StatusEffect = null,
+            HoldoutOffset = new Vector2(0.5f, 0),
 
             Name = name,
             Description = description
@@ -190,7 +197,8 @@ public partial class Item
         int miningPower = 0,
         int durability = 0,
         StatusEffect statusEffect = null,
-        float holdOutOffset = 0,
+        Vector2 holdoutOffset = new Vector2(),
+        float projectileOffset = 0,
 
         string description = "",
         Dictionary<string, int> materials = null,
@@ -219,8 +227,9 @@ public partial class Item
             Ammo = ammo,
             MiningPower = miningPower,
             Durability = durability,
-            StatusEffect = statusEffect,
-            ProjectileOffset = holdOutOffset,
+            StatusEffect = statusEffect, 
+            ProjectileOffset = projectileOffset,
+            HoldoutOffset = holdoutOffset,
 
             Name = name,
             Description = description

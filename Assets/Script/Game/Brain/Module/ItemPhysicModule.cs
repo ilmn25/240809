@@ -5,15 +5,15 @@ public class ItemPhysicModule : Module
 {
     private Vector3 _velocity;
     private float _deltaTime;
-    
-    private float GRAVITY = 35;  
-    private float BOUNCE_FACTOR = 0.3f;  
-    private int SLIDE_RANGE = 2;   
-    private float COLLISION_RANGE = 0.3f;  
- 
+
+    private const float Gravity = 35;
+    private const float BounceFactor = 0.3f;
+    private const int SlideRange = 2;
+    private const float CollisionRange = 0.3f;
+
     public void PopItem() //spawn velocity 
     {
-        _velocity = new Vector3(Random.Range(-SLIDE_RANGE, SLIDE_RANGE), 0, Random.Range(-SLIDE_RANGE, SLIDE_RANGE));  
+        _velocity = new Vector3(Random.Range(-SlideRange, SlideRange), 0, Random.Range(-SlideRange, SlideRange));  
     }
  
     public void HandlePhysicsUpdate()
@@ -26,8 +26,8 @@ public class ItemPhysicModule : Module
             return;
         }
 
-        _velocity += GRAVITY * _deltaTime * Vector3.down;
-        _velocity.y = Mathf.Max(_velocity.y, -GRAVITY); 
+        _velocity += Gravity * _deltaTime * Vector3.down;
+        _velocity.y = Mathf.Max(_velocity.y, -Gravity); 
         Vector3 newPosition = Machine.transform.position + _velocity * _deltaTime;
         
         if (IsMovable(newPosition))
@@ -36,7 +36,7 @@ public class ItemPhysicModule : Module
         }
         else
         { 
-            _velocity = -_velocity * BOUNCE_FACTOR;
+            _velocity = -_velocity * BounceFactor;
         } 
     }
     
@@ -46,7 +46,7 @@ public class ItemPhysicModule : Module
     {  
         // Define an array to store the results
         tempCollisionArray[0] = null;
-        collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), COLLISION_RANGE, tempCollisionArray, Game.MaskStatic);
+        collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), CollisionRange, tempCollisionArray, Game.MaskStatic);
 
         return !(collisionCount > 0);
     }

@@ -28,6 +28,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        
         if (PlayerStatus == PlayerStatus.Dead && Iframes == 1)
         {
             Machine.transform.position = new Vector3(
@@ -36,17 +37,27 @@ public class PlayerInfo : MobInfo
                 World.ChunkSize * WorldGen.Size.z / 2);
             Sprite.gameObject.SetActive(true);
             Health = HealthMax;
+            Inventory.RefreshInventory();
         }
-        FaceTarget = Equipment != null;
-        TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+
+        FaceTarget = Equipment != null || Target;
+        if (!Target)
+            TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+        
         if (Hunger > 0) Hunger -= 0.01f;
-        HandleMovement();
+        if (!Target)
+        {
+            SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
+            HandleMovement();
+        }
+        else
+        {
+            SpeedTarget = IsGrounded ? SpeedGround : SpeedAir * 1.5f;
+        }
     }
 
     private void HandleMovement()
-    {
-        SpeedTarget = Control.Inst.Sprint.Key() && Stamina > 1 ? SpeedTarget : SpeedAir;
-        
+    { 
         if (IsGrounded)
         {
             _coyoteTimer = CoyoteTime; // Reset coyote timer when grounded

@@ -1,7 +1,8 @@
 using UnityEngine;
 
 class MobAttackSwing : MobState {
-
+    
+    private Item _equipment;
     public override void OnEnterState()
     {
         if (Info.Equipment.ProjectileInfo == null)
@@ -11,6 +12,7 @@ class MobAttackSwing : MobState {
         } 
         Info.Animator.speed = 1f; 
         Info.Animator.Play("EquipSwing", 0, 0f);   
+        _equipment = Info.Equipment;
         Projectile.Spawn(Info.SpriteToolTrack.transform.position, Info.AimPosition,
             Info.Equipment.ProjectileInfo, Info.TargetHitboxType, Machine); 
     }
@@ -21,8 +23,8 @@ class MobAttackSwing : MobState {
         {
             if (stateInfo.IsName("EquipSwing"))
             { 
-                Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
-                Info.Animator.speed = Info.Equipment.Speed;
+                Audio.PlaySFX(_equipment.Sfx, 0.5f);
+                Info.Animator.speed = _equipment.Speed;
                 Info.Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))
