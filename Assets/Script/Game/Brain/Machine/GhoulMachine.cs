@@ -51,7 +51,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
         Info.SetEquipment(Item.GetItem("sword"));
     }
 
-    public void OnActionSecondary()
+    public void OnActionSecondary(EntityMachine entityMachine)
     {
         if (Info.Target) return;
         SetState<DialogueState>();

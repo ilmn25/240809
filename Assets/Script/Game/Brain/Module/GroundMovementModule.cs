@@ -32,17 +32,16 @@ public class GroundMovementModule : MovementModule
         _deltaTime = Utility.GetDeltaTime();
         _newPosition = Machine.transform.position;
 
-        HandleJump();
-
+        HandleJump(); 
         if (Info.Direction != Vector3.zero)
         {  
             //! speeding up to start
             Info.SpeedCurrent = Mathf.Lerp(Info.SpeedCurrent, Info.SpeedTarget, _deltaTime / Info.AccelerationTime);
-
+            // if (Info.IsPlayer)Utility.Log(Info.SpeedTarget, Info.Direction);
             if (Info.Direction.x != 0 && Info.Direction.z != 0)
             {
                 _speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
-            }
+            } else _speedAdjust = 1;
             _newPosition.x += Info.Direction.x * Info.SpeedCurrent * _deltaTime * _speedAdjust;
             _newPosition.z += Info.Direction.z * Info.SpeedCurrent * _deltaTime * _speedAdjust;
 

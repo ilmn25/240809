@@ -19,6 +19,7 @@ public class StructurePreviewMachine : BasicMachine
 
 public class StructurePreviewState : State
 {
+        private static Vector3 _targetPosition;
         private static SpriteRenderer _spriteRenderer;
         public override void Initialize()
         {
@@ -31,7 +32,6 @@ public class StructurePreviewState : State
                 _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + StructureRecipe.Target.StringID); 
                 Machine.transform.position = Game.Player.transform.position;
         }
-
         public override void OnUpdateState()
         {
                 if (StructureRecipe.Target == null)
@@ -42,9 +42,10 @@ public class StructurePreviewState : State
                 if (!Control.MouseTarget && Scene.InPlayerBlockRange(position, 6) &&
                     World.GetBlock(position + Vector3Int.down) != 0)
                 { 
+                        _targetPosition = position+ new Vector3(0.5f, 0, 0.5f);
                         _spriteRenderer.enabled = true;
                         Machine.transform.position = Vector3.Lerp(Machine.transform.position, 
-                               position + new Vector3(0.5f, 0, 0.5f), Time.deltaTime * 10);
+                                _targetPosition, Time.deltaTime * 10);
                         if (!GUIMain.IsHover && Control.Inst.ActionPrimary.KeyDown())
                         { 
                                 StructureRecipe.Build(position);
@@ -53,7 +54,8 @@ public class StructurePreviewState : State
                 }
                 else
                 {
-                        _spriteRenderer.enabled = false;
+                        Machine.transform.position = Vector3.Lerp(Machine.transform.position, 
+                                _targetPosition, Time.deltaTime * 10);
                 }
         }
 

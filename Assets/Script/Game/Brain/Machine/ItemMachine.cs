@@ -2,7 +2,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ItemMachine : EntityMachine, IActionPrimary
+public class ItemMachine : EntityMachine, IActionSecondary
 {
     private bool _wasInRange;
     private SpriteRenderer _spriteRenderer;
@@ -31,7 +31,7 @@ public class ItemMachine : EntityMachine, IActionPrimary
             _itemPhysicModule.HandlePhysicsUpdate();
     }
 
-    public void OnActionPrimary(EntityMachine entityMachine)
+    public void OnActionSecondary(EntityMachine entityMachine)
     {        
         if (Vector3.Distance(transform.position, Game.Player.transform.position) < 3f) 
         { 

@@ -3,6 +3,7 @@ using UnityEngine;
 public class DynamicInfo : Info
 { 
     public HitboxType HitboxType;
+    public bool IsPlayer = false;
     public string CharSprite;
     public string HurtSfx;
     public string DeathSfx; 
@@ -31,6 +32,7 @@ public class DynamicInfo : Info
      
     protected int Iframes = 15;
     protected int IframesCurrent;  
+    
     public float AirTime;
     public Vector3 Velocity = Vector3.zero;
     public bool IsGrounded = false;
@@ -40,8 +42,7 @@ public class DynamicInfo : Info
 
     private static readonly Collider[] ColliderArray = new Collider[3];
     
-    protected virtual void OnHit(Projectile projectile) { }
-    protected virtual void OnDeath() { } 
+    protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() { 
         int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Game.MaskEntity);
         for (int i = 0; i < hitCount; i++)
@@ -65,14 +66,14 @@ public class DynamicInfo : Info
         SpriteToolTrack = Sprite.transform.Find("tool_track");
         SpriteTool = SpriteToolTrack.Find("tool").Find("tool_offset");
         SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>();
-        
-        Health = HealthMax;
+         
     }
     public override void Update()
     { 
         OnUpdate();
         if (IframesCurrent > 0) IframesCurrent--;
-
+        
+        if (!IsPlayer) return;
         if (!IsGrounded && Velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
@@ -82,13 +83,7 @@ public class DynamicInfo : Info
             }
             AirTime = 0;
         }
-        
-        if (Health <= 0)
-        { 
-            Audio.PlaySFX(DeathSfx, 0.8f);
-            Health = HealthMax;
-            OnDeath();
-        }
+         
     }   
     
     public override bool OnHitInternal(Projectile projectile)

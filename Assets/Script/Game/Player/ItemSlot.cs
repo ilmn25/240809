@@ -15,7 +15,7 @@ public class ItemSlot
         string text = item.Name;
         if (item.Type == ItemType.Structure)
         {
-            text += "\n Structure";
+            text += "\nstructure";
             StructureRecipe recipe = StructureRecipe.Dictionary[StringID];
             text += " \n \nbuild time: " + recipe.Time + "s";
             text += " \ningredients: ";

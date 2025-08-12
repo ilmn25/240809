@@ -19,7 +19,7 @@ public class StationMachine: StructureMachine, IActionSecondary
     }
     
 
-    public void OnActionSecondary()
+    public void OnActionSecondary(EntityMachine entityMachine)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InBuildingState>();

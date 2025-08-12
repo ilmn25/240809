@@ -38,8 +38,7 @@ public abstract class PathingModule : MobModule
  
  
 
-    protected const int MaxRepathCount = 4;   
-    private const int MaxStuckCount = 250;    
+    protected const int MaxRepathCount = 4;    
     public void SetTarget(PathingTarget pathingTarget)
     {
         PathingTarget = pathingTarget;
@@ -123,7 +122,7 @@ public abstract class PathingModule : MobModule
                   Vector2.Distance(
                       new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
                       new Vector2(Machine.transform.position.x, Machine.transform.position.z)
-                  ) < PointReachDistance/3))
+                  ) < PointReachDistance/2))
             {
                 _nextPoint++; 
                 if (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat 
@@ -206,7 +205,7 @@ public abstract class PathingModule : MobModule
         if (_selfMoveDistance < SelfMovedDistance)
         { 
             _stuckCount++;
-            if (_stuckCount > MaxStuckCount)
+            if (_stuckCount > Info.MaxStuckCount)
             { 
                 _stuckCount = 0;
                 return true;

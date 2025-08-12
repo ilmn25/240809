@@ -67,31 +67,32 @@ public class PlayerTerraformModule : Module
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.down;
             BreakBlock();
         }
-    }
- 
-    public static void HandlePositionInfo(Vector3 position, Vector3 direction)
-    {
-        _position = position;
-        _direction = direction;
+        
         if (_block)
         {
             if (_block.name != "overlay")
             {
                 _coordinate = OffsetPosition(false, _position, _direction);
-                if (position != Vector3.down)
+                if (_position != Vector3.down)
                     _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate, Time.deltaTime * PreviewSpeed);
                 else
                     _block.transform.position = Vector3.down;
             }
             else
-            {
-                _coordinate = OffsetPosition(true, _position, _direction);
-                if (position != Vector3.down)
+            { 
+                if (_position != Vector3.down)
                     _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate - new Vector3(0.02f, 0.02f, 0.02f), Time.deltaTime * PreviewSpeed);
                 else
                     _block.transform.position = Vector3.down;
             } 
         }
+    }
+ 
+    public static void HandlePositionInfo(Vector3 position, Vector3 direction, bool isBreak)
+    {
+        _position = position;
+        _direction = direction; 
+        _coordinate = OffsetPosition(isBreak, _position, _direction);
     }
 
     public static void HandleMapPlace()
