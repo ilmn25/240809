@@ -20,7 +20,7 @@ public class ChestMachine : StructureMachine, IActionSecondary
     }
     
 
-    public void OnActionSecondary()
+    public void OnActionSecondary(EntityMachine entityMachine)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InContainerState>();

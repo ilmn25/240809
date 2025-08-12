@@ -6,7 +6,7 @@ public interface IActionPrimary : IAction
 }
 public interface IActionSecondary : IAction
 {
-    void OnActionSecondary();  
+    void OnActionSecondary(EntityMachine entityMachine);  
 }
 
 public interface IHover : IAction

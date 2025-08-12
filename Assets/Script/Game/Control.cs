@@ -6,6 +6,7 @@ public class Control
 {
     private const int InteractRange = 16;
     public static Control Inst = new Control();
+    public static MobInfo Info;
     
     private static RaycastHit _mouseRaycastInfo;
     public static Vector3 MouseDirection; //direction of ray from camera to mouse target 
@@ -90,12 +91,19 @@ public class Control
     {
         if (Inst.ActionPrimaryNear.KeyDown())
         {
-            Game.Player.GetComponent<PlayerMachine>().Info.Target =
-                ((Machine)GetNearestInteractable<IActionPrimary>()).transform; // null error fix later
+            // IActionPrimary target = GetNearestInteractable<IActionPrimary>();
+            // if (target == null) return;
+            // // Info.Target = ((Machine)target).transform;  
+            // Info.IActionTarget = IActionTarget.Primary;
+            // Info.IAction = target;
         }
-        else if (Inst.ActionSecondaryNear.KeyDown())
+        else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         { 
-            GetNearestInteractable<IActionSecondary>()?.OnActionSecondary(); 
+            IActionSecondary target = GetNearestInteractable<IActionSecondary>();
+            if (target == null) return;
+            Info.Target = ((Machine)target).transform;  
+            Info.ActionTarget = IActionTarget.Secondary;
+            Info.Action = target;
         }
     }
 
@@ -149,12 +157,17 @@ public class Control
         
         if (MouseTarget && Vector3.Distance(MousePosition, Game.Player.transform.position) < InteractRange)
         {
-            if (Inst.ActionPrimary.KeyDown() && MouseTarget.GetComponent<IActionPrimary>() != null)
+            if (Inst.ActionPrimary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IActionPrimary>()) != null)
             {
-                Game.Player.GetComponent<PlayerMachine>().Info.Target = MouseTarget;
+                Info.Target = MouseTarget;
+                Info.ActionTarget = IActionTarget.Primary;
             }
-            if (Inst.ActionSecondary.KeyDown())
-                MouseTarget.GetComponent<IActionSecondary>()?.OnActionSecondary(); 
+
+            if (Inst.ActionSecondary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IActionSecondary>()) != null)
+            {
+                Info.Target = MouseTarget;
+                Info.ActionTarget = IActionTarget.Secondary;
+            }
         } 
     }
     private static void HandleRaycast()

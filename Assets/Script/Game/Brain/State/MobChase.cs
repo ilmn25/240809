@@ -17,26 +17,7 @@ class MobChase : MobState {
             Info.PathingStatus = PathingStatus.Reached;  
     }
 }
-class MobChasePickUp : MobState {
-    public override void OnEnterState()
-    {
-        Module<PathingModule>().SetTarget(PathingTarget.Target);
-    }
-    
-    public override void OnUpdateState() {
-        if (Info.PathingStatus == PathingStatus.Reached)
-        {
-            Info.Target.gameObject.GetComponent<IActionPrimary>().OnActionPrimary((EntityMachine) Machine);
-            Info.Target = null;
-            Machine.SetState<DefaultState>();
-        }
-        else if (Info.PathingStatus == PathingStatus.Stuck)
-        {
-            Info.Target = null;
-            Machine.SetState<DefaultState>();
-        }
-    } 
-}
+
 class MobChaseAim : MobState { 
     public override void OnEnterState()
     {

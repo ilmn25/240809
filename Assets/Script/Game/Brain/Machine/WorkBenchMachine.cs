@@ -23,7 +23,7 @@ public class WorkBenchMachine: StructureMachine, IActionSecondary
     }
     
 
-    public void OnActionSecondary()
+    public void OnActionSecondary(EntityMachine entityMachine)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InCraftingState>();

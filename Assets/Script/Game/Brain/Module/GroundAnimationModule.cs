@@ -65,7 +65,7 @@ public class GroundAnimationModule : MobModule
             z = -0.11f;
         // float angleX = (Mathf.Lerp(0, 90, Math.Abs(angle) / 45) + 360) % 360;
         // Normalize angle to 0–360
-        Info.SpriteToolTrack.localPosition = new Vector3(0, 0.3f, z);
+        Info.SpriteToolTrack.localPosition = new Vector3(0, 0.4f, z);
         Info.SpriteToolTrack.localRotation = Quaternion.Euler(80, 0, (angle + 360) % 360);
     }
     

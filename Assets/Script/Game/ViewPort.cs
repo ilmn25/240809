@@ -76,7 +76,7 @@ public class ViewPort
     {
         // Normalize input to avoid scaling issues
         direction.Normalize();
-
+ 
         // Rotate the vector counter-clockwise by orbitRotation
         float rotatedX = direction.x * _cosAngle - direction.y * _sinAngle;
         float rotatedY = direction.x * _sinAngle + direction.y * _cosAngle;
@@ -85,7 +85,7 @@ public class ViewPort
 
         // Optional: Snap to cardinal directions if needed
         rotated.x = Mathf.Abs(rotated.x) < 0.1f ? 0 : Mathf.Sign(rotated.x);
-        rotated.y = Mathf.Abs(rotated.y) < 0.1f ? 0 : Mathf.Sign(rotated.y);
+        rotated.y = Mathf.Abs(rotated.y) < 0.1f ? 0 : Mathf.Sign(rotated.y); 
 
         return rotated;
     }

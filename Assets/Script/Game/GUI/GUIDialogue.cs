@@ -34,17 +34,17 @@ public class GUIDialogue
         else
         {
             if (Showing)
-            {
+            { 
                 Showing = false;
                 new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
-                    new Vector3(450, -95, 203), EaseSpeed));
+                    new Vector3(500, -95, 203), EaseSpeed));
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
                     0, EaseSpeed));
                 _scaleTask.Finished += (bool isManual) =>
                 {
                     if (_scrollTask != null && _scrollTask.Running) _scrollTask.Stop();
-                    Game.GUIDialogue.SetActive(false);
+                    Game.GUIDialogue.SetActive(false); 
                 }; 
             }
         }

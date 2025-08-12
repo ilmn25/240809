@@ -8,10 +8,6 @@ public class FPSLogger : MonoBehaviour
     
     private PlayerInfo _playerInfo;
 
-    void Start()
-    {
-        _playerInfo = Game.Player.GetComponent<PlayerMachine>().GetModule<PlayerInfo>();
-    }
 
     void Update()
     {
@@ -35,6 +31,6 @@ public class FPSLogger : MonoBehaviour
 
         // Display FPS on the screen
         UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-            "FPS: " + Mathf.Ceil(fps) + "\n HP: " + _playerInfo.Health, style);
+            "FPS: " + Mathf.Ceil(fps) + "\n HP: " + Control.Info.Health, style);
     }
 }

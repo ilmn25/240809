@@ -8,7 +8,7 @@ public class PlayerMachine : EntityMachine, IHitBox
     {   
         AddModule(new PlayerInfo()
         { 
-            Equipment = Inventory.CurrentItemData,
+            Equipment = Inventory.CurrentItemData, 
             HitboxType = HitboxType.Friendly,
             TargetHitboxType = HitboxType.Passive,
             HealthMax = PlayerData.Inst.health,
@@ -19,6 +19,8 @@ public class PlayerMachine : EntityMachine, IHitBox
             Stamina = PlayerData.Inst.stamina,
             SpeedGround = 6,
             SpeedAir = 8,
+            PathAmount = 7000,
+            MaxStuckCount = 100,
             AccelerationTime = 0.2f,
             DecelerationTime = 0.08f,
             Gravity = -40f,
@@ -36,8 +38,9 @@ public class PlayerMachine : EntityMachine, IHitBox
         Inventory.SlotUpdate += EventSlotUpdate;
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
-        AddState(new MobChasePickUp());
+        AddState(new MobChaseInteract());
         AddState(new EquipSelectState()); 
+        Control.Info = _info;
     }
 
     private void HandleInput()
@@ -76,7 +79,7 @@ public class PlayerMachine : EntityMachine, IHitBox
         if (GUIMain.IsHover || !IsCurrentState<DefaultState>()) return; 
         if (Info.Target)
         {
-            SetState<MobChasePickUp>();
+            SetState<MobChaseInteract>();
             return;
         }
         switch (Inventory.CurrentItemData?.Type)
@@ -86,7 +89,7 @@ public class PlayerMachine : EntityMachine, IHitBox
                     Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
                     Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
                 {
-                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection); 
+                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection, true); 
                     if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
                         PlayerTerraformModule.HandleMapBreak(); 
                      
@@ -122,7 +125,7 @@ public class PlayerMachine : EntityMachine, IHitBox
                 if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
                     Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
                 {
-                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection);
+                    PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection, false);
                     if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
                     {
                         SetState<MobAttackSwing>();

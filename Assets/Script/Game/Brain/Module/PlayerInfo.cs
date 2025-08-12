@@ -23,37 +23,52 @@ public class PlayerInfo : MobInfo
     { 
         base.Initialize();
         IframesCurrent = 400;
+        IsPlayer = true;
     }
 
     protected override void OnUpdate()
     {
         base.OnUpdate();
         
-        if (PlayerStatus == PlayerStatus.Dead && Iframes == 1)
-        {
+        if (PlayerStatus == PlayerStatus.Dead)
+        { 
+            if (IframesCurrent != 1) return;
+            PlayerStatus = PlayerStatus.Active;
             Machine.transform.position = new Vector3(
                 World.ChunkSize * WorldGen.Size.x / 2,
                 World.ChunkSize * WorldGen.Size.y - 5,
                 World.ChunkSize * WorldGen.Size.z / 2);
             Sprite.gameObject.SetActive(true);
             Health = HealthMax;
-            Inventory.RefreshInventory();
-        }
-
-        FaceTarget = Equipment != null || Target;
-        if (!Target)
-            TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
-        
-        if (Hunger > 0) Hunger -= 0.01f;
-        if (!Target)
-        {
-            SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
-            HandleMovement();
+            Inventory.RefreshInventory(); 
         }
         else
         {
-            SpeedTarget = IsGrounded ? SpeedGround : SpeedAir * 1.5f;
-        }
+            if (Health <= 0)
+            { 
+                Audio.PlaySFX(DeathSfx, 0.8f);
+                Sprite.gameObject.SetActive(false);
+                PlayerStatus = PlayerStatus.Dead;
+                GUIMain.Show(false); 
+                Velocity = Vector2.zero; 
+                Direction = Vector2.zero;
+                IframesCurrent = 500;
+            }
+            
+            FaceTarget = Equipment != null || Target;  
+            
+            if (Hunger > 0) Hunger -= 0.01f; 
+            if (!Target)
+            {
+                TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+                SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
+                HandleMovement();
+            }
+            else
+            {
+                SpeedTarget = IsGrounded ? SpeedGround : SpeedAir * 1.5f;
+            }
+        } 
     }
 
     private void HandleMovement()
@@ -101,15 +116,12 @@ public class PlayerInfo : MobInfo
         float sinAngle = Mathf.Sin(orbitRotation);
         Direction.x = rawInput.x * cosAngle - rawInput.y * sinAngle;
         Direction.z = rawInput.x * sinAngle + rawInput.y * cosAngle; 
-    }
-
-    protected override void OnDeath()
-    { 
-        Game.Player.transform.position = Utility.AddToVector(Game.Player.transform.position, 0,7, 0);
-        Sprite.gameObject.SetActive(false);
-        PlayerStatus = PlayerStatus.Dead;
-        GUIMain.Show(false);
-        IframesCurrent = 1000;
+        Direction = Direction.normalized; 
+        Direction = new Vector3(
+            Direction.x > 0.001f ? 1f : Direction.x < -0.001f ? -1f : 0f,
+            0f,
+            Direction.z > 0.001f ? 1f : Direction.z < -0.001f ? -1f : 0f
+        );
     }
  
     // for later passive effects boosts

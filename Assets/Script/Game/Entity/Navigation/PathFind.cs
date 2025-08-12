@@ -40,7 +40,7 @@ public class PathFind
     {  
         List<Node> openList = new List<Node>(); 
         HashSet<Vector3> closedList = new HashSet<Vector3>();
-        
+        Vector3 delta;
         float currentDistance;
         float closestDistance = 1000; 
         Vector3Int dirPosition;
@@ -62,8 +62,15 @@ public class PathFind
             openList.RemoveAt(0); //remove current from open list
             closedList.Add(currentNode.Position); //add to closed list
             
-            //found condition
-            if (currentNode.Position == endPosition) return currentNode.GetPathList();  
+            delta = endPosition - currentNode.Position;
+
+            if ((Mathf.Abs(delta.x) == 1 && delta.y == 0 && delta.z == 0) ||
+                (delta.x == 0 && Mathf.Abs(delta.y) == 1 && delta.z == 0) ||
+                (delta.x == 0 && delta.y == 0 && Mathf.Abs(delta.z) == 1))
+            {
+                currentNode =  new Node(endPosition, currentNode, 0, 0, false,  Vector3Int.FloorToInt(endPosition - currentNode.Position));
+                return currentNode.GetPathList();
+            }  
             
             foreach (var direction in Node.Directions) //scan each direction
             {  
