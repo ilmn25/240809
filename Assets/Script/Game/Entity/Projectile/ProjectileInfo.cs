@@ -7,7 +7,7 @@ public class ProjectileInfo
 { 
     protected static readonly Collider[] HitBuffer = new Collider[50];
     
-    public float Damage;
+    public int Damage;
     public float Knockback;
     public float CritChance;
     public float Radius;  
@@ -19,10 +19,9 @@ public class ProjectileInfo
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }
-
-    public float GetDamage()
+    public int GetDamage()
     {
-        return  Random.value < CritChance / 100f ? Damage * 2f : Damage;
+        return  Random.value < CritChance / 100 ? Damage * 2 : Damage;
     }
  
 }

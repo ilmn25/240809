@@ -13,7 +13,7 @@ public class HunterMachine : MobMachine
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
-            HealthMax = 100,
+            HealthMax = 12,
             Defense = 1, 
             DistAttack = 18,
             HurtSfx = "npc_hurt", 

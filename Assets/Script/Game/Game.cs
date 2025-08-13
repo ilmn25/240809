@@ -20,6 +20,7 @@ public class Game : MonoBehaviour
     public static int IndexUI;
     
     public static GameObject Player;
+    public static PlayerInfo PlayerInfo;
     public static GameObject ViewPortObject;
     public static GameObject CameraObject;
     public static Camera Camera;

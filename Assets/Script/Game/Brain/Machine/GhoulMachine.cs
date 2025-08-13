@@ -28,7 +28,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
-            HealthMax = 100,
+            HealthMax = 16,
             Defense = 1, 
             DistAttack = 1,
             HurtSfx = "npc_hurt",

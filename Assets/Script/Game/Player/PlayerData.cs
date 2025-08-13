@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerData
 {
     public Storage inventory;
-    public int health = 200;
+    public int health = 6;
     public int mana = 100;
     public int sanity = 100;
     public int hunger = 100;

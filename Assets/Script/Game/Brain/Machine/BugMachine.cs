@@ -9,7 +9,7 @@ public class BugMachine : MobMachine
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
-            HealthMax = 100,
+            HealthMax = 8,
             Defense = 1,
             DistAttack = 8,
             HurtSfx = "npc_hurt",

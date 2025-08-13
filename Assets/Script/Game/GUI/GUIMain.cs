@@ -22,6 +22,7 @@ public class GUIMain
     public static void Initialize()
     {
         GUICraft.Initialize();
+        GUIHealthBar.Initialize();
         Cursor = new GUICursor();
         Cursor.Initialize();
         Cursor.Show(false);

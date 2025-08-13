@@ -17,9 +17,9 @@ public class DynamicInfo : Info
     public float Gravity = -40f;
     public float JumpVelocity = 10f; 
     
-    public float Health; 
-    public float HealthMax;
-    public float Defense; 
+    public int Health; 
+    public int HealthMax;
+    public int Defense; 
     public readonly float EntityCollisionRadius = 0.15f;
     
     public Transform Sprite;
@@ -30,7 +30,7 @@ public class DynamicInfo : Info
     public Transform SpriteTool;
     public SpriteRenderer SpriteToolRenderer; 
      
-    protected int Iframes = 15;
+    public int Iframes = 15;
     protected int IframesCurrent;  
     
     public float AirTime;
@@ -78,7 +78,7 @@ public class DynamicInfo : Info
         else {
             if (AirTime > 75)
             {
-                Health -= AirTime/8;
+                Health -=  (int)AirTime/100;
                 Audio.PlaySFX(HurtSfx,0.4f);
             }
             AirTime = 0;
@@ -89,7 +89,7 @@ public class DynamicInfo : Info
     public override bool OnHitInternal(Projectile projectile)
     {
         if (IframesCurrent != 0) return false;
-        switch (projectile.Target)
+        switch (projectile.TargetHitBoxType)
         {
             case HitboxType.Friendly: // enemy kill friendly 
                 if (HitboxType == HitboxType.Enemy) return false;

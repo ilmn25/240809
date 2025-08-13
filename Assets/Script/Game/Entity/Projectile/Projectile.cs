@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum HitboxType {Friendly, Enemy, Passive, All}
 public class Projectile : MonoBehaviour
@@ -7,10 +8,12 @@ public class Projectile : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public ProjectileInfo Info;
     public int LifeSpan;
-    public HitboxType Target;
+    public int LodgeTime = 0;
+    public HitboxType TargetHitBoxType;
     public Vector3 Destination;
     public Vector3 Direction;
     public Machine Source;
+    public Machine Target;
     private void Update()
     {
         Info.AI(this);
@@ -31,9 +34,11 @@ public class Projectile : MonoBehaviour
         projectile.Source = source;
         projectile.transform.position = origin; 
         projectile.Info = info; 
-        projectile.Target = target; 
+        projectile.TargetHitBoxType = target; 
         projectile.Destination = dest;
-        projectile.Direction = (dest - origin).normalized; 
+        projectile.Direction = (dest - origin).normalized;
+        projectile.Target = null;
+        projectile.LodgeTime = 0;
         
         Vector3 direction =  projectile.Direction;
         direction.y = 0;

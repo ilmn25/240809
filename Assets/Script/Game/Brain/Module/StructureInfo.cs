@@ -10,7 +10,7 @@ public class StructureInfo : Info
  
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.Info.Breaking == 0 || projectile.Target != HitboxType.Passive) return false;
+        if (projectile.Info.Breaking == 0 || projectile.TargetHitBoxType != HitboxType.Passive) return false;
         Health -= projectile.Info.Breaking;
         if (Health <= 0)
         {
