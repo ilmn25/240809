@@ -53,18 +53,23 @@ public class Game : MonoBehaviour
         GUIMain.Initialize(); 
         WorldGen.Initialize(); 
         Audio.Initialize();
-        Block.Initialize();  
-        Entity.Spawn("player", Vector3Int.FloorToInt( new Vector3( 
-            World.ChunkSize * WorldGen.Size.x / 2,
-            World.ChunkSize * WorldGen.Size.y - 5,
-            World.ChunkSize * WorldGen.Size.z / 2)));
-        Player = GameObject.Find("player");
+        Block.Initialize();   
         MapCull.Initialize(); 
         EntityDynamicLoad.Initialize();  
         MapLoad.Initialize();
         Scene.Initialize();  
         ViewPort.Initialize();  
-        Instantiate(Resources.Load<GameObject>($"prefab/item")).AddComponent<StructurePreviewMachine>(); 
+        Instantiate(Resources.Load<GameObject>($"prefab/item")).AddComponent<StructurePreviewMachine>();
+        
+        if (PlayerData.Inst.position == null) 
+            Entity.Spawn("player", Vector3Int.FloorToInt( new Vector3( 
+            World.ChunkSize * WorldGen.Size.x / 2,
+            World.ChunkSize * WorldGen.Size.y - 5,
+            World.ChunkSize * WorldGen.Size.z / 2)));
+        else
+        {
+            ViewPortObject.transform.position = PlayerData.Inst.position.ToVector3Int();
+        }
     }
 
     private void Update()

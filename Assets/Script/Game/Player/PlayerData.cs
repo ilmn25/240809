@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 [Serializable]
 public class PlayerData
@@ -12,6 +13,7 @@ public class PlayerData
     public int hunger = 100;
     public int stamina = 100;  
     public int speed = 100;
+    public SVector3Int position;
 
     [NonSerialized]
     public static PlayerData Inst;
@@ -24,6 +26,7 @@ public class PlayerData
     public static void Save()
     { 
         Inst.inventory = Inventory.Storage;
+        Inst.position = new SVector3Int(Vector3Int.FloorToInt(Game.Player.transform.position));
         Utility.FileSave(Inst, "player");
     }
 

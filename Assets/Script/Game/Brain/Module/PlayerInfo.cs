@@ -2,7 +2,8 @@ using UnityEngine;
 
 public enum PlayerStatus {
     Active, 
-    Dead
+    Dead,
+    Loading,
 }
 public class PlayerInfo : MobInfo
 { 
@@ -11,7 +12,7 @@ public class PlayerInfo : MobInfo
     public float Hunger;
     public float Stamina; 
     public bool IsBusy = false; 
-    public PlayerStatus PlayerStatus = PlayerStatus.Dead;
+    public PlayerStatus PlayerStatus = PlayerStatus.Loading;
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
@@ -30,20 +31,8 @@ public class PlayerInfo : MobInfo
     {
         base.OnUpdate();
         
-        if (PlayerStatus == PlayerStatus.Dead)
+        if (PlayerStatus == PlayerStatus.Active)
         { 
-            if (IframesCurrent != 1) return;
-            PlayerStatus = PlayerStatus.Active;
-            Machine.transform.position = new Vector3(
-                World.ChunkSize * WorldGen.Size.x / 2,
-                World.ChunkSize * WorldGen.Size.y - 5,
-                World.ChunkSize * WorldGen.Size.z / 2);
-            Sprite.gameObject.SetActive(true);
-            Health = HealthMax;
-            Inventory.RefreshInventory(); 
-        }
-        else
-        {
             if (Health <= 0)
             { 
                 Audio.PlaySFX(DeathSfx, 0.8f);
@@ -67,7 +56,22 @@ public class PlayerInfo : MobInfo
             else
             {
                 SpeedTarget = IsGrounded ? SpeedGround : SpeedAir * 1.5f;
-            }
+            } 
+        }
+        else
+        { 
+            if (IframesCurrent != 1) return;
+            PlayerStatus = PlayerStatus.Active;
+            if (PlayerStatus == PlayerStatus.Loading)
+            {
+                Machine.transform.position = new Vector3(
+                    World.ChunkSize * WorldGen.Size.x / 2,
+                    World.ChunkSize * WorldGen.Size.y - 5,
+                    World.ChunkSize * WorldGen.Size.z / 2);
+                Sprite.gameObject.SetActive(true); 
+            } 
+            Health = HealthMax;
+            Inventory.RefreshInventory(); 
         } 
     }
 
