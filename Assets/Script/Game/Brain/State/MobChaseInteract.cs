@@ -7,7 +7,7 @@ class MobChaseInteract : MobState {
     public override void OnUpdateState() {
         if (Info.PathingStatus == PathingStatus.Reached)
         {
-            if (Info.ActionTarget == IActionTarget.Secondary)
+            if (Info.Target && Info.ActionTarget == IActionTarget.Secondary)
                 ((IActionSecondary)Info.Action).OnActionSecondary((EntityMachine) Machine); 
             Info.Target = null;
             Machine.SetState<DefaultState>();

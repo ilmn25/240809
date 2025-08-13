@@ -41,6 +41,7 @@ public class PlayerMachine : EntityMachine, IHitBox
         AddState(new MobChaseInteract());
         AddState(new EquipSelectState()); 
         Control.Info = _info;
+        Game.Player = gameObject;
     }
 
     private void HandleInput()

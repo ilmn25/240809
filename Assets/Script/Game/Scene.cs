@@ -26,12 +26,12 @@ public class Scene
     public static void Initialize()
     {  
         World.Load(0); 
-        _playerChunkPositionPrevious = World.GetChunkCoordinate(Game.Player.transform.position); 
+        _playerChunkPositionPrevious = World.GetChunkCoordinate(Game.ViewPortObject.transform.position); 
     }
 
     public static void Update()
     {
-        PlayerChunkPosition = World.GetChunkCoordinate(Game.Player.transform.position);
+        PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {  
             PlayerChunkTraverse?.Invoke();
@@ -51,7 +51,7 @@ public class Scene
 
     public static bool InPlayerBlockRange(Vector3 position, float distance)
     {
-        Vector3 playerPos = Game.Player.transform.position;
+        Vector3 playerPos = Game.ViewPortObject.transform.position;
 
         return position.x >= playerPos.x - distance &&
                position.x <= playerPos.x + distance &&

@@ -39,8 +39,8 @@ public class MapCull
  
         _chunkPositionPrevious = Scene.PlayerChunkPosition;
 
-        LightIndoor = Game.Player.transform.Find("light_indoor").gameObject;
-        LightSelf = Game.Player.transform.Find("light_self").gameObject;   
+        LightIndoor = Game.ViewPortObject.transform.Find("light_indoor").gameObject;
+        LightSelf = Game.ViewPortObject.transform.Find("light_self").gameObject;   
         Volume = Game.CameraObject.gameObject.GetComponent<Volume>();
         
         HandleLight(false); 
