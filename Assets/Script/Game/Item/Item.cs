@@ -28,7 +28,7 @@ public partial class Item
             speed: 1.3f,
             range: 1,
             projectileInfo: new SwingProjectileInfo {
-                Damage = 25,
+                Damage = 2,
                 Knockback = 15,
                 CritChance = 10,
                 Speed = 1.3f,
@@ -44,7 +44,7 @@ public partial class Item
             speed: 1.4f,
             range: 4f,
             projectileInfo: new SwingProjectileInfo {
-                Damage = 8,
+                Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
                 Speed = 2,
@@ -62,7 +62,7 @@ public partial class Item
             speed: 1.8f,
             range: 4f,
             projectileInfo: new SwingProjectileInfo {
-                Damage = 8,
+                Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
                 Speed = 2,
@@ -77,16 +77,17 @@ public partial class Item
         AddToolDefinition(
             stringID: "spear",
             gesture: ItemGesture.Swing,
-            speed: 0.3f,
+            speed: 0.1f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = "spear", 
-                Damage = 25, 
+                Damage = 2, 
                 Knockback = 10, 
                 CritChance = 10, 
                 LifeSpan = 10000, 
                 Speed = 130, 
                 Radius = 0.1f,
                 Penetration = 1,
+                LodgeTime = 50000,
             },
             ammo: "spear",
             materials: new Dictionary<string, int> { { "wood", 1 } },
@@ -101,7 +102,7 @@ public partial class Item
             speed: 2f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = "bullet",
-                Damage = 10,
+                Damage = 1,
                 Knockback = 5,
                 CritChance = 10,
                 LifeSpan = 10000,
@@ -120,7 +121,7 @@ public partial class Item
             speed: 0.6f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = "bullet",
-                Damage = 25,
+                Damage = 1,
                 Knockback = 6,
                 CritChance = 10,
                 LifeSpan = 10000,

@@ -4,10 +4,10 @@ using UnityEngine;
 public class MobAttackPounce : MobState
 { 
     private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
-            Damage = 10,
-            Knockback = 15,
+            Damage = 1,
+            Knockback = 10,
             CritChance = 0.1f,
-            Radius = 1.1f,
+            Radius = 0.7f,
         };
 
     private int _delay = 0;

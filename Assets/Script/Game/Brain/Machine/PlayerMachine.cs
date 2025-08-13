@@ -19,6 +19,7 @@ public class PlayerMachine : EntityMachine, IHitBox
             Stamina = PlayerData.Inst.stamina,
             SpeedGround = 6,
             SpeedAir = 8,
+            Iframes = 100, 
             PathAmount = 7000,
             MaxStuckCount = 100,
             AccelerationTime = 0.2f,
@@ -42,6 +43,7 @@ public class PlayerMachine : EntityMachine, IHitBox
         AddState(new EquipSelectState()); 
         Control.Info = _info;
         Game.Player = gameObject;
+        Game.PlayerInfo = _info;
     }
 
     private void HandleInput()

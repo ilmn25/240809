@@ -23,8 +23,13 @@ public class PlayerInfo : MobInfo
     public override void Initialize()
     { 
         base.Initialize();
-        IframesCurrent = 400;
-        IsPlayer = true;
+        IframesCurrent = 300;
+        IsPlayer = true;    
+    }
+
+    protected override void OnHit(Projectile projectile)
+    {
+        GUIHealthBar.Update();
     }
 
     protected override void OnUpdate()
@@ -60,9 +65,8 @@ public class PlayerInfo : MobInfo
         }
         else
         { 
-            if (IframesCurrent != 1) return;
-            PlayerStatus = PlayerStatus.Active;
-            if (PlayerStatus == PlayerStatus.Loading)
+            if (IframesCurrent != 1) return; 
+            if (PlayerStatus == PlayerStatus.Dead)
             {
                 Machine.transform.position = new Vector3(
                     World.ChunkSize * WorldGen.Size.x / 2,
@@ -72,6 +76,8 @@ public class PlayerInfo : MobInfo
             } 
             Health = HealthMax;
             Inventory.RefreshInventory(); 
+            PlayerStatus = PlayerStatus.Active;
+            GUIHealthBar.Update();
         } 
     }
 

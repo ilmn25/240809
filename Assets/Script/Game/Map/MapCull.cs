@@ -155,7 +155,7 @@ public class MapCull
             return;
         }
         
-        _playerPosition = Game.Player.transform.position;
+        _playerPosition = Game.ViewPortObject.transform.position;
         if (_currentCullMode == CullMode.On)
         {
             YCheck = true;

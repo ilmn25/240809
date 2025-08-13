@@ -31,7 +31,8 @@ public class GroundPathingModule : PathingModule
     {
         if (PathingTarget == PathingTarget.Target)
         {
-            while (!Info.IsGrounded || Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down))
+            // !Info.IsGrounded || 
+            while ( Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down))
                 await Task.Delay(100); // Yield control back to the caller and continue checking
 
             return await PathFind.FindPath(this, Info.PathAmount);
