@@ -32,7 +32,7 @@ public static class Utility
     {
         if (parameters.Length == 0)
         {
-            Debug.Log("(uwu) HAI");
+            Debug.Log("LOG");
         }
         else
         {

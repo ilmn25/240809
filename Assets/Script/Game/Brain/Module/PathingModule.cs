@@ -54,18 +54,26 @@ public abstract class PathingModule : MobModule
     public abstract bool IsValidPosition(Vector3Int pos, Vector3Int dir, Node currentNode);
     public abstract void OnStuck(); 
 
-    public void IsTargetReached()
+    public bool IsTargetReached()
     {
         if (PathingTarget != PathingTarget.Target)
         {
-            if (Path == null) return;
-        
+            if (Path == null) return false;
+
             if (Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
+            {
                 Info.PathingStatus = PathingStatus.Reached;  
-            return;
+                return true;
+            } 
+            return false;
         }
+
         if (Vector3.Distance(Machine.transform.position, Info.Target.position) < 1)
+        {
             Info.PathingStatus = PathingStatus.Reached; 
+            return true;
+        } 
+        return false;
     }
     
     public Vector3 GetTargetPosition()
@@ -79,7 +87,7 @@ public abstract class PathingModule : MobModule
     public override void Update()
     {
         if (Info.PathingStatus != PathingStatus.Pending || PathingTarget == PathingTarget.None) return;
-            
+        Info.Direction = Vector3.zero;       
         if (!_repathRoutine) CheckRepathRoutine();
 
         if (_updateSelfPosition)
@@ -94,13 +102,9 @@ public abstract class PathingModule : MobModule
             _updateTargetPosition = false;
         }
 
-        IsTargetReached();
         
-        if (Path != null 
-            && _nextPoint < Path.Count)
-        {
+        if (!IsTargetReached() && Path != null && _nextPoint < Path.Count)
             HandleMovePoint();
-        }
 
         if (_nextPointQueued != -1)
         {

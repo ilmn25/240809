@@ -61,12 +61,18 @@ public class Game : MonoBehaviour
         Scene.Initialize();  
         ViewPort.Initialize();  
         Instantiate(Resources.Load<GameObject>($"prefab/item")).AddComponent<StructurePreviewMachine>();
-        
-        if (PlayerData.Inst.position == null) 
-            Entity.Spawn("player", Vector3Int.FloorToInt( new Vector3( 
-            World.ChunkSize * WorldGen.Size.x / 2,
-            World.ChunkSize * WorldGen.Size.y - 5,
-            World.ChunkSize * WorldGen.Size.z / 2)));
+
+        if (PlayerData.Inst.position == null)
+        {
+            World.Inst[World.ChunkSize * WorldGen.Size.x / 2,
+                World.ChunkSize * WorldGen.Size.y - 5,
+                World.ChunkSize * WorldGen.Size.z / 2].dynamicEntity.Add
+                (Entity.GetChunkEntityData("player", new SVector3Int(Vector3Int.zero)));  
+            
+            ViewPortObject.transform.position = new Vector3(World.ChunkSize * WorldGen.Size.x / 2,
+                World.ChunkSize * WorldGen.Size.y - 5,
+                World.ChunkSize * WorldGen.Size.z / 2);
+        } 
         else
         {
             ViewPortObject.transform.position = PlayerData.Inst.position.ToVector3Int();
@@ -96,7 +102,7 @@ public class Game : MonoBehaviour
     private void OnApplicationQuit()
     {
         Block.Dispose();
-        PlayerData.Save();
+        // PlayerData.Save();
         Control.Save(); 
         MapLoad.CancellationTokenSourceKillGame.Cancel();
     }

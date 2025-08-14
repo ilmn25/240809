@@ -34,11 +34,11 @@ public class GUIHealthBar
                 for (int i = 0; i < HealthBar.Count; i += 1)
                 {
                         int target = i * 2 + 2;
-                        if (target < Game.PlayerInfo.Health)
+                        if (target <= Game.PlayerInfo.Health)
                         {
                                 HealthBar[i].sprite = Cache.LoadSprite("sprite/heartfull");
                         }
-                        else if (target - 1 < Game.PlayerInfo.Health)
+                        else if (target - 1 <= Game.PlayerInfo.Health)
                         {
                                 HealthBar[i].sprite = Cache.LoadSprite("sprite/hearthalf");
                         }

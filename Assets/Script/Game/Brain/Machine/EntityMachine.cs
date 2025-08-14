@@ -50,5 +50,8 @@ public abstract class EntityMachine : Machine
             EntityDynamicLoad.ForgetEntity(this);
         ObjectPool.ReturnObject(gameObject); 
     }  
+    
+    public virtual void Attack() { }
+    
 }
 

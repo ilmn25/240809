@@ -16,6 +16,7 @@ public class ProjectileInfo
     public string Effects;
     public ProjectileClass Class; 
     public string Sprite;
+    public string Ammo;
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }

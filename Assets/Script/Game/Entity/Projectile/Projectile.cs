@@ -7,13 +7,14 @@ public class Projectile : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
     public ProjectileInfo Info;
-    public int LifeSpan;
-    public int LodgeTime = 0;
+    public int LifeSpan; 
     public HitboxType TargetHitBoxType;
     public Vector3 Destination;
     public Vector3 Direction;
     public Machine Source;
-    public Machine Target;
+    public Transform Target;
+    public Quaternion RelativeRotation;
+
     private void Update()
     {
         Info.AI(this);
@@ -38,7 +39,6 @@ public class Projectile : MonoBehaviour
         projectile.Destination = dest;
         projectile.Direction = (dest - origin).normalized;
         projectile.Target = null;
-        projectile.LodgeTime = 0;
         
         Vector3 direction =  projectile.Direction;
         direction.y = 0;

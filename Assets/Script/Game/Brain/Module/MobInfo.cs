@@ -42,12 +42,16 @@ public class MobInfo : DynamicInfo
     { 
         if (item != null)
         {
-            Equipment = item;
-            SpriteTool.gameObject.SetActive(true);
-            SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
-            SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + item.StringID);
-            SpriteToolTrack.transform.localScale = Vector3.one * item.Scale;
-            Machine.SetState<EquipSelectState>();
+            if (Equipment == null || Equipment != item)
+            {
+                Equipment = item;
+                SpriteTool.gameObject.SetActive(true);
+                SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
+                SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.RotationOffset);
+                SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + item.StringID);
+                SpriteToolTrack.transform.localScale = Vector3.one * item.Scale;
+                Machine.SetState<EquipSelectState>();
+            } 
         }
         else
         {
@@ -80,8 +84,10 @@ public class EnemyInfo : MobInfo
 
     protected override void OnHit(Projectile projectile)
     { 
+        if (Target == projectile.Source.transform) return;
         Target = projectile.Source.transform;
         PathingStatus = PathingStatus.Reached; 
+        Machine.SetState<DefaultState>();
     }
  
 }

@@ -6,11 +6,11 @@ public class RangedProjectileInfo : ProjectileInfo
     public int Penetration; // ignored for now
     public bool Self = true;
     public bool Stuck = false;
-    public int LodgeTime = 0;
+    public bool Lodge = false;
 
     public override void AI(Projectile projectile)
     {
-        if (projectile.LodgeTime == 0)
+        if (!projectile.Target)
         {
             // Check lifespan
             if (projectile.LifeSpan > LifeSpan)
@@ -28,29 +28,39 @@ public class RangedProjectileInfo : ProjectileInfo
                 if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskMap))
                 {
                     Audio.PlaySFX("dig_stone");
-                    projectile.LodgeTime = 1;
+                    Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);
+                    projectile.Delete();
                     break;  
                 } 
             
-                IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
+                IHitBox target = HitBuffer[i].GetComponent<IHitBoxAttack>();
                 if (target == null) continue;
-            
+                
                 if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
                 {
-                    projectile.Target = (Machine)target;
-                    projectile.LodgeTime = 1;
+                    if (Lodge)
+                    {
+                        projectile.Target = ((MobMachine)target).Info.SpriteToolTrack ?? projectile.Target.transform;;
+                        projectile.RelativeRotation = Quaternion.Inverse(projectile.Target.rotation) * projectile.transform.rotation;
+                    }
+                    else
+                    {
+                        projectile.Delete();
+                    }
                     break;
                 } 
             } 
         }
         else
         {
-            if (projectile.Target) projectile.transform.position = projectile.Target.transform.position + Vector3.up * 0.35f;
-            if (projectile.LodgeTime > LodgeTime || (projectile.Target && !projectile.Target.isActiveAndEnabled))
+            projectile.transform.position = projectile.Target.position;
+            projectile.transform.rotation = projectile.Target.rotation * projectile.RelativeRotation;
+            
+            if (!projectile.Target.gameObject.activeSelf)
             {
-                projectile.Delete();
+                Entity.SpawnItem(Ammo, projectile.transform.position);
+                projectile.Delete();    
             }
-            projectile.LodgeTime++;
         }
     }
 }

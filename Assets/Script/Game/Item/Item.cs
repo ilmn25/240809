@@ -77,23 +77,24 @@ public partial class Item
         AddToolDefinition(
             stringID: "spear",
             gesture: ItemGesture.Swing,
-            speed: 0.1f,
+            speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = "spear", 
                 Damage = 2, 
                 Knockback = 10, 
                 CritChance = 10, 
                 LifeSpan = 10000, 
-                Speed = 130, 
-                Radius = 0.1f,
+                Speed = 60, 
+                Radius = 0.3f,
                 Penetration = 1,
-                LodgeTime = 50000,
+                Lodge = true,
+                Ammo = "spear",
             },
-            ammo: "spear",
             materials: new Dictionary<string, int> { { "wood", 1 } },
             projectileOffset: 1.016f,
             stackSize: 20,
-            holdoutOffset: new Vector2(0.65f, 0)
+            holdoutOffset: new Vector2(0.65f, 0),
+            rotationOffset: 45
         );
         
         AddToolDefinition(
@@ -127,9 +128,9 @@ public partial class Item
                 LifeSpan = 10000,
                 Speed = 12,
                 Radius = 0.1f,
+                Ammo = "bullet",
                 Penetration = 1
-            },
-            ammo: "bullet",
+            }, 
             materials: new Dictionary<string, int> { { "wood", 2 } },
             projectileOffset: 1.016f,
             holdoutOffset: new Vector2(0.4f, 0)
@@ -194,11 +195,11 @@ public partial class Item
         float speed = 1,
         float range = 1,
         ProjectileInfo projectileInfo = null,
-        string ammo = null,
         int miningPower = 0,
         int durability = 0,
         StatusEffect statusEffect = null,
         Vector2 holdoutOffset = new Vector2(),
+        int rotationOffset = 0,
         float projectileOffset = 0,
 
         string description = "",
@@ -225,12 +226,12 @@ public partial class Item
             Speed = speed,
             Range = range,
             ProjectileInfo = projectileInfo,
-            Ammo = ammo,
             MiningPower = miningPower,
             Durability = durability,
             StatusEffect = statusEffect, 
             ProjectileOffset = projectileOffset,
             HoldoutOffset = holdoutOffset,
+            RotationOffset = rotationOffset,
 
             Name = name,
             Description = description

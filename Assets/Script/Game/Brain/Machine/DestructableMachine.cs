@@ -11,7 +11,7 @@ public class StructureMachine : EntityMachine
     }
 }
 
-public class DestructableMachine : StructureMachine, IHitBox
+public class DestructableMachine : StructureMachine, IHitBoxResource
 {
     private String _sfx;
     private int _health; 

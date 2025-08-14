@@ -21,7 +21,6 @@ public class Inventory
     public static void SetInventory(Storage storage)
     {
         Storage = storage;
-        RefreshInventory();
     }
     
     public static void Update()
@@ -95,7 +94,7 @@ public class Inventory
     { 
         _currentKey = CalculateKey();
         CurrentItem = Storage.List[_currentKey];
-        CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID);
+        CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID); 
         SlotUpdate?.Invoke(); 
     }
 

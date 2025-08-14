@@ -91,17 +91,17 @@ public class Control
     {
         if (Inst.ActionPrimaryNear.KeyDown())
         {
-            // IActionPrimary target = GetNearestInteractable<IActionPrimary>();
-            // if (target == null) return;
-            // // Info.Target = ((Machine)target).transform;  
-            // Info.IActionTarget = IActionTarget.Primary;
-            // Info.IAction = target;
+            IHitBoxResource target = GetNearestInteractable<IHitBoxResource>();
+            if (target == null) return;
+            Info.Target = ((Machine)target).transform;  
+            Info.ActionTarget = IActionTarget.Hit;
+            Info.Action = target;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         { 
             IActionSecondary target = GetNearestInteractable<IActionSecondary>();
             if (target == null) return;
-            Info.Target = ((Machine)target).transform;  
+            Info.Target = ((MonoBehaviour)target).transform;  
             Info.ActionTarget = IActionTarget.Secondary;
             Info.Action = target;
         }
@@ -155,13 +155,13 @@ public class Control
         }
         else MouseTarget = null;
         
-        if (MouseTarget && Vector3.Distance(MousePosition, Game.Player.transform.position) < InteractRange)
+        if (MouseTarget && Vector3.Distance(MousePosition, Game.ViewPortObject.transform.position) < InteractRange)
         {
-            if (Inst.ActionPrimary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IActionPrimary>()) != null)
-            {
-                Info.Target = MouseTarget;
-                Info.ActionTarget = IActionTarget.Primary;
-            }
+            // if (Inst.ActionPrimary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IHitBox>()) != null)
+            // {
+            //     Info.Target = MouseTarget;
+            //     Info.ActionTarget = IActionTarget.Hit;
+            // }
 
             if (Inst.ActionSecondary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IActionSecondary>()) != null)
             {

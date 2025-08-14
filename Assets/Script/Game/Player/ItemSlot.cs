@@ -56,7 +56,7 @@ public class ItemSlot
             // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
             // else text += " \nrange: " + item.ProjectileInfo.Radius;
             // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
-            if (item.Ammo != null) text += " \n \nammo: " + item.Ammo;
+            if (item.ProjectileInfo.Ammo != null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
 
 
             if (ingredients)
