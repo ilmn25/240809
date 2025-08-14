@@ -8,7 +8,7 @@ public class NPCCED : ChunkEntityData
 }
 
 
-public class MobMachine : EntityMachine, IHitBox
+public class MobMachine : EntityMachine, IHitBoxAttack
 {
     public override void OnSetup()
     {

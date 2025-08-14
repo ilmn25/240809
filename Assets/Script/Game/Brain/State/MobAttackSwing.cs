@@ -35,4 +35,10 @@ class MobAttackSwing : MobState {
             }
         } 
     }
+
+    public override void OnExitState()
+    {
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipIdle", 0, 0f); 
+    }
 }

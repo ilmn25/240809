@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChestMachine : StructureMachine, IActionSecondary
+public class ChestMachine : StructureMachine, IActionSecondary, IHitBoxResource
 {
     public override void OnStart()
     {

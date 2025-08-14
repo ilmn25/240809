@@ -72,12 +72,12 @@ public class PlayerInfo : MobInfo
                     World.ChunkSize * WorldGen.Size.x / 2,
                     World.ChunkSize * WorldGen.Size.y - 5,
                     World.ChunkSize * WorldGen.Size.z / 2);
-                Sprite.gameObject.SetActive(true); 
+                Sprite.gameObject.SetActive(true);  
             } 
             Health = HealthMax;
-            Inventory.RefreshInventory(); 
             PlayerStatus = PlayerStatus.Active;
             GUIHealthBar.Update();
+            Inventory.RefreshInventory();
         } 
     }
 

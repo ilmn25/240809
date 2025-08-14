@@ -7,8 +7,7 @@ public class PlayerMachine : EntityMachine, IHitBox
     public override void OnStart()
     {   
         AddModule(new PlayerInfo()
-        { 
-            Equipment = Inventory.CurrentItemData, 
+        {  
             HitboxType = HitboxType.Friendly,
             TargetHitboxType = HitboxType.Passive,
             HealthMax = PlayerData.Inst.health,
@@ -39,11 +38,12 @@ public class PlayerMachine : EntityMachine, IHitBox
         Inventory.SlotUpdate += EventSlotUpdate;
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
-        AddState(new MobChaseInteract());
+        AddState(new MobChaseAction());
         AddState(new EquipSelectState()); 
         Control.Info = _info;
         Game.Player = gameObject;
         Game.PlayerInfo = _info;
+        Info.SetEquipment(Inventory.CurrentItemData);
     }
 
     private void HandleInput()
@@ -55,16 +55,18 @@ public class PlayerMachine : EntityMachine, IHitBox
         }
 
         if (Info.Target && (Input.GetKeyDown(KeyCode.A) ||
-            Input.GetKeyDown(KeyCode.W) ||
-            Input.GetKeyDown(KeyCode.S) ||
-            Input.GetKeyDown(KeyCode.D) ||
-            Input.GetKeyDown(KeyCode.Space)))
+                            Input.GetKeyDown(KeyCode.W) ||
+                            Input.GetKeyDown(KeyCode.S) ||
+                            Input.GetKeyDown(KeyCode.D) ||
+                            Input.GetKeyDown(KeyCode.Space)))
+        {
             Info.PathingStatus = PathingStatus.Stuck;
+            SetState<DefaultState>();
+            Info.Target = null;
+        } 
         
         if (Input.GetKeyDown(KeyCode.N))
-        {
             Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position), 200);
-        }
         if (Input.GetKeyDown(KeyCode.M)) 
             Entity.Spawn("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
@@ -82,13 +84,13 @@ public class PlayerMachine : EntityMachine, IHitBox
         if (GUIMain.IsHover || !IsCurrentState<DefaultState>()) return; 
         if (Info.Target)
         {
-            SetState<MobChaseInteract>();
+            SetState<MobChaseAction>();
             return;
         }
-        switch (Inventory.CurrentItemData?.Type)
+        switch (Info.Equipment?.Type)
         {
             case ItemType.Tool:
-                if (Inventory.CurrentItemData.MiningPower != 0 && 
+                if (Info.Equipment.MiningPower != 0 && 
                     Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
                     Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
                 {
@@ -102,24 +104,7 @@ public class PlayerMachine : EntityMachine, IHitBox
                      Control.Inst.DigUp.Key() ||
                      Control.Inst.DigDown.Key()))
                 {
-                    if (Info.Equipment.Ammo != null && 
-                        Inventory.Storage.GetAmount(Info.Equipment.Ammo) == 0) return;
-                    
-                    Info.AimPosition = Control.MouseTarget ?
-                        Control.MouseTarget.transform.position + Vector3.up * 0.55f :
-                        Control.MousePosition + Vector3.up * 0.15f; 
-                    
-                    switch (Info.Equipment.Gesture)
-                    {
-                        case ItemGesture.Swing:
-                            SetState<MobAttackSwing>();
-                            break;
-                        case ItemGesture.Shoot:
-                            SetState<MobAttackShoot>();
-                            break;
-                    }
-                    
-                    if (Info.Equipment.Ammo != null) Inventory.RemoveItem(Info.Equipment.Ammo);
+                    Attack();
                 }
 
                 break;
@@ -141,9 +126,32 @@ public class PlayerMachine : EntityMachine, IHitBox
     }
     
     public void EventSlotUpdate()
-    {
+    { 
         Info.SetEquipment(Inventory.CurrentItemData); 
     }
+
+    public override void Attack()
+    {
+        if (Info.Equipment.ProjectileInfo.Ammo != null && 
+            Inventory.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
+                    
+        Info.AimPosition = Control.MouseTarget ?
+            Control.MouseTarget.transform.position + Vector3.up * 0.55f :
+            Control.MousePosition + Vector3.up * 0.15f; 
+                    
+        switch (Info.Equipment.Gesture)
+        {
+            case ItemGesture.Swing:
+                SetState<MobAttackSwing>();
+                break;
+            case ItemGesture.Shoot:
+                SetState<MobAttackShoot>();
+                break;
+        }
+                    
+        if (Info.Equipment.ProjectileInfo.Ammo != null) Inventory.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+    }
+    
     public void OnDrawGizmos()
     {
         if (Camera.current != Camera.main)

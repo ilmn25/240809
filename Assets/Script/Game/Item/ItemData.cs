@@ -19,12 +19,12 @@ public partial class Item
     public float Speed;
     public float Range;
     public ProjectileInfo ProjectileInfo;
-    public string Ammo;
     public int MiningPower; 
     public int Durability;
     public StatusEffect StatusEffect; 
     public float ProjectileOffset;
     public Vector2 HoldoutOffset;
+    public float RotationOffset;
      
     public string Name; 
     public string Description;  

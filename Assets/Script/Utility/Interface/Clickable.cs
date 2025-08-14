@@ -15,3 +15,5 @@ public interface IHover : IAction
 } 
 
 public interface IHitBox : IAction { }
+public interface IHitBoxAttack : IHitBox { }
+public interface IHitBoxResource : IHitBox { }
