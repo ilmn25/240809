@@ -3,13 +3,9 @@ using UnityEngine;
 
 public class HunterMachine : MobMachine
 {   
-    private int _ammo;
-    private const int AmmoMax = 5; 
-
-    public override void OnStart()
+    public static Info CreateInfo()
     {
-        _ammo = AmmoMax; 
-        AddModule(new EnemyInfo()
+        return new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
@@ -18,8 +14,16 @@ public class HunterMachine : MobMachine
             DistAttack = 18,
             HurtSfx = "npc_hurt", 
             DeathSfx = "player_die",
-            SpeedGround = 2.8f
-        }); 
+            SpeedGround = 2.8f,
+            EquipmentId = "pistol"
+        }; 
+    }
+    private int _ammo;
+    private const int AmmoMax = 5; 
+
+    public override void OnStart()
+    {
+        _ammo = AmmoMax;  
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule()); 
@@ -31,8 +35,8 @@ public class HunterMachine : MobMachine
         AddState(new MobRoam());
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
-        AddState(new EquipSelectState());
-        Info.SetEquipment(Item.GetItem("pistol"));
+        AddState(new EquipSelectState()); 
+        Info.SetEquipment(Info.EquipmentId);
     } 
     
     public override void OnUpdate()
@@ -98,7 +102,11 @@ public class HunterMachine : MobMachine
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
+        {
             Info.Target = Game.Player.transform;
+            Info.PathingStatus = PathingStatus.Reached; 
+            SetState<DefaultState>();
+        } 
         else if (Input.GetKeyDown(KeyCode.T))
             Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))

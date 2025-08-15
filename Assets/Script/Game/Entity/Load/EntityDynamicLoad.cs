@@ -26,7 +26,7 @@ public class EntityDynamicLoad
             if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
                 if (World.IsInWorldBounds(entityChunkPosition))
-                    World.Inst[entityChunkPosition].dynamicEntity.Add(entityMachine.GetEntityData());
+                    World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.GetEntityData());
                 removeList.Add(entityMachine);
             }
         }
@@ -61,7 +61,7 @@ public class EntityDynamicLoad
         {
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             if (World.IsInWorldBounds(entityChunkPosition))
-                World.Inst[entityChunkPosition].dynamicEntity.Add(entityMachine.GetEntityData());
+                World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.GetEntityData());
             removeList.Add(entityMachine);
         }
         foreach (var entityMachine in removeList) entityMachine.Delete();
@@ -72,16 +72,15 @@ public class EntityDynamicLoad
         Entity entity;
         EntityMachine currentEntityMachine;
         GameObject currentInstance = null;
-        List<ChunkEntityData> chunkEntityList = World.Inst[chunkCoordinate].dynamicEntity;
-        foreach (ChunkEntityData entityData in chunkEntityList)
+        List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity;
+        foreach (Info entityData in chunkEntityList)
         {   
             entity = Entity.Dictionary[entityData.stringID];
             if (entity.PrefabName == "item")
                 currentInstance = ObjectPool.GetObject(entity.PrefabName);
             else                
-                currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
-            
-            currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0.5f, 0.5f); 
+                currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID); 
+            currentInstance.transform.position = entityData.position + new Vector3(0.5f, 0.5f, 0.5f); 
             // Utility.Log(chunkCoordinate, entityData.position.ToVector3Int(), currentInstance.transform.position);
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine)); 

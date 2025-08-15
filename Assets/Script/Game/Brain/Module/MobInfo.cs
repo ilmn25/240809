@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 
 public enum IActionTarget {Primary, Secondary, Hit}
+[System.Serializable]
 public class MobInfo : DynamicInfo
 { 
     public int DistAttack = 2;
@@ -16,18 +18,18 @@ public class MobInfo : DynamicInfo
     public int PathFall = 15;
     public int PathAir = 4;
     public int PathAmount = 3000;
-    public int MaxStuckCount = 250;    
-    
-    public Item Equipment;
- 
-    public Transform Target;
-    public IAction Action;
-    public IActionTarget ActionTarget;
-    public bool FaceTarget;
-    public Vector3 AimPosition;
+    public int MaxStuckCount = 250;
+    public string EquipmentId;
     public HitboxType TargetHitboxType;
-    public PathingStatus PathingStatus = PathingStatus.Pending; 
-
+ 
+    [NonSerialized] public Item Equipment;
+    [NonSerialized] public Transform Target;
+    [NonSerialized] public IAction Action;
+    [NonSerialized] public IActionTarget ActionTarget;
+    [NonSerialized] public bool FaceTarget;
+    [NonSerialized] public Vector3 AimPosition; 
+    [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending; 
+ 
     protected override void OnUpdate()
     { 
         base.OnUpdate();
@@ -36,14 +38,17 @@ public class MobInfo : DynamicInfo
             TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.transform.position) - 
                               Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
         }
-    }    
-    
-    public void SetEquipment(Item item)
-    { 
+    } 
+
+    public void SetEquipment(String stringID)
+    {
+        Item item = null;
+        if (stringID != null) item = Item.GetItem(stringID);
         if (item != null)
         {
             if (Equipment == null || Equipment != item)
             {
+                EquipmentId = stringID;
                 Equipment = item;
                 SpriteTool.gameObject.SetActive(true);
                 SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
@@ -55,39 +60,9 @@ public class MobInfo : DynamicInfo
         }
         else
         {
+            EquipmentId = null;
             Equipment = null;
             SpriteTool.gameObject.SetActive(false);
         }
     }
-}
-
-public class EnemyInfo : MobInfo
-{
-    public override void Initialize()
-    {
-        base.Initialize();
-        Health = HealthMax;
-    }
-
-    protected override void OnUpdate()
-    {
-        base.OnUpdate();
-        FaceTarget = Target;
-        SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
-        if (Health <= 0)
-        { 
-            Loot.Gettable(((EntityMachine)Machine).entityData.stringID).Spawn(Machine.transform.position);
-            ((EntityMachine)Machine).Delete();
-            Audio.PlaySFX(DeathSfx, 0.8f);
-        }
-    }
-
-    protected override void OnHit(Projectile projectile)
-    { 
-        if (Target == projectile.Source.transform) return;
-        Target = projectile.Source.transform;
-        PathingStatus = PathingStatus.Reached; 
-        Machine.SetState<DefaultState>();
-    }
- 
 }

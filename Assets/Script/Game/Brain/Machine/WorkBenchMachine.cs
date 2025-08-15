@@ -1,6 +1,6 @@
 public class WorkBenchMachine: StructureMachine, IActionSecondary
 {
-    public override void OnStart()
+    public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
         storage.AddItem("brick");
@@ -9,19 +9,21 @@ public class WorkBenchMachine: StructureMachine, IActionSecondary
         storage.AddItem("pistol");
         storage.AddItem("spear");
         storage.AddItem("minigun");
-        AddModule(new ContainerInfo()
+        return new ContainerInfo()
         {
             Health = 500,
             Loot = "tree",
             SfxHit = "dig_stone",
             SfxDestroy = "dig_stone",
             Storage = storage
-        });
+        };
+    }
+    public override void OnStart()
+    {
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
         AddState(new InCraftingState());
-    }
-    
+    } 
 
     public void OnActionSecondary(EntityMachine entityMachine)
     {

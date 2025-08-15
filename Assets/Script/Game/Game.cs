@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
 using UnityEngine; 
@@ -42,7 +44,13 @@ public class Game : MonoBehaviour
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 160;
         SetConstants(); 
-        PlayerData.Load();  
+        // PlayerData.Load();  
+        
+        
+        SurrogateSelector surrogateSelector = new SurrogateSelector();
+        surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), new Vector3SerializationSurrogate());
+        surrogateSelector.AddSurrogate(typeof(Vector3Int), new StreamingContext(StreamingContextStates.All), new Vector3IntSerializationSurrogate());
+        Utility.BinaryFormatter.SurrogateSelector = surrogateSelector;
     }
 
     private void Start()
@@ -61,22 +69,6 @@ public class Game : MonoBehaviour
         Scene.Initialize();  
         ViewPort.Initialize();  
         Instantiate(Resources.Load<GameObject>($"prefab/item")).AddComponent<StructurePreviewMachine>();
-
-        if (PlayerData.Inst.position == null)
-        {
-            World.Inst[World.ChunkSize * WorldGen.Size.x / 2,
-                World.ChunkSize * WorldGen.Size.y - 5,
-                World.ChunkSize * WorldGen.Size.z / 2].dynamicEntity.Add
-                (Entity.GetChunkEntityData("player", new SVector3Int(Vector3Int.zero)));  
-            
-            ViewPortObject.transform.position = new Vector3(World.ChunkSize * WorldGen.Size.x / 2,
-                World.ChunkSize * WorldGen.Size.y - 5,
-                World.ChunkSize * WorldGen.Size.z / 2);
-        } 
-        else
-        {
-            ViewPortObject.transform.position = PlayerData.Inst.position.ToVector3Int();
-        }
     }
 
     private void Update()
@@ -84,6 +76,7 @@ public class Game : MonoBehaviour
         if (Control.Inst.Pause.KeyDown())
         {
             World.Save(0);
+            Application.Quit();
         }
         
         GUIMain.Update();

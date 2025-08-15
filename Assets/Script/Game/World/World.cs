@@ -13,15 +13,16 @@ public class World
     [NonSerialized] public static readonly int ChunkSize = 15;
      
     private Chunk[] _chunks;
-    public readonly SVector3Int Length;
-    public readonly SVector3Int Bounds;
+    public Info target;
+    public readonly Vector3Int Length;
+    public readonly Vector3Int Bounds;
     public static int Seed;
  
 
     public World(int x, int y, int z)
     {
-        Bounds = new SVector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
-        Length = new SVector3Int(x, y, z);
+        Bounds = new Vector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
+        Length = new Vector3Int(x, y, z);
         _chunks = new Chunk[x * y * z];
         Seed = Environment.TickCount;
     }

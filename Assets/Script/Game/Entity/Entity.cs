@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 public partial class Entity
 { 
@@ -71,30 +72,12 @@ public partial class Entity
         public static void AddItem(string stringID)
         {
                 Dictionary.Add(stringID, Item); 
-        }
-        
-        public static ChunkEntityData GetChunkEntityData(string stringID, Vector3Int worldPosition)
-        {
-                return new ChunkEntityData()
-                {
-                        stringID = stringID,
-                        position = new SVector3Int(worldPosition),
-                };
-        }
-        public static ChunkEntityData GetChunkEntityData(string stringID, SVector3Int worldPosition)
-        {
-                return new ChunkEntityData()
-                {
-                        stringID = stringID,
-                        position = worldPosition,
-                }; 
-        }
+        } 
         
         public static void SpawnItem(string stringID, Vector3 worldPosition, int count = 1)
         {
                 for (int i = 0; i < count; i++)
                 {
-                        ChunkEntityData entityData = GetChunkEntityData(stringID, Vector3Int.FloorToInt(worldPosition));
 
                         GameObject gameObject = ObjectPool.GetObject("item");
                         gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + new Vector3(0.5f, 0.5f, 0.5f); 
@@ -102,14 +85,13 @@ public partial class Entity
                         EntityMachine currentEntityMachine = (EntityMachine)
                                 (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
                         EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                        currentEntityMachine.Initialize(entityData);
+                        currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition));
                         
                 } 
         }
         
-        public static void Spawn(string stringID, Vector3Int worldPosition)
+        public static void Spawn(string stringID, Vector3 worldPosition)
         {
-                ChunkEntityData entityData = GetChunkEntityData(stringID, worldPosition);
                 
                 GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0, 0.5f);   
@@ -121,6 +103,25 @@ public partial class Entity
                         EntityStaticLoad.InviteEntity(currentEntityMachine); 
                 else
                         EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                currentEntityMachine.Initialize(entityData);
+                currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition));
         }
+
+        public static Info CreateInfo(string stringID, Vector3 worldPosition)
+        {
+                Type machineType = Dictionary[stringID].Machine;
+
+                MethodInfo method = machineType.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+
+                if (method != null && method.ReturnType == typeof(Info))
+                {
+                        Info info = (Info)method.Invoke(null, null);
+                        info.stringID = stringID;
+                        info.position = worldPosition;
+                        return info;
+                }
+
+                throw new InvalidOperationException($"Machine type '{machineType.Name}' must have a public static NewInfo method returning Info.");
+        }
+
+
 }

@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[System.Serializable]
 public class DynamicInfo : Info
 { 
     public HitboxType HitboxType;
@@ -10,35 +12,36 @@ public class DynamicInfo : Info
     public float KnockBackResistance = 1;
      
     public float SpeedGround = 5;
-    public float SpeedAir = 10;
-    public float SpeedTarget = 10;
-    public float AccelerationTime = 0.3f;
-    public float DecelerationTime = 0.08f;
+    public float SpeedAir = 10;  
     public float Gravity = -40f;
     public float JumpVelocity = 10f; 
     
     public int Health; 
     public int HealthMax;
     public int Defense; 
-    public readonly float EntityCollisionRadius = 0.15f;
+    public int Iframes = 5;
     
-    public Transform Sprite;
-    public Animator Animator;
-    public Transform SpriteChar;
-    public SpriteRenderer SpriteCharRenderer;
-    public Transform SpriteToolTrack;
-    public Transform SpriteTool;
-    public SpriteRenderer SpriteToolRenderer; 
-     
-    public int Iframes = 15;
-    protected int IframesCurrent;  
+    [NonSerialized] public readonly float EntityCollisionRadius = 0.15f;
+    [NonSerialized] public float AccelerationTime = 0.3f;
+    [NonSerialized] public float DecelerationTime = 0.08f;
     
-    public float AirTime;
-    public Vector3 Velocity = Vector3.zero;
-    public bool IsGrounded = false;
-    public Vector3 Direction = Vector3.zero; 
-    public Vector3 TargetScreenDir;
-    public float SpeedCurrent;
+    [NonSerialized] public Transform Sprite;
+    [NonSerialized] public Animator Animator;
+    [NonSerialized] public Transform SpriteChar;
+    [NonSerialized] public SpriteRenderer SpriteCharRenderer;
+    [NonSerialized] public Transform SpriteToolTrack;
+    [NonSerialized] public Transform SpriteTool;
+    [NonSerialized] public SpriteRenderer SpriteToolRenderer;
+ 
+    [NonSerialized] protected int IframesCurrent;
+
+    [NonSerialized] public float AirTime;
+    [NonSerialized] public Vector3 Velocity = Vector3.zero;
+    [NonSerialized] public bool IsGrounded = false;
+    [NonSerialized] public Vector3 Direction = Vector3.zero;
+    [NonSerialized] public Vector3 TargetScreenDir;
+    [NonSerialized] public float SpeedCurrent;
+    [NonSerialized] public float SpeedTarget = 10;
 
     private static readonly Collider[] ColliderArray = new Collider[3];
     
@@ -102,11 +105,11 @@ public class DynamicInfo : Info
                 if (HitboxType == HitboxType.Friendly) return false;
                 break;
         }
-        IframesCurrent = Iframes;
-        OnHit(projectile);
+        IframesCurrent = Iframes; 
         Audio.PlaySFX(HurtSfx, 0.4f);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
+        OnHit(projectile);
         return true;
     }
     public void KnockBack(Vector3 position, float force, bool isAway)

@@ -20,6 +20,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnRefreshSlot(object sender, EventArgs e)
     {
+        if (GUIStorage.Storage == null) return;
         ItemSlot slot = GUIStorage.Storage.List[slotNumber];
         if (slot.Stack != 0)
         {

@@ -9,7 +9,7 @@ public abstract class State
     public Tag[] Tags;
     public Machine Machine;
     public State Parent;
-    public Info Info => (Info) Machine.Info;
+    public Info Info => ((EntityMachine)Machine).Info;
  
     public virtual void Initialize() {}
     public virtual void OnEnterState() {}
@@ -26,9 +26,9 @@ public class DefaultState : State { }
 
 public class MobState : State
 {
-    public new MobInfo Info => (MobInfo) Machine.Info;
+    public new MobInfo Info => (MobInfo)((EntityMachine)Machine).Info;
 }
 public class PlayerState : State
 {
-    public new PlayerInfo Info => (PlayerInfo) Machine.Info;
+    public new PlayerInfo Info => (PlayerInfo) ((EntityMachine)Machine).Info;
 }

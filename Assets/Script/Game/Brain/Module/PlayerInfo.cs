@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum PlayerStatus {
@@ -5,26 +6,30 @@ public enum PlayerStatus {
     Dead,
     Loading,
 }
+[System.Serializable]
 public class PlayerInfo : MobInfo
 { 
+    public Storage Storage;
     public float Mana;
     public float Sanity;
     public float Hunger;
-    public float Stamina; 
-    public bool IsBusy = false; 
-    public PlayerStatus PlayerStatus = PlayerStatus.Loading;
+    public float Stamina;  
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
     private const float HoldVelocity = 0.05f;
     private const float ClampVelocity = 10f;
-    private float _jumpGraceTimer;
-    private float _coyoteTimer; 
+    [NonSerialized] private float _jumpGraceTimer;
+    [NonSerialized] private float _coyoteTimer;
+    [NonSerialized]  public bool IsBusy = false; 
+    [NonSerialized] public PlayerStatus PlayerStatus = PlayerStatus.Loading;
+
     public override void Initialize()
     { 
-        base.Initialize();
+        base.Initialize(); 
         IframesCurrent = 300;
-        IsPlayer = true;    
+        IsPlayer = true;
+        Inventory.RefreshInventory();
     }
 
     protected override void OnHit(Projectile projectile)

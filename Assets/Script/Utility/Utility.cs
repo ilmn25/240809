@@ -6,7 +6,7 @@ using UnityEngine;
 public static class Utility
 {
     private static readonly string SavePath;
-    private static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
+    public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
 
     static Utility()
     {

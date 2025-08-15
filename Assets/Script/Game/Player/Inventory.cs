@@ -18,9 +18,9 @@ public class Inventory
 
     public static event Action SlotUpdate; 
 
-    public static void SetInventory(Storage storage)
+    public static void SetInventory()
     {
-        Storage = storage;
+        Storage = ((PlayerInfo)World.Inst.target).Storage;
     }
     
     public static void Update()

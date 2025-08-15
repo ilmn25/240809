@@ -3,7 +3,12 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class ItemMachine : EntityMachine, IActionSecondary
-{
+{    
+    public static Info CreateInfo()
+    {
+        return new Info();
+    }
+    
     private bool _wasInRange;
     private SpriteRenderer _spriteRenderer;
     private ItemPhysicModule _itemPhysicModule; 
@@ -15,11 +20,11 @@ public class ItemMachine : EntityMachine, IActionSecondary
 
     public override void OnStart()
     {  
-        _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + entityData.stringID);
+        _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + Info.stringID);
         AddModule(new ItemPhysicModule()); 
         AddModule(new ItemSpriteCullModule()); 
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
-        transform.localScale = Vector3.one * Item.GetItem(entityData.stringID).Scale;
+        transform.localScale = Vector3.one * Item.GetItem(Info.stringID).Scale;
         _itemPhysicModule = GetModule<ItemPhysicModule>();
         _itemPhysicModule.PopItem(); 
     }

@@ -24,7 +24,7 @@ public partial class Item
     public StatusEffect StatusEffect; 
     public float ProjectileOffset;
     public Vector2 HoldoutOffset;
-    public float RotationOffset;
+    public float RotationOffset = 90;
      
     public string Name; 
     public string Description;  

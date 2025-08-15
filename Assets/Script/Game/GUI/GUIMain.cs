@@ -9,7 +9,7 @@ public class GUIMain
     private const float HideDuration = 0.2f;
     
     private static CoroutineTask _showTask; 
-    private static GUIStorage _inventory;
+    public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
     public static GUIStorage HandCrafting;
     public static GUIStorage Crafting;
@@ -21,25 +21,22 @@ public class GUIMain
     public static bool IsHover;
     public static void Initialize()
     {
-        GUICraft.Initialize();
-        GUIHealthBar.Initialize();
+        GUICraft.Initialize(); 
         Cursor = new GUICursor();
         Cursor.Initialize();
         Cursor.Show(false);
         
-        _inventory = new GUIChest()
+        StorageInv = new GUIChest()
         {
-            Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, 166), 
             Name = "Inventory",
         };
-        _inventory.Initialize();
+        StorageInv.Initialize();
         
         Storage = new GUIChest()
         {
-            Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -19), 
@@ -64,7 +61,6 @@ public class GUIMain
         
         Crafting = new GUICrafting()
         {
-            Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -50), 
@@ -75,7 +71,6 @@ public class GUIMain
         
         Building = new GUIBuilding()
         {
-            Storage = Inventory.Storage,
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -100), 
@@ -97,7 +92,7 @@ public class GUIMain
         GUIDialogue.Update();
         GUICraft.Update(); 
         Cursor.Update();
-        _inventory.Update();
+        StorageInv.Update();
         Storage.Update();
         HandCrafting.Update();
         Crafting.Update();
@@ -142,7 +137,7 @@ public class GUIMain
 
     public static void RefreshStorage()
     {
-        _inventory.OnRefreshSlot?.Invoke(_inventory, null);
+        StorageInv.OnRefreshSlot?.Invoke(StorageInv, null);
         Storage.OnRefreshSlot?.Invoke(Storage, null);
         HandCrafting.OnRefreshSlot?.Invoke(HandCrafting, null);
         Crafting.OnRefreshSlot?.Invoke(Crafting, null);

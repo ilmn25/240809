@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class BugMachine : MobMachine
 {   
-    public override void OnStart()
+    public static Info CreateInfo()
     {
-        AddModule(new EnemyInfo()
+        return new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
@@ -19,7 +19,10 @@ public class BugMachine : MobMachine
             SpeedGround = 14,
             SpeedAir = 10,
             JumpVelocity = 12,
-        });
+        };
+    }
+    public override void OnStart()
+    { 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -83,7 +86,11 @@ public class BugMachine : MobMachine
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
+        {
             Info.Target = Game.Player.transform;
+            Info.PathingStatus = PathingStatus.Reached; 
+            SetState<DefaultState>();
+        } 
         else if (Input.GetKeyDown(KeyCode.T))
             Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))

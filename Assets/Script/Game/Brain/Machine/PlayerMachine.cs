@@ -3,19 +3,20 @@ using UnityEngine;
 
 public class PlayerMachine : EntityMachine, IHitBox
 {
-    private PlayerInfo _info;
-    public override void OnStart()
-    {   
-        AddModule(new PlayerInfo()
+    private new PlayerInfo Info => GetModule<PlayerInfo>();
+    public static Info CreateInfo()
+    { 
+        return new PlayerInfo()
         {  
             HitboxType = HitboxType.Friendly,
             TargetHitboxType = HitboxType.Passive,
-            HealthMax = PlayerData.Inst.health,
+            Storage = new Storage(27),
+            HealthMax = 6,
             Defense = 0,
-            Mana = PlayerData.Inst.mana,
-            Sanity = PlayerData.Inst.sanity,
-            Hunger = PlayerData.Inst.hunger,
-            Stamina = PlayerData.Inst.stamina,
+            Mana = 100,
+            Sanity = 100,
+            Hunger = 100,
+            Stamina = 100,
             SpeedGround = 6,
             SpeedAir = 8,
             Iframes = 100, 
@@ -27,23 +28,27 @@ public class PlayerMachine : EntityMachine, IHitBox
             JumpVelocity = 12f,
             DeathSfx = "player_die",
             HurtSfx = "player_hurt", 
-        });
+        };
+    }
+    public override void OnStart()
+    {   
+ 
         AddModule(new SpriteOrbitModule(transform)); 
         AddModule(new GroundAnimationModule()); 
         AddModule(new GroundMovementModule()); 
         AddModule(new GroundPathingModule()); 
         AddModule(new PlayerTerraformModule());  
         
-        _info = GetModule<PlayerInfo>();
         Inventory.SlotUpdate += EventSlotUpdate;
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
         AddState(new MobChaseAction());
         AddState(new EquipSelectState()); 
-        Control.Info = _info;
+        Control.Info = Info;
+        GUIHealthBar.Initialize(); 
         Game.Player = gameObject;
-        Game.PlayerInfo = _info;
-        Info.SetEquipment(Inventory.CurrentItemData);
+        Game.PlayerInfo = Info;
+        GUIMain.StorageInv.Storage = Info.Storage;
     }
 
     private void HandleInput()
@@ -53,12 +58,12 @@ public class PlayerMachine : EntityMachine, IHitBox
             MapCull.ForceRevertMesh(); 
             transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
         }
-
+         
         if (Info.Target && (Input.GetKeyDown(KeyCode.A) ||
-                            Input.GetKeyDown(KeyCode.W) ||
-                            Input.GetKeyDown(KeyCode.S) ||
-                            Input.GetKeyDown(KeyCode.D) ||
-                            Input.GetKeyDown(KeyCode.Space)))
+                                 Input.GetKeyDown(KeyCode.W) ||
+                                 Input.GetKeyDown(KeyCode.S) ||
+                                 Input.GetKeyDown(KeyCode.D) ||
+                                 Input.GetKeyDown(KeyCode.Space)))
         {
             Info.PathingStatus = PathingStatus.Stuck;
             SetState<DefaultState>();
@@ -81,7 +86,7 @@ public class PlayerMachine : EntityMachine, IHitBox
     public override void OnUpdate()
     {
         HandleInput();
-        if (GUIMain.IsHover || !IsCurrentState<DefaultState>()) return; 
+        if (GUIMain.IsHover || !IsCurrentState<DefaultState>()) return;
         if (Info.Target)
         {
             SetState<MobChaseAction>();
@@ -92,17 +97,14 @@ public class PlayerMachine : EntityMachine, IHitBox
             case ItemType.Tool:
                 if (Info.Equipment.MiningPower != 0 && 
                     Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                    Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
+                    Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                 {
                     PlayerTerraformModule.HandlePositionInfo(Control.MousePosition,  Control.MouseDirection, true); 
-                    if (!_info.IsBusy && Control.Inst.ActionPrimary.Key()) 
+                    if (!Info.IsBusy && Control.Inst.ActionPrimary.Key()) 
                         PlayerTerraformModule.HandleMapBreak(); 
                      
                 } 
-                if (!_info.IsBusy && 
-                    (Control.Inst.ActionPrimary.Key() ||
-                     Control.Inst.DigUp.Key() ||
-                     Control.Inst.DigDown.Key()))
+                if (Control.Inst.ActionPrimary.Key() || Control.Inst.DigUp.Key() || Control.Inst.DigDown.Key())
                 {
                     Attack();
                 }
@@ -111,10 +113,10 @@ public class PlayerMachine : EntityMachine, IHitBox
             
             case ItemType.Block: 
                 if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                    Scene.InPlayerBlockRange(Control.MousePosition, _info.GetRange()))
+                    Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                 {
                     PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection, false);
-                    if (!_info.IsBusy && Control.Inst.ActionSecondary.Key())
+                    if (Control.Inst.ActionSecondary.Key())
                     {
                         SetState<MobAttackSwing>();
                         PlayerTerraformModule.HandleMapPlace();
@@ -127,7 +129,7 @@ public class PlayerMachine : EntityMachine, IHitBox
     
     public void EventSlotUpdate()
     { 
-        Info.SetEquipment(Inventory.CurrentItemData); 
+        Info.SetEquipment(Inventory.CurrentItemData != null ? Inventory.CurrentItemData.StringID : null); 
     }
 
     public override void Attack()
