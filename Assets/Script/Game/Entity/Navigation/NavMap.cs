@@ -17,7 +17,7 @@ public class NavMap
     public static void GenerateNavMap()
     {
         Chunk chunk;
-        _bounds = World.Inst.Bounds.ToVector3Int();
+        _bounds = World.Inst.Bounds;
         _bitMap = new BitArray(_bounds.x * _bounds.y * _bounds.z); 
         
         for (int wx = 0; wx < World.Inst.Length.x; wx++)
@@ -42,11 +42,11 @@ public class NavMap
                                 }
                             }
                         }
-                        foreach (var entity in chunk.staticEntity)
+                        foreach (var entity in chunk.StaticEntity)
                         {
-                            int entityX = chunkX + Mathf.FloorToInt(entity.position.x);
-                            int entityY = chunkY + Mathf.FloorToInt(entity.position.y);
-                            int entityZ = chunkZ + Mathf.FloorToInt(entity.position.z);
+                            int entityX = Mathf.FloorToInt(entity.position.x);
+                            int entityY = Mathf.FloorToInt(entity.position.y);
+                            int entityZ = Mathf.FloorToInt(entity.position.z);
 
                             Vector3Int bounds = Entity.Dictionary[entity.stringID].Bounds;
                             int entityEndX = entityX + bounds.x;

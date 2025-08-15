@@ -7,8 +7,7 @@ public abstract class Machine : MonoBehaviour
     protected readonly List<Module> Modules = new List<Module>();
     protected readonly List<State> States = new List<State>();
     protected State StateCurrent = State.DefaultState;
-    protected State StatePrevious = State.DefaultState;
-    public Info Info;
+    protected State StatePrevious = State.DefaultState; 
     
     public virtual void OnStart() {}
     public virtual void OnReset() {}
@@ -62,7 +61,6 @@ public abstract class Machine : MonoBehaviour
         module.Machine = this;
         Modules.Add(module);
         module.Initialize();
-        if (module is Info) Info = module as Info;
         return module;
     }
     

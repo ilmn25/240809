@@ -88,6 +88,7 @@ public partial class Item
                 Radius = 0.3f,
                 Penetration = 1,
                 Lodge = true,
+                PickUp = true,
                 Ammo = "spear",
             },
             materials: new Dictionary<string, int> { { "wood", 1 } },

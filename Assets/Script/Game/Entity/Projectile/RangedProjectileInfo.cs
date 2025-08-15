@@ -7,6 +7,7 @@ public class RangedProjectileInfo : ProjectileInfo
     public bool Self = true;
     public bool Stuck = false;
     public bool Lodge = false;
+    public bool PickUp = false;
 
     public override void AI(Projectile projectile)
     {
@@ -28,7 +29,7 @@ public class RangedProjectileInfo : ProjectileInfo
                 if (Utility.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskMap))
                 {
                     Audio.PlaySFX("dig_stone");
-                    Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);
+                    if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);
                     projectile.Delete();
                     break;  
                 } 
@@ -58,7 +59,7 @@ public class RangedProjectileInfo : ProjectileInfo
             
             if (!projectile.Target.gameObject.activeSelf)
             {
-                Entity.SpawnItem(Ammo, projectile.transform.position);
+                if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position);
                 projectile.Delete();    
             }
         }

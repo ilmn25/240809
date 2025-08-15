@@ -3,15 +3,16 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
 [System.Serializable]
-public class Chunk
+public class Chunk 
 {
-    private int[] _map;
-    private int _size;
-    public List<ChunkEntityData> staticEntity;
-    public List<ChunkEntityData> dynamicEntity;
-    public static Chunk Zero; 
+    protected int[] Map;
+    protected int Size;  
+    
+    public static readonly Chunk Zero;   
+    public readonly List<Info> StaticEntity;
+    public readonly List<Info> DynamicEntity; 
+    
     static Chunk()
     {
         Zero = new Chunk();
@@ -25,26 +26,24 @@ public class Chunk
                 }
             }
         }
-    }
-        
+    } 
     public Chunk(int size = 0)
     {
-        _size = size == 0 ? World.ChunkSize : size;
-        _map = new int[_size * _size * _size];
-        staticEntity = new List<ChunkEntityData>();
-        dynamicEntity = new List<ChunkEntityData>();
+        Size = size == 0 ? World.ChunkSize : size;
+        Map = new int[Size * Size * Size];
+        StaticEntity = new List<Info>();
+        DynamicEntity = new List<Info>();
     } 
     
     public int this[int x, int y, int z]
     {
-        get => _map[x + _size * (y + _size * z)];
-        set => _map[x + _size * (y + _size * z)] = value;
+        get => Map[x + Size * (y + Size * z)];
+        set => Map[x + Size * (y + Size * z)] = value;
     }
     
     public int this[Vector3Int position]
     {
-        get => _map[position.x + _size * (position.y + _size * position.z)];
-        set => _map[position.x + _size * (position.y + _size * position.z)] = value;
+        get => Map[position.x + Size * (position.y + Size * position.z)];
+        set => Map[position.x + Size * (position.y + Size * position.z)] = value;
     } 
- 
-}
+} 

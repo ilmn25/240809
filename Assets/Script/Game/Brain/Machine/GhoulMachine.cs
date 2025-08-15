@@ -1,30 +1,21 @@
  
 using UnityEngine;
 
-[System.Serializable]
-public class NPCCED : ChunkEntityData
-{
-    public string npcStatus = "idle";
-}
-
-
 public class MobMachine : EntityMachine, IHitBoxAttack
 {
+    public new MobInfo Info => GetModule<MobInfo>();
     public override void OnSetup()
     {
         transform.Find("sprite").Find("char").GetComponent<SpriteRenderer>().sprite =
-            Cache.LoadSprite("character/" + entityData.stringID);
+            Cache.LoadSprite("character/" + Info.stringID);
     }
 }
 
 public class GhoulMachine : MobMachine, IActionSecondary
 {   
-    public override void OnStart()
-    {
-        Dialogue dialogue = new Dialogue();
-        dialogue.Lines.Add("hello");
-        dialogue.Lines.Add("are u buying or not");
-        AddModule(new EnemyInfo()
+    public static Info CreateInfo()
+    { 
+        return new EnemyInfo()
         {
             HitboxType = HitboxType.Enemy,
             TargetHitboxType = HitboxType.Friendly,
@@ -34,7 +25,15 @@ public class GhoulMachine : MobMachine, IActionSecondary
             HurtSfx = "npc_hurt",
             DeathSfx = "player_die",
             DistRoam = 7,
-        }); 
+            EquipmentId = "sword"
+        };  
+    }
+    public override void OnStart()
+    {
+         
+        Dialogue dialogue = new Dialogue();
+        dialogue.Lines.Add("hello");
+        dialogue.Lines.Add("are u buying or not");
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -47,8 +46,8 @@ public class GhoulMachine : MobMachine, IActionSecondary
         AddState(new MobEvade());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
-        AddState(new DialogueState(dialogue));
-        Info.SetEquipment(Item.GetItem("sword"));
+        AddState(new DialogueState(dialogue)); 
+        Info.SetEquipment(Info.EquipmentId);
     }
 
     public void OnActionSecondary(EntityMachine entityMachine)
@@ -96,7 +95,11 @@ public class GhoulMachine : MobMachine, IActionSecondary
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Y))
+        {
             Info.Target = Game.Player.transform;
+            Info.PathingStatus = PathingStatus.Reached; 
+            SetState<DefaultState>();
+        } 
         else if (Input.GetKeyDown(KeyCode.T))
             Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))

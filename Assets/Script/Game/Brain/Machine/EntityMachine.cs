@@ -3,45 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public abstract class EntityMachine : Machine
+public abstract class EntityMachine : Machine, IInfoProvider
 { 
-    public new MobInfo Info => GetModule<MobInfo>();
-    public ChunkEntityData entityData;
+    public Info Info => GetModule<Info>();
     public Entity Entity;
     private bool _initialSetup;  
-    public ChunkEntityData GetEntityData()
+    public Info GetEntityData()
     {
-        entityData.position = new SVector3Int(World.GetBlockCoordinate(transform.position));
+        Info.position = Vector3Int.FloorToInt(transform.position);
         UpdateEntityData();
-        return entityData;
-    } 
-    
+        return Info;
+    }
+
+    public static Info NewInfo() => new Info();
     public virtual void OnSetup() {}
     public virtual void UpdateEntityData() { }
     
-    public void Initialize(ChunkEntityData data) { 
-        entityData = data;   
-        if (!_initialSetup)
-        { 
-            _initialSetup = true;
-            Entity = Entity.Dictionary[entityData.stringID]; 
-            gameObject.layer = Entity.Collision;
-            if (Entity.Bounds != Vector3Int.zero)
-            {
-                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-                boxCollider.size = Entity.Bounds;
-                boxCollider.center = new Vector3(0, Entity.Bounds.y / 2, 0); 
-            } 
-            OnSetup();
-        } 
+    public void Initialize(Info data) { 
         Modules.Clear();
         States.Clear();
         StateCurrent = State.DefaultState;
         StatePrevious = State.DefaultState;
-        base.Info = null;
+        AddModule(data);
+        if (!_initialSetup)
+        { 
+            _initialSetup = true;
+            Entity = Entity.Dictionary[data.stringID]; 
+            gameObject.layer = Entity.Collision;
+            if (Entity.Bounds != Vector3Int.zero)
+            {
+                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+                boxCollider.center = new Vector3(0, (float)Entity.Bounds.y / 2, 0); 
+                boxCollider.size = Entity.Bounds; 
+            } 
+            OnSetup();
+        }  
         StartInternal();
-    }
-
+    } 
     public void Delete()
     { 
         if (Entity.StaticLoad)

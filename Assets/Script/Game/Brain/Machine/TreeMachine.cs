@@ -1,4 +1,12 @@
 public class TreeMachine : DestructableMachine
 {
-    public TreeMachine() : base("dig_stone", 15) { }
+    public static Info CreateInfo()
+    {
+        return new StructureInfo {
+            Health = 15,
+            Loot = "tree",
+            SfxHit = "dig_stone",
+            SfxDestroy = "dig_stone",
+        }; 
+    }
 }

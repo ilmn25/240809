@@ -5,9 +5,8 @@ public class MobSpriteCullModule : SpriteCullModule
 { 
     public override void Initialize()
     {
-        MobInfo mobInfo = (MobInfo)Machine.Info;
-        Sprites.Add(mobInfo.SpriteCharRenderer);
-        Sprites.Add(mobInfo.SpriteToolRenderer);
+        Sprites.Add(Info.SpriteCharRenderer);
+        Sprites.Add(Info.SpriteToolRenderer);
         MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull(); 
     }
@@ -33,7 +32,7 @@ public class ItemSpriteCullModule : SpriteCullModule
         HandleCull();
     }
 }
-public class SpriteCullModule : Module
+public class SpriteCullModule : MobModule
 { 
     protected List<SpriteRenderer> Sprites = new List<SpriteRenderer>();
      

@@ -1,4 +1,12 @@
 public class SlabMachine : DestructableMachine
 {
-    public SlabMachine() : base("dig_metal", 10) { }
+    public static Info CreateInfo()
+    {
+        return new StructureInfo {
+            Health = 10,
+            Loot = "slab",
+            SfxHit = "dig_metal",
+            SfxDestroy = "dig_metal",
+        }; 
+    }
 }

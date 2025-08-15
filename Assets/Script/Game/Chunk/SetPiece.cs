@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public static class SetPiece
+public partial class SetPiece
 {
     
     private static Vector3Int _positionA;
@@ -94,22 +94,22 @@ public static class SetPiece
             Chunk chunk = World.Inst[chunkCoord.x, chunkCoord.y, chunkCoord.z];
             
             // Check and add static entities
-            foreach (ChunkEntityData entity in chunk.staticEntity)
+            foreach (Info entity in chunk.StaticEntity)
             {
-                if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
+                if (IsEntityInRange(Vector3Int.FloorToInt(entity.position) , minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.position = new SVector3Int(entity.position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
-                    setPiece.StaticEntity.Add(entity); 
+                    entity.position -= new Vector3Int(minX, minY, minZ);
+                    setPiece.StaticEntity.Add(entity.ToSetPieceInfo());  
                 }
             }
 
             // Check and add dynamic entities
-            foreach (ChunkEntityData entity in chunk.dynamicEntity)
+            foreach (Info entity in chunk.DynamicEntity)
             {
-                if (IsEntityInRange(entity.position.ToVector3Int() + chunkCoord, minX, minY, minZ, maxX, maxY, maxZ))
+                if (IsEntityInRange(Vector3Int.FloorToInt(entity.position), minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.position = new SVector3Int(entity.position.ToVector3Int() + chunkCoord - new Vector3Int(minX, minY, minZ));
-                    setPiece.DynamicEntity.Add(entity); 
+                    entity.position -= new Vector3Int(minX, minY, minZ);
+                    setPiece.DynamicEntity.Add(entity.ToSetPieceInfo()); 
                 }
             }
         }
@@ -120,25 +120,25 @@ public static class SetPiece
     { 
         Vector3Int chunkPos, worldPos, blockPos;
         
-        foreach (ChunkEntityData entity in setPiece.StaticEntity)
+        foreach (SetEntity entity in setPiece.StaticEntity)
         {
-            worldPos = position + entity.position.ToVector3Int();
+            worldPos = position + entity.position;
             if (World.IsInWorldBounds(worldPos))
             {
                 chunkPos = World.GetChunkCoordinate(worldPos);
-                entity.position.Set(World.GetBlockCoordinate(worldPos)); 
-                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].staticEntity.Add(entity);
+                entity.position = worldPos; 
+                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].StaticEntity.Add(entity.ToInfo());
             } 
         }
 
-        foreach (ChunkEntityData entity in setPiece.DynamicEntity)
+        foreach (SetEntity entity in setPiece.DynamicEntity)
         { 
-            worldPos = position + entity.position.ToVector3Int();
+            worldPos = position + entity.position;
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
-                entity.position.Set(World.GetBlockCoordinate(worldPos));
-                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].dynamicEntity.Add(entity);
+                entity.position = worldPos;
+                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity.ToInfo());
             }  
         }
         

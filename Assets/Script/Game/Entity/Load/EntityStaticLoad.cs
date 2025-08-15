@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EntityStaticLoad
 {
-    public static readonly Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)> ActiveEntities = new Dictionary<Vector3Int, (List<ChunkEntityData>, List<EntityMachine>)>();
+    public static readonly Dictionary<Vector3Int, (List<Info>, List<EntityMachine>)> ActiveEntities = new Dictionary<Vector3Int, (List<Info>, List<EntityMachine>)>();
 
     public static void ForgetEntity(EntityMachine entity)
     {
@@ -38,18 +38,18 @@ public class EntityStaticLoad
         Entity entity;
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
-        List<ChunkEntityData> activeEntities = World.Inst[chunkCoordinate].staticEntity;
+        List<Info> activeEntities = World.Inst[chunkCoordinate].StaticEntity;
         // Find the key once
         if (!ActiveEntities.ContainsKey(chunkCoordinate))
         {
             ActiveEntities[chunkCoordinate] = (activeEntities, new List<EntityMachine>());
         }
 
-        foreach (ChunkEntityData entityData in activeEntities)
+        foreach (Info entityData in activeEntities)
         {
             entity = Entity.Dictionary[entityData.stringID];
             currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
-            currentInstance.transform.position = chunkCoordinate + entityData.position.ToVector3Int() + new Vector3(0.5f, 0, 0.5f);
+            currentInstance.transform.position = entityData.position + new Vector3(0.5f, 0, 0.5f);
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
             ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  

@@ -2,18 +2,21 @@ using UnityEngine;
 
 public class ChestMachine : StructureMachine, IActionSecondary, IHitBoxResource
 {
-    public override void OnStart()
+    public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
         Loot.Gettable("chest").AddToContainer(storage);
-        AddModule(new ContainerInfo()
+        return new ContainerInfo()
         {
             Health = 500,
             Loot = "tree",
             SfxHit = "dig_stone",
             SfxDestroy = "dig_stone",
             Storage = storage
-        });
+        };
+    }
+    public override void OnStart()
+    { 
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
         AddState(new InContainerState());

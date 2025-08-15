@@ -1,12 +1,14 @@
+using System;
 using UnityEngine;
 
+[System.Serializable]
 public class StructureInfo : Info
 {
     public float Health;
     public string SfxHit;
     public string SfxDestroy;
     public string Loot;
-    private BoxCollider _boxCollider;
+    [NonSerialized] private BoxCollider _boxCollider;
  
     public override bool OnHitInternal(Projectile projectile)
     {
@@ -32,6 +34,7 @@ public class StructureInfo : Info
 }
 
 
+[System.Serializable]
 public class ContainerInfo : StructureInfo
 {
     public Storage Storage;

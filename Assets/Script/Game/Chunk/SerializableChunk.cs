@@ -5,8 +5,8 @@ public class SerializableChunk
 {
     public int[] map;
     public int size;
-    public List<ChunkEntityData> StaticEntity = new List<ChunkEntityData>();
-    public List<ChunkEntityData> DynamicEntity = new List<ChunkEntityData>();
+    public List<SetEntity> StaticEntity = new List<SetEntity>();
+    public List<SetEntity> DynamicEntity = new List<SetEntity>();
 
     public SerializableChunk(int size)
     {

@@ -6,9 +6,9 @@ public class WorldGen
     private static System.Random Random;
 
     private static readonly bool SpawnStaticEntity = true;
-    private static readonly bool SpawnDynamicEntity = false;
+    private static readonly bool SpawnDynamicEntity = true;
     private static readonly bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(10, 5, 10);
+    public static readonly Vector3Int Size = new Vector3Int(10, 4, 10);
     
     // private static readonly bool SpawnStaticEntity = false;
     // private static readonly bool SpawnDynamicEntity = false;
@@ -62,9 +62,14 @@ public class WorldGen
         
         foreach (var coordinates in coordinatesList)
         {
-            World.Inst[coordinates] = Generate(coordinates); 
-        }   
+            World.Inst[coordinates] = Generate(coordinates);
+        }
 
+        Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 5, World.ChunkSize * Size.z / 2);
+        Info player = Entity.CreateInfo("player", playerPos);
+        World.Inst[playerPos].DynamicEntity.Add(player); 
+        World.Inst.target = player;
+        
         int chunkSize = World.ChunkSize;
         for (int x = 0; x < World.Inst.Bounds.x; x++)
         {
@@ -77,7 +82,7 @@ public class WorldGen
                     int localChunkX = worldPos.x % chunkSize;
                     int localChunkY = worldPos.y % chunkSize;
                     int localChunkZ = worldPos.z % chunkSize;
-
+        
                     if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
                         localChunkY + 1 != chunkSize &&
                         World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
@@ -121,7 +126,7 @@ public class WorldGen
         else
         {
             HandleBlockGeneration();
-            HandleEntityGeneration(_chunk); 
+            HandleEntityGeneration(_chunk, coordinates); 
         } 
         
         return _chunk;
@@ -246,10 +251,8 @@ public class WorldGen
         }
     }
  
-    private static void HandleEntityGeneration(Chunk chunk)
+    private static void HandleEntityGeneration(Chunk chunk, Vector3Int coordinates)
     { 
-        ChunkEntityData entityData;
-        SVector3Int entityPosition;
         
         for (int x = 0; x < World.ChunkSize; x++)
         {
@@ -270,18 +273,15 @@ public class WorldGen
                                     double rng = Random.NextDouble();
                                     if (rng <= 0.02)
                                     {
-                                        entityData = Entity.GetChunkEntityData("tree", new SVector3Int(x, y + 1, z));
-                                        chunk.staticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(Entity.CreateInfo("tree", coordinates + new Vector3(x, y + 1, z)));
                                     }
                                     else if (rng <= 0.04)
                                     {
-                                        entityData = Entity.GetChunkEntityData("bush1", new SVector3Int(x, y + 1, z));
-                                        chunk.staticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(Entity.CreateInfo("bush1", coordinates + new Vector3(x, y + 1, z)));
                                     }
                                     else if (rng <= 0.08)
                                     {
-                                        entityData = Entity.GetChunkEntityData("grass", new SVector3Int(x, y + 1, z));
-                                        chunk.staticEntity.Add(entityData);
+                                        chunk.StaticEntity.Add(Entity.CreateInfo("grass", coordinates + new Vector3(x, y + 1, z)));
                                     }
                                 }
                             }
@@ -289,39 +289,35 @@ public class WorldGen
                             {
                                 if (Random.NextDouble() <= 0.0004)
                                 {
-                                    entityData = Entity.GetChunkEntityData("chest", new SVector3Int(x, y + 1, z));
-                                    chunk.staticEntity.Add(entityData);
+                                    chunk.StaticEntity.Add(Entity.CreateInfo("chest", coordinates + new Vector3(x, y + 1, z)));
                                 } 
                                 else if (Random.NextDouble() <= 0.02)
                                 {
-                                    entityData = Entity.GetChunkEntityData("slab", new SVector3Int(x, y + 1, z));
-                                    chunk.staticEntity.Add(entityData);
+                                    chunk.StaticEntity.Add(Entity.CreateInfo("slab", coordinates + new Vector3(x, y + 1, z)));
                                 }
                             }
  
                         }
                         if (SpawnDynamicEntity && Random.NextDouble() <= 0.0002)
-                        {
-                            entityPosition = new SVector3Int(x, y + 1, z);
+                        { 
                             if (Random.NextDouble() <= 0.5)
                             {
                                 if (Random.NextDouble() <= 0.5)
                                 {
-                                    entityData = Entity.GetChunkEntityData("snare_flea", entityPosition);
+                                    chunk.DynamicEntity.Add(Entity.CreateInfo("snare_flea", coordinates + new Vector3Int(x, y + 1, z)));
                                 } else
                                 {
-                                    entityData = Entity.GetChunkEntityData("chito", entityPosition);
+                                    chunk.DynamicEntity.Add(Entity.CreateInfo("chito", coordinates + new Vector3Int(x, y + 1, z))); 
                                 }
                             } else { 
                                 if (Random.NextDouble() <= 0.5)
                                 {
-                                    entityData = Entity.GetChunkEntityData("megumin", entityPosition);
+                                    chunk.DynamicEntity.Add(Entity.CreateInfo("megumin", coordinates + new Vector3Int(x, y + 1, z))); 
                                 } else
                                 {
-                                    entityData = Entity.GetChunkEntityData("yuuri", entityPosition);
+                                    chunk.DynamicEntity.Add(Entity.CreateInfo("yuuri", coordinates + new Vector3Int(x, y + 1, z)));
                                 }
-                            }
-                            chunk.dynamicEntity.Add(entityData); 
+                            } 
                         }
                     } 
                 }
