@@ -14,9 +14,10 @@ public partial class Item
         AddBlockDefinition("dirt", 5, 1, "dig_stone");
         AddBlockDefinition("sand", 5, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
         AddBlockDefinition("backroom",10,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
-        AddBlockDefinition("stone",  8, 2, "dig_stone"); 
+        AddBlockDefinition("stone",  8, 2, "dig_stone");  
         AddBlockDefinition("wood", 6, 2, "dig_stone");
         AddBlockDefinition("bullet", 6, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
+        AddBlockDefinition("granite",  8, 2, "dig_stone");
         
         AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);

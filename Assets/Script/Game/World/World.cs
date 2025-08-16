@@ -24,7 +24,7 @@ public class World
         Bounds = new Vector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
         Length = new Vector3Int(x, y, z);
         _chunks = new Chunk[x * y * z];
-        Seed = Environment.TickCount;
+        Seed = DateTime.Now.Millisecond * DateTime.Now.Second;
     }
 
     public static void Save(int id)

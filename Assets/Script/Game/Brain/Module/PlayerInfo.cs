@@ -40,6 +40,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        if (Control.Inst.Jump.KeyDown()) Velocity.y += 15;
         
         if (PlayerStatus == PlayerStatus.Active)
         { 
@@ -80,6 +81,7 @@ public class PlayerInfo : MobInfo
                 Sprite.gameObject.SetActive(true);  
             } 
             Health = HealthMax;
+            Velocity = Vector2.zero;
             PlayerStatus = PlayerStatus.Active;
             GUIHealthBar.Update();
             Inventory.RefreshInventory();
