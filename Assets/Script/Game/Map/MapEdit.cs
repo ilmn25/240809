@@ -16,36 +16,22 @@ public class MapEdit
         string blockNameID;
         if (existingBlockData != default)
         {
-            // Use existing breakCost and breakThreshold
             breakCost = existingBlockData.breakCost;
             breakThreshold = existingBlockData.breakThreshold;
             blockNameID = Block.ConvertID(World.GetBlock(coordinate));
         }
         else
         {
-            // Check if the block is occupied
-            blockNameID = Block.ConvertID(World.GetBlock(coordinate));
-            if (blockNameID == null)
-            {
-                return; // Block is not occupied or an error occurred
-            }
-
-            // Get the block value
+            blockNameID = Block.ConvertID(World.GetBlock(coordinate)); 
             Block targetBlockData = Block.GetBlock(blockNameID);
             breakCost = targetBlockData.BreakCost;
             breakThreshold = targetBlockData.BreakThreshold;
-            
-            // Add the block data to the list
-            // blockDataList.Add((chunkCoordinate, blockCoordinate, breakCost, breakThreshold));
         }
 
-        // Check if the break value is above the threshold
         if (breakValue >= breakThreshold)
         { 
-            // Deduct the break cost
             breakCost -= breakValue;
 
-            // If the cost reaches 0 or below, break the block and remove from the list
             if (breakCost <= 0)
             {
                 Entity.SpawnItem(blockNameID, coordinate);
@@ -55,8 +41,7 @@ public class MapEdit
             }
             else
             {
-                Audio.PlaySFX("dig_sand", 0.5f);
-                // Update the block data in the list
+                Audio.PlaySFX("dig_stone");
                 _blockDataList.Remove(existingBlockData);
                 _blockDataList.Add((coordinate, breakCost, breakThreshold));
             }

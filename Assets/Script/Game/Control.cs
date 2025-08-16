@@ -5,8 +5,8 @@ using UnityEngine;
 public class Control
 {
     private const int InteractRange = 16;
-    public static Control Inst = new Control();
-    public static MobInfo Info;
+    public static Control Inst = new Control(); 
+    public static int CurrentPlayerIndex = 0;
     
     private static RaycastHit _mouseRaycastInfo;
     public static Vector3 MouseDirection; //direction of ray from camera to mouse target 
@@ -67,9 +67,27 @@ public class Control
     {
         Inst = Utility.FileLoad<Control>("KeyBinds") ?? new Control();
     }
+
+    public static void SetPlayer(int i)
+    {
+        Game.PlayerInfo = World.Inst.target[i];
+        Game.Player = null;
+        GUIMain.StorageInv.Storage = Game.PlayerInfo.Storage;
+        Inventory.Storage = Game.PlayerInfo.Storage;
+        GUIHealthBar.Update();
+        CurrentPlayerIndex = i;
+    }
     
     public static void Update()
     {
+        if (Input.GetKeyDown(KeyCode.T))
+        { 
+            if (CurrentPlayerIndex == World.Inst.target.Count - 1)
+                SetPlayer(0);
+            else
+                SetPlayer(CurrentPlayerIndex + 1);
+        }
+        
         if (Input.GetKeyDown(KeyCode.F11))
         {
             if (Screen.fullScreen)
@@ -93,17 +111,17 @@ public class Control
         {
             IHitBoxResource target = GetNearestInteractable<IHitBoxResource>();
             if (target == null) return;
-            Info.Target = ((Machine)target).transform;  
-            Info.ActionTarget = IActionTarget.Hit;
-            Info.Action = target;
+            Game.PlayerInfo.Target = ((Machine)target).transform;  
+            Game.PlayerInfo.ActionTarget = IActionTarget.Hit;
+            Game.PlayerInfo.Action = target;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         { 
             IActionSecondary target = GetNearestInteractable<IActionSecondary>();
             if (target == null) return;
-            Info.Target = ((MonoBehaviour)target).transform;  
-            Info.ActionTarget = IActionTarget.Secondary;
-            Info.Action = target;
+            Game.PlayerInfo.Target = ((MonoBehaviour)target).transform;  
+            Game.PlayerInfo.ActionTarget = IActionTarget.Secondary;
+            Game.PlayerInfo.Action = target;
         }
     }
 
@@ -114,6 +132,7 @@ public class Control
         T target, nearTarget = null;
         foreach (Collider collider in hitColliders)
         {
+            if (collider.gameObject == Game.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
             // Debug.Log(collider.gameObject.name);
@@ -162,11 +181,16 @@ public class Control
             //     Info.Target = MouseTarget;
             //     Info.ActionTarget = IActionTarget.Hit;
             // }
-
-            if (Inst.ActionSecondary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IActionSecondary>()) != null)
-            {
-                Info.Target = MouseTarget;
-                Info.ActionTarget = IActionTarget.Secondary;
+    
+            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Game.Player)
+            { 
+                IAction action = MouseTarget.GetComponent<IActionSecondary>();
+                if (action != null)
+                {
+                    Game.PlayerInfo.Action = action;
+                    Game.PlayerInfo.Target = MouseTarget;
+                    Game.PlayerInfo.ActionTarget = IActionTarget.Secondary;
+                } 
             }
         } 
     }

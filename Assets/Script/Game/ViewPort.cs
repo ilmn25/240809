@@ -151,8 +151,11 @@ public class ViewPort
     {
         if (Game.Player)
         {
-            Vector3 targetPosition = Game.Player.transform.position;
-            Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, targetPosition, Time.deltaTime * FollowSpeed);
+            Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.Player.transform.position, Time.deltaTime * FollowSpeed);
+        }
+        else if (Game.PlayerInfo != null)
+        {
+            Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.PlayerInfo.position, Time.deltaTime * FollowSpeed);
         }
     }
  

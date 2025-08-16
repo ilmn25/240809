@@ -25,10 +25,12 @@ public class Scene
 
     public static void Initialize()
     {  
-        World.Load(0);
-        Game.ViewPortObject.transform.position = World.Inst.target.position;
-        Inventory.SetInventory();
+        World.Load(0); 
+        Control.SetPlayer(0); 
+        Game.ViewPortObject.transform.position = Game.PlayerInfo.position;
+        GUIHealthBar.Initialize();
     }
+    
 
     public static void Update()
     {

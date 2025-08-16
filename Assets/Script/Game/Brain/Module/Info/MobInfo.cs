@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum IActionTarget {Primary, Secondary, Hit}
+public enum IActionTarget {Follow, Secondary, Hit}
 [System.Serializable]
 public class MobInfo : DynamicInfo
 { 
@@ -19,7 +19,6 @@ public class MobInfo : DynamicInfo
     public int PathAir = 4;
     public int PathAmount = 3000;
     public int MaxStuckCount = 250;
-    public string EquipmentId;
     public HitboxType TargetHitboxType;
  
     [NonSerialized] public Item Equipment;
@@ -41,14 +40,12 @@ public class MobInfo : DynamicInfo
     } 
 
     public void SetEquipment(String stringID)
-    {
-        Item item = null;
-        if (stringID != null) item = Item.GetItem(stringID);
-        if (item != null)
+    { 
+        if (stringID != null)
         {
+            Item item = Item.GetItem(stringID);
             if (Equipment == null || Equipment != item)
             {
-                EquipmentId = stringID;
                 Equipment = item;
                 SpriteTool.gameObject.SetActive(true);
                 SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
@@ -60,7 +57,6 @@ public class MobInfo : DynamicInfo
         }
         else
         {
-            EquipmentId = null;
             Equipment = null;
             SpriteTool.gameObject.SetActive(false);
         }

@@ -29,7 +29,7 @@ public abstract class Machine : MonoBehaviour
     
     public void SetState<T>() where T : State
     {
-        StateCurrent = GetState<T>(); 
+        StateCurrent = GetState<T>();
         if (StateCurrent != StatePrevious)
         {
             StateCurrent.OnEnterState();

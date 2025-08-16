@@ -19,7 +19,10 @@ public class ChestMachine : StructureMachine, IActionSecondary, IHitBoxResource
     { 
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
-        AddState(new InContainerState());
+        AddState(new InContainerState()
+        {
+            Storage = ((ContainerInfo)Info).Storage
+        });
     }
     
 
@@ -34,10 +37,11 @@ public class ChestMachine : StructureMachine, IActionSecondary, IHitBoxResource
 
 public class InContainerState : State
 {
+    public Storage Storage;
     public override void OnEnterState()
     {
         Audio.PlaySFX("text", 0.5f);
-        GUIMain.Storage.Storage = ((ContainerInfo)Info).Storage;
+        GUIMain.Storage.Storage = Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
         GUIMain.Storage.Show(true, !GUIMain.Showing);

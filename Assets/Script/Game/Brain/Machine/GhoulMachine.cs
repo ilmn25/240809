@@ -24,8 +24,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
             DistAttack = 1,
             HurtSfx = "npc_hurt",
             DeathSfx = "player_die",
-            DistRoam = 7,
-            EquipmentId = "sword"
+            DistRoam = 7 
         };  
     }
     public override void OnStart()
@@ -47,7 +46,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
         AddState(new DialogueState(dialogue)); 
-        Info.SetEquipment(Info.EquipmentId);
+        Info.SetEquipment("sword");
     }
 
     public void OnActionSecondary(EntityMachine entityMachine)

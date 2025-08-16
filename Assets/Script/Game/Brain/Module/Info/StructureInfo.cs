@@ -18,28 +18,17 @@ public class StructureInfo : Info
         {
             Audio.PlaySFX(SfxDestroy); 
             ((EntityMachine)Machine).Delete();
-            global::Loot.Gettable(Loot).Spawn(Machine.transform.position);
-            OnHit();
+            global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
+            OnDestroy(projectile);
         }
         else
         {
             Audio.PlaySFX(SfxHit); 
-            OnDestroy();
+            OnHit(projectile); 
         }
         return true;
     }
 
-    public virtual void OnHit() { }
-    public virtual void OnDestroy() { }
-}
-
-
-[System.Serializable]
-public class ContainerInfo : StructureInfo
-{
-    public Storage Storage;
-    public override void OnDestroy()
-    {
-        Storage.Explode(Machine.transform.position);
-    }
+    public virtual void OnHit(Projectile projectile) { }
+    public virtual void OnDestroy(Projectile projectile) { }
 }
