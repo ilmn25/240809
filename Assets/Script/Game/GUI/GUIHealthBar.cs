@@ -16,7 +16,7 @@ public class GUIHealthBar
                 rectTransform.localScale = Vector3.one * 0.6f;
 
                 GameObject heart;
-                for (int i = 0; i < Control.Info.HealthMax / 2; i++)
+                for (int i = 0; i < Game.PlayerInfo.HealthMax / 2; i++)
                 {
                         heart = Object.Instantiate(Resources.Load<GameObject>("prefab/gui_heart"), rectTransform);
                         RectTransform heartRect = heart.GetComponent<RectTransform>();

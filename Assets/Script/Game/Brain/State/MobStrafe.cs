@@ -1,10 +1,11 @@
-class MobRoam : MobState {
+class MobStrafe : MobState {
     public override void OnEnterState()
-    {
-        Module<PathingModule>().SetTarget(PathingTarget.Roam);
+    { 
+        Module<PathingModule>().SetTarget(PathingTarget.Strafe);
     }
     
-    public override void OnUpdateState() {
+    public override void OnUpdateState()
+    {
         if (Info.PathingStatus != PathingStatus.Pending) Machine.SetState<DefaultState>();
     }
 }

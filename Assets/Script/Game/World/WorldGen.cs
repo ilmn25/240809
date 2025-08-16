@@ -16,7 +16,7 @@ public class WorldGen
     protected static readonly bool SpawnStaticEntity = true;
     protected static readonly bool SpawnDynamicEntity = true;
     protected static readonly bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(10, 12, 10);
+    public static readonly Vector3Int Size = new Vector3Int(15, 5, 15);
     
     // private static readonly bool SpawnStaticEntity = false;
     // private static readonly bool SpawnDynamicEntity = false;
@@ -60,10 +60,18 @@ public class WorldGen
         }
 
         Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 5, World.ChunkSize * Size.z / 2);
-        Info player = Entity.CreateInfo("player", playerPos);
+        PlayerInfo player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
         World.Inst[playerPos].DynamicEntity.Add(player); 
-        World.Inst.target = player;
+        World.Inst.target.Add(player);
         
+        player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        World.Inst[playerPos].DynamicEntity.Add(player); 
+        World.Inst.target.Add(player);
+
+        // player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        // World.Inst[playerPos].DynamicEntity.Add(player); 
+        // World.Inst.target.Add(player);
+
         int chunkSize = World.ChunkSize;
         for (int x = 0; x < World.Inst.Bounds.x; x++)
         {
@@ -81,18 +89,18 @@ public class WorldGen
                         localChunkY + 1 != chunkSize &&
                         World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
                     {
-                        if (Random.NextDouble() <= 0.002)
+                        if (Random.NextDouble() <= 0.0004)
                         {
                             global::SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), global::SetPiece.LoadSetPieceFile("house_stone"));
                         }
-                        else if (Random.NextDouble() <= 0.004)
-                        {
-                            global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_a"));
-                        }
-                        else if (Random.NextDouble() <= 0.004)
-                        {
-                            global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_b")); 
-                        } 
+                        // else if (Random.NextDouble() <= 0.001)
+                        // {
+                        //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_a"));
+                        // }
+                        // else if (Random.NextDouble() <= 0.001)
+                        // {
+                        //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_b")); 
+                        // } 
                     } 
                 }
             }

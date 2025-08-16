@@ -140,7 +140,7 @@ public class GUIChest : GUIStorage
             (Storage.List[CurrentSlotKey], GUICursor.Data) = 
                 (GUICursor.Data, Storage.List[CurrentSlotKey]);
         } 
-        GUIMain.RefreshStorage();
+        Inventory.RefreshInventory();
     }
 
     protected override void ActionSecondary()
@@ -155,7 +155,7 @@ public class GUIChest : GUIStorage
                 else 
                     GUICursor.Data.Add(itemSlot, 1);
                         
-                GUIMain.RefreshStorage();
+                Inventory.RefreshInventory();
             }
         }
     }

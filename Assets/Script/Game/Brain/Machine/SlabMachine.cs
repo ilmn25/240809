@@ -2,8 +2,8 @@ public class SlabMachine : DestructableMachine
 {
     public static Info CreateInfo()
     {
-        return new StructureInfo {
-            Health = 10,
+        return new DestructableInfo {
+            Health = 60,
             Loot = "slab",
             SfxHit = "dig_metal",
             SfxDestroy = "dig_metal",

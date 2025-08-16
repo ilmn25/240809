@@ -23,6 +23,7 @@ public class SpotLightModule : MonoBehaviour
         yield return new WaitForSeconds(DELAY);
         while (true)
         {
+            if (!Game.Player) yield return new WaitForSeconds(0.5f);
             _offset = Game.Player.transform.position - transform.position;
             _offset.y = 0; // Ignore the y-axis
             _offset.Normalize();

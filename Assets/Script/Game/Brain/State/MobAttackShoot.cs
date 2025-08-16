@@ -24,7 +24,7 @@ public class MobAttackShoot : MobState
         Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.ProjectileOffset,
             Info.AimPosition,
             Info.Equipment.ProjectileInfo,
-            Info.TargetHitboxType, Machine);
+            Info.TargetHitboxType, Info);
     }
  
     public override void OnUpdateState()

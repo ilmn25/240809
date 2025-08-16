@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class EquipSelectState : MobState
 {
     public override void OnEnterState()

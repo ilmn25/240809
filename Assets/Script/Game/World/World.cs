@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ public class World
     [NonSerialized] public static readonly int ChunkSize = 15;
      
     private Chunk[] _chunks;
-    public Info target;
+    public List<PlayerInfo> target = new();
     public readonly Vector3Int Length;
     public readonly Vector3Int Bounds;
     public static int Seed;

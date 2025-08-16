@@ -34,8 +34,7 @@ public class DynamicInfo : Info
     [NonSerialized] public SpriteRenderer SpriteToolRenderer;
  
     [NonSerialized] protected int IframesCurrent;
-
-    [NonSerialized] public float AirTime;
+ 
     [NonSerialized] public Vector3 Velocity = Vector3.zero;
     [NonSerialized] public bool IsGrounded = false;
     [NonSerialized] public Vector3 Direction = Vector3.zero;
@@ -54,8 +53,11 @@ public class DynamicInfo : Info
 
             if (col.gameObject == Machine.gameObject || col.gameObject.layer != Game.IndexSemiCollide)
                 continue;
-
-            KnockBack(col.transform.position, 0.5f, true);
+            
+            if (col.gameObject.name == "player")
+                KnockBack(col.transform.position, 0.2f, true);
+            else
+                KnockBack(col.transform.position, 0.5f, true);
             break; 
         }
     } 
@@ -74,23 +76,11 @@ public class DynamicInfo : Info
     public override void Update()
     { 
         OnUpdate();
-        if (IframesCurrent > 0) IframesCurrent--;
-        
-        if (!IsPlayer) return;
-        if (!IsGrounded && Velocity.y < -10) AirTime += 1;
-        else {
-            if (AirTime > 75)
-            {
-                Health -=  (int)AirTime/100;
-                Audio.PlaySFX(HurtSfx,0.4f);
-            }
-            AirTime = 0;
-        }
-         
+        if (IframesCurrent > 0) IframesCurrent--; 
     }   
     
     public override bool OnHitInternal(Projectile projectile)
-    {
+    { 
         if (IframesCurrent != 0) return false;
         switch (projectile.TargetHitBoxType)
         {

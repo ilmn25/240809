@@ -17,11 +17,7 @@ public class Inventory
     public static readonly int InventorySlotAmount = 9;
 
     public static event Action SlotUpdate; 
-
-    public static void SetInventory()
-    {
-        Storage = ((PlayerInfo)World.Inst.target).Storage;
-    }
+ 
     
     public static void Update()
     { 
@@ -94,8 +90,17 @@ public class Inventory
     { 
         _currentKey = CalculateKey();
         CurrentItem = Storage.List[_currentKey];
-        CurrentItemData = CurrentItem.Stack == 0 ? null : Item.GetItem(CurrentItem.StringID); 
-        SlotUpdate?.Invoke(); 
+        if (CurrentItem.Stack == 0)
+        {
+            CurrentItemData = null;
+            Game.PlayerInfo.SetEquipment(null);
+        }
+        else
+        {
+            CurrentItemData = Item.GetItem(CurrentItem.StringID);
+            Game.PlayerInfo.SetEquipment(CurrentItem.StringID);
+        }
+        SlotUpdate?.Invoke();  
     }
 
     public static int CalculateKey(int row = -1, int slot = -1)

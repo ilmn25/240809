@@ -21,6 +21,7 @@ public class GUIMain
     public static bool IsHover;
     public static void Initialize()
     {
+        Inventory.SlotUpdate += RefreshStorage;
         GUICraft.Initialize(); 
         Cursor = new GUICursor();
         Cursor.Initialize();

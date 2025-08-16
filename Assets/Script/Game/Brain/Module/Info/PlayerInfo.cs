@@ -19,6 +19,7 @@ public class PlayerInfo : MobInfo
     private const float CoyoteTime = 0.1f; 
     private const float HoldVelocity = 0.05f;
     private const float ClampVelocity = 10f;
+    [NonSerialized] public float AirTime;
     [NonSerialized] private float _jumpGraceTimer;
     [NonSerialized] private float _coyoteTimer;
     [NonSerialized]  public bool IsBusy = false; 
@@ -40,25 +41,24 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        if (Control.Inst.Jump.KeyDown()) Velocity.y += 15;
-        
+
         if (PlayerStatus == PlayerStatus.Active)
-        { 
+        {
             if (Health <= 0)
-            { 
+            {
                 Audio.PlaySFX(DeathSfx, 0.8f);
                 Sprite.gameObject.SetActive(false);
                 PlayerStatus = PlayerStatus.Dead;
-                GUIMain.Show(false); 
-                Velocity = Vector2.zero; 
+                GUIMain.Show(false);
+                Velocity = Vector2.zero;
                 Direction = Vector2.zero;
                 IframesCurrent = 500;
             }
-            
-            FaceTarget = Equipment != null || Target;  
-            
-            if (Hunger > 0) Hunger -= 0.01f; 
-            if (!Target)
+
+            FaceTarget = Equipment != null || Target;
+
+            if (Hunger > 0) Hunger -= 0.01f;
+            if (Game.PlayerInfo == this && (!Target || ActionTarget != IActionTarget.Secondary))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
                 SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
@@ -66,7 +66,7 @@ public class PlayerInfo : MobInfo
             }
             else
             {
-                SpeedTarget = IsGrounded ? SpeedGround : SpeedAir * 1.5f;
+                SpeedTarget = IsGrounded ? SpeedAir * 1.3f : SpeedAir * 1.8f;
             } 
         }
         else
@@ -86,6 +86,17 @@ public class PlayerInfo : MobInfo
             GUIHealthBar.Update();
             Inventory.RefreshInventory();
         } 
+        
+        if (!IsGrounded && Velocity.y < -10) AirTime += 1;
+        else {
+            if (AirTime > 75)
+            {
+                Health += (int)(Velocity.y * 3/ Gravity);
+                GUIHealthBar.Update();
+                Audio.PlaySFX(HurtSfx,0.4f);
+            }
+            AirTime = 0;
+        }
     }
 
     private void HandleMovement()

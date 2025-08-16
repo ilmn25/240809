@@ -27,8 +27,4 @@ public class DefaultState : State { }
 public class MobState : State
 {
     public new MobInfo Info => (MobInfo)((EntityMachine)Machine).Info;
-}
-public class PlayerState : State
-{
-    public new PlayerInfo Info => (PlayerInfo) ((EntityMachine)Machine).Info;
-}
+} 

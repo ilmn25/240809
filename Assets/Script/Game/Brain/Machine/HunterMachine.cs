@@ -14,8 +14,7 @@ public class HunterMachine : MobMachine
             DistAttack = 18,
             HurtSfx = "npc_hurt", 
             DeathSfx = "player_die",
-            SpeedGround = 2.8f,
-            EquipmentId = "pistol"
+            SpeedGround = 2.8f
         }; 
     }
     private int _ammo;
@@ -36,7 +35,7 @@ public class HunterMachine : MobMachine
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
         AddState(new EquipSelectState()); 
-        Info.SetEquipment(Info.EquipmentId);
+        Info.SetEquipment("pistol");
     } 
     
     public override void OnUpdate()
