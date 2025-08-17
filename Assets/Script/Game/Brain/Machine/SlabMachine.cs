@@ -2,7 +2,7 @@ public class SlabMachine : DestructableMachine
 {
     public static Info CreateInfo()
     {
-        return new DestructableInfo {
+        return new ResourceInfo() {
             Health = 60,
             Loot = "slab",
             SfxHit = "dig_metal",

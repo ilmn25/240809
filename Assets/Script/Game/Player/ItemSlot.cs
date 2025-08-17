@@ -50,7 +50,7 @@ public class ItemSlot
             text += " " + Durability + "%"; 
             text += " \n \n" + item.ProjectileInfo.Damage + " damage";
             text += " \n" + item.ProjectileInfo.Knockback + " knockback\n";
-            if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
+            // if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
             if (item.ProjectileInfo.Breaking != 0) text += " \nbreaking power: " + item.ProjectileInfo.Breaking;  
             // text += " \nattack cooldown: " + item.Speed;
             // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  

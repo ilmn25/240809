@@ -5,19 +5,19 @@ using UnityEngine;
 
 public partial class Item 
 {
-    private static readonly Dictionary<string, Item> Dictionary = new Dictionary<string, Item>();
+    private static readonly Dictionary<string, Item> Dictionary = new ();
 
     public static void Initialize()
     {
-        AddBlockDefinition("brick", 15, 4, "dig_metal", materials: new Dictionary<string, int> { { "stone", 3} });
-        AddBlockDefinition("marble", 20, 4, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } }, craftStack: 2);
-        AddBlockDefinition("dirt", 5, 1, "dig_stone");
-        AddBlockDefinition("sand", 5, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
-        AddBlockDefinition("backroom",10,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
-        AddBlockDefinition("stone",  8, 2, "dig_stone");  
-        AddBlockDefinition("wood", 6, 2, "dig_stone");
-        AddBlockDefinition("bullet", 6, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
-        AddBlockDefinition("granite",  8, 2, "dig_stone");
+        AddBlockDefinition("brick", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "stone", 3} });
+        AddBlockDefinition("marble", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } }, craftStack: 2);
+        AddBlockDefinition("dirt", 100, 1, "dig_stone");
+        AddBlockDefinition("sand", 100, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
+        AddBlockDefinition("backroom",100,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
+        AddBlockDefinition("stone",  100, 2, "dig_stone");  
+        AddBlockDefinition("wood", 100, 2, "dig_stone");
+        AddBlockDefinition("bullet", 100, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
+        AddBlockDefinition("granite",  100, 2, "dig_stone");
         
         AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
@@ -34,6 +34,8 @@ public partial class Item
                 CritChance = 10,
                 Speed = 1.3f,
                 Radius = 2f,
+                Breaking = 1,
+                OperationType = OperationType.Break
             },
             materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
             holdoutOffset: new Vector2(0.6f, 0)
@@ -50,9 +52,9 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Breaking = 0,
-            },
-            miningPower: 5,
+                Breaking = 3,
+                OperationType = OperationType.Dig
+            }, 
             materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
@@ -68,9 +70,9 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Breaking = 1,
+                Breaking = 3,
+                OperationType = OperationType.Build
             },
-            miningPower: 0,
             materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
@@ -168,12 +170,8 @@ public partial class Item
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing,
 
-            Speed = 1.5f,
+            Speed = 3,
             Range = 5,
-            // ProjectileInfo = null,
-            // MiningPower = 0,
-            // Durability = 0,
-            // StatusEffect = null,
             HoldoutOffset = new Vector2(0.5f, 0),
 
             Name = name,
@@ -197,7 +195,6 @@ public partial class Item
         float speed = 1,
         float range = 1,
         ProjectileInfo projectileInfo = null,
-        int miningPower = 0,
         int durability = 0,
         StatusEffect statusEffect = null,
         Vector2 holdoutOffset = new Vector2(),
@@ -228,7 +225,6 @@ public partial class Item
             Speed = speed,
             Range = range,
             ProjectileInfo = projectileInfo,
-            MiningPower = miningPower,
             Durability = durability,
             StatusEffect = statusEffect, 
             ProjectileOffset = projectileOffset,

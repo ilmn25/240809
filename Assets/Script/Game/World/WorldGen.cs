@@ -68,10 +68,10 @@ public class WorldGen
         World.Inst[playerPos].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
 
-        // player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
-        // World.Inst[playerPos].DynamicEntity.Add(player); 
-        // World.Inst.target.Add(player);
-
+        player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        World.Inst[playerPos].DynamicEntity.Add(player); 
+        World.Inst.target.Add(player);
+        if (Flat) return;
         int chunkSize = World.ChunkSize;
         for (int x = 0; x < World.Inst.Bounds.x; x++)
         {

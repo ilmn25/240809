@@ -33,7 +33,10 @@ public abstract class EntityMachine : Machine, IInfoProvider
             if (Entity.Bounds != Vector3Int.zero)
             {
                 BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-                boxCollider.center = new Vector3(0, (float)Entity.Bounds.y / 2, 0); 
+                if (data is BlockInfo) 
+                    boxCollider.center = new Vector3(0.5f, (float)Entity.Bounds.y / 2, 0.5f);
+                else
+                    boxCollider.center = new Vector3(0, (float)Entity.Bounds.y / 2, 0); 
                 boxCollider.size = Entity.Bounds; 
             } 
             OnSetup();

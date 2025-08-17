@@ -112,7 +112,7 @@ public class Control
             IHitBoxResource target = GetNearestInteractable<IHitBoxResource>();
             if (target == null) return;
             Game.PlayerInfo.Target = ((Machine)target).transform;  
-            Game.PlayerInfo.ActionTarget = IActionTarget.Hit;
+            Game.PlayerInfo.ActionType = IActionType.Hit;
             Game.PlayerInfo.Action = target;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
@@ -120,7 +120,7 @@ public class Control
             IActionSecondary target = GetNearestInteractable<IActionSecondary>();
             if (target == null) return;
             Game.PlayerInfo.Target = ((MonoBehaviour)target).transform;  
-            Game.PlayerInfo.ActionTarget = IActionTarget.Secondary;
+            Game.PlayerInfo.ActionType = IActionType.Secondary;
             Game.PlayerInfo.Action = target;
         }
     }
@@ -189,7 +189,7 @@ public class Control
                 {
                     Game.PlayerInfo.Action = action;
                     Game.PlayerInfo.Target = MouseTarget;
-                    Game.PlayerInfo.ActionTarget = IActionTarget.Secondary;
+                    Game.PlayerInfo.ActionType = IActionType.Secondary;
                 } 
             }
         } 

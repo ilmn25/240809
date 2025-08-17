@@ -15,7 +15,9 @@ public class SwingProjectileInfo : ProjectileInfo
             IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
             if (target == null) continue;
 
-            ((Machine)target).GetModule<Info>().OnHitInternal(projectile);
+            if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
+                projectile.Delete();
+                
         }
 
         projectile.Delete();
