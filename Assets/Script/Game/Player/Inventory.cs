@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Inventory 
 {
-    public static Storage Storage; 
-    
     private static int _currentRow = 0;
     private static int _currentSlot = 0;
     private static int _currentKey = 0;
@@ -78,19 +76,22 @@ public class Inventory
             _currentSlot = 8;
             RefreshInventory();
         }
+         
 
         if (Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         {
-            if (CurrentItem.Stack == 0)
-            {
-                CurrentItemData = null;
-                Game.PlayerInfo.SetEquipment(null);
-            }
-            else
+            _currentKey = CalculateKey();
+            CurrentItem = Game.PlayerInfo.Storage.List[_currentKey];
+            if (CurrentItem is not { Stack: 0 })
             {
                 CurrentItemData = Item.GetItem(CurrentItem.StringID);
                 Game.PlayerInfo.SetEquipment(CurrentItem.StringID);
-            }
+            } 
+        }
+        if (CurrentItem is { Stack: 0 })
+        {
+            CurrentItemData = null;     
+            Game.PlayerInfo.SetEquipment(null);
         }
     }
 
@@ -101,9 +102,7 @@ public class Inventory
     }
 
     public static void RefreshInventory()
-    { 
-        _currentKey = CalculateKey();
-        CurrentItem = Storage.List[_currentKey]; 
+    {  
         SlotUpdate?.Invoke();  
     }
 
@@ -116,13 +115,13 @@ public class Inventory
     
     public static void AddItem(string stringID, int quantity = 1)
     {  
-        Storage.AddItem(stringID, quantity, _currentKey, Game.Player.transform.position);
+        Game.PlayerInfo.Storage.AddItem(stringID, quantity, _currentKey, Game.Player.transform.position);
         RefreshInventory();
     }
     
     public static void RemoveItem(string stringID, int quantity = 1)
     {
-        Storage.RemoveItem(stringID, quantity, _currentKey);
+        Game.PlayerInfo.Storage.RemoveItem(stringID, quantity, _currentKey);
         RefreshInventory();
     }   
 }

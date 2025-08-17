@@ -11,7 +11,7 @@ public class StructureMachine : EntityMachine
     }
 }
 
-public class DestructableMachine : StructureMachine, IHitBoxResource
+public class DestructableMachine : StructureMachine, IActionPrimaryResource
 {
     public override void OnStart()
     { 

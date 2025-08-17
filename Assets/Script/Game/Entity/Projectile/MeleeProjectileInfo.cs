@@ -12,7 +12,7 @@ public class SwingProjectileInfo : ProjectileInfo
 
         for (int i = 0; i < hitCount; i++)
         {
-            IHitBox target = HitBuffer[i].GetComponent<IHitBox>();
+            IActionPrimary target = HitBuffer[i].GetComponent<IActionPrimary>();
             if (target == null) continue;
 
             if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
@@ -34,7 +34,7 @@ public class ContactDamageProjectileInfo : ProjectileInfo
 
         for (int i = 0; i < hitCount; i++)
         {
-            IHitBox target = _hitBuffer[i].GetComponent<IHitBox>();
+            IActionPrimary target = _hitBuffer[i].GetComponent<IActionPrimary>();
             if (target == null) continue;
 
             ((Machine)target).GetModule<Info>().OnHitInternal(projectile);

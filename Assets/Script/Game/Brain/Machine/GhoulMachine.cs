@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class MobMachine : EntityMachine, IHitBoxAttack
+public class MobMachine : EntityMachine, IActionPrimaryAttack
 {
     public new MobInfo Info => GetModule<MobInfo>();
     public override void OnSetup()
@@ -11,7 +11,7 @@ public class MobMachine : EntityMachine, IHitBoxAttack
     }
 }
 
-public class GhoulMachine : MobMachine, IActionSecondary
+public class GhoulMachine : MobMachine, IActionSecondaryInteract
 {   
     public static Info CreateInfo()
     { 
@@ -49,9 +49,9 @@ public class GhoulMachine : MobMachine, IActionSecondary
         Info.SetEquipment("sword");
     }
 
-    public void OnActionSecondary(EntityMachine entityMachine)
+    public void OnActionSecondary(Info info)
     {
-        if (Info.Target) return;
+        if (Info.Target != null) return;
         SetState<DialogueState>();
     }
     public override void OnUpdate()
@@ -60,13 +60,13 @@ public class GhoulMachine : MobMachine, IActionSecondary
 
         if (IsCurrentState<DefaultState>())
         {
-            if (Info.Target)
+            if (Info.Target != null)
             {
-                if (Vector3.Distance(Info.Target.transform.position, transform.position) < Info.DistAttack)
+                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
                     if (Random.value < 0.7f)
                     {
-                        Info.AimPosition = Info.Target.transform.position;
+                        Info.AimPosition = Info.Target.position;
                         SetState<MobAttackSwing>();
                     } 
                     else
@@ -95,7 +95,7 @@ public class GhoulMachine : MobMachine, IActionSecondary
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Info.Target = Game.Player.transform;
+            Info.Target = (MobInfo) Game.PlayerInfo;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 

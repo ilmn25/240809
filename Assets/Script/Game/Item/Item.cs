@@ -24,6 +24,7 @@ public partial class Item
         AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
         AddStructureDefinition("workbench", new Dictionary<string, int> {{ "stone", 15 }}, 200);
+        AddStructureDefinition("blueprint_station", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         
         AddToolDefinition(
             stringID: "sword",
@@ -116,6 +117,7 @@ public partial class Item
                 Speed = 50,
                 Radius = 0.1f,
                 Penetration = 1,
+                Scale = 0.6f
             },
             materials: new Dictionary<string, int> { { "wood", 2 } },
             projectileOffset: 1.54f,
@@ -135,7 +137,8 @@ public partial class Item
                 Speed = 12,
                 Radius = 0.1f,
                 Ammo = "bullet",
-                Penetration = 1
+                Penetration = 1,
+                Scale = 0.6f
             }, 
             materials: new Dictionary<string, int> { { "wood", 2 } },
             projectileOffset: 1.016f,

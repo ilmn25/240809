@@ -103,7 +103,7 @@ public partial class Entity
                         EntityMachine currentEntityMachine = (EntityMachine)
                                 (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
                         EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                        currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition));
+                        currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition)); 
                         
                 } 
         }

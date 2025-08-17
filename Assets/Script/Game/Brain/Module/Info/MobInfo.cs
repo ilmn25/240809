@@ -13,7 +13,7 @@ using UnityEngine;
 //     }
 // }
 
-public enum IActionType {Follow, Secondary, Hit, Dig}
+public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
 [System.Serializable]
 public class MobInfo : DynamicInfo
 { 
@@ -34,9 +34,10 @@ public class MobInfo : DynamicInfo
     public HitboxType TargetHitboxType;
  
     [NonSerialized] public Item Equipment;
-    [NonSerialized] public Transform Target;
-    [NonSerialized] public IAction Action;
+    
+    [NonSerialized] public Info Target;
     [NonSerialized] public IActionType ActionType;
+    
     [NonSerialized] public bool FaceTarget;
     [NonSerialized] public Vector3 AimPosition; 
     [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending; 
@@ -44,9 +45,9 @@ public class MobInfo : DynamicInfo
     protected override void OnUpdate()
     { 
         base.OnUpdate();
-        if (Target)
+        if (Target != null)
         {
-            TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.transform.position) - 
+            TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.position) - 
                               Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
         }
     } 

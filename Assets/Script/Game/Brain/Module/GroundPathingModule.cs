@@ -30,7 +30,7 @@ public class GroundPathingModule : PathingModule
     protected override async Task<List<Node>> GetPath()
     {
         if (PathingTarget == PathingTarget.Target)
-        {
+        {   
             // !Info.IsGrounded || 
             while ( Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down))
                 await Task.Delay(100); // Yield control back to the caller and continue checking

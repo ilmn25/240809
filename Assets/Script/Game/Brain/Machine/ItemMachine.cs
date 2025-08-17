@@ -2,11 +2,11 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class ItemMachine : EntityMachine, IActionSecondary
+public class ItemMachine : EntityMachine, IActionSecondaryPickUp
 {    
     public static Info CreateInfo()
     {
-        return new Info();
+        return new ItemInfo();
     }
     
     private bool _wasInRange;
@@ -30,20 +30,11 @@ public class ItemMachine : EntityMachine, IActionSecondary
     }
 
     public override void OnUpdate()
-    { 
+    {  
         if (transform.position.y < -5) Delete();
         else if (_spriteRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(transform.position))) 
             _itemPhysicModule.HandlePhysicsUpdate();
     }
-
-    public void OnActionSecondary(EntityMachine entityMachine)
-    {        
-        if (Vector3.Distance(transform.position, Game.Player.transform.position) < 3f) 
-        { 
-            Audio.PlaySFX("pick_up", 0.4f);
-            Inventory.AddItem(Info.stringID);
-            Delete();
-        }
-    }
+ 
 }
  

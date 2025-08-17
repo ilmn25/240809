@@ -44,14 +44,14 @@ public class HunterMachine : MobMachine
         
         if (IsCurrentState<DefaultState>())
         {
-            if (Info.Target)
+            if (Info.Target != null)
             {
                 if (InRangeAndVisible())
                 {
                     if (_ammo != 0)
                     {
                         _ammo--;
-                        Info.AimPosition = Info.Target.transform.position + 0.3f * Vector3.up;
+                        Info.AimPosition = Info.Target.position + 0.3f * Vector3.up;
                         SetState<MobAttackShoot>();
                     }
                     else
@@ -81,13 +81,13 @@ public class HunterMachine : MobMachine
             bool InRangeAndVisible()
             {
                 Vector3 origin = transform.position + Vector3.up * 0.3f; 
-                float distance = Vector3.Distance(origin, Info.Target.transform.position);
+                float distance = Vector3.Distance(origin, Info.Target.position);
 
                 // Debug.DrawRay(origin, direction * distance, Color.red, 0.1f); // Lasts 0.1 seconds
 
                 if (distance > Info.DistAttack) return false;
 
-                if (Physics.Raycast(origin, (Info.Target.transform.position - origin).normalized,
+                if (Physics.Raycast(origin, (Info.Target.position - origin).normalized,
                         out RaycastHit hit, distance, Game.MaskMap))
                 {
                     return hit.distance >= distance - 0.2f;
@@ -102,7 +102,7 @@ public class HunterMachine : MobMachine
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Info.Target = Game.Player.transform;
+            Info.Target = Game.PlayerInfo;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 

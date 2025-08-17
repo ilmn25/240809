@@ -1,4 +1,4 @@
-public class BlockMachine : EntityMachine, IHitBoxResource
+public class BlockMachine : EntityMachine, IActionPrimaryResource
 {
     public new BlockInfo Info => GetModule<BlockInfo>();
     public static Info CreateInfo()

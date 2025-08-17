@@ -73,7 +73,6 @@ public class Control
         Game.PlayerInfo = World.Inst.target[i];
         Game.Player = null;
         GUIMain.StorageInv.Storage = Game.PlayerInfo.Storage;
-        Inventory.Storage = Game.PlayerInfo.Storage;
         GUIHealthBar.Update();
         CurrentPlayerIndex = i;
     }
@@ -109,19 +108,21 @@ public class Control
     {
         if (Inst.ActionPrimaryNear.KeyDown())
         {
-            IHitBoxResource target = GetNearestInteractable<IHitBoxResource>();
+            IActionPrimaryResource target = GetNearestInteractable<IActionPrimaryResource>();
             if (target == null) return;
-            Game.PlayerInfo.Target = ((Machine)target).transform;  
+            Game.PlayerInfo.Target = ((EntityMachine)target).Info;  
             Game.PlayerInfo.ActionType = IActionType.Hit;
-            Game.PlayerInfo.Action = target;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         { 
             IActionSecondary target = GetNearestInteractable<IActionSecondary>();
             if (target == null) return;
-            Game.PlayerInfo.Target = ((MonoBehaviour)target).transform;  
-            Game.PlayerInfo.ActionType = IActionType.Secondary;
-            Game.PlayerInfo.Action = target;
+            Game.PlayerInfo.Target = ((EntityMachine)target).Info;   
+            
+            if (target is IActionSecondaryPickUp)
+                Game.PlayerInfo.ActionType = IActionType.PickUp;
+            else
+                Game.PlayerInfo.ActionType = IActionType.Interact;
         }
     }
 
@@ -187,9 +188,11 @@ public class Control
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
                 {
-                    Game.PlayerInfo.Action = action;
-                    Game.PlayerInfo.Target = MouseTarget;
-                    Game.PlayerInfo.ActionType = IActionType.Secondary;
+                    Game.PlayerInfo.Target = ((EntityMachine)action).Info;
+                    if (action is IActionSecondaryPickUp)
+                        Game.PlayerInfo.ActionType = IActionType.PickUp;
+                    else
+                        Game.PlayerInfo.ActionType = IActionType.Interact;
                 } 
             }
         } 

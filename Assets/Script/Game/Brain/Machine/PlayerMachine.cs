@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
+public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSecondaryInteract
 {
     private new PlayerInfo Info => GetModule<PlayerInfo>();
     public static Info CreateInfo()
@@ -52,7 +52,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
         Inventory.RefreshInventory();
     }
 
-    public void OnActionSecondary(EntityMachine entityMachine)
+    public void OnActionSecondary(Info info)
     {
         if (IsCurrentState<InContainerState>())
             SetState<DefaultState>();
@@ -68,7 +68,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
             transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
         }
          
-        if (Info.Target && Info.ActionType == IActionType.Secondary && 
+        if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact &&
             (Input.GetKeyDown(KeyCode.A) ||
              Input.GetKeyDown(KeyCode.W) ||
              Input.GetKeyDown(KeyCode.S) ||
@@ -103,8 +103,8 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
             
             if (IsCurrentState<DefaultState>())
             {
-                if (Info.Target && Info.ActionType == IActionType.Secondary)
-                {
+                if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact)
+                { 
                     SetState<MobChaseAction>();
                 }
                 else if (!GUIMain.IsHover)
@@ -150,11 +150,11 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
         }
         else if (IsCurrentState<DefaultState>()) 
         {
-            if (!Info.Target || !Info.Target.gameObject.activeSelf)
+            if (Info.Target == null)
             {  
                 if (Game.Player)
                 {
-                    Info.Target = Game.Player.transform;
+                    Info.Target = Game.PlayerInfo;
                     Info.ActionType = IActionType.Follow;
                 }
             } 
@@ -165,7 +165,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
     public override void Attack()
     {
         if (Info.Equipment.ProjectileInfo.Ammo != null && 
-            Inventory.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
+            Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
                     
         Info.AimPosition = Control.MouseTarget ?
             Control.MouseTarget.transform.position + Vector3.up * 0.55f :
@@ -183,12 +183,5 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                     
         if (Info.Equipment.ProjectileInfo.Ammo != null) Inventory.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
     }
-    
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
-    }
+     
 } 

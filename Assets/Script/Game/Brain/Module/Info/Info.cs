@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
-public class Info : Module
+public class Info : EntityModule
 {
     public static readonly Dictionary<string, Info> Dictionary = new Dictionary<string, Info>();
     public string stringID;
@@ -17,4 +17,3 @@ public class Info : Module
     }
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
 }
- 
