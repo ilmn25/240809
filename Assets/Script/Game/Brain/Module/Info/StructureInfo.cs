@@ -34,7 +34,7 @@ public class StructureInfo : Info
         }
         return true;
     }
-
+ 
     public virtual void OnHit(Projectile projectile) { }
     public virtual void OnDestroy(Projectile projectile) { }
 }

@@ -54,9 +54,9 @@ public class Loot
         loot.Add(0.1f, 1, "pistol"); 
         
         loot = CreateTable("stone");
-        loot.Add(1, 3, "stone");  
-        loot.Add(0.5f, 1, "stone"); 
-        loot.Add(0.5f, 1, "stone"); 
+        loot.Add(1, 3, "gravel");  
+        loot.Add(0.5f, 1, "gravel"); 
+        loot.Add(0.5f, 1, "gravel"); 
     }
 
     public static Loot CreateTable(string id)

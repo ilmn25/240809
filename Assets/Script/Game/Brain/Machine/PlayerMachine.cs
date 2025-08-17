@@ -1,4 +1,5 @@
  
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
@@ -24,15 +25,15 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
             MaxStuckCount = 100,
             AccelerationTime = 0.2f,
             DecelerationTime = 0.08f,
-            DistAttack = 4,
+            DistAttack = 3,
             Gravity = -40f,
             JumpVelocity = 12f,
             DeathSfx = "player_die",
             HurtSfx = "player_hurt", 
-        };
+        }; 
     }
     public override void OnStart()
-    {   
+    {    
         AddModule(new SpriteOrbitModule(transform)); 
         AddModule(new GroundAnimationModule()); 
         AddModule(new GroundMovementModule()); 
@@ -47,6 +48,8 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
         {
             Storage = Info.Storage
         });
+        
+        Inventory.RefreshInventory();
     }
 
     public void OnActionSecondary(EntityMachine entityMachine)
@@ -110,13 +113,13 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                     {
                         case ItemType.Tool:
                             if (Info.Equipment.ProjectileInfo.OperationType == OperationType.Dig &&
-                                Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                                Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
                                 PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
                                     true);
                                 if (!Info.IsBusy && Control.Inst.ActionPrimary.Key())
-                                    PlayerTerraformModule.HandleMapBreak();
+                                    PlayerTerraformModule.HandleMapBreak(); 
                             }
 
                             if (Control.Inst.ActionPrimary.Key() || Control.Inst.DigUp.Key() ||
@@ -128,7 +131,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                             break;
 
                         case ItemType.Block:
-                            if (Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
+                            if (Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
                                 PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,

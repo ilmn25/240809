@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum ItemRarity { Common, Rare, Epic, Legendary }
-public enum ItemType { Tool, Armor, Accessory, Block, Structure }
+public enum ItemType { Tool, Armor, Accessory, Block, Structure, Material}
 
 public enum ItemGesture { Swing, Poke, Cast, Shoot}
 public partial class Item

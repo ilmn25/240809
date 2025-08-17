@@ -9,15 +9,17 @@ public partial class Item
 
     public static void Initialize()
     {
-        AddBlockDefinition("brick", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "stone", 3} });
+        AddBlockDefinition("brick", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "gravel", 3} });
         AddBlockDefinition("marble", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } }, craftStack: 2);
         AddBlockDefinition("dirt", 100, 1, "dig_stone");
         AddBlockDefinition("sand", 100, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
         AddBlockDefinition("backroom",100,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
         AddBlockDefinition("stone",  100, 2, "dig_stone");  
-        AddBlockDefinition("wood", 100, 2, "dig_stone");
-        AddBlockDefinition("bullet", 100, 2, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 5);
+        AddBlockDefinition("wood", 100, 2, "dig_stone"); 
         AddBlockDefinition("granite",  100, 2, "dig_stone");
+        
+        AddMaterialDefinition("bullet", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 5);
+        AddMaterialDefinition("gravel", craftStack: 5);
         
         AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
@@ -140,7 +142,38 @@ public partial class Item
             holdoutOffset: new Vector2(0.4f, 0)
         );
     }
+    
+    private static void AddMaterialDefinition(
+        string stringID,
+        string name = "",  
+        string description = "",
+        Dictionary<string, int> materials = null,
+        int craftStack = 1,
+        int stackSize = 100)
+    {
+        if (name == "") name = stringID;
+        Entity.AddItem(stringID);
 
+        Item itemData = new Item()
+        {
+            StringID = stringID,
+            StackSize = stackSize,
+            Rarity = ItemRarity.Common,
+            Scale = 0.6f,
+
+            Type = ItemType.Material,
+            Gesture = ItemGesture.Swing,
+            HoldoutOffset = new Vector2(0.5f, 0),
+
+            Name = name,
+            Description = description
+        };
+
+        if (materials != null)
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, null);
+
+        Dictionary[stringID] = itemData;
+    }
 
     private static void AddBlockDefinition(
         string stringID,

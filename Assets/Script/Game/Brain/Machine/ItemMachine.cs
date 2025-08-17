@@ -41,7 +41,7 @@ public class ItemMachine : EntityMachine, IActionSecondary
         if (Vector3.Distance(transform.position, Game.Player.transform.position) < 3f) 
         { 
             Audio.PlaySFX("pick_up", 0.4f);
-            Inventory.AddItem(GetEntityData().stringID, 1);
+            Inventory.AddItem(Info.stringID);
             Delete();
         }
     }

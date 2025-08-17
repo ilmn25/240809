@@ -52,10 +52,10 @@ public class BlockPreview
         }
 
         // Apply cached mesh and material
-        gameObject.GetComponent<MeshFilter>().mesh = cached.mesh;
-        gameObject.GetComponent<MeshRenderer>().material = cached.material;
+        GameObject sprite = gameObject.transform.Find("sprite").gameObject; 
+        sprite.GetComponent<MeshFilter>().mesh = cached.mesh;
+        sprite.GetComponent<MeshRenderer>().material = cached.material;
     }
-
    
     private static void GenerateMesh()
     {

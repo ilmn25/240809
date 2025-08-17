@@ -169,7 +169,7 @@ public abstract class PathingModule : MobModule
         } 
         else
         { 
-            Info.Direction = (Utility.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
+            Info.Direction = (Helper.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
         } 
     }
  
@@ -249,10 +249,10 @@ public abstract class PathingModule : MobModule
         float distance, nearestDistance;
         if (_pathQueued != null && _pathQueued.Count > 0) 
         {
-            nearestDistance = Utility.SquaredDistance(Machine.transform.position, _pathQueued[0].Position);
+            nearestDistance = Helper.SquaredDistance(Machine.transform.position, _pathQueued[0].Position);
             for (int i = 1; i < _pathQueued.Count; i++)
             {
-                distance = Utility.SquaredDistance(Machine.transform.position, _pathQueued[i].Position);
+                distance = Helper.SquaredDistance(Machine.transform.position, _pathQueued[i].Position);
                 if (distance < nearestDistance)
                 {
                     nearestPoint = i;

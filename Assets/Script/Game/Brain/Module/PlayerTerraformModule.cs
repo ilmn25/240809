@@ -12,7 +12,7 @@ public class PlayerTerraformModule : Module
     public static readonly int PreviewSpeed = 10;
     public override void Initialize()
     {
-        Inventory.SlotUpdate += EventSlotUpdate;
+        // Inventory.SlotUpdate += EventSlotUpdate;
         _block = ObjectPool.GetObject("block");
         _block.SetActive(false);
     }
@@ -50,7 +50,8 @@ public class PlayerTerraformModule : Module
     }
     
     public override void Update()
-    {  
+    {
+        EventSlotUpdate();
         // if (GUI.Active) return;
   
         if ( Control.Inst.DigUp.KeyDown())
@@ -72,14 +73,14 @@ public class PlayerTerraformModule : Module
             {
                 _coordinate = OffsetPosition(false, _position, _direction);
                 if (_position != Vector3.down)
-                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate, Time.deltaTime * PreviewSpeed);
+                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate+ new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
                 else
                     _block.transform.position = Vector3.down;
             }
             else
             { 
                 if (_position != Vector3.down)
-                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate - new Vector3(0.02f, 0.02f, 0.02f), Time.deltaTime * PreviewSpeed);
+                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate + new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
                 else
                     _block.transform.position = Vector3.down;
             } 
@@ -106,12 +107,12 @@ public class PlayerTerraformModule : Module
 
     public static void SpawnBlock()
     {
-        GameObject gameObject = ObjectPool.GetObject("block");
-        gameObject.transform.position = _coordinate;
+        GameObject gameObject = ObjectPool.GetObject("block"); 
+        gameObject.transform.position = _coordinate + new Vector3(0.5f, 0, 0.5f);
         
         BlockMachine currentEntityMachine = gameObject.GetComponent<BlockMachine>() ?? gameObject.AddComponent<BlockMachine>();
         EntityStaticLoad.InviteEntity(currentEntityMachine);
-        BlockInfo info = (BlockInfo)Entity.CreateInfo("block", _coordinate - Vector3Int.down / 2);
+        BlockInfo info = (BlockInfo)Entity.CreateInfo("block", _coordinate);
         
         Block block;
         if (_block.name == "overlay")

@@ -24,12 +24,12 @@ public class GroundMovementModule : MovementModule
     public override void Update()
     { 
         if (Info.Health <= 0) return;
-        if (Machine.transform.position.y < -1) Machine.transform.position = Utility.AddToVector(Machine.transform.position, 0, 100, 0);
+        if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         
         if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) return;
         
         // _deltaTime = GameSystem._deltaTime;
-        _deltaTime = Utility.GetDeltaTime();
+        _deltaTime = Helper.GetDeltaTime();
         _newPosition = Machine.transform.position;
 
         HandleJump(); 

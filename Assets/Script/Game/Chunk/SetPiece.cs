@@ -12,22 +12,22 @@ public partial class SetPiece
     { 
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
-            Utility.Log("anchor A set");
+            Helper.Log("anchor A set");
             _positionA = Vector3Int.FloorToInt(Game.Player.transform.position);
         }
         if (Input.GetKeyDown(KeyCode.RightBracket))
         {
-            Utility.Log("anchor B set");
+            Helper.Log("anchor B set");
             _positionB = Vector3Int.FloorToInt(Game.Player.transform.position);
         } 
         if (Input.GetKeyDown(KeyCode.Equals))
         {
-            Utility.Log("exported to file");
+            Helper.Log("exported to file");
             SaveSetPieceFile(CopySetPiece(), Scene.SetPieceName);
         }
         if (Input.GetKeyDown(KeyCode.Minus))
         {
-            Utility.Log("imported to world"); 
+            Helper.Log("imported to world"); 
             PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(Scene.SetPieceName));
         }
     }

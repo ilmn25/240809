@@ -1,6 +1,18 @@
 using System;
 using UnityEngine;
 
+// public class ActionTask
+// {
+//     [NonSerialized] public IActionType ActionType;
+//     [NonSerialized] public Info SourceInfo; 
+//     [NonSerialized] public Info TargetInfo; 
+//
+//     public Vector3 GetPosition()
+//     { 
+//         return TargetInfo.position;
+//     }
+// }
+
 public enum IActionType {Follow, Secondary, Hit, Dig}
 [System.Serializable]
 public class MobInfo : DynamicInfo
@@ -23,7 +35,6 @@ public class MobInfo : DynamicInfo
  
     [NonSerialized] public Item Equipment;
     [NonSerialized] public Transform Target;
-    [NonSerialized] public Vector3Int TargetBlockCoordinate;
     [NonSerialized] public IAction Action;
     [NonSerialized] public IActionType ActionType;
     [NonSerialized] public bool FaceTarget;
@@ -43,16 +54,15 @@ public class MobInfo : DynamicInfo
     public void SetEquipment(String stringID)
     { 
         if (stringID != null)
-        {
-            Item item = Item.GetItem(stringID);
-            if (Equipment == null || Equipment != item)
+        { 
+            if (Equipment == null || Equipment.StringID != stringID)
             {
-                Equipment = item;
+                Equipment = Item.GetItem(stringID);
                 SpriteTool.gameObject.SetActive(true);
-                SpriteTool.localPosition = new Vector3(item.HoldoutOffset.x, item.HoldoutOffset.y, 0);
+                SpriteTool.localPosition = new Vector3(Equipment.HoldoutOffset.x, Equipment.HoldoutOffset.y, 0);
                 SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.RotationOffset);
-                SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + item.StringID);
-                SpriteToolTrack.transform.localScale = Vector3.one * item.Scale;
+                SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Equipment.StringID);
+                SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Scale;
                 Machine.SetState<EquipSelectState>();
             } 
         }

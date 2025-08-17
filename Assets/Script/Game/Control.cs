@@ -45,12 +45,12 @@ public class Control
 
     public static void Save()
     {
-        Utility.FileSave(Inst, "KeyBinds");
+        Helper.FileSave(Inst, "KeyBinds");
     }
 
     public static void Load()
     {
-        Inst = Utility.FileLoad<Control>("KeyBinds");
+        Inst = Helper.FileLoad<Control>("KeyBinds");
     }
     
     public static Vector2Int GetMovementAxis()
@@ -65,7 +65,7 @@ public class Control
 
     public static void Initialize()
     {
-        Inst = Utility.FileLoad<Control>("KeyBinds") ?? new Control();
+        Inst = Helper.FileLoad<Control>("KeyBinds") ?? new Control();
     }
 
     public static void SetPlayer(int i)
@@ -136,7 +136,7 @@ public class Control
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
             // Debug.Log(collider.gameObject.name);
-            distance = Utility.SquaredDistance(collider.transform.position, Game.Player.transform.position);
+            distance = Helper.SquaredDistance(collider.transform.position, Game.Player.transform.position);
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;

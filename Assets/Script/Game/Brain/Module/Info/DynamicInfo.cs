@@ -46,6 +46,8 @@ public class DynamicInfo : Info
     
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() { 
+        if (Machine) position = Machine.transform.position;
+        
         int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Game.MaskEntity);
         for (int i = 0; i < hitCount; i++)
         {

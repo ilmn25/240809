@@ -19,7 +19,7 @@ class MobChaseAction : MobState {
             return;
         }
         if (Info.ActionType != IActionType.Secondary && 
-            (!Info.Target || Utility.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
+            (!Info.Target || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
             Info.PathingStatus = PathingStatus.Reached;  
         
         if (Info.PathingStatus == PathingStatus.Reached)
