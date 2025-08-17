@@ -27,9 +27,18 @@ public partial class Entity
                 AddStructure<WorkBenchMachine>("workbench", Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>("station", Vector3Int.one, Game.IndexCollide);
                 AddStructure<ChestMachine>("chest", Vector3Int.one, Game.IndexCollide);
-                AddStructure<DecorMachine>("bush1", Vector3Int.zero, Game.IndexSemiCollide);
+                AddStructure<DecorMachine>("bush1", Vector3Int.zero, Game.IndexNoCollide);
                 AddStructure<DecorMachine>("grass", Vector3Int.zero, Game.IndexNoCollide); 
                 AddStructure<SlabMachine>("slab", Vector3Int.one, Game.IndexNoCollide);
+                
+                Dictionary.Add("block", new Entity
+                {
+                        Bounds = Vector3Int.one,
+                        Collision = Game.IndexSemiCollide,
+                        PrefabName = "block",
+                        Machine = typeof(BlockMachine),
+                        StaticLoad = true,
+                });
                 
                 Dictionary.Add("player", new Entity
                 {
@@ -92,7 +101,6 @@ public partial class Entity
         
         public static void Spawn(string stringID, Vector3 worldPosition)
         {
-                
                 GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
                 gameObject.transform.position = worldPosition + new Vector3(0.5f, 0, 0.5f);   
         

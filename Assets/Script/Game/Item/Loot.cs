@@ -41,14 +41,22 @@ public class Loot
         
         loot = CreateTable("megumin");
         loot.Add(0.1f, 1, "sword", "axe"); 
+        
         loot = CreateTable("chito");
         loot.Add(0.7f, 10, "bullet"); 
         loot.Add(0.1f, 1, "pistol"); 
+        
         loot = CreateTable("snare_flea");
         loot.Add(0.5f, 6, "wood"); 
+        
         loot = CreateTable("yuuri");
         loot.Add(0.7f, 10, "bullet");  
         loot.Add(0.1f, 1, "pistol"); 
+        
+        loot = CreateTable("stone");
+        loot.Add(1, 3, "stone");  
+        loot.Add(0.5f, 1, "stone"); 
+        loot.Add(0.5f, 1, "stone"); 
     }
 
     public static Loot CreateTable(string id)

@@ -2,7 +2,7 @@ public class TreeMachine : DestructableMachine
 {
     public static Info CreateInfo()
     {
-        return new DestructableInfo {
+        return new ResourceInfo() {
             Health = 100,
             Loot = "tree",
             SfxHit = "dig_stone",

@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerTerraformModule : Module
 {
+    public static List<Vector3Int> Position = new List<Vector3Int>();
     private static GameObject _block;
     private static Vector3 _position;
     private static Vector3 _direction;
@@ -11,45 +13,39 @@ public class PlayerTerraformModule : Module
     public override void Initialize()
     {
         Inventory.SlotUpdate += EventSlotUpdate;
+        _block = ObjectPool.GetObject("block");
+        _block.SetActive(false);
     }
 
     private static void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
         {
-            if (_block)
-                BlockPreview.Delete(_block);
+            _block.SetActive(false);
         }
         else if (Inventory.CurrentItemData.Type == ItemType.Block)
         {
-            if (!_block)
+            _block.SetActive(true);
+            if (_block.name != Inventory.CurrentItemData.StringID)
             {
-                _block = BlockPreview.Create(Inventory.CurrentItemData.StringID);
-            }
-            else if (_block.name != Inventory.CurrentItemData.StringID)
-            {
-                BlockPreview.Delete(_block);
-                _block = BlockPreview.Create(Inventory.CurrentItemData.StringID);
+                _block.name = Inventory.CurrentItemData.StringID;
+                BlockPreview.Set(_block, Inventory.CurrentItemData.StringID);
+                _block.transform.localScale = Vector3.one;
             }  
         } 
-        else if (Inventory.CurrentItemData.MiningPower != 0)
+        else if (Inventory.CurrentItemData.ProjectileInfo.OperationType == OperationType.Dig)
         {
-            if (!_block)
+            _block.SetActive(true); 
+            if (_block.name != "overlay")
             {
-                _block = BlockPreview.Create("overlay");
-                _block.transform.localScale = Vector3.one * 1.04f;
-            }
-            else if (_block.name != "overlay")
-            {
-                BlockPreview.Delete(_block);
-                _block = BlockPreview.Create("overlay");
+                _block.name = "overlay";
+                BlockPreview.Set(_block, "overlay");
                 _block.transform.localScale = Vector3.one * 1.04f;
             } 
         }
         else
         {
-            if (_block)
-                BlockPreview.Delete(_block);
+            _block.SetActive(false);
         }
     }
     
@@ -60,15 +56,17 @@ public class PlayerTerraformModule : Module
         if ( Control.Inst.DigUp.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.up;
-            BreakBlock();
+            if (Position.Contains(_coordinate)) return;
+            SpawnBlock();
         }
         else if ( Control.Inst.DigDown.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.down;
-            BreakBlock();
+            if (Position.Contains(_coordinate)) return;
+            SpawnBlock();
         }
         
-        if (_block)
+        if (_block.activeSelf)
         {
             if (_block.name != "overlay")
             {
@@ -98,28 +96,55 @@ public class PlayerTerraformModule : Module
     public static void HandleMapPlace()
     {
         _coordinate = OffsetPosition(false, _position, _direction);
-        
+        if (Position.Contains(_coordinate)) return;
         if (!World.IsInWorldBounds(_coordinate)) return; 
-        
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
-        World.SetBlock(_coordinate, Block.ConvertID(_block.name));
+        SpawnBlock();
+        
         Inventory.RemoveItem(_block.name);
     }
 
+    public static void SpawnBlock()
+    {
+        GameObject gameObject = ObjectPool.GetObject("block");
+        gameObject.transform.position = _coordinate;
+        
+        BlockMachine currentEntityMachine = gameObject.GetComponent<BlockMachine>() ?? gameObject.AddComponent<BlockMachine>();
+        EntityStaticLoad.InviteEntity(currentEntityMachine);
+        BlockInfo info = (BlockInfo)Entity.CreateInfo("block", _coordinate - Vector3Int.down / 2);
+        
+        Block block;
+        if (_block.name == "overlay")
+        { 
+            block = Block.GetBlock(World.GetBlock(_coordinate));
+            info.operationType = OperationType.Dig;
+            info.blockID = 0;
+            info.texture = "overlay";
+        }
+        else
+        { 
+            block = Block.GetBlock(_block.name); 
+            info.operationType = OperationType.Build;
+            info.blockID = Block.ConvertID(block.StringID);
+            info.texture = block.StringID;
+        }
+        
+        info.Health = block.BreakCost;
+        info.threshold = block.BreakThreshold;
+        info.SfxHit = "dig_metal";
+        info.SfxDestroy = "dig_metal";
+         
+        currentEntityMachine.Initialize(info);
+        Position.Add(_coordinate);
+    }
+    
     public static void HandleMapBreak()
     {
         _coordinate = OffsetPosition(true, _position, _direction);
-        BreakBlock();
+        if (Position.Contains(_coordinate)) return;
+        SpawnBlock();
     }
-
-    public static void BreakBlock()
-    {
-        int miningPower = 0;
-        if (Inventory.CurrentItemData == null || Inventory.CurrentItemData.Type == ItemType.Block) miningPower = 1;
-        else if (Inventory.CurrentItemData.Type == ItemType.Tool ) miningPower = Inventory.CurrentItemData.MiningPower;
-        MapEdit.BreakBlock(_coordinate, miningPower);
-    } 
-
+    
     public static Vector3Int OffsetPosition(bool isBreak, Vector3 position, Vector3 direction)
     {
         Vector3 adjustedPoint;

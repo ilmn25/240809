@@ -58,7 +58,7 @@ public class PlayerInfo : MobInfo
             FaceTarget = Equipment != null || Target;
 
             if (Hunger > 0) Hunger -= 0.01f;
-            if (Game.PlayerInfo == this && (!Target || ActionTarget != IActionTarget.Secondary))
+            if (Game.PlayerInfo == this && (!Target || ActionType != IActionType.Secondary))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
                 SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;

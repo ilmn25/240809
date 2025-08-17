@@ -1,25 +1,31 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
+public enum OperationType { Dig, Build, Break, None }
 [System.Serializable]
 public class StructureInfo : Info
 {
-    public float Health;
+    public float Health; 
+    public int threshold = 1;
     public string SfxHit;
     public string SfxDestroy;
     public string Loot;
-    [NonSerialized] private BoxCollider _boxCollider;
+    public OperationType operationType;
  
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.Info.Breaking == 0 || projectile.TargetHitBoxType != HitboxType.Passive) return false;
+        if (projectile.Info.OperationType != operationType || 
+            projectile.Info.Breaking < threshold || 
+            projectile.TargetHitBoxType != HitboxType.Passive) return false;
+        
         Health -= projectile.Info.Breaking;
         if (Health <= 0)
-        {
-            Audio.PlaySFX(SfxDestroy); 
-            ((EntityMachine)Machine).Delete();
-            global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
+        { 
+            Audio.PlaySFX(SfxDestroy);  
+            if (Loot != null) global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
             OnDestroy(projectile);
+            ((EntityMachine)Machine).Delete();
         }
         else
         {

@@ -65,7 +65,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
             transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
         }
          
-        if (Info.Target && Info.ActionTarget == IActionTarget.Secondary && 
+        if (Info.Target && Info.ActionType == IActionType.Secondary && 
             (Input.GetKeyDown(KeyCode.A) ||
              Input.GetKeyDown(KeyCode.W) ||
              Input.GetKeyDown(KeyCode.S) ||
@@ -100,7 +100,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
             
             if (IsCurrentState<DefaultState>())
             {
-                if (Info.Target && Info.ActionTarget == IActionTarget.Secondary)
+                if (Info.Target && Info.ActionType == IActionType.Secondary)
                 {
                     SetState<MobChaseAction>();
                 }
@@ -109,7 +109,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                     switch (Info.Equipment?.Type)
                     {
                         case ItemType.Tool:
-                            if (Info.Equipment.MiningPower != 0 &&
+                            if (Info.Equipment.ProjectileInfo.OperationType == OperationType.Dig &&
                                 Utility.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
@@ -117,7 +117,6 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                                     true);
                                 if (!Info.IsBusy && Control.Inst.ActionPrimary.Key())
                                     PlayerTerraformModule.HandleMapBreak();
-
                             }
 
                             if (Control.Inst.ActionPrimary.Key() || Control.Inst.DigUp.Key() ||
@@ -153,7 +152,7 @@ public class PlayerMachine : EntityMachine, IHitBoxAttack, IActionSecondary
                 if (Game.Player)
                 {
                     Info.Target = Game.Player.transform;
-                    Info.ActionTarget = IActionTarget.Follow;
+                    Info.ActionType = IActionType.Follow;
                 }
             } 
             SetState<MobChaseAction>();

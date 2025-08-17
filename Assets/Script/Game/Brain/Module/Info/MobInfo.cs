@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum IActionTarget {Follow, Secondary, Hit}
+public enum IActionType {Follow, Secondary, Hit, Dig}
 [System.Serializable]
 public class MobInfo : DynamicInfo
 { 
@@ -23,8 +23,9 @@ public class MobInfo : DynamicInfo
  
     [NonSerialized] public Item Equipment;
     [NonSerialized] public Transform Target;
+    [NonSerialized] public Vector3Int TargetBlockCoordinate;
     [NonSerialized] public IAction Action;
-    [NonSerialized] public IActionTarget ActionTarget;
+    [NonSerialized] public IActionType ActionType;
     [NonSerialized] public bool FaceTarget;
     [NonSerialized] public Vector3 AimPosition; 
     [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending; 

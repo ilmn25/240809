@@ -12,7 +12,8 @@ public class ProjectileInfo
     public float CritChance;
     public float Radius;  
     public float Speed;
-    public float Breaking = 0;
+    public int Breaking = 0;
+    public OperationType OperationType = OperationType.None;
     public string Effects;
     public ProjectileClass Class; 
     public string Sprite;

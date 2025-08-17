@@ -3,69 +3,60 @@ using UnityEngine;
 
 public class BlockPreview 
 { 
+    private static readonly Dictionary<string, (Mesh mesh, Material material)> Cache = new();
+
     private static readonly float Opacity = 0.45f;
     
-    private static GameObject _meshObject;
     private static List<Vector3> _vertices;
     private static List<int> _triangles;
     private static List<Vector2> _uvs;
     private static List<Vector3> _normals;  
-    
-    public static void Delete(GameObject gameObject)
+     
+    public static void Set(GameObject gameObject, string blockID)
     {
-        Object.Destroy(gameObject);
+        if (!Cache.TryGetValue(blockID, out var cached))
+        {
+            // Generate mesh
+            GenerateMesh();
+            Mesh mesh = new()
+            {
+                vertices = _vertices.ToArray(),
+                triangles = _triangles.ToArray(),
+                uv = _uvs.ToArray(),
+                normals = _normals.ToArray()
+            };
+
+            // Create material
+            Material meshMaterial = new(Resources.Load<Material>(Block.MeshMaterialPath))
+            {
+                mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
+            };
+
+            meshMaterial.SetFloat("_Mode", 3);
+            meshMaterial.SetFloat("_Surface", 1);
+            meshMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            meshMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            meshMaterial.SetInt("_ZWrite", 0);
+            meshMaterial.DisableKeyword("_ALPHATEST_ON");
+            meshMaterial.EnableKeyword("_ALPHABLEND_ON");
+            meshMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            meshMaterial.renderQueue = 3000;
+
+            Color color = meshMaterial.color;
+            color.a = Opacity;
+            meshMaterial.color = color;
+
+            // Cache the result
+            cached = (mesh, meshMaterial);
+            Cache[blockID] = cached;
+        }
+
+        // Apply cached mesh and material
+        gameObject.GetComponent<MeshFilter>().mesh = cached.mesh;
+        gameObject.GetComponent<MeshRenderer>().material = cached.material;
     }
 
-    public static GameObject Create(string blockID)
-    {
-        GenerateMesh();
-        
-        Mesh mesh = new()
-        {
-            vertices = _vertices.ToArray(),
-            triangles = _triangles.ToArray(),
-            uv = _uvs.ToArray(),
-            normals = _normals.ToArray()  
-        };
-
-        _meshObject = new(blockID)
-        {
-            layer = Game.IndexMap
-        };
-    
-        _meshObject.transform.position = Game.Player.transform.position; 
-
-        MeshFilter meshFilter = _meshObject.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = _meshObject.AddComponent<MeshRenderer>();
-        meshFilter.mesh = mesh;
-        Material meshMaterial = new(Resources.Load<Material>(Block.MeshMaterialPath))
-        {
-            mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
-        };
-
-        // Set the rendering mode to Transparent
-        meshMaterial.SetFloat("_Mode", 3);
-        meshMaterial.SetFloat("_Surface", 1); // 1 means Transparent
-        meshMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        meshMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        meshMaterial.SetInt("_ZWrite", 0);
-        meshMaterial.DisableKeyword("_ALPHATEST_ON");
-        meshMaterial.EnableKeyword("_ALPHABLEND_ON");
-        meshMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        meshMaterial.renderQueue = 3000;
-
-        // Set the alpha value to 0.5 for 50% transparency
-        Color color = meshMaterial.color;
-        color.a = Opacity;
-        meshMaterial.color = color;
-        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        
-
-        meshRenderer.material = meshMaterial;
-
-        return _meshObject;
-    }
-
+   
     private static void GenerateMesh()
     {
         _vertices = new List<Vector3>();
