@@ -18,6 +18,7 @@ public class ProjectileInfo
     public ProjectileClass Class; 
     public string Sprite;
     public string Ammo;
+    public float Scale = 1;
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }

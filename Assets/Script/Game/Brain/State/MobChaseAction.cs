@@ -3,7 +3,7 @@ using UnityEngine;
 class MobChaseAction : MobState {
     public override void OnEnterState()
     {
-        if (Info.Target)
+        if (Info.Target != null)
         { 
             Module<PathingModule>().SetTarget(PathingTarget.Target);
         } 
@@ -12,27 +12,33 @@ class MobChaseAction : MobState {
     }
     
     public override void OnUpdateState() {
-        if (Game.PlayerInfo == Info && Info.ActionType != IActionType.Secondary)
+        if (Game.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
         {
             Info.Target = null;
-            Machine.SetState<DefaultState>(); 
+            Machine.SetState<DefaultState>();
             return;
         }
-        if (Info.ActionType != IActionType.Secondary && 
-            (!Info.Target || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
+        if (Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp && 
+            (Info.Target == null || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
             Info.PathingStatus = PathingStatus.Reached;  
         
         if (Info.PathingStatus == PathingStatus.Reached)
         {
-            if (Info.Target)
+            if (Info.Target != null)
             { 
-                if (Info.ActionType == IActionType.Secondary && Info.Target.gameObject.activeSelf)
+                if (Info.ActionType == IActionType.Interact && Info.Target.Machine.gameObject.activeSelf)
                 {
-                    ((IActionSecondary)Info.Action).OnActionSecondary((EntityMachine) Machine);
+                    (Info.Target.Machine as IActionSecondaryInteract).OnActionSecondary(Info);
                     Info.Target = null;
                     Machine.SetState<DefaultState>();
                 } 
-                else if (Info.ActionType == IActionType.Hit && Info.Target.gameObject.activeSelf)
+                else if (Info.ActionType == IActionType.PickUp && Info.Target.Machine.gameObject.activeSelf)
+                {
+                    (Info.Target as ItemInfo).OnActionSecondary(Info);
+                    Info.Target = null;
+                    Machine.SetState<DefaultState>();
+                }
+                else if (Info.ActionType == IActionType.Hit && Info.Target.Machine.gameObject.activeSelf)
                 {
                     ((EntityMachine)Machine).Attack();
                 }

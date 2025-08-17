@@ -42,15 +42,15 @@ public class BugMachine : MobMachine
 
         if (IsCurrentState<DefaultState>())
         {
-            if (Info.Target)
+            if (Info.Target != null)
             {
-                if (Vector3.Distance(Info.Target.transform.position, transform.position) < Info.DistAttack)
+                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
                     if (Random.value < 0.2f)
                         SetState<MobStrafe>();
                     else
                     {
-                        Info.AimPosition = Info.Target.transform.position;
+                        Info.AimPosition = Info.Target.position;
                         SetState<MobAttackPounce>();
                     } 
                 }
@@ -87,7 +87,7 @@ public class BugMachine : MobMachine
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Info.Target = Game.Player.transform;
+            Info.Target = (MobInfo)Game.PlayerInfo;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 

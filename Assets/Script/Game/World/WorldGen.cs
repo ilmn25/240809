@@ -17,7 +17,6 @@ public class WorldGen
     protected static readonly bool SpawnDynamicEntity = true;
     protected static readonly bool Flat = false;
     public static readonly Vector3Int Size = new Vector3Int(15, 5, 15);
-    
     // private static readonly bool SpawnStaticEntity = false;
     // private static readonly bool SpawnDynamicEntity = false;
     // private static readonly bool Flat = true;

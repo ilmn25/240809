@@ -14,20 +14,25 @@ public abstract class Module
         return Machine.GetModule<T>();
     }
 }
-
-public abstract class DynamicModule : Module
+[System.Serializable]
+public abstract class EntityModule : Module
 {
-    protected DynamicInfo Info => (DynamicInfo)((EntityMachine) Machine).Info;
+    public EntityMachine EntityMachine => (EntityMachine) Machine;
 }
-
-public abstract class MobModule : Module
+[System.Serializable]
+public abstract class DynamicModule : EntityModule
 {
-    public MobInfo Info => (MobInfo)((EntityMachine)Machine).Info;
+    protected DynamicInfo Info => (DynamicInfo)EntityMachine.Info;
 }
-
-public abstract class PlayerModule : Module
+[System.Serializable]
+public abstract class MobModule : EntityModule
 {
-    public PlayerInfo Info => (PlayerInfo)((EntityMachine) Machine).Info;
+    public MobInfo Info => (MobInfo)EntityMachine.Info;
 }
-
+[System.Serializable]
+public abstract class PlayerModule : EntityModule
+{
+    public PlayerInfo Info => (PlayerInfo)EntityMachine.Info;
+}
+[System.Serializable]
 public abstract class MovementModule : DynamicModule { } 

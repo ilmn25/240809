@@ -11,7 +11,6 @@ public class Projectile : MonoBehaviour
     public HitboxType TargetHitBoxType;
     public Vector3 Destination;
     public Vector3 Direction;
-    public Machine Source;
     public DynamicInfo SourceInfo;
     public Transform Target;
     public Quaternion RelativeRotation;
@@ -34,13 +33,13 @@ public class Projectile : MonoBehaviour
         if (!projectile.spriteRenderer)
             projectile.spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         projectile.SourceInfo = sourceInfo;
-        projectile.Source = sourceInfo.Machine; 
         projectile.transform.position = origin; 
         projectile.Info = info; 
         projectile.TargetHitBoxType = target; 
         projectile.Destination = dest;
         projectile.Direction = (dest - origin).normalized;
-        projectile.Target = null;
+        projectile.Target = null; 
+        gameObject.transform.localScale = Vector3.one * info.Scale;
         
         Vector3 direction =  projectile.Direction;
         direction.y = 0;

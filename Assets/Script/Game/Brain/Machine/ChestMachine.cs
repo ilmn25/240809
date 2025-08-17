@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChestMachine : StructureMachine, IActionSecondary, IHitBoxResource
+public class ChestMachine : StructureMachine, IActionSecondary, IActionPrimaryResource
 {
     public static Info CreateInfo()
     {

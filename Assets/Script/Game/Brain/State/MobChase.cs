@@ -13,7 +13,7 @@ class MobChase : MobState {
             Machine.SetState<DefaultState>();
             return;
         }
-        if (!Info.Target || Vector3.Distance(Machine.transform.position, Info.Target.position) < Info.DistAttack)
+        if (Info.Target == null || Vector3.Distance(Machine.transform.position, Info.Target.position) < Info.DistAttack)
             Info.PathingStatus = PathingStatus.Reached;  
     }
 }

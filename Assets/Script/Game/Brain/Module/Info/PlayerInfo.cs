@@ -54,10 +54,10 @@ public class PlayerInfo : MobInfo
                 IframesCurrent = 500;
             }
 
-            FaceTarget = Equipment != null || Target;
+            FaceTarget = Equipment != null || Target != null;
 
             if (Hunger > 0) Hunger -= 0.01f;
-            if (Game.PlayerInfo == this && (!Target || ActionType != IActionType.Secondary))
+            if (Game.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
                 SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;

@@ -10,7 +10,7 @@ public class EnemyInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        FaceTarget = Target;
+        FaceTarget = Target != null;
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
         if (Health <= 0)
         { 
@@ -22,8 +22,8 @@ public class EnemyInfo : MobInfo
 
     protected override void OnHit(Projectile projectile)
     { 
-        if (Target == projectile.Source.transform) return;
-        Target = projectile.Source.transform;
+        if (Target == projectile.SourceInfo) return;
+        Target = projectile.SourceInfo;
         PathingStatus = PathingStatus.Reached; 
         Machine.SetState<DefaultState>();
     }

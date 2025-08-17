@@ -5,8 +5,7 @@ public class DestructableInfo : StructureInfo
     public override void OnHit(Projectile projectile)
     {
         PlayerInfo info = (PlayerInfo)projectile.SourceInfo;
-        info.Target = Machine.transform;
-        info.Action = (IAction)Machine;
+        info.Target = this;
         info.ActionType = IActionType.Hit;
     }
     public override void OnDestroy(Projectile projectile)
