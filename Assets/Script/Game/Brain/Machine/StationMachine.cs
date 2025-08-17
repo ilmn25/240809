@@ -43,7 +43,7 @@ public class InBuildingState : State
 
     public override void OnUpdateState()
     {
-        if (!GUIMain.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 49) { //walk away from npc
+        if (!GUIMain.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 49) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

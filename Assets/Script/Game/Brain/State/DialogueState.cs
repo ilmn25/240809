@@ -27,7 +27,7 @@ public class DialogueState : MobState {
     
     public override void OnUpdateState()
     {
-        if (!GUIDialogue.Showing || Utility.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!GUIDialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

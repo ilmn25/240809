@@ -11,6 +11,10 @@ public partial class Entity
         public Type Machine;
         public int Collision;
         public bool StaticLoad;
+        public Vector3 SpawnOffset;
+        
+        public static Vector3 MidAir = new Vector3(0.5f, 0.3f, 0.5f);
+        public static Vector3 Floor = new Vector3(0.5f, 0f, 0.5f);
          
         private static readonly Entity Item = new Entity
         {
@@ -18,7 +22,8 @@ public partial class Entity
                 Collision = Game.IndexNoCollide,
                 PrefabName = "item",
                 Machine = typeof(ItemMachine),
-                StaticLoad = false
+                StaticLoad = false,
+                SpawnOffset = MidAir
         };  
         
         public static void Initialize()
@@ -38,6 +43,7 @@ public partial class Entity
                         PrefabName = "block",
                         Machine = typeof(BlockMachine),
                         StaticLoad = true,
+                        SpawnOffset = Floor,
                 });
                 
                 Dictionary.Add("player", new Entity
@@ -47,6 +53,7 @@ public partial class Entity
                         PrefabName = "player",
                         Machine = typeof(PlayerMachine),
                         StaticLoad = false,
+                        SpawnOffset = MidAir,
                 });
                 AddMob<HunterMachine>("chito"); 
                 AddMob<HunterMachine>("yuuri");
@@ -63,6 +70,7 @@ public partial class Entity
                         PrefabName = "mob",
                         Machine = typeof(T),
                         StaticLoad = false,
+                        SpawnOffset = MidAir,
                 });
         }
 
@@ -75,6 +83,7 @@ public partial class Entity
                         PrefabName = "structure",
                         Machine = typeof(T),
                         StaticLoad = true,
+                        SpawnOffset = Floor,
                 });
         }
 
@@ -116,20 +125,19 @@ public partial class Entity
 
         public static Info CreateInfo(string stringID, Vector3 worldPosition)
         {
-                Type machineType = Dictionary[stringID].Machine;
+                Entity entity = Dictionary[stringID];
 
-                MethodInfo method = machineType.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+                MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
 
                 if (method != null && method.ReturnType == typeof(Info))
                 {
                         Info info = (Info)method.Invoke(null, null);
                         info.stringID = stringID;
-                        info.position = worldPosition;
+                        info.position = worldPosition + entity.SpawnOffset;
                         return info;
                 }
-
-                throw new InvalidOperationException($"Machine type '{machineType.Name}' must have a public static NewInfo method returning Info.");
+                
+                Debug.Log("error making info");
+                return null;
         }
-
-
 }

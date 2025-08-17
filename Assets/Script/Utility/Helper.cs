@@ -3,12 +3,12 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public static class Utility
+public static class Helper
 {
     private static readonly string SavePath;
     public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
 
-    static Utility()
+    static Helper()
     {
         SavePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
     }

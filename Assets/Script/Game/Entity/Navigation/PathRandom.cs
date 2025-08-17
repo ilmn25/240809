@@ -49,7 +49,7 @@ public class PathRandom
         Node closestNode = null;
         Node neighborNode;  
         
-        openList.Add(new Node(startPosition, null, 0, Utility.SquaredDistance(startPosition, endPosition), false, Vector3Int.zero));
+        openList.Add(new Node(startPosition, null, 0, Helper.SquaredDistance(startPosition, endPosition), false, Vector3Int.zero));
         while (openList.Count > 0 && closedList.Count < scanCount)
         { 
             openList.Sort((A, B) => A.F.CompareTo(B.F)); // sort lowest f to [0] 
@@ -64,18 +64,18 @@ public class PathRandom
                 if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(dirPosition), Scene.LogicDistance)) continue;  
                  
                 isFloat = Node.IsAir(dirPosition + Vector3Int.down); // set true if midair
-                gCost = currentNode.G + Utility.SquaredDistance(currentNode.Position, dirPosition);
+                gCost = currentNode.G + Helper.SquaredDistance(currentNode.Position, dirPosition);
                 if (direction.x != 0 && direction.z != 0 && isFloat) gCost++;  
                   
                 //don't add if not the lowest node compared to others
                 if (openList.Exists(node => node.Position == dirPosition && node.G <= gCost) ||
                     !agent.IsValidPosition(dirPosition, direction, currentNode)) continue;
                 
-                hCost = Utility.SquaredDistance(dirPosition, endPosition); 
+                hCost = Helper.SquaredDistance(dirPosition, endPosition); 
                 neighborNode = new Node(dirPosition, currentNode, gCost, hCost, isFloat, direction);
                 openList.Add(neighborNode);
 
-                currentDistance = Utility.SquaredDistance(dirPosition, endPosition);
+                currentDistance = Helper.SquaredDistance(dirPosition, endPosition);
                 if (currentDistance < closestDistance)
                 {
                     closestDistance = currentDistance;

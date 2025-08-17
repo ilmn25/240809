@@ -50,7 +50,7 @@ public class Game : MonoBehaviour
         SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), new Vector3SerializationSurrogate());
         surrogateSelector.AddSurrogate(typeof(Vector3Int), new StreamingContext(StreamingContextStates.All), new Vector3IntSerializationSurrogate());
-        Utility.BinaryFormatter.SurrogateSelector = surrogateSelector;
+        Helper.BinaryFormatter.SurrogateSelector = surrogateSelector;
     }
 
     private void Start()

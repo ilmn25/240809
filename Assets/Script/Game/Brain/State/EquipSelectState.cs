@@ -7,7 +7,7 @@ public class EquipSelectState : MobState
     }
     
     public override void OnUpdateState()
-    { 
+    {  
         if (Info.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
             Machine.SetState<DefaultState>();

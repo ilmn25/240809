@@ -78,6 +78,20 @@ public class Inventory
             _currentSlot = 8;
             RefreshInventory();
         }
+
+        if (Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+        {
+            if (CurrentItem.Stack == 0)
+            {
+                CurrentItemData = null;
+                Game.PlayerInfo.SetEquipment(null);
+            }
+            else
+            {
+                CurrentItemData = Item.GetItem(CurrentItem.StringID);
+                Game.PlayerInfo.SetEquipment(CurrentItem.StringID);
+            }
+        }
     }
 
     public static void HandleScrollInput(float input)
@@ -89,17 +103,7 @@ public class Inventory
     public static void RefreshInventory()
     { 
         _currentKey = CalculateKey();
-        CurrentItem = Storage.List[_currentKey];
-        if (CurrentItem.Stack == 0)
-        {
-            CurrentItemData = null;
-            Game.PlayerInfo.SetEquipment(null);
-        }
-        else
-        {
-            CurrentItemData = Item.GetItem(CurrentItem.StringID);
-            Game.PlayerInfo.SetEquipment(CurrentItem.StringID);
-        }
+        CurrentItem = Storage.List[_currentKey]; 
         SlotUpdate?.Invoke();  
     }
 

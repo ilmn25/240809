@@ -101,7 +101,7 @@ public class MapLoad
                     await Task.Run(() => LoadMeshMath()); 
                     await Task.Delay(10);
                     LoadMeshObject(replace);
-                }  else Utility.Log("Chunk in queue is zero");
+                }  else Helper.Log("Chunk in queue is zero");
             }
         }
         catch (Exception ex)

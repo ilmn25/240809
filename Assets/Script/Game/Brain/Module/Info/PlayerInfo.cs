@@ -29,8 +29,7 @@ public class PlayerInfo : MobInfo
     { 
         base.Initialize(); 
         IframesCurrent = 300;
-        IsPlayer = true;
-        Inventory.RefreshInventory();
+        IsPlayer = true; 
     }
 
     protected override void OnHit(Projectile projectile)
@@ -107,7 +106,7 @@ public class PlayerInfo : MobInfo
         }
         else
         {
-            _coyoteTimer -= Utility.GetDeltaTime();; // Decrease coyote timer when not grounded
+            _coyoteTimer -= Helper.GetDeltaTime();; // Decrease coyote timer when not grounded
         }
 
         if (Control.Inst.Jump.KeyDown())
@@ -120,7 +119,7 @@ public class PlayerInfo : MobInfo
         }
         else
         {
-            _jumpGraceTimer -= Utility.GetDeltaTime();; // Decrease jump grace timer
+            _jumpGraceTimer -= Helper.GetDeltaTime();; // Decrease jump grace timer
         }
 
         if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)

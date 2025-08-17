@@ -9,8 +9,8 @@ public class BlockInfo : DestructableInfo
 
     public override void Initialize()
     {
-        if (operationType == OperationType.Break)
-        {
+        if (operationType == OperationType.Dig)
+        { 
             Loot = Block.ConvertID(World.GetBlock(Vector3Int.FloorToInt(position)));
             Machine.transform.localScale = Vector3.one * 1.04f; 
         } 

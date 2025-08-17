@@ -27,7 +27,7 @@ public class EntityStaticLoad
         List<EntityMachine> removeList = new List<EntityMachine>();
         foreach (EntityMachine entityMachine in ActiveEntities[key].Item2)
         { 
-            ActiveEntities[key].Item1.Add(entityMachine.GetEntityData()); 
+            ActiveEntities[key].Item1.Add(entityMachine.Info); 
             removeList.Add(entityMachine);
         }
         foreach (var entityMachine in removeList) entityMachine.Delete();
@@ -45,20 +45,15 @@ public class EntityStaticLoad
             ActiveEntities[chunkCoordinate] = (activeEntities, new List<EntityMachine>());
         }
 
-        foreach (Info entityData in activeEntities)
+        foreach (Info info in activeEntities)
         {
-            entity = Entity.Dictionary[entityData.stringID];
-            currentInstance = ObjectPool.GetObject(entity.PrefabName, entityData.stringID);
-            
-            if (entity.PrefabName == "block")
-                currentInstance.transform.position = entityData.position;
-            else
-                currentInstance.transform.position = entityData.position + new Vector3(0.5f, 0, 0.5f);
-            
+            entity = Entity.Dictionary[info.stringID];
+            currentInstance = ObjectPool.GetObject(entity.PrefabName, info.stringID);
+            currentInstance.transform.position = info.position;
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
             ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  
-            currentEntityMachine.Initialize(entityData);
+            currentEntityMachine.Initialize(info);
         }
         activeEntities.Clear();
     } 
