@@ -30,6 +30,8 @@ public partial class Entity
         {
                 AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), Game.IndexCollide);
                 AddStructure<WorkBenchMachine>("workbench", Vector3Int.one, Game.IndexCollide);
+                AddStructure<WorkBenchMachine>("furnace", Vector3Int.one, Game.IndexCollide);
+                AddStructure<WorkBenchMachine>("stonecutter", Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>("station", Vector3Int.one, Game.IndexCollide);
                 AddStructure<ChestMachine>("chest", Vector3Int.one, Game.IndexCollide);
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, Game.IndexNoCollide);

@@ -18,7 +18,7 @@ public class GUIHandCrafting : GUIStorage
         } 
         else if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
         {
-             ItemRecipe.CraftItem(item.StringID);
+             ItemRecipe.CraftItem(item.StringID, !Input.GetKey(KeyCode.LeftShift));
         }
     }
     

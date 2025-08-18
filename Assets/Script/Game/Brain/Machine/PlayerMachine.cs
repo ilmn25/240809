@@ -76,10 +76,13 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
              Input.GetKeyDown(KeyCode.Space)))
         { 
             Info.CancelTarget();
-        } 
-        
+        }
+
         if (Input.GetKeyDown(KeyCode.N))
-            Entity.SpawnItem("brick", Vector3Int.FloorToInt(transform.position), 200);
+        {
+            Info.Storage.AddItem("wood", 50);
+            Info.Storage.AddItem("stone", 50);
+        } 
         if (Input.GetKeyDown(KeyCode.M)) 
             Entity.Spawn("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
