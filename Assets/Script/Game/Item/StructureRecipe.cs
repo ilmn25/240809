@@ -34,7 +34,7 @@ public class StructureRecipe
                 Entity.Spawn(Target!.StringID, position); 
                 foreach (var ingredient in Target.Ingredients)
                 {
-                        Inventory.RemoveItem(ingredient.Key, ingredient.Value);
+                        Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
                 } 
                 GUIMain.RefreshStorage();
         }

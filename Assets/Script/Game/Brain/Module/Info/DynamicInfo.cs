@@ -56,7 +56,7 @@ public class DynamicInfo : Info
             if (col.gameObject == Machine.gameObject || col.gameObject.layer != Game.IndexSemiCollide)
                 continue;
             
-            if (col.gameObject.name == "player")
+            if (Game.Player && col.gameObject == Game.Player)
                 KnockBack(col.transform.position, 0.2f, true);
             else
                 KnockBack(col.transform.position, 0.5f, true);

@@ -102,7 +102,7 @@ public class PlayerTerraformModule : Module
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         SpawnBlock();
         
-        Inventory.RemoveItem(_block.name);
+        Game.PlayerInfo.Storage.RemoveItem(_block.name);
     }
 
     public static void SpawnBlock()

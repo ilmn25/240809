@@ -39,7 +39,7 @@ public partial class ItemRecipe
         Audio.PlaySFX("pick_up", 0.4f);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            Inventory.RemoveItem(ingredient.Key, ingredient.Value);
+            Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
         }
         
         ItemSlot craftedItem = new ItemSlot();

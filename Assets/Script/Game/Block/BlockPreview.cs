@@ -5,7 +5,7 @@ public class BlockPreview
 { 
     private static readonly Dictionary<string, (Mesh mesh, Material material)> Cache = new();
 
-    private static readonly float Opacity = 0.45f;
+    private const float Opacity = 0.45f;
     
     private static List<Vector3> _vertices;
     private static List<int> _triangles;

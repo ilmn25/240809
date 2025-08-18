@@ -96,18 +96,19 @@ public partial class Entity
         
         public static void SpawnItem(string stringID, Vector3 worldPosition, int count = 1)
         {
-                for (int i = 0; i < count; i++)
-                {
-
-                        GameObject gameObject = ObjectPool.GetObject("item");
-                        gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + new Vector3(0.5f, 0.5f, 0.5f); 
+                GameObject gameObject = ObjectPool.GetObject("item");
+                gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + new Vector3(0.5f, 0.5f, 0.5f); 
         
-                        EntityMachine currentEntityMachine = (EntityMachine)
-                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
-                        EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                        currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition)); 
-                        
-                } 
+                EntityMachine currentEntityMachine = (EntityMachine)
+                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
+                EntityDynamicLoad.InviteEntity(currentEntityMachine);
+                ItemInfo itemInfo = (ItemInfo)CreateInfo(stringID, worldPosition);
+                itemInfo.item = new ItemSlot
+                {
+                        StringID = stringID,
+                        Stack = count,
+                };
+                currentEntityMachine.Initialize(itemInfo);  
         }
         
         public static void Spawn(string stringID, Vector3 worldPosition)

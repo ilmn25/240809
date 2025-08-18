@@ -19,8 +19,17 @@ public class Inventory
     { 
         if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
         {
-            Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position);
-            RemoveItem(CurrentItem.StringID); 
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position, CurrentItem.Stack); 
+                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.StringID, CurrentItem.Stack, Game.PlayerInfo.Storage.Key);
+            }
+            else
+            {
+                Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position); 
+                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.StringID, 1, Game.PlayerInfo.Storage.Key);
+            } 
+            RefreshInventory();
         }
 
         if (Control.Inst.Hotbar1.KeyDown())
@@ -108,10 +117,5 @@ public class Inventory
         Game.PlayerInfo.Storage.AddItem(stringID, quantity, Game.PlayerInfo.Storage.Key, Game.Player.transform.position);
         RefreshInventory();
     }
-    
-    public static void RemoveItem(string stringID, int quantity = 1)
-    {
-        Game.PlayerInfo.Storage.RemoveItem(stringID, quantity, Game.PlayerInfo.Storage.Key);
-        RefreshInventory();
-    }   
+     
 }

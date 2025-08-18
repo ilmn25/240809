@@ -131,4 +131,9 @@ public class ItemSlot
     {
         return Stack == 0;
     }
+    public bool isFull()
+    {
+        return Stack == Item.GetItem(StringID).StackSize;
+    }
+     
 }
