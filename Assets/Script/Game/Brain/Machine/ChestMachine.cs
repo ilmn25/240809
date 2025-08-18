@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ChestMachine : StructureMachine, IActionSecondary, IActionPrimaryResource
+public class ChestMachine : StructureMachine, IActionSecondaryInteract, IActionPrimaryResource
 {
     public static Info CreateInfo()
     {
@@ -26,7 +26,7 @@ public class ChestMachine : StructureMachine, IActionSecondary, IActionPrimaryRe
     }
     
 
-    public void OnActionSecondary(EntityMachine entityMachine)
+    public void OnActionSecondary(Info info)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InContainerState>();

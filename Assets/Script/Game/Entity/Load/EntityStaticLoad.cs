@@ -30,7 +30,7 @@ public class EntityStaticLoad
             ActiveEntities[key].Item1.Add(entityMachine.Info); 
             removeList.Add(entityMachine);
         }
-        foreach (var entityMachine in removeList) entityMachine.Delete();
+        foreach (var entityMachine in removeList) entityMachine.Unload();
     }
 
     public static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)

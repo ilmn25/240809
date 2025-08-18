@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Inventory 
-{
-    private static int _currentRow = 0;
-    private static int _currentSlot = 0;
-    private static int _currentKey = 0;
+{ 
+    private static int _buffer = 0;
     public static ItemSlot CurrentItem;
     public static Item CurrentItemData;
 
-    public static readonly int InventoryRowAmount = 3;
+    public static readonly int InventoryRowAmount = 1;
     public static readonly int InventorySlotAmount = 9;
 
     public static event Action SlotUpdate; 
@@ -25,63 +23,61 @@ public class Inventory
             RemoveItem(CurrentItem.StringID); 
         }
 
-        if (Control.Inst.Hotbar.KeyDown())
-        {
-            _currentRow = (_currentRow + 1) % InventoryRowAmount;
-            RefreshInventory();
-        }
-
         if (Control.Inst.Hotbar1.KeyDown())
         {  
-            _currentSlot = 0;
+            _buffer = 0;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar2.KeyDown())
         {  
-            _currentSlot = 1;
+            _buffer = 1;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar3.KeyDown())
         {  
-            _currentSlot = 2;
+            _buffer = 2;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar4.KeyDown())
         {  
-            _currentSlot = 3;
+            _buffer = 3;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar5.KeyDown())
         {  
-            _currentSlot = 4;
+            _buffer = 4;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar6.KeyDown())
         {  
-            _currentSlot = 5;
+            _buffer = 5;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar7.KeyDown())
         {  
-            _currentSlot = 6;
+            _buffer = 6;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar8.KeyDown())
         {  
-            _currentSlot = 7;
+            _buffer = 7;
             RefreshInventory();
         }
         else if (Control.Inst.Hotbar9.KeyDown())
         {  
-            _currentSlot = 8;
+            _buffer = 8;
             RefreshInventory();
         }
          
 
-        if (Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+        if (Game.PlayerInfo.Machine && Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         {
-            _currentKey = CalculateKey();
-            CurrentItem = Game.PlayerInfo.Storage.List[_currentKey];
+            if (_buffer != -1)
+            {
+                Game.PlayerInfo.Storage.Key = _buffer;
+                _buffer = -1;
+            }
+            CurrentItem = Game.PlayerInfo.Storage.List[Game.PlayerInfo.Storage.Key];
             if (CurrentItem is not { Stack: 0 })
             {
                 CurrentItemData = Item.GetItem(CurrentItem.StringID);
@@ -97,7 +93,7 @@ public class Inventory
 
     public static void HandleScrollInput(float input)
     {
-        _currentSlot = (int)Mathf.Repeat(_currentSlot + (int)input, InventorySlotAmount); 
+        _buffer = (int)Mathf.Repeat(_buffer + (int)input, InventorySlotAmount); 
         RefreshInventory(); 
     }
 
@@ -105,23 +101,17 @@ public class Inventory
     {  
         SlotUpdate?.Invoke();  
     }
-
-    public static int CalculateKey(int row = -1, int slot = -1)
-    {
-        if (row == -1)
-            return _currentRow * InventorySlotAmount + _currentSlot;
-        return row * InventorySlotAmount + slot;
-    } 
+ 
     
     public static void AddItem(string stringID, int quantity = 1)
     {  
-        Game.PlayerInfo.Storage.AddItem(stringID, quantity, _currentKey, Game.Player.transform.position);
+        Game.PlayerInfo.Storage.AddItem(stringID, quantity, Game.PlayerInfo.Storage.Key, Game.Player.transform.position);
         RefreshInventory();
     }
     
     public static void RemoveItem(string stringID, int quantity = 1)
     {
-        Game.PlayerInfo.Storage.RemoveItem(stringID, quantity, _currentKey);
+        Game.PlayerInfo.Storage.RemoveItem(stringID, quantity, Game.PlayerInfo.Storage.Key);
         RefreshInventory();
     }   
 }

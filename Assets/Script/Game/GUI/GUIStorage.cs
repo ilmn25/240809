@@ -9,9 +9,11 @@ public class  GUIStorage : GUI
     public EventHandler OnRefreshSlot;
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
+    private int _cooldown = 0;
+    private int _cooldownSpeed = 60;
     
     public Storage Storage; 
-    public int RowAmount = 3;
+    public int RowAmount = 1;
     public int SlotAmount = 9;
     public string Name;
     protected int CurrentSlotKey = -1; 
@@ -57,17 +59,36 @@ public class  GUIStorage : GUI
         {
             if (Control.Inst.ActionPrimary.KeyDown())
             { 
-                ActionPrimary(); 
+                ActionPrimaryDown(); 
             }
             else if (Control.Inst.ActionSecondary.KeyDown())
             { 
-                ActionSecondary(); 
+                ActionSecondaryDown(); 
+            }
+            else if (Control.Inst.ActionSecondary.Key())
+            {
+                if (_cooldown == 0)
+                {
+                    _cooldown = _cooldownSpeed;
+                    if (_cooldownSpeed != 10) _cooldownSpeed -= 10;
+                    ActionSecondaryKey(); 
+                }
+                else
+                {
+                    _cooldown--;
+                }
+            }
+            else if (Control.Inst.ActionSecondary.KeyUp())
+            { 
+                _cooldownSpeed = 60;
+                _cooldown = 0;
             }
         }
     }
 
-    protected virtual void ActionPrimary() {}
-    protected virtual void ActionSecondary() {} 
+    protected virtual void ActionPrimaryDown() {}
+    protected virtual void ActionSecondaryDown() {} 
+    protected virtual void ActionSecondaryKey() {} 
     public void SetInfoPanel(int currentSlotKey = -1)
     { 
         CurrentSlotKey = currentSlotKey;
@@ -92,7 +113,7 @@ public class  GUIStorage : GUI
 
 public class GUIBuilding : GUIStorage
 {
-    protected override void ActionPrimary()
+    protected override void ActionPrimaryDown()
     {
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
         if (StructureRecipe.IsCraftable(Storage.List[CurrentSlotKey].StringID))
@@ -108,7 +129,7 @@ public class GUIBuilding : GUIStorage
 
 public class GUICrafting : GUIStorage
 {
-    protected override void ActionPrimary()
+    protected override void ActionPrimaryDown()
     { 
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
         if (!ItemRecipe.IsCraftable(Storage.List[CurrentSlotKey].StringID)) return;
@@ -125,7 +146,7 @@ public class GUICrafting : GUIStorage
 
 public class GUIChest : GUIStorage
 {
-    protected override void ActionPrimary()
+    protected override void ActionPrimaryDown()
     {
         if (GUICursor.Data.isEmpty())
         {
@@ -137,29 +158,39 @@ public class GUIChest : GUIStorage
         } 
         else
         {
+            Audio.PlaySFX("pick_up", 0.4f);
             (Storage.List[CurrentSlotKey], GUICursor.Data) = 
                 (GUICursor.Data, Storage.List[CurrentSlotKey]);
         } 
         Inventory.RefreshInventory();
     }
 
-    protected override void ActionSecondary()
+    protected override void ActionSecondaryDown()
+    {
+        if (!Input.GetKeyDown(KeyCode.LeftShift)) return;
+        ItemSlot itemSlot = Storage.List[CurrentSlotKey];
+        if (!itemSlot.isEmpty())
+        {
+            if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
+            {
+                GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
+                Inventory.RefreshInventory();
+            }
+        }
+    }
+
+    protected override void ActionSecondaryKey()
     {
         ItemSlot itemSlot = Storage.List[CurrentSlotKey];
         if (!itemSlot.isEmpty())
         {
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
-                if (Input.GetKey(KeyCode.LeftShift))
-                    GUICursor.Data.Add(itemSlot, itemSlot.Stack/2);
-                else 
-                    GUICursor.Data.Add(itemSlot, 1);
-                        
+                GUICursor.Data.Add(itemSlot, 1);
                 Inventory.RefreshInventory();
             }
         }
     }
-
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
         GUIMain.Cursor.Set(itemSlot.StringID);

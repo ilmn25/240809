@@ -19,7 +19,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
             Hunger = 100,
             Stamina = 100,
             SpeedGround = 5,
-            SpeedAir = 7,
+            SpeedAir = 6,
             Iframes = 100, 
             PathAmount = 7000,
             MaxStuckCount = 100,
@@ -74,10 +74,8 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
              Input.GetKeyDown(KeyCode.S) ||
              Input.GetKeyDown(KeyCode.D) ||
              Input.GetKeyDown(KeyCode.Space)))
-        {
-            Info.PathingStatus = PathingStatus.Stuck;
-            SetState<DefaultState>();
-            Info.Target = null;
+        { 
+            Info.CancelTarget();
         } 
         
         if (Input.GetKeyDown(KeyCode.N))
@@ -112,13 +110,13 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                     switch (Info.Equipment?.Type)
                     {
                         case ItemType.Tool:
-                            if (Info.Equipment.ProjectileInfo.OperationType == OperationType.Dig &&
+                            if (Info.Equipment.Name == "blueprint" &&
                                 Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
                                 PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
                                     true);
-                                if (!Info.IsBusy && Control.Inst.ActionPrimary.Key())
+                                if (Control.Inst.ActionPrimary.Key())
                                     PlayerTerraformModule.HandleMapBreak(); 
                             }
 
@@ -150,12 +148,16 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
         }
         else if (IsCurrentState<DefaultState>()) 
         {
-            if (Info.Target == null)
+            if (Info.Target == null && Game.PlayerInfo.PlayerStatus == PlayerStatus.Active)
             {  
-                if (Game.Player)
+                if (Game.PlayerInfo.CombatCooldown < 0)
                 {
                     Info.Target = Game.PlayerInfo;
                     Info.ActionType = IActionType.Follow;
+                }
+                else
+                {
+                    Info.CancelTarget();
                 }
             } 
             SetState<MobChaseAction>();
@@ -164,12 +166,9 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
      
     public override void Attack()
     {
-        if (Info.Equipment.ProjectileInfo.Ammo != null && 
+        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null && 
             Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
-                    
-        Info.AimPosition = Control.MouseTarget ?
-            Control.MouseTarget.transform.position + Vector3.up * 0.55f :
-            Control.MousePosition + Vector3.up * 0.15f; 
+                     
                     
         switch (Info.Equipment.Gesture)
         {
@@ -181,7 +180,6 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                 break;
         }
                     
-        if (Info.Equipment.ProjectileInfo.Ammo != null) Inventory.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null) Inventory.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
     }
-     
 } 

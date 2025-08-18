@@ -7,11 +7,7 @@ public class DestructableInfo : StructureInfo
         PlayerInfo info = (PlayerInfo)projectile.SourceInfo;
         info.Target = this;
         info.ActionType = IActionType.Hit;
-    }
-    public override void OnDestroy(Projectile projectile)
-    {
-        ((PlayerInfo)projectile.SourceInfo).Target = null;
-    }
+    } 
 }
 
 [System.Serializable]

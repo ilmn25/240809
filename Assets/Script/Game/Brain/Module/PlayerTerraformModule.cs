@@ -33,7 +33,7 @@ public class PlayerTerraformModule : Module
                 _block.transform.localScale = Vector3.one;
             }  
         } 
-        else if (Inventory.CurrentItemData.ProjectileInfo.OperationType == OperationType.Dig)
+        else if (Inventory.CurrentItemData.Name == "blueprint")
         {
             _block.SetActive(true); 
             if (_block.name != "overlay")

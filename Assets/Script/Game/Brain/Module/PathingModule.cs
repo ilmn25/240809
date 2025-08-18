@@ -67,7 +67,8 @@ public abstract class PathingModule : MobModule
             } 
             return false;
         }
- 
+
+        
         if (Vector3.Distance(Machine.transform.position, Info.Target.position) < 1)
         {
             Info.PathingStatus = PathingStatus.Reached; 

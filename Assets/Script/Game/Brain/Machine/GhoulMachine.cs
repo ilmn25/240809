@@ -95,7 +95,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Info.Target = (MobInfo) Game.PlayerInfo;
+            Info.Target = Game.PlayerInfo;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 

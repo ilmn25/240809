@@ -95,6 +95,7 @@ public class ItemSlot
  
     public void Add(ItemSlot slot, int amountToAdd = 0)
     {
+        Audio.PlaySFX("pick_up", 0.4f);
         if (slot.isEmpty()) return;
         int maxStackSize = Item.GetItem(slot.StringID).StackSize;
         int addableAmount;

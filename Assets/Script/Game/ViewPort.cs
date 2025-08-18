@@ -149,14 +149,7 @@ public class ViewPort
 
     private static void HandlePlayerFollow()
     {
-        if (Game.Player)
-        {
-            Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.Player.transform.position, Time.deltaTime * FollowSpeed);
-        }
-        else if (Game.PlayerInfo != null)
-        {
-            Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.PlayerInfo.position, Time.deltaTime * FollowSpeed);
-        }
+        Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.PlayerInfo.position, Time.deltaTime * FollowSpeed);
     }
  
 }

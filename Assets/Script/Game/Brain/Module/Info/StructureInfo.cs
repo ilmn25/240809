@@ -29,7 +29,7 @@ public class StructureInfo : Info
         }
         else
         {
-            Audio.PlaySFX(SfxHit); 
+            Audio.PlaySFX(SfxHit, 0.1f); 
             OnHit(projectile); 
         }
         return true;

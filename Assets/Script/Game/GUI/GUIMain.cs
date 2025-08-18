@@ -22,7 +22,7 @@ public class GUIMain
     public static void Initialize()
     {
         Inventory.SlotUpdate += RefreshStorage;
-        GUICraft.Initialize(); 
+        // GUICraft.Initialize(); 
         Cursor = new GUICursor();
         Cursor.Initialize();
         Cursor.Show(false);
@@ -48,12 +48,12 @@ public class GUIMain
 
         Storage storage = new Storage(18);
         storage.AddItem("station");
-        storage.AddItem("hammer");
+        storage.AddItem("axe_stone");
         storage.AddItem("spear");
         HandCrafting = new GUIHandCrafting()
         {
             Storage = storage,
-            RowAmount = 2,
+            RowAmount = 1,
             SlotAmount = 9,
             Position = new Vector2(-100, -50), 
             Name = "Crafting",

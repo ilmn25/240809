@@ -26,7 +26,7 @@ public class Loot
         loot.Add(1, 7, "brick"); 
         loot.Add(0.5f, 2, "brick");
         loot.Add(0.5f, 5, "marble");  
-        loot.Add(1, 1, "sword", "axe"); 
+        loot.Add(1, 1, "sword", "axe_diamond"); 
         loot.Add(0.5f, 1, "minigun"); 
         
         loot = CreateTable("slab");
@@ -40,7 +40,7 @@ public class Loot
         loot.Add(0.5f, 2, "wood"); 
         
         loot = CreateTable("megumin");
-        loot.Add(0.1f, 1, "sword", "axe"); 
+        loot.Add(0.1f, 1, "sword", "axe_diamond"); 
         
         loot = CreateTable("chito");
         loot.Add(0.7f, 10, "bullet"); 

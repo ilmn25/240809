@@ -1,4 +1,4 @@
-public class StationMachine: StructureMachine, IActionSecondary
+public class StationMachine: StructureMachine, IActionSecondaryInteract
 {    public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
@@ -21,7 +21,7 @@ public class StationMachine: StructureMachine, IActionSecondary
     }
     
 
-    public void OnActionSecondary(EntityMachine entityMachine)
+    public void OnActionSecondary(Info info)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InBuildingState>();

@@ -13,8 +13,7 @@ public class DialogueState : MobState {
     {
         if (Game.GUIDialogue.activeSelf)
         {
-            Machine.SetState<DefaultState>();
-            Info.Target = null;
+            Info.CancelTarget();
             return;
         }
         Audio.PlaySFX("chat");

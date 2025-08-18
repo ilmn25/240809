@@ -11,6 +11,7 @@ public class GUIInfoPanel : GUI
         Rect = Game.GUIInfoPanel.GetComponent<RectTransform>();
         GameObject = Game.GUIInfoPanel.gameObject;
         GameObject.AddComponent<HoverModule>().GUI = this;
+        Position = new Vector2(-360, -125);
         base.Initialize();
     }
     

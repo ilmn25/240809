@@ -36,6 +36,7 @@ public partial class ItemRecipe
     
     public static void CraftItem(string stringID)
     { 
+        Audio.PlaySFX("pick_up", 0.4f);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             Inventory.RemoveItem(ingredient.Key, ingredient.Value);
