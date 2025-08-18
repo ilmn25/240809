@@ -14,8 +14,7 @@ class MobChaseAction : MobState {
     public override void OnUpdateState() {
         if (Game.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
         {
-            Info.Target = null;
-            Machine.SetState<DefaultState>();
+            Info.CancelTarget();
             return;
         }
         if (Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp && 
@@ -29,14 +28,12 @@ class MobChaseAction : MobState {
                 if (Info.ActionType == IActionType.Interact && Info.Target.Machine.gameObject.activeSelf)
                 {
                     (Info.Target.Machine as IActionSecondaryInteract).OnActionSecondary(Info);
-                    Info.Target = null;
-                    Machine.SetState<DefaultState>();
+                    Info.CancelTarget(); 
                 } 
                 else if (Info.ActionType == IActionType.PickUp && Info.Target.Machine.gameObject.activeSelf)
                 {
                     (Info.Target as ItemInfo).OnActionSecondary(Info);
-                    Info.Target = null;
-                    Machine.SetState<DefaultState>();
+                    Info.CancelTarget();
                 }
                 else if (Info.ActionType == IActionType.Hit && Info.Target.Machine.gameObject.activeSelf)
                 {
@@ -49,15 +46,13 @@ class MobChaseAction : MobState {
                 }
                 else
                 {
-                    Info.Target = null;
-                    Machine.SetState<DefaultState>(); 
+                    Info.CancelTarget();
                 } 
             }  
         }
         else if (Info.PathingStatus == PathingStatus.Stuck)
         {
-            Info.Target = null;
-            Machine.SetState<DefaultState>();
+            Info.CancelTarget();
         }
     } 
 }

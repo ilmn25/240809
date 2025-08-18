@@ -8,6 +8,7 @@ public class Storage
         
         public List<ItemSlot> List;
         public int ID;
+        public int Key;
         
         public Storage(int size)
         {

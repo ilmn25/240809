@@ -7,7 +7,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
 { 
     public Info Info => GetModule<Info>();
     public Entity Entity;
-    private bool _initialSetup;   
+    private bool _initialSetup = false;   
 
     public static Info NewInfo() => new Info();
     public virtual void OnSetup() {}
@@ -33,8 +33,13 @@ public abstract class EntityMachine : Machine, IInfoProvider
         }  
         StartInternal();
     } 
-    
+     
     public void Delete()
+    { 
+        Info.Destroyed = true;
+        Unload();
+    }
+    public void Unload()
     { 
         Info.Machine = null;
         if (Entity.StaticLoad)

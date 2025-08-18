@@ -6,8 +6,8 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class GUIHandCrafting : GUIStorage
-{
-    protected override void ActionPrimary()
+{ 
+    protected override void ActionPrimaryDown()
     {
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].StringID);
@@ -20,7 +20,18 @@ public class GUIHandCrafting : GUIStorage
         {
              ItemRecipe.CraftItem(item.StringID);
         }
-    } 
+    }
+    
+    protected override void ActionSecondaryKey()
+    {
+        if (Storage.List[CurrentSlotKey].Stack == 0) return;
+        Item item = Item.GetItem(Storage.List[CurrentSlotKey].StringID);
+
+        if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
+        {
+            ItemRecipe.CraftItem(item.StringID);
+        }
+    }
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     { 

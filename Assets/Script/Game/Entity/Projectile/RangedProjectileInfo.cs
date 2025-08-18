@@ -35,7 +35,7 @@ public class RangedProjectileInfo : ProjectileInfo
                 } 
             
                 IActionPrimary target = HitBuffer[i].GetComponent<IActionPrimaryAttack>();
-                if (target == null) continue;
+                if (target == null || projectile.SourceInfo.Machine == (Machine)target) continue;
                  
                 if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
                 {

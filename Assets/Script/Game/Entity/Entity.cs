@@ -18,7 +18,7 @@ public partial class Entity
          
         private static readonly Entity Item = new Entity
         {
-                Bounds = Vector3Int.one,
+                Bounds = Vector3Int.zero,
                 Collision = Game.IndexNoCollide,
                 PrefabName = "item",
                 Machine = typeof(ItemMachine),

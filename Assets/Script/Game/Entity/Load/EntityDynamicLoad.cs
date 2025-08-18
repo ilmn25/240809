@@ -30,7 +30,7 @@ public class EntityDynamicLoad
                 removeList.Add(entityMachine);
             }
         }
-        foreach (var entityMachine in removeList) entityMachine.Delete();
+        foreach (var entityMachine in removeList) entityMachine.Unload();
     }
 
 
@@ -64,7 +64,7 @@ public class EntityDynamicLoad
                 World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
             removeList.Add(entityMachine);
         }
-        foreach (var entityMachine in removeList) entityMachine.Delete();
+        foreach (var entityMachine in removeList) entityMachine.Unload();
     }
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)

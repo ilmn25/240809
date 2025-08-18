@@ -1,10 +1,11 @@
-public class WorkBenchMachine: StructureMachine, IActionSecondary
+public class WorkBenchMachine: StructureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
         storage.AddItem("brick");
-        storage.AddItem("axe");
+        storage.AddItem("axe_stone");
+        storage.AddItem("axe_iron");
         storage.AddItem("hammer");
         storage.AddItem("pistol");
         storage.AddItem("spear");
@@ -25,7 +26,7 @@ public class WorkBenchMachine: StructureMachine, IActionSecondary
         AddState(new InCraftingState());
     } 
 
-    public void OnActionSecondary(EntityMachine entityMachine)
+    public void OnActionSecondary(Info info)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InCraftingState>();

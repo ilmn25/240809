@@ -71,6 +71,7 @@ public class Control
     public static void SetPlayer(int i)
     {
         Game.PlayerInfo = World.Inst.target[i];
+        Game.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Game.Player = null;
         GUIMain.StorageInv.Storage = Game.PlayerInfo.Storage;
         GUIHealthBar.Update();
@@ -136,7 +137,6 @@ public class Control
             if (collider.gameObject == Game.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
-            // Debug.Log(collider.gameObject.name);
             distance = Helper.SquaredDistance(collider.transform.position, Game.Player.transform.position);
             if (distance < nearestDistance)
             {

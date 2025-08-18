@@ -19,7 +19,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
     }
 
     public override void OnStart()
-    {  
+    {
         _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + Info.stringID);
         AddModule(new ItemPhysicModule()); 
         AddModule(new ItemSpriteCullModule()); 

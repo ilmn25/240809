@@ -22,7 +22,7 @@ public class EnemyInfo : MobInfo
 
     protected override void OnHit(Projectile projectile)
     { 
-        if (Target == projectile.SourceInfo) return;
+        if (projectile.SourceInfo == Game.PlayerInfo) Game.PlayerInfo.CombatCooldown = 10000;
         Target = projectile.SourceInfo;
         PathingStatus = PathingStatus.Reached; 
         Machine.SetState<DefaultState>();

@@ -13,16 +13,16 @@ public class PlayerInfo : MobInfo
     public float Mana;
     public float Sanity;
     public float Hunger;
-    public float Stamina;  
+    public float Stamina;   
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
     private const float HoldVelocity = 0.05f;
     private const float ClampVelocity = 10f;
+    [NonSerialized] public int CombatCooldown;
     [NonSerialized] public float AirTime;
     [NonSerialized] private float _jumpGraceTimer;
     [NonSerialized] private float _coyoteTimer;
-    [NonSerialized]  public bool IsBusy = false; 
     [NonSerialized] public PlayerStatus PlayerStatus = PlayerStatus.Loading;
 
     public override void Initialize()
@@ -40,17 +40,18 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-
+        CombatCooldown--;
         if (PlayerStatus == PlayerStatus.Active)
         {
             if (Health <= 0)
             {
                 Audio.PlaySFX(DeathSfx, 0.8f);
                 Sprite.gameObject.SetActive(false);
+                CancelTarget();
                 PlayerStatus = PlayerStatus.Dead;
                 GUIMain.Show(false);
-                Velocity = Vector2.zero;
-                Direction = Vector2.zero;
+                CombatCooldown = 0;
+                Velocity = Vector2.zero; 
                 IframesCurrent = 500;
             }
 
@@ -60,12 +61,19 @@ public class PlayerInfo : MobInfo
             if (Game.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+                
+                AimPosition = Control.MouseTarget ?
+                    Control.MouseTarget.transform.position + Vector3.up * 0.55f :
+                    Control.MousePosition + Vector3.up * 0.15f; 
+                
                 SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
                 HandleMovement();
             }
             else
             {
-                SpeedTarget = IsGrounded ? SpeedAir * 1.3f : SpeedAir * 1.8f;
+                if (Target != null) AimPosition = Target.position; 
+                
+                SpeedTarget = IsGrounded ? SpeedGround + 0.1f : SpeedAir * 1.3f;
             } 
         }
         else
@@ -77,13 +85,14 @@ public class PlayerInfo : MobInfo
                     World.ChunkSize * WorldGen.Size.x / 2,
                     World.ChunkSize * WorldGen.Size.y - 5,
                     World.ChunkSize * WorldGen.Size.z / 2);
-                Sprite.gameObject.SetActive(true);  
+                Sprite.gameObject.SetActive(true);   
             } 
             Health = HealthMax;
             Velocity = Vector2.zero;
             PlayerStatus = PlayerStatus.Active;
             GUIHealthBar.Update();
             Inventory.RefreshInventory();
+            Machine.SetState<DefaultState>();
         } 
         
         if (!IsGrounded && Velocity.y < -10) AirTime += 1;

@@ -40,17 +40,33 @@ public class MobInfo : DynamicInfo
     
     [NonSerialized] public bool FaceTarget;
     [NonSerialized] public Vector3 AimPosition; 
-    [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending; 
- 
+    [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending;
+
+    public void CancelTarget()
+    {
+        Target = null; 
+        PathingStatus = PathingStatus.Stuck;
+        Direction = Vector3.zero;            
+        Machine.SetState<DefaultState>();
+        if (Input.GetKey(KeyCode.B))Debug.Log("a");
+    }
+    
     protected override void OnUpdate()
     { 
         base.OnUpdate();
         if (Target != null)
         {
-            TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.position) - 
-                              Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
+            if (Target.Destroyed)
+            {
+                CancelTarget();
+            }
+            else
+            {
+                TargetScreenDir = (Camera.main.WorldToScreenPoint(Target.position) - 
+                                   Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
+            }
         }
-    } 
+    }   
 
     public void SetEquipment(String stringID)
     { 

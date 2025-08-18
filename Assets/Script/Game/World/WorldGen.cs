@@ -194,26 +194,15 @@ public class WorldGen
                             }
  
                         }
-                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.0002)
+                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.002)
                         { 
                             if (Random.NextDouble() <= 0.5)
                             {
-                                if (Random.NextDouble() <= 0.5)
-                                {
-                                    chunk.DynamicEntity.Add(Entity.CreateInfo("snare_flea", coordinates + new Vector3Int(x, y + 1, z)));
-                                } else
-                                {
-                                    chunk.DynamicEntity.Add(Entity.CreateInfo("chito", coordinates + new Vector3Int(x, y + 1, z))); 
-                                }
-                            } else { 
-                                if (Random.NextDouble() <= 0.5)
-                                {
-                                    chunk.DynamicEntity.Add(Entity.CreateInfo("megumin", coordinates + new Vector3Int(x, y + 1, z))); 
-                                } else
-                                {
-                                    chunk.DynamicEntity.Add(Entity.CreateInfo("yuuri", coordinates + new Vector3Int(x, y + 1, z)));
-                                }
-                            } 
+                                chunk.DynamicEntity.Add(Entity.CreateInfo("flint", coordinates + new Vector3Int(x, y + 1, z)));
+                            } else
+                            {
+                                chunk.DynamicEntity.Add(Entity.CreateInfo("sticks", coordinates + new Vector3Int(x, y + 1, z))); 
+                            }
                         }
                     } 
                 }
