@@ -11,6 +11,9 @@ public class ItemPhysicModule : Module
     private const int SlideRange = 2;
     private const float CollisionRange = 0.3f;
 
+    private static readonly Collider[] TempCollisionArray = new Collider[1];
+    private static int _collisionCount; 
+    
     public void PopItem() //spawn velocity 
     {
         _velocity = new Vector3(Random.Range(-SlideRange, SlideRange), 0, Random.Range(-SlideRange, SlideRange));  
@@ -39,16 +42,14 @@ public class ItemPhysicModule : Module
             _velocity = -_velocity * BounceFactor;
         } 
     }
-    
-    Collider[] tempCollisionArray = new Collider[1];
-    int collisionCount; 
+     
     private bool IsMovable(Vector3 newPosition)
     {  
         // Define an array to store the results
-        tempCollisionArray[0] = null;
-        collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), CollisionRange, tempCollisionArray, Game.MaskStatic);
+        TempCollisionArray[0] = null;
+        _collisionCount = Physics.OverlapSphereNonAlloc(newPosition + new Vector3(0,0.2f,0), CollisionRange, TempCollisionArray, Game.MaskStatic);
 
-        return !(collisionCount > 0);
+        return !(_collisionCount > 0);
     }
     
     //! DEBUG TOOLS

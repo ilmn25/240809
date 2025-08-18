@@ -183,6 +183,6 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                 break;
         }
                     
-        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null) Inventory.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null) Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
     }
 } 
