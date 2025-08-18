@@ -37,6 +37,13 @@ public class StructurePreviewState : State
                 if (StructureRecipe.Target == null)
                         Machine.SetState<DefaultState>();
                 
+                if (!GUIMain.IsHover && Control.Inst.ActionSecondary.KeyDown())
+                {  
+                        StructureRecipe.Target = null;
+                        Machine.SetState<DefaultState>(); 
+                        return;
+                }
+                
                 Vector3Int position = Vector3Int.FloorToInt(Control.MousePosition - Control.MouseDirection * 0.1f);
                 
                 if (!Control.MouseTarget && Scene.InPlayerBlockRange(position, 6) &&
@@ -48,6 +55,7 @@ public class StructurePreviewState : State
                                 _targetPosition, Time.deltaTime * 10);
                         if (!GUIMain.IsHover && Control.Inst.ActionPrimary.KeyDown())
                         { 
+                                Audio.PlaySFX("pick_up", 0.4f);
                                 StructureRecipe.Build(position);
                                 StructureRecipe.Target = null;
                         }

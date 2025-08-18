@@ -66,7 +66,7 @@ public class Storage
                 } 
                 // RefreshInventory();
         }
-
+                
         public void AddItem(string stringID, int quantity = 1, int priority = 0, Vector3 position = default)
         {   
                 int maxStackSize = Item.GetItem(stringID).StackSize;

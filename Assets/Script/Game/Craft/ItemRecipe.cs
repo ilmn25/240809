@@ -34,7 +34,7 @@ public partial class ItemRecipe
         return true;
     }
     
-    public static void CraftItem(string stringID)
+    public static void CraftItem(string stringID, bool isCursor = true)
     { 
         Audio.PlaySFX("pick_up", 0.4f);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
@@ -45,7 +45,7 @@ public partial class ItemRecipe
         ItemSlot craftedItem = new ItemSlot();
         
         craftedItem.SetItem(Dictionary[stringID].Stack, stringID, null, false);
-        if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem))
+        if (isCursor && (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem)))
         {
             GUICursor.Data.Add(craftedItem);
         }

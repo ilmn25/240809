@@ -29,6 +29,8 @@ public partial class Item
         AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
         AddStructureDefinition("workbench", new Dictionary<string, int> {{ "stone", 15 }}, 200);
+        AddStructureDefinition("stonecutter", new Dictionary<string, int> {{ "stone", 15 }}, 200);
+        AddStructureDefinition("furnace", new Dictionary<string, int> {{ "stone", 15 }}, 200);
         AddStructureDefinition("blueprint_station", new Dictionary<string, int> {{ "wood", 15 }}, 200);
         
         AddToolDefinition(

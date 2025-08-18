@@ -2,8 +2,10 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
 {    public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
-        storage.AddItem("chest"); 
         storage.AddItem("workbench");
+        storage.AddItem("stonecutter");
+        storage.AddItem("furnace");
+        storage.AddItem("chest");   
         return new ContainerInfo()
         {
             Health = 500,

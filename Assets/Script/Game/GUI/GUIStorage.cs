@@ -10,7 +10,7 @@ public class  GUIStorage : GUI
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
     private int _cooldown = 0;
-    private int _cooldownSpeed = 60;
+    private int _cooldownSpeed = 40;
     
     public Storage Storage; 
     public int RowAmount = 1;
@@ -80,7 +80,7 @@ public class  GUIStorage : GUI
             }
             else if (Control.Inst.ActionSecondary.KeyUp())
             { 
-                _cooldownSpeed = 60;
+                _cooldownSpeed = 40;
                 _cooldown = 0;
             }
         }
@@ -148,32 +148,69 @@ public class GUIChest : GUIStorage
 {
     protected override void ActionPrimaryDown()
     {
-        if (GUICursor.Data.isEmpty())
+        if (Storage.List[CurrentSlotKey].isEmpty() && GUICursor.Data.isEmpty())
         {
-            GUICursor.Data.Add(Storage.List[CurrentSlotKey]);
+            return;
         }
-        else if (Storage.List[CurrentSlotKey].isSame(GUICursor.Data))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            Storage.List[CurrentSlotKey].Add(GUICursor.Data);
-        } 
+            if (GUIMain.StorageInv == this)
+            {
+                if (GUIMain.Storage.Showing)
+                {
+                    GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey].StringID, 
+                        Storage.List[CurrentSlotKey].Stack);
+                    Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                        Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                }
+                else
+                {
+                    Entity.SpawnItem(Storage.List[CurrentSlotKey].StringID, Game.PlayerInfo.position, 
+                        Storage.List[CurrentSlotKey].Stack);
+                    Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                        Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                }
+                //doesnt account for full inventory
+            }
+            else
+            {
+                GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey].StringID, 
+                    Storage.List[CurrentSlotKey].Stack);
+                Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                    Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                //doesnt account for full inventory
+            } 
+        }
         else
-        {
-            Audio.PlaySFX("pick_up", 0.4f);
-            (Storage.List[CurrentSlotKey], GUICursor.Data) = 
-                (GUICursor.Data, Storage.List[CurrentSlotKey]);
+        { 
+            if (GUICursor.Data.isEmpty())
+            { 
+                GUICursor.Data.Add(Storage.List[CurrentSlotKey]);
+            } 
+            else if (Storage.List[CurrentSlotKey].isSame(GUICursor.Data))
+            { 
+                Storage.List[CurrentSlotKey].Add(GUICursor.Data);
+            } 
+            else
+            { 
+                (Storage.List[CurrentSlotKey], GUICursor.Data) = 
+                    (GUICursor.Data, Storage.List[CurrentSlotKey]);
+            } 
         } 
+        Audio.PlaySFX("pick_up", 0.4f);
         Inventory.RefreshInventory();
     }
 
     protected override void ActionSecondaryDown()
     {
-        if (!Input.GetKeyDown(KeyCode.LeftShift)) return;
+        if (!Input.GetKey(KeyCode.LeftShift)) return;
         ItemSlot itemSlot = Storage.List[CurrentSlotKey];
         if (!itemSlot.isEmpty())
         {
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
                 GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
+                Audio.PlaySFX("pick_up", 0.4f);
                 Inventory.RefreshInventory();
             }
         }
@@ -187,6 +224,7 @@ public class GUIChest : GUIStorage
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
                 GUICursor.Data.Add(itemSlot, 1);
+                Audio.PlaySFX("pick_up", 0.4f);
                 Inventory.RefreshInventory();
             }
         }
