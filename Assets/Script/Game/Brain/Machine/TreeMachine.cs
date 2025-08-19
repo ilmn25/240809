@@ -4,7 +4,7 @@ public class TreeMachine : DestructableMachine
     {
         return new ResourceInfo() {
             Health = 100,
-            Loot = "tree",
+            Loot = ID.Tree,
             SfxHit = "dig_stone",
             SfxDestroy = "dig_stone",
         }; 

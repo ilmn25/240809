@@ -13,7 +13,7 @@ public class PlayerTerraformModule : Module
     public override void Initialize()
     {
         // Inventory.SlotUpdate += EventSlotUpdate;
-        _block = ObjectPool.GetObject("block");
+        _block = ObjectPool.GetObject(ID.BlockPrefab);
         _block.SetActive(false);
     }
 
@@ -26,9 +26,9 @@ public class PlayerTerraformModule : Module
         else if (Inventory.CurrentItemData.Type == ItemType.Block)
         {
             _block.SetActive(true);
-            if (_block.name != Inventory.CurrentItemData.StringID)
+            if (_block.name != Inventory.CurrentItemData.StringID.ToString())
             {
-                _block.name = Inventory.CurrentItemData.StringID;
+                _block.name = Inventory.CurrentItemData.StringID.ToString();
                 BlockPreview.Set(_block, Inventory.CurrentItemData.StringID);
                 _block.transform.localScale = Vector3.one;
             }  
@@ -39,7 +39,7 @@ public class PlayerTerraformModule : Module
             if (_block.name != "overlay")
             {
                 _block.name = "overlay";
-                BlockPreview.Set(_block, "overlay");
+                BlockPreview.Set(_block, ID.OverlayBlock);
                 _block.transform.localScale = Vector3.one * 1.04f;
             } 
         }
@@ -102,7 +102,7 @@ public class PlayerTerraformModule : Module
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         SpawnBlock();
         
-        Game.PlayerInfo.Storage.RemoveItem(_block.name);
+        Game.PlayerInfo.Storage.RemoveItem(Game.PlayerInfo.Equipment.StringID);
     }
 
     public static void SpawnBlock()
@@ -112,16 +112,15 @@ public class PlayerTerraformModule : Module
         if (_block.name == "overlay")
         { 
             block = Block.GetBlock(World.GetBlock(_coordinate));
-            info = (BreakBlockInfo)Entity.Spawn("breakblock", _coordinate);
-            info.operationType = OperationType.Dig;
-            info.Loot = block.StringID;
-            BlockPreview.Set(info.Machine.gameObject, "overlay");
+            info = (BreakBlockInfo)Entity.Spawn(ID.BreakBlock, _coordinate);
+            info.operationType = OperationType.Mining;
+            info.Loot = block.StringID; 
         }
         else
         { 
-            block = Block.GetBlock(_block.name);
-            info = (BlockInfo)Entity.Spawn("block", _coordinate);
-            info.operationType = OperationType.Build;
+            block = Block.GetBlock(Game.PlayerInfo.Equipment.StringID);
+            info = (BlockInfo)Entity.Spawn(ID.Block, _coordinate);
+            info.operationType = OperationType.Building;
             ((BlockInfo)info).blockID = block.StringID;
             BlockPreview.Set(info.Machine.gameObject, block.StringID);
         }

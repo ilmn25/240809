@@ -1,16 +1,14 @@
-public class StationMachine: StructureMachine, IActionSecondaryInteract
-{    public static Info CreateInfo()
+public class FurnaceMachine: StructureMachine, IActionSecondaryInteract
+{ 
+    public static Info CreateInfo()
     {
-        Storage storage = new Storage(27);
-        storage.AddItem(ID.Blueprint);   
-        storage.AddItem(ID.Workbench);
-        storage.AddItem(ID.Stonecutter);
-        storage.AddItem(ID.Furnace);
-        storage.AddItem(ID.Chest);   
+        Storage storage = new Storage(9);
+        storage.AddItem(ID.Charcoal);
+        storage.AddItem(ID.Steel); 
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.Tree,
+            Loot = ID.Slab,
             SfxHit = "dig_stone",
             SfxDestroy = "dig_stone",
             Storage = storage
@@ -21,8 +19,7 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
         AddState(new InCraftingState());
-    }
-    
+    } 
 
     public void OnActionSecondary(Info info)
     {
@@ -31,4 +28,4 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
         else 
             SetState<DefaultState>();
     }
-} 
+}

@@ -2,20 +2,20 @@ using System.Collections.Generic;
  
 public partial class ItemRecipe 
 {
-    public static Dictionary<string, ItemRecipe> Dictionary = new Dictionary<string, ItemRecipe>();
+    public static Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
 
     public int Stack;
-    public Dictionary<string, int> Ingredients;
+    public Dictionary<ID, int> Ingredients;
     public string[] Modifiers;
  
-    public static ItemRecipe GetRecipe(string stringID)
+    public static ItemRecipe GetRecipe(ID stringID)
     {
         if (Dictionary.ContainsKey(stringID))
             return Dictionary[stringID];
         return null;
     }
     
-    public static void AddRecipe(string stringID, Dictionary<string, int> ingredients, int stack, string[] modifiers)
+    public static void AddRecipe(ID stringID, Dictionary<ID, int> ingredients, int stack, string[] modifiers)
     {
         Dictionary.Add(stringID, new ItemRecipe()
         {
@@ -25,7 +25,7 @@ public partial class ItemRecipe
         });
     }
 
-    public static bool IsCraftable (string stringID)
+    public static bool IsCraftable (ID stringID)
     {
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
@@ -34,7 +34,7 @@ public partial class ItemRecipe
         return true;
     }
     
-    public static void CraftItem(string stringID, bool isCursor = true)
+    public static void CraftItem(ID stringID, bool isCursor = true)
     { 
         Audio.PlaySFX("pick_up", 0.4f);
         foreach (var ingredient in Dictionary[stringID].Ingredients)

@@ -4,7 +4,7 @@ public class SlabMachine : DestructableMachine
     {
         return new ResourceInfo() {
             Health = 60,
-            Loot = "slab",
+            Loot = ID.Slab,
             SfxHit = "dig_metal",
             SfxDestroy = "dig_metal",
         }; 

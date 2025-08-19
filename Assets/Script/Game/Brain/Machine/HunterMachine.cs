@@ -35,7 +35,7 @@ public class HunterMachine : MobMachine
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
         AddState(new EquipSelectState()); 
-        Info.SetEquipment("pistol");
+        Info.SetEquipment(ID.Pistol);
     } 
     
     public override void OnUpdate()

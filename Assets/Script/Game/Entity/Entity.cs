@@ -4,10 +4,10 @@ using System.Reflection;
 using UnityEngine;
 public partial class Entity
 { 
-        public static readonly Dictionary<string, Entity> Dictionary = new Dictionary<string, Entity>();
+        public static readonly Dictionary<ID, Entity> Dictionary = new Dictionary<ID, Entity>();
         
         public Vector3Int Bounds;
-        public string PrefabName;
+        public ID PrefabName;
         public Type Machine;
         public int Collision;
         public bool StaticLoad;
@@ -20,7 +20,7 @@ public partial class Entity
         {
                 Bounds = Vector3Int.zero,
                 Collision = Game.IndexNoCollide,
-                PrefabName = "item",
+                PrefabName = ID.ItemPrefab,
                 Machine = typeof(ItemMachine),
                 StaticLoad = false,
                 SpawnOffset = MidAir
@@ -28,85 +28,85 @@ public partial class Entity
         
         public static void Initialize()
         {
-                AddStructure<TreeMachine>("tree", new Vector3Int(1, 3, 1), Game.IndexCollide);
-                AddStructure<WorkBenchMachine>("workbench", Vector3Int.one, Game.IndexCollide);
-                AddStructure<WorkBenchMachine>("furnace", Vector3Int.one, Game.IndexCollide);
-                AddStructure<WorkBenchMachine>("stonecutter", Vector3Int.one, Game.IndexCollide);
-                AddStructure<ConstructionMachine>("construction", Vector3Int.one, Game.IndexCollide);
-                AddStructure<StationMachine>("station", Vector3Int.one, Game.IndexCollide);
-                AddStructure<ChestMachine>("chest", Vector3Int.one, Game.IndexCollide);
-                AddStructure<DecorMachine>("bush1", Vector3Int.zero, Game.IndexNoCollide);
-                AddStructure<DecorMachine>("grass", Vector3Int.zero, Game.IndexNoCollide); 
-                AddStructure<SlabMachine>("slab", Vector3Int.one, Game.IndexNoCollide);
+                AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Game.IndexCollide);
+                AddStructure<WorkBenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
+                AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
+                AddStructure<WorkBenchMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
+                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Game.IndexCollide);
+                AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
+                AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);
+                AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Game.IndexNoCollide);
+                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide); 
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexNoCollide);
                 
-                Dictionary.Add("block", new Entity
+                Dictionary.Add(ID.Block, new Entity
                 {
                         Bounds = Vector3Int.one,
                         Collision = Game.IndexSemiCollide,
-                        PrefabName = "block",
+                        PrefabName = ID.BlockPrefab,
                         Machine = typeof(BlockMachine),
                         StaticLoad = true,
                         SpawnOffset = Floor,
                 });
-                Dictionary.Add("breakblock", new Entity
+                Dictionary.Add(ID.BreakBlock, new Entity
                 {
                         Bounds = Vector3Int.one,
                         Collision = Game.IndexNoCollide,
-                        PrefabName = "block",
+                        PrefabName = ID.BlockPrefab,
                         Machine = typeof(BreakBlockMachine),
                         StaticLoad = true,
                         SpawnOffset = Floor,
                 });
                 
-                Dictionary.Add("player", new Entity
+                Dictionary.Add(ID.Player, new Entity
                 {
                         Bounds = Vector3Int.one,
                         Collision = Game.IndexSemiCollide,
-                        PrefabName = "player",
+                        PrefabName = ID.PlayerPrefab,
                         Machine = typeof(PlayerMachine),
                         StaticLoad = false,
                         SpawnOffset = MidAir,
                 });
-                AddMob<HunterMachine>("chito"); 
-                AddMob<HunterMachine>("yuuri");
-                AddMob<BugMachine>("snare_flea"); 
-                AddMob<GhoulMachine>("megumin");
+                AddMob<HunterMachine>(ID.Chito); 
+                AddMob<HunterMachine>(ID.Yuuri);
+                AddMob<BugMachine>(ID.SnareFlea); 
+                AddMob<GhoulMachine>(ID.Megumin);
         }
 
-        private static void AddMob<T>(string stringID) where T : EntityMachine
+        private static void AddMob<T>(ID stringID) where T : EntityMachine
         {
                 Dictionary.Add(stringID, new Entity
                 {
                         Bounds = Vector3Int.one,
                         Collision = Game.IndexSemiCollide,
-                        PrefabName = "mob",
+                        PrefabName = ID.MobPrefab,
                         Machine = typeof(T),
                         StaticLoad = false,
                         SpawnOffset = MidAir,
                 });
         }
 
-        private static void AddStructure<T>(string stringID, Vector3Int bounds, int collision) where T : EntityMachine
+        private static void AddStructure<T>(ID stringID, Vector3Int bounds, int collision) where T : EntityMachine
         {
                 Dictionary.Add(stringID, new Entity
                 {
                         Bounds = bounds,
                         Collision = collision,
-                        PrefabName = "structure",
+                        PrefabName = ID.StructurePrefab,
                         Machine = typeof(T),
                         StaticLoad = true,
                         SpawnOffset = Floor,
                 });
         }
 
-        public static void AddItem(string stringID)
+        public static void AddItem(ID stringID)
         {
                 Dictionary.Add(stringID, Item); 
         } 
         
-        public static void SpawnItem(string stringID, Vector3 worldPosition, int count = 1)
+        public static void SpawnItem(ID stringID, Vector3 worldPosition, int count = 1)
         {
-                GameObject gameObject = ObjectPool.GetObject("item");
+                GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
                 gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + new Vector3(0.5f, 0.5f, 0.5f); 
         
                 EntityMachine currentEntityMachine = (EntityMachine)
@@ -121,7 +121,7 @@ public partial class Entity
                 currentEntityMachine.Initialize(itemInfo);  
         }
         
-        public static Info Spawn(string stringID, Vector3 worldPosition)
+        public static Info Spawn(ID stringID, Vector3 worldPosition)
         {
                 GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
                 gameObject.transform.position = worldPosition + Dictionary[stringID].SpawnOffset;   
@@ -138,7 +138,7 @@ public partial class Entity
                 return info;
         }
 
-        public static Info CreateInfo(string stringID, Vector3 worldPosition)
+        public static Info CreateInfo(ID stringID, Vector3 worldPosition)
         {
                 Entity entity = Dictionary[stringID];
 

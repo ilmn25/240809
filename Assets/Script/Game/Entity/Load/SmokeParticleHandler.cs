@@ -10,7 +10,7 @@ public class SmokeParticleHandler
 
     static SmokeParticleHandler()
     {
-        GameObject prefab = Resources.Load<GameObject>("prefab/smoke_particle");
+        GameObject prefab = Resources.Load<GameObject>("prefab/SmokePrefab");
         for (int i = 0; i < PoolSize; i++)
         {
             _smokeParticle = Object.Instantiate(prefab);

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BlockPreview 
 { 
-    private static readonly Dictionary<string, (Mesh mesh, Material material)> Cache = new();
+    private static readonly Dictionary<ID, (Mesh mesh, Material material)> Cache = new();
 
     private const float Opacity = 0.45f;
     
@@ -12,7 +12,7 @@ public class BlockPreview
     private static List<Vector2> _uvs;
     private static List<Vector3> _normals;  
      
-    public static void Set(GameObject gameObject, string blockID)
+    public static void Set(GameObject gameObject, ID blockID)
     {
         if (!Cache.TryGetValue(blockID, out var cached))
         {
@@ -29,7 +29,7 @@ public class BlockPreview
             // Create material
             Material meshMaterial = new(Resources.Load<Material>(Block.MeshMaterialPath))
             {
-                mainTexture = Resources.Load<Texture2D>($"texture/tileset/block_{blockID}")
+                mainTexture = Resources.Load<Texture2D>($"texture/tileset/{blockID}")
             };
 
             meshMaterial.SetFloat("_Mode", 3);

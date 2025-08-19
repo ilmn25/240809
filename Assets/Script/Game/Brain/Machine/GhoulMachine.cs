@@ -46,7 +46,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
         AddState(new DialogueState(dialogue)); 
-        Info.SetEquipment("sword");
+        Info.SetEquipment(ID.Sword);
     }
 
     public void OnActionSecondary(Info info)

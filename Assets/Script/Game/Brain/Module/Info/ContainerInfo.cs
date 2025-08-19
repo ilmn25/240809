@@ -5,7 +5,7 @@ public class ContainerInfo : StructureInfo
     public override void Initialize()
     { 
         base.Initialize();
-        operationType = OperationType.Break;
+        operationType = OperationType.Breaking;
     }
 
     public override void OnDestroy(Projectile projectile)

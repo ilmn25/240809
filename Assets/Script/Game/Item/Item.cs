@@ -5,36 +5,52 @@ using UnityEngine;
 
 public partial class Item 
 {
-    private static readonly Dictionary<string, Item> Dictionary = new ();
-
+    private static readonly Dictionary<ID, Item> Dictionary = new ();
     public static void Initialize()
     {
-        AddBlockDefinition("brick", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "gravel", 3} });
-        AddBlockDefinition("marble", 100, 3, "dig_metal", materials: new Dictionary<string, int> { { "stone", 1 }, { "brick", 1 } }, craftStack: 2);
-        AddBlockDefinition("dirt", 100, 1, "dig_stone");
-        AddBlockDefinition("sand", 100, 1, "dig_sand", materials: new Dictionary<string, int> { { "stone", 1 } }, craftStack: 2);
-        AddBlockDefinition("backroom",100,  3, "dig_stone", materials: new Dictionary<string, int> { { "dirt", 1 } }, craftStack: 2);
-        AddBlockDefinition("stone",  100, 2, "dig_stone");  
-        AddBlockDefinition("wood", 100, 2, "dig_stone"); 
-        AddBlockDefinition("granite",  100, 2, "dig_stone");
-        
-        AddMaterialDefinition("bullet", materials: new Dictionary<string, int> { { "gravel", 2 } }, craftStack: 5);
-        AddMaterialDefinition("gravel");
-        AddMaterialDefinition("sticks");
-        AddMaterialDefinition("flint");
-        AddMaterialDefinition("debris_metal");
-        AddMaterialDefinition("charcoal");
-        AddMaterialDefinition("steel");
-        
-        AddStructureDefinition("chest", new Dictionary<string, int> {{ "wood", 15 }}, 200);
-        AddStructureDefinition("station", new Dictionary<string, int> {{ "stone", 15 }}, 200);
-        AddStructureDefinition("workbench", new Dictionary<string, int> {{ "stone", 15 }}, 200);
-        AddStructureDefinition("stonecutter", new Dictionary<string, int> {{ "stone", 15 }}, 200);
-        AddStructureDefinition("furnace", new Dictionary<string, int> {{ "stone", 15 }}, 200);
-        AddStructureDefinition("blueprint_station", new Dictionary<string, int> {{ "wood", 15 }}, 200);
-        
+        Loot loot;
+
+        // Blocks
+        AddBlockDefinition(ID.BrickBlock, 100, 3, "dig_metal", materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddBlockDefinition(ID.MarbleBlock, 100, 3, "dig_metal", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.DirtBlock, 100, 1, "dig_stone");
+        loot = Loot.CreateTable(ID.DirtBlock);
+        loot.Add(1, 3, ID.Gravel);
+        loot.Add(0.5f, 1, ID.Flint);
+        loot.Add(0.5f, 1, ID.Sticks);
+        AddBlockDefinition(ID.SandBlock, 100, 1, "dig_sand", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.BackroomBlock, 100, 3, "dig_stone", materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.StoneBlock, 100, 2, "dig_stone");
+        loot = Loot.CreateTable(ID.StoneBlock);
+        loot.Add(1, 3, ID.Gravel);
+        loot.Add(0.5f, 1, ID.Gravel);
+        loot.Add(0.5f, 1, ID.Gravel);
+        AddBlockDefinition(ID.WoodBlock, 100, 2, "dig_stone");
+        AddBlockDefinition(ID.GraniteBlock, 100, 2, "dig_stone");
+
+        // Materials
+        AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Gravel, 2 } }, craftStack: 5);
+        AddMaterialDefinition(ID.Gravel);
+        AddMaterialDefinition(ID.Sticks);
+        AddMaterialDefinition(ID.Flint);
+        AddMaterialDefinition(ID.DebrisMetal);
+        AddMaterialDefinition(ID.Charcoal);
+        AddMaterialDefinition(ID.Steel);
+        AddMaterialDefinition(ID.Brick);
+        AddMaterialDefinition(ID.Stake);
+        AddMaterialDefinition(ID.Slag);
+
+        // Structures
+        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.WoodBlock, 15 } }, 200);
+        AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
+        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
+        AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
+        AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
+        AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.WoodBlock, 15 } }, 200);
+
+        // Tools
         AddToolDefinition(
-            stringID: "sword",
+            stringID: ID.Sword,
             gesture: ItemGesture.Swing,
             speed: 1.3f,
             range: 1,
@@ -45,22 +61,23 @@ public partial class Item
                 Speed = 1.3f,
                 Radius = 2f,
                 Breaking = 1,
-                OperationType = OperationType.Break
+                OperationType = OperationType.Breaking
             },
-            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
+            materials: new Dictionary<ID, int> { { ID.Flint, 5 }, { ID.Stake, 2 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
 
         AddToolDefinition(
-            stringID: "blueprint",
+            stringID: ID.Blueprint,
             gesture: ItemGesture.Swing,
             speed: 4f,
-            range: 7f, 
-            materials: new Dictionary<string, int> { { "wood", 2 } },
+            range: 7f,
+            materials: new Dictionary<ID, int> { { ID.Paper, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
-        ); 
+        );
+
         AddToolDefinition(
-            stringID: "axe_stone",
+            stringID: ID.StonePickaxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -71,13 +88,32 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
                 Breaking = 2,
-                OperationType = OperationType.Break
-            }, 
-            materials: new Dictionary<string, int> { { "sticks", 2 }, { "flint", 3 } },
+                OperationType = OperationType.Mining
+            },
+            materials: new Dictionary<ID, int> { { ID.Stake, 2 }, { ID.Flint, 5 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
+
         AddToolDefinition(
-            stringID: "axe_metal",
+            stringID: ID.StoneAxe,
+            gesture: ItemGesture.Swing,
+            speed: 1.4f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 1,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 2,
+                Radius = 2,
+                Breaking = 2,
+                OperationType = OperationType.Breaking
+            },
+            materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
+            holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
+            stringID: ID.MetalAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -88,13 +124,14 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
                 Breaking = 3,
-                OperationType = OperationType.Dig
-            }, 
-            materials: new Dictionary<string, int> { { "steel", 2 }, { "wood", 2 } },
+                OperationType = OperationType.Breaking
+            },
+            materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 5 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
+
         AddToolDefinition(
-            stringID: "axe_diamond",
+            stringID: ID.DiamondAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -105,13 +142,14 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
                 Breaking = 4,
-                OperationType = OperationType.Dig
-            }, 
-            materials: new Dictionary<string, int> { { "stone", 1 }, { "wood", 2 } },
+                OperationType = OperationType.Breaking
+            },
+            materials: new Dictionary<ID, int> { { ID.Brick, 1 }, { ID.Stake, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
+
         AddToolDefinition(
-            stringID: "hammer",
+            stringID: ID.Hammer,
             gesture: ItemGesture.Swing,
             speed: 1.8f,
             range: 4f,
@@ -122,38 +160,37 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
                 Breaking = 3,
-                OperationType = OperationType.Build
+                OperationType = OperationType.Building
             },
-            materials: new Dictionary<string, int> { { "stone", 2 }, { "wood", 2 } },
+            materials: new Dictionary<ID, int> { { ID.Brick, 2 }, { ID.Stake, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
-        
+
         AddToolDefinition(
-            stringID: "spear",
+            stringID: ID.Spear,
             gesture: ItemGesture.Swing,
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
-                Sprite = "spear", 
-                Damage = 2, 
-                Knockback = 10, 
-                CritChance = 10, 
-                LifeSpan = 10000, 
-                Speed = 60, 
+                Sprite = "spear",
+                Damage = 2,
+                Knockback = 10,
+                CritChance = 10,
+                LifeSpan = 10000,
+                Speed = 60,
                 Radius = 0.3f,
                 Penetration = 1,
                 Lodge = true,
                 PickUp = true,
-                Ammo = "spear",
+                Ammo = ID.Spear
             },
-            materials: new Dictionary<string, int> { { "wood", 1 } },
+            materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Stake, 2 } },
             projectileOffset: 1.016f,
             stackSize: 20,
             holdoutOffset: new Vector2(0.65f, 0),
             rotationOffset: 45
         );
-        
         AddToolDefinition(
-            stringID: "minigun",
+            stringID: ID.Minigun,
             gesture: ItemGesture.Shoot,
             speed: 2f,
             projectileInfo: new RangedProjectileInfo {
@@ -167,13 +204,13 @@ public partial class Item
                 Penetration = 1,
                 Scale = 0.6f
             },
-            materials: new Dictionary<string, int> { { "wood", 2 } },
+            materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
             projectileOffset: 1.54f,
             holdoutOffset: new Vector2(0.4f, 0)
         );
 
         AddToolDefinition(
-            stringID: "pistol",
+            stringID: ID.Pistol,
             gesture: ItemGesture.Shoot,
             speed: 0.6f,
             projectileInfo: new RangedProjectileInfo {
@@ -184,25 +221,22 @@ public partial class Item
                 LifeSpan = 10000,
                 Speed = 12,
                 Radius = 0.1f,
-                Ammo = "bullet",
+                Ammo = ID.Bullet,
                 Penetration = 1,
                 Scale = 0.6f
-            }, 
-            materials: new Dictionary<string, int> { { "wood", 2 } },
+            },
+            materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
             projectileOffset: 1.016f,
             holdoutOffset: new Vector2(0.4f, 0)
         );
     }
-    
     private static void AddMaterialDefinition(
-        string stringID,
-        string name = "",  
+        ID stringID,
         string description = "",
-        Dictionary<string, int> materials = null,
+        Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int stackSize = 15)
     {
-        if (name == "") name = stringID;
         Entity.AddItem(stringID);
 
         Item itemData = new Item()
@@ -216,7 +250,6 @@ public partial class Item
             Gesture = ItemGesture.Swing,
             HoldoutOffset = new Vector2(0.5f, 0),
 
-            Name = name,
             Description = description
         };
 
@@ -227,17 +260,15 @@ public partial class Item
     }
 
     private static void AddBlockDefinition(
-        string stringID,
+        ID stringID,
         int breakCost = 1,
         int breakThreshold = 1,
         string sfx = "",
-        string name = "",  
         string description = "",
-        Dictionary<string, int> materials = null,
+        Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int stackSize = 100)
     {
-        if (name == "") name = stringID;
         if (sfx == "") sfx = "dig_sand";
         Entity.AddItem(stringID);
         Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
@@ -258,7 +289,6 @@ public partial class Item
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
 
-            Name = name,
             Description = description
         };
 
@@ -269,10 +299,9 @@ public partial class Item
     }
 
     private static void AddToolDefinition(
-        string stringID,
+        ID stringID,
         ItemGesture gesture,
         string sfx = "",
-        string name = "",
         int stackSize = 1,
         ItemRarity rarity = ItemRarity.Common,
 
@@ -286,12 +315,11 @@ public partial class Item
         float projectileOffset = 0,
 
         string description = "",
-        Dictionary<string, int> materials = null,
+        Dictionary<ID, int> materials = null,
         int craftStack = 1,
         string[] modifiers = null
     )
     {
-        if (name == "") name = stringID;
         Entity.AddItem(stringID);
 
         Item itemData = new Item()
@@ -305,17 +333,16 @@ public partial class Item
 
             Type = ItemType.Tool,
             Gesture = gesture,
-            
+
             Speed = speed,
             Range = range,
             ProjectileInfo = projectileInfo,
             Durability = durability,
-            StatusEffect = statusEffect, 
+            StatusEffect = statusEffect,
             ProjectileOffset = projectileOffset,
             HoldoutOffset = holdoutOffset,
             RotationOffset = rotationOffset,
 
-            Name = name,
             Description = description
         };
 
@@ -324,20 +351,16 @@ public partial class Item
 
         Dictionary[stringID] = itemData;
     }
-  
+
     private static void AddStructureDefinition(
-        string stringID, 
-        Dictionary<string, int> materials,
+        ID stringID,
+        Dictionary<ID, int> materials,
         int time = 200,
-        // int breakCost = 1,
-        // int breakThreshold = 1,  
         string sfx = "",
-        string name = "",  
         string description = "")
     {
-        if (name == "") name = stringID;
         if (sfx == "") sfx = "dig_sand";
-        
+
         Item itemData = new Item()
         {
             StringID = stringID,
@@ -350,16 +373,18 @@ public partial class Item
             Gesture = ItemGesture.Swing,
 
             Speed = 1,
-            Range = 5,  
+            Range = 5,
 
-            Name = name,
             Description = description
         };
-        if (materials != null) StructureRecipe.AddRecipe(stringID, time, materials);
+
+        if (materials != null)
+            StructureRecipe.AddRecipe(stringID, time, materials);
+
         Dictionary[stringID] = itemData;
     }
 
-    public static Item GetItem(string stringID)
+    public static Item GetItem(ID stringID)
     {
         if (Dictionary.ContainsKey(stringID))
         {
@@ -367,4 +392,5 @@ public partial class Item
         }
         return null;
     }
+
 }

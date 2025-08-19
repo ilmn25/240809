@@ -9,7 +9,7 @@ public class GenTaskCrater : WorldGen
     private const int Steps = 5;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID("dirt") : _id; 
+    private static int ID => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
 
     public static void Run()
     {

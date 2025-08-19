@@ -21,7 +21,7 @@ public class DynamicInfo : Info
     public int Defense; 
     public int Iframes = 5;
     
-    [NonSerialized] public readonly float EntityCollisionRadius = 0.15f;
+    [NonSerialized] public readonly float EntityCollisionRadius = 0.25f;
     [NonSerialized] public float AccelerationTime = 0.3f;
     [NonSerialized] public float DecelerationTime = 0.08f;
     

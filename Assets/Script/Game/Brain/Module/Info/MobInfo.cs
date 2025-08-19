@@ -68,13 +68,13 @@ public class MobInfo : DynamicInfo
         }
     }   
 
-    public void SetEquipment(String stringID)
+    public void SetEquipment(ID target)
     { 
-        if (stringID != null)
+        if (target != ID.Null)
         { 
-            if (Equipment == null || Equipment.StringID != stringID)
+            if (Equipment == null || Equipment.StringID != target)
             {
-                Equipment = Item.GetItem(stringID);
+                Equipment = Item.GetItem(target);
                 SpriteTool.gameObject.SetActive(true);
                 SpriteTool.localPosition = new Vector3(Equipment.HoldoutOffset.x, Equipment.HoldoutOffset.y, 0);
                 SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.RotationOffset);

@@ -96,7 +96,7 @@ public class Inventory
         if (CurrentItem is { Stack: 0 })
         {
             CurrentItemData = null;     
-            Game.PlayerInfo.SetEquipment(null);
+            Game.PlayerInfo.SetEquipment(ID.Null);
         }
     }
 
@@ -112,7 +112,7 @@ public class Inventory
     }
  
     
-    public static void AddItem(string stringID, int quantity = 1)
+    public static void AddItem(ID stringID, int quantity = 1)
     {  
         Game.PlayerInfo.Storage.AddItem(stringID, quantity, Game.PlayerInfo.Storage.Key, Game.Player.transform.position);
         RefreshInventory();

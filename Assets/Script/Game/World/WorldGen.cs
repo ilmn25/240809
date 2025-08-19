@@ -59,51 +59,51 @@ public class WorldGen
         }
 
         Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 5, World.ChunkSize * Size.z / 2);
-        PlayerInfo player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
         World.Inst[playerPos].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
         
-        player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
         World.Inst[playerPos].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
 
-        player = (PlayerInfo) Entity.CreateInfo("player", playerPos);
+        player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
         World.Inst[playerPos].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
         if (Flat) return;
-        int chunkSize = World.ChunkSize;
-        for (int x = 0; x < World.Inst.Bounds.x; x++)
-        {
-            for (int y = 0; y < World.Inst.Bounds.y - 1; y++)
-            {
-                for (int z = 0; z < World.Inst.Bounds.z; z++)
-                { 
-                    Vector3Int worldPos = new Vector3Int(x, y, z);
-                    Vector3Int chunkPos = NavMap.GetRelativePosition(worldPos);
-                    int localChunkX = worldPos.x % chunkSize;
-                    int localChunkY = worldPos.y % chunkSize;
-                    int localChunkZ = worldPos.z % chunkSize;
-        
-                    if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY, localChunkZ] == Block.ConvertID("dirt") &&
-                        localChunkY + 1 != chunkSize &&
-                        World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
-                    {
-                        if (Random.NextDouble() <= 0.0004)
-                        {
-                            global::SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), global::SetPiece.LoadSetPieceFile("house_stone"));
-                        }
-                        // else if (Random.NextDouble() <= 0.001)
-                        // {
-                        //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_a"));
-                        // }
-                        // else if (Random.NextDouble() <= 0.001)
-                        // {
-                        //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_b")); 
-                        // } 
-                    } 
-                }
-            }
-        }
+        // int chunkSize = World.ChunkSize;
+        // for (int x = 0; x < World.Inst.Bounds.x; x++)
+        // {
+        //     for (int y = 0; y < World.Inst.Bounds.y - 1; y++)
+        //     {
+        //         for (int z = 0; z < World.Inst.Bounds.z; z++)
+        //         { 
+        //             Vector3Int worldPos = new Vector3Int(x, y, z);
+        //             Vector3Int chunkPos = NavMap.GetRelativePosition(worldPos);
+        //             int localChunkX = worldPos.x % chunkSize;
+        //             int localChunkY = worldPos.y % chunkSize;
+        //             int localChunkZ = worldPos.z % chunkSize;
+        //
+        //             if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY, localChunkZ] == Block.ConvertID(ID.DirtBlock) &&
+        //                 localChunkY + 1 != chunkSize &&
+        //                 World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
+        //             {
+        //                 if (Random.NextDouble() <= 0.0004)
+        //                 {
+        //                     global::SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), global::SetPiece.LoadSetPieceFile("house_stone"));
+        //                 }
+        //                 // else if (Random.NextDouble() <= 0.001)
+        //                 // {
+        //                 //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_a"));
+        //                 // }
+        //                 // else if (Random.NextDouble() <= 0.001)
+        //                 // {
+        //                 //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_b")); 
+        //                 // } 
+        //             } 
+        //         }
+        //     }
+        // }
     }
 
     private static Chunk Generate(Vector3Int coordinates)
@@ -163,21 +163,21 @@ public class WorldGen
                     {
                         if (SpawnStaticEntity)
                         {
-                            if (chunk[x, y, z] == Block.ConvertID("dirt"))
+                            if (chunk[x, y, z] == Block.ConvertID(ID.DirtBlock))
                             {
                                 {
                                     double rng = Random.NextDouble();
                                     if (rng <= 0.02)
                                     {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo("tree", coordinates + new Vector3(x, y + 1, z)));
+                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Tree, coordinates + new Vector3(x, y + 1, z)));
                                     }
                                     else if (rng <= 0.04)
                                     {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo("bush1", coordinates + new Vector3(x, y + 1, z)));
+                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Bush, coordinates + new Vector3(x, y + 1, z)));
                                     }
                                     else if (rng <= 0.2)
                                     {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo("grass", coordinates + new Vector3(x, y + 1, z)));
+                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, coordinates + new Vector3(x, y + 1, z)));
                                     }
                                 }
                             }
@@ -185,11 +185,11 @@ public class WorldGen
                             {
                                 if (Random.NextDouble() <= 0.0004)
                                 {
-                                    chunk.StaticEntity.Add(Entity.CreateInfo("chest", coordinates + new Vector3(x, y + 1, z)));
+                                    chunk.StaticEntity.Add(Entity.CreateInfo(ID.Chest, coordinates + new Vector3(x, y + 1, z)));
                                 } 
                                 else if (Random.NextDouble() <= 0.02)
                                 {
-                                    chunk.StaticEntity.Add(Entity.CreateInfo("slab", coordinates + new Vector3(x, y + 1, z)));
+                                    chunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, coordinates + new Vector3(x, y + 1, z)));
                                 }
                             }
  
@@ -198,10 +198,10 @@ public class WorldGen
                         { 
                             if (Random.NextDouble() <= 0.5)
                             {
-                                chunk.DynamicEntity.Add(Entity.CreateInfo("flint", coordinates + new Vector3Int(x, y + 1, z)));
+                                chunk.DynamicEntity.Add(Entity.CreateInfo(ID.Flint, coordinates + new Vector3Int(x, y + 1, z)));
                             } else
                             {
-                                chunk.DynamicEntity.Add(Entity.CreateInfo("sticks", coordinates + new Vector3Int(x, y + 1, z))); 
+                                chunk.DynamicEntity.Add(Entity.CreateInfo(ID.Sticks, coordinates + new Vector3Int(x, y + 1, z))); 
                             }
                         }
                     } 

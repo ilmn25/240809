@@ -9,7 +9,7 @@ public class GenTaskGranite : WorldGen
     private static readonly float Offset = GetOffset();
 
     private static int _idGranite;
-    private static int ID => _idGranite == 0 ? Block.ConvertID("granite") : _idGranite;
+    private static int ID => _idGranite == 0 ? Block.ConvertID(global::ID.GraniteBlock) : _idGranite;
 
     public static void Run()
     {

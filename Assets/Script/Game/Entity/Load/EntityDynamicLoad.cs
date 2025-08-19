@@ -77,7 +77,7 @@ public class EntityDynamicLoad
         {   
             entity = Entity.Dictionary[info.stringID];
             
-            if (entity.PrefabName == "item")
+            if (entity.PrefabName == ID.ItemPrefab)
                 currentInstance = ObjectPool.GetObject(entity.PrefabName);
             else                
                 currentInstance = ObjectPool.GetObject(entity.PrefabName, info.stringID);
