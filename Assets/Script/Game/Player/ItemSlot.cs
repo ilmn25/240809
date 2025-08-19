@@ -21,7 +21,7 @@ public class ItemSlot
             text += " \ningredients: ";
             foreach (var ingredient in recipe.Ingredients)
             {
-                text += "\n" + ingredient.Key + " x " + ingredient.Value;
+                text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
             }
             text += "\n \n" + item.Description;
         }
@@ -38,7 +38,7 @@ public class ItemSlot
                     text += " \n \ningredients: ";
                     foreach (var ingredient in recipe.Ingredients)
                     {
-                        text += "\n" + ingredient.Key + " x " + ingredient.Value;
+                        text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
                     }
                 }
             }
@@ -85,7 +85,7 @@ public class ItemSlot
                 {
                     foreach (var ingredient in recipe.Ingredients)
                     {
-                        text += "\n" + ingredient.Key + " x " + ingredient.Value;
+                        text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
                     }
                 }
             }
@@ -113,7 +113,7 @@ public class ItemSlot
  
     public void Add(ItemSlot slot, int amountToAdd = 0)
     {
-        Audio.PlaySFX("pick_up", 0.4f);
+        Audio.PlaySFX(SfxID.Item);
         if (slot.isEmpty()) return;
         int maxStackSize = Item.GetItem(slot.StringID).StackSize;
         int addableAmount;

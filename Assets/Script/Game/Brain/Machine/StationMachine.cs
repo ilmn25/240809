@@ -1,7 +1,8 @@
-public class StationMachine: StructureMachine, IActionSecondaryInteract
-{    public static Info CreateInfo()
+public class StationMachine: CraftingMachine
+{
+    public static Info CreateInfo()
     {
-        Storage storage = new Storage(27);
+        Storage storage = new Storage(9);
         storage.AddItem(ID.Blueprint);   
         storage.AddItem(ID.Workbench);
         storage.AddItem(ID.Stonecutter);
@@ -11,24 +12,25 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
         {
             Health = 500,
             Loot = ID.Tree,
-            SfxHit = "dig_stone",
-            SfxDestroy = "dig_stone",
+            SfxHit = SfxID.HitStone,
+            SfxDestroy = SfxID.HitStone,
             Storage = storage
         };
     }
-    public override void OnStart()
+}  
+public class StonecutterMachine: CraftingMachine
+{
+    public static Info CreateInfo()
     {
-        AddModule(new StructureSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule()); 
-        AddState(new InCraftingState());
+        Storage storage = new Storage(9);
+        storage.AddItem(ID.BrickBlock);    
+        return new ContainerInfo()
+        {
+            Health = 500,
+            Loot = ID.Tree,
+            SfxHit = SfxID.HitStone,
+            SfxDestroy = SfxID.HitStone,
+            Storage = storage
+        };
     }
-    
-
-    public void OnActionSecondary(Info info)
-    {
-        if (IsCurrentState<DefaultState>())
-            SetState<InCraftingState>();
-        else 
-            SetState<DefaultState>();
-    }
-} 
+}  

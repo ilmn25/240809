@@ -21,23 +21,21 @@ public class Loot
     public static void Initialize()
     {
         Loot loot = CreateTable(ID.Chest);
-        loot.Add(1, 1, ID.StoneBlock);
-        loot.Add(0.5f, 2, ID.StoneBlock);
-        loot.Add(1, 7, ID.Brick); 
-        loot.Add(0.5f, 2, ID.Brick);
-        loot.Add(0.5f, 5, ID.MarbleBlock);  
-        loot.Add(1, 1, ID.Sword, ID.DiamondAxe); 
-        loot.Add(0.5f, 1, ID.Minigun); 
+        loot.Add(1, 1, ID.MetalChunks);
+        loot.Add(1, 3, ID.Brick); 
+        loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
+        loot.Add(1, 1, ID.Spear, ID.StoneAxe); 
         
         loot = CreateTable(ID.Slab);
-        loot.Add(1, 3, ID.StoneBlock); 
-        loot.Add(0.5f, 1, ID.StoneBlock);
-        loot.Add(0.5f, 1, ID.MarbleBlock);
-        loot.Add(0.5f, 1, ID.MarbleBlock, ID.SandBlock); 
+        loot.Add(1, 2, ID.Flint); 
+        loot.Add(0.5f, 1, ID.Gravel);
+        loot.Add(0.5f, 1, ID.Flint);
+        loot.Add(0.5f, 1, ID.Flint);
         
         loot = CreateTable(ID.Tree);
-        loot.Add(1, 3, ID.WoodBlock);
-        loot.Add(0.5f, 2, ID.WoodBlock); 
+        loot.Add(1, 4, ID.Log);
+        loot.Add(0.5f, 1, ID.Log); 
+        loot.Add(0.5f, 1, ID.Log); 
         
         loot = CreateTable(ID.Megumin);
         loot.Add(0.1f, 1, ID.Sword, ID.DiamondAxe); 
@@ -47,7 +45,7 @@ public class Loot
         loot.Add(0.1f, 1, ID.Pistol); 
         
         loot = CreateTable(ID.SnareFlea);
-        loot.Add(0.5f, 6, ID.WoodBlock); 
+        loot.Add(0.5f, 6, ID.Sticks); 
         
         loot = CreateTable(ID.Yuuri);
         loot.Add(0.7f, 10, ID.Bullet);  

@@ -3,7 +3,7 @@ public class InContainerState : State
     public Storage Storage;
     public override void OnEnterState()
     {
-        Audio.PlaySFX("text", 0.5f);
+        Audio.PlaySFX(SfxID.Text);
         GUIMain.Storage.Storage = Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);

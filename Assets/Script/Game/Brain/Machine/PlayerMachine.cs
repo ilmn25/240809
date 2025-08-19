@@ -121,7 +121,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                                     true);
                                 if (Control.Inst.ActionPrimary.Key())
                                 {
-                                    Audio.PlaySFX("pick_up", 0.7f);
+                                    Audio.PlaySFX(SfxID.Item);
                                     PlayerTerraformModule.HandleMapBreak(); 
                                 } 
                             }

@@ -29,9 +29,9 @@ public partial class Entity
         public static void Initialize()
         {
                 AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Game.IndexCollide);
-                AddStructure<WorkBenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
+                AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
-                AddStructure<WorkBenchMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
+                AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);

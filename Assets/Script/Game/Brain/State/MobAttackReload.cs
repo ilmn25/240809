@@ -21,13 +21,13 @@ class MobAttackReload : MobState {
         
         Info.Animator.speed = 1.2f; 
         Info.Animator.Play("EquipReload", 0, 0f);  
-        Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
+        Audio.PlaySFX(Info.Equipment.Sfx);
     }
         
     public override void OnUpdateState() {
         if (Info.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
-            Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
+            Audio.PlaySFX(Info.Equipment.Sfx);
             Info.Animator.speed = 1f;
             Info.Animator.Play("EquipIdle", 0, 0f);
             Machine.SetState<DefaultState>();

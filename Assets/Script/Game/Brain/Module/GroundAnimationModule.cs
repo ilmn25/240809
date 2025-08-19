@@ -96,7 +96,8 @@ public class GroundAnimationModule : MobModule
             {
                 SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, Info.IsPlayer);
                 _nextTrailTimer = Time.time + TrailFrequency;
-                if (Info.IsPlayer) Audio.PlaySFX($"footstep_{Random.Range(1, 3)}", 0.3f);
+                if (Info == Game.PlayerInfo) 
+                    Audio.PlaySFX((SfxID)Random.Range((int)SfxID.Footsteps1, (int)SfxID.Footsteps2 + 1));
             }
         }
         else

@@ -55,7 +55,7 @@ public class StructurePreviewState : State
                                 _targetPosition, Time.deltaTime * 10);
                         if (!GUIMain.IsHover && Control.Inst.ActionPrimary.KeyDown())
                         { 
-                                Audio.PlaySFX("pick_up", 0.4f);
+                                Audio.PlaySFX(SfxID.Item);
                                 StructureRecipe.Build( position);
                                 StructureRecipe.Target = null;
                                 Machine.SetState<DefaultState>(); 

@@ -98,7 +98,7 @@ public class DynamicInfo : Info
                 break;
         }
         IframesCurrent = Iframes; 
-        Audio.PlaySFX(HurtSfx, 0.4f);
+        Audio.PlaySFX(SfxID.HitMob);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         OnHit(projectile);

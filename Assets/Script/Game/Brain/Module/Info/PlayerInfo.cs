@@ -45,7 +45,7 @@ public class PlayerInfo : MobInfo
         {
             if (Health <= 0)
             {
-                Audio.PlaySFX(DeathSfx, 0.8f);
+                Audio.PlaySFX(SfxID.DeathPlayer);
                 Sprite.gameObject.SetActive(false);
                 CancelTarget();
                 PlayerStatus = PlayerStatus.Dead;
@@ -101,7 +101,7 @@ public class PlayerInfo : MobInfo
             {
                 Health += (int)(Velocity.y * 3/ Gravity);
                 GUIHealthBar.Update();
-                Audio.PlaySFX(HurtSfx,0.4f);
+                Audio.PlaySFX(SfxID.HitPlayer);
             }
             AirTime = 0;
         }

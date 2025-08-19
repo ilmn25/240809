@@ -28,7 +28,7 @@ public class RangedProjectileInfo : ProjectileInfo
             {
                 if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskMap))
                 {
-                    Audio.PlaySFX("dig_stone");
+                    Audio.PlaySFX(SfxID.HitStone);
                     if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);
                     projectile.Delete();
                     break;  
