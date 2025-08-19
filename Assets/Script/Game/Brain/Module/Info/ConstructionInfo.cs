@@ -3,7 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class ConstructionInfo : DestructableInfo
 {
-    public string structureID; 
+    public ID structureID; 
     public override void OnDestroy(Projectile projectile)
     { 
         base.OnDestroy(projectile);

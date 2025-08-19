@@ -29,7 +29,7 @@ public class Storage
                 Dictionary.Remove(ID);
         }
         
-        public void RemoveItem(string stringID, int quantity = 1, int priority = 0)
+        public void RemoveItem(ID stringID, int quantity = 1, int priority = 0)
         {
                 // Prioritize current slot
                 if (List[priority].StringID == stringID)
@@ -67,7 +67,7 @@ public class Storage
                 // RefreshInventory();
         }
                 
-        public void AddItem(string stringID, int quantity = 1, int priority = 0, Vector3 position = default)
+        public void AddItem(ID stringID, int quantity = 1, int priority = 0, Vector3 position = default)
         {   
                 int maxStackSize = Item.GetItem(stringID).StackSize;
                 
@@ -119,7 +119,7 @@ public class Storage
                 // RefreshInventory();
         }
         
-        public int GetAmount(string stringID)
+        public int GetAmount(ID stringID)
         {
                 int count = 0;
                 foreach (var slot in List)

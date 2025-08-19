@@ -3,18 +3,15 @@ public class WorkBenchMachine: StructureMachine, IActionSecondaryInteract
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        storage.AddItem("brick");
-        storage.AddItem("axe_stone");
-        storage.AddItem("axe_metal");
-        storage.AddItem("hammer");
-        storage.AddItem("pistol");
-        storage.AddItem("spear");
-        storage.AddItem("minigun");
-        storage.AddItem("sword");
+        storage.AddItem(ID.Brick);
+        storage.AddItem(ID.StonePickaxe);
+        storage.AddItem(ID.MetalAxe);
+        storage.AddItem(ID.Hammer);
+        storage.AddItem(ID.Sword);
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = "tree",
+            Loot = ID.Tree,
             SfxHit = "dig_stone",
             SfxDestroy = "dig_stone",
             Storage = storage

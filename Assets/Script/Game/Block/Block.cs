@@ -5,7 +5,7 @@ using UnityEngine;
 public partial class Block 
 {
     private static Dictionary<int, Block> _dictionary  = new Dictionary<int, Block>();
-    private static IntStringMap<int, string> _blockIDMap = new IntStringMap<int, string>();
+    private static IntStringMap<int, ID> _blockIDMap = new IntStringMap<int, ID>();
     private static int _nextBlockID = 1;
     
     public static int TextureAtlasWidth;
@@ -46,8 +46,7 @@ public partial class Block
         List<Texture2D> textures = new List<Texture2D>();
         foreach (var kvp in _blockIDMap.InttoString)
         {
-            string stringID = kvp.Value;
-            textures.Add(Resources.Load<Texture2D>($"texture/tileset/block_{stringID}"));
+            textures.Add(Resources.Load<Texture2D>($"texture/tileset/{kvp.Value}"));
         } 
 
         // if too small, uv mapping will BREAK
@@ -71,7 +70,7 @@ public partial class Block
         MeshMaterial.mainTexture = TextureAtlas;
     }
 
-    public static void AddBlockDefinition(string stringID, int breakThreshold, int breakCost)
+    public static void AddBlockDefinition(ID stringID, int breakThreshold, int breakCost)
     {
         int id = _nextBlockID++;
         Block blockData = new Block(stringID, breakThreshold, breakCost);
@@ -84,19 +83,19 @@ public partial class Block
         return _dictionary.GetValueOrDefault(id);
     }
 
-    public static Block GetBlock(string stringID)
+    public static Block GetBlock(ID stringID)
     {
         return _dictionary.GetValueOrDefault(_blockIDMap.StringtoInt[stringID]);
     }
  
-    public static int ConvertID(string stringID)
+    public static int ConvertID(ID stringID)
     {
         return _blockIDMap.StringtoInt[stringID];
     }
 
-    public static string ConvertID(int id)
+    public static ID ConvertID(int id)
     {
-        if (id == 0) return null;
+        if (id == 0) return ID.Null;
         return _blockIDMap.InttoString[id];
     }
  

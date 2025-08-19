@@ -7,7 +7,7 @@ public class GenTaskStone : WorldGen
     private const float Scale = 0.05f;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID("stone") : _id; 
+    private static int ID => _id == 0 ? Block.ConvertID(global::ID.StoneBlock) : _id; 
     
     public static void Run()
     {

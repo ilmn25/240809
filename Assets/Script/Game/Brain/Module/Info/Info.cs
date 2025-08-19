@@ -5,7 +5,7 @@ using UnityEngine;
 public class Info : EntityModule
 {
     public static readonly Dictionary<string, Info> Dictionary = new Dictionary<string, Info>();
-    public string stringID;
+    public ID stringID;
     public Vector3 position;
     [NonSerialized] public bool Destroyed = false;
     public SetEntity ToSetPieceInfo()

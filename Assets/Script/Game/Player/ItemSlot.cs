@@ -5,7 +5,7 @@ public class ItemSlot
 {
     public int Stack = 0;
     public int Durability;
-    public string StringID;
+    public ID StringID;
     public string Modifier;
     public bool Locked;
 
@@ -58,13 +58,13 @@ public class ItemSlot
                 {
                     switch (item.ProjectileInfo.OperationType)
                     {
-                        case OperationType.Build:
+                        case OperationType.Building:
                             text += " \nbuilding: " + item.ProjectileInfo.Breaking;
                             break;
-                        case OperationType.Dig:
+                        case OperationType.Mining:
                             text += " \nmining: " + item.ProjectileInfo.Breaking;
                             break;
-                        case OperationType.Break:
+                        case OperationType.Breaking:
                             text += " \nbreaking: " + item.ProjectileInfo.Breaking;
                             break;
                     }
@@ -73,7 +73,7 @@ public class ItemSlot
                 // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
                 // else text += " \nrange: " + item.ProjectileInfo.Radius;
                 // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
-                if (item.ProjectileInfo.Ammo != null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
+                if (item.ProjectileInfo.Ammo != ID.Null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
             } 
 
 
@@ -95,7 +95,7 @@ public class ItemSlot
         return text;
     }
     
-    public void SetItem(int stack, string stringID, string modifier, bool locked)
+    public void SetItem(int stack, ID stringID, string modifier, bool locked)
     {
         Stack = stack;
         StringID = stringID;
@@ -106,7 +106,7 @@ public class ItemSlot
     public void clear()
     {
         Stack = 0;
-        StringID = null;
+        StringID = ID.Null;
         Modifier = null;
         Locked = false;
     }
@@ -140,7 +140,7 @@ public class ItemSlot
     {
         return slot.StringID == StringID && slot.Modifier == Modifier;
     }
-    public bool isSame(string stringID, string modifier)
+    public bool isSame(ID stringID, string modifier)
     {
         return stringID == StringID && modifier == Modifier;
     }

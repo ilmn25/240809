@@ -17,7 +17,7 @@ public class ProjectileInfo
     public string Effects;
     public ProjectileClass Class; 
     public string Sprite;
-    public string Ammo;
+    public ID Ammo;
     public float Scale = 1;
 
     public virtual void AI(Projectile projectile) { }

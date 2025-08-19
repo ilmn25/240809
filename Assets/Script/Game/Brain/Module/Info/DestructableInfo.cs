@@ -16,6 +16,6 @@ public class ResourceInfo : DestructableInfo
     public override void Initialize()
     {
         base.Initialize();
-        operationType = OperationType.Break;
+        operationType = OperationType.Breaking;
     }
 }

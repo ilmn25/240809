@@ -20,7 +20,7 @@ public class GenTaskSand : WorldGen
     private const float Scale = 0.03f;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID("sand") : _id; 
+    private static int ID => _id == 0 ? Block.ConvertID(global::ID.SandBlock) : _id; 
     
     public static void Run()
     {

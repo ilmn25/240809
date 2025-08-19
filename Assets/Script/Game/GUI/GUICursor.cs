@@ -31,15 +31,15 @@ public class GUICursor : GUI
         Rect.anchoredPosition = mousePosition;
     }
 
-    public void Set(string info = null)
+    public void Set(ID info = ID.Null)
     {
-        if (info == null)
+        if (info == ID.Null)
         {
             Show(false);
             return;
         }
         Show(true);
-        _cursorInfoText.text = info;
+        _cursorInfoText.text = Item.GetItem(info).Name;
     }
     
     public static void UpdateCursorSlot()

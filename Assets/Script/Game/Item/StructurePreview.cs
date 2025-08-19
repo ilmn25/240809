@@ -45,7 +45,7 @@ public class StructurePreviewState : State
                 }
                 
                 Vector3Int position = Vector3Int.FloorToInt(Control.MousePosition - Control.MouseDirection * 0.1f);
-                
+ 
                 if (!Control.MouseTarget && Scene.InPlayerBlockRange(position, 6) &&
                     World.GetBlock(position + Vector3Int.down) != 0)
                 { 
@@ -58,6 +58,7 @@ public class StructurePreviewState : State
                                 Audio.PlaySFX("pick_up", 0.4f);
                                 StructureRecipe.Build( position);
                                 StructureRecipe.Target = null;
+                                Machine.SetState<DefaultState>(); 
                         }
                 }
                 else

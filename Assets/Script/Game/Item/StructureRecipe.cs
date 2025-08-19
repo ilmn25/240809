@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class StructureRecipe
 {
-        public static Dictionary<string, StructureRecipe> Dictionary = new Dictionary<string, StructureRecipe>();
+        public static Dictionary<ID, StructureRecipe> Dictionary = new Dictionary<ID, StructureRecipe>();
         public static StructureRecipe Target;
         
-        public string StringID;
+        public ID StringID;
         public int Time;
-        public Dictionary<string, int> Ingredients;
+        public Dictionary<ID, int> Ingredients;
         
-        public static void AddRecipe(string stringID, int time, Dictionary<string, int> ingredients)
+        public static void AddRecipe(ID stringID, int time, Dictionary<ID, int> ingredients)
         {
                 Dictionary.Add(stringID, new StructureRecipe()
                 {
@@ -20,7 +20,7 @@ public class StructureRecipe
                 });
         }
         
-        public static bool IsCraftable (string stringID)
+        public static bool IsCraftable (ID stringID)
         {
                 foreach (var ingredient in Dictionary[stringID].Ingredients)
                 {
@@ -31,10 +31,10 @@ public class StructureRecipe
 
         public static void Build(Vector3Int position)
         {
-                ConstructionInfo info = (ConstructionInfo)Entity.Spawn("construction", position);
+                ConstructionInfo info = (ConstructionInfo)Entity.Spawn(ID.Construction, position);
                 info.structureID = Target.StringID;
                 info.Health = Target.Time;
-                info.operationType = OperationType.Build;
+                info.operationType = OperationType.Building;
                 info.SfxHit = "dig_metal";
                 info.SfxDestroy = "dig_metal";
                 foreach (var ingredient in Target.Ingredients)

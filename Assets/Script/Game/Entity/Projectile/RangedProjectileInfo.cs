@@ -11,7 +11,7 @@ public class RangedProjectileInfo : ProjectileInfo
 
     public override void AI(Projectile projectile)
     {
-        if (!projectile.Target)
+        if (projectile.Target == null)
         {
             // Check lifespan
             if (projectile.LifeSpan > LifeSpan)
@@ -41,8 +41,8 @@ public class RangedProjectileInfo : ProjectileInfo
                 {
                     if (Lodge)
                     {
-                        projectile.Target = ((MobMachine)target).Info.SpriteToolTrack ?? projectile.Target.transform;;
-                        projectile.RelativeRotation = Quaternion.Inverse(projectile.Target.rotation) * projectile.transform.rotation;
+                        projectile.Target = ((MobMachine)target).Info;
+                        projectile.RelativeRotation = Quaternion.Inverse(projectile.Target.SpriteToolTrack.rotation) * projectile.transform.rotation;
                     }
                     else
                     {
@@ -54,14 +54,14 @@ public class RangedProjectileInfo : ProjectileInfo
         }
         else
         {
-            projectile.transform.position = projectile.Target.position;
-            projectile.transform.rotation = projectile.Target.rotation * projectile.RelativeRotation;
+            projectile.transform.position = projectile.Target.SpriteToolTrack.position;
+            projectile.transform.rotation = projectile.Target.SpriteToolTrack.rotation * projectile.RelativeRotation;
             
-            if (!projectile.Target.gameObject.activeSelf)
+            if (projectile.Target.Destroyed)
             {
                 if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position);
                 projectile.Delete();    
             }
         }
     }
-} // TODO Spear hangs mid air if die on hit
+}  

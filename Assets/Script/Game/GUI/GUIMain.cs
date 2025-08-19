@@ -46,10 +46,10 @@ public class GUIMain
         Storage.Show(false);
 
         Storage storage = new Storage(18);
-        storage.AddItem("station");
-        storage.AddItem("axe_stone");
-        storage.AddItem("hammer");
-        storage.AddItem("spear");
+        storage.AddItem(ID.Station);
+        storage.AddItem(ID.StoneAxe);
+        storage.AddItem(ID.Hammer);
+        storage.AddItem(ID.Spear);
         HandCrafting = new GUICraft()
         {
             Storage = storage,

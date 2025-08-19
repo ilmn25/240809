@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public enum OperationType { Dig, Build, Break, None }
+public enum OperationType { Mining, Building, Breaking, None }
 [System.Serializable]
 public class StructureInfo : Info
 {
@@ -10,7 +10,7 @@ public class StructureInfo : Info
     public int threshold = 1;
     public string SfxHit;
     public string SfxDestroy;
-    public string Loot;
+    public ID Loot;
     public OperationType operationType;
     [NonSerialized] public SpriteRenderer SpriteRenderer;
     public override void Initialize()
@@ -28,7 +28,7 @@ public class StructureInfo : Info
         if (Health <= 0)
         { 
             Audio.PlaySFX(SfxDestroy);  
-            if (Loot != null) global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
+            if (Loot != ID.Null) global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
             OnDestroy(projectile);
             ((EntityMachine)Machine).Delete();
         }

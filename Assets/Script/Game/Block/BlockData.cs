@@ -1,11 +1,11 @@
 [System.Serializable]
 public partial class Block
 { 
-    public string StringID { get; set; }
+    public ID StringID { get; set; }
     public int BreakThreshold { get; set; }
     public int BreakCost { get; set; }
 
-    public Block(string stringID, int breakThreshold, int breakCost)
+    public Block(ID stringID, int breakThreshold, int breakCost)
     { 
         StringID = stringID;
         BreakThreshold = breakThreshold;

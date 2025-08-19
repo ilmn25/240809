@@ -1,0 +1,67 @@
+public enum ID
+{
+    Null,
+    // Blocks
+    BrickBlock,
+    MarbleBlock,
+    DirtBlock,
+    SandBlock,
+    BackroomBlock,
+    StoneBlock,
+    WoodBlock,
+    GraniteBlock,
+
+    // Materials
+    Bullet,
+    Gravel,
+    Sticks,
+    Flint,
+    DebrisMetal,
+    Charcoal,
+    Steel,
+    Stake,
+    Slag,
+    Paper,
+    Brick,
+
+    // Structures
+    Chest,
+    Station,
+    Workbench,
+    Stonecutter,
+    Furnace,
+    BlueprintStation,
+
+    // Tools
+    Sword,
+    Blueprint,
+    StonePickaxe,
+    StoneAxe,
+    MetalAxe,
+    DiamondAxe,
+    Hammer,
+    Spear,
+    Minigun,
+    Pistol,
+    
+    Slab,
+    Tree,
+    Megumin,
+    Chito,
+    SnareFlea,
+    Yuuri,
+    BreakBlock,
+    Block,
+    ItemPrefab,
+    ProjectilePrefab,
+    ConstructionPrefab,
+    Construction,
+    Bush,
+    Grass,
+    BlockPrefab,
+    Player,
+    PlayerPrefab,
+    MobPrefab,
+    StructurePrefab,
+    OverlayBlock
+}

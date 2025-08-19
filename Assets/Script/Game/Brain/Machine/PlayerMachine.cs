@@ -80,17 +80,17 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
 
         if (Input.GetKeyDown(KeyCode.N))
         {
-            Info.Storage.AddItem("wood", 50);
-            Info.Storage.AddItem("stone", 50);
+            Info.Storage.AddItem(ID.WoodBlock, 50);
+            Info.Storage.AddItem(ID.StoneBlock, 50);
         } 
         if (Input.GetKeyDown(KeyCode.M)) 
-            Entity.Spawn("megumin", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn(ID.Megumin, Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.L)) 
-            Entity.Spawn("snare_flea", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn(ID.SnareFlea, Vector3Int.FloorToInt(transform.position + Vector3.up));
         if (Input.GetKeyDown(KeyCode.K))
         {
-            Entity.Spawn("chito", Vector3Int.FloorToInt(transform.position + Vector3.up));
-            Entity.Spawn("yuuri", Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn(ID.Chito, Vector3Int.FloorToInt(transform.position + Vector3.up));
+            Entity.Spawn(ID.Yuuri, Vector3Int.FloorToInt(transform.position + Vector3.up));
         } 
     }
     
@@ -120,7 +120,10 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                                 PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
                                     true);
                                 if (Control.Inst.ActionPrimary.Key())
+                                {
+                                    Audio.PlaySFX("pick_up", 0.7f);
                                     PlayerTerraformModule.HandleMapBreak(); 
+                                } 
                             }
 
                             if (Control.Inst.ActionPrimary.Key() || Control.Inst.DigUp.Key() ||
@@ -169,7 +172,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
      
     public override void Attack()
     {
-        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null && 
+        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != ID.Null && 
             Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
                      
                     
@@ -183,6 +186,6 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
                 break;
         }
                     
-        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != null) Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != ID.Null) Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
     }
 } 

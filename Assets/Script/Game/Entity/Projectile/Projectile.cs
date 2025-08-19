@@ -12,7 +12,7 @@ public class Projectile : MonoBehaviour
     public Vector3 Destination;
     public Vector3 Direction;
     public DynamicInfo SourceInfo;
-    public Transform Target;
+    public DynamicInfo Target;
     public Quaternion RelativeRotation;
 
     private void Update()
@@ -28,7 +28,7 @@ public class Projectile : MonoBehaviour
     
     public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target, MobInfo sourceInfo)
     {
-        GameObject gameObject = ObjectPool.GetObject("projectile");
+        GameObject gameObject = ObjectPool.GetObject(ID.ProjectilePrefab);
         Projectile projectile = gameObject.GetComponent<Projectile>();
         if (!projectile.spriteRenderer)
             projectile.spriteRenderer = gameObject.GetComponent<SpriteRenderer>();

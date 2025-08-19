@@ -68,7 +68,7 @@ public class Game : MonoBehaviour
         MapLoad.Initialize();
         Scene.Initialize();  
         ViewPort.Initialize();  
-        Instantiate(Resources.Load<GameObject>($"prefab/item")).AddComponent<StructurePreviewMachine>();
+        Instantiate(Resources.Load<GameObject>($"prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
     }
 
     private void Update()
