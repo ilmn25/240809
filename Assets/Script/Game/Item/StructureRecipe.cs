@@ -35,8 +35,8 @@ public class StructureRecipe
                 info.structureID = Target.StringID;
                 info.Health = Target.Time;
                 info.operationType = OperationType.Building;
-                info.SfxHit = "dig_metal";
-                info.SfxDestroy = "dig_metal";
+                info.SfxHit = SfxID.HitMetal;
+                info.SfxDestroy = SfxID.HitMetal;
                 foreach (var ingredient in Target.Ingredients)
                 {
                         Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);

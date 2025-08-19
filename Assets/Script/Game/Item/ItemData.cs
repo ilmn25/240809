@@ -11,7 +11,7 @@ public partial class Item
     public ItemRarity Rarity; 
     
     public float Scale; 
-    public string Sfx; 
+    public SfxID Sfx; 
     
     public ItemType Type; 
     public ItemGesture Gesture;

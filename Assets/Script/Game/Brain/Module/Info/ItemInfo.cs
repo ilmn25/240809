@@ -23,7 +23,7 @@ public class ItemInfo : Info
     {        
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
-            Audio.PlaySFX("pick_up", 0.4f);
+            Audio.PlaySFX(SfxID.Item);
             ((PlayerInfo)info).Storage.AddItem(item.StringID, item.Stack);
             EntityMachine.Delete();
         }

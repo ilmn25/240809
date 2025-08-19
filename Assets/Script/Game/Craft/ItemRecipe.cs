@@ -36,7 +36,7 @@ public partial class ItemRecipe
     
     public static void CraftItem(ID stringID, bool isCursor = true)
     { 
-        Audio.PlaySFX("pick_up", 0.4f);
+        Audio.PlaySFX(SfxID.Item);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);

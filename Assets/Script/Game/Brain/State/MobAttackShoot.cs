@@ -10,7 +10,7 @@ public class MobAttackShoot : MobState
             Machine.SetState<DefaultState>();
             return;
         } 
-        Audio.PlaySFX(Info.Equipment.Sfx, 0.5f);
+        Audio.PlaySFX(Info.Equipment.Sfx);
         Info.Animator.speed = Info.Equipment.Speed; 
         Info.Animator.Play("EquipShoot", 0, 0f);  
         

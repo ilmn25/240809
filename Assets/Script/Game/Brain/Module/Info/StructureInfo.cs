@@ -8,8 +8,8 @@ public class StructureInfo : Info
 {
     public float Health; 
     public int threshold = 1;
-    public string SfxHit;
-    public string SfxDestroy;
+    public SfxID SfxHit;
+    public SfxID SfxDestroy;
     public ID Loot;
     public OperationType operationType;
     [NonSerialized] public SpriteRenderer SpriteRenderer;
@@ -34,7 +34,7 @@ public class StructureInfo : Info
         }
         else
         {
-            Audio.PlaySFX(SfxHit, 0.1f); 
+            Audio.PlaySFX(SfxHit); 
             OnHit(projectile); 
         }
         return true;

@@ -32,8 +32,8 @@ public class LootChestMachine : ChestMachine
         {
             Health = 500,
             Loot = ID.Tree,
-            SfxHit = "dig_stone",
-            SfxDestroy = "dig_stone",
+            SfxHit = SfxID.HitStone,
+            SfxDestroy = SfxID.HitStone,
             Storage = storage
         };
     }
@@ -47,8 +47,8 @@ public class BasicChestMachine : ChestMachine
         {
             Health = 500,
             Loot = ID.Tree,
-            SfxHit = "dig_stone",
-            SfxDestroy = "dig_stone",
+            SfxHit = SfxID.HitStone,
+            SfxDestroy = SfxID.HitStone,
             Storage = storage
         };
     }

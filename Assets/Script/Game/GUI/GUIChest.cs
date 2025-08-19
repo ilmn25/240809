@@ -53,7 +53,7 @@ public class GUIChest : GUIStorage
                     (GUICursor.Data, Storage.List[CurrentSlotKey]);
             } 
         } 
-        Audio.PlaySFX("pick_up", 0.4f);
+        Audio.PlaySFX(SfxID.Item);
         Inventory.RefreshInventory();
     }
 
@@ -66,7 +66,7 @@ public class GUIChest : GUIStorage
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
                 GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
-                Audio.PlaySFX("pick_up", 0.4f);
+                Audio.PlaySFX(SfxID.Item);
                 Inventory.RefreshInventory();
             }
         }
@@ -80,14 +80,14 @@ public class GUIChest : GUIStorage
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
                 GUICursor.Data.Add(itemSlot, 1);
-                Audio.PlaySFX("pick_up", 0.4f);
+                Audio.PlaySFX(SfxID.Item);
                 Inventory.RefreshInventory();
             }
         }
     }
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.Set(itemSlot.StringID);
-        GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
+        GUIMain.Cursor.Set(itemSlot.GetItemInfo(false));
+        // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
     }
 }

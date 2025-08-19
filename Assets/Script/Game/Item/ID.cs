@@ -16,7 +16,7 @@ public enum ID
     Gravel,
     Sticks,
     Flint,
-    DebrisMetal,
+    MetalChunks,
     Charcoal,
     Steel,
     Stake,
@@ -63,5 +63,7 @@ public enum ID
     PlayerPrefab,
     MobPrefab,
     StructurePrefab,
-    OverlayBlock
+    OverlayBlock,
+    Plank,
+    Log
 }

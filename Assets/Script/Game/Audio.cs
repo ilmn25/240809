@@ -10,8 +10,15 @@ public class Audio
     private static readonly float SfxVolume = 0.5f;
     private static readonly int PoolSize = 12;
 
+    private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>();
     public static void Initialize()
     {
+        Volume.Add(SfxID.HitMetal, 0.3f);
+        Volume.Add(SfxID.HitStone, 1.5f);
+        Volume.Add(SfxID.Footsteps1, 0.4f);
+        Volume.Add(SfxID.Footsteps2, 0.4f);
+        Volume.Add(SfxID.Text, 0.3f);
+        Volume.Add(SfxID.Wind, 0.7f);
         GameObject audioManager = new GameObject("Audio");
         _bgmSource = audioManager.AddComponent<AudioSource>();
 
@@ -23,8 +30,8 @@ public class Audio
         }
 
         PlayBGM("fairy_fountain", 0.4f);
-        PlaySFX("wind", 0.2f, true);
-        PlaySFX("noise", 0.3f, true);
+        PlaySFX(SfxID.Wind, true);
+        PlaySFX(SfxID.Noise, true);
     }
 
     public static void PlayBGM(string id, float volume = 1f, bool loop = true)
@@ -38,12 +45,12 @@ public class Audio
         _bgmSource.Play();
     }
 
-    public static AudioSource PlaySFX(string id, float volume = 1f, bool loop = false)
+    public static AudioSource PlaySFX(SfxID id, bool loop = false)
     {
-        if (id == "") return null;
         AudioClip clip = Cache.LoadAudioClip($"sfx/{id}");
-        if (clip == null) return null;
-
+        if (!clip) return null;
+        
+        float volume = Volume.ContainsKey(id) ? Volume[id] : 1;
         AudioSource availableSource = GetAvailableAudioSource();
         if (availableSource)
         {

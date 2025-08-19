@@ -16,7 +16,7 @@ public class DialogueState : MobState {
             Info.CancelTarget();
             return;
         }
-        Audio.PlaySFX("chat");
+        Audio.PlaySFX(SfxID.Notification);
         Info.PathingStatus = PathingStatus.Reached;
         Info.Direction = Vector3.zero; 
         GUIDialogue.Dialogue = Dialogue;

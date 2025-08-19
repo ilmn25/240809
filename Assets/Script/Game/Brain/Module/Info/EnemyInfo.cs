@@ -16,7 +16,7 @@ public class EnemyInfo : MobInfo
         { 
             Loot.Gettable(((EntityMachine)Machine).Info.stringID).Spawn(Machine.transform.position);
             ((EntityMachine)Machine).Delete();
-            Audio.PlaySFX(DeathSfx, 0.8f);
+            Audio.PlaySFX(SfxID.DeathPlayer);
         }
     }
 

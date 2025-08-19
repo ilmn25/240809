@@ -127,8 +127,8 @@ public class PlayerTerraformModule : Module
         
         info.Health = block.BreakCost;
         info.threshold = block.BreakThreshold;
-        info.SfxHit = "dig_metal";
-        info.SfxDestroy = "dig_metal";
+        info.SfxHit = SfxID.HitMetal;
+        info.SfxDestroy = SfxID.HitMetal;
          
         Position.Add(_coordinate);
     }

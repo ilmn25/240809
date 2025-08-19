@@ -49,7 +49,7 @@ public class GUIMain
         storage.AddItem(ID.Station);
         storage.AddItem(ID.StoneAxe);
         storage.AddItem(ID.Hammer);
-        storage.AddItem(ID.Spear);
+        storage.AddItem(ID.Stake);
         HandCrafting = new GUICraft()
         {
             Storage = storage,

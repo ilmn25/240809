@@ -1,0 +1,18 @@
+public enum SfxID
+{
+    Null,
+    HitShrub,
+    HitMetal,
+    HitSand,
+    HitStone,
+    HitPlayer,
+    HitMob,
+    DeathPlayer,
+    Notification,
+    Text,
+    Item,
+    Noise,
+    Wind,
+    Footsteps1,
+    Footsteps2,
+}

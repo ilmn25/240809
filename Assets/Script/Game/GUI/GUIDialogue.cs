@@ -55,7 +55,7 @@ public class GUIDialogue
             
             if (Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown())
             { 
-                Audio.PlaySFX("text", 0.2f); 
+                Audio.PlaySFX(SfxID.Text); 
                 
                 if (_scrollTask.Running)
                 {
@@ -77,7 +77,7 @@ public class GUIDialogue
     
     private static void HandleScroll()
     {
-        _audioSource = Audio.PlaySFX("text", 0.2f, true);
+        _audioSource = Audio.PlaySFX(SfxID.Text, true);
         
         _scrollTask =  new CoroutineTask(GUIMain.ScrollText(Dialogue.Lines[_currentLine], Game.GUIDialogueText));
         _scrollTask.Finished += (bool isManual) => 

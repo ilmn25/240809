@@ -11,42 +11,48 @@ public partial class Item
         Loot loot;
 
         // Blocks
-        AddBlockDefinition(ID.BrickBlock, 100, 3, "dig_metal", materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
-        AddBlockDefinition(ID.MarbleBlock, 100, 3, "dig_metal", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.DirtBlock, 100, 1, "dig_stone");
+        AddBlockDefinition(ID.BrickBlock, 100, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        loot = Loot.CreateTable(ID.BrickBlock);
+        loot.Add(1, 3, ID.Gravel);
+        loot.Add(0.5f, 1, ID.Slag);
+        loot.Add(0.5f, 1, ID.Brick);
+        AddBlockDefinition(ID.MarbleBlock, 100, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.DirtBlock, 100, 1, SfxID.HitStone);
         loot = Loot.CreateTable(ID.DirtBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
-        AddBlockDefinition(ID.SandBlock, 100, 1, "dig_sand", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.BackroomBlock, 100, 3, "dig_stone", materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.StoneBlock, 100, 2, "dig_stone");
+        AddBlockDefinition(ID.SandBlock, 100, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.BackroomBlock, 100, 3, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.StoneBlock, 100, 2, SfxID.HitStone);
         loot = Loot.CreateTable(ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
-        loot.Add(0.5f, 1, ID.Gravel);
-        loot.Add(0.5f, 1, ID.Gravel);
-        AddBlockDefinition(ID.WoodBlock, 100, 2, "dig_stone");
-        AddBlockDefinition(ID.GraniteBlock, 100, 2, "dig_stone");
+        loot.Add(0.5f, 1, ID.MetalChunks);
+        loot.Add(0.5f, 1, ID.MetalChunks);
+        AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone);
+        AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone);
 
         // Materials
         AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Gravel, 2 } }, craftStack: 5);
         AddMaterialDefinition(ID.Gravel);
         AddMaterialDefinition(ID.Sticks);
         AddMaterialDefinition(ID.Flint);
-        AddMaterialDefinition(ID.DebrisMetal);
-        AddMaterialDefinition(ID.Charcoal);
-        AddMaterialDefinition(ID.Steel);
-        AddMaterialDefinition(ID.Brick);
-        AddMaterialDefinition(ID.Stake);
-        AddMaterialDefinition(ID.Slag);
+        AddMaterialDefinition(ID.MetalChunks);
+        AddMaterialDefinition(ID.Charcoal, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
+        AddMaterialDefinition(ID.Steel, materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 } });
+        AddMaterialDefinition(ID.Brick, materials: new Dictionary<ID, int> { { ID.Slag, 3 } });
+        AddMaterialDefinition(ID.Stake, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
+        AddMaterialDefinition(ID.Slag, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddMaterialDefinition(ID.Log);
+        AddMaterialDefinition(ID.Plank, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
 
         // Structures
-        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.WoodBlock, 15 } }, 200);
-        AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
-        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
-        AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
-        AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.StoneBlock, 15 } }, 200);
-        AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.WoodBlock, 15 } }, 200);
+        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 200);
+        AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.Log, 15 }, { ID.Flint, 15 } }, 200);
+        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 200);
+        AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }}, 200);
+        AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Gravel, 15 } }, 200);
+        AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 200);
 
         // Tools
         AddToolDefinition(
@@ -72,7 +78,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 4f,
             range: 7f,
-            materials: new Dictionary<ID, int> { { ID.Paper, 2 } },
+            materials: new Dictionary<ID, int> { { ID.Log, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
 
@@ -263,13 +269,12 @@ public partial class Item
         ID stringID,
         int breakCost = 1,
         int breakThreshold = 1,
-        string sfx = "",
+        SfxID sfx = SfxID.HitSand,
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int stackSize = 100)
     {
-        if (sfx == "") sfx = "dig_sand";
         Entity.AddItem(stringID);
         Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
 
@@ -301,7 +306,7 @@ public partial class Item
     private static void AddToolDefinition(
         ID stringID,
         ItemGesture gesture,
-        string sfx = "",
+        SfxID sfx = SfxID.Null,
         int stackSize = 1,
         ItemRarity rarity = ItemRarity.Common,
 
@@ -356,11 +361,9 @@ public partial class Item
         ID stringID,
         Dictionary<ID, int> materials,
         int time = 200,
-        string sfx = "",
+        SfxID sfx = SfxID.HitSand,
         string description = "")
     {
-        if (sfx == "") sfx = "dig_sand";
-
         Item itemData = new Item()
         {
             StringID = stringID,

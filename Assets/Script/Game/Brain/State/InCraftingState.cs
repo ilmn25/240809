@@ -2,7 +2,7 @@ public class InCraftingState : State
 {
     public override void OnEnterState()
     {
-        Audio.PlaySFX("text", 0.5f);
+        Audio.PlaySFX(SfxID.Text);
         GUIMain.Crafting.Storage = ((ContainerInfo)Info).Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
