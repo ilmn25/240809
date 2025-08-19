@@ -17,7 +17,7 @@ class MobChaseAction : MobState {
             Info.CancelTarget();
             return;
         }
-        if (Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp && 
+        if (Info.ActionType != IActionType.PickUp && 
             (Info.Target == null || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
             Info.PathingStatus = PathingStatus.Reached;  
         

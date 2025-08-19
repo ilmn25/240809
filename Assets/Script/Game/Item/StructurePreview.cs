@@ -56,7 +56,7 @@ public class StructurePreviewState : State
                         if (!GUIMain.IsHover && Control.Inst.ActionPrimary.KeyDown())
                         { 
                                 Audio.PlaySFX("pick_up", 0.4f);
-                                StructureRecipe.Build(position);
+                                StructureRecipe.Build( position);
                                 StructureRecipe.Target = null;
                         }
                 }
@@ -65,7 +65,7 @@ public class StructurePreviewState : State
                         Machine.transform.position = Vector3.Lerp(Machine.transform.position, 
                                 _targetPosition, Time.deltaTime * 10);
                 }
-        }
+        } // TODO unresponsive, dont inactive if spam
 
         public override void OnExitState()
         {

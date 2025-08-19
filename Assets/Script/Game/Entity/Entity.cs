@@ -32,6 +32,7 @@ public partial class Entity
                 AddStructure<WorkBenchMachine>("workbench", Vector3Int.one, Game.IndexCollide);
                 AddStructure<WorkBenchMachine>("furnace", Vector3Int.one, Game.IndexCollide);
                 AddStructure<WorkBenchMachine>("stonecutter", Vector3Int.one, Game.IndexCollide);
+                AddStructure<ConstructionMachine>("construction", Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>("station", Vector3Int.one, Game.IndexCollide);
                 AddStructure<ChestMachine>("chest", Vector3Int.one, Game.IndexCollide);
                 AddStructure<DecorMachine>("bush1", Vector3Int.zero, Game.IndexNoCollide);
@@ -44,6 +45,15 @@ public partial class Entity
                         Collision = Game.IndexSemiCollide,
                         PrefabName = "block",
                         Machine = typeof(BlockMachine),
+                        StaticLoad = true,
+                        SpawnOffset = Floor,
+                });
+                Dictionary.Add("breakblock", new Entity
+                {
+                        Bounds = Vector3Int.one,
+                        Collision = Game.IndexNoCollide,
+                        PrefabName = "block",
+                        Machine = typeof(BreakBlockMachine),
                         StaticLoad = true,
                         SpawnOffset = Floor,
                 });
@@ -111,10 +121,10 @@ public partial class Entity
                 currentEntityMachine.Initialize(itemInfo);  
         }
         
-        public static void Spawn(string stringID, Vector3 worldPosition)
+        public static Info Spawn(string stringID, Vector3 worldPosition)
         {
                 GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
-                gameObject.transform.position = worldPosition + new Vector3(0.5f, 0, 0.5f);   
+                gameObject.transform.position = worldPosition + Dictionary[stringID].SpawnOffset;   
         
                 EntityMachine currentEntityMachine = (EntityMachine)
                         (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
@@ -122,8 +132,10 @@ public partial class Entity
                 if (Dictionary[stringID].StaticLoad)
                         EntityStaticLoad.InviteEntity(currentEntityMachine); 
                 else
-                        EntityDynamicLoad.InviteEntity(currentEntityMachine); 
-                currentEntityMachine.Initialize(CreateInfo(stringID, worldPosition));
+                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
+                Info info = CreateInfo(stringID, worldPosition);
+                currentEntityMachine.Initialize(info);
+                return info;
         }
 
         public static Info CreateInfo(string stringID, Vector3 worldPosition)

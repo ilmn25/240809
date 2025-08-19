@@ -54,7 +54,7 @@ public partial class Item
         AddToolDefinition(
             stringID: "blueprint",
             gesture: ItemGesture.Swing,
-            speed: 1.4f,
+            speed: 4f,
             range: 7f, 
             materials: new Dictionary<string, int> { { "wood", 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
@@ -254,7 +254,7 @@ public partial class Item
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing,
 
-            Speed = 3,
+            Speed = 4,
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
 

@@ -2,6 +2,7 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
 {    public static Info CreateInfo()
     {
         Storage storage = new Storage(27);
+        storage.AddItem("blueprint");   
         storage.AddItem("workbench");
         storage.AddItem("stonecutter");
         storage.AddItem("furnace");
@@ -19,39 +20,15 @@ public class StationMachine: StructureMachine, IActionSecondaryInteract
     {
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
-        AddState(new InBuildingState());
+        AddState(new InCraftingState());
     }
     
 
     public void OnActionSecondary(Info info)
     {
         if (IsCurrentState<DefaultState>())
-            SetState<InBuildingState>();
+            SetState<InCraftingState>();
         else 
             SetState<DefaultState>();
     }
-}
-
-public class InBuildingState : State
-{
-    public override void OnEnterState()
-    {
-        Audio.PlaySFX("text", 0.5f);
-        GUIMain.Building.Storage = ((ContainerInfo)Info).Storage;
-        GUIMain.RefreshStorage(); 
-        GUIMain.Show(true);
-        GUIMain.Building.Show(true, !GUIMain.Showing);
-    }
-
-    public override void OnUpdateState()
-    {
-        if (!GUIMain.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 49) { //walk away from npc
-            Machine.SetState<DefaultState>();
-        }
-    }
-
-    public override void OnExitState()
-    {
-        GUIMain.Building.Show(false);
-    }
-}
+} 
