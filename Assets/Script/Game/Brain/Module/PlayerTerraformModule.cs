@@ -107,27 +107,23 @@ public class PlayerTerraformModule : Module
 
     public static void SpawnBlock()
     {
-        GameObject gameObject = ObjectPool.GetObject("block"); 
-        gameObject.transform.position = _coordinate + new Vector3(0.5f, 0, 0.5f);
-        
-        BlockMachine currentEntityMachine = gameObject.GetComponent<BlockMachine>() ?? gameObject.AddComponent<BlockMachine>();
-        EntityStaticLoad.InviteEntity(currentEntityMachine);
-        BlockInfo info = (BlockInfo)Entity.CreateInfo("block", _coordinate);
-        
+        StructureInfo info;
         Block block;
         if (_block.name == "overlay")
         { 
             block = Block.GetBlock(World.GetBlock(_coordinate));
+            info = (BreakBlockInfo)Entity.Spawn("breakblock", _coordinate);
             info.operationType = OperationType.Dig;
-            info.blockID = 0;
-            info.texture = "overlay";
+            info.Loot = block.StringID;
+            BlockPreview.Set(info.Machine.gameObject, "overlay");
         }
         else
         { 
-            block = Block.GetBlock(_block.name); 
+            block = Block.GetBlock(_block.name);
+            info = (BlockInfo)Entity.Spawn("block", _coordinate);
             info.operationType = OperationType.Build;
-            info.blockID = Block.ConvertID(block.StringID);
-            info.texture = block.StringID;
+            ((BlockInfo)info).blockID = block.StringID;
+            BlockPreview.Set(info.Machine.gameObject, block.StringID);
         }
         
         info.Health = block.BreakCost;
@@ -135,7 +131,6 @@ public class PlayerTerraformModule : Module
         info.SfxHit = "dig_metal";
         info.SfxDestroy = "dig_metal";
          
-        currentEntityMachine.Initialize(info);
         Position.Add(_coordinate);
     }
     

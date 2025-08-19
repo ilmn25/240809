@@ -31,7 +31,12 @@ public class StructureRecipe
 
         public static void Build(Vector3Int position)
         {
-                Entity.Spawn(Target!.StringID, position); 
+                ConstructionInfo info = (ConstructionInfo)Entity.Spawn("construction", position);
+                info.structureID = Target.StringID;
+                info.Health = Target.Time;
+                info.operationType = OperationType.Build;
+                info.SfxHit = "dig_metal";
+                info.SfxDestroy = "dig_metal";
                 foreach (var ingredient in Target.Ingredients)
                 {
                         Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);

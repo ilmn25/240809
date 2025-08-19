@@ -25,7 +25,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
             MaxStuckCount = 100,
             AccelerationTime = 0.2f,
             DecelerationTime = 0.08f,
-            DistAttack = 3,
+            DistAttack = 2,
             Gravity = -40f,
             JumpVelocity = 12f,
             DeathSfx = "player_die",

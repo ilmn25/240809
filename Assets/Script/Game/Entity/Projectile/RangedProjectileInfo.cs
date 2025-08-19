@@ -64,4 +64,4 @@ public class RangedProjectileInfo : ProjectileInfo
             }
         }
     }
-}
+} // TODO Spear hangs mid air if die on hit

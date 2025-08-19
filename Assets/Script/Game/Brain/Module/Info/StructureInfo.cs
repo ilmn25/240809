@@ -12,7 +12,12 @@ public class StructureInfo : Info
     public string SfxDestroy;
     public string Loot;
     public OperationType operationType;
- 
+    [NonSerialized] public SpriteRenderer SpriteRenderer;
+    public override void Initialize()
+    {
+        SpriteRenderer = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
+    }
+
     public override bool OnHitInternal(Projectile projectile)
     {
         if (projectile.Info.OperationType != operationType || 

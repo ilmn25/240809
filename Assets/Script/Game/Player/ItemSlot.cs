@@ -47,16 +47,34 @@ public class ItemSlot
         }
         else if (item.Type == ItemType.Tool)
         { 
-            text += " " + Durability + "%"; 
-            text += " \n \n" + item.ProjectileInfo.Damage + " damage";
-            text += " \n" + item.ProjectileInfo.Knockback + " knockback\n";
-            // if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
-            if (item.ProjectileInfo.Breaking != 0) text += " \nbreaking power: " + item.ProjectileInfo.Breaking;  
-            // text += " \nattack cooldown: " + item.Speed;
-            // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
-            // else text += " \nrange: " + item.ProjectileInfo.Radius;
-            // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
-            if (item.ProjectileInfo.Ammo != null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
+            text += " " + Durability + "%";
+
+            if (item.ProjectileInfo != null)
+            {
+                text += " \n \n" + item.ProjectileInfo.Damage + " damage";
+                text += " \n" + item.ProjectileInfo.Knockback + " knockback\n";
+                // if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
+                if (item.ProjectileInfo.Breaking != 0)
+                {
+                    switch (item.ProjectileInfo.OperationType)
+                    {
+                        case OperationType.Build:
+                            text += " \nbuilding: " + item.ProjectileInfo.Breaking;
+                            break;
+                        case OperationType.Dig:
+                            text += " \nmining: " + item.ProjectileInfo.Breaking;
+                            break;
+                        case OperationType.Break:
+                            text += " \nbreaking: " + item.ProjectileInfo.Breaking;
+                            break;
+                    }
+                }  
+                // text += " \nattack cooldown: " + item.Speed;
+                // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
+                // else text += " \nrange: " + item.ProjectileInfo.Radius;
+                // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
+                if (item.ProjectileInfo.Ammo != null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
+            } 
 
 
             if (ingredients)

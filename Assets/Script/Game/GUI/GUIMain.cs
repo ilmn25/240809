@@ -13,7 +13,6 @@ public class GUIMain
     public static GUIStorage Storage; 
     public static GUIStorage HandCrafting;
     public static GUIStorage Crafting;
-    public static GUIStorage Building;
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
 
@@ -49,8 +48,9 @@ public class GUIMain
         Storage storage = new Storage(18);
         storage.AddItem("station");
         storage.AddItem("axe_stone");
+        storage.AddItem("hammer");
         storage.AddItem("spear");
-        HandCrafting = new GUIHandCrafting()
+        HandCrafting = new GUICraft()
         {
             Storage = storage,
             RowAmount = 1,
@@ -60,25 +60,16 @@ public class GUIMain
         };
         HandCrafting.Initialize();
         
-        Crafting = new GUICrafting()
+        Crafting = new GUICraft()
         {
-            RowAmount = Inventory.InventoryRowAmount,
+            RowAmount = 1,
             SlotAmount = Inventory.InventorySlotAmount,
             Position = new Vector2(0, -50), 
-            Name = "Crafting Station",
+            Name = "Station",
         };
         Crafting.Initialize();
         Crafting.Show(false);
-        
-        Building = new GUIBuilding()
-        {
-            RowAmount = Inventory.InventoryRowAmount,
-            SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(0, -100), 
-            Name = "Building Station",
-        };
-        Building.Initialize();
-        Building.Show(false);
+         
         
         InfoPanel = new GUIInfoPanel();
         InfoPanel.Initialize();
@@ -91,13 +82,11 @@ public class GUIMain
     public static void Update()
     {
         GUIDialogue.Update();
-        GUICraft.Update(); 
         Cursor.Update();
         StorageInv.Update();
         Storage.Update();
         HandCrafting.Update();
         Crafting.Update();
-        Building.Update();
         InfoPanel.UpdateDrag();
 
         if (Control.Inst.Inv.KeyDown())
@@ -142,7 +131,6 @@ public class GUIMain
         Storage.OnRefreshSlot?.Invoke(Storage, null);
         HandCrafting.OnRefreshSlot?.Invoke(HandCrafting, null);
         Crafting.OnRefreshSlot?.Invoke(Crafting, null);
-        Building.OnRefreshSlot?.Invoke(Building, null);
         GUICursor.UpdateCursorSlot();
     }
 

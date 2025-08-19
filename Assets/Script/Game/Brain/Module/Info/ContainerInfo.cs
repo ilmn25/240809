@@ -4,6 +4,7 @@ public class ContainerInfo : StructureInfo
     public Storage Storage;
     public override void Initialize()
     { 
+        base.Initialize();
         operationType = OperationType.Break;
     }
 
