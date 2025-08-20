@@ -11,20 +11,20 @@ public partial class Item
         Loot loot;
 
         // Blocks
-        AddBlockDefinition(ID.BrickBlock, 150, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddBlockDefinition(ID.BrickBlock, 150, 1, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
         loot = Loot.CreateTable(ID.BrickBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
-        AddBlockDefinition(ID.MarbleBlock, 200, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.MarbleBlock, 200, 1, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.DirtBlock, 80, 1, SfxID.HitStone);
         loot = Loot.CreateTable(ID.DirtBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.BackroomBlock, 150, 3, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.StoneBlock, 150, 2, SfxID.HitStone);
+        AddBlockDefinition(ID.BackroomBlock, 200, 2, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.StoneBlock, 150, 1, SfxID.HitStone);
         loot = Loot.CreateTable(ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);
@@ -96,7 +96,7 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Breaking = 2,
+                Breaking = 1,
                 OperationType = OperationType.Mining
             },
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 4 } },
@@ -114,7 +114,7 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Breaking = 2,
+                Breaking = 1,
                 OperationType = OperationType.Breaking
             },
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
@@ -132,7 +132,7 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
-                Breaking = 3,
+                Breaking = 2,
                 OperationType = OperationType.Breaking
             },
             materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 5 } },

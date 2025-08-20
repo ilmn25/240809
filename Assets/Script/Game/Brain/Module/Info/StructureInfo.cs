@@ -20,10 +20,16 @@ public class StructureInfo : Info
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        projectile.SourceInfo.Target = this;
-        projectile.SourceInfo.ActionType = IActionType.Hit;
-        // return HandleHealth(projectile.SourceInfo); 
-        return true;
+        if (projectile.SourceInfo.Equipment.ProjectileInfo.OperationType != operationType ||
+            projectile.SourceInfo.Equipment.ProjectileInfo.Breaking < threshold ||
+            projectile.SourceInfo.TargetHitboxType != HitboxType.Passive)
+        {
+            projectile.SourceInfo.Target = this;
+            projectile.SourceInfo.ActionType = IActionType.Hit;;
+            return true;
+        } 
+        return false;
+        // if (!PlayerTask.Pending.Contains(this)) PlayerTask.Pending.Add(this) 
     }
 
     public override void AbstractHit(MobInfo info)
@@ -38,6 +44,7 @@ public class StructureInfo : Info
             Audio.PlaySFX(SfxDestroy);  
             if (Loot != ID.Null) global::Loot.Gettable(Loot).Spawn(position); 
             OnDestroy(info);
+            PlayerTask.Pending.Remove(this);
             Destroy();
         }
         else

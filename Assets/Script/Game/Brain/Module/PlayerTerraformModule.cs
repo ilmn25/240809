@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerTerraformModule : Module
 {
-    public static List<Vector3Int> Position = new List<Vector3Int>();
+    public static List<Vector3Int> PendingBlocks = new ();
     private static GameObject _block;
     private static Vector3 _position;
     private static Vector3 _direction;
@@ -15,8 +15,8 @@ public class PlayerTerraformModule : Module
         // Inventory.SlotUpdate += EventSlotUpdate;
         _block = ObjectPool.GetObject(ID.BlockPrefab);
         _block.SetActive(false);
-    }
-
+    } 
+    
     private static void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
@@ -57,13 +57,13 @@ public class PlayerTerraformModule : Module
         if ( Control.Inst.DigUp.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.up;
-            if (Position.Contains(_coordinate)) return;
+            if (PendingBlocks.Contains(_coordinate)) return;
             SpawnBlock();
         }
         else if ( Control.Inst.DigDown.KeyDown())
         {
             _coordinate = Vector3Int.FloorToInt(Game.Player.transform.position) + Vector3Int.down;
-            if (Position.Contains(_coordinate)) return;
+            if (PendingBlocks.Contains(_coordinate)) return;
             SpawnBlock();
         }
         
@@ -97,7 +97,7 @@ public class PlayerTerraformModule : Module
     public static void HandleMapPlace()
     {
         _coordinate = OffsetPosition(false, _position, _direction);
-        if (Position.Contains(_coordinate)) return;
+        if (PendingBlocks.Contains(_coordinate)) return;
         if (!World.IsInWorldBounds(_coordinate)) return; 
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         SpawnBlock();
@@ -130,13 +130,14 @@ public class PlayerTerraformModule : Module
         info.SfxHit = SfxID.HitMetal;
         info.SfxDestroy = SfxID.HitMetal;
          
-        Position.Add(_coordinate);
+        PendingBlocks.Add(_coordinate);
+        PlayerTask.Pending.Add(info);
     }
     
     public static void HandleMapBreak()
     {
         _coordinate = OffsetPosition(true, _position, _direction);
-        if (Position.Contains(_coordinate)) return;
+        if (PendingBlocks.Contains(_coordinate)) return;
         SpawnBlock();
     }
     

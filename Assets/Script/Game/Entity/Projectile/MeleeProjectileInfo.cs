@@ -9,7 +9,6 @@ public class SwingProjectileInfo : ProjectileInfo
         Vector3 direction = (projectile.Destination - projectile.transform.position).normalized;
         Vector3 center = projectile.transform.position + direction * (Radius * 0.5f);
         int hitCount = Physics.OverlapSphereNonAlloc(center, Radius / 2, HitBuffer, Game.MaskEntity);
-        int landed = 0;
         Info info;
         for (int i = 0; i < hitCount; i++)
         {
@@ -20,7 +19,6 @@ public class SwingProjectileInfo : ProjectileInfo
             if (info == projectile.SourceInfo.Target)
                 projectile.SourceInfo.Target.AbstractHit(projectile.SourceInfo);
         }
-         
         projectile.Delete();
     }
 }

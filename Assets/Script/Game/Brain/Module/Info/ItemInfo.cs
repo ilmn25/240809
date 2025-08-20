@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 
 [System.Serializable]
 public class ItemInfo : Info
 {
     public ItemSlot item;
+    [NonSerialized] public bool StackOnSpawn = true;
 
     public override void Initialize()
     {

@@ -42,7 +42,7 @@ public class Game : MonoBehaviour
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
-        Application.targetFrameRate = 160;
+        Application.targetFrameRate = 100;
         SetConstants(); 
         // PlayerData.Load();  
         
