@@ -46,6 +46,7 @@ public partial class ItemRecipe
         if (isCursor && (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem)))
         {
             GUICursor.Data.Add(craftedItem);
+            Audio.PlaySFX(SfxID.Item);
         }
         
         if (craftedItem.Stack > 0)

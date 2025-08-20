@@ -44,25 +44,7 @@ public class NavMap
                         }
                         foreach (var entity in chunk.StaticEntity)
                         {
-                            int entityX = Mathf.FloorToInt(entity.position.x);
-                            int entityY = Mathf.FloorToInt(entity.position.y);
-                            int entityZ = Mathf.FloorToInt(entity.position.z);
-
-                            Vector3Int bounds = Entity.Dictionary[entity.stringID].Bounds;
-                            int entityEndX = entityX + bounds.x;
-                            int entityEndY = entityY + bounds.y;
-                            int entityEndZ = entityZ + bounds.z;
-
-                            for (int x = entityX; x < entityEndX; x++)
-                            {
-                                for (int y = entityY; y < entityEndY; y++)
-                                {
-                                    for (int z = entityZ; z < entityEndZ; z++)
-                                    {
-                                        Set(x, y, z, false);
-                                    }
-                                }
-                            }
+                            SetEntity(Entity.Dictionary[entity.stringID], entity.position, false);
                         }
                     }
                 }
@@ -81,14 +63,39 @@ public class NavMap
         return _bitMap[GetIndex(worldPosition)];
     }
 
-    public static void Set(Vector3Int worldPosition, bool value, bool check = false)
+    public static void Set(Vector3Int worldPosition, bool value, bool isAir = false)
     {
-        if (check && !World.IsInWorldBounds(worldPosition)) return;
-        _bitMap[GetIndex(worldPosition)] = value;
+        if (isAir && !World.IsInWorldBounds(worldPosition)) return;
+        _bitMap[GetIndex(worldPosition)] = value; 
     }
-    public static void Set(int x, int y, int z, bool value, bool check = false)
+    
+    public static void Set(int x, int y, int z, bool value, bool isAir = false)
     {
-        if (check && !World.IsInWorldBounds(x, y, z)) return;
+        if (isAir && !World.IsInWorldBounds(x, y, z)) return;
         _bitMap[GetIndex(x, y, z)] = value;
+    }
+
+    public static void SetEntity(Entity entity, Vector3 position, bool isAir)
+    {
+        if (entity.Collision != Game.IndexCollide) return; 
+        int entityX = Mathf.FloorToInt(position.x);
+        int entityY = Mathf.FloorToInt(position.y);
+        int entityZ = Mathf.FloorToInt(position.z);
+
+        Vector3Int bounds = entity.Bounds;
+        int entityEndX = entityX + bounds.x;
+        int entityEndY = entityY + bounds.y;
+        int entityEndZ = entityZ + bounds.z;
+
+        for (int x = entityX; x < entityEndX; x++)
+        {
+            for (int y = entityY; y < entityEndY; y++)
+            {
+                for (int z = entityZ; z < entityEndZ; z++)
+                {
+                    NavMap.Set(x, y, z, isAir);
+                }
+            }
+        }
     }
 } 

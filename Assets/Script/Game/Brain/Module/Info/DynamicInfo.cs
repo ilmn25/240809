@@ -3,7 +3,8 @@ using UnityEngine;
 
 [System.Serializable]
 public class DynamicInfo : Info
-{ 
+{
+    private const int KnockbackInterval = 10;
     public HitboxType HitboxType;
     public string CharSprite;
     public string HurtSfx;
@@ -23,6 +24,7 @@ public class DynamicInfo : Info
     [NonSerialized] public readonly float EntityCollisionRadius = 0.25f;
     [NonSerialized] public float AccelerationTime = 0.3f;
     [NonSerialized] public float DecelerationTime = 0.08f;
+    [NonSerialized] public int KnockbackCounter = 0;
     
     [NonSerialized] public Transform Sprite;
     [NonSerialized] public Animator Animator;
@@ -46,6 +48,13 @@ public class DynamicInfo : Info
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() { 
         if (Machine) position = Machine.transform.position;
+
+        if (KnockbackCounter != KnockbackInterval)
+        {
+            KnockbackCounter++;
+            return;
+        }
+        KnockbackCounter = 0;
         
         int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Game.MaskEntity);
         for (int i = 0; i < hitCount; i++)
@@ -56,9 +65,9 @@ public class DynamicInfo : Info
                 continue;
             
             if (Game.Player && col.gameObject == Game.Player)
-                KnockBack(col.transform.position, 0.2f, true);
+                KnockBack(col.transform.position, 0.1f * KnockbackInterval, true);
             else
-                KnockBack(col.transform.position, 0.5f, true);
+                KnockBack(col.transform.position, 0.2f * KnockbackInterval, true);
             break; 
         }
     } 

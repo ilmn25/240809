@@ -48,7 +48,6 @@ public class Audio
     public static AudioSource PlaySFX(SfxID id, bool loop = false)
     {
         AudioClip clip = Cache.LoadAudioClip($"sfx/{id}");
-        if (id == SfxID.Item) Debug.Log("");
         if (!clip) return null;
         
         float volume = Volume.ContainsKey(id) ? Volume[id] : 1;

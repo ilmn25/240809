@@ -132,7 +132,6 @@ public class ItemSlot
         
         Stack += addableAmount;
         slot.Stack -= addableAmount;
-        Audio.PlaySFX(SfxID.Item);
 
         if (slot.Stack == 0) slot.clear();
     }

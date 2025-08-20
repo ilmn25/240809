@@ -26,10 +26,11 @@ public class GroundMovementModule : MovementModule
         if (Info.Health <= 0) return;
         if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         
-        if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) return;
-        
-        // _deltaTime = GameSystem._deltaTime;
         _deltaTime = Helper.GetDeltaTime();
+        if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position))) {
+            Machine.transform.position += Info.Direction * (_deltaTime * Info.SpeedTarget);
+            return;
+        }
         _newPosition = Machine.transform.position;
 
         HandleJump(); 

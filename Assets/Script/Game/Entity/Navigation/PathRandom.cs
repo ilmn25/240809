@@ -26,7 +26,7 @@ public class PathRandom
             
             Vector3 dest = agent.Machine.transform.position - agent.Info.Target.position;
             dest.y = 0;
-            offset = Vector3Int.FloorToInt(dest.normalized * scanCount); 
+            offset = Vector3Int.FloorToInt(dest.normalized) * scanCount; 
         } 
         
         Vector3Int startPosition =

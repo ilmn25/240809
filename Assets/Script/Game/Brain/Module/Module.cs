@@ -1,38 +1,79 @@
 using System;
 
-[System.Serializable]
+[Serializable]
 public abstract class Module
 {
     [NonSerialized] public Machine Machine;
-    
+
     public virtual void Initialize() {}
     public virtual void Update() {}
     public virtual void Terminate() {}
-    
+
     public T GetModule<T>() where T : Module
     {
         return Machine.GetModule<T>();
     }
 }
-[System.Serializable]
+
+[Serializable]
 public abstract class EntityModule : Module
 {
-    public EntityMachine EntityMachine => (EntityMachine) Machine;
+    public EntityMachine EntityMachine => (EntityMachine)Machine;
 }
-[System.Serializable]
+
+[Serializable]
 public abstract class DynamicModule : EntityModule
 {
-    protected DynamicInfo Info => (DynamicInfo)EntityMachine.Info;
+    private DynamicInfo _info;
+
+    protected DynamicInfo Info
+    {
+        get
+        {
+            if (_info == null)
+            {
+                _info = (DynamicInfo)EntityMachine.Info;
+            }
+            return _info;
+        }
+    }
 }
-[System.Serializable]
+
+[Serializable]
 public abstract class MobModule : EntityModule
 {
-    public MobInfo Info => (MobInfo)EntityMachine.Info;
+    private MobInfo _info;
+
+    public MobInfo Info
+    {
+        get
+        {
+            if (_info == null)
+            {
+                _info = (MobInfo)EntityMachine.Info;
+            }
+            return _info;
+        }
+    }
 }
-[System.Serializable]
+
+[Serializable]
 public abstract class PlayerModule : EntityModule
 {
-    public PlayerInfo Info => (PlayerInfo)EntityMachine.Info;
+    private PlayerInfo _info;
+
+    public PlayerInfo Info
+    {
+        get
+        {
+            if (_info == null)
+            {
+                _info = (PlayerInfo)EntityMachine.Info;
+            }
+            return _info;
+        }
+    }
 }
-[System.Serializable]
-public abstract class MovementModule : DynamicModule { } 
+
+[Serializable]
+public abstract class MovementModule : DynamicModule { }
