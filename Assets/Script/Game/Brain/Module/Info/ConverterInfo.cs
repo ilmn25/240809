@@ -18,9 +18,9 @@ public class ConverterInfo : ContainerInfo
         {
             Vector3 offset = new Vector3(
                 Random.value > 0.5f ? 0.65f : -0.65f,
-                0.8f, 
+                1.8f, 
                 Random.value > 0.5f ? 0.65f : -0.65f);
-            Entity.SpawnItem(Pending[0], Machine.transform.position + offset);
+            Entity.SpawnItem(Pending[0], Machine.transform.position + offset, stackOnSpawn: false);
             // Helper.Log(Pending[0], Pending.Count);
             Pending.RemoveAt(0);
             _counter = 0;

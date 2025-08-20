@@ -18,8 +18,28 @@ public class Storage
                         List.Add(new ItemSlot());
                 int id = Dictionary.Count;
                 Dictionary.Add(id, List);
-        } 
+        }
 
+        public bool SetTool(OperationType operation)
+        { 
+                int targetKey = -1;
+                int targetBreaking =  0;
+                for (int i = 0; i < List.Count; i++)
+                {
+                        Item item = Item.GetItem(List[i].ID);
+                        if (item == null || item.ProjectileInfo == null) continue;
+                        if (operation == item.ProjectileInfo.OperationType &&
+                            targetBreaking < item.ProjectileInfo.Breaking)
+                        {
+                                targetBreaking = item.ProjectileInfo.Breaking;
+                                targetKey = i;
+                        }
+                }
+                if (targetKey == -1) return false;
+                Key = targetKey;
+                ((MobInfo)info).SetEquipment(List[Key].ID);
+                return true;
+        }
         public void Explode(Vector3 position)
         {
                 foreach (ItemSlot itemSlot in List)

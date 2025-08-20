@@ -20,7 +20,7 @@ public class GroundMovementModule : MovementModule
     private Vector3 _tempPosition;
     
     private static readonly Collider[] ColliderArray = new Collider[1];
-
+    
     public override void Update()
     { 
         if (Info.Health <= 0) return;

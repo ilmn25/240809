@@ -1,4 +1,5 @@
  
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
  
@@ -159,7 +160,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             } 
         }
         else if (IsCurrentState<DefaultState>()) 
-        {
+        { 
             if (Info.Target == null && Game.PlayerInfo.PlayerStatus == PlayerStatus.Active)
             {  
                 if (Game.PlayerInfo.CombatCooldown < 0)
@@ -167,11 +168,21 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                     Info.Target = Game.PlayerInfo;
                     Info.ActionType = IActionType.Follow;
                 }
-                else
-                {
-                    Info.CancelTarget();
-                }
             } 
+            
+            if (Info.Target == Game.PlayerInfo && PlayerTask.Pending.Count != 0)
+            {  
+                foreach (StructureInfo structureInfo in PlayerTask.Pending)
+                { 
+                    if (Info.Storage.SetTool(structureInfo.operationType))
+                    {
+                        Info.Target = structureInfo;
+                        Info.ActionType = IActionType.Hit; 
+                        return;
+                    } 
+                } 
+            } 
+            
             SetState<MobChaseAction>();
         } 
     }

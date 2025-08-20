@@ -107,7 +107,7 @@ public partial class Entity
                 Dictionary.Add(stringID, Item); 
         } 
         
-        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1)
+        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true)
         {
                 int stackSize = global::Item.GetItem(id).StackSize;
 
@@ -129,7 +129,7 @@ public partial class Entity
                                 ID = id,
                                 Stack = spawnCount,
                         };
-
+                        itemInfo.StackOnSpawn = stackOnSpawn;
                         currentEntityMachine.Initialize(itemInfo);
                          
                 }
