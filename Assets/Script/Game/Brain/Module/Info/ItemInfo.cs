@@ -9,7 +9,7 @@ public class ItemInfo : Info
     {
         if (item == null) item = new ItemSlot
         {
-            StringID = stringID,
+            ID = stringID,
             Stack = 1,
         };
     }
@@ -24,7 +24,8 @@ public class ItemInfo : Info
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
             Audio.PlaySFX(SfxID.Item);
-            ((PlayerInfo)info).Storage.AddItem(item.StringID, item.Stack);
+            ((PlayerInfo)info).Storage.AddItem(item.ID, item.Stack);
+            Inventory.RefreshInventory();
             EntityMachine.Delete();
         }
     }

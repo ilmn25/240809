@@ -36,7 +36,7 @@ public enum ID
     Sword,
     Blueprint,
     StonePickaxe,
-    StoneAxe,
+    StoneHatchet,
     MetalAxe,
     DiamondAxe,
     Hammer,
@@ -65,5 +65,8 @@ public enum ID
     StructurePrefab,
     OverlayBlock,
     Plank,
-    Log
+    Log,
+    Sawmill,
+    Campfire,
+    Anvil
 }

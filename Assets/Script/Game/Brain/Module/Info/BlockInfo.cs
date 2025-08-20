@@ -15,6 +15,7 @@ public class BlockInfo : DestructableInfo
 }
 
 
+[System.Serializable]
 public class BreakBlockInfo : DestructableInfo
 { 
     public override void OnDestroy(Projectile projectile)

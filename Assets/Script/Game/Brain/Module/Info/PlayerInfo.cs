@@ -29,7 +29,7 @@ public class PlayerInfo : MobInfo
     { 
         base.Initialize(); 
         IframesCurrent = 300;
-        IsPlayer = true; 
+        Storage.info = this;
     }
 
     protected override void OnHit(Projectile projectile)
@@ -46,13 +46,14 @@ public class PlayerInfo : MobInfo
             if (Health <= 0)
             {
                 Audio.PlaySFX(SfxID.DeathPlayer);
-                Sprite.gameObject.SetActive(false);
+                SpriteTool.gameObject.SetActive(false);
                 CancelTarget();
                 PlayerStatus = PlayerStatus.Dead;
                 GUIMain.Show(false);
                 CombatCooldown = 0;
                 Velocity = Vector2.zero; 
                 IframesCurrent = 500;
+                Machine.SetState<DeadState>();
             }
 
             FaceTarget = Equipment != null || Target != null;
@@ -85,7 +86,7 @@ public class PlayerInfo : MobInfo
                     World.ChunkSize * WorldGen.Size.x / 2,
                     World.ChunkSize * WorldGen.Size.y - 5,
                     World.ChunkSize * WorldGen.Size.z / 2);
-                Sprite.gameObject.SetActive(true);   
+                SpriteTool.gameObject.SetActive(true);   
             } 
             Health = HealthMax;
             Velocity = Vector2.zero;

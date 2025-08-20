@@ -11,7 +11,10 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
         {  
             HitboxType = HitboxType.Friendly,
             TargetHitboxType = HitboxType.Passive,
-            Storage = new Storage(27),
+            Storage = new Storage(9)
+            {
+                Name = "Inventory"
+            },
             HealthMax = 6,
             Defense = 0,
             Mana = 100,
@@ -40,6 +43,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
         AddModule(new GroundPathingModule()); 
         AddModule(new PlayerTerraformModule());  
         
+        AddState(new DeadState());
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
         AddState(new MobChaseAction());
@@ -48,8 +52,6 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
         {
             Storage = Info.Storage
         });
-        
-        Inventory.RefreshInventory();
     }
 
     public void OnActionSecondary(Info info)
@@ -77,21 +79,24 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
         { 
             Info.CancelTarget();
         }
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            Info.Storage.AddItem(ID.WoodBlock, 50);
-            Info.Storage.AddItem(ID.StoneBlock, 50);
-        } 
-        if (Input.GetKeyDown(KeyCode.M)) 
-            Entity.Spawn(ID.Megumin, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        if (Input.GetKeyDown(KeyCode.L)) 
-            Entity.Spawn(ID.SnareFlea, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            Entity.Spawn(ID.Chito, Vector3Int.FloorToInt(transform.position + Vector3.up));
-            Entity.Spawn(ID.Yuuri, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        } 
+        //
+        // if (Input.GetKeyDown(KeyCode.N))
+        // {
+        //     Info.Storage.AddItem(ID.Log, 15);
+        //     Info.Storage.AddItem(ID.Gravel, 15);
+        //     Info.Storage.AddItem(ID.Flint, 15);
+        //     Info.Storage.AddItem(ID.Sticks, 15);
+        //     Info.Storage.AddItem(ID.Stake, 15);
+        // } 
+        // if (Input.GetKeyDown(KeyCode.M)) 
+        //     Entity.Spawn(ID.Megumin, Vector3Int.FloorToInt(transform.position + Vector3.up));
+        // if (Input.GetKeyDown(KeyCode.L)) 
+        //     Entity.Spawn(ID.SnareFlea, Vector3Int.FloorToInt(transform.position + Vector3.up));
+        // if (Input.GetKeyDown(KeyCode.K))
+        // {
+        //     Entity.Spawn(ID.Chito, Vector3Int.FloorToInt(transform.position + Vector3.up));
+        //     Entity.Spawn(ID.Yuuri, Vector3Int.FloorToInt(transform.position + Vector3.up));
+        // } 
     }
     
     public override void OnUpdate()

@@ -5,6 +5,7 @@ public partial class ItemRecipe
     public static Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
 
     public int Stack;
+    public int Time;
     public Dictionary<ID, int> Ingredients;
     public string[] Modifiers;
  
@@ -15,12 +16,13 @@ public partial class ItemRecipe
         return null;
     }
     
-    public static void AddRecipe(ID stringID, Dictionary<ID, int> ingredients, int stack, string[] modifiers)
+    public static void AddRecipe(ID stringID, Dictionary<ID, int> ingredients, int stack, int time, string[] modifiers)
     {
         Dictionary.Add(stringID, new ItemRecipe()
         {
             Stack = stack,
             Ingredients = ingredients,
+            Time = time,
             Modifiers = modifiers,
         });
     }
@@ -35,12 +37,8 @@ public partial class ItemRecipe
     }
     
     public static void CraftItem(ID stringID, bool isCursor = true)
-    { 
-        Audio.PlaySFX(SfxID.Item);
-        foreach (var ingredient in Dictionary[stringID].Ingredients)
-        {
-            Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
-        }
+    {
+        TakeIngredients(stringID);
         
         ItemSlot craftedItem = new ItemSlot();
         
@@ -52,8 +50,17 @@ public partial class ItemRecipe
         
         if (craftedItem.Stack > 0)
         { 
-            Inventory.AddItem(stringID);
-        } 
-        GUIMain.RefreshStorage();
+            Game.PlayerInfo.Storage.AddItem(stringID, 1, Game.PlayerInfo.Storage.Key);
+            Inventory.RefreshInventory();
+        }  
+    }
+
+    public static void TakeIngredients(ID stringID)
+    {
+        Audio.PlaySFX(SfxID.Item);
+        foreach (var ingredient in Dictionary[stringID].Ingredients)
+        {
+            Game.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
+        }
     }
 }

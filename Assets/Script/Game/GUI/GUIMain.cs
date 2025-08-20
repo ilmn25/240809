@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class GUIMain
     public static GUIStorage Storage; 
     public static GUIStorage HandCrafting;
     public static GUIStorage Crafting;
+    public static GUIConverter Converter;
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
 
@@ -30,8 +32,7 @@ public class GUIMain
         {
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(0, 166), 
-            Name = "Inventory",
+            Position = new Vector2(-91, 170), 
         };
         StorageInv.Initialize();
         
@@ -39,24 +40,25 @@ public class GUIMain
         {
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(0, -19), 
-            Name = "Storage",
+            Position = new Vector2(-92, 74), 
         };
         Storage.Initialize();
         Storage.Show(false);
 
-        Storage storage = new Storage(18);
+        Storage storage = new Storage(9)
+        {
+            Name = "Crafting",
+        };
         storage.AddItem(ID.Station);
-        storage.AddItem(ID.StoneAxe);
+        storage.AddItem(ID.StoneHatchet);
         storage.AddItem(ID.Hammer);
-        storage.AddItem(ID.Stake);
+        storage.AddItem(ID.Campfire);
         HandCrafting = new GUICraft()
         {
             Storage = storage,
             RowAmount = 1,
             SlotAmount = 9,
-            Position = new Vector2(-100, -50), 
-            Name = "Crafting",
+            Position = new Vector2(297, 169), 
         };
         HandCrafting.Initialize();
         
@@ -64,11 +66,19 @@ public class GUIMain
         {
             RowAmount = 1,
             SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(0, -50), 
-            Name = "Station",
+            Position = new Vector2(297, 77), 
         };
         Crafting.Initialize();
         Crafting.Show(false);
+        
+        Converter = new GUIConverter()
+        {
+            RowAmount = 1,
+            SlotAmount = 3,
+            Position = new Vector2(297, -15), 
+        };
+        Converter.Initialize();
+        Converter.Show(false);
          
         
         InfoPanel = new GUIInfoPanel();
@@ -87,6 +97,7 @@ public class GUIMain
         Storage.Update();
         HandCrafting.Update();
         Crafting.Update();
+        Converter.Update();
         InfoPanel.UpdateDrag();
 
         if (Control.Inst.Inv.KeyDown())
@@ -105,7 +116,7 @@ public class GUIMain
             if (!Showing)
             {
                 Showing = true;
-                 RefreshStorage();
+                RefreshStorage();
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(true, ShowDuration, Game.GUIInv, 0.7f));
             }
@@ -117,6 +128,7 @@ public class GUIMain
                 Showing = false;
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
+                Cursor.Set();
                 // _showTask.Finished += (bool isManual) => 
                 // {
                 //     Game.GUIInv.SetActive(false);
@@ -131,6 +143,7 @@ public class GUIMain
         Storage.OnRefreshSlot?.Invoke(Storage, null);
         HandCrafting.OnRefreshSlot?.Invoke(HandCrafting, null);
         Crafting.OnRefreshSlot?.Invoke(Crafting, null);
+        Converter.OnRefreshSlot?.Invoke(Converter, null);
         GUICursor.UpdateCursorSlot();
     }
 

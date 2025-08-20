@@ -1,22 +1,23 @@
 using System;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class ItemSlot
 {
     public int Stack = 0;
     public int Durability;
-    public ID StringID;
+    [FormerlySerializedAs("StringID")] public ID ID;
     public string Modifier;
     public bool Locked;
 
     public string GetItemInfo(bool ingredients)
     {
-        Item item = Item.GetItem(StringID);
+        Item item = Item.GetItem(ID);
         string text = item.Name;
         if (item.Type == ItemType.Structure)
         {
             text += "\nstructure";
-            StructureRecipe recipe = StructureRecipe.Dictionary[StringID];
+            StructureRecipe recipe = StructureRecipe.Dictionary[ID];
             text += " \n \nbuild time: " + recipe.Time + "s";
             text += " \ningredients: ";
             foreach (var ingredient in recipe.Ingredients)
@@ -26,13 +27,13 @@ public class ItemSlot
             text += "\n \n" + item.Description;
         }
         else 
-        if (item.Type == ItemType.Block)
+        if (item.Type == ItemType.Block || item.Type == ItemType.Material)
         { 
             text += " x " + Stack;
 
             if (ingredients)
             {
-                ItemRecipe recipe = ItemRecipe.GetRecipe(StringID);
+                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
                 if (recipe != null)
                 {
                     text += " \n \ningredients: ";
@@ -80,7 +81,7 @@ public class ItemSlot
             if (ingredients)
             {
                 text += " \n \ningredients: ";
-                ItemRecipe recipe = ItemRecipe.Dictionary[StringID];
+                ItemRecipe recipe = ItemRecipe.Dictionary[ID];
                 if (recipe != null)
                 {
                     foreach (var ingredient in recipe.Ingredients)
@@ -98,7 +99,7 @@ public class ItemSlot
     public void SetItem(int stack, ID stringID, string modifier, bool locked)
     {
         Stack = stack;
-        StringID = stringID;
+        ID = stringID;
         Modifier = modifier;
         Locked = locked;
     }
@@ -106,16 +107,15 @@ public class ItemSlot
     public void clear()
     {
         Stack = 0;
-        StringID = ID.Null;
+        ID = ID.Null;
         Modifier = null;
         Locked = false;
     }
  
     public void Add(ItemSlot slot, int amountToAdd = 0)
-    {
-        Audio.PlaySFX(SfxID.Item);
-        if (slot.isEmpty()) return;
-        int maxStackSize = Item.GetItem(slot.StringID).StackSize;
+    { 
+        if (slot.isEmpty()) return; 
+        int maxStackSize = Item.GetItem(slot.ID).StackSize;
         int addableAmount;
 
         if (amountToAdd == 0)
@@ -125,24 +125,25 @@ public class ItemSlot
 
         if (isEmpty())
         {
-            StringID = slot.StringID;
+            ID = slot.ID;
             Modifier = slot.Modifier;
             Locked = slot.Locked;
         }
         
         Stack += addableAmount;
         slot.Stack -= addableAmount;
+        Audio.PlaySFX(SfxID.Item);
 
         if (slot.Stack == 0) slot.clear();
     }
 
     public bool isSame(ItemSlot slot)
     {
-        return slot.StringID == StringID && slot.Modifier == Modifier;
+        return slot.ID == ID && slot.Modifier == Modifier;
     }
     public bool isSame(ID stringID, string modifier)
     {
-        return stringID == StringID && modifier == Modifier;
+        return stringID == ID && modifier == Modifier;
     }
     
     public bool isEmpty()
@@ -151,7 +152,7 @@ public class ItemSlot
     }
     public bool isFull()
     {
-        return Stack == Item.GetItem(StringID).StackSize;
+        return Stack == Item.GetItem(ID).StackSize;
     }
      
 }

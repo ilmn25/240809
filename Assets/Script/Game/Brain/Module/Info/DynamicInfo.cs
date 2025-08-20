@@ -5,7 +5,6 @@ using UnityEngine;
 public class DynamicInfo : Info
 { 
     public HitboxType HitboxType;
-    public bool IsPlayer = false;
     public string CharSprite;
     public string HurtSfx;
     public string DeathSfx; 

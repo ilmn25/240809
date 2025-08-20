@@ -30,6 +30,7 @@ public class GroundAnimationModule : MobModule
  
     public override void Update()
     {
+        if (Info is PlayerInfo && ((PlayerInfo)Info).PlayerStatus != PlayerStatus.Active) return;
         if (Info.SpriteCharRenderer.isVisible)
         {
             if (Info.FaceTarget)
@@ -93,11 +94,17 @@ public class GroundAnimationModule : MobModule
             Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, newY, Info.Sprite.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)
-            {
-                SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, Info.IsPlayer);
+            { 
                 _nextTrailTimer = Time.time + TrailFrequency;
-                if (Info == Game.PlayerInfo) 
+                if (Info == Game.PlayerInfo)
+                {
                     Audio.PlaySFX((SfxID)Random.Range((int)SfxID.Footsteps1, (int)SfxID.Footsteps2 + 1));
+                    SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, true);
+                }
+                else
+                {
+                    SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, false);
+                }
             }
         }
         else

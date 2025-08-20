@@ -21,13 +21,13 @@ public class Inventory
         {
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position, CurrentItem.Stack); 
-                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.StringID, CurrentItem.Stack, Game.PlayerInfo.Storage.Key);
+                Entity.SpawnItem(CurrentItem.ID, Game.Player.transform.position, CurrentItem.Stack); 
+                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.ID, CurrentItem.Stack, Game.PlayerInfo.Storage.Key);
             }
             else
             {
-                Entity.SpawnItem(CurrentItem.StringID, Game.Player.transform.position); 
-                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.StringID, 1, Game.PlayerInfo.Storage.Key);
+                Entity.SpawnItem(CurrentItem.ID, Game.Player.transform.position); 
+                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.ID, 1, Game.PlayerInfo.Storage.Key);
             } 
             RefreshInventory();
         }
@@ -89,8 +89,8 @@ public class Inventory
             CurrentItem = Game.PlayerInfo.Storage.List[Game.PlayerInfo.Storage.Key];
             if (CurrentItem is not { Stack: 0 })
             {
-                CurrentItemData = Item.GetItem(CurrentItem.StringID);
-                Game.PlayerInfo.SetEquipment(CurrentItem.StringID);
+                CurrentItemData = Item.GetItem(CurrentItem.ID);
+                Game.PlayerInfo.SetEquipment(CurrentItem.ID);
             } 
         }
         if (CurrentItem is { Stack: 0 })
@@ -111,11 +111,5 @@ public class Inventory
         SlotUpdate?.Invoke();  
     }
  
-    
-    public static void AddItem(ID stringID, int quantity = 1)
-    {  
-        Game.PlayerInfo.Storage.AddItem(stringID, quantity, Game.PlayerInfo.Storage.Key, Game.Player.transform.position);
-        RefreshInventory();
-    }
      
 }

@@ -18,19 +18,19 @@ public class ControlKey
 
     public bool KeyDown()
     {
-        return ModifierActive() && 
+        return ModifierActive() && !Console.IsTyping &&
                (Input.GetKeyDown(_primary) || Input.GetKeyDown(_secondary));
     }
 
     public bool Key()
     {
-        return ModifierActive() && 
+        return ModifierActive() && !Console.IsTyping &&
                (Input.GetKey(_primary) || Input.GetKey(_secondary));
     }
 
     public bool KeyUp()
     {
-        return ModifierActive() && 
+        return ModifierActive() && !Console.IsTyping && 
                (Input.GetKeyUp(_primary) || Input.GetKeyUp(_secondary));
     }
 

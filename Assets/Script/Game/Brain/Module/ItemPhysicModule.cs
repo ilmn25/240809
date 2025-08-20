@@ -8,7 +8,7 @@ public class ItemPhysicModule : Module
 
     private const float Gravity = 35;
     private const float BounceFactor = 0.3f;
-    private const int SlideRange = 2;
+    private const int SlideRange = 3;
     private const float CollisionRange = 0.3f;
 
     private static readonly Collider[] TempCollisionArray = new Collider[1];

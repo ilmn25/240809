@@ -14,25 +14,25 @@ public class GUIChest : GUIStorage
             {
                 if (GUIMain.Storage.Showing)
                 {
-                    GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey].StringID, 
+                    GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey].ID, 
                         Storage.List[CurrentSlotKey].Stack);
-                    Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                    Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
                         Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
                 }
                 else
                 {
-                    Entity.SpawnItem(Storage.List[CurrentSlotKey].StringID, Game.PlayerInfo.position, 
+                    Entity.SpawnItem(Storage.List[CurrentSlotKey].ID, Game.PlayerInfo.position, 
                         Storage.List[CurrentSlotKey].Stack);
-                    Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                    Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
                         Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
                 }
                 //doesnt account for full inventory
             }
             else
             {
-                GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey].StringID, 
+                GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey].ID, 
                     Storage.List[CurrentSlotKey].Stack);
-                Storage.RemoveItem(Storage.List[CurrentSlotKey].StringID, 
+                Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
                     Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
                 //doesnt account for full inventory
             } 

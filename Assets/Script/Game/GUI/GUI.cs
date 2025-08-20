@@ -12,7 +12,7 @@ public class GUI
     protected GameObject GameObject;
     protected RectTransform ParentRect; 
     private Vector2 _dragOffset;
-    private CoroutineTask _scaleTask;
+    public CoroutineTask ScaleTask;
     public bool Showing = true;
     private GameObject _shadow; 
 
@@ -61,11 +61,11 @@ public class GUI
         {
             if (!Showing)
             {
-                _scaleTask?.Stop();
+                ScaleTask?.Stop();
                 if (instant)
                     GameObject.transform.localScale = Vector3.one * 0.9f;
                 else
-                    _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowSpeed, GameObject, 0.9f));
+                    ScaleTask = new CoroutineTask(GUIMain.Scale(true, ShowSpeed, GameObject, 0.9f));
                 Showing = true;
             }
         }
@@ -73,8 +73,8 @@ public class GUI
         {
             if (Showing)
             {
-                _scaleTask?.Stop();
-                _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideSpeed, GameObject, 0));
+                ScaleTask?.Stop();
+                ScaleTask = new CoroutineTask(GUIMain.Scale(false, HideSpeed, GameObject, 0));
                 Showing = false;
             }
         } 

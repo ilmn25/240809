@@ -24,7 +24,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         ItemSlot slot = GUIStorage.Storage.List[slotNumber];
         if (slot.Stack != 0)
         {
-            _image.sprite =Cache.LoadSprite("sprite/" + slot.StringID);
+            _image.sprite =Cache.LoadSprite("sprite/" + slot.ID);
             _image.color = Color.white;
             _text.text = slot.Stack.ToString();
         }
@@ -38,6 +38,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (GUIStorage.ScaleTask is { Running: true }) return;
         if (GUIStorage.IsDrag) return;
             GUIStorage.SetInfoPanel(slotNumber);
             ScaleSlot(1.1f);
@@ -45,6 +46,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
  
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (GUIStorage.ScaleTask is { Running: true }) return;
         GUIStorage.SetInfoPanel();
         ScaleSlot(1f);
     }

@@ -51,7 +51,7 @@ public class GUICursor : GUI
         else
         {
             Game.GUICursorSlot.SetActive(true);
-            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.StringID}");
+            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.ID}");
             _cursorSlotText.text = Data.Stack.ToString();
         } 
     } 

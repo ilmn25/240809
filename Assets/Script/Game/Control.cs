@@ -15,16 +15,19 @@ public class Control
     public static int MouseLayer; // -1 means void
     
     public readonly ControlKey Inv = new (KeyCode.Tab);
+    public readonly ControlKey SwapChar = new (KeyCode.T);
     public readonly ControlKey Pause = new (KeyCode.Escape);
+    public readonly ControlKey FullScreen = new (KeyCode.F11);
     public readonly ControlKey DigUp = new (KeyCode.Mouse4);
     public readonly ControlKey DigDown = new (KeyCode.Mouse3);
     public readonly ControlKey ActionPrimary = new (KeyCode.Mouse0);
     public readonly ControlKey ActionSecondary = new (KeyCode.Mouse1);
-    public readonly ControlKey ActionPrimaryNear = new (KeyCode.F);
-    public readonly ControlKey ActionSecondaryNear = new (KeyCode.G);
+    public readonly ControlKey ActionPrimaryNear = new (KeyCode.G);
+    public readonly ControlKey ActionSecondaryNear = new (KeyCode.F);
     public readonly ControlKey OrbitLeft = new (KeyCode.Q);
     public readonly ControlKey OrbitRight = new (KeyCode.E);
-    public readonly ControlKey CullMode= new (KeyCode.Z);
+    public readonly ControlKey CullUp = new (KeyCode.Z);
+    public readonly ControlKey CullDown = new (KeyCode.X);
     public readonly ControlKey Up = new (KeyCode.W);
     public readonly ControlKey Down = new (KeyCode.S);
     public readonly ControlKey Left = new (KeyCode.A);
@@ -80,7 +83,7 @@ public class Control
     
     public static void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Inst.SwapChar.KeyDown())
         { 
             if (CurrentPlayerIndex == World.Inst.target.Count - 1)
                 SetPlayer(0);
@@ -88,7 +91,7 @@ public class Control
                 SetPlayer(CurrentPlayerIndex + 1);
         }
         
-        if (Input.GetKeyDown(KeyCode.F11))
+        if (Inst.FullScreen.KeyDown())
         {
             if (Screen.fullScreen)
                 Screen.SetResolution(960, 540, false);
@@ -116,15 +119,22 @@ public class Control
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         { 
-            IActionSecondary target = GetNearestInteractable<IActionSecondary>();
+            IActionSecondary target = GetNearestInteractable<IActionSecondaryPickUp>();
             if (target == null) return;
             Game.PlayerInfo.Target = ((EntityMachine)target).Info;   
-            
-            if (target is IActionSecondaryPickUp)
-                Game.PlayerInfo.ActionType = IActionType.PickUp;
-            else
-                Game.PlayerInfo.ActionType = IActionType.Interact;
+            Game.PlayerInfo.ActionType = IActionType.PickUp;
         }
+        // else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
+        // { 
+        //     IActionSecondary target = GetNearestInteractable<IActionSecondary>();
+        //     if (target == null) return;
+        //     Game.PlayerInfo.Target = ((EntityMachine)target).Info;   
+        //     
+        //     if (target is IActionSecondaryPickUp)
+        //         Game.PlayerInfo.ActionType = IActionType.PickUp;
+        //     else
+        //         Game.PlayerInfo.ActionType = IActionType.Interact;
+        // }
     }
 
     private static T GetNearestInteractable<T>() where T : class, IAction
@@ -151,15 +161,11 @@ public class Control
     {
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0) return;
-
-        // GUICraft.HandleScrollInput(scroll);
-        if (Input.GetKey(KeyCode.Mouse1))
-        { 
-            ViewPort.HandleScrollInput(scroll); 
-        }
-        else if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.LeftShift))
+ 
+        if (!Input.GetKey(KeyCode.LeftAlt))
         {
-            MapCull.HandleScrollInput(scroll);
+            // MapCull.HandleScrollInput(scroll);
+            ViewPort.HandleScrollInput(scroll); 
         }  
         else
         {
