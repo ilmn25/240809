@@ -1,8 +1,8 @@
  
 using UnityEditor;
 using UnityEngine;
-
-public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSecondaryInteract
+ 
+public class PlayerMachine : MobMachine, IActionSecondaryInteract
 {
     private new PlayerInfo Info => GetModule<PlayerInfo>();
     public static Info CreateInfo()
@@ -33,6 +33,7 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
             JumpVelocity = 12f,
             DeathSfx = "player_die",
             HurtSfx = "player_hurt", 
+            CharSprite = ID.Chito 
         }; 
     }
     public override void OnStart()
@@ -177,20 +178,13 @@ public class PlayerMachine : EntityMachine, IActionPrimaryAttack, IActionSeconda
      
     public override void Attack()
     {
-        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != ID.Null && 
-            Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
-                     
-                    
-        switch (Info.Equipment.Gesture)
+        if (Info.Equipment.ProjectileInfo != null)
         {
-            case ItemGesture.Swing:
-                SetState<MobAttackSwing>();
-                break;
-            case ItemGesture.Shoot:
-                SetState<MobAttackShoot>();
-                break;
-        }
-                    
-        if (Info.Equipment.ProjectileInfo != null && Info.Equipment.ProjectileInfo.Ammo != ID.Null) Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+            if (Info.Equipment.ProjectileInfo.Ammo != ID.Null && 
+                Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
+            Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
+        } 
+         
+        base.Attack();
     }
 } 

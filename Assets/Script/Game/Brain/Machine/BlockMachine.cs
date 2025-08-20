@@ -13,7 +13,7 @@ public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecond
         Entity.SpawnItem(Info.blockID, transform.position);
         PlayerTerraformModule.Position.Remove(Vector3Int.FloorToInt(this.transform.position));
         Audio.PlaySFX(SfxID.Item);
-        Delete();
+        Info.Destroy();
     }
 }
 public class BreakBlockMachine : EntityMachine, IActionPrimaryResource, IActionSecondaryInteract
@@ -34,6 +34,6 @@ public class BreakBlockMachine : EntityMachine, IActionPrimaryResource, IActionS
     {
         PlayerTerraformModule.Position.Remove(Vector3Int.FloorToInt(this.transform.position));
         Audio.PlaySFX(SfxID.Item);
-        Delete();
+        Info.Destroy();
     }
 }

@@ -17,4 +17,6 @@ public class Info : EntityModule
         };
     }
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
+    public virtual void AbstractHit(MobInfo info) { }
+    public void Destroy() {Destroyed = true;}
 }

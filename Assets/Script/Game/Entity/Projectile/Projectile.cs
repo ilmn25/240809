@@ -11,7 +11,7 @@ public class Projectile : MonoBehaviour
     public HitboxType TargetHitBoxType;
     public Vector3 Destination;
     public Vector3 Direction;
-    public DynamicInfo SourceInfo;
+    public MobInfo SourceInfo;
     public DynamicInfo Target;
     public Quaternion RelativeRotation;
 

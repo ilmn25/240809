@@ -15,7 +15,7 @@ public class EnemyInfo : MobInfo
         if (Health <= 0)
         { 
             Loot.Gettable(((EntityMachine)Machine).Info.stringID).Spawn(Machine.transform.position);
-            ((EntityMachine)Machine).Delete();
+            Destroy();
             Audio.PlaySFX(SfxID.DeathPlayer);
         }
     }

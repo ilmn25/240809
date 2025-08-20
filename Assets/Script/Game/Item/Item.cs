@@ -11,20 +11,20 @@ public partial class Item
         Loot loot;
 
         // Blocks
-        AddBlockDefinition(ID.BrickBlock, 70, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddBlockDefinition(ID.BrickBlock, 150, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
         loot = Loot.CreateTable(ID.BrickBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
-        AddBlockDefinition(ID.MarbleBlock, 100, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.DirtBlock, 50, 1, SfxID.HitStone);
+        AddBlockDefinition(ID.MarbleBlock, 200, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.DirtBlock, 80, 1, SfxID.HitStone);
         loot = Loot.CreateTable(ID.DirtBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.BackroomBlock, 100, 3, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.StoneBlock, 100, 2, SfxID.HitStone);
+        AddBlockDefinition(ID.BackroomBlock, 150, 3, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.StoneBlock, 150, 2, SfxID.HitStone);
         loot = Loot.CreateTable(ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);

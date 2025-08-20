@@ -40,7 +40,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
                 if (nearbyItem.item.isSame(Info.item))
                 {
                     Info.item.Add(nearbyItem.item);
-                    if (nearbyItem.item.isEmpty()) ((ItemMachine)nearbyItem.Machine).Delete();
+                    if (nearbyItem.item.isEmpty()) nearbyItem.Destroy();
                     if (Info.item.isFull()) break;
                 }
             }
@@ -57,7 +57,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
 
     public override void OnUpdate()
     {  
-        if (transform.position.y < -5) Delete();
+        if (transform.position.y < -5) Info.Destroy();
         else if (_spriteRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(transform.position))) 
             _itemPhysicModule.HandlePhysicsUpdate();
     }

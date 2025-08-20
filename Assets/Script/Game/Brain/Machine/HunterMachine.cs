@@ -52,7 +52,7 @@ public class HunterMachine : MobMachine
                     {
                         _ammo--;
                         Info.AimPosition = Info.Target.position + 0.3f * Vector3.up;
-                        SetState<MobAttackShoot>();
+                        Attack();
                     }
                     else
                     {

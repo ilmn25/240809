@@ -12,7 +12,7 @@ class StaticIdle : State
     {
         if (Vector3Int.FloorToInt(Machine.transform.position) + Vector3Int.down == worldPosition) // if block under is gone
         {
-            ((EntityMachine) Machine).Delete();
+            Info.Destroy();
         } 
     }
     public override void OnExitState()
