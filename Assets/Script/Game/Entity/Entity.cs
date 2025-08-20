@@ -131,20 +131,22 @@ public partial class Entity
                         };
 
                         currentEntityMachine.Initialize(itemInfo);
+                         
                 }
         }
 
         
         public static Info Spawn(ID stringID, Vector3 worldPosition)
         {
-                GameObject gameObject = ObjectPool.GetObject(Dictionary[stringID].PrefabName, stringID);
-                gameObject.transform.position = worldPosition + Dictionary[stringID].SpawnOffset;   
+                Entity entity = Dictionary[stringID];
+                GameObject gameObject = ObjectPool.GetObject(entity.PrefabName, stringID);
+                gameObject.transform.position = worldPosition + entity.SpawnOffset;   
         
                 EntityMachine currentEntityMachine = (EntityMachine)
-                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
-                
-                if (Dictionary[stringID].StaticLoad)
-                        EntityStaticLoad.InviteEntity(currentEntityMachine); 
+                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
+
+                if (entity.StaticLoad)
+                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity); 
                 else
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
                 Info info = CreateInfo(stringID, worldPosition);

@@ -9,7 +9,7 @@ public class Game : MonoBehaviour
 {
     public static readonly float MaxDeltaTime = 0.03f;
     
-    private const float FixedUpdateMS = 0.10f;
+    private const float FixedUpdateMS = 0.30f;
      
     
     public static LayerMask MaskMap;  

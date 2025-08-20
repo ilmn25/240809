@@ -5,12 +5,14 @@ public class EntityStaticLoad
 {
     public static readonly Dictionary<Vector3Int, (List<Info>, List<EntityMachine>)> ActiveEntities = new Dictionary<Vector3Int, (List<Info>, List<EntityMachine>)>();
 
-    public static void ForgetEntity(EntityMachine entity)
+    public static void ForgetEntity(EntityMachine entityMachine, Entity entity)
     {
-        ActiveEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Remove(entity);
+        ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Remove(entityMachine);
+        NavMap.SetEntity(entity, entityMachine.transform.position, false);
     }
-    public static void InviteEntity(EntityMachine entity) { // not done
-        ActiveEntities[World.GetChunkCoordinate(entity.transform.position)].Item2.Add(entity);
+    public static void InviteEntity(EntityMachine entityMachine, Entity entity) { // not done
+        ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Add(entityMachine);
+        NavMap.SetEntity(entity, entityMachine.transform.position, false);
     }
     
     public static void UnloadWorld()

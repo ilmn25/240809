@@ -28,6 +28,18 @@ public static class Helper
                (a.y - b.y) * (a.y - b.y) + 
                (a.z - b.z) * (a.z - b.z);
     } 
+    public static float SquaredDistance(Vector3Int a, Vector3Int b)
+    {
+        return (a.x - b.x) * (a.x - b.x) + 
+               (a.y - b.y) * (a.y - b.y) + 
+               (a.z - b.z) * (a.z - b.z);
+    } 
+    public static float SquaredDistance(Vector3 a, Vector3Int b)
+    {
+        return (a.x - b.x) * (a.x - b.x) + 
+               (a.y - b.y) * (a.y - b.y) + 
+               (a.z - b.z) * (a.z - b.z);
+    } 
     public static void Log(params object[] parameters)
     {
         if (parameters.Length == 0)

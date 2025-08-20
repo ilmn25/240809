@@ -60,7 +60,7 @@ public abstract class PathingModule : MobModule
         {
             if (Path == null) return false;
 
-            if (Vector3.Distance(Machine.transform.position, Path[^1].Position) < 1)
+            if (Helper.SquaredDistance(Machine.transform.position, Path[^1].Position) < 1)
             {
                 Info.PathingStatus = PathingStatus.Reached;  
                 return true;
@@ -69,7 +69,7 @@ public abstract class PathingModule : MobModule
         }
 
         
-        if (Vector3.Distance(Machine.transform.position, Info.Target.position) < 1)
+        if (Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < 1)
         {
             Info.PathingStatus = PathingStatus.Reached; 
             return true;
@@ -103,9 +103,17 @@ public abstract class PathingModule : MobModule
             _updateTargetPosition = false;
         }
 
-        
+
         if (!IsTargetReached() && Path != null && _nextPoint < Path.Count)
-            HandleMovePoint();
+        {
+            if (Info.SpriteCharRenderer.isVisible) 
+                HandleMovePoint();
+            else
+            {
+                if ( _nextPoint < Path.Count -1 && Helper.SquaredDistance(Machine.transform.position, Path[_nextPoint].Position) < 0.2) _nextPoint++;
+                Info.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
+            } 
+        } 
 
         if (_nextPointQueued != -1)
         {

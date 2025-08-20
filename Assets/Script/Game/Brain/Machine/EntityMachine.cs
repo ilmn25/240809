@@ -43,7 +43,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
     { 
         Info.Machine = null;
         if (Entity.StaticLoad)
-            EntityStaticLoad.ForgetEntity(this);
+            EntityStaticLoad.ForgetEntity(this, Entity);
         else 
             EntityDynamicLoad.ForgetEntity(this);
         ObjectPool.ReturnObject(gameObject); 
