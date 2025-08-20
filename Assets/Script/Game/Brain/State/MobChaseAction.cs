@@ -30,19 +30,18 @@ class MobChaseAction : MobState {
                     (Info.Target.Machine as IActionSecondaryInteract).OnActionSecondary(Info);
                     Info.CancelTarget(); 
                 } 
-                else if (Info.ActionType == IActionType.PickUp && Info.Target.Machine.gameObject.activeSelf)
+                else if (Info.ActionType == IActionType.PickUp && !Info.Target.Destroyed)
                 {
                     (Info.Target as ItemInfo).OnActionSecondary(Info);
                     Info.CancelTarget();
                 }
-                else if (Info.ActionType == IActionType.Hit && Info.Target.Machine.gameObject.activeSelf)
+                else if (Info.ActionType == IActionType.Hit && !Info.Target.Destroyed)
                 {
                     ((EntityMachine)Machine).Attack();
                 }
-                else if (Info.ActionType == IActionType.Dig)
+                else if (Info.ActionType == IActionType.Dig && !Info.Target.Destroyed)
                 {
                     ((EntityMachine)Machine).Attack();
-                    
                 }
                 else
                 {

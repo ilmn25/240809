@@ -1,12 +1,11 @@
 using UnityEngine;
 
 [System.Serializable]
-public class ConstructionInfo : DestructableInfo
+public class ConstructionInfo : StructureInfo
 {
     public ID structureID; 
-    public override void OnDestroy(Projectile projectile)
+    public override void OnDestroy(MobInfo info)
     { 
-        base.OnDestroy(projectile);
         Entity.Spawn(structureID, Vector3Int.FloorToInt(Machine.transform.position));
     }
 }

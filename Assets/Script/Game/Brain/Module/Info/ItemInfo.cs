@@ -26,7 +26,7 @@ public class ItemInfo : Info
             Audio.PlaySFX(SfxID.Item);
             ((PlayerInfo)info).Storage.AddItem(item.ID, item.Stack);
             Inventory.RefreshInventory();
-            EntityMachine.Delete();
+            Destroy();
         }
     }
 }

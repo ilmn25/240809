@@ -20,26 +20,32 @@ public class StructureInfo : Info
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.Info.OperationType != operationType || 
-            projectile.Info.Breaking < threshold || 
-            projectile.TargetHitBoxType != HitboxType.Passive) return false;
+        projectile.SourceInfo.Target = this;
+        projectile.SourceInfo.ActionType = IActionType.Hit;
+        // return HandleHealth(projectile.SourceInfo); 
+        return true;
+    }
+
+    public override void AbstractHit(MobInfo info)
+    {
+        if (info.Equipment.ProjectileInfo.OperationType != operationType || 
+            info.Equipment.ProjectileInfo.Breaking < threshold || 
+            info.TargetHitboxType != HitboxType.Passive) return;
         
-        Health -= projectile.Info.Breaking;
+        Health -= info.Equipment.ProjectileInfo.Breaking;
         if (Health <= 0)
         { 
             Audio.PlaySFX(SfxDestroy);  
-            if (Loot != ID.Null) global::Loot.Gettable(Loot).Spawn(Machine.transform.position); 
-            OnDestroy(projectile);
-            ((EntityMachine)Machine).Delete();
+            if (Loot != ID.Null) global::Loot.Gettable(Loot).Spawn(position); 
+            OnDestroy(info);
+            Destroy();
         }
         else
         {
             Audio.PlaySFX(SfxHit); 
-            OnHit(projectile); 
-        }
-        return true;
+            OnHit(info); 
+        } 
     }
- 
-    public virtual void OnHit(Projectile projectile) { }
-    public virtual void OnDestroy(Projectile projectile) { }
+    public virtual void OnHit(MobInfo info) { }
+    public virtual void OnDestroy(MobInfo info) { }
 }

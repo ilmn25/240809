@@ -9,7 +9,7 @@ public class ContainerInfo : StructureInfo
         operationType = OperationType.Breaking;
     }
 
-    public override void OnDestroy(Projectile projectile)
+    public override void OnDestroy(MobInfo info)
     {
         Storage.Explode(Machine.transform.position);
     }

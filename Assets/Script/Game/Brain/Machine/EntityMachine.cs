@@ -33,12 +33,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
         }  
         StartInternal();
     } 
-     
-    public void Delete()
-    { 
-        Info.Destroyed = true;
-        Unload();
-    }
+      
     public void Unload()
     { 
         Info.Machine = null;
@@ -48,8 +43,13 @@ public abstract class EntityMachine : Machine, IInfoProvider
             EntityDynamicLoad.ForgetEntity(this);
         ObjectPool.ReturnObject(gameObject); 
     }
- 
-    
+
+    public override void Update()
+    {
+        base.Update();
+        if (Info.Destroyed) Unload();
+    }
+
     public virtual void Attack() { }
 }
 

@@ -6,7 +6,7 @@ public class DynamicInfo : Info
 {
     private const int KnockbackInterval = 10;
     public HitboxType HitboxType;
-    public string CharSprite;
+    public ID CharSprite = ID.Null;
     public string HurtSfx;
     public string DeathSfx; 
     public float KnockBackResistance = 1;
@@ -80,8 +80,7 @@ public class DynamicInfo : Info
         SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
         SpriteToolTrack = Sprite.transform.Find("tool_track");
         SpriteTool = SpriteToolTrack.Find("tool").Find("tool_offset");
-        SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>();
-         
+        SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>(); 
     }
     public override void Update()
     { 
