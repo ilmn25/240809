@@ -15,16 +15,20 @@ public class  GUIStorage : GUI
     public Storage Storage; 
     public int RowAmount = 1;
     public int SlotAmount = 9;
-    public string Name;
+    private string Name => Storage.Name ?? Storage.info.stringID.ToString();
     protected int CurrentSlotKey = -1; 
- 
- 
+    private TextMeshProUGUI _text;
+
+    private void OnRefresh(object sender, EventArgs e)
+    {
+        if (Storage != null)
+            _text.text = Name;
+    }
     public new void Initialize()
-    { 
+    {  
         GameObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
             Game.GUIInv.transform);
-        GameObject.name = Name;
-        GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>().text = Name;
+        _text = GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
         GameObject.GetComponent<HoverModule>().GUI = this;
         Rect = GameObject.GetComponent<RectTransform>();
         base.Initialize();
@@ -46,11 +50,13 @@ public class  GUIStorage : GUI
             guiStorageSlot.slotNumber = row * SlotAmount + column;
             guiStorageSlot.GUIStorage = this;
         }
+        OnRefreshSlot += OnRefresh;
     }
  
     
     public void Update()
     {
+        if (ScaleTask is { Running: true }) return;
         if (CurrentSlotKey == -1 || IsDrag)
         {
             UpdateDrag();
@@ -85,7 +91,7 @@ public class  GUIStorage : GUI
             }
         }
     }
-
+    
     protected virtual void ActionPrimaryDown() {}
     protected virtual void ActionSecondaryDown() {} 
     protected virtual void ActionSecondaryKey() {} 

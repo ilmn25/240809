@@ -23,14 +23,10 @@ public class FPSLogger : MonoBehaviour
     }
 
     void OnGUI()
-    {
-        // Create a style for the text
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 24;
-        style.normal.textColor = Color.white;
+    { 
 
         // Display FPS on the screen
         UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-            "FPS: " + Mathf.Ceil(fps), style);
+            "FPS: " + Mathf.Ceil(fps), Console.GUIStyle);
     }
 }

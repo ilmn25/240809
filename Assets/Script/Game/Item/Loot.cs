@@ -24,7 +24,7 @@ public class Loot
         loot.Add(1, 1, ID.MetalChunks);
         loot.Add(1, 3, ID.Brick); 
         loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
-        loot.Add(1, 1, ID.Spear, ID.StoneAxe); 
+        loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
         
         loot = CreateTable(ID.Slab);
         loot.Add(1, 2, ID.Flint); 

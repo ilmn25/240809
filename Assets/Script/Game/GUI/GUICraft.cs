@@ -10,7 +10,7 @@ public class GUICraft : GUIStorage
     protected override void ActionPrimaryDown()
     {
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
-        Item item = Item.GetItem(Storage.List[CurrentSlotKey].StringID);
+        Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
         if (item.Type == ItemType.Structure && StructureRecipe.IsCraftable(item.StringID))
         {
@@ -25,7 +25,7 @@ public class GUICraft : GUIStorage
     protected override void ActionSecondaryKey()
     {
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
-        Item item = Item.GetItem(Storage.List[CurrentSlotKey].StringID);
+        Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
         if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
         {

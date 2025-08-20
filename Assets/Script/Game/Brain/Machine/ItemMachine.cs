@@ -34,7 +34,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             if (col.gameObject == gameObject)
                 continue;
 
-            if (col.gameObject.name == "item")
+            if (col.gameObject.name == "ItemPrefab")
             {
                 nearbyItem = col.GetComponent<ItemMachine>().Info;
                 if (nearbyItem.item.isSame(Info.item))

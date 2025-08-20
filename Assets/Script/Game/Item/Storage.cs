@@ -9,7 +9,8 @@ public class Storage
         public List<ItemSlot> List;
         public int ID;
         public int Key;
-        
+        public Info info;
+        public string Name;
         public Storage(int size)
         {
                 List = new List<ItemSlot>(size);
@@ -24,7 +25,7 @@ public class Storage
                 foreach (ItemSlot itemSlot in List)
                 {
                         if (itemSlot.Stack == 0) continue;
-                        Entity.SpawnItem(itemSlot.StringID, Vector3Int.FloorToInt(position), itemSlot.Stack);
+                        Entity.SpawnItem(itemSlot.ID, Vector3Int.FloorToInt(position), itemSlot.Stack);
                 }
                 Dictionary.Remove(ID);
         }
@@ -32,7 +33,7 @@ public class Storage
         public void RemoveItem(ID stringID, int quantity = 1, int priority = 0)
         {
                 // Prioritize current slot
-                if (List[priority].StringID == stringID)
+                if (List[priority].ID == stringID)
                 {
                         int removableAmount = Math.Min(quantity, List[priority].Stack);
                         List[priority].Stack -= removableAmount;
@@ -48,7 +49,7 @@ public class Storage
                 // Continue with other slots if necessary
                 foreach (var slot in List)
                 {
-                        if (slot.StringID == stringID)
+                        if (slot.ID == stringID)
                         {
                                 int removableAmount = Math.Min(quantity, slot.Stack);
                                 slot.Stack -= removableAmount;
@@ -67,12 +68,12 @@ public class Storage
                 // RefreshInventory();
         }
                 
-        public void AddItem(ID stringID, int quantity = 1, int priority = 0, Vector3 position = default)
+        public void AddItem(ID stringID, int quantity = 1, int priority = 0)
         {   
                 int maxStackSize = Item.GetItem(stringID).StackSize;
                 
                 // First try to add to the current slot
-                if (List[priority].StringID == stringID && List[priority].Stack < maxStackSize)
+                if (List[priority].ID == stringID && List[priority].Stack < maxStackSize)
                 {
                         int addableAmount = Math.Min(quantity, maxStackSize - List[priority].Stack);
                         List[priority].Stack += addableAmount;
@@ -88,7 +89,7 @@ public class Storage
                 // Try to add to existing slots with the same item
                 foreach (var slot in List)
                 {
-                        if (slot.StringID == stringID && slot.Stack < maxStackSize)
+                        if (slot.ID == stringID && slot.Stack < maxStackSize)
                         {
                                 int addableAmount = Math.Min(quantity, maxStackSize - slot.Stack);
                                 slot.Stack += addableAmount;
@@ -108,7 +109,7 @@ public class Storage
                         int slotID = GetEmptySlot();
                         if (slotID == -1)
                         {
-                                Entity.SpawnItem(stringID, position, quantity);
+                                Entity.SpawnItem(stringID, info.position, quantity);
                                 break;
                         }
                         int addableAmount = Math.Min(quantity, maxStackSize - List[slotID].Stack);
@@ -124,7 +125,7 @@ public class Storage
                 int count = 0;
                 foreach (var slot in List)
                 {
-                        if (slot.StringID == stringID)
+                        if (slot.ID == stringID)
                         { 
                                 count += slot.Stack;
                         }

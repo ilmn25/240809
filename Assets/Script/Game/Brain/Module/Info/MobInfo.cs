@@ -48,7 +48,6 @@ public class MobInfo : DynamicInfo
         PathingStatus = PathingStatus.Stuck;
         Direction = Vector3.zero;            
         Machine.SetState<DefaultState>();
-        if (Input.GetKey(KeyCode.B))Debug.Log("a");
     }
     
     protected override void OnUpdate()

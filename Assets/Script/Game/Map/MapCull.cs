@@ -48,20 +48,29 @@ public class MapCull
     
     public static void Update() 
     {
-        if (Control.Inst.CullMode.KeyDown()) {
-            switch (_currentCullMode)
-            {
-                case CullMode.On:
-                    _currentCullMode = CullMode.Off;
-                    break;
-                case CullMode.Off:
-                    _currentCullMode = CullMode.Auto;
-                    break;
-                case CullMode.Auto:
-                    _currentCullMode = CullMode.On;
-                    break;
-            }
+        if (Control.Inst.CullUp.KeyDown())
+        {
+            _visionHeight += 1;
         }
+        else if (Control.Inst.CullDown.KeyDown())
+        {
+            _visionHeight -= 1;
+        }
+        // if (Control.Inst.CullUp.KeyDown())
+        // {
+            // switch (_currentCullMode)
+            // {
+            //     case CullMode.On:
+            //         _currentCullMode = CullMode.Off;
+            //         break;
+            //     case CullMode.Off:
+            //         _currentCullMode = CullMode.Auto;
+            //         break;
+            //     case CullMode.Auto:
+            //         _currentCullMode = CullMode.On;
+            //         break;
+            // }
+        // }
     }
 
     private static IEnumerator YCheckRoutine()
@@ -78,16 +87,18 @@ public class MapCull
     {
         if (Time.frameCount > CullSyncFrame + 1)
         {
-            if (YThreshold < (int)_playerPosition.y)
-            {
-                YThreshold = (int)_playerPosition.y;
-                _visionHeight = YThreshold;
-            }
-            else if (YThreshold > (int)_playerPosition.y + 10)
-            {
-                YThreshold = (int)_playerPosition.y + 10;
-                _visionHeight = YThreshold;
-            }
+            YThreshold = (int)_playerPosition.y + _visionHeight;
+            // if (YThreshold < (int)_playerPosition.y)
+            // {
+            //     YThreshold = (int)_playerPosition.y;
+            //     _visionHeight = YThreshold;
+            // }
+            // else if (YThreshold > (int)_playerPosition.y + 10)
+            // {
+            //     YThreshold = (int)_playerPosition.y + 10;
+            //     _visionHeight = YThreshold;
+            // }
+             
             
             if (!_yCheckPrevious && YCheck) // enter
             {

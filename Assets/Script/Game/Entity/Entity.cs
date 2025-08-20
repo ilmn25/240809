@@ -32,6 +32,9 @@ public partial class Entity
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
+                AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Game.IndexCollide);
+                AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Game.IndexCollide);
+                AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Game.IndexCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);
@@ -104,22 +107,33 @@ public partial class Entity
                 Dictionary.Add(stringID, Item); 
         } 
         
-        public static void SpawnItem(ID stringID, Vector3 worldPosition, int count = 1)
+        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1)
         {
-                GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
-                gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + new Vector3(0.5f, 0.5f, 0.5f); 
-        
-                EntityMachine currentEntityMachine = (EntityMachine)
-                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[stringID].Machine));
-                EntityDynamicLoad.InviteEntity(currentEntityMachine);
-                ItemInfo itemInfo = (ItemInfo)CreateInfo(stringID, worldPosition);
-                itemInfo.item = new ItemSlot
+                int stackSize = global::Item.GetItem(id).StackSize;
+
+                while (count > 0)
                 {
-                        StringID = stringID,
-                        Stack = count,
-                };
-                currentEntityMachine.Initialize(itemInfo);  
+                        int spawnCount = Mathf.Min(count, stackSize);
+                        count -= spawnCount;
+
+                        GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
+                        gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + Item.SpawnOffset;
+
+                        EntityMachine currentEntityMachine = (EntityMachine)
+                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[id].Machine));
+                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
+
+                        ItemInfo itemInfo = (ItemInfo)CreateInfo(id, worldPosition + Item.SpawnOffset);
+                        itemInfo.item = new ItemSlot
+                        {
+                                ID = id,
+                                Stack = spawnCount,
+                        };
+
+                        currentEntityMachine.Initialize(itemInfo);
+                }
         }
+
         
         public static Info Spawn(ID stringID, Vector3 worldPosition)
         {

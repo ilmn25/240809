@@ -5,9 +5,9 @@ public class StationMachine: CraftingMachine
         Storage storage = new Storage(9);
         storage.AddItem(ID.Blueprint);   
         storage.AddItem(ID.Workbench);
+        storage.AddItem(ID.Sawmill);
         storage.AddItem(ID.Stonecutter);
-        storage.AddItem(ID.Furnace);
-        storage.AddItem(ID.Chest);   
+        storage.AddItem(ID.Furnace); 
         return new ContainerInfo()
         {
             Health = 500,
@@ -17,13 +17,14 @@ public class StationMachine: CraftingMachine
             Storage = storage
         };
     }
-}  
-public class StonecutterMachine: CraftingMachine
+}
+public class AnvilMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        storage.AddItem(ID.BrickBlock);    
+        storage.AddItem(ID.Sword);
+        storage.AddItem(ID.MetalAxe);
         return new ContainerInfo()
         {
             Health = 500,
@@ -33,4 +34,4 @@ public class StonecutterMachine: CraftingMachine
             Storage = storage
         };
     }
-}  
+}

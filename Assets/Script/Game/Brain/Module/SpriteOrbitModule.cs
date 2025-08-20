@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpriteOrbitModule : Module
+public class SpriteOrbitModule : EntityModule
 {
     private Transform _sprite;
 

@@ -11,18 +11,18 @@ public partial class Item
         Loot loot;
 
         // Blocks
-        AddBlockDefinition(ID.BrickBlock, 100, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddBlockDefinition(ID.BrickBlock, 70, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
         loot = Loot.CreateTable(ID.BrickBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
         AddBlockDefinition(ID.MarbleBlock, 100, 3, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.DirtBlock, 100, 1, SfxID.HitStone);
+        AddBlockDefinition(ID.DirtBlock, 50, 1, SfxID.HitStone);
         loot = Loot.CreateTable(ID.DirtBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
-        AddBlockDefinition(ID.SandBlock, 100, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.BackroomBlock, 100, 3, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.StoneBlock, 100, 2, SfxID.HitStone);
         loot = Loot.CreateTable(ID.StoneBlock);
@@ -33,26 +33,29 @@ public partial class Item
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone);
 
         // Materials
-        AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Gravel, 2 } }, craftStack: 5);
+        AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Gravel, 2 } }, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Gravel);
         AddMaterialDefinition(ID.Sticks);
         AddMaterialDefinition(ID.Flint);
         AddMaterialDefinition(ID.MetalChunks);
-        AddMaterialDefinition(ID.Charcoal, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
-        AddMaterialDefinition(ID.Steel, materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 } });
-        AddMaterialDefinition(ID.Brick, materials: new Dictionary<ID, int> { { ID.Slag, 3 } });
+        AddMaterialDefinition(ID.Charcoal, materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
+        AddMaterialDefinition(ID.Steel, materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 }, {ID.Charcoal, 2} }, time:2000);
+        AddMaterialDefinition(ID.Brick, materials: new Dictionary<ID, int> { { ID.Slag, 3 } }, time:1500);
         AddMaterialDefinition(ID.Stake, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
-        AddMaterialDefinition(ID.Slag, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
+        AddMaterialDefinition(ID.Slag, materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
         AddMaterialDefinition(ID.Log);
-        AddMaterialDefinition(ID.Plank, materials: new Dictionary<ID, int> { { ID.Log, 3 } });
+        AddMaterialDefinition(ID.Plank, materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500);
 
         // Structures
-        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 200);
-        AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.Log, 15 }, { ID.Flint, 15 } }, 200);
-        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 200);
-        AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }}, 200);
-        AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Gravel, 15 } }, 200);
-        AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 200);
+        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100);
+        AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.Log, 15 }, { ID.Flint, 5 } }, 100);
+        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100);
+        AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 6 }, { ID.Plank, 5 }}, 100);
+        AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100);
+        AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100);
+        AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Gravel, 15 } }, 100);
+        AddStructureDefinition(ID.Anvil, new Dictionary<ID, int> { { ID.Steel, 8 }, { ID.Hammer, 1}}, 100);
+        AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 100);
 
         // Tools
         AddToolDefinition(
@@ -96,12 +99,12 @@ public partial class Item
                 Breaking = 2,
                 OperationType = OperationType.Mining
             },
-            materials: new Dictionary<ID, int> { { ID.Stake, 2 }, { ID.Flint, 5 } },
+            materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 4 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
 
         AddToolDefinition(
-            stringID: ID.StoneAxe,
+            stringID: ID.StoneHatchet,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -168,7 +171,7 @@ public partial class Item
                 Breaking = 3,
                 OperationType = OperationType.Building
             },
-            materials: new Dictionary<ID, int> { { ID.Brick, 2 }, { ID.Stake, 2 } },
+            materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
 
@@ -241,6 +244,7 @@ public partial class Item
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
+        int time = 0,
         int stackSize = 15)
     {
         Entity.AddItem(stringID);
@@ -260,7 +264,7 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, null);
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, time, null);
 
         Dictionary[stringID] = itemData;
     }
@@ -273,6 +277,7 @@ public partial class Item
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
+        int time = 0,
         int stackSize = 100)
     {
         Entity.AddItem(stringID);
@@ -298,7 +303,7 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, null);
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, time,null);
 
         Dictionary[stringID] = itemData;
     }
@@ -322,6 +327,7 @@ public partial class Item
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
+        int time = 0,
         string[] modifiers = null
     )
     {
@@ -352,7 +358,7 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, modifiers);
+            ItemRecipe.AddRecipe(stringID, materials, craftStack, time, modifiers);
 
         Dictionary[stringID] = itemData;
     }
