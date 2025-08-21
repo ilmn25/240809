@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class GUI
@@ -16,6 +18,9 @@ public class GUI
     public bool Showing = true;
     private GameObject _shadow; 
 
+    protected TextMeshProUGUI Text;
+    private CoroutineTask _textScrollTask;
+    
     public void Initialize()
     {
         Rect.anchoredPosition = Position;
@@ -58,16 +63,18 @@ public class GUI
     public void Show(bool isShow, bool instant = false)
     {
         if (isShow)
-        {
+        { 
             if (!Showing)
             {
                 ScaleTask?.Stop();
                 if (instant)
                     GameObject.transform.localScale = Vector3.one * 0.9f;
                 else
-                    ScaleTask = new CoroutineTask(GUIMain.Scale(true, ShowSpeed, GameObject, 0.9f));
+                    ScaleTask = new CoroutineTask(GUIMain.Scale(true, ShowSpeed, GameObject, 0.9f)); 
                 Showing = true;
-            }
+            }  
+            _textScrollTask?.Stop();
+            new CoroutineTask(Delay());
         }
         else
         {
@@ -75,8 +82,19 @@ public class GUI
             {
                 ScaleTask?.Stop();
                 ScaleTask = new CoroutineTask(GUIMain.Scale(false, HideSpeed, GameObject, 0));
+                ScaleTask.Finished += (bool isManual) => 
+                { 
+                    _textScrollTask?.Stop();
+                }; 
                 Showing = false;
             }
         } 
     }
+    
+    IEnumerator Delay()
+    {
+        yield return null;
+        _textScrollTask = TextScroller.HandleScroll(Text);
+    }
+     
 }

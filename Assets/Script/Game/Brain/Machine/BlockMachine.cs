@@ -8,6 +8,12 @@ public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecond
         return new BlockInfo();
     }
 
+    public override void OnSetup()
+    {
+        transform.localScale = Vector3.one * 1.04f; 
+        BlockPreview.Set(gameObject, Info.blockID);
+    }
+    
     public void OnActionSecondary(Info info)
     {
         Entity.SpawnItem(Info.blockID, transform.position);

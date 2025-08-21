@@ -17,7 +17,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
         States.Clear();
         StateCurrent = State.DefaultState;
         StatePrevious = State.DefaultState;
-        AddModule(info);
+        AddModule(info); 
         if (!_initialSetup)
         { 
             _initialSetup = true;

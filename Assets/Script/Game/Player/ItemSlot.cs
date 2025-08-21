@@ -26,13 +26,13 @@ public class ItemSlot
         Stack = count;
         Durability = Item.GetItem(id).Durability;
     }
+    
     public string ToString(bool ingredients)
     {
-        Item item = Item.GetItem(ID);
-        string text = item.Name;
-        if (item.Type == ItemType.Structure)
+        string text = "";
+        if (Info.Type == ItemType.Structure)
         {
-            text += "\nstructure";
+            text += "structure";
             StructureRecipe recipe = StructureRecipe.Dictionary[ID];
             text += " \n \nbuild time: " + recipe.Time + "s";
             text += " \ningredients: ";
@@ -40,12 +40,12 @@ public class ItemSlot
             {
                 text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
             }
-            text += "\n \n" + item.Description;
+            text += "\n \n" + Info.Description;
         }
         else 
-        if (item.Type == ItemType.Block || item.Type == ItemType.Material)
+        if (Info.Type == ItemType.Block || Info.Type == ItemType.Material)
         { 
-            text += " x " + Stack;
+            text += Stack + "x";
 
             if (ingredients)
             {
@@ -60,37 +60,37 @@ public class ItemSlot
                 }
             }
 
-            text += "\n \n" + item.Description;
+            text += "\n \n" + Info.Description;
         }
-        else if (item.Type == ItemType.Tool)
+        else if (Info.Type == ItemType.Tool)
         { 
-            if (Durability != -1) text += " " + Durability + "%";
+            if (Durability != -1) text += Durability + "x\n";
 
-            if (item.ProjectileInfo != null)
+            if (Info.ProjectileInfo != null)
             {
-                text += " \n \n" + item.ProjectileInfo.Damage + " damage";
-                text += " \n" + item.ProjectileInfo.Knockback + " knockback\n";
-                // if (item.MiningPower != 0) text += " \nmining power: " + item.MiningPower;  
-                if (item.ProjectileInfo.Breaking != 0)
+                text += Info.ProjectileInfo.Damage + " damage";
+                text += " \n" + Info.ProjectileInfo.Knockback + " knockback\n";
+                // if (Info.MiningPower != 0) text += " \nmining power: " + Info.MiningPower;  
+                if (Info.ProjectileInfo.Breaking != 0)
                 {
-                    switch (item.ProjectileInfo.OperationType)
+                    switch (Info.ProjectileInfo.OperationType)
                     {
                         case OperationType.Building:
-                            text += " \nbuilding: " + item.ProjectileInfo.Breaking;
+                            text += " \nbuilding: " + Info.ProjectileInfo.Breaking;
                             break;
                         case OperationType.Mining:
-                            text += " \nmining: " + item.ProjectileInfo.Breaking;
+                            text += " \nmining: " + Info.ProjectileInfo.Breaking;
                             break;
                         case OperationType.Breaking:
-                            text += " \nbreaking: " + item.ProjectileInfo.Breaking;
+                            text += " \nbreaking: " + Info.ProjectileInfo.Breaking;
                             break;
                     }
                 }  
-                // text += " \nattack cooldown: " + item.Speed;
-                // if (item.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + item.ProjectileInfo.Damage;  
-                // else text += " \nrange: " + item.ProjectileInfo.Radius;
-                // text += " \ncrit chance: " + item.ProjectileInfo.CritChance * 100 + "%";  
-                if (item.ProjectileInfo.Ammo != ID.Null) text += " \n \nammo: " + item.ProjectileInfo.Ammo;
+                // text += " \nattack cooldown: " + Info.Speed;
+                // if (Info.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + Info.ProjectileInfo.Damage;  
+                // else text += " \nrange: " + Info.ProjectileInfo.Radius;
+                // text += " \ncrit chance: " + Info.ProjectileInfo.CritChance * 100 + "%";  
+                if (Info.ProjectileInfo.Ammo != ID.Null) text += " \n \nammo: " + Info.ProjectileInfo.Ammo;
             } 
 
 
@@ -107,7 +107,7 @@ public class ItemSlot
                 }
             }
 
-            text += "\n \n" + item.Description;
+            text += "\n \n" + Info.Description;
         }
         return text;
     } 
@@ -123,7 +123,7 @@ public class ItemSlot
     public void Add(ItemSlot slot, int amountToAdd = 0)
     { 
         if (slot.isEmpty()) return; 
-        int maxStackSize = Item.GetItem(slot.ID).StackSize;
+        int maxStackSize = slot.Info.StackSize;
         int addableAmount;
 
         if (amountToAdd == 0)
@@ -160,7 +160,7 @@ public class ItemSlot
     }
     public bool isFull()
     {
-        return Stack == Item.GetItem(ID).StackSize;
+        return Stack == Info.StackSize;
     }
      
 }

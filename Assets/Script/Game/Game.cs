@@ -43,6 +43,7 @@ public class Game : MonoBehaviour
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 100;
+        Application.runInBackground = true;
         SetConstants(); 
         // PlayerData.Load();  
         
@@ -73,6 +74,7 @@ public class Game : MonoBehaviour
 
     private void Update()
     { 
+        QualitySettings.vSyncCount = 0;
         if (Control.Inst.Pause.KeyDown())
         {
             World.Save(0);

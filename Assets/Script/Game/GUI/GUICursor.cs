@@ -7,7 +7,7 @@ public class GUICursor : GUI
 {
     public static ItemSlot Data = new ItemSlot();
 
-    private static TextMeshProUGUI _cursorInfoText; 
+    private static TextMeshProUGUI _infoSlotText;
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
     
@@ -19,7 +19,8 @@ public class GUICursor : GUI
         Rect = Game.GUICursor.GetComponent<RectTransform>();
         GameObject = Game.GUICursorInfo;
         base.Initialize();        
-        _cursorInfoText = Game.GUICursorInfo.transform.Find("text").GetComponent<TextMeshProUGUI>(); 
+        _infoSlotText = Game.GUICursorInfo.transform.Find("info").GetComponent<TextMeshProUGUI>(); 
+        Text = Game.GUICursorInfo.transform.Find("text").GetComponent<TextMeshProUGUI>(); 
         _cursorSlotText = Game.GUICursorSlot.transform.Find("text").GetComponent<TextMeshProUGUI>();
         _cursorSlotImage = Game.GUICursorSlot.transform.Find("image").GetComponent<Image>();
     }
@@ -31,15 +32,16 @@ public class GUICursor : GUI
         Rect.anchoredPosition = mousePosition;
     }
 
-    public void Set(string info = null)
+    public void Set(ItemSlot item = null, bool ingredient = false)
     {
-        if (info == null)
+        if (item == null)
         {
             Show(false);
             return;
         }
-        Show(true);
-        _cursorInfoText.text = info;
+        Text.text = item.Info.Name;
+        _infoSlotText.text = item.ToString(ingredient);
+        Show(true); 
     } 
     
     public static void UpdateCursorSlot()

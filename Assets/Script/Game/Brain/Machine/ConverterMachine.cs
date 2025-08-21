@@ -11,7 +11,9 @@ public abstract class ConverterMachine: StructureMachine, IActionSecondaryIntera
     {
         if (IsCurrentState<DefaultState>())
             SetState<InConverterState>();
-        else 
+        else
+        {
             SetState<DefaultState>();
+        } 
     }
 }

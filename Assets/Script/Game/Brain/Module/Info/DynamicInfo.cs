@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 [System.Serializable]
 public class DynamicInfo : Info
 {
-    private const int KnockbackInterval = 5;
+    private const int KnockbackInterval = 3;
     public HitboxType HitboxType;
     public ID CharSprite = ID.Null;
     public SfxID HitSfx = SfxID.HitMob;
@@ -73,9 +73,9 @@ public class DynamicInfo : Info
                 continue;
             
             if (Game.Player && col.gameObject == Game.Player)
-                KnockBack(col.transform.position, 0.1f * KnockbackInterval, true);
+                KnockBack(col.transform.position, 1, true);
             else
-                KnockBack(col.transform.position, 0.2f * KnockbackInterval, true);
+                KnockBack(col.transform.position, 2 , true);
             break; 
         }
     } 

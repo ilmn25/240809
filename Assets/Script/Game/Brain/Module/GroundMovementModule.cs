@@ -12,7 +12,11 @@ public class GroundMovementModule : MovementModule
     private Vector3 _previousPosition;
     private Vector3 _directionBuffer = Vector3.zero;
     private Vector3 _abstractPos;
-    
+    public override void Initialize()
+    {
+        _abstractPos = Info.position;
+    }
+
     public override void Update()
     { 
         if (Info.Health <= 0) return;
@@ -40,8 +44,8 @@ public class GroundMovementModule : MovementModule
             } else _speedAdjust = 1;
             NewPosition.x += Info.Direction.x * Info.SpeedCurrent * DeltaTime * _speedAdjust;
             NewPosition.z += Info.Direction.z * Info.SpeedCurrent * DeltaTime * _speedAdjust;
-
-            if (!IsMovable(NewPosition))
+            
+            if (IsMovable(Machine.transform.position) && !IsMovable(NewPosition))
             {
                 HandleObstacle(NewPosition);
             } 
