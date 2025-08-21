@@ -3,7 +3,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
-using UnityEngine; 
+using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Game : MonoBehaviour
 {
@@ -25,6 +26,11 @@ public class Game : MonoBehaviour
     public static PlayerInfo PlayerInfo;
     public static GameObject ViewPortObject;
     public static GameObject CameraObject;
+    public static GameObject LightIndoor;
+    public static Light DirectionalLight;
+    public static Light SpotLight;
+    public static GameObject LightSelf;
+    public static Volume Volume;
     public static Camera Camera;
     public static Camera GUICamera;
     public static GameObject GUIObject;
@@ -88,6 +94,7 @@ public class Game : MonoBehaviour
         MapCull.Update();
         ViewPort.Update(); 
         MobSpawner.Update();
+        DayNightCycle.Update();
          
     }
     private void FixedUpdate()
@@ -119,6 +126,11 @@ public class Game : MonoBehaviour
         ViewPortObject = GameObject.Find("viewport");
         CameraObject = GameObject.Find("main_camera");
         Camera = CameraObject.GetComponent<Camera>();
+        LightIndoor = ViewPortObject.transform.Find("light_indoor").gameObject;
+        LightSelf = ViewPortObject.transform.Find("light_self").gameObject;   
+        DirectionalLight = ViewPortObject.transform.Find("light_directional").gameObject.GetComponent<Light>();  
+        SpotLight = ViewPortObject.transform.Find("light_spot").gameObject.GetComponent<Light>();   
+        Volume = CameraObject.gameObject.GetComponent<Volume>();
         GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
         
         GUIObject = GameObject.Find("gui");
