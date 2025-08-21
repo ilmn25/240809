@@ -8,6 +8,7 @@ public class Info : EntityModule
     public ID stringID;
     public Vector3 position;
     [NonSerialized] public bool Destroyed = false;
+    [NonSerialized] public bool IsInRenderRange;
     public SetEntity ToSetPieceInfo()
     {
         return new SetEntity()

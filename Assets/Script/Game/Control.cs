@@ -12,10 +12,10 @@ public class Control
     public static Vector3 MouseDirection; //direction of ray from camera to mouse target 
     public static Vector3 MousePosition; //position of mouse target 
     public static Transform MouseTarget;
-    public static int MouseLayer; // -1 means void
+    public static int MouseLayer; // -1 means hit void
     
     public readonly ControlKey Inv = new (KeyCode.Tab);
-    public readonly ControlKey SwapChar = new (KeyCode.T);
+    public readonly ControlKey SwapChar = new (KeyCode.BackQuote);
     public readonly ControlKey Pause = new (KeyCode.Escape);
     public readonly ControlKey FullScreen = new (KeyCode.F11);
     public readonly ControlKey DigUp = new (KeyCode.Mouse4);

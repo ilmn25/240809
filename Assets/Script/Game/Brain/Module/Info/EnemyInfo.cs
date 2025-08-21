@@ -1,13 +1,14 @@
+using System;
 using TMPro;
 
 [System.Serializable]
 public class EnemyInfo : MobInfo
 {
-    private TextMeshPro _textMeshPro;
+    // [NonSerialized] private TextMeshPro _textMeshPro;
     public override void Initialize()
     {
         base.Initialize();
-        _textMeshPro = Machine.transform.Find("text").GetComponent<TextMeshPro>();
+        // _textMeshPro = Machine.transform.Find("text").GetComponent<TextMeshPro>();
         Health = HealthMax;
         HitboxType = HitboxType.Enemy;
         TargetHitboxType = HitboxType.Player;
@@ -18,7 +19,7 @@ public class EnemyInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        _textMeshPro.text = Health.ToString();
+        // _textMeshPro.text = Health.ToString();
         FaceTarget = Target != null;
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
         if (Health <= 0)

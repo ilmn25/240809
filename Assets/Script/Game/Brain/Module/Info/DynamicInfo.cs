@@ -41,8 +41,7 @@ public class DynamicInfo : Info
     [NonSerialized] public Vector3 Velocity = Vector3.zero;
     [NonSerialized] public bool IsGrounded = false;
     [NonSerialized] public Vector3 Direction = Vector3.zero;
-    [NonSerialized] public Vector3 TargetPointPosition;
-    [NonSerialized] public bool IsInRenderRange;
+    [NonSerialized] public Vector3 TargetPointPosition; 
     [NonSerialized] public Vector3 TargetScreenDir;
     [NonSerialized] public float SpeedCurrent;
     [NonSerialized] public float SpeedTarget = 10;

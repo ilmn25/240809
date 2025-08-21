@@ -88,13 +88,13 @@ public class Inventory
             if (CurrentItem is not { Stack: 0 })
             {
                 CurrentItemData = Item.GetItem(CurrentItem.ID);
-                Game.PlayerInfo.SetEquipment(CurrentItem.ID);
+                Game.PlayerInfo.SetEquipment(CurrentItem);
             } 
         }
         if (CurrentItem is { Stack: 0 })
         {
             CurrentItemData = null;     
-            Game.PlayerInfo.SetEquipment(ID.Null);
+            Game.PlayerInfo.SetEquipment(null);
         }
     }
 

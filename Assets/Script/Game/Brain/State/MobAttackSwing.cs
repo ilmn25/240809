@@ -7,9 +7,9 @@ class MobAttackSwing : MobState {
     { 
         Info.Animator.speed = 1f; 
         Info.Animator.Play("EquipSwing", 0, 0f);   
-        _equipment = Info.Equipment;
-        if (Info.Equipment.ProjectileInfo != null) Projectile.Spawn(Info.SpriteToolTrack.transform.position, Info.AimPosition,
-            Info.Equipment.ProjectileInfo, Info.TargetHitboxType, Info); 
+        _equipment = Info.Equipment.Info;
+        if (Info.Equipment.Info.ProjectileInfo != null) Projectile.Spawn(Info.SpriteToolTrack.transform.position, Info.AimPosition,
+            Info.Equipment.Info.ProjectileInfo, Info.TargetHitboxType, Info); 
     }
     
     public override void OnUpdateState() {

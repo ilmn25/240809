@@ -16,7 +16,6 @@ public class GroundPathingModule : PathingModule
             RepathCount++;
             if (RepathCount == MaxRepathCount)
             {
-                Helper.Log();
                 Info.PathingStatus = PathingStatus.Stuck;
                 Info.Direction = Vector3.zero;
                 RepathCount = 0;

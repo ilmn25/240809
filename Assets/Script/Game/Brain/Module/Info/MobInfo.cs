@@ -36,7 +36,7 @@ public class MobInfo : DynamicInfo
     public bool MustLandFirst = false;
     public HitboxType TargetHitboxType;
  
-    [NonSerialized] public Item Equipment;
+    [NonSerialized] public ItemSlot Equipment;
     
     [NonSerialized] public Info Target;
     [NonSerialized] public IActionType ActionType;
@@ -70,18 +70,18 @@ public class MobInfo : DynamicInfo
         }
     }   
 
-    public void SetEquipment(ID target)
+    public void SetEquipment(ItemSlot target)
     { 
-        if (target != ID.Null)
+        if (target != null)
         { 
-            if (Equipment == null || Equipment.StringID != target)
+            if (Equipment == null || Equipment != target)
             {
-                Equipment = Item.GetItem(target);
+                Equipment = target;
                 SpriteTool.gameObject.SetActive(true);
-                SpriteTool.localPosition = new Vector3(Equipment.HoldoutOffset.x, Equipment.HoldoutOffset.y, 0);
-                SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.RotationOffset);
-                SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Equipment.StringID);
-                SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Scale;
+                SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
+                SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
+                SpriteToolRenderer.sprite = Cache.LoadSprite("sprite/" + Equipment.Info.StringID);
+                SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
                 Machine.SetState<EquipSelectState>();
             } 
         }

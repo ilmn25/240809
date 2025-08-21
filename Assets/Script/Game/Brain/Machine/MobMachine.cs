@@ -13,10 +13,10 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     
     public override void Attack()
     {  
-        if (!MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(transform.position))) 
+        if (Info.Target != null && !Info.Target.IsInRenderRange) 
             Info.Target.AbstractHit(Info);
          
-        if (Info.Equipment.ProjectileInfo != null)
+        if (Info.Equipment.Info.ProjectileInfo != null)
         {
             Vector3 direction = Info.SpriteToolTrack.right;
             if (Info.SpriteToolTrack.lossyScale.x < 0f) 
@@ -24,13 +24,13 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
             direction.y = 0;
             direction.Normalize();
 
-            Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.ProjectileOffset,
+            Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
                 Info.AimPosition,
-                Info.Equipment.ProjectileInfo,
+                Info.Equipment.Info.ProjectileInfo,
                 Info.TargetHitboxType, Info);
         } 
                     
-        switch (Info.Equipment.Gesture)
+        switch (Info.Equipment.Info.Gesture)
         {
             case ItemGesture.Swing:
                 SetState<MobAttackSwing>();

@@ -32,7 +32,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
         AddState(new DialogueState(dialogue)); 
-        Info.SetEquipment(ID.SteelSword);
+        Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
     public void OnActionSecondary(Info info)

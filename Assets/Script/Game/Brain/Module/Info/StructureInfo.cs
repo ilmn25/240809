@@ -21,8 +21,8 @@ public class StructureInfo : Info
     public override bool OnHitInternal(Projectile projectile)
     {
         if (projectile.SourceInfo.TargetHitboxType == HitboxType.Player ||
-            projectile.SourceInfo.Equipment.ProjectileInfo.OperationType != operationType ||
-            projectile.SourceInfo.Equipment.ProjectileInfo.Breaking < threshold)
+            projectile.SourceInfo.Equipment.Info.ProjectileInfo.OperationType != operationType ||
+            projectile.SourceInfo.Equipment.Info.ProjectileInfo.Breaking < threshold)
         { 
             return false;
         }  
@@ -35,10 +35,10 @@ public class StructureInfo : Info
     public override void AbstractHit(MobInfo info)
     {
         if ( info.TargetHitboxType == HitboxType.Player ||
-             info.Equipment.ProjectileInfo.OperationType != operationType || 
-             info.Equipment.ProjectileInfo.Breaking < threshold) return;
+             info.Equipment.Info.ProjectileInfo.OperationType != operationType || 
+             info.Equipment.Info.ProjectileInfo.Breaking < threshold) return;
         
-        Health -= info.Equipment.ProjectileInfo.Breaking;
+        Health -= info.Equipment.Info.ProjectileInfo.Breaking;
         if (Health <= 0)
         { 
             Audio.PlaySFX(SfxDestroy);  
