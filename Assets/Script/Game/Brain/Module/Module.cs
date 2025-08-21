@@ -74,6 +74,3 @@ public abstract class PlayerModule : EntityModule
         }
     }
 }
-
-[Serializable]
-public abstract class MovementModule : DynamicModule { }

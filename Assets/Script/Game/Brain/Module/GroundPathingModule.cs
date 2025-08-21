@@ -1,7 +1,10 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
+ 
 
 public class GroundPathingModule : PathingModule
 {  
@@ -13,6 +16,7 @@ public class GroundPathingModule : PathingModule
             RepathCount++;
             if (RepathCount == MaxRepathCount)
             {
+                Helper.Log();
                 Info.PathingStatus = PathingStatus.Stuck;
                 Info.Direction = Vector3.zero;
                 RepathCount = 0;

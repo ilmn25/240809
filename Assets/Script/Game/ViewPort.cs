@@ -22,7 +22,7 @@ public class ViewPort
     private static Coroutine _orbitCoroutine; 
     private static float _screenWidth;
     private static float _screenHeight; 
-    private static float _targetFOV = 40;
+    private static float _targetFOV = 24;
     private static float _sinAngle = 0;
     private static float _cosAngle = 0;
     private static bool _isOrbiting = false;

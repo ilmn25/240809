@@ -22,8 +22,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             Sanity = 100,
             Hunger = 100,
             Stamina = 100,
-            SpeedGround = 5,
-            SpeedAir = 6,
+            SpeedLogic = 4,
+            SpeedGround = 4,
+            SpeedAir = 5,
             Iframes = 100, 
             PathAmount = 7000,
             MaxStuckCount = 100,
@@ -32,8 +33,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             DistAttack = 2,
             Gravity = -40f,
             JumpVelocity = 12f,
-            DeathSfx = "player_die",
-            HurtSfx = "player_hurt", 
+            DeathSfx = SfxID.DeathPlayer,
+            HitSfx = SfxID.HitPlayer, 
             CharSprite = ID.Chito 
         }; 
     }
@@ -197,5 +198,12 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         } 
          
         base.Attack();
+    }
+    public void OnDrawGizmos()
+    {
+        if (Camera.current != Camera.main)
+            return;
+
+        GetModule<GroundPathingModule>().DrawGizmos();
     }
 } 

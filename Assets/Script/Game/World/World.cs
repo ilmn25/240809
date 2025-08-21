@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = System.Random;
 
 [Serializable]
 public class World
@@ -25,7 +27,7 @@ public class World
         Bounds = new Vector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
         Length = new Vector3Int(x, y, z);
         _chunks = new Chunk[x * y * z];
-        Seed = DateTime.Now.Millisecond * DateTime.Now.Second;
+        Seed = UnityEngine.Random.Range(1, 1000);
     }
 
     public static void Save(int id)

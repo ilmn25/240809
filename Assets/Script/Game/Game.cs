@@ -85,6 +85,7 @@ public class Game : MonoBehaviour
         Control.Update();
         MapCull.Update();
         ViewPort.Update(); 
+        MobSpawner.Update();
          
     }
     private void FixedUpdate()

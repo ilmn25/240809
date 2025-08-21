@@ -6,7 +6,7 @@ public partial class Entity
 { 
         public static readonly Dictionary<ID, Entity> Dictionary = new Dictionary<ID, Entity>();
         
-        public Vector3Int Bounds;
+        public Vector3 Bounds;
         public ID PrefabName;
         public Type Machine;
         public int Collision;
@@ -61,9 +61,9 @@ public partial class Entity
                         SpawnOffset = Floor,
                 });
                 
-                Dictionary.Add(ID.Player, new Entity
+                Dictionary.Add(ID.Player, new Entity  
                 {
-                        Bounds = Vector3Int.one,
+                        Bounds = Vector3.one * 0.7f,
                         Collision = Game.IndexSemiCollide,
                         PrefabName = ID.PlayerPrefab,
                         Machine = typeof(PlayerMachine),
@@ -74,13 +74,14 @@ public partial class Entity
                 AddMob<HunterMachine>(ID.Yuuri);
                 AddMob<BugMachine>(ID.SnareFlea); 
                 AddMob<GhoulMachine>(ID.Megumin);
+                AddMob<SlimeMachine>(ID.Slime);
         }
 
         private static void AddMob<T>(ID stringID) where T : EntityMachine
         {
                 Dictionary.Add(stringID, new Entity
                 {
-                        Bounds = Vector3Int.one,
+                        Bounds = Vector3.one * 0.7f,
                         Collision = Game.IndexSemiCollide,
                         PrefabName = ID.MobPrefab,
                         Machine = typeof(T),

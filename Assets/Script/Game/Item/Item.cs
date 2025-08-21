@@ -59,7 +59,7 @@ public partial class Item
 
         // Tools
         AddToolDefinition(
-            stringID: ID.Sword,
+            stringID: ID.SteelSword,
             gesture: ItemGesture.Swing,
             speed: 1.3f,
             range: 1,

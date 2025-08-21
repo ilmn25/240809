@@ -10,18 +10,17 @@ public abstract class PathingModule : MobModule
 { 
     public PathingTarget PathingTarget = PathingTarget.None;  
     
-    private const float PointReachDistance = 0.45f;
-    private const float PointLostDistance = 5;
-    private const float RepathInterval = 0.5f;
-    private const int JumpSkipAmount = 1;
-    private const float SelfMovedDistance = 0.002f;
+    protected const float PointReachDistance = 0.45f; 
+    protected const float RepathInterval = 0.5f;
+    protected const int JumpSkipAmount = 1; 
+    protected const float SelfMovedDistance = 0.002f;
 
     private bool _repathRoutine; 
     private bool _isPathFinding; 
     
     protected List<Node> Path;
     private List<Node> _pathQueued; 
-    private int _nextPoint;
+    protected int NextPoint;
     private int _nextPointQueued = -1;
     
     private float _nextPointDistance; 
@@ -103,63 +102,85 @@ public abstract class PathingModule : MobModule
             _updateTargetPosition = false;
         }
 
-
-        if (!IsTargetReached() && Path != null && _nextPoint < Path.Count)
-        {
-            if (Info.SpriteCharRenderer.isVisible) 
-                HandleMovePoint();
-            else
-            {
-                if ( _nextPoint < Path.Count -1 && Helper.SquaredDistance(Machine.transform.position, Path[_nextPoint].Position) < 0.2) _nextPoint++;
-                Info.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
-            } 
-        } 
-
         if (_nextPointQueued != -1)
         {
             Path = _pathQueued;
-            _nextPoint = _nextPointQueued;
+            NextPoint = _nextPointQueued;
             _nextPointQueued = -1;
             _targetPositionPrevious = GetTargetPosition();
         }
+
+        if (!IsTargetReached() && Path != null && NextPoint < Path.Count)
+        {
+            if (!Info.IsInRenderRange)
+            {
+                if ( NextPoint < Path.Count -1 && Machine.transform.position == Path[NextPoint].Position) NextPoint++;
+                Info.TargetPointPosition = Path[NextPoint].Position;
+                Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized; 
+            }
+            else
+                HandleMovePoint(); 
+        } 
     }
     
     private void HandleMovePoint()
     { 
-        if (_nextPoint != Path.Count - 1)
-        { 
-            if (_nextPoint == 0 ||
-                 (((!Path[_nextPoint].IsFloat 
-                    && math.distance(Path[_nextPoint].Position.y, Machine.transform.position.y) < 0.04f)
-                   || Path[_nextPoint].IsFloat) &&
+        if (NextPoint != Path.Count - 1)
+        {
+            if (Info.MustLandFirst)
+            {
+                if (!Info.IsGrounded)
+                {
+                    Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized;
+                    return;
+                };   
+            }
+            if (NextPoint == 0 ||
+                 (((!Path[NextPoint].IsFloat && math.distance(Path[NextPoint].Position.y, Machine.transform.position.y) < Info.PathJump)
+                   || Path[NextPoint].IsFloat) &&
                   Vector2.Distance(
-                      new Vector2(Path[_nextPoint].Position.x, Path[_nextPoint].Position.z), 
+                      new Vector2(Path[NextPoint].Position.x, Path[NextPoint].Position.z), 
                       new Vector2(Machine.transform.position.x, Machine.transform.position.z)
                   ) < PointReachDistance/2))
-            {
-                _nextPoint++; 
-                if (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat 
-                && Path[_nextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
-                (Path[_nextPoint + 1].Direction.x == Path[_nextPoint].Direction.x ||
-                 Path[_nextPoint + 1].Direction.z == Path[_nextPoint].Direction.z))
+            { 
+                for (int i = 0; i < Info.NormalSkipAmount; i++)
                 {
-                    Node initialNode = Path[_nextPoint];
-                    while (_nextPoint < Path.Count - 1 && Path[_nextPoint].IsFloat
-                    && Path[_nextPoint].Position.y >= (int)Machine.transform.position.y &&
-                    (Path[_nextPoint + 1].Direction.x == initialNode.Direction.x ||
-                     Path[_nextPoint + 1].Direction.z == initialNode.Direction.z))
-                    {  
-                        _nextPoint++;
-                    }
+                    if (NextPoint >= Path.Count - 1) return;
+                    NextPoint++;
+                    if (Path[NextPoint].IsFloat) break;
+                }
 
-                    int potentialSkipPoint = _nextPoint + JumpSkipAmount;
-                    if (potentialSkipPoint < Path.Count - 1 
-                    && !Path[potentialSkipPoint].IsFloat 
-                    && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[_nextPoint].Position.y))
+                try
+                {
+
+                    if (NextPoint < Path.Count && Path[NextPoint].IsFloat &&
+                        Path[NextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
+                        (Path[NextPoint + 1].Direction.x == Path[NextPoint].Direction.x ||
+                         Path[NextPoint + 1].Direction.z == Path[NextPoint].Direction.z))
                     {
-                        _nextPoint = potentialSkipPoint;
+                        Node initialNode = Path[NextPoint];
+                        while (NextPoint < Path.Count - 1 && Path[NextPoint].IsFloat
+                                                          && Path[NextPoint].Position.y >=
+                                                          (int)Machine.transform.position.y &&
+                                                          (Path[NextPoint + 1].Direction.x == initialNode.Direction.x ||
+                                                           Path[NextPoint + 1].Direction.z == initialNode.Direction.z))
+                        {
+                            NextPoint++;
+                        }
+
+                        int potentialSkipPoint = NextPoint + JumpSkipAmount;
+                        if (potentialSkipPoint < Path.Count - 1
+                            && !Path[potentialSkipPoint].IsFloat
+                            && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[NextPoint].Position.y))
+                        {
+                            NextPoint = potentialSkipPoint;
+                        }
                     }
-                } 
+                }
+                catch (Exception)
+                {
+                    Helper.Log(NextPoint, Path.Count);
+                }
                 // else
                 // {
                 //     if (_nextPoint == 0 ||
@@ -174,7 +195,7 @@ public abstract class PathingModule : MobModule
                 // } 
             }  
                 
-            Info.Direction = (Path[_nextPoint].Position - Machine.transform.position).normalized; 
+            Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized; 
         } 
         else
         { 
@@ -187,7 +208,7 @@ public abstract class PathingModule : MobModule
         _repathRoutine = true;
         await Task.Delay((int)RepathInterval * 1000); 
  
-        if (_nextPointQueued == -1 && Info.PathingStatus == PathingStatus.Pending && !_isPathFinding )
+        if (Info.SpeedCurrent != 0 && _nextPointQueued == -1 && Info.PathingStatus == PathingStatus.Pending && !_isPathFinding )
         {
             if (PathingTarget == PathingTarget.Target &&
                 Vector3.Distance(_targetPositionPrevious, Info.Target.position) > Info.DistAttack)
@@ -208,7 +229,7 @@ public abstract class PathingModule : MobModule
   
     private bool IsStuck()
     {
-        if (Path != null && Vector3.Distance(Machine.transform.position, Path[_nextPoint].Position) > PointLostDistance)
+        if (Path != null && Vector3.Distance(Machine.transform.position, Path[NextPoint].Position) > Info.PointLostDistance)
         {
             return true;
         }
@@ -225,7 +246,7 @@ public abstract class PathingModule : MobModule
             } 
             return false;
         }
-
+        
         _stuckCount = 0;
         return false;
     }
@@ -270,7 +291,7 @@ public abstract class PathingModule : MobModule
             } 
             if (nearestPoint == 0) nearestPoint = Mathf.Min(1, _pathQueued.Count -1); 
         }
-        return nearestPoint;
+        return nearestPoint + Info.NormalSkipAmount - 1;
     }
 
     
@@ -300,7 +321,7 @@ public abstract class PathingModule : MobModule
                 Gizmos.DrawLine(Path[i].Position, Path[i + 1].Position);
             }
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(Path[_nextPoint].Position, 0.2f); // Adjust the radius as needed
+            Gizmos.DrawSphere(Path[NextPoint].Position, 0.2f); // Adjust the radius as needed
         } 
     }
 }

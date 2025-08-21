@@ -33,7 +33,7 @@ public enum ID
     BlueprintStation,
 
     // Tools
-    Sword,
+    SteelSword,
     Blueprint,
     StonePickaxe,
     StoneHatchet,
@@ -68,5 +68,6 @@ public enum ID
     Log,
     Sawmill,
     Campfire,
-    Anvil
+    Anvil,
+    Slime
 }

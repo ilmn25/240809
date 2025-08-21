@@ -31,7 +31,7 @@ public class GroundAnimationModule : MobModule
     public override void Update()
     {
         if (Info is PlayerInfo && ((PlayerInfo)Info).PlayerStatus != PlayerStatus.Active) return;
-        if (Info.SpriteCharRenderer.isVisible)
+        if (Info.IsInRenderRange)
         {
             if (Info.FaceTarget)
             {

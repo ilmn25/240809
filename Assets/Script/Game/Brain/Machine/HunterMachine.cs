@@ -7,14 +7,10 @@ public class HunterMachine : MobMachine
     {
         return new EnemyInfo()
         {
-            HitboxType = HitboxType.Enemy,
-            TargetHitboxType = HitboxType.Friendly,
             HealthMax = 12,
             SpeedGround = 4,
             Defense = 1, 
             DistAttack = 18,
-            HurtSfx = "npc_hurt", 
-            DeathSfx = "player_die",
         }; 
     }
     private int _ammo;
