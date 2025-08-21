@@ -21,13 +21,11 @@ public class Inventory
         {
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                Entity.SpawnItem(CurrentItem.ID, Game.Player.transform.position, CurrentItem.Stack); 
-                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.ID, CurrentItem.Stack, Game.PlayerInfo.Storage.Key);
+                Entity.SpawnItem(CurrentItem, Game.Player.transform.position); 
             }
             else
             {
-                Entity.SpawnItem(CurrentItem.ID, Game.Player.transform.position); 
-                Game.PlayerInfo.Storage.RemoveItem(CurrentItem.ID, 1, Game.PlayerInfo.Storage.Key);
+                Entity.SpawnItem(CurrentItem, Game.Player.transform.position, Amount : 1); 
             } 
             RefreshInventory();
         }

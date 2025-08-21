@@ -6,11 +6,27 @@ public class ItemSlot
 {
     public int Stack = 0;
     public int Durability;
-    [FormerlySerializedAs("StringID")] public ID ID;
+    public ID ID;
     public string Modifier;
     public bool Locked;
-
-    public string GetItemInfo(bool ingredients)
+    [NonSerialized] private Item _item;
+    public Item Info
+    {
+        get
+        {
+            if (_item == null || _item.StringID != ID)
+                _item = Item.GetItem(ID);
+            return _item;
+        }
+    }
+    public ItemSlot(){}
+    public ItemSlot(ID id, int count = 1)
+    {
+        ID = id;
+        Stack = count;
+        Durability = Item.GetItem(id).Durability;
+    }
+    public string ToString(bool ingredients)
     {
         Item item = Item.GetItem(ID);
         string text = item.Name;
@@ -48,7 +64,7 @@ public class ItemSlot
         }
         else if (item.Type == ItemType.Tool)
         { 
-            text += " " + Durability + "%";
+            if (Durability != -1) text += " " + Durability + "%";
 
             if (item.ProjectileInfo != null)
             {
@@ -94,15 +110,7 @@ public class ItemSlot
             text += "\n \n" + item.Description;
         }
         return text;
-    }
-    
-    public void SetItem(int stack, ID stringID, string modifier, bool locked)
-    {
-        Stack = stack;
-        ID = stringID;
-        Modifier = modifier;
-        Locked = locked;
-    }
+    } 
 
     public void clear()
     {
@@ -129,7 +137,8 @@ public class ItemSlot
             Modifier = slot.Modifier;
             Locked = slot.Locked;
         }
-        
+
+        if (maxStackSize == 1) Durability = slot.Durability;
         Stack += addableAmount;
         slot.Stack -= addableAmount;
 

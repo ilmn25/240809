@@ -20,9 +20,9 @@ public class WorkbenchMachine: CraftingMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9); 
-        storage.AddItem(ID.Spear);
-        storage.AddItem(ID.StonePickaxe); 
-        storage.AddItem(ID.Hammer); 
+        storage.CreateAndAddItem(ID.Spear);
+        storage.CreateAndAddItem(ID.StonePickaxe); 
+        storage.CreateAndAddItem(ID.Hammer); 
         return new ContainerInfo()
         {
             Health = 500,

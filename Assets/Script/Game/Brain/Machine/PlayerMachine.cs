@@ -196,7 +196,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
             Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
         } 
-         
+        // if (Info.Eq != -1) durabilty--; and delete
         base.Attack();
     }
     public void OnDrawGizmos()

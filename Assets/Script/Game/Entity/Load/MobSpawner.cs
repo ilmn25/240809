@@ -8,14 +8,15 @@ public class MobSpawner
     public static List<ID> List = new List<ID>()
     {
         ID.SnareFlea,
-        ID.Megumin,
+        // ID.Megumin,
         ID.Slime,
-        ID.Chito,
-        ID.Yuuri
+        // ID.Chito,
+        // ID.Yuuri
     };
     public static void Update()
     {
-        if (timer == 2000)
+        timer++;
+        if (timer == 6000)
         {
             timer = 0;
             float angle = Random.Range(0f, Mathf.PI * 2f);

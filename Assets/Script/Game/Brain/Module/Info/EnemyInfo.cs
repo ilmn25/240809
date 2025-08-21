@@ -11,7 +11,8 @@ public class EnemyInfo : MobInfo
         Health = HealthMax;
         HitboxType = HitboxType.Enemy;
         TargetHitboxType = HitboxType.Player;
-        // Target = Game.PlayerInfo;
+        Target = Game.PlayerInfo;
+        ActionType = IActionType.Hit;
     }
 
     protected override void OnUpdate()

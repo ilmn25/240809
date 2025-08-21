@@ -14,26 +14,17 @@ public class GUIChest : GUIStorage
             {
                 if (GUIMain.Storage.Showing)
                 {
-                    GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey].ID, 
-                        Storage.List[CurrentSlotKey].Stack);
-                    Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
-                        Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                    GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey]);
                 }
                 else
                 {
-                    Entity.SpawnItem(Storage.List[CurrentSlotKey].ID, Game.PlayerInfo.position, 
-                        Storage.List[CurrentSlotKey].Stack);
-                    Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
-                        Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                    Entity.SpawnItem(Storage.List[CurrentSlotKey], Game.PlayerInfo.position); 
                 }
                 //doesnt account for full inventory
             }
             else
             {
-                GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey].ID, 
-                    Storage.List[CurrentSlotKey].Stack);
-                Storage.RemoveItem(Storage.List[CurrentSlotKey].ID, 
-                    Storage.List[CurrentSlotKey].Stack, CurrentSlotKey); 
+                GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey]);
                 //doesnt account for full inventory
             } 
         }
@@ -48,9 +39,11 @@ public class GUIChest : GUIStorage
                 Storage.List[CurrentSlotKey].Add(GUICursor.Data);
             } 
             else
-            { 
-                (Storage.List[CurrentSlotKey], GUICursor.Data) = 
-                    (GUICursor.Data, Storage.List[CurrentSlotKey]);
+            {
+                ItemSlot item = new ItemSlot();
+                item.Add(GUICursor.Data);
+                GUICursor.Data.Add(Storage.List[CurrentSlotKey]);
+                Storage.List[CurrentSlotKey].Add(item);
             } 
         } 
         Audio.PlaySFX(SfxID.Item);
@@ -87,7 +80,7 @@ public class GUIChest : GUIStorage
     }
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.Set(itemSlot.GetItemInfo(false));
+        GUIMain.Cursor.Set(itemSlot.ToString(false));
         // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
     }
 }

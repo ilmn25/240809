@@ -106,33 +106,30 @@ public partial class Entity
         public static void AddItem(ID stringID)
         {
                 Dictionary.Add(stringID, Item); 
-        } 
-        
+        }
+
         public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true)
         {
-                int stackSize = global::Item.GetItem(id).StackSize;
+                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn);
+        }
 
-                while (count > 0)
+        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int Amount = 999)
+        { 
+                while (!slot.isEmpty())
                 {
-                        int spawnCount = Mathf.Min(count, stackSize);
-                        count -= spawnCount;
-
                         GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
                         gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + Item.SpawnOffset;
 
-                        EntityMachine currentEntityMachine = (EntityMachine)
-                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(Dictionary[id].Machine));
+                        EntityMachine currentEntityMachine = 
+                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>());
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
 
-                        ItemInfo itemInfo = (ItemInfo)CreateInfo(id, worldPosition + Item.SpawnOffset);
-                        itemInfo.item = new ItemSlot
-                        {
-                                ID = id,
-                                Stack = spawnCount,
-                        };
+                        ItemInfo itemInfo = (ItemInfo)CreateInfo(slot.ID, worldPosition + Item.SpawnOffset);
+                        itemInfo.item = new ItemSlot();
+                        itemInfo.item.Add(slot, Amount);
+                        
                         itemInfo.StackOnSpawn = stackOnSpawn;
                         currentEntityMachine.Initialize(itemInfo);
-                         
                 }
         }
 

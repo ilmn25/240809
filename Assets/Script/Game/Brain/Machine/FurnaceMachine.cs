@@ -3,9 +3,9 @@ public class FurnaceMachine: ConverterMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(3);
-        storage.AddItem(ID.Charcoal);   
-        storage.AddItem(ID.Slag);    
-        storage.AddItem(ID.Steel);    
+        storage.CreateAndAddItem(ID.Charcoal);   
+        storage.CreateAndAddItem(ID.Slag);    
+        storage.CreateAndAddItem(ID.Steel);    
         return new ConverterInfo()
         {
             Health = 500,
