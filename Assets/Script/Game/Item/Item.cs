@@ -81,6 +81,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 4f,
             range: 7f,
+            durability: -1,
             materials: new Dictionary<ID, int> { { ID.Log, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
@@ -318,7 +319,7 @@ public partial class Item
         float speed = 1,
         float range = 1,
         ProjectileInfo projectileInfo = null,
-        int durability = 0,
+        int durability = 200,
         StatusEffect statusEffect = null,
         Vector2 holdoutOffset = new Vector2(),
         int rotationOffset = 0,

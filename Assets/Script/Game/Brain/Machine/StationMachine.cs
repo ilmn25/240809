@@ -3,11 +3,11 @@ public class StationMachine: CraftingMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        storage.AddItem(ID.Blueprint);   
-        storage.AddItem(ID.Workbench);
-        storage.AddItem(ID.Sawmill);
-        storage.AddItem(ID.Stonecutter);
-        storage.AddItem(ID.Furnace); 
+        storage.CreateAndAddItem(ID.Blueprint);   
+        storage.CreateAndAddItem(ID.Workbench);
+        storage.CreateAndAddItem(ID.Sawmill);
+        storage.CreateAndAddItem(ID.Stonecutter);
+        storage.CreateAndAddItem(ID.Furnace); 
         return new ContainerInfo()
         {
             Health = 500,
@@ -23,8 +23,8 @@ public class AnvilMachine: CraftingMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        storage.AddItem(ID.SteelSword);
-        storage.AddItem(ID.MetalAxe);
+        storage.CreateAndAddItem(ID.SteelSword);
+        storage.CreateAndAddItem(ID.MetalAxe);
         return new ContainerInfo()
         {
             Health = 500,

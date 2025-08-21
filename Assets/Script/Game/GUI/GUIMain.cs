@@ -49,10 +49,10 @@ public class GUIMain
         {
             Name = "Crafting",
         };
-        storage.AddItem(ID.Station);
-        storage.AddItem(ID.StoneHatchet);
-        storage.AddItem(ID.Hammer);
-        storage.AddItem(ID.Campfire);
+        storage.CreateAndAddItem(ID.Station);
+        storage.CreateAndAddItem(ID.StoneHatchet);
+        storage.CreateAndAddItem(ID.Hammer);
+        storage.CreateAndAddItem(ID.Campfire);
         HandCrafting = new GUICraft()
         {
             Storage = storage,

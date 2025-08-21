@@ -19,7 +19,7 @@ public partial class Item
     public float Speed;
     public float Range;
     public ProjectileInfo ProjectileInfo;
-    public int Durability;
+    public int Durability = -1;
     public StatusEffect StatusEffect; 
     public float ProjectileOffset;
     public Vector2 HoldoutOffset;
@@ -33,5 +33,5 @@ public partial class Item
         string rawName = StringID.ToString();
         return System.Text.RegularExpressions.Regex.Replace(rawName, "(?<!^)([A-Z])", " $1").ToLower();
     }
-
+ 
 }

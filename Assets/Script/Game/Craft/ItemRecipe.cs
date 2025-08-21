@@ -40,9 +40,8 @@ public partial class ItemRecipe
     {
         TakeIngredients(stringID);
         
-        ItemSlot craftedItem = new ItemSlot();
+        ItemSlot craftedItem = new ItemSlot(stringID, Dictionary[stringID].Stack);
         
-        craftedItem.SetItem(Dictionary[stringID].Stack, stringID, null, false);
         if (isCursor && (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem)))
         {
             GUICursor.Data.Add(craftedItem);
@@ -51,7 +50,7 @@ public partial class ItemRecipe
         
         if (craftedItem.Stack > 0)
         { 
-            Game.PlayerInfo.Storage.AddItem(stringID, 1, Game.PlayerInfo.Storage.Key);
+            Game.PlayerInfo.Storage.AddItem(craftedItem, Game.PlayerInfo.Storage.Key);
             Inventory.RefreshInventory();
         }  
     }

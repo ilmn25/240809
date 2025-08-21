@@ -30,7 +30,7 @@ public class GUIConverter : GUIStorage
     
     protected override void SetInfoPanel(ItemSlot itemSlot)
     { 
-        GUIMain.Cursor.Set(itemSlot.GetItemInfo(true));
+        GUIMain.Cursor.Set(itemSlot.ToString(true));
         // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(true));
     }
 }

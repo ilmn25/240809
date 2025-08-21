@@ -101,7 +101,7 @@ public class Loot
                 if (Random.value <= entry.Chance)
                 {
                     ID itemID = items[Random.Range(0, items.Count)];
-                    storage.AddItem(itemID);
+                    storage.CreateAndAddItem(itemID);
                 }
             } 
         }

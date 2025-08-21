@@ -44,8 +44,8 @@ public class Storage
         {
                 foreach (ItemSlot itemSlot in List)
                 {
-                        if (itemSlot.Stack == 0) continue;
-                        Entity.SpawnItem(itemSlot.ID, Vector3Int.FloorToInt(position), itemSlot.Stack);
+                        if (itemSlot.isEmpty()) continue;
+                        Entity.SpawnItem(itemSlot, Vector3Int.FloorToInt(position));
                 }
                 Dictionary.Remove(ID);
         }
@@ -87,54 +87,38 @@ public class Storage
                 } 
                 // RefreshInventory();
         }
-                
-        public void AddItem(ID stringID, int quantity = 1, int priority = 0)
-        {   
-                int maxStackSize = Item.GetItem(stringID).StackSize;
-                
-                // First try to add to the current slot
-                if (List[priority].ID == stringID && List[priority].Stack < maxStackSize)
-                {
-                        int addableAmount = Math.Min(quantity, maxStackSize - List[priority].Stack);
-                        List[priority].Stack += addableAmount;
-                        quantity -= addableAmount;
 
-                        if (quantity <= 0)
-                        {
-                                // RefreshInventory();
-                                return;
-                        }
+        public void CreateAndAddItem(ID stringID, int count = 1)
+        {
+               AddItem(new ItemSlot(stringID, count));
+        }
+
+        public void AddItem(ItemSlot newItemSlot, int priority = 0)
+        {    
+                if (List[priority].isSame(newItemSlot))
+                { 
+                        List[priority].Add(newItemSlot);
+                        if (newItemSlot.isEmpty()) return;
                 }
 
-                // Try to add to existing slots with the same item
                 foreach (var slot in List)
                 {
-                        if (slot.ID == stringID && slot.Stack < maxStackSize)
+                        if (slot.isSame(newItemSlot))
                         {
-                                int addableAmount = Math.Min(quantity, maxStackSize - slot.Stack);
-                                slot.Stack += addableAmount;
-                                quantity -= addableAmount;
-
-                                if (quantity <= 0)
-                                { 
-                                        // RefreshInventory();
-                                        return;
-                                }
+                                slot.Add(newItemSlot);
+                                if (newItemSlot.isEmpty()) return;
                         }
                 }
 
-                // If there's still quantity left, find new slots
-                while (quantity > 0)
+                while (!newItemSlot.isEmpty())
                 { 
                         int slotID = GetEmptySlot();
                         if (slotID == -1)
                         {
-                                Entity.SpawnItem(stringID, info.position, quantity);
+                                Entity.SpawnItem(newItemSlot, info.position);
                                 break;
-                        }
-                        int addableAmount = Math.Min(quantity, maxStackSize - List[slotID].Stack);
-                        List[slotID].SetItem(List[slotID].Stack + addableAmount, stringID, List[slotID].Modifier, List[slotID].Locked);
-                        quantity -= addableAmount;
+                        } 
+                        List[slotID].Add(newItemSlot);
                 }
 
                 // RefreshInventory();
