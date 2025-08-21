@@ -35,7 +35,7 @@ public class GUICraft : GUIStorage
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     { 
-        GUIMain.Cursor.Set(itemSlot.ToString(true));
+        GUIMain.Cursor.Set(itemSlot, true);
         // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(true));
     }
 }

@@ -3,5 +3,5 @@ using UnityEngine;
 
 public class PlayerTask
 {
-    public static List<StructureInfo> Pending = new ();
+    public static List<StructureInfo> Pending = new (); //TODO save
 }

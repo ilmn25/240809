@@ -16,7 +16,7 @@ public class MobSpawner
     public static void Update()
     {
         timer++;
-        if (timer == 6000)
+        if (timer == 12000)
         {
             timer = 0;
             float angle = Random.Range(0f, Mathf.PI * 2f);

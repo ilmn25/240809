@@ -16,19 +16,18 @@ public class  GUIStorage : GUI
     public int RowAmount = 1;
     public int SlotAmount = 9;
     private string Name => Storage.Name ?? Storage.info.stringID.ToString();
-    protected int CurrentSlotKey = -1; 
-    private TextMeshProUGUI _text;
+    protected int CurrentSlotKey = -1;  
 
     private void OnRefresh(object sender, EventArgs e)
     {
         if (Storage != null)
-            _text.text = Name;
+            Text.text = Name;
     }
     public new void Initialize()
     {  
         GameObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
             Game.GUIInv.transform);
-        _text = GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        Text = GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
         GameObject.GetComponent<HoverModule>().GUI = this;
         Rect = GameObject.GetComponent<RectTransform>();
         base.Initialize();
