@@ -38,7 +38,7 @@ public class Loot
         loot.Add(0.5f, 1, ID.Log); 
         
         loot = CreateTable(ID.Megumin);
-        loot.Add(0.1f, 1, ID.Sword, ID.DiamondAxe); 
+        loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
         
         loot = CreateTable(ID.Chito);
         loot.Add(0.7f, 10, ID.Bullet); 
@@ -46,6 +46,8 @@ public class Loot
         
         loot = CreateTable(ID.SnareFlea);
         loot.Add(0.5f, 6, ID.Sticks); 
+        loot = CreateTable(ID.Slime);
+        loot.Add(1, 2, ID.Slag); 
         
         loot = CreateTable(ID.Yuuri);
         loot.Add(0.7f, 10, ID.Bullet);  

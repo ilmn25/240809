@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public enum HitboxType {Friendly, Enemy, Passive, All}
+public enum HitboxType {Friendly, Enemy, Passive, All,
+    Player
+}
 public class Projectile : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;

@@ -82,7 +82,7 @@ public class NavMap
         int entityY = Mathf.FloorToInt(position.y);
         int entityZ = Mathf.FloorToInt(position.z);
 
-        Vector3Int bounds = entity.Bounds;
+        Vector3Int bounds = Vector3Int.FloorToInt(entity.Bounds);
         int entityEndX = entityX + bounds.x;
         int entityEndY = entityY + bounds.y;
         int entityEndZ = entityZ + bounds.z;

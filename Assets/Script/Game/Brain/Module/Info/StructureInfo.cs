@@ -20,23 +20,23 @@ public class StructureInfo : Info
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.SourceInfo.Equipment.ProjectileInfo.OperationType != operationType ||
-            projectile.SourceInfo.Equipment.ProjectileInfo.Breaking < threshold ||
-            projectile.SourceInfo.TargetHitboxType != HitboxType.Passive)
-        {
-            projectile.SourceInfo.Target = this;
-            projectile.SourceInfo.ActionType = IActionType.Hit;;
-            return true;
-        } 
-        return false;
+        if (projectile.SourceInfo.TargetHitboxType == HitboxType.Player ||
+            projectile.SourceInfo.Equipment.ProjectileInfo.OperationType != operationType ||
+            projectile.SourceInfo.Equipment.ProjectileInfo.Breaking < threshold)
+        { 
+            return false;
+        }  
+        projectile.SourceInfo.Target = this;
+        projectile.SourceInfo.ActionType = IActionType.Hit;;
+        return true;
         // if (!PlayerTask.Pending.Contains(this)) PlayerTask.Pending.Add(this) 
     }
 
     public override void AbstractHit(MobInfo info)
     {
-        if (info.Equipment.ProjectileInfo.OperationType != operationType || 
-            info.Equipment.ProjectileInfo.Breaking < threshold || 
-            info.TargetHitboxType != HitboxType.Passive) return;
+        if ( info.TargetHitboxType == HitboxType.Player ||
+             info.Equipment.ProjectileInfo.OperationType != operationType || 
+             info.Equipment.ProjectileInfo.Breaking < threshold) return;
         
         Health -= info.Equipment.ProjectileInfo.Breaking;
         if (Health <= 0)

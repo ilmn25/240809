@@ -30,7 +30,10 @@ public class MobInfo : DynamicInfo
     public int PathFall = 15;
     public int PathAir = 4;
     public int PathAmount = 3000;
-    public int MaxStuckCount = 250;
+    public int MaxStuckCount = 250; 
+    public int PointLostDistance = 5;
+    public int NormalSkipAmount = 1;
+    public bool MustLandFirst = false;
     public HitboxType TargetHitboxType;
  
     [NonSerialized] public Item Equipment;

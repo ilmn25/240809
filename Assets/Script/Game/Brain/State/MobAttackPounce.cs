@@ -7,14 +7,17 @@ public class MobAttackPounce : MobState
             Damage = 1,
             Knockback = 10,
             CritChance = 0.1f,
-            Radius = 0.7f,
+            Radius = 0.3f,
         };
 
     private int _delay = 0;
+    private bool _jumpCheck = false;
+    private int _pounceCount = 0;
+    public int Pounces = 5;
 
-    public override void Initialize()
+    public MobAttackPounce(int pounces)
     {
-        _delay = 0;
+        Pounces = pounces;
     }
 
     public override void OnEnterState()
@@ -28,16 +31,27 @@ public class MobAttackPounce : MobState
 
     public override void OnUpdateState()    
     {
-        _delay++;
-        if (_delay > 370)
-        {
-            Machine.SetState<DefaultState>();
-            _delay = 0;
-        }
-        else if (_delay > 30)
+        _delay++; 
+        if (_delay > 5)
         {
             Projectile.Spawn(Info.SpriteToolTrack.position,Info.AimPosition,
                 _projectileInfo, Info.TargetHitboxType, Info);
-        } 
+        }
+
+        if (Info.IsGrounded)
+        {
+            if (!_jumpCheck)
+            {
+                _jumpCheck = true;
+                _pounceCount++;
+                if (_pounceCount == Pounces)
+                {
+                    _pounceCount = 0;
+                    _delay = 0;
+                    Machine.SetState<DefaultState>();
+                }
+            } 
+        }
+        else _jumpCheck = false;
     }
 }

@@ -23,7 +23,7 @@ public class AnvilMachine: CraftingMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        storage.AddItem(ID.Sword);
+        storage.AddItem(ID.SteelSword);
         storage.AddItem(ID.MetalAxe);
         return new ContainerInfo()
         {

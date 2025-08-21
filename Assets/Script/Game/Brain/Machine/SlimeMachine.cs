@@ -1,56 +1,65 @@
- 
+using UnityEditor;
 using UnityEngine;
 
- 
-
-public class BugMachine : MobMachine
+public class SlimeMachine : MobMachine
 {   
+    private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
+        Damage = 1,
+        Knockback = 10,
+        CritChance = 0.1f,
+        Radius = 0.7f,
+    };
+    
     public static Info CreateInfo()
     {
         return new EnemyInfo()
         {
-            HealthMax = 15,
+            HealthMax = 16,
             Defense = 1,
-            DistAttack = 8,
-            PathJump = 2,
+            DistAttack = 3,
+            PathJump = 3,
             PathAir = 6,
-            SpeedGround = 14,
-            SpeedAir = 10,
-            JumpVelocity = 12,
+            DistRoam = 15,
+            DistStrafe = 3,
+            SpeedGround = 0,
+            SpeedLogic = 2,
+            SpeedAir = 14,
+            JumpVelocity = 15,
+            DecelerationTime = 0,
+            AccelerationTime = 0.1f,
+            NormalSkipAmount = 3,
+            MustLandFirst = true,
+            MaxStuckCount = 700,
+            PointLostDistance = 7,
+            
         };
     }
     public override void OnStart()
     { 
-        AddModule(new GroundMovementModule());
+        AddModule(new SlimeMovementModule());
         AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());
         AddModule(new SpriteOrbitModule());
 
         AddState(new MobIdle());
         AddState(new MobChase());
-        AddState(new MobStrafe());
         AddState(new MobRoam());
-        AddState(new MobAttackPounce(5));
+        AddState(new MobAttackPounce(1));
     }
+
 
     public override void OnUpdate()
     {
         HandleInput();
-
+ 
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)
-            {
+            { 
                 if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
-                    if (Random.value < 0.2f)
-                        SetState<MobStrafe>();
-                    else
-                    {
-                        Info.AimPosition = Info.Target.position;
-                        SetState<MobAttackPounce>();
-                    } 
+                    Info.AimPosition = Info.Target.position;
+                    SetState<MobAttackPounce>();
                 }
                 else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
@@ -63,19 +72,14 @@ public class BugMachine : MobMachine
             }
             else
             {
-                switch (Random.Range(1,6))
+                switch (Random.Range(1,3))
                 {
                     case 1:
                         SetState<MobRoam>();
                         break;
                     case 2:
-                    case 3:
-                        SetState<MobStrafe>();
-                        break;
-                    case 4:
-                    case 5: 
                         SetState<MobIdle>();
-                        break;
+                        break;  
                 } 
             }
         }
@@ -86,6 +90,7 @@ public class BugMachine : MobMachine
         if (Input.GetKeyDown(KeyCode.Y))
         {
             Info.Target = Game.PlayerInfo;
+            Info.ActionType = IActionType.Hit;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 

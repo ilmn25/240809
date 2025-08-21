@@ -1,16 +1,18 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class DynamicInfo : Info
 {
-    private const int KnockbackInterval = 10;
+    private const int KnockbackInterval = 5;
     public HitboxType HitboxType;
     public ID CharSprite = ID.Null;
-    public string HurtSfx;
-    public string DeathSfx; 
+    public SfxID HitSfx = SfxID.HitMob;
+    public SfxID DeathSfx = SfxID.DeathPlayer; 
     public float KnockBackResistance = 1;
      
+    public float SpeedLogic = 5;
     public float SpeedGround = 5;
     public float SpeedAir = 10;  
     public float Gravity = -40f;
@@ -39,6 +41,8 @@ public class DynamicInfo : Info
     [NonSerialized] public Vector3 Velocity = Vector3.zero;
     [NonSerialized] public bool IsGrounded = false;
     [NonSerialized] public Vector3 Direction = Vector3.zero;
+    [NonSerialized] public Vector3 TargetPointPosition;
+    [NonSerialized] public bool IsInRenderRange;
     [NonSerialized] public Vector3 TargetScreenDir;
     [NonSerialized] public float SpeedCurrent;
     [NonSerialized] public float SpeedTarget = 10;
@@ -46,8 +50,13 @@ public class DynamicInfo : Info
     private static readonly Collider[] ColliderArray = new Collider[3];
     
     protected virtual void OnHit(Projectile projectile) { } 
-    protected virtual void OnUpdate() { 
-        if (Machine) position = Machine.transform.position;
+    protected virtual void OnUpdate() {
+        if (Machine)
+        {
+            position = Machine.transform.position;
+            IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
+        }
+        
 
         if (KnockbackCounter != KnockbackInterval)
         {
@@ -93,6 +102,9 @@ public class DynamicInfo : Info
         if (IframesCurrent != 0) return false;
         switch (projectile.TargetHitBoxType)
         {
+            case HitboxType.Player:  
+                if (this != Game.PlayerInfo) return false;
+                break;
             case HitboxType.Friendly: // enemy kill friendly 
                 if (HitboxType == HitboxType.Enemy) return false;
                 break;
@@ -105,7 +117,7 @@ public class DynamicInfo : Info
                 break;
         }
         IframesCurrent = Iframes; 
-        Audio.PlaySFX(SfxID.HitMob);
+        Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         OnHit(projectile);

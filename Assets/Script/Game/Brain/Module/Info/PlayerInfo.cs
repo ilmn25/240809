@@ -67,6 +67,7 @@ public class PlayerInfo : MobInfo
                     Control.MouseTarget.transform.position + Vector3.up * 0.55f :
                     Control.MousePosition + Vector3.up * 0.15f; 
                 
+                if (!IsInRenderRange) return;
                 SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
                 HandleMovement();
             }
