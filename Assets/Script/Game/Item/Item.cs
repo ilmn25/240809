@@ -205,7 +205,7 @@ public partial class Item
             speed: 2f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = "bullet",
-                Damage = 1,
+                Damage = 1000,
                 Knockback = 5,
                 CritChance = 10,
                 LifeSpan = 10000,
@@ -216,6 +216,7 @@ public partial class Item
             },
             materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
             projectileOffset: 1.54f,
+            durability: -1,
             holdoutOffset: new Vector2(0.4f, 0)
         );
 

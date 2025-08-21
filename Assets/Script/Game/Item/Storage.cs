@@ -37,7 +37,7 @@ public class Storage
                 }
                 if (targetKey == -1) return false;
                 Key = targetKey;
-                ((MobInfo)info).SetEquipment(List[Key].ID);
+                ((MobInfo)info).SetEquipment(List[Key]);
                 return true;
         }
         public void Explode(Vector3 position)

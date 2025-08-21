@@ -102,7 +102,7 @@ public class PlayerTerraformModule : Module
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         SpawnBlock();
         
-        Game.PlayerInfo.Storage.RemoveItem(Game.PlayerInfo.Equipment.StringID);
+        Game.PlayerInfo.Storage.RemoveItem(Game.PlayerInfo.Equipment.ID);
     }
 
     public static void SpawnBlock()
@@ -118,7 +118,7 @@ public class PlayerTerraformModule : Module
         }
         else
         { 
-            block = Block.GetBlock(Game.PlayerInfo.Equipment.StringID);
+            block = Block.GetBlock(Game.PlayerInfo.Equipment.ID);
             info = (BlockInfo)Entity.Spawn(ID.Block, _coordinate);
             info.operationType = OperationType.Building;
             ((BlockInfo)info).blockID = block.StringID;

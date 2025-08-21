@@ -118,10 +118,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 }
                 else if (!GUIMain.IsHover)
                 {
-                    switch (Info.Equipment?.Type)
+                    switch (Info.Equipment?.Info.Type)
                     {
                         case ItemType.Tool:
-                            if (Info.Equipment.Name == "blueprint" &&
+                            if (Info.Equipment.Info.Name == "blueprint" &&
                                 Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
@@ -190,14 +190,30 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     public override void Attack()
     {
-        if (Info.Equipment.ProjectileInfo != null)
+        if (Info.Equipment == null)
         {
-            if (Info.Equipment.ProjectileInfo.Ammo != ID.Null && 
-                Info.Storage.GetAmount(Info.Equipment.ProjectileInfo.Ammo) == 0) return;
-            Info.Storage.RemoveItem(Info.Equipment.ProjectileInfo.Ammo);
-        } 
-        // if (Info.Eq != -1) durabilty--; and delete
+            Info.Target = null;
+            return;
+        }
+        
+        if (Info.Equipment.Info.ProjectileInfo != null)
+        {
+            if (Info.Equipment.Info.ProjectileInfo.Ammo != ID.Null && 
+                Info.Storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
+            Info.Storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
+        }
+
         base.Attack();
+        
+        if (Info.Equipment.Durability != -1)
+        {
+            Info.Equipment.Durability--;
+            if (Info.Equipment.Durability == 0)
+            {
+                Info.Equipment.clear();
+                Info.SetEquipment(null);
+            } 
+        }  
     }
     public void OnDrawGizmos()
     {

@@ -109,17 +109,18 @@ public abstract class PathingModule : MobModule
             _nextPointQueued = -1;
             _targetPositionPrevious = GetTargetPosition();
         }
-
+        
         if (!IsTargetReached() && Path != null && NextPoint < Path.Count)
         {
             if (!Info.IsInRenderRange)
             {
-                if ( NextPoint < Path.Count -1 && Machine.transform.position == Path[NextPoint].Position) NextPoint++;
-                Info.TargetPointPosition = Path[NextPoint].Position;
-                Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized; 
+                Info.TargetPointPosition = Path[NextPoint].Position + Vector3.up * 0.1f;
+                Info.Direction = (Info.TargetPointPosition - Machine.transform.position).normalized; 
+                if ( NextPoint < Path.Count -1 && Machine.transform.position == Info.TargetPointPosition) NextPoint++; 
             }
             else
                 HandleMovePoint(); 
+            
         } 
     }
     
@@ -153,7 +154,7 @@ public abstract class PathingModule : MobModule
                 try
                 {
 
-                    if (NextPoint < Path.Count && Path[NextPoint].IsFloat &&
+                    if (NextPoint < Path.Count - 1 && Path[NextPoint].IsFloat &&
                         Path[NextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
                         (Path[NextPoint + 1].Direction.x == Path[NextPoint].Direction.x ||
                          Path[NextPoint + 1].Direction.z == Path[NextPoint].Direction.z))

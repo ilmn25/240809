@@ -55,6 +55,7 @@ public class EntityStaticLoad
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
             ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  
+            info.IsInRenderRange = true;
             currentEntityMachine.Initialize(info);
         }
         activeEntities.Clear();

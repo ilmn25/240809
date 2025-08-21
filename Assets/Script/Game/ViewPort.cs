@@ -6,7 +6,7 @@ using UnityEngine;
 public class ViewPort 
 {
     public const float Distance = 26;
-    private const int FOV = 55;
+    private const int MaxFOV = 100;
     private const float TiltDegreeX = 0.15f;
     private const float TiltDegreeY = 0.2f;
     private const float PanDegree = 1f;
@@ -69,7 +69,7 @@ public class ViewPort
     {  
         // DISTANCE -= input * FOV_CHANGE_SPEED;
         _targetFOV -= input * FOVChangeSpeed;
-        _targetFOV = Mathf.Clamp(_targetFOV, 10, FOV);
+        _targetFOV = Mathf.Clamp(_targetFOV, 10, MaxFOV);
     }
     
     public static Vector2 GetRelativeDirection(Vector2 direction)
