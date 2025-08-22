@@ -58,7 +58,7 @@ public class WorldGen
             World.Inst[coordinates] = Generate(coordinates);
         }
 
-        Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 15, World.ChunkSize * Size.z / 2);
+        Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 35, World.ChunkSize * Size.z / 2);
         PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
         World.Inst[playerPos].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
