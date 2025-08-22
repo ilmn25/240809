@@ -3,34 +3,11 @@ using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public partial class SetPiece
+public class SetPiece
 {
     
-    private static Vector3Int _positionA;
-    private static Vector3Int _positionB;
-    public static void Update()
-    { 
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
-        {
-            Helper.Log("anchor A set");
-            _positionA = Vector3Int.FloorToInt(Game.Player.transform.position);
-        }
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-        {
-            Helper.Log("anchor B set");
-            _positionB = Vector3Int.FloorToInt(Game.Player.transform.position);
-        } 
-        if (Input.GetKeyDown(KeyCode.Equals))
-        {
-            Helper.Log("exported to file");
-            SaveSetPieceFile(CopySetPiece(), Scene.SetPieceName);
-        }
-        if (Input.GetKeyDown(KeyCode.Minus))
-        {
-            Helper.Log("imported to world"); 
-            PasteSetPiece(Vector3Int.FloorToInt(Game.Player.transform.position), LoadSetPieceFile(Scene.SetPieceName));
-        }
-    }
+    public static Vector3Int PositionA;
+    public static Vector3Int PositionB;
      
     public static void SaveSetPieceFile(SerializableChunk setPiece, string fileName)
     {
@@ -38,29 +15,29 @@ public partial class SetPiece
         {
             TypeNameHandling = TypeNameHandling.Auto
         });
-        string path = Path.Combine(Application.dataPath, "Resources/set", fileName + ".json");
+        string path = Path.Combine(Application.dataPath, "Resources/Set", fileName + ".json");
         File.WriteAllText(path, json);
     }
 
     public static SerializableChunk LoadSetPieceFile(string fileName)
     { 
-        TextAsset textAsset = Resources.Load<TextAsset>("set/" + fileName);
+        TextAsset textAsset = Resources.Load<TextAsset>("Set/" + fileName);
         return JsonConvert.DeserializeObject<SerializableChunk>(textAsset.text, new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.Auto
         });
     }
     
-    public static SerializableChunk CopySetPiece()
+    public static void CopyAndSave(string name)
     {
         EntityStaticLoad.UnloadWorld();
         EntityDynamicLoad.UnloadWorld();
-        int minX = Mathf.Min(_positionA.x, _positionB.x);
-        int minY = Mathf.Min(_positionA.y, _positionB.y);
-        int minZ = Mathf.Min(_positionA.z, _positionB.z);
-        int maxX = Mathf.Max(_positionA.x, _positionB.x);
-        int maxY = Mathf.Max(_positionA.y, _positionB.y);
-        int maxZ = Mathf.Max(_positionA.z, _positionB.z);
+        int minX = Mathf.Min(PositionA.x, PositionB.x);
+        int minY = Mathf.Min(PositionA.y, PositionB.y);
+        int minZ = Mathf.Min(PositionA.z, PositionB.z);
+        int maxX = Mathf.Max(PositionA.x, PositionB.x);
+        int maxY = Mathf.Max(PositionA.y, PositionB.y);
+        int maxZ = Mathf.Max(PositionA.z, PositionB.z);
 
         SerializableChunk setPiece = new SerializableChunk(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
         Vector3Int min = new Vector3Int(minX, minY, minZ);
@@ -113,11 +90,12 @@ public partial class SetPiece
                 }
             }
         }
-        return setPiece; 
+        SaveSetPieceFile(setPiece, name);
     }
     
-    public static void PasteSetPiece(Vector3Int position, SerializableChunk setPiece)
+    public static void LoadAndPaste(Vector3Int position, string name)
     { 
+        SerializableChunk setPiece = LoadSetPieceFile(name);
         Vector3Int chunkPos, worldPos, blockPos;
         
         foreach (SetEntity entity in setPiece.StaticEntity)

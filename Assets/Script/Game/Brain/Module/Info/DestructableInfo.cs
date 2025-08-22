@@ -1,6 +1,6 @@
  
 [System.Serializable]
-public class ResourceInfo : StructureInfo
+public class ResourceInfo : SpriteStructureInfo
 {
     public override void Initialize()
     {

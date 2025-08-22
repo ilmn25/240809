@@ -3,6 +3,15 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public enum OperationType { Mining, Building, Breaking, None }
+
+[System.Serializable]
+public class SpriteStructureInfo : StructureInfo
+{
+    public override void Initialize()
+    {
+        SpriteRenderer = Machine.transform.Find("Sprite").GetComponent<SpriteRenderer>();
+    }
+}
 [System.Serializable]
 public class StructureInfo : Info
 {
@@ -12,11 +21,7 @@ public class StructureInfo : Info
     public SfxID SfxDestroy;
     public ID Loot;
     public OperationType operationType;
-    [NonSerialized] public SpriteRenderer SpriteRenderer;
-    public override void Initialize()
-    {
-        SpriteRenderer = Machine.transform.Find("Sprite").GetComponent<SpriteRenderer>();
-    }
+    [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
     public override bool OnHitInternal(Projectile projectile)
     {

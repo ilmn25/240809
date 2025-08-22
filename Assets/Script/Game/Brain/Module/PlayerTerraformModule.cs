@@ -107,6 +107,18 @@ public class PlayerTerraformModule : Module
 
     public static void SpawnBlock()
     {
+        if (Game.BuildMode)
+        {
+            if (_block.name == "overlay")
+                World.SetBlock(_coordinate);
+            else
+            {
+                Game.PlayerInfo.Storage.CreateAndAddItem(Game.PlayerInfo.Equipment.ID);
+                World.SetBlock(_coordinate, Block.ConvertID(Game.PlayerInfo.Equipment.ID)); 
+            }
+            return;
+        }
+        
         StructureInfo info;
         Block block;
         if (_block.name == "overlay")
@@ -137,7 +149,7 @@ public class PlayerTerraformModule : Module
     public static void HandleMapBreak()
     {
         _coordinate = OffsetPosition(true, _position, _direction);
-        if (PendingBlocks.Contains(_coordinate)) return;
+        if (PendingBlocks.Contains(_coordinate)) return; 
         SpawnBlock();
     }
     

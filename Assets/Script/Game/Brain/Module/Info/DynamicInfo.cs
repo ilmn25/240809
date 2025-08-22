@@ -51,7 +51,7 @@ public class DynamicInfo : Info
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() {
         if (Machine)
-        {
+        { 
             position = Machine.transform.position;
             IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
         }

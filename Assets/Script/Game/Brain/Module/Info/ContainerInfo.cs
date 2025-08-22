@@ -1,5 +1,5 @@
 [System.Serializable]
-public class ContainerInfo : StructureInfo
+public class ContainerInfo : SpriteStructureInfo
 {
     public Storage Storage;
     public override void Initialize()

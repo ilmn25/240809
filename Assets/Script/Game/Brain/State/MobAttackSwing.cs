@@ -5,7 +5,7 @@ class MobAttackSwing : MobState {
     private Item _equipment;
     public override void OnEnterState()
     { 
-        Info.Animator.speed = 1f; 
+        Info.Animator.speed = 1f;  
         Info.Animator.Play("EquipSwing", 0, 0f);   
         _equipment = Info.Equipment.Info;
         if (Info.Equipment.Info.ProjectileInfo != null) Projectile.Spawn(Info.SpriteToolTrack.transform.position, Info.AimPosition,

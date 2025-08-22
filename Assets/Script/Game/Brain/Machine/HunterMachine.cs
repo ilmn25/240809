@@ -36,8 +36,7 @@ public class HunterMachine : MobMachine
     
     public override void OnUpdate()
     {
-        HandleInput();
-        
+        HandleInput(); 
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)

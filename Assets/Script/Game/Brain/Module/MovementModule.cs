@@ -68,6 +68,8 @@ public abstract class MovementModule : DynamicModule
     
     protected void HandleMove()
     { 
+        if (Game.BuildMode && Info != Game.PlayerInfo) NewPosition = Machine.transform.position;
+        
         if (Info.Velocity.y > Info.Gravity) //terminal velocity
         {
             Info.Velocity.y += Info.Gravity * DeltaTime;

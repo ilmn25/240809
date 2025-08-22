@@ -11,14 +11,14 @@ public class EnemyInfo : MobInfo
         // _textMeshPro = Machine.transform.Find("text").GetComponent<TextMeshPro>();
         Health = HealthMax;
         HitboxType = HitboxType.Enemy;
-        TargetHitboxType = HitboxType.Player;
-        Target = Game.PlayerInfo;
+        TargetHitboxType = HitboxType.Player; 
         ActionType = IActionType.Hit;
+        // Target = Game.PlayerInfo;
     }
 
     protected override void OnUpdate()
-    {
-        base.OnUpdate();
+    { 
+        base.OnUpdate(); 
         // _textMeshPro.text = Health.ToString();
         FaceTarget = Target != null;
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
