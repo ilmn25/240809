@@ -21,14 +21,14 @@ public partial class Block
     
     public static Material MeshMaterial; 
     public static Material ShadowMeshMaterial;
-    public const string MeshMaterialPath = "shader/material/custom_lit";
+    public const string MeshMaterialPath = "Shader/Material/CustomLit";
 
     public static void Initialize()
     {
         Colx = new NativeArray<int>(new[] {0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176}, Allocator.Persistent);
         Rowy = new NativeArray<int>(new[] {112, 96, 80, 64, 48, 32, 16, 0}, Allocator.Persistent);  
         
-        ShadowMeshMaterial = new(Resources.Load<Material>("shader/material/custom_shadow"));
+        ShadowMeshMaterial = new(Resources.Load<Material>("Shader/Material/CustomShadow"));
         MeshMaterial = new(Resources.Load<Material>(MeshMaterialPath));
  
         HandleTextureAtlas();
@@ -46,7 +46,7 @@ public partial class Block
         List<Texture2D> textures = new List<Texture2D>();
         foreach (var kvp in _blockIDMap.InttoString)
         {
-            textures.Add(Resources.Load<Texture2D>($"texture/tileset/{kvp.Value}"));
+            textures.Add(Resources.Load<Texture2D>($"Texture/Tileset/{kvp.Value}"));
         } 
 
         // if too small, uv mapping will BREAK

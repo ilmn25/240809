@@ -8,7 +8,7 @@ public class Cache
 
     public static AudioClip LoadAudioClip(string path)
     {
-        string fullPath = "audio/" + path;
+        string fullPath = "Audio/" + path;
         if (AudioClipCache.TryGetValue(fullPath, out AudioClip cachedClip))
         {
             return cachedClip;
@@ -25,7 +25,7 @@ public class Cache
 
     public static Sprite LoadSprite(string path)
     {
-        string fullPath = "texture/" + path;
+        string fullPath = "Texture/" + path;
         if (SpriteCache.TryGetValue(fullPath, out Sprite cachedSprite))
         {
             return cachedSprite;

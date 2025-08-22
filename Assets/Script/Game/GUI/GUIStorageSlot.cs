@@ -14,8 +14,8 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private void Start()
     {
         GUIStorage.OnRefreshSlot += OnRefreshSlot;
-        _image = transform.Find("image").GetComponent<Image>();
-        _text = transform.Find("text").GetComponent<TextMeshProUGUI>();
+        _image = transform.Find("Image").GetComponent<Image>();
+        _text = transform.Find("Text").GetComponent<TextMeshProUGUI>();
     }
 
     private void OnRefreshSlot(object sender, EventArgs e)
@@ -24,7 +24,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         ItemSlot slot = GUIStorage.Storage.List[slotNumber];
         if (slot.Stack != 0)
         {
-            _image.sprite =Cache.LoadSprite("sprite/" + slot.ID);
+            _image.sprite =Cache.LoadSprite("Sprite/" + slot.ID);
             _image.color = Color.white;
             _text.text = slot.Stack.ToString();
         }

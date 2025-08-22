@@ -7,7 +7,7 @@ public class ConstructionMachine : EntityMachine, IActionPrimaryResource
     }
     public override void OnStart()
     {
-        Info.SpriteRenderer.sprite = Cache.LoadSprite("sprite/construction");
+        Info.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/Construction");
         AddModule(new StructureSpriteCullModule()); 
         AddModule(new SpriteOrbitModule()); 
     }

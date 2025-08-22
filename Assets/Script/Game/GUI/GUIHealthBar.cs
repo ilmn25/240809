@@ -18,7 +18,7 @@ public class GUIHealthBar
                 GameObject heart;
                 for (int i = 0; i < Game.PlayerInfo.HealthMax / 2; i++)
                 {
-                        heart = Object.Instantiate(Resources.Load<GameObject>("prefab/gui_heart"), rectTransform);
+                        heart = Object.Instantiate(Resources.Load<GameObject>("Prefab/GUIHeart"), rectTransform);
                         RectTransform heartRect = heart.GetComponent<RectTransform>();
 
                         // Set anchored position relative to parent
@@ -36,15 +36,15 @@ public class GUIHealthBar
                         int target = i * 2 + 2; 
                         if (target <= Game.PlayerInfo.Health)
                         {
-                                HealthBar[i].sprite = Cache.LoadSprite("sprite/heartfull");
+                                HealthBar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartFull");
                         }
                         else if (target - 1 <= Game.PlayerInfo.Health)
                         {
-                                HealthBar[i].sprite = Cache.LoadSprite("sprite/hearthalf");
+                                HealthBar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartHalf");
                         }
                         else
                         {
-                                HealthBar[i].sprite = Cache.LoadSprite("sprite/heartempty");
+                                HealthBar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartEmpty");
                         }
                 }
         }

@@ -49,7 +49,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             }
         } 
         
-        _spriteRenderer.sprite = Cache.LoadSprite("sprite/" + Info.stringID);
+        _spriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.stringID);
         AddModule(new ItemPhysicModule()); 
         AddModule(new ItemSpriteCullModule()); 
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);

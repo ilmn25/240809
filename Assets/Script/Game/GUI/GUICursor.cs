@@ -19,10 +19,10 @@ public class GUICursor : GUI
         Rect = Game.GUICursor.GetComponent<RectTransform>();
         GameObject = Game.GUICursorInfo;
         base.Initialize();        
-        _infoSlotText = Game.GUICursorInfo.transform.Find("info").GetComponent<TextMeshProUGUI>(); 
-        Text = Game.GUICursorInfo.transform.Find("text").GetComponent<TextMeshProUGUI>(); 
-        _cursorSlotText = Game.GUICursorSlot.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        _cursorSlotImage = Game.GUICursorSlot.transform.Find("image").GetComponent<Image>();
+        _infoSlotText = Game.GUICursorInfo.transform.Find("Info").GetComponent<TextMeshProUGUI>(); 
+        Text = Game.GUICursorInfo.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
+        _cursorSlotText = Game.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        _cursorSlotImage = Game.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
     }
 
     public void Update()

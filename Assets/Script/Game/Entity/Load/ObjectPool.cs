@@ -16,7 +16,7 @@ public class ObjectPool
         }
         else
         {
-            obj = Object.Instantiate(Resources.Load<GameObject>($"prefab/{prefabName}"));
+            obj = Object.Instantiate(Resources.Load<GameObject>($"Prefab/{prefabName}"));
             obj.name = stringID.ToString();
         } 
 

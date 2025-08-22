@@ -15,7 +15,7 @@ public class StructureInfo : Info
     [NonSerialized] public SpriteRenderer SpriteRenderer;
     public override void Initialize()
     {
-        SpriteRenderer = Machine.transform.Find("sprite").GetComponent<SpriteRenderer>();
+        SpriteRenderer = Machine.transform.Find("Sprite").GetComponent<SpriteRenderer>();
     }
 
     public override bool OnHitInternal(Projectile projectile)

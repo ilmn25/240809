@@ -22,9 +22,6 @@ public class MapCull
     private enum CullMode { On, Off, Auto}
     private static CullMode _currentCullMode = CullMode.Auto;
     
-    private static GameObject LightIndoor;
-    private static GameObject LightSelf;
-    private static Volume Volume;
     private static readonly Vector3 ForwardDirection = Quaternion.Euler(AngleOffset, 5, 0) * Vector3.up;
     private static readonly Vector3 BackwardDirection = Quaternion.Euler(-AngleOffset, 5, 0) * Vector3.up;
     private static readonly Vector3 LeftDirection = Quaternion.Euler(0, 5, -AngleOffset) * Vector3.up;
@@ -36,13 +33,7 @@ public class MapCull
     {
         new CoroutineTask(YCheckRoutine());
         ViewPort.OnOrbitRotate += HandleObstructionCheck; 
- 
         _chunkPositionPrevious = Scene.PlayerChunkPosition;
-
-        LightIndoor = Game.ViewPortObject.transform.Find("light_indoor").gameObject;
-        LightSelf = Game.ViewPortObject.transform.Find("light_self").gameObject;   
-        Volume = Game.CameraObject.gameObject.GetComponent<Volume>();
-        
         HandleLight(false); 
     }
     
@@ -153,9 +144,9 @@ public class MapCull
 
     static void HandleLight(bool flag)
     {
-        LightIndoor.SetActive(flag);
-        LightSelf.SetActive(flag); 
-        Volume.profile = flag? Resources.Load<VolumeProfile>("shader/preset/volume_indoor") : Resources.Load<VolumeProfile>("shader/preset/volume_outdoor"); 
+        Game.LightIndoor.SetActive(flag);
+        Game.LightSelf.SetActive(flag); 
+        Game.Volume.profile = flag? Resources.Load<VolumeProfile>("Shader/Preset/VolumeIndoor") : Resources.Load<VolumeProfile>("Shader/Preset/VolumeOutdoor"); 
     }
 
     static void HandleObstructionCheck()
