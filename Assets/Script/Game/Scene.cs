@@ -11,13 +11,12 @@ using Debug = UnityEngine.Debug;
 
 public class Scene 
 { 
-    public static event Action PlayerChunkTraverse; 
-
     public static Vector3Int PlayerChunkPosition;
     private static Vector3Int _playerChunkPositionPrevious;
 
     public static readonly int RenderRange = 2;
     public static readonly int LogicRange = 4; 
+    public static readonly int GenRange = 7; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
@@ -33,14 +32,17 @@ public class Scene
     
 
     public static void Update()
-    {
+    { 
         PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
-        {  
-            PlayerChunkTraverse?.Invoke();
-            _playerChunkPositionPrevious = PlayerChunkPosition; 
+        {
+            new CoroutineTask(WorldGen.GenerateNearbyChunks(PlayerChunkPosition)); 
+            MapLoad.OnChunkTraverse(); // static is called when each chunk gets spawned per yield
+            EntityDynamicLoad.OnChunkTraverse();
+            _playerChunkPositionPrevious = PlayerChunkPosition;
         }
     }
+     
     
     public static bool InPlayerChunkRange(Vector3 position, float distance)
     {

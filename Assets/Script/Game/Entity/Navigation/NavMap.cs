@@ -5,51 +5,51 @@ using UnityEngine;
 public class NavMap
 {
     private static BitArray _bitMap;
-    private static Vector3Int _bounds; 
     private static int GetIndex(int x, int y, int z)
     {
-        return x + _bounds.x * (y + _bounds.y * z);
+        return x + World.Inst.Bounds.x * (y + World.Inst.Bounds.y * z);
     }
     private static int GetIndex(Vector3Int coordinate)
     {
-        return coordinate.x + _bounds.x * (coordinate.y + _bounds.y * coordinate.z);
+        return coordinate.x + World.Inst.Bounds.x * (coordinate.y + World.Inst.Bounds.y * coordinate.z);
     }
-    public static void GenerateNavMap()
+    
+    public static void Initialize()
     {
-        Chunk chunk;
-        _bounds = World.Inst.Bounds;
-        _bitMap = new BitArray(_bounds.x * _bounds.y * _bounds.z); 
+        _bitMap = new BitArray(World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z); 
         
-        for (int wx = 0; wx < World.Inst.Length.x; wx++)
+        for (int x = 0; x < World.Inst.Length.x; x++)
         { 
-            for (int wy = 0; wy < World.Inst.Length.y; wy++)
+            for (int y = 0; y < World.Inst.Length.y; y++)
             {
-                for (int wz = 0; wz < World.Inst.Length.z; wz++)
+                for (int z = 0; z < World.Inst.Length.z; z++)
                 {
-                    int chunkX = wx * World.ChunkSize;
-                    int chunkY = wy * World.ChunkSize;
-                    int chunkZ = wz * World.ChunkSize;
-                    chunk = World.Inst[chunkX, chunkY, chunkZ]; 
-                    if (chunk != null)
-                    { 
-                        for (int i = 0; i < World.ChunkSize; i++)
-                        {
-                            for (int j = 0; j < World.ChunkSize; j++)
-                            {
-                                for (int k = 0; k < World.ChunkSize; k++)
-                                {
-                                    Set(chunkX + i, chunkY + j, chunkZ + k, chunk[i, j, k] == 0);
-                                }
-                            }
-                        }
-                        foreach (var entity in chunk.StaticEntity)
-                        {
-                            SetEntity(Entity.Dictionary[entity.stringID], entity.position, false);
-                        }
-                    }
+                    SetChunk(new Vector3Int(x, y, z) * World.ChunkSize);
                 }
             }
         } 
+    }
+
+    public static void SetChunk(Vector3Int coordinate)
+    { 
+        Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z]; 
+        if (chunk != null)
+        { 
+            for (int x = 0; x < World.ChunkSize; x++)
+            {
+                for (int y = 0; y < World.ChunkSize; y++)
+                {
+                    for (int z = 0; z < World.ChunkSize; z++)
+                    {
+                        Set(coordinate.x + x, coordinate.y + y, coordinate.z + z, chunk[x, y, z] == 0);
+                    }
+                }
+            }
+            foreach (var entity in chunk.StaticEntity)
+            {
+                SetEntity(Entity.Dictionary[entity.stringID], entity.position, false);
+            }
+        }
     }
 
     public static Vector3Int GetRelativePosition(Vector3Int coordinate)

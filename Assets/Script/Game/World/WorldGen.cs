@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -7,24 +8,19 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-
-    public static float GetOffset()
-    {
-        return (float)Random.NextDouble() * 1000;
-    }
+    public static readonly Vector3Int Size = new Vector3Int(30, 6, 30);
+    // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
+    public static readonly Vector3Int SpawnPoint = 
+        new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 2), World.ChunkSize * 2); 
+ 
 
     protected static readonly bool SpawnStaticEntity = true;
     protected static readonly bool SpawnDynamicEntity = true;
-    protected static readonly bool Flat = false;
-    public static readonly Vector3Int Size = new Vector3Int(15, 5, 15);
+    protected static readonly bool Flat = false; 
     // private static readonly bool SpawnStaticEntity = false;
     // private static readonly bool SpawnDynamicEntity = false;
-    // private static readonly bool Flat = true;
-    // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
-     
-    protected const int WallHeight = 5;
-    protected const int FloorHeight = 2;
-  
+    // private static readonly bool Flat = true; 
+      
     
     protected static Chunk CurrentChunk;
     protected static Vector3Int CurrentCoordinate; 
@@ -32,40 +28,48 @@ public class WorldGen
     
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
+    public static float GetOffset()
+    {
+        return (float)Random.NextDouble() * 1000;
+    }
     public static void Initialize() {
         Random = new System.Random(World.Seed);
- 
     }
 
     public static void GenerateTestMap()
     { 
-        World.Inst = new World(Size.x, Size.y, Size.z);
-        List<Vector3Int> coordinatesList = new List<Vector3Int>();
-
-        for (int x = 0; x < Size.x * World.ChunkSize; x += World.ChunkSize)
+        World.Inst = new World(Size.x, Size.y, Size.z); 
+        Vector3Int position;
+        for (int x = -Scene.GenRange; x <= Scene.GenRange; x++)
         {
-            for (int y = 0; y < Size.y * World.ChunkSize; y += World.ChunkSize)
+            for (int y = -Scene.GenRange; y <= Scene.GenRange; y++)
             {
-                for (int z = 0; z < Size.z * World.ChunkSize; z += World.ChunkSize)
+                for (int z = -Scene.GenRange; z <= Scene.GenRange; z++)
                 {
-                    coordinatesList.Add(new Vector3Int(x, y, z));
+                    position = new Vector3Int(
+                        SpawnPoint.x + x * World.ChunkSize,
+                        SpawnPoint.y + y * World.ChunkSize,
+                        SpawnPoint.z + z * World.ChunkSize);
+
+                    if (World.Inst[position] == null)
+                    {
+                        Generate(position);
+                    }
                 }
             }
-        } 
-        
-        foreach (var coordinates in coordinatesList)
-        {
-            World.Inst[coordinates] = Generate(coordinates);
         }
-
-        Vector3Int playerPos = new Vector3Int(World.ChunkSize * Size.x / 2, World.ChunkSize * Size.y - 35, World.ChunkSize * Size.z / 2);
-        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
-        World.Inst[playerPos].DynamicEntity.Add(player); 
+        NavMap.Initialize();
+        
+        Vector3Int playerSpawnPoint = SpawnPoint;
+        while (!NavMap.Get(playerSpawnPoint)) playerSpawnPoint.y++; 
+        
+        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
+        World.Inst[SpawnPoint].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
         
-        player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
+        player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
         player.CharSprite = ID.Yuuri;
-        World.Inst[playerPos].DynamicEntity.Add(player); 
+        World.Inst[SpawnPoint].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
 
         // player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
@@ -108,11 +112,38 @@ public class WorldGen
         // }
     }
 
-    private static Chunk Generate(Vector3Int coordinates)
+    public static IEnumerator GenerateNearbyChunks(Vector3Int center)
+    {
+        Vector3Int position;
+        for (int x = -Scene.GenRange; x <= Scene.GenRange; x++)
+        {
+            for (int y = -Scene.GenRange; y <= Scene.GenRange; y++)
+            {
+                for (int z = -Scene.GenRange; z <= Scene.GenRange; z++)
+                {
+                    position = new Vector3Int(
+                        center.x + x * World.ChunkSize,
+                        center.y + y * World.ChunkSize,
+                        center.z + z * World.ChunkSize);
+
+                    if (World.Inst[position] == null)
+                    {
+                        Generate(position);
+                        yield return null;  
+                        NavMap.SetChunk(position);
+                        yield return null;  
+                    }
+                }
+            }
+        }
+    }
+
+    public static void Generate(Vector3Int coordinates)
     {
         CurrentCoordinate = coordinates;
         CurrentChunk = new Chunk();
-
+        World.Inst[coordinates] = CurrentChunk;
+        
         if (Flat)
         {
             if (coordinates.y == 0)
@@ -125,7 +156,7 @@ public class WorldGen
                     }
                 }
             }
-            return CurrentChunk;
+            return;
         }
         
         // Stopwatch stopwatch = new Stopwatch();
@@ -144,8 +175,6 @@ public class WorldGen
 
         // stopwatch.Stop();
         // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
-        
-        return CurrentChunk;
     }   
   
  

@@ -82,7 +82,7 @@ public class DayNightCycle
         return new Color(r / 255f, g / 255f, b / 255f);
     }
     
-    private const int Length = 2000;
+    private const int Length = 20000;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime; 
     private static int _currentTime;
@@ -102,12 +102,12 @@ public class DayNightCycle
                 SetTarget(Day);
             else
                 SetTarget(DayFog);
-        else if (_currentTime == Length * 10/24)
+        else if (_currentTime == Length * 12/24)
             if (Random.value < 0.9f)
                 SetTarget(Noon);
             else
                 SetTarget(Rapture);
-        else if (_currentTime == Length * 14/24)
+        else if (_currentTime == Length * 19/24)
             if (Random.value < 0.7f)
                 SetTarget(Night);
             else

@@ -10,8 +10,7 @@ public class Game : MonoBehaviour
 {
     public static readonly float MaxDeltaTime = 0.03f;
     
-    private const float FixedUpdateMS = 0.30f;
-     
+    private const float FixedUpdateMS = 0.30f; 
     
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;
@@ -71,7 +70,6 @@ public class Game : MonoBehaviour
         Audio.Initialize();
         Block.Initialize();   
         MapCull.Initialize(); 
-        EntityDynamicLoad.Initialize();  
         MapLoad.Initialize();
         Scene.Initialize();  
         ViewPort.Initialize();  
