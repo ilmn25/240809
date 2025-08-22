@@ -15,13 +15,13 @@ public class World
     [NonSerialized] public static World Inst;
     [NonSerialized] public static readonly int ChunkSize = 15;
      
-    private Chunk[] _chunks;
-    public List<PlayerInfo> target = new();
+    private Chunk[] _chunks; 
     public readonly Vector3Int Length;
     public readonly Vector3Int Bounds;
     public static int Seed;
  
-
+    public List<PlayerInfo> target = new();
+    
     public World(int x, int y, int z)
     {
         Bounds = new Vector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
@@ -42,6 +42,8 @@ public class World
     { 
         Inst = Helper.FileLoad<World>("World" + id);
         if (Inst == null) WorldGen.GenerateTestMap();
+        
+        NavMap.Initialize();
     }
 
     private int GetIndex(int chunkX, int chunkY, int chunkZ)

@@ -8,23 +8,15 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-    public static readonly Vector3Int Size = new Vector3Int(30, 6, 30);
+    public static readonly Vector3Int Size = new Vector3Int(15, 5, 15);
     // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
     public static readonly Vector3Int SpawnPoint = 
-        new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 2), World.ChunkSize * 2); 
+        new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
  
-
-    protected static readonly bool SpawnStaticEntity = true;
-    protected static readonly bool SpawnDynamicEntity = true;
     protected static readonly bool Flat = false; 
-    // private static readonly bool SpawnStaticEntity = false;
-    // private static readonly bool SpawnDynamicEntity = false;
-    // private static readonly bool Flat = true; 
-      
     
     protected static Chunk CurrentChunk;
     protected static Vector3Int CurrentCoordinate; 
-    protected static Chunk SetPiece; 
     
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
@@ -57,11 +49,10 @@ public class WorldGen
                     }
                 }
             }
-        }
-        NavMap.Initialize();
+        } 
         
         Vector3Int playerSpawnPoint = SpawnPoint;
-        while (!NavMap.Get(playerSpawnPoint)) playerSpawnPoint.y++; 
+        // while (!NavMap.Get(playerSpawnPoint)) playerSpawnPoint.y++; 
         
         PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
         World.Inst[SpawnPoint].DynamicEntity.Add(player); 
@@ -143,103 +134,28 @@ public class WorldGen
         CurrentCoordinate = coordinates;
         CurrentChunk = new Chunk();
         World.Inst[coordinates] = CurrentChunk;
-        
-        if (Flat)
+
+        if (!Flat)
         {
-            if (coordinates.y == 0)
-            {
-                for (int z = 0; z < World.ChunkSize; z++)
-                {
-                    for (int x = 0; x < World.ChunkSize; x++)
-                    {
-                        CurrentChunk[x, 0, z] = 1;
-                    }
-                }
-            }
+            // Stopwatch stopwatch = new Stopwatch();
+            // stopwatch.Start();
+            GenTaskStone.Run();
+            GenTaskGranite.Run();  
+            GenTaskMarble.Run();
+            GenTaskDirt.Run();
+            GenTaskSand.Run();  
+            GenTaskMaze.Run();
+            GenTaskCrater.Run(); 
+            GenTaskCaves.Run();    
+            GenTaskEntity.Run();    
+            // stopwatch.Stop();
+            // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
             return;
-        }
-        
-        // Stopwatch stopwatch = new Stopwatch();
-        // stopwatch.Start();
+        } 
 
-        GenTaskStone.Run();
-        GenTaskGranite.Run();  
-        GenTaskMarble.Run();
-        GenTaskDirt.Run();
-        GenTaskSand.Run();  
-        GenTaskMaze.Run();
-        GenTaskCrater.Run(); 
-        GenTaskCaves.Run();    
-        // HandleBlockGeneration();
-        HandleEntityGeneration(CurrentChunk, CurrentCoordinate);
-
-        // stopwatch.Stop();
-        // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
+        if (coordinates.y == 0)
+            for (int z = 0; z < World.ChunkSize; z++)
+                for (int x = 0; x < World.ChunkSize; x++)
+                    CurrentChunk[x, 0, z] = 1;
     }   
-  
- 
-    private static void HandleEntityGeneration(Chunk chunk, Vector3Int coordinates)
-    { 
-        
-        for (int x = 0; x < World.ChunkSize; x++)
-        {
-            for (int y = 0; y < World.ChunkSize; y++)
-            {
-                for (int z = 0; z <  World.ChunkSize; z++)
-                {
-                    if (
-                        y + 1 < World.ChunkSize &&
-                        chunk[x, y, z] != 0 && 
-                        chunk[x, y + 1, z] == 0) 
-                    {
-                        if (SpawnStaticEntity)
-                        {
-                            if (chunk[x, y, z] == Block.ConvertID(ID.DirtBlock))
-                            {
-                                {
-                                    double rng = Random.NextDouble();
-                                    if (rng <= 0.02)
-                                    {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Tree, coordinates + new Vector3(x, y + 1, z)));
-                                    }
-                                    else if (rng <= 0.04)
-                                    {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Bush, coordinates + new Vector3(x, y + 1, z)));
-                                    }
-                                    else if (rng <= 0.2)
-                                    {
-                                        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, coordinates + new Vector3(x, y + 1, z)));
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (Random.NextDouble() <= 0.0004)
-                                {
-                                    chunk.StaticEntity.Add(Entity.CreateInfo(ID.Chest, coordinates + new Vector3(x, y + 1, z)));
-                                } 
-                                else if (Random.NextDouble() <= 0.02)
-                                {
-                                    chunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, coordinates + new Vector3(x, y + 1, z)));
-                                }
-                            }
- 
-                        }
-                        if (SpawnDynamicEntity && Random.NextDouble() <= 0.002)
-                        { 
-                            if (Random.NextDouble() <= 0.5)
-                            {
-                                chunk.DynamicEntity.Add(Entity.CreateInfo(ID.Flint, coordinates + new Vector3Int(x, y + 1, z)));
-                            } else
-                            {
-                                chunk.DynamicEntity.Add(Entity.CreateInfo(ID.Sticks, coordinates + new Vector3Int(x, y + 1, z))); 
-                            }
-                        }
-                    } 
-                }
-            }
-        }
-    }
-     
- 
 }

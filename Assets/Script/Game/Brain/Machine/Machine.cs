@@ -85,11 +85,8 @@ public abstract class Machine : MonoBehaviour
     public virtual void Update()
     {  
         OnUpdate();  
+        
         if (StateCurrent != null) StateCurrent.OnUpdateState();
-        // foreach (Module module in Modules)
-        // {
-        //     module.Update();
-        // }
 
         for (int i = 0; i < Modules.Count; i++)
         {

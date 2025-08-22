@@ -16,7 +16,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             {
                 Name = "Inventory"
             },
-            HealthMax = 6,
+            HealthMax = 12,
             Defense = 0,
             Mana = 100,
             Sanity = 100,

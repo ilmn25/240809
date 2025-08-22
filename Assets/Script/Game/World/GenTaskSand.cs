@@ -1,18 +1,5 @@
-using UnityEngine;
-public enum BiomeType {Desert, Grass}
-public class GenBiome : WorldGen
-{
-    protected static float DrynessOffset = GetOffset();
-    protected static float Scale = 0.02f;
+using UnityEngine; 
 
-    public static BiomeType GetBiomeType(int x, int z)
-    {
-        float value = Mathf.PerlinNoise((CurrentCoordinate.x + x) * Scale + DrynessOffset, 
-            (CurrentCoordinate.z + z) * Scale + DrynessOffset);
-        if (value > 0.5f) return BiomeType.Grass;
-        return BiomeType.Desert;
-    }
-}
 public class GenTaskSand : WorldGen
 {
     private static float _x, _z, _value;

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class ConstructionInfo : StructureInfo
+public class ConstructionInfo : SpriteStructureInfo
 {
     public ID structureID; 
     public override void OnDestroy(MobInfo info)

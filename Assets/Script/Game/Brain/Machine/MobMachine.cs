@@ -7,9 +7,8 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     {
         if (Info.CharSprite == ID.Null) Info.CharSprite = Info.stringID;
         transform.Find("Sprite").Find("Char").GetComponent<SpriteRenderer>().sprite =
-            Cache.LoadSprite("Character/" + Info.CharSprite);
+            Cache.LoadSprite("Sprite/" + Info.CharSprite);
     }
-    
     
     public override void Attack()
     {  
@@ -29,7 +28,6 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
                 Info.Equipment.Info.ProjectileInfo,
                 Info.TargetHitboxType, Info);
         } 
-                    
         switch (Info.Equipment.Info.Gesture)
         {
             case ItemGesture.Swing:

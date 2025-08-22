@@ -8,4 +8,4 @@ public class StructureMachine : EntityMachine
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.stringID);
     }
-}
+} 

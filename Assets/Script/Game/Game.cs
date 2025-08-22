@@ -3,13 +3,14 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class Game : MonoBehaviour
 {
-    public static readonly float MaxDeltaTime = 0.03f;
-    
+    public const float MaxDeltaTime = 0.03f;
+    public static readonly bool BuildMode = false;
     private const float FixedUpdateMS = 0.30f; 
     
     public static LayerMask MaskMap;  
@@ -78,20 +79,20 @@ public class Game : MonoBehaviour
 
     private void Update()
     { 
-        QualitySettings.vSyncCount = 0;
+        QualitySettings.vSyncCount = 0; // fps limit doesnt work if not, somewhere something is setting it to 1
         if (Control.Inst.Pause.KeyDown())
         {
             World.Save(0);
             Application.Quit();
+            // EditorApplication.isPlaying = false;
         }
         
         GUIMain.Update();
-        SetPiece.Update();
         Inventory.Update();
         Control.Update();
         MapCull.Update();
         ViewPort.Update(); 
-        MobSpawner.Update();
+        if (!BuildMode) MobSpawner.Update();
         DayNightCycle.Update();
          
     }
