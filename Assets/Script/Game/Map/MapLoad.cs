@@ -36,11 +36,8 @@ public class MapLoad
     
     public static async void Initialize()
     {   
-        Scene.PlayerChunkTraverse += HandleChunkMapTraverse;
-        
         await Task.Delay(50);
-        HandleChunkMapTraverse(); 
-        NavMap.GenerateNavMap();
+        OnChunkTraverse();  
     }
     
     public static void RefreshExistingChunk(Vector3Int chunkCoordinates)
@@ -50,7 +47,7 @@ public class MapLoad
     }
 
  
-    static void HandleChunkMapTraverse()
+    public static void OnChunkTraverse()
     {
         foreach (var kvp in ActiveChunks)
         {

@@ -137,7 +137,8 @@ public abstract class PathingModule : MobModule
                 };   
             }
             if (NextPoint == 0 ||
-                 (((!Path[NextPoint].IsFloat && math.distance(Path[NextPoint].Position.y, Machine.transform.position.y) < Info.PathJump)
+                 (((!Path[NextPoint].IsFloat && 
+                    math.distance(Path[NextPoint].Position.y, Machine.transform.position.y) < 0.04f)
                    || Path[NextPoint].IsFloat) &&
                   Vector2.Distance(
                       new Vector2(Path[NextPoint].Position.x, Path[NextPoint].Position.z), 

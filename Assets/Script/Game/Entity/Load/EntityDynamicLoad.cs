@@ -6,15 +6,16 @@ public class EntityDynamicLoad
 
     private static List<EntityMachine> _activeEntities = new List<EntityMachine>();
 
-    public static void Initialize()
-    {
-        Scene.PlayerChunkTraverse += ScanAndUnload; 
-        Scene.PlayerChunkTraverse += ScanAndLoad; 
-    }
 
     public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
     public static void InviteEntity(EntityMachine entity) { _activeEntities.Add(entity); }
 
+    public static void OnChunkTraverse()
+    {
+        ScanAndUnload();
+        ScanAndLoad();
+    }
+    
     private static void ScanAndUnload()
     {
         List<EntityMachine> removeList = new List<EntityMachine>();

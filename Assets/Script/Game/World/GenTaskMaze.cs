@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class GenTaskMaze : WorldGen
 {
+    private const int WallHeight = 5;
+    private const int FloorHeight = 2;
+    
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID(global::ID.BackroomBlock) : _id; 
+    private static int ID => _id == 0 ? Block.ConvertID(global::ID.BackroomBlock) : _id;  
 
     public static void Run()
     {
