@@ -7,7 +7,7 @@ public class GUIInfoPanel : GUI
     
     public new void Initialize()
     {
-        _infoText = Game.GUIInfoPanel.transform.Find("text").GetComponent<TextMeshProUGUI>(); 
+        _infoText = Game.GUIInfoPanel.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
         Rect = Game.GUIInfoPanel.GetComponent<RectTransform>();
         GameObject = Game.GUIInfoPanel.gameObject;
         GameObject.AddComponent<HoverModule>().GUI = this;

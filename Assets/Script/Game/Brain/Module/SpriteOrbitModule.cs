@@ -11,7 +11,7 @@ public class SpriteOrbitModule : EntityModule
 
     public override void Initialize()
     { 
-        if (!_sprite) _sprite = Machine.transform.Find("sprite");
+        if (!_sprite) _sprite = Machine.transform.Find("Sprite");
         _sprite.rotation = ViewPort.CurrentRotation;
         ViewPort.UpdateOrbitRotate += UpdateOrbit;
     }

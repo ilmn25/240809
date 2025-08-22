@@ -48,7 +48,7 @@ public class Projectile : MonoBehaviour
         Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
         projectile.transform.rotation = rotation * Quaternion.Euler(90, 45, 0); 
 
-        projectile.spriteRenderer.sprite = Cache.LoadSprite("sprite/" + info.Sprite);
+        projectile.spriteRenderer.sprite = Cache.LoadSprite("Sprite/" + info.Sprite);
         projectile.Info.OnSpawn(projectile); 
     }
  

@@ -82,12 +82,12 @@ public class DynamicInfo : Info
 
     public override void Initialize()
     { 
-        Sprite = Machine.transform.Find("sprite");
+        Sprite = Machine.transform.Find("Sprite");
         Animator = Sprite.GetComponent<Animator>();
-        SpriteChar = Sprite.Find("char");
+        SpriteChar = Sprite.Find("Char");
         SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
-        SpriteToolTrack = Sprite.transform.Find("tool_track");
-        SpriteTool = SpriteToolTrack.Find("tool").Find("tool_offset");
+        SpriteToolTrack = Sprite.transform.Find("ToolTrack");
+        SpriteTool = SpriteToolTrack.Find("Tool").Find("ToolOffset");
         SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>(); 
     }
     public override void Update()

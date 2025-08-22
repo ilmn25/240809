@@ -1,2 +1,0 @@
- 
-collider colission blocking objects, solution = set layer to ignore raycast and then use tag to clossion 

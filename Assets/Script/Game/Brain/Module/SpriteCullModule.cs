@@ -16,7 +16,7 @@ public class StructureSpriteCullModule : SpriteCullModule
 {
     public override void Initialize()
     {
-        Sprites.Add(Machine.transform.Find("sprite").GetComponent<SpriteRenderer>());
+        Sprites.Add(Machine.transform.Find("Sprite").GetComponent<SpriteRenderer>());
         MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull();
     }

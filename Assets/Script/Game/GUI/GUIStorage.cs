@@ -25,15 +25,15 @@ public class  GUIStorage : GUI
     }
     public new void Initialize()
     {  
-        GameObject = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_storage"),
+        GameObject = Object.Instantiate(Resources.Load<GameObject>($"Prefab/GUIStorage"),
             Game.GUIInv.transform);
-        Text = GameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        Text = GameObject.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GameObject.GetComponent<HoverModule>().GUI = this;
         Rect = GameObject.GetComponent<RectTransform>();
         base.Initialize();
         for (int i = 0; i < SlotAmount * RowAmount; i++)
         {
-            GameObject slot = Object.Instantiate(Resources.Load<GameObject>($"prefab/gui_item_slot"),
+            GameObject slot = Object.Instantiate(Resources.Load<GameObject>($"Prefab/GUIItemSlot"),
                 GameObject.transform, false);
 
             int row = i / SlotAmount;

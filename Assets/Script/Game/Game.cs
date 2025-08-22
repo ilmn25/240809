@@ -75,7 +75,7 @@ public class Game : MonoBehaviour
         MapLoad.Initialize();
         Scene.Initialize();  
         ViewPort.Initialize();  
-        Instantiate(Resources.Load<GameObject>($"prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
+        Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
     }
 
     private void Update()
@@ -122,27 +122,26 @@ public class Game : MonoBehaviour
         IndexSemiCollide = LayerMask.NameToLayer("SemiCollide");
         IndexUI = LayerMask.NameToLayer("UI");
  
-         
-        ViewPortObject = GameObject.Find("viewport");
-        CameraObject = GameObject.Find("main_camera");
+        ViewPortObject = GameObject.Find("Viewport");
+        CameraObject = GameObject.Find("MainCamera");
         Camera = CameraObject.GetComponent<Camera>();
-        LightIndoor = ViewPortObject.transform.Find("light_indoor").gameObject;
-        LightSelf = ViewPortObject.transform.Find("light_self").gameObject;   
-        DirectionalLight = ViewPortObject.transform.Find("light_directional").gameObject.GetComponent<Light>();  
-        SpotLight = ViewPortObject.transform.Find("light_spot").gameObject.GetComponent<Light>();   
+        LightIndoor = ViewPortObject.transform.Find("LightIndoor").gameObject;
+        LightSelf = ViewPortObject.transform.Find("LightSelf").gameObject;   
+        DirectionalLight = ViewPortObject.transform.Find("LightDir").gameObject.GetComponent<Light>();  
+        SpotLight = ViewPortObject.transform.Find("LightSpot").gameObject.GetComponent<Light>();   
         Volume = CameraObject.gameObject.GetComponent<Volume>();
-        GUICamera = GameObject.Find("hud_camera").GetComponent<Camera>();
+        GUICamera = GameObject.Find("HudCamera").GetComponent<Camera>();
         
-        GUIObject = GameObject.Find("gui");
-        GUIDialogue = GUIObject.transform.Find("dialogue_box").gameObject;
-        GUIDialogueText = GUIDialogue.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        GUIImage = GUIObject.transform.Find("image").gameObject;
-        GUIInv = GUIObject.transform.Find("inventory").gameObject;
-        GUIInvCrafting = GUIInv.transform.Find("crafting").gameObject;
-        GUIInfoPanel = GUIInv.transform.Find("info").gameObject;
-        GUICursor = GUIObject.transform.Find("cursor").Find("cursor").gameObject;
-        GUICursorInfo = GUICursor.transform.Find("info").gameObject;
-        GUICursorSlot = GUICursor.transform.Find("slot").gameObject;
+        GUIObject = GameObject.Find("GUI");
+        GUIDialogue = GUIObject.transform.Find("Dialogue").gameObject;
+        GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        GUIImage = GUIObject.transform.Find("Image").gameObject;
+        GUIInv = GUIObject.transform.Find("Inventory").gameObject;
+        GUIInvCrafting = GUIInv.transform.Find("Crafting").gameObject;
+        GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;
+        GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;
+        GUICursorInfo = GUICursor.transform.Find("Info").gameObject;    
+        GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
     }
  
 }

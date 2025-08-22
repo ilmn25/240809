@@ -29,14 +29,14 @@ public class Audio
             _audioSources.Add(newSource);
         }
 
-        PlayBGM("fairy_fountain", 0.4f);
+        PlayBGM("DST", 0.3f);
         PlaySFX(SfxID.Wind, true);
         PlaySFX(SfxID.Noise, true);
     }
 
     public static void PlayBGM(string id, float volume = 1f, bool loop = true)
     {
-        AudioClip clip = Cache.LoadAudioClip($"audio/bgm/{id}");
+        AudioClip clip = Cache.LoadAudioClip($"BGM/{id}");
         if (clip == null) return;
 
         _bgmSource.clip = clip;
@@ -47,7 +47,7 @@ public class Audio
 
     public static AudioSource PlaySFX(SfxID id, bool loop = false)
     {
-        AudioClip clip = Cache.LoadAudioClip($"sfx/{id}");
+        AudioClip clip = Cache.LoadAudioClip($"SFX/{id}");
         if (!clip) return null;
         
         float volume = Volume.ContainsKey(id) ? Volume[id] : 1;
