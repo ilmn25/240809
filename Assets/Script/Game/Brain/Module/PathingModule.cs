@@ -119,69 +119,69 @@ public abstract class PathingModule : MobModule
                 if ( NextPoint < Path.Count -1 && Machine.transform.position == Info.TargetPointPosition) NextPoint++; 
             }
             else
-                HandleMovePoint(); 
+               NextPoint = HandleMovePoint(NextPoint, Path); 
             
         } 
     }
     
-    private void HandleMovePoint()
+    private int HandleMovePoint(int nextPoint, List<Node> path)
     { 
-        if (NextPoint != Path.Count - 1)
+        if (nextPoint != path.Count - 1)
         {
             if (Info.MustLandFirst)
             {
                 if (!Info.IsGrounded)
                 {
-                    Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized;
-                    return;
+                    Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
+                    return nextPoint;
                 };   
             }
-            if (NextPoint == 0 ||
-                 (((!Path[NextPoint].IsFloat && 
-                    math.distance(Path[NextPoint].Position.y, Machine.transform.position.y) < 0.04f)
-                   || Path[NextPoint].IsFloat) &&
+            if (nextPoint == 0 ||
+                 (((!path[nextPoint].IsFloat && 
+                    math.distance(path[nextPoint].Position.y, Machine.transform.position.y) < 0.04f)
+                   || path[nextPoint].IsFloat) &&
                   Vector2.Distance(
-                      new Vector2(Path[NextPoint].Position.x, Path[NextPoint].Position.z), 
+                      new Vector2(path[nextPoint].Position.x, path[nextPoint].Position.z), 
                       new Vector2(Machine.transform.position.x, Machine.transform.position.z)
                   ) < PointReachDistance/2))
             { 
                 for (int i = 0; i < Info.NormalSkipAmount; i++)
                 {
-                    if (NextPoint >= Path.Count - 1) return;
-                    NextPoint++;
-                    if (Path[NextPoint].IsFloat) break;
+                    if (nextPoint >= path.Count - 1) return nextPoint;
+                    nextPoint++;
+                    if (path[nextPoint].IsFloat) break;
                 }
 
                 try
                 {
 
-                    if (NextPoint < Path.Count - 1 && Path[NextPoint].IsFloat &&
-                        Path[NextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
-                        (Path[NextPoint + 1].Direction.x == Path[NextPoint].Direction.x ||
-                         Path[NextPoint + 1].Direction.z == Path[NextPoint].Direction.z))
+                    if (nextPoint < path.Count - 1 && path[nextPoint].IsFloat &&
+                        path[nextPoint].Position.y > (int)Machine.transform.position.y - 1 &&
+                        (path[nextPoint + 1].Direction.x == path[nextPoint].Direction.x ||
+                         path[nextPoint + 1].Direction.z == path[nextPoint].Direction.z))
                     {
-                        Node initialNode = Path[NextPoint];
-                        while (NextPoint < Path.Count - 1 && Path[NextPoint].IsFloat
-                                                          && Path[NextPoint].Position.y >=
+                        Node initialNode = path[nextPoint];
+                        while (nextPoint < path.Count - 1 && path[nextPoint].IsFloat
+                                                          && path[nextPoint].Position.y >=
                                                           (int)Machine.transform.position.y &&
-                                                          (Path[NextPoint + 1].Direction.x == initialNode.Direction.x ||
-                                                           Path[NextPoint + 1].Direction.z == initialNode.Direction.z))
+                                                          (path[nextPoint + 1].Direction.x == initialNode.Direction.x ||
+                                                           path[nextPoint + 1].Direction.z == initialNode.Direction.z))
                         {
-                            NextPoint++;
+                            nextPoint++;
                         }
 
-                        int potentialSkipPoint = NextPoint + JumpSkipAmount;
-                        if (potentialSkipPoint < Path.Count - 1
-                            && !Path[potentialSkipPoint].IsFloat
-                            && Mathf.Approximately(Path[potentialSkipPoint].Position.y, Path[NextPoint].Position.y))
+                        int potentialSkipPoint = nextPoint + JumpSkipAmount;
+                        if (potentialSkipPoint < path.Count - 1
+                            && !path[potentialSkipPoint].IsFloat
+                            && Mathf.Approximately(path[potentialSkipPoint].Position.y, path[nextPoint].Position.y))
                         {
-                            NextPoint = potentialSkipPoint;
+                            nextPoint = potentialSkipPoint;
                         }
                     }
                 }
                 catch (Exception)
                 {
-                    Helper.Log(NextPoint, Path.Count);
+                    Helper.Log(nextPoint, path.Count);
                 }
                 // else
                 // {
@@ -197,12 +197,9 @@ public abstract class PathingModule : MobModule
                 // } 
             }  
                 
-            Info.Direction = (Path[NextPoint].Position - Machine.transform.position).normalized; 
         } 
-        else
-        { 
-            Info.Direction = (Helper.AddToVector(GetTargetPosition(), 0, -0.3f, 0) - Machine.transform.position).normalized;
-        } 
+        Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized; 
+        return nextPoint;
     }
  
     private async void CheckRepathRoutine()
@@ -291,9 +288,10 @@ public abstract class PathingModule : MobModule
                     nearestDistance = distance;
                 } else break; 
             } 
-            if (nearestPoint == 0) nearestPoint = Mathf.Min(1, _pathQueued.Count -1); 
+            if (nearestPoint == 0) nearestPoint = Mathf.Min(1, _pathQueued.Count -1);
+            if (_pathQueued[nearestPoint].IsFloat && nearestPoint != _pathQueued.Count - 1) nearestPoint++;
         }
-        return nearestPoint + Info.NormalSkipAmount - 1;
+        return nearestPoint; ;
     }
 
     

@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
  
 public class NavMap
 {
-    private static BitArray _bitMap;
+    private static readonly BitArray BitMap = new (
+        World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z);
+    private static readonly List<Vector3Int> LoadedChunks = new ();
     private static int GetIndex(int x, int y, int z)
     {
         return x + World.Inst.Bounds.x * (y + World.Inst.Bounds.y * z);
@@ -12,26 +15,11 @@ public class NavMap
     private static int GetIndex(Vector3Int coordinate)
     {
         return coordinate.x + World.Inst.Bounds.x * (coordinate.y + World.Inst.Bounds.y * coordinate.z);
-    }
-    
-    public static void Initialize()
-    {
-        _bitMap = new BitArray(World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z); 
-        
-        for (int x = 0; x < World.Inst.Length.x; x++)
-        { 
-            for (int y = 0; y < World.Inst.Length.y; y++)
-            {
-                for (int z = 0; z < World.Inst.Length.z; z++)
-                {
-                    SetChunk(new Vector3Int(x, y, z) * World.ChunkSize);
-                }
-            }
-        } 
-    }
-
+    } 
     public static void SetChunk(Vector3Int coordinate)
     { 
+        if (!World.IsInWorldBounds(coordinate) || LoadedChunks.Contains(coordinate)) return;
+        LoadedChunks.Add(coordinate);
         Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z]; 
         if (chunk != null)
         { 
@@ -60,19 +48,19 @@ public class NavMap
     public static bool Get(Vector3Int worldPosition)
     {
         if (!World.IsInWorldBounds(worldPosition)) return true;
-        return _bitMap[GetIndex(worldPosition)];
+        return BitMap[GetIndex(worldPosition)];
     }
 
     public static void Set(Vector3Int worldPosition, bool value, bool isAir = false)
     {
         if (isAir && !World.IsInWorldBounds(worldPosition)) return;
-        _bitMap[GetIndex(worldPosition)] = value; 
+        BitMap[GetIndex(worldPosition)] = value; 
     }
     
     public static void Set(int x, int y, int z, bool value, bool isAir = false)
     {
         if (isAir && !World.IsInWorldBounds(x, y, z)) return;
-        _bitMap[GetIndex(x, y, z)] = value;
+        BitMap[GetIndex(x, y, z)] = value;
     }
 
     public static void SetEntity(Entity entity, Vector3 position, bool isAir)

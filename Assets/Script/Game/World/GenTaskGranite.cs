@@ -11,7 +11,7 @@ public class GenTaskGranite : WorldGen
     private static int _idGranite;
     private static int ID => _idGranite == 0 ? Block.ConvertID(global::ID.GraniteBlock) : _idGranite;
 
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         int chunkSize = World.ChunkSize;
 

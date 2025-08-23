@@ -95,7 +95,7 @@ public partial class Item
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = 2,
+                Speed = Game.BuildMode? 18 : 4,
                 Radius = 2,
                 Breaking = 1,
                 OperationType = OperationType.Mining
@@ -297,7 +297,7 @@ public partial class Item
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing,
 
-            Speed = 4,
+            Speed = Game.BuildMode? 18 : 4,
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
 

@@ -18,7 +18,6 @@ public class MapCull
     private static int _yThresholdPrevious = 0;  
     private static bool _yCheckPrevious = false;   
     private static Vector3 _chunkPositionPrevious;   
-    private static int _visionHeight = 5;
     private enum CullMode { On, Off, Auto}
     private static CullMode _currentCullMode = CullMode.Auto;
     
@@ -41,11 +40,11 @@ public class MapCull
     {
         if (Control.Inst.CullUp.KeyDown())
         {
-            _visionHeight += 1;
+            YThreshold += 1;
         }
         else if (Control.Inst.CullDown.KeyDown())
         {
-            _visionHeight -= 1;
+            YThreshold -= 1;
         }
         // if (Control.Inst.CullUp.KeyDown())
         // {
@@ -77,18 +76,15 @@ public class MapCull
     static void HandleCheck()
     {
         if (Time.frameCount > CullSyncFrame + 1)
-        {
-            YThreshold = (int)_playerPosition.y + _visionHeight;
-            // if (YThreshold < (int)_playerPosition.y)
-            // {
-            //     YThreshold = (int)_playerPosition.y;
-            //     _visionHeight = YThreshold;
-            // }
-            // else if (YThreshold > (int)_playerPosition.y + 10)
-            // {
-            //     YThreshold = (int)_playerPosition.y + 10;
-            //     _visionHeight = YThreshold;
-            // }
+        { 
+            if (YThreshold < (int)_playerPosition.y - 10)
+            {
+                YThreshold = (int)_playerPosition.y - 10;
+            }
+            else if (YThreshold > (int)_playerPosition.y + 10)
+            {
+                YThreshold = (int)_playerPosition.y + 10;
+            }
              
             
             if (!_yCheckPrevious && YCheck) // enter
@@ -161,7 +157,7 @@ public class MapCull
         if (_currentCullMode == CullMode.On)
         {
             YCheck = true;
-            YThreshold = _visionHeight;
+            // YThreshold = _visionHeight;
             return;
         }
         
@@ -173,7 +169,7 @@ public class MapCull
             if (Physics.Raycast(new Ray(_playerPosition,  cameraPosition - _playerPosition), out _, Vector3.Distance(_playerPosition, cameraPosition), Game.MaskMap))
             {
                 YCheck = true;
-                YThreshold = _visionHeight;
+                // YThreshold = _visionHeight;
                 return;
             }
         }
@@ -183,7 +179,7 @@ public class MapCull
             Physics.Raycast(new Ray(_playerPosition, LeftDirection), out _, 50, Game.MaskMap) &&
             Physics.Raycast(new Ray(_playerPosition, RightDirection), out _, 50, Game.MaskMap)) {
             YCheck = true;
-            YThreshold = _visionHeight;
+            // YThreshold = _visionHeight;
             return;
         }
      
@@ -200,6 +196,6 @@ public class MapCull
 
     public static void HandleScrollInput(float scroll)
     {
-        _visionHeight += (scroll > 0) ? 1 : -1;
+        YThreshold += (scroll > 0) ? 1 : -1;
     }
 }

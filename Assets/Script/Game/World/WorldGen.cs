@@ -14,10 +14,6 @@ public class WorldGen
         new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
  
     protected static readonly bool Flat = false; 
-    
-    protected static Chunk CurrentChunk;
-    protected static Vector3Int CurrentCoordinate; 
-    
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static float GetOffset()
@@ -28,7 +24,7 @@ public class WorldGen
         Random = new System.Random(World.Seed);
     }
 
-    public static void GenerateTestMap()
+    public static void GenerateWorld()
     { 
         World.Inst = new World(Size.x, Size.y, Size.z); 
         Vector3Int position;
@@ -66,41 +62,7 @@ public class WorldGen
         // player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
         // player.CharSprite = ID.Yuuri;
         // World.Inst[playerPos].DynamicEntity.Add(player); 
-        // World.Inst.target.Add(player);
-        if (Flat) return;
-        // int chunkSize = World.ChunkSize;
-        // for (int x = 0; x < World.Inst.Bounds.x; x++)
-        // {
-        //     for (int y = 0; y < World.Inst.Bounds.y - 1; y++)
-        //     {
-        //         for (int z = 0; z < World.Inst.Bounds.z; z++)
-        //         { 
-        //             Vector3Int worldPos = new Vector3Int(x, y, z);
-        //             Vector3Int chunkPos = NavMap.GetRelativePosition(worldPos);
-        //             int localChunkX = worldPos.x % chunkSize;
-        //             int localChunkY = worldPos.y % chunkSize;
-        //             int localChunkZ = worldPos.z % chunkSize;
-        //
-        //             if (World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY, localChunkZ] == Block.ConvertID(ID.DirtBlock) &&
-        //                 localChunkY + 1 != chunkSize &&
-        //                 World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][localChunkX, localChunkY + 1, localChunkZ] == 0)
-        //             {
-        //                 if (Random.NextDouble() <= 0.0004)
-        //                 {
-        //                     global::SetPiece.PasteSetPiece(new Vector3Int(x, y+1, z), global::SetPiece.LoadSetPieceFile("house_stone"));
-        //                 }
-        //                 // else if (Random.NextDouble() <= 0.001)
-        //                 // {
-        //                 //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_a"));
-        //                 // }
-        //                 // else if (Random.NextDouble() <= 0.001)
-        //                 // {
-        //                 //     global::SetPiece.PasteSetPiece(new Vector3Int(x, y, z), global::SetPiece.LoadSetPieceFile("tree_b")); 
-        //                 // } 
-        //             } 
-        //         }
-        //     }
-        // }
+        // World.Inst.target.Add(player);  
     }
 
     public static IEnumerator GenerateNearbyChunks(Vector3Int center)
@@ -121,8 +83,6 @@ public class WorldGen
                     {
                         Generate(position);
                         yield return null;  
-                        NavMap.SetChunk(position);
-                        yield return null;  
                     }
                 }
             }
@@ -131,23 +91,23 @@ public class WorldGen
 
     public static void Generate(Vector3Int coordinates)
     {
-        CurrentCoordinate = coordinates;
-        CurrentChunk = new Chunk();
+        Chunk CurrentChunk = new Chunk();
         World.Inst[coordinates] = CurrentChunk;
 
         if (!Flat)
         {
             // Stopwatch stopwatch = new Stopwatch();
             // stopwatch.Start();
-            GenTaskStone.Run();
-            GenTaskGranite.Run();  
-            GenTaskMarble.Run();
-            GenTaskDirt.Run();
-            GenTaskSand.Run();  
-            GenTaskMaze.Run();
-            GenTaskCrater.Run(); 
-            GenTaskCaves.Run();    
-            GenTaskEntity.Run();    
+            GenTaskStone.Run(coordinates, CurrentChunk);
+            GenTaskGranite.Run(coordinates, CurrentChunk);  
+            GenTaskMarble.Run(coordinates, CurrentChunk);
+            GenTaskDirt.Run(coordinates, CurrentChunk);
+            GenTaskSand.Run(coordinates, CurrentChunk);
+            GenTaskMaze.Run(coordinates, CurrentChunk);
+            GenTaskCrater.Run(coordinates, CurrentChunk);
+            GenTaskCaves.Run(coordinates, CurrentChunk);
+            GenTaskSet.Run(coordinates, CurrentChunk);
+            GenTaskEntity.Run(coordinates, CurrentChunk);
             // stopwatch.Stop();
             // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
             return;

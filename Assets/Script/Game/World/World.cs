@@ -41,9 +41,7 @@ public class World
     public static void Load(int id)
     { 
         Inst = Helper.FileLoad<World>("World" + id);
-        if (Inst == null) WorldGen.GenerateTestMap();
-        
-        NavMap.Initialize();
+        if (Inst == null) WorldGen.GenerateWorld(); 
     }
 
     private int GetIndex(int chunkX, int chunkY, int chunkZ)

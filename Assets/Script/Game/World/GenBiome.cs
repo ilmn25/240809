@@ -8,8 +8,8 @@ public class GenBiome : WorldGen
 
     public static BiomeType GetBiomeType(int x, int z)
     {
-        float value = Mathf.PerlinNoise((CurrentCoordinate.x + x) * Scale + DrynessOffset, 
-            (CurrentCoordinate.z + z) * Scale + DrynessOffset);
+        float value = Mathf.PerlinNoise(x * Scale + DrynessOffset, 
+            z * Scale + DrynessOffset);
         if (value > 0.5f) return BiomeType.Grass;
         return BiomeType.Desert;
     }

@@ -20,8 +20,6 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
-    public const string SetPieceName = "tree_a";
-
     public static void Initialize()
     {  
         World.Load(0); 
@@ -30,7 +28,6 @@ public class Scene
         GUIHealthBar.Initialize();
     }
     
-
     public static void Update()
     { 
         PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);

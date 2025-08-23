@@ -6,7 +6,6 @@ public class EntityDynamicLoad
 
     private static List<EntityMachine> _activeEntities = new List<EntityMachine>();
 
-
     public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
     public static void InviteEntity(EntityMachine entity) { _activeEntities.Add(entity); }
 
@@ -44,11 +43,13 @@ public class EntityDynamicLoad
             {
                 for (int z = -Scene.LogicRange; z <= Scene.LogicRange; z++)
                 {
-                    LoadEntitiesInChunk(new Vector3Int(
+                    Vector3Int chunkCoordinate = new Vector3Int(
                         Scene.PlayerChunkPosition.x + x * World.ChunkSize,
                         Scene.PlayerChunkPosition.y + y * World.ChunkSize,
                         Scene.PlayerChunkPosition.z + z * World.ChunkSize
-                    ));
+                    );
+                    NavMap.SetChunk(chunkCoordinate);
+                    LoadEntitiesInChunk(chunkCoordinate); 
                 }
             }
         } 
