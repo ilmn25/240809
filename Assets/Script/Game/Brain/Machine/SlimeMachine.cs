@@ -44,6 +44,7 @@ public class SlimeMachine : MobMachine
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
+        AddState(new MobHit());
         AddState(new MobAttackPounce(1));
     }
 

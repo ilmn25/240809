@@ -22,10 +22,10 @@ public class DynamicInfo : Info
     public int HealthMax;
     public int Defense; 
     public int Iframes = 5;
+    public float AccelerationTime = 0.3f;
+    public float DecelerationTime = 0.08f;
     
-    [NonSerialized] public readonly float EntityCollisionRadius = 0.25f;
-    [NonSerialized] public float AccelerationTime = 0.3f;
-    [NonSerialized] public float DecelerationTime = 0.08f;
+    public const float EntityCollisionRadius = 0.25f; 
     [NonSerialized] public int KnockbackCounter = 0;
     
     [NonSerialized] public Transform Sprite;

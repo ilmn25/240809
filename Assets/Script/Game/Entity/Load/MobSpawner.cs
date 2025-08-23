@@ -15,7 +15,7 @@ public class MobSpawner
     };
     public static void Update()
     {
-        _timer++;
+        // _timer++;
         if (_timer == 5000)
         {
             _timer = 0;

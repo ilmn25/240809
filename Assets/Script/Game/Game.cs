@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
             
-    public static readonly bool BuildMode = false;
+    public static readonly bool BuildMode = true;
     public static bool Fly = false;
     
     public static LayerMask MaskMap;  

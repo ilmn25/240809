@@ -17,7 +17,6 @@ public class PlayerInfo : MobInfo
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
-    [NonSerialized] public int CombatCooldown;
     [NonSerialized] public float AirTime;
     [NonSerialized] private float _jumpGraceTimer;
     [NonSerialized] private float _coyoteTimer;
@@ -32,13 +31,13 @@ public class PlayerInfo : MobInfo
 
     protected override void OnHit(Projectile projectile)
     {
-        GUIHealthBar.Update();
+        GUIHealthBar.Update(); 
+        Machine.SetState<MobHit>();
     }
 
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        CombatCooldown--;
         if (PlayerStatus == PlayerStatus.Active)
         {
             if (Health <= 0)
@@ -48,7 +47,6 @@ public class PlayerInfo : MobInfo
                 CancelTarget();
                 PlayerStatus = PlayerStatus.Dead;
                 GUIMain.Show(false);
-                CombatCooldown = 0;
                 Velocity = Vector2.zero; 
                 IframesCurrent = 500;
                 Machine.SetState<DeadState>();

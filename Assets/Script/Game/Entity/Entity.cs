@@ -65,7 +65,7 @@ public partial class Entity
                 {
                         Bounds = Vector3.one * 0.7f,
                         Collision = Game.IndexSemiCollide,
-                        PrefabName = ID.PlayerPrefab,
+                        PrefabName = ID.MobPrefab,
                         Machine = typeof(PlayerMachine),
                         StaticLoad = false,
                         SpawnOffset = MidAir,

@@ -8,12 +8,12 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-    public static readonly Vector3Int Size = new Vector3Int(15, 5, 15);
+    public static readonly Vector3Int Size = new Vector3Int(15, 2, 15);
     // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
     public static readonly Vector3Int SpawnPoint = 
         new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
  
-    protected static readonly bool Flat = false; 
+    protected static readonly bool Flat = true; 
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static float GetOffset()
@@ -54,6 +54,7 @@ public class WorldGen
         World.Inst[SpawnPoint].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
         
+        if(Game.BuildMode)return;
         player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
         player.CharSprite = ID.Yuuri;
         World.Inst[SpawnPoint].DynamicEntity.Add(player); 
