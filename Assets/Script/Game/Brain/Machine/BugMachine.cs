@@ -31,6 +31,7 @@ public class BugMachine : MobMachine
         AddState(new MobChase());
         AddState(new MobStrafe());
         AddState(new MobRoam());
+        AddState(new MobHit());
         AddState(new MobAttackPounce(5));
     }
 

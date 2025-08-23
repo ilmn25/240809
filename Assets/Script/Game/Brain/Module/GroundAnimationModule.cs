@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class GroundAnimationModule : MobModule
 {
-    private const float BounceSpeed = 1.65f;
-    private const float BounceRange = 0.15f;
+    private const float BounceSpeed = 1.35f;
+    private const float BounceRange = 0.125f;
     // private const float BounceSpeed = 1f;
     // private const float BounceRange = 0.12f;
     private const float TrailFrequency = 0.5f;
@@ -84,13 +84,15 @@ public class GroundAnimationModule : MobModule
         }
     }
 
+    private float _bounceTimer;
     void HandleBounceAndTrail()
     {
-        bool isMoving = Info.SpeedCurrent > 0.35 && Info.IsGrounded;
+        bool isMoving = Info.Direction.magnitude > 0.5 && Info.IsGrounded;
 
         if (isMoving)
-        {
-            float newY = Mathf.PingPong(Time.time * BounceSpeed, BounceRange);
+        { 
+            _bounceTimer += Time.deltaTime * BounceSpeed * Mathf.Clamp01((Info.SpeedCurrent * 1.5f) / Info.SpeedTarget);
+            float newY = Mathf.PingPong(_bounceTimer, BounceRange);
             Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, newY, Info.Sprite.localPosition.z);
 
             if (Time.time >= _nextTrailTimer)

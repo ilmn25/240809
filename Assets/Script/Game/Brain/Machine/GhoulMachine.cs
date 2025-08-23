@@ -17,8 +17,8 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     {
          
         Dialogue dialogue = new Dialogue();
-        dialogue.Lines.Add("hello");
-        dialogue.Lines.Add("are u buying or not");
+        dialogue.Lines.Add("bruhhh");
+        dialogue.Lines.Add("shut up and open the door femboy");
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -29,6 +29,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobChase());
         AddState(new MobRoam());
         AddState(new MobEvade());
+        AddState(new MobHit());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
         AddState(new DialogueState(dialogue)); 

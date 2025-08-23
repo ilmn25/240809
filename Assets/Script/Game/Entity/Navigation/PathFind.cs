@@ -64,13 +64,13 @@ public class PathFind
             
             delta = endPosition - currentNode.Position;
 
-            if ((Mathf.Abs(delta.x) == 1 && delta.y == 0 && delta.z == 0) ||
-                (delta.x == 0 && Mathf.Abs(delta.y) == 1 && delta.z == 0) ||
-                (delta.x == 0 && delta.y == 0 && Mathf.Abs(delta.z) == 1))
+            if ((Mathf.Abs(delta.x) <= 1 && delta.y == 0 && delta.z == 0) ||
+                (delta.x == 0 && Mathf.Abs(delta.y) <= 1 && delta.z == 0) ||
+                (delta.x == 0 && delta.y == 0 && Mathf.Abs(delta.z) <= 1))
             {
                 currentNode =  new Node(endPosition, currentNode, 0, 0, false,  Vector3Int.FloorToInt(endPosition - currentNode.Position));
                 return currentNode.GetPathList();
-            }  
+            }
             
             foreach (var direction in Node.Directions) //scan each direction
             {  

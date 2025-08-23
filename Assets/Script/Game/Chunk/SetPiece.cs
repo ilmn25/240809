@@ -109,7 +109,7 @@ public class SetPiece
                 World.Inst[chunkPos].StaticEntity.Add(entity.ToInfo());
             } 
         }
-
+ 
         foreach (SetEntity entity in setPiece.DynamicEntity)
         { 
             worldPos = position + entity.position;
@@ -121,7 +121,7 @@ public class SetPiece
                 World.Inst[chunkPos].DynamicEntity.Add(entity.ToInfo());
             }  
         }
-        
+ 
         for (int x = 0; x < setPiece.size; x++)
         {
             for (int y = 0; y < setPiece.size; y++)
@@ -136,7 +136,7 @@ public class SetPiece
                         {
                             chunkPos = World.GetChunkCoordinate(worldPos);
                             if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
-                            World.Inst[chunkPos][World.GetBlockCoordinate(worldPos)] = blockID;
+                            World.Inst[chunkPos][World.GetBlockCoordinate(worldPos)] = blockID; 
                         } 
                     }
                 }

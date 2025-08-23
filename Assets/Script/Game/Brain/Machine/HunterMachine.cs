@@ -28,6 +28,7 @@ public class HunterMachine : MobMachine
         AddState(new MobIdle());
         AddState(new MobChaseAim());
         AddState(new MobRoam());
+        AddState(new MobHit());
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
         AddState(new EquipSelectState()); 

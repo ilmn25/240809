@@ -26,10 +26,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             SpeedGround = 4,
             SpeedAir = 5,
             Iframes = 100, 
-            PathAmount = 7000,
-            MaxStuckCount = 30,
-            AccelerationTime = 0.2f,
-            DecelerationTime = 0.08f,
+            PathAmount = 6000,
+            MaxStuckCount = 8,
+            AccelerationTime = 0.3f,
+            DecelerationTime = 0.1f,
             DistAttack = 2,
             Gravity = -40f,
             JumpVelocity = 12f,
@@ -50,6 +50,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
         AddState(new MobChaseAction());
+        AddState(new MobHit());
         AddState(new EquipSelectState());   
         AddState(new InContainerState()
         {
@@ -164,11 +165,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         { 
             if (Info.Target == null && Game.PlayerInfo.PlayerStatus == PlayerStatus.Active)
             {  
-                if (Game.PlayerInfo.CombatCooldown < 0)
-                {
-                    Info.Target = Game.PlayerInfo;
-                    Info.ActionType = IActionType.Follow;
-                }
+                Info.Target = Game.PlayerInfo;
+                Info.ActionType = IActionType.Follow;
             } 
             
             if (Info.Target == Game.PlayerInfo && PlayerTask.Pending.Count != 0)
