@@ -9,7 +9,7 @@ public class GenTaskDirt : WorldGen
     private static int _id;
     private static int ID => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
     
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {
@@ -17,7 +17,7 @@ public class GenTaskDirt : WorldGen
 
             for (int z = 0; z < World.ChunkSize; z++)
             { 
-                if (GenBiome.GetBiomeType(x, z) != BiomeType.Grass) continue; 
+                if (GenBiome.GetBiomeType(CurrentCoordinate.x + x, CurrentCoordinate.z + z) != BiomeType.Grass) continue; 
                 _z = (CurrentCoordinate.z + z) * Scale + Offset;
 
                 _value = Mathf.PerlinNoise(_x, _z);

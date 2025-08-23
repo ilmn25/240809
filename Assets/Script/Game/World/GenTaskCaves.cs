@@ -9,7 +9,7 @@ public class GenTaskCaves : WorldGen
         noiseScale = 0.1f,
         threshold = 0.4f // You can tweak this for cave density
     };
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

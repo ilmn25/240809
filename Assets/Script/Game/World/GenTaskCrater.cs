@@ -11,7 +11,7 @@ public class GenTaskCrater : WorldGen
     private static int _id;
     private static int ID => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
 
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         int chunkSize = World.ChunkSize;
 

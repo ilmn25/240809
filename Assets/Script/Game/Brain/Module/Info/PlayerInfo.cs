@@ -17,8 +17,6 @@ public class PlayerInfo : MobInfo
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
-    private const float HoldVelocity = 0.05f;
-    private const float ClampVelocity = 10f;
     [NonSerialized] public int CombatCooldown;
     [NonSerialized] public float AirTime;
     [NonSerialized] private float _jumpGraceTimer;
@@ -75,7 +73,7 @@ public class PlayerInfo : MobInfo
             {
                 if (Target != null) AimPosition = Target.position; 
                 
-                SpeedTarget = IsGrounded ? SpeedGround + 0.1f : SpeedAir * 1.3f;
+                SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
             } 
         }
         else
@@ -122,11 +120,10 @@ public class PlayerInfo : MobInfo
 
         if (Control.Inst.Jump.KeyDown())
         {
-            _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
-        }
-        else if (Control.Inst.Jump.KeyDown() && Velocity.y > ClampVelocity)
-        {
-            Velocity.y += HoldVelocity;
+            if (Game.Fly)
+                Velocity.y = JumpVelocity;
+            else 
+                _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed
         }
         else
         {

@@ -9,9 +9,11 @@ using UnityEngine.Rendering;
 
 public class Game : MonoBehaviour
 {
-    public const float MaxDeltaTime = 0.03f;
-    public static readonly bool BuildMode = false;
+    public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
+            
+    public static readonly bool BuildMode = false;
+    public static bool Fly = false;
     
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;
@@ -42,9 +44,9 @@ public class Game : MonoBehaviour
     public static GameObject GUIInfoPanel;
     public static GameObject GUICursor;
     public static GameObject GUICursorInfo;
-    public static GameObject GUICursorSlot;
-     
-    
+    public static GameObject GUICursorSlot; 
+
+
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;

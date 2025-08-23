@@ -5,7 +5,7 @@ public class GenTaskEntity : WorldGen
     private static int _id;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
     
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

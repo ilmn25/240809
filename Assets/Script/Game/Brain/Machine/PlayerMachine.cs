@@ -27,7 +27,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             SpeedAir = 5,
             Iframes = 100, 
             PathAmount = 7000,
-            MaxStuckCount = 100,
+            MaxStuckCount = 30,
             AccelerationTime = 0.2f,
             DecelerationTime = 0.08f,
             DistAttack = 2,

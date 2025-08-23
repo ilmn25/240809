@@ -96,7 +96,7 @@ public class SetPiece
     public static void LoadAndPaste(Vector3Int position, string name)
     { 
         SerializableChunk setPiece = LoadSetPieceFile(name);
-        Vector3Int chunkPos, worldPos, blockPos;
+        Vector3Int chunkPos, worldPos;
         
         foreach (SetEntity entity in setPiece.StaticEntity)
         {
@@ -105,7 +105,8 @@ public class SetPiece
             {
                 chunkPos = World.GetChunkCoordinate(worldPos);
                 entity.position = worldPos; 
-                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].StaticEntity.Add(entity.ToInfo());
+                if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                World.Inst[chunkPos].StaticEntity.Add(entity.ToInfo());
             } 
         }
 
@@ -116,7 +117,8 @@ public class SetPiece
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
                 entity.position = worldPos;
-                World.Inst[chunkPos.x, chunkPos.y, chunkPos.z].DynamicEntity.Add(entity.ToInfo());
+                if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                World.Inst[chunkPos].DynamicEntity.Add(entity.ToInfo());
             }  
         }
         
@@ -130,10 +132,12 @@ public class SetPiece
                     if (blockID != 0)
                     {
                         worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
-                        chunkPos = World.GetChunkCoordinate(worldPos);
-                        blockPos = World.GetBlockCoordinate(worldPos); 
                         if (World.IsInWorldBounds(worldPos))
-                            World.Inst[chunkPos.x, chunkPos.y, chunkPos.z][blockPos.x, blockPos.y, blockPos.z] = blockID;
+                        {
+                            chunkPos = World.GetChunkCoordinate(worldPos);
+                            if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                            World.Inst[chunkPos][World.GetBlockCoordinate(worldPos)] = blockID;
+                        } 
                     }
                 }
             }

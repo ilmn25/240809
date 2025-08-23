@@ -8,7 +8,7 @@ public class GenTaskMaze : WorldGen
     private static int _id;
     private static int ID => _id == 0 ? Block.ConvertID(global::ID.BackroomBlock) : _id;  
 
-    public static void Run()
+    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         if (CurrentCoordinate.y != 0) return;
 
