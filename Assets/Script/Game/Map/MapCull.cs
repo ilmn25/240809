@@ -13,7 +13,7 @@ public class MapCull
  
     public static int CullSyncFrame = 0;  
     public static bool YCheck = false;   
-    public static int YThreshold = 0; 
+    public static int YThreshold = Int32.MaxValue; 
     
     private static int _yThresholdPrevious = 0;  
     private static bool _yCheckPrevious = false;   
@@ -130,7 +130,7 @@ public class MapCull
         if (_delayBuffer) return;
         _delayBuffer = true;
 
-        await Task.Delay(65);
+        await Task.Delay(125);
         if (YCheck == yCheckPrevious)
         { 
             UpdateYCull();

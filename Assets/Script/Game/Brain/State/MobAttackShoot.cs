@@ -12,7 +12,8 @@ public class MobAttackShoot : MobState
         } 
         Audio.PlaySFX(Info.Equipment.Info.Sfx);
         Info.Animator.speed = Info.Equipment.Info.Speed; 
-        Info.Animator.Play("EquipShoot", 0, 0f);  
+        Info.Animator.Play("EquipShoot", 0, 0f);
+        ViewPort.StartScreenShake(2, 0.05f);
     }
  
     public override void OnUpdateState()
