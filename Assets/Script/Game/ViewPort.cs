@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
-using Unity.Mathematics;
 using UnityEngine;
 
-public class ViewPort 
+public partial class ViewPort 
 {
     public const float Distance = 26;
     private const int MaxFOV = 100;
@@ -44,6 +42,7 @@ public class ViewPort
         
         HandlePlayerFollow(); 
         HandleCameraSway();
+        HandleScreenShake();
 
         if (Control.Inst.OrbitLeft.KeyDown())
         { 
@@ -149,7 +148,8 @@ public class ViewPort
 
     private static void HandlePlayerFollow()
     {
-        Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, Game.PlayerInfo.position, Time.deltaTime * FollowSpeed);
+        Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, 
+            Game.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ShakeOffset;
     }
  
 }

@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
             
-    public static readonly bool BuildMode = true;
+    public static readonly bool BuildMode = false;
     public static bool Fly = false;
     
     public static LayerMask MaskMap;  
@@ -21,8 +21,7 @@ public class Game : MonoBehaviour
     public static int IndexMap;
     public static int IndexCollide;
     public static int IndexNoCollide;
-    public static int IndexSemiCollide;
-    public static int IndexUI;
+    public static int IndexSemiCollide; 
     
     public static GameObject Player;
     public static PlayerInfo PlayerInfo;
@@ -64,7 +63,14 @@ public class Game : MonoBehaviour
 
     private void Start()
     { 
-        Control.Initialize(); 
+        EnvParticle.Initialize(); 
+        DayNightCycle.Set(DayNightCycle.Sunrise.AmbientLight, 
+            DayNightCycle.Sunrise.FogColor, 
+            DayNightCycle.Sunrise.DirectionalLight,
+            DayNightCycle.Sunrise.SpotLight,
+            DayNightCycle.Sunrise.BackgroundColor);
+        
+        Control.Initialize();  
         Item.Initialize();
         Entity.Initialize(); 
         Loot.Initialize();
@@ -121,7 +127,6 @@ public class Game : MonoBehaviour
         IndexCollide = LayerMask.NameToLayer("Collide");
         IndexNoCollide = LayerMask.NameToLayer("NoCollide");
         IndexSemiCollide = LayerMask.NameToLayer("SemiCollide");
-        IndexUI = LayerMask.NameToLayer("UI");
  
         ViewPortObject = GameObject.Find("Viewport");
         CameraObject = GameObject.Find("MainCamera");

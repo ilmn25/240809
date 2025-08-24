@@ -29,7 +29,7 @@ public class Audio
             _audioSources.Add(newSource);
         }
 
-        PlayBGM("DST", 0.3f);
+        // PlayBGM("FairyFountain", 0.2f);
         PlaySFX(SfxID.Wind, true);
         PlaySFX(SfxID.Noise, true);
     }

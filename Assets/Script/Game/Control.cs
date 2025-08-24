@@ -111,7 +111,7 @@ public class Control
     private static void HandleActionButton()
     {
         if (Inst.ActionPrimaryNear.KeyDown())
-        {
+        { 
             IActionPrimaryResource target = GetNearestInteractable<IActionPrimaryResource>();
             if (target == null) return;
             Game.PlayerInfo.Target = ((EntityMachine)target).Info;  

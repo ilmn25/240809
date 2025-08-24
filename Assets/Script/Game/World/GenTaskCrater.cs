@@ -4,7 +4,7 @@ public class GenTaskCrater : WorldGen
 {
     private static readonly int centerX = World.Inst.Bounds.x/2;
     private static readonly int centerZ = World.Inst.Bounds.z/2;
-    private static readonly int Radius = World.Inst.Bounds.z/5;
+    private static readonly int Radius = World.Inst.Bounds.z/6;
     private const float Scale = 0.1f;
     private const int Steps = 5;
     private static readonly float Offset = GetOffset();

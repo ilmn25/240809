@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class DayNightCycle
@@ -17,14 +8,16 @@ public class DayNightCycle
     public Color SpotLight;
     public Color DirectionalLight;
     public Color BackgroundColor;
- 
+    public EnvParticles EnvParticles = EnvParticles.Null;
+    
     public static DayNightCycle Rapture = new DayNightCycle()
     {
         AmbientLight = GetColor(39, 38, 64),
         FogColor = GetColor(97, 39, 39),
         SpotLight = GetColor(161, 77, 77),
         DirectionalLight = GetColor(255, 68, 47),
-        BackgroundColor = GetColor(190, 130, 134)
+        BackgroundColor = GetColor(190, 130, 134),
+        EnvParticles = EnvParticles.Leaf
     };
     public static DayNightCycle Day = new DayNightCycle()
     {
@@ -32,7 +25,8 @@ public class DayNightCycle
         FogColor = GetColor(117, 110, 138),
         SpotLight = GetColor(197, 142, 88),
         DirectionalLight = GetColor(135, 124, 121),
-        BackgroundColor = GetColor(116, 113, 137)
+        BackgroundColor = GetColor(116, 113, 137),
+        EnvParticles = EnvParticles.Leaf
     };
     public static DayNightCycle DayFog = new DayNightCycle()
     {
@@ -40,7 +34,8 @@ public class DayNightCycle
         FogColor = GetColor(146, 146, 146),
         SpotLight = GetColor(97, 97, 97),
         DirectionalLight = GetColor(105, 101, 159),
-        BackgroundColor = GetColor(131, 131, 135)
+        BackgroundColor = GetColor(131, 131, 135),
+        EnvParticles = EnvParticles.Snow
     };
     
     public static DayNightCycle Noon = new DayNightCycle()
@@ -49,7 +44,8 @@ public class DayNightCycle
         FogColor = GetColor(118, 105, 105),
         SpotLight = GetColor(103, 70, 66),
         DirectionalLight = GetColor(255, 184, 56),
-        BackgroundColor = GetColor(188, 111, 77)
+        BackgroundColor = GetColor(188, 111, 77),
+        EnvParticles = EnvParticles.Leaf
     };
 
     public static DayNightCycle Night = new DayNightCycle()
@@ -58,7 +54,8 @@ public class DayNightCycle
         FogColor = Color.black,
         SpotLight = GetColor(97, 97, 97),
         DirectionalLight = GetColor(91, 56, 255),
-        BackgroundColor = GetColor(45, 50, 63)
+        BackgroundColor = GetColor(45, 50, 63),
+        EnvParticles = EnvParticles.Rain
     };
     public static DayNightCycle NightFull = new DayNightCycle()
     {
@@ -66,15 +63,16 @@ public class DayNightCycle
         FogColor = Color.black,
         SpotLight = GetColor(164, 138, 129),
         DirectionalLight = GetColor(91, 56, 255),
-        BackgroundColor = GetColor(45, 50, 63)
+        BackgroundColor = GetColor(45, 50, 63) 
     };
     public static DayNightCycle Sunrise = new DayNightCycle()
     {
         AmbientLight = GetColor(38, 37, 63),
         FogColor = Color.black,
-        SpotLight = GetColor(164, 138, 129),
+        SpotLight = GetColor(154, 90, 69),
         DirectionalLight = GetColor(254, 57, 90),
-        BackgroundColor = GetColor(45, 50, 63)
+        BackgroundColor = GetColor(75, 59, 55),
+        EnvParticles = EnvParticles.Leaf
     };
     
     public static Color GetColor(float r, float g, float b)
@@ -82,7 +80,7 @@ public class DayNightCycle
         return new Color(r / 255f, g / 255f, b / 255f);
     }
     
-    private const int Length = 20000;
+    private const int Length = 30000;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime; 
     private static int _currentTime;
@@ -94,16 +92,19 @@ public class DayNightCycle
         _previous = _current;
         _current = target;
         _currentTransitionTime = 0;
+        EnvParticle.Set(target.EnvParticles);
     }
     public static void Update()
     {  
         if (_currentTime == 0)
-            if (Random.value < 0.8f)
+            SetTarget(Sunrise);
+        else if (_currentTime == Length * 3/24)
+            if (Random.value < 0.5f)
                 SetTarget(Day);
             else
                 SetTarget(DayFog);
-        else if (_currentTime == Length * 12/24)
-            if (Random.value < 0.9f)
+        else if (_currentTime == Length * 13/24)
+            if (Random.value < 0.7f)
                 SetTarget(Noon);
             else
                 SetTarget(Rapture);
@@ -118,10 +119,20 @@ public class DayNightCycle
         if (_currentTransitionTime < TransitionLength - 1) _currentTransitionTime++;
         
         float t = Mathf.InverseLerp(0, TransitionLength, _currentTransitionTime % TransitionLength);
-        RenderSettings.ambientLight = Color.Lerp(_previous.AmbientLight, _current.AmbientLight, t);
-        RenderSettings.fogColor = Color.Lerp(_previous.FogColor, _current.FogColor, t);
-        Game.SpotLight.color = Color.Lerp(_previous.SpotLight, _current.SpotLight, t);
-        Game.DirectionalLight.color = Color.Lerp(_previous.DirectionalLight, _current.DirectionalLight, t);
-        Game.Camera.backgroundColor = Color.Lerp(_previous.BackgroundColor, _current.BackgroundColor, t);
-    }   
+        Set(Color.Lerp(_previous.AmbientLight, _current.AmbientLight, t), 
+            Color.Lerp(_previous.FogColor, _current.FogColor, t),
+            Color.Lerp(_previous.SpotLight, _current.SpotLight, t),
+            Color.Lerp(_previous.DirectionalLight, _current.DirectionalLight, t),
+            Color.Lerp(_previous.BackgroundColor, _current.BackgroundColor, t)); 
+    }
+
+    public static void Set(Color ambientLight, Color fogColor, Color spotLight, Color directionalLight,
+        Color backgroundColor)
+    {
+        RenderSettings.ambientLight = ambientLight;
+        RenderSettings.fogColor = fogColor;
+        Game.SpotLight.color = spotLight;
+        Game.DirectionalLight.color = directionalLight;
+        Game.Camera.backgroundColor = backgroundColor;
+    }
 }

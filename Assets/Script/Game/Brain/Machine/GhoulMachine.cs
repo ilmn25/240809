@@ -16,9 +16,9 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     public override void OnStart()
     {
          
-        Dialogue dialogue = new Dialogue();
-        dialogue.Lines.Add("bruhhh");
-        dialogue.Lines.Add("shut up and open the door femboy");
+        Dialogue dialogue = new Dialogue(); 
+        dialogue.Lines.Add("go away femboy");
+        dialogue.Lines.Add("btw bento is a femboy");
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());

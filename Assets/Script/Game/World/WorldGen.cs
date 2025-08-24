@@ -8,12 +8,12 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-    public static readonly Vector3Int Size = new Vector3Int(15, 2, 15);
+    public static readonly Vector3Int Size = new Vector3Int(15, 6, 15);
     // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
     public static readonly Vector3Int SpawnPoint = 
         new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
  
-    protected static readonly bool Flat = true; 
+    protected static readonly bool Flat = false; 
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;
     
     public static float GetOffset()
@@ -107,7 +107,8 @@ public class WorldGen
             GenTaskMaze.Run(coordinates, CurrentChunk);
             GenTaskCrater.Run(coordinates, CurrentChunk);
             GenTaskCaves.Run(coordinates, CurrentChunk);
-            GenTaskSet.Run(coordinates, CurrentChunk);
+            GenTaskHouse.Run(coordinates, CurrentChunk);
+            GenTaskThrone.Run(coordinates, CurrentChunk);
             GenTaskEntity.Run(coordinates, CurrentChunk);
             // stopwatch.Stop();
             // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
