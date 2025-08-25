@@ -1,11 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class ItemInfo : Info
 {
     public ItemSlot item;
+    public int despawn;
     [NonSerialized] public bool StackOnSpawn = true;
+    [NonSerialized] public Vector3 Velocity;
+    [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
     public override void Initialize()
     {
@@ -14,11 +18,23 @@ public class ItemInfo : Info
             ID = stringID,
             Stack = 1,
         };
+        SpriteRenderer = Machine.transform.GetComponent<SpriteRenderer>();
     }
 
     public override void Update()
     {
-        if (Machine) position = Machine.transform.position;
+        if (despawn > 0)
+        {
+            despawn--;
+            if (despawn == 0) Destroy();
+        }
+        
+        if (Machine)
+        {
+            position = Machine.transform.position;
+            IsInRenderRange = SpriteRenderer.isVisible &&
+                              MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
+        }
     }
 
     public void OnActionSecondary(Info info)

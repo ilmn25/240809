@@ -69,5 +69,10 @@ public enum ID
     Sawmill,
     Campfire,
     Anvil,
-    Slime
+    Slime,
+    Casing,
+    Sulphur,
+    BulletProjectile,
+    Meat,
+    CookedMeat
 }

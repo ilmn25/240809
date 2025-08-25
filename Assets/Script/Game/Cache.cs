@@ -5,7 +5,7 @@ public class Cache
 {
     private static readonly Dictionary<string, AudioClip> AudioClipCache = new Dictionary<string, AudioClip>();
     private static readonly Dictionary<string, Sprite> SpriteCache = new Dictionary<string, Sprite>();
-
+    
     public static AudioClip LoadAudioClip(string path)
     {
         string fullPath = "Audio/" + path;

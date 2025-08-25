@@ -1,10 +1,11 @@
-public class FurnaceMachine: ConverterMachine
+public class SawmillMachine: ConverterMachine
 {
     public static Info CreateInfo()
     {
         Storage storage = new Storage(3);
-        storage.CreateAndAddItem(ID.Slag);    
-        storage.CreateAndAddItem(ID.Steel);    
+        storage.CreateAndAddItem(ID.Plank);
+        storage.CreateAndAddItem(ID.Stake);
+        storage.CreateAndAddItem(ID.Chest);   
         return new ConverterInfo()
         {
             Health = 500,

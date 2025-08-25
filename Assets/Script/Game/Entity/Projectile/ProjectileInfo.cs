@@ -16,7 +16,7 @@ public class ProjectileInfo
     public OperationType OperationType = OperationType.None;
     public string Effects;
     public ProjectileClass Class; 
-    public string Sprite;
+    public ID Sprite;
     public ID Ammo;
     public float Scale = 1;
 

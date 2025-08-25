@@ -21,7 +21,7 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
             if (Info.SpriteToolTrack.lossyScale.x < 0f) 
                 direction *= -1;
             direction.y = 0;
-            direction.Normalize();
+            direction.Normalize(); 
 
             Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
                 Info.AimPosition,
@@ -37,6 +37,5 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
                 SetState<MobAttackShoot>();
                 break;
         }
-                     
     }
 }

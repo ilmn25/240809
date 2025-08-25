@@ -33,7 +33,11 @@ public partial class Item
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone);
 
         // Materials
-        AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Gravel, 2 } }, craftStack: 5, time:1500);
+        AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
+        AddMaterialDefinition(ID.Casing);
+        AddMaterialDefinition(ID.Sulphur);
+        AddMaterialDefinition(ID.Meat);
+        AddMaterialDefinition(ID.CookedMeat, materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddMaterialDefinition(ID.Gravel);
         AddMaterialDefinition(ID.Sticks);
         AddMaterialDefinition(ID.Flint);
@@ -79,6 +83,7 @@ public partial class Item
         AddToolDefinition(
             stringID: ID.Blueprint,
             gesture: ItemGesture.Swing,
+            sfx: SfxID.Null,
             speed: 4f,
             range: 7f,
             durability: -1,
@@ -181,7 +186,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
-                Sprite = "spear",
+                Sprite = ID.Spear,
                 Damage = 2,
                 Knockback = 10,
                 CritChance = 10,
@@ -203,19 +208,19 @@ public partial class Item
             stringID: ID.Minigun,
             gesture: ItemGesture.Shoot,
             speed: 2f,
+            sfx: SfxID.Minigun,
             projectileInfo: new RangedProjectileInfo {
-                Sprite = "bullet",
+                Sprite = ID.BulletProjectile,
                 Damage = 1000,
                 Knockback = 5,
                 CritChance = 10,
                 LifeSpan = 10000,
-                Speed = 50,
+                Speed = 60,
                 Radius = 0.1f,
-                Penetration = 1,
-                Scale = 0.6f
+                Penetration = 1, 
             },
             materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
-            projectileOffset: 1.54f,
+            projectileOffset: 1.4f,
             durability: -1,
             holdoutOffset: new Vector2(0.4f, 0)
         );
@@ -224,21 +229,21 @@ public partial class Item
             stringID: ID.Pistol,
             gesture: ItemGesture.Shoot,
             speed: 0.6f,
+            sfx: SfxID.Pistol,
             projectileInfo: new RangedProjectileInfo {
-                Sprite = "bullet",
+                Sprite = ID.BulletProjectile,
                 Damage = 1,
                 Knockback = 6,
                 CritChance = 10,
                 LifeSpan = 10000,
-                Speed = 12,
+                Speed = 60,
                 Radius = 0.1f,
                 Ammo = ID.Bullet,
-                Penetration = 1,
-                Scale = 0.6f
+                Penetration = 1, 
             },
             materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
             projectileOffset: 1.016f,
-            holdoutOffset: new Vector2(0.4f, 0)
+            holdoutOffset: new Vector2(0.4f, -0.25f)
         );
     }
     private static void AddMaterialDefinition(
@@ -313,7 +318,7 @@ public partial class Item
     private static void AddToolDefinition(
         ID stringID,
         ItemGesture gesture,
-        SfxID sfx = SfxID.Null,
+        SfxID sfx = SfxID.Sword,
         int stackSize = 1,
         ItemRarity rarity = ItemRarity.Common,
 

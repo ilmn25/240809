@@ -1,10 +1,10 @@
-public class FurnaceMachine: ConverterMachine
+public class CampfireMachine: ConverterMachine
 {
     public static Info CreateInfo()
     {
         Storage storage = new Storage(3);
-        storage.CreateAndAddItem(ID.Slag);    
-        storage.CreateAndAddItem(ID.Steel);    
+        storage.CreateAndAddItem(ID.Charcoal);
+        storage.CreateAndAddItem(ID.CookedMeat);
         return new ConverterInfo()
         {
             Health = 500,

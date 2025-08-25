@@ -63,13 +63,7 @@ public class Game : MonoBehaviour
 
     private void Start()
     { 
-        EnvParticle.Initialize(); 
-        DayNightCycle.Set(DayNightCycle.Sunrise.AmbientLight, 
-            DayNightCycle.Sunrise.FogColor, 
-            DayNightCycle.Sunrise.DirectionalLight,
-            DayNightCycle.Sunrise.SpotLight,
-            DayNightCycle.Sunrise.BackgroundColor);
-        
+        EnvParticle.Initialize();  
         Control.Initialize();  
         Item.Initialize();
         Entity.Initialize(); 
@@ -80,8 +74,8 @@ public class Game : MonoBehaviour
         Block.Initialize();   
         MapCull.Initialize(); 
         MapLoad.Initialize();
-        Scene.Initialize();  
-        ViewPort.Initialize();  
+        Scene.Initialize();
+        ViewPort.Initialize();
         Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
     }
 

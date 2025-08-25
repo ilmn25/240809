@@ -108,12 +108,12 @@ public partial class Entity
                 Dictionary.Add(stringID, Item); 
         }
 
-        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true)
+        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)
         {
-                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn);
+                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn, count, velocity);
         }
 
-        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int Amount = 999)
+        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1) // amount to add, add all 999
         { 
                 while (!slot.isEmpty())
                 {
@@ -126,7 +126,9 @@ public partial class Entity
 
                         ItemInfo itemInfo = (ItemInfo)CreateInfo(slot.ID, worldPosition + Item.SpawnOffset);
                         itemInfo.item = new ItemSlot();
-                        itemInfo.item.Add(slot, Amount);
+                        itemInfo.item.Add(slot, amount);
+                        itemInfo.Velocity = velocity;
+                        itemInfo.despawn = despawn;
                         
                         itemInfo.StackOnSpawn = stackOnSpawn;
                         currentEntityMachine.Initialize(itemInfo);
