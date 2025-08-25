@@ -17,8 +17,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     {
          
         Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("go away femboy");
-        dialogue.Lines.Add("btw bento is a femboy");
+        dialogue.Lines.Add("go away femboy"); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());

@@ -25,13 +25,13 @@ public class SmokeParticleComponent : MonoBehaviour
         while (_stateInfo.normalizedTime < 1 || _animator.IsInTransition(0))
         {
             await Task.Delay(100); // Check every 100 milliseconds
-            if (this != null)
+            if (this)
             {
                 _stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
             }
             else return; // Exit if the object has been destroyed
         }
-        if (this != null)
+        if (this)
         {
             transform.position = new Vector3(0, 500, 0);
             SmokeParticleHandler.ReturnSmokeParticleToPool(gameObject);

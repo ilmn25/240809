@@ -77,7 +77,7 @@ public class Control
         Game.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Game.Player = null;
         GUIMain.StorageInv.Storage = Game.PlayerInfo.Storage;
-        GUIHealthBar.Update();
+        GUIBar.Update();
         CurrentPlayerIndex = i;
     }
     

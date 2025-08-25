@@ -15,4 +15,7 @@ public enum SfxID
     Wind,
     Footsteps1,
     Footsteps2,
+    Pistol,
+    Minigun,
+    Sword
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum PlayerStatus {
@@ -12,7 +14,8 @@ public class PlayerInfo : MobInfo
     public Storage Storage;
     public float Mana;
     public float Sanity;
-    public float Hunger;
+    public int Hunger;
+    public int HungerMax = 20;
     public float Stamina;   
     
     private const float JumpGraceTime = 0.1f; 
@@ -27,14 +30,30 @@ public class PlayerInfo : MobInfo
         base.Initialize(); 
         IframesCurrent = 300;
         Storage.info = this;
+        _ = new CoroutineTask(HungerClock());
     }
 
     protected override void OnHit(Projectile projectile)
     {
-        GUIHealthBar.Update(); 
+        GUIBar.Update(); 
         Machine.SetState<MobHit>();
     }
 
+    private IEnumerator HungerClock()
+    {
+        while (!Destroyed)
+        {
+            if (Hunger <= 0)  
+            {
+                Health--;
+                Audio.PlaySFX(SfxID.HitPlayer);
+            }
+            else Hunger--; 
+            GUIBar.Update(); 
+            yield return new WaitForSeconds(5);
+        } 
+    }
+    
     protected override void OnUpdate()
     {
         base.OnUpdate();
@@ -54,7 +73,6 @@ public class PlayerInfo : MobInfo
 
             FaceTarget = Equipment != null || Target != null;
 
-            if (Hunger > 0) Hunger -= 0.01f;
             if (Game.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
@@ -79,26 +97,25 @@ public class PlayerInfo : MobInfo
             if (IframesCurrent != 1) return; 
             if (PlayerStatus == PlayerStatus.Dead)
             {
-                Machine.transform.position = new Vector3(
-                    World.ChunkSize * WorldGen.Size.x / 2,
-                    World.ChunkSize * WorldGen.Size.y - 5,
-                    World.ChunkSize * WorldGen.Size.z / 2);
+                Machine.transform.position = WorldGen.SpawnPoint;
                 SpriteTool.gameObject.SetActive(true);   
             } 
             Health = HealthMax;
+            Hunger = HungerMax;
             Velocity = Vector2.zero;
             PlayerStatus = PlayerStatus.Active;
-            GUIHealthBar.Update();
+            GUIBar.Update();
             Inventory.RefreshInventory();
             Machine.SetState<DefaultState>();
         } 
         
+        //fall damage
         if (!IsGrounded && Velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
             {
                 Health += (int)(Velocity.y * 3/ Gravity);
-                GUIHealthBar.Update();
+                GUIBar.Update();
                 Audio.PlaySFX(SfxID.HitPlayer);
             }
             AirTime = 0;

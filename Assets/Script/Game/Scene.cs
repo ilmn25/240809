@@ -25,7 +25,7 @@ public class Scene
         World.Load(0); 
         Control.SetPlayer(0); 
         Game.ViewPortObject.transform.position = Game.PlayerInfo.position;
-        GUIHealthBar.Initialize();
+        GUIBar.Update();
     }
     
     public static void Update()

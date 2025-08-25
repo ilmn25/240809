@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SmokeParticleHandler
 {
-    private static Queue<GameObject> _smokeParticlePool = new Queue<GameObject>();
+    private static readonly Queue<GameObject> SmokeParticlePool = new Queue<GameObject>();
     private const int PoolSize = 10;
     private static int _smokeParticleCount = 0;
     private static GameObject _smokeParticle;
@@ -15,7 +15,7 @@ public class SmokeParticleHandler
         {
             _smokeParticle = Object.Instantiate(prefab);
             _smokeParticle.SetActive(false);
-            _smokeParticlePool.Enqueue(_smokeParticle);
+            SmokeParticlePool.Enqueue(_smokeParticle);
         }
     }
 
@@ -24,7 +24,7 @@ public class SmokeParticleHandler
         if (force || _smokeParticleCount < 5)
         {
             _smokeParticle = GetSmokeParticleFromPool();
-            if (_smokeParticle != null)
+            if (_smokeParticle)
             {
                 _smokeParticle.SetActive(true);
                 _smokeParticle.GetComponent<SmokeParticleComponent>().SpawnSmoke(smokePosition);
@@ -35,9 +35,9 @@ public class SmokeParticleHandler
 
     public static GameObject GetSmokeParticleFromPool()
     {
-        if (_smokeParticlePool.Count > 0)
+        if (SmokeParticlePool.Count > 0)
         {
-            return _smokeParticlePool.Dequeue();
+            return SmokeParticlePool.Dequeue();
         }
         else return null;
     }
@@ -45,7 +45,7 @@ public class SmokeParticleHandler
     public static void ReturnSmokeParticleToPool(GameObject smokeParticle)
     {
         smokeParticle.SetActive(false);
-        _smokeParticlePool.Enqueue(smokeParticle);
+        SmokeParticlePool.Enqueue(smokeParticle);
         _smokeParticleCount--;
     }
 }

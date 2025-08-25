@@ -6,6 +6,7 @@ public partial class ViewPort
     private const int ShakeInterval = 2;
     private static float _currentShakeTime;
     private static int _currentShakeInterval;
+    private static Vector3 _direction;
     
     private static float _shakeMagnitude = 0.1f; 
     public static Vector3 ShakeOffset;
@@ -17,7 +18,8 @@ public partial class ViewPort
             _currentShakeInterval++;
             if (_currentShakeInterval == ShakeInterval)
             { 
-                ShakeOffset = Random.insideUnitSphere * (_shakeMagnitude * (_currentShakeTime / _shakeDuration));
+                ShakeOffset = (_direction == default ? Random.insideUnitSphere : _direction) * 
+                              (_shakeMagnitude * (_currentShakeTime / _shakeDuration));
                 _currentShakeTime --;
                 _currentShakeInterval = 0;
             }  
@@ -29,8 +31,9 @@ public partial class ViewPort
         }
     }
 
-    public static void StartScreenShake(int duration, float magnitude)
+    public static void StartScreenShake(int duration, float magnitude, Vector3 direction = default)
     {
+        _direction = direction; 
         _shakeDuration = duration;
         _shakeMagnitude = magnitude;
         _currentShakeTime = _shakeDuration;

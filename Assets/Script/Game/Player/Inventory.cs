@@ -25,7 +25,7 @@ public class Inventory
             }
             else
             {
-                Entity.SpawnItem(CurrentItem, Game.Player.transform.position, Amount : 1); 
+                Entity.SpawnItem(CurrentItem, Game.Player.transform.position, amount : 1); 
             } 
             RefreshInventory();
         }

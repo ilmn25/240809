@@ -85,7 +85,7 @@ public class DayNightCycle
     private static int _currentTransitionTime; 
     private static int _currentTime;
     private static DayNightCycle _previous = Night;
-    private static DayNightCycle _current = Day;
+    private static DayNightCycle _current = Sunrise;
 
     private static void SetTarget(DayNightCycle target)
     {
@@ -95,24 +95,24 @@ public class DayNightCycle
         EnvParticle.Set(target.EnvParticles);
     }
     public static void Update()
-    {  
+    {   
         if (_currentTime == 0)
-            SetTarget(Sunrise);
-        else if (_currentTime == Length * 3/24)
             if (Random.value < 0.5f)
                 SetTarget(Day);
             else
                 SetTarget(DayFog);
-        else if (_currentTime == Length * 13/24)
+        else if (_currentTime == Length * 12/24)
             if (Random.value < 0.7f)
                 SetTarget(Noon);
             else
                 SetTarget(Rapture);
-        else if (_currentTime == Length * 19/24)
+        else if (_currentTime == Length * 17/24)
             if (Random.value < 0.7f)
                 SetTarget(Night);
             else
                 SetTarget(NightFull);
+        else if (_currentTime == Length * 23/24)
+            SetTarget(Sunrise);
         
         _currentTime++; 
         if (_currentTime == Length) _currentTime = 0;

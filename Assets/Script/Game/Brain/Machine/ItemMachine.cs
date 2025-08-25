@@ -4,28 +4,22 @@ using Random = UnityEngine.Random;
 
 public class ItemMachine : EntityMachine, IActionSecondaryPickUp
 {    
-    private static readonly Collider[] CollisionArray = new Collider[40];
-    private static int _collisionCount; 
-    private bool _wasInRange;
-    private SpriteRenderer _spriteRenderer;
-    private ItemPhysicModule _itemPhysicModule; 
-    public new ItemInfo Info => GetModule<ItemInfo>();
-
     
     public static Info CreateInfo()
     {
         return new ItemInfo();
     }
-     
-    
-    public override void OnSetup()
-    {
-        _spriteRenderer = GetComponent<SpriteRenderer>(); 
-    }
+    private ItemInfo ItemInfo => (ItemInfo)Info; 
 
+    private static readonly Collider[] CollisionArray = new Collider[40];
+    private static int _collisionCount; 
+    private float _deltaTime;
+    private const float Gravity = 35;
+    private const float BounceFactor = 0.3f;
+    private const float CollisionRange = 0.3f; 
     public override void OnStart()
     {
-        if (Info.StackOnSpawn)
+        if (ItemInfo.StackOnSpawn)
         {
             ItemInfo nearbyItem;
             _collisionCount = Physics.OverlapSphereNonAlloc(transform.position, 2, CollisionArray, Game.MaskEntity);
@@ -38,32 +32,57 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
 
                 if (col.gameObject.name == "ItemPrefab")
                 {
-                    nearbyItem = col.GetComponent<ItemMachine>().Info;
-                    if (nearbyItem.item.isSame(Info.item))
+                    nearbyItem = col.GetComponent<ItemMachine>().ItemInfo;
+                    if (nearbyItem.item.isSame(ItemInfo.item))
                     {
-                        Info.item.Add(nearbyItem.item);
+                        ItemInfo.item.Add(nearbyItem.item);
                         if (nearbyItem.item.isEmpty()) nearbyItem.Destroy();
-                        if (Info.item.isFull()) break;
+                        if (ItemInfo.item.isFull()) break;
                     }
                 }
             }
         } 
         
-        _spriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.stringID);
-        AddModule(new ItemPhysicModule()); 
+        ItemInfo.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + ItemInfo.stringID);
         AddModule(new ItemSpriteCullModule()); 
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
-        transform.localScale = Vector3.one * Item.GetItem(Info.stringID).Scale;
-        _itemPhysicModule = GetModule<ItemPhysicModule>();
-        _itemPhysicModule.PopItem(); 
+        transform.localScale = Vector3.one * Item.GetItem(ItemInfo.stringID).Scale;
+        if (ItemInfo.Velocity == default) 
+            ItemInfo.Velocity = new Vector3(Random.Range(-3, 3), 0, Random.Range(-3, 3));  
     }
 
     public override void OnUpdate()
-    {  
-        if (transform.position.y < -5) Info.Destroy();
-        else if (_spriteRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(transform.position))) 
-            _itemPhysicModule.HandlePhysicsUpdate();
+    { 
+        if (!ItemInfo.IsInRenderRange)  return;
+        _deltaTime = Helper.GetDeltaTime();
+
+        if (!IsMovable(transform.position))
+        {
+            transform.position += new Vector3(0, 5, 0) * _deltaTime;
+            return;
+        }
+
+        ItemInfo.Velocity += Gravity * _deltaTime * Vector3.down;
+        ItemInfo.Velocity.y = Mathf.Max(ItemInfo.Velocity.y, -Gravity); 
+        Vector3 newPosition = transform.position + ItemInfo.Velocity * _deltaTime;
+        
+        if (IsMovable(newPosition))
+        {
+            transform.position = newPosition;
+        }
+        else
+        { 
+            ItemInfo.Velocity = -ItemInfo.Velocity * BounceFactor;
+        }
+
+        return;
+
+        bool IsMovable(Vector3 pos)
+        {  
+            _collisionCount = Physics.OverlapSphereNonAlloc(pos + new Vector3(0,0.2f,0), CollisionRange, CollisionArray, Game.MaskStatic);
+
+            return !(_collisionCount > 0);
+        } 
     }
- 
 }
  

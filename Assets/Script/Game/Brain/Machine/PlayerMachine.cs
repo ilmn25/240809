@@ -20,7 +20,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             Defense = 0,
             Mana = 100,
             Sanity = 100,
-            Hunger = 100,
             Stamina = 100,
             SpeedLogic = 4,
             SpeedGround = 4,
