@@ -2,8 +2,7 @@ public abstract class ConverterMachine: StructureMachine, IActionSecondaryIntera
 { 
     public override void OnStart()
     {
-        AddModule(new StructureSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule()); 
+        base.OnStart();
         AddState(new InConverterState());
     } 
 

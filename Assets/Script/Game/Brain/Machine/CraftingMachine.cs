@@ -2,8 +2,7 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
 { 
     public override void OnStart()
     {
-        AddModule(new StructureSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule()); 
+        base.OnStart();
         AddState(new InCraftingState());
     } 
 

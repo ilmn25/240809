@@ -8,8 +8,7 @@ public class DecorMachine : StructureMachine
     }
     public override void OnStart()
     {
-        AddModule(new StructureSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule()); 
+        base.OnStart();
         AddState(new StaticIdle(),true);  
     }  
 }

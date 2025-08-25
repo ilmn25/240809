@@ -22,7 +22,8 @@ public class MobAttackShoot : MobState
         direction.y = 0;
         direction.Normalize();
         ViewPort.StartScreenShake(1, 0.035f, direction);
-        Entity.SpawnItem(ID.Casing, Info.position, 1, false, -direction * 5, 5000);
+        Entity.SpawnItem(ID.Casing, Info.position, 1, false, 
+            (Vector3.up -direction) * 5, 15000);
     }
  
     public override void OnUpdateState()

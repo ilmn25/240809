@@ -4,8 +4,7 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
 { 
     public override void OnStart()
     { 
-        AddModule(new StructureSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule()); 
+        base.OnStart();
         AddState(new InContainerState()
         {
             Storage = ((ContainerInfo)Info).Storage

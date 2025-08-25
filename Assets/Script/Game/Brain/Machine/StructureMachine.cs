@@ -8,4 +8,9 @@ public class StructureMachine : EntityMachine
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.stringID);
     }
+    public override void OnStart()
+    { 
+        AddModule(new SpriteOrbitModule()); 
+        AddModule(new StructureSpriteCullModule());   
+    }
 } 
