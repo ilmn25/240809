@@ -6,7 +6,7 @@ public class ContainerInfo : SpriteStructureInfo
     { 
         base.Initialize();
         Storage.info = this;
-        operationType = OperationType.Breaking;
+        operationType = OperationType.Cutting;
     }
 
     public override void OnDestroy(MobInfo info)

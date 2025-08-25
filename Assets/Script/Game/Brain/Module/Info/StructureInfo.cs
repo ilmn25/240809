@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public enum OperationType { Mining, Building, Breaking, None }
+public enum OperationType { Mining, Building, Cutting, None }
 
 [System.Serializable]
 public class SpriteStructureInfo : StructureInfo

@@ -81,7 +81,7 @@ public class ItemSlot
                         case OperationType.Mining:
                             text += " \nmining: " + Info.ProjectileInfo.Breaking;
                             break;
-                        case OperationType.Breaking:
+                        case OperationType.Cutting:
                             text += " \nbreaking: " + Info.ProjectileInfo.Breaking;
                             break;
                     }

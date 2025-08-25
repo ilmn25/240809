@@ -74,5 +74,6 @@ public enum ID
     Sulphur,
     BulletProjectile,
     Meat,
-    CookedMeat
+    CookedMeat,
+    Cytoplasm
 }

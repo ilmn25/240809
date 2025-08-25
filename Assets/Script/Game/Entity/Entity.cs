@@ -110,7 +110,7 @@ public partial class Entity
 
         public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)
         {
-                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn, count, velocity);
+                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn, count, velocity, despawn);
         }
 
         public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1) // amount to add, add all 999
