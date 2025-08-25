@@ -8,8 +8,8 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-    public static readonly Vector3Int Size = new Vector3Int(15, 6, 15);
-    // public static readonly Vector3Int Size = new Vector3Int(5, 2, 5);
+    // public static readonly Vector3Int Size = new Vector3Int(15, 6, 15);
+    public static readonly Vector3Int Size = new Vector3Int(5, 4, 5);
     public static readonly Vector3Int SpawnPoint = 
         new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
  
@@ -95,7 +95,7 @@ public class WorldGen
         Chunk CurrentChunk = new Chunk();
         World.Inst[coordinates] = CurrentChunk;
 
-        if (!Flat)
+        if (!Flat && !Game.BuildMode)
         {
             // Stopwatch stopwatch = new Stopwatch();
             // stopwatch.Start();

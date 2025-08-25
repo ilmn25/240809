@@ -3,8 +3,8 @@ using UnityEngine;
 public class GenTaskThrone : WorldGen
 {
     private static int _id;
-    private static int DirtBlock => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
-    
+    private static int DirtBlock => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id;
+    private static SerializableChunk Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
         if (UnityEngine.Random.Range(0, 10) != 0) return; 
@@ -17,7 +17,7 @@ public class GenTaskThrone : WorldGen
                     if (CurrentChunk[x, y, z] == DirtBlock && CurrentChunk[x, y + 1, z] == 0 && 
                         CurrentChunk[x + 6, y, z + 6] == DirtBlock && CurrentChunk[x + 6, y + 1, z + 6] == 0)
                     {
-                        SetPiece.LoadAndPaste(CurrentCoordinate + new Vector3Int(x, y, z), "Throne");
+                        SetPiece.Paste(CurrentCoordinate + new Vector3Int(x, y, z), Throne);
                         return;
                     }
                 }
@@ -28,7 +28,8 @@ public class GenTaskThrone : WorldGen
 public class GenTaskHouse : WorldGen
 {
     private static int _id;
-    private static int DirtBlock => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
+    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
+    private static SerializableChunk House = SetPiece.LoadSetPieceFile("House");
     
     public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
     {
@@ -42,7 +43,7 @@ public class GenTaskHouse : WorldGen
                     if (CurrentChunk[x, y, z] == DirtBlock && CurrentChunk[x, y + 1, z] == 0 && 
                         CurrentChunk[x + 9, y, z + 9] == DirtBlock && CurrentChunk[x + 9, y + 1, z + 9] == 0)
                     {
-                        SetPiece.LoadAndPaste(CurrentCoordinate + new Vector3Int(x, y, z), "House");
+                        SetPiece.Paste(CurrentCoordinate + new Vector3Int(x, y, z), House);
                         return;
                     }
                 }

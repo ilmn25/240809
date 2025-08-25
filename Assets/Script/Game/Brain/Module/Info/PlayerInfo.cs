@@ -50,7 +50,7 @@ public class PlayerInfo : MobInfo
             }
             else Hunger--; 
             GUIBar.Update(); 
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(120);
         } 
     }
     

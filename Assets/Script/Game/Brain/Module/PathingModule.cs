@@ -154,8 +154,9 @@ public abstract class PathingModule : MobModule
 
                 nextPoint = HandleAirMovePoint(nextPoint, path); 
             }  
-        } 
-        Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
+            Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
+        }
+        else Info.Direction = Vector3.zero;
         return nextPoint;
     }
 
@@ -166,14 +167,16 @@ public abstract class PathingModule : MobModule
             (path[nextPoint + 1].Direction.x == path[nextPoint].Direction.x ||
              path[nextPoint + 1].Direction.z == path[nextPoint].Direction.z))
         {
-            Node initialNode = path[nextPoint];
-            while (nextPoint < path.Count - 1 && path[nextPoint].IsFloat
-                                              && path[nextPoint].Position.y >=
-                                              (int)Machine.transform.position.y &&
-                                              (path[nextPoint + 1].Direction.x == initialNode.Direction.x ||
-                                               path[nextPoint + 1].Direction.z == initialNode.Direction.z))
+            int initialPoint = nextPoint;
+            while (nextPoint < path.Count - 1 && 
+                   // nextPoint - initialPoint < Info.PointLostDistance - JumpSkipAmount &&
+                   path[nextPoint].IsFloat && 
+                   path[nextPoint].Position.y >= (int)Machine.transform.position.y &&
+                   (path[nextPoint + 1].Direction.x == path[initialPoint].Direction.x ||
+                    path[nextPoint + 1].Direction.z == path[initialPoint].Direction.z))
             {
                 nextPoint++;
+                if (Info.CanFly) break;
             }
 
             int potentialSkipPoint = nextPoint + JumpSkipAmount;

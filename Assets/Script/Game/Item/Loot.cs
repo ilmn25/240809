@@ -52,6 +52,9 @@ public class Loot
         loot = CreateTable(ID.Yuuri);
         loot.Add(0.7f, 10, ID.Bullet);  
         loot.Add(0.1f, 1, ID.Pistol); 
+        loot = CreateTable(ID.Harpy);
+        loot.Add(0.7f, 10, ID.Bullet);  
+        loot.Add(0.1f, 1, ID.Pistol); 
          
     }
 

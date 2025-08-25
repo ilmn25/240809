@@ -75,5 +75,6 @@ public enum ID
     BulletProjectile,
     Meat,
     CookedMeat,
-    Cytoplasm
+    Cytoplasm,
+    Harpy
 }

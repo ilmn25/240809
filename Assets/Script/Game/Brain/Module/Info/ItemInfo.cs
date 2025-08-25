@@ -15,7 +15,7 @@ public class ItemInfo : Info
     {
         if (item == null) item = new ItemSlot
         {
-            ID = stringID,
+            ID = id,
             Stack = 1,
         };
         SpriteRenderer = Machine.transform.GetComponent<SpriteRenderer>();

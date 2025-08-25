@@ -16,7 +16,8 @@ public class DynamicInfo : Info
     public float SpeedGround = 5;
     public float SpeedAir = 10;  
     public float Gravity = -40f;
-    public float JumpVelocity = 10f; 
+    public float JumpVelocity = 10f;
+    public bool CanFly = false;
     
     public int Health; 
     public int HealthMax;
@@ -47,8 +48,8 @@ public class DynamicInfo : Info
     [NonSerialized] public float SpeedCurrent;
     [NonSerialized] public float SpeedTarget = 10;
 
-    private static readonly Collider[] ColliderArray = new Collider[3];
-    
+    private static readonly Collider[] ColliderArray = new Collider[3]; 
+
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() {
         if (Machine)

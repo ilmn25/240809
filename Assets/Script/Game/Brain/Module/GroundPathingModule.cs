@@ -35,10 +35,13 @@ public class GroundPathingModule : PathingModule
         if (PathingTarget == PathingTarget.Target)
         {   
             // !Info.IsGrounded cant because grounded only lasts a frame || 
-            while (Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down) ||
-                   (!Info.IsGrounded && Node.IsAir(Vector3Int.FloorToInt(Info.position) + Vector3Int.down)))
+            if (!Info.CanFly)
             {
-                await Task.Delay(100); 
+                while (Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down) ||
+                       (!Info.IsGrounded && Node.IsAir(Vector3Int.FloorToInt(Info.position) + Vector3Int.down)))
+                {
+                    await Task.Delay(100); 
+                } 
             } 
 
             return await PathFind.FindPath(this, Info.PathAmount);

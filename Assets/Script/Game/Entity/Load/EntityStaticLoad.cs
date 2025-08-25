@@ -13,16 +13,7 @@ public class EntityStaticLoad
     public static void InviteEntity(EntityMachine entityMachine, Entity entity) { // not done
         ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Add(entityMachine);
         NavMap.SetEntity(entity, entityMachine.transform.position, false);
-    }
-    
-    public static void UnloadWorld()
-    {
-        foreach (var key in ActiveEntities.Keys)
-        {
-            UnloadEntitiesInChunk(key);
-        }
-        ActiveEntities.Clear();
-    }
+    } 
       
     public static void UnloadEntitiesInChunk(Vector3Int key)
     {
@@ -49,8 +40,8 @@ public class EntityStaticLoad
 
         foreach (Info info in activeEntities)
         {
-            entity = Entity.Dictionary[info.stringID];
-            currentInstance = ObjectPool.GetObject(entity.PrefabName, info.stringID);
+            entity = Entity.Dictionary[info.id];
+            currentInstance = ObjectPool.GetObject(entity.PrefabName, info.id);
             currentInstance.transform.position = info.position;
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));

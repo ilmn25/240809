@@ -27,12 +27,14 @@ public class PathRandom
             Vector3 dest = agent.Machine.transform.position - agent.Info.Target.position;
             dest.y = 0;
             offset = Vector3Int.FloorToInt(dest.normalized) * scanCount; 
-        } 
-        
+        }
+        if (agent.Info.CanFly) offset.y = (int) agent.Info.position.y + 100;
+        else offset.y = (int) agent.Info.position.y;
+ 
         Vector3Int startPosition =
-            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Info.position));
         Vector3Int endPosition =
-            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Machine.transform.position + offset));
+            NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Info.position + offset));
 
         List<Node> openList = new List<Node>(); 
         HashSet<Vector3> closedList = new HashSet<Vector3>();
@@ -84,6 +86,6 @@ public class PathRandom
             }
         }
 
-        return closestNode?.GetPathList(); // Return the path to the closest node 
+        return closestNode?.GetPathList(agent.Info.CanFly); // Return the path to the closest node 
     }
 }

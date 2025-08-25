@@ -73,7 +73,7 @@ public class GroundMovementModule : MovementModule
     protected virtual void HandleJump()
     { 
         // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
-        if (Info.IsGrounded && Info.Direction.y > 0)
+        if ((Info.IsGrounded || Info.CanFly) && Info.Direction.y > 0)
         {
             Info.Velocity.y = Info.JumpVelocity; 
             Info.IsGrounded = false;

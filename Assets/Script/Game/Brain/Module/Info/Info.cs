@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 [System.Serializable]
 public class Info : EntityModule
 {
     public static readonly Dictionary<string, Info> Dictionary = new Dictionary<string, Info>();
-    public ID stringID;
+    public ID id;
     public Vector3 position;
     [NonSerialized] public bool Destroyed = false;
     [NonSerialized] public bool IsInRenderRange;
@@ -13,7 +15,7 @@ public class Info : EntityModule
     {
         return new SetEntity()
         {
-            stringID = stringID,
+            id = id,
             position = Vector3Int.FloorToInt(position)
         };
     }

@@ -6,8 +6,8 @@ using Newtonsoft.Json;
 public class SetPiece
 {
     
-    public static Vector3Int PositionA;
-    public static Vector3Int PositionB;
+    public static Vector3Int Pos1;
+    public static Vector3Int Pos2;
      
     public static void SaveSetPieceFile(SerializableChunk setPiece, string fileName)
     {
@@ -28,16 +28,14 @@ public class SetPiece
         });
     }
     
-    public static void CopyAndSave(string name)
-    {
-        EntityStaticLoad.UnloadWorld();
-        EntityDynamicLoad.UnloadWorld();
-        int minX = Mathf.Min(PositionA.x, PositionB.x);
-        int minY = Mathf.Min(PositionA.y, PositionB.y);
-        int minZ = Mathf.Min(PositionA.z, PositionB.z);
-        int maxX = Mathf.Max(PositionA.x, PositionB.x);
-        int maxY = Mathf.Max(PositionA.y, PositionB.y);
-        int maxZ = Mathf.Max(PositionA.z, PositionB.z);
+    public static SerializableChunk Copy()
+    { 
+        int minX = Mathf.Min(Pos1.x, Pos2.x);
+        int minY = Mathf.Min(Pos1.y, Pos2.y);
+        int minZ = Mathf.Min(Pos1.z, Pos2.z);
+        int maxX = Mathf.Max(Pos1.x, Pos2.x);
+        int maxY = Mathf.Max(Pos1.y, Pos2.y);
+        int maxZ = Mathf.Max(Pos1.z, Pos2.z);
 
         SerializableChunk setPiece = new SerializableChunk(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
         Vector3Int min = new Vector3Int(minX, minY, minZ);
@@ -90,12 +88,12 @@ public class SetPiece
                 }
             }
         }
-        SaveSetPieceFile(setPiece, name);
+
+        return setPiece;
     }
     
-    public static void LoadAndPaste(Vector3Int position, string name)
-    { 
-        SerializableChunk setPiece = LoadSetPieceFile(name);
+    public static void Paste(Vector3Int position, SerializableChunk setPiece)
+    {  
         Vector3Int chunkPos, worldPos;
         
         foreach (SetEntity entity in setPiece.StaticEntity)
@@ -103,10 +101,10 @@ public class SetPiece
             worldPos = position + entity.position;
             if (World.IsInWorldBounds(worldPos))
             {
-                chunkPos = World.GetChunkCoordinate(worldPos);
-                entity.position = worldPos; 
+                chunkPos = World.GetChunkCoordinate(worldPos); 
                 if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
-                World.Inst[chunkPos].StaticEntity.Add(entity.ToInfo());
+                World.Inst[chunkPos].StaticEntity.Add(
+                    Entity.CreateInfo(entity.id, worldPos));
             } 
         }
  
@@ -116,9 +114,9 @@ public class SetPiece
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
-                entity.position = worldPos;
                 if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
-                World.Inst[chunkPos].DynamicEntity.Add(entity.ToInfo());
+                World.Inst[chunkPos].DynamicEntity.Add(
+                    Entity.CreateInfo(entity.id, worldPos));
             }  
         }
  

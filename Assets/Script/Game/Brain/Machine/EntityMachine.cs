@@ -21,7 +21,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
         if (!_initialSetup)
         { 
             _initialSetup = true;
-            Entity = Entity.Dictionary[info.stringID]; 
+            Entity = Entity.Dictionary[info.id]; 
             gameObject.layer = Entity.Collision;
             if (Entity.Bounds != Vector3Int.zero)
             {
