@@ -30,11 +30,21 @@ public class World
         Seed = UnityEngine.Random.Range(1, 1000);
     }
 
+    public static void UnloadWorld()
+    {  
+        EntityDynamicLoad.UnloadWorld(); 
+        MapLoad.UnloadMap(); 
+    }
+
+    public static void LoadWorld()
+    { 
+        EntityDynamicLoad.OnChunkTraverse();
+        MapLoad.OnChunkTraverse();
+    }
+    
     public static void Save(int id)
     {
-        EntityStaticLoad.UnloadWorld();
-        EntityDynamicLoad.UnloadWorld();
-
+        UnloadWorld();
         Helper.FileSave(Inst, "World" + id);
     }
 

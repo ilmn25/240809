@@ -17,7 +17,7 @@ class MobAttackSwing : MobState {
         {
             if (stateInfo.IsName("EquipSwing"))
             {  
-                Info.Animator.speed = _equipment.Speed;
+                Info.Animator.speed = Game.BuildMode? 70 : _equipment.Speed;
                 Info.Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))

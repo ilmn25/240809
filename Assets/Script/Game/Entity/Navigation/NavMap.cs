@@ -35,7 +35,7 @@ public class NavMap
             }
             foreach (var entity in chunk.StaticEntity)
             {
-                SetEntity(Entity.Dictionary[entity.stringID], entity.position, false);
+                SetEntity(Entity.Dictionary[entity.id], entity.position, false);
             }
         }
     }

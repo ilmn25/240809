@@ -77,12 +77,12 @@ public class EntityDynamicLoad
         List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity;
         foreach (Info info in chunkEntityList)
         {   
-            entity = Entity.Dictionary[info.stringID];
+            entity = Entity.Dictionary[info.id];
             
             if (entity.PrefabName == ID.ItemPrefab)
                 currentInstance = ObjectPool.GetObject(entity.PrefabName);
             else                
-                currentInstance = ObjectPool.GetObject(entity.PrefabName, info.stringID);
+                currentInstance = ObjectPool.GetObject(entity.PrefabName, info.id);
             currentInstance.transform.position = info.position;
             // Utility.Log(chunkCoordinate, entityData.position.ToVector3Int(), currentInstance.transform.position);
             currentEntityMachine = (EntityMachine)

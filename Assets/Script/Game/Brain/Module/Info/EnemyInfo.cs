@@ -24,7 +24,7 @@ public class EnemyInfo : MobInfo
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
         if (Health <= 0)
         { 
-            Loot.Gettable(((EntityMachine)Machine).Info.stringID).Spawn(Machine.transform.position);
+            Loot.Gettable(((EntityMachine)Machine).Info.id).Spawn(Machine.transform.position);
             Destroy();
             Audio.PlaySFX(DeathSfx);
         }

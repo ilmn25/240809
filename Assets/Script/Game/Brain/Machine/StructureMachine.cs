@@ -6,7 +6,7 @@ public class StructureMachine : EntityMachine
     public override void OnSetup()
     {
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
-        SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.stringID);
+        SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id);
     }
     public override void OnStart()
     { 

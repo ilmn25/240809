@@ -34,8 +34,7 @@ public class Scene
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
             new CoroutineTask(WorldGen.GenerateNearbyChunks(PlayerChunkPosition)); 
-            MapLoad.OnChunkTraverse(); // static is called when each chunk gets spawned per yield
-            EntityDynamicLoad.OnChunkTraverse();
+            World.LoadWorld();
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }
     }

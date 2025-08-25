@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
             
-    public static readonly bool BuildMode = false;
+    public static bool BuildMode = true;
     public static bool Fly = false;
     
     public static LayerMask MaskMap;  
@@ -58,11 +58,11 @@ public class Game : MonoBehaviour
         SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), new Vector3SerializationSurrogate());
         surrogateSelector.AddSurrogate(typeof(Vector3Int), new StreamingContext(StreamingContextStates.All), new Vector3IntSerializationSurrogate());
-        Helper.BinaryFormatter.SurrogateSelector = surrogateSelector;
+        Helper.BinaryFormatter.SurrogateSelector = surrogateSelector; 
     }
 
     private void Start()
-    { 
+    {  
         EnvParticle.Initialize();  
         Control.Initialize();  
         Item.Initialize();
@@ -73,14 +73,16 @@ public class Game : MonoBehaviour
         Audio.Initialize();
         Block.Initialize();   
         MapCull.Initialize(); 
-        MapLoad.Initialize();
         Scene.Initialize();
         ViewPort.Initialize();
+        PlayerTerraformModule.Block = ObjectPool.GetObject(ID.BlockPrefab);
+        PlayerTerraformModule.Block.SetActive(false);
         Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
     }
 
     private void Update()
-    { 
+    {  
+        
         QualitySettings.vSyncCount = 0; // fps limit doesnt work if not, somewhere something is setting it to 1
         if (Control.Inst.Pause.KeyDown())
         {

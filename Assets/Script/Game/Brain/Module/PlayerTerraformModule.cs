@@ -4,48 +4,42 @@ using UnityEngine;
 public class PlayerTerraformModule : Module
 {
     public static List<Vector3Int> PendingBlocks = new ();
-    private static GameObject _block;
+    public static GameObject Block;
     private static Vector3 _position;
     private static Vector3 _direction;
     private static Vector3Int _coordinate;
 
-    public static readonly int PreviewSpeed = 10;
-    public override void Initialize()
-    {
-        // Inventory.SlotUpdate += EventSlotUpdate;
-        _block = ObjectPool.GetObject(ID.BlockPrefab);
-        _block.SetActive(false);
-    } 
+    public static readonly int PreviewSpeed = 10; 
     
     private static void EventSlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
         {
-            _block.SetActive(false);
+            Block.SetActive(false);
         }
         else if (Inventory.CurrentItemData.Type == ItemType.Block)
         {
-            _block.SetActive(true);
-            if (_block.name != Inventory.CurrentItemData.StringID.ToString())
+            Block.SetActive(true);
+            if (Block.name != Inventory.CurrentItemData.StringID.ToString())
             {
-                _block.name = Inventory.CurrentItemData.StringID.ToString();
-                BlockPreview.Set(_block, Inventory.CurrentItemData.StringID);
-                _block.transform.localScale = Vector3.one;
+                Block.name = Inventory.CurrentItemData.StringID.ToString();
+                BlockPreview.Set(Block, Inventory.CurrentItemData.StringID);
+                Block.transform.localScale = Vector3.one;
             }  
         } 
         else if (Inventory.CurrentItemData.Name == "blueprint")
         {
-            _block.SetActive(true); 
-            if (_block.name != "overlay")
+            Block.SetActive(true); 
+            if (Block.name != "overlay")
             {
-                _block.name = "overlay";
-                BlockPreview.Set(_block, ID.OverlayBlock);
-                _block.transform.localScale = Vector3.one * 1.04f;
+                Block.name = "overlay";
+                BlockPreview.Set(Block, ID.OverlayBlock);
+                Block.transform.localScale = Vector3.one * 1.04f;
             } 
         }
         else
         {
-            _block.SetActive(false);
+            Block.SetActive(false);
         }
     }
     
@@ -67,22 +61,22 @@ public class PlayerTerraformModule : Module
             SpawnBlock();
         }
         
-        if (_block.activeSelf)
+        if (Block.activeSelf)
         {
-            if (_block.name != "overlay")
+            if (Block.name != "overlay")
             {
                 _coordinate = OffsetPosition(false, _position, _direction);
                 if (_position != Vector3.down)
-                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate+ new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
+                    Block.transform.position = Vector3.Lerp(Block.transform.position, _coordinate+ new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
                 else
-                    _block.transform.position = Vector3.down;
+                    Block.transform.position = Vector3.down;
             }
             else
             { 
                 if (_position != Vector3.down)
-                    _block.transform.position = Vector3.Lerp(_block.transform.position, _coordinate + new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
+                    Block.transform.position = Vector3.Lerp(Block.transform.position, _coordinate + new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
                 else
-                    _block.transform.position = Vector3.down;
+                    Block.transform.position = Vector3.down;
             } 
         }
     }
@@ -109,28 +103,28 @@ public class PlayerTerraformModule : Module
     {
         if (Game.BuildMode)
         {
-            if (_block.name == "overlay")
+            if (Block.name == "overlay")
                 World.SetBlock(_coordinate);
             else
             {
                 Game.PlayerInfo.Storage.CreateAndAddItem(Game.PlayerInfo.Equipment.ID);
-                World.SetBlock(_coordinate, Block.ConvertID(Game.PlayerInfo.Equipment.ID)); 
+                World.SetBlock(_coordinate, global::Block.ConvertID(Game.PlayerInfo.Equipment.ID)); 
             }
             return;
         }
         
         StructureInfo info;
         Block block;
-        if (_block.name == "overlay")
+        if (Block.name == "overlay")
         { 
-            block = Block.GetBlock(World.GetBlock(_coordinate));
+            block = global::Block.GetBlock(World.GetBlock(_coordinate));
             info = (BreakBlockInfo)Entity.Spawn(ID.BreakBlock, _coordinate);
             info.operationType = OperationType.Mining;
             info.Loot = block.StringID; 
         }
         else
         { 
-            block = Block.GetBlock(Game.PlayerInfo.Equipment.ID);
+            block = global::Block.GetBlock(Game.PlayerInfo.Equipment.ID);
             info = (BlockInfo)Entity.Spawn(ID.Block, _coordinate);
             info.operationType = OperationType.Building;
             ((BlockInfo)info).blockID = block.StringID;

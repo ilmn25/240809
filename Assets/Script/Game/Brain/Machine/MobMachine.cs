@@ -5,7 +5,7 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     public new MobInfo Info => GetModule<MobInfo>();
     public override void OnSetup()
     {
-        if (Info.CharSprite == ID.Null) Info.CharSprite = Info.stringID;
+        if (Info.CharSprite == ID.Null) Info.CharSprite = Info.id;
         transform.Find("Sprite").Find("Char").GetComponent<SpriteRenderer>().sprite =
             Cache.LoadSprite("Sprite/" + Info.CharSprite);
     }

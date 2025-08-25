@@ -90,7 +90,7 @@ public partial class Item
             Type = ItemType.Block,
             Gesture = ItemGesture.Swing,
 
-            Speed = Game.BuildMode? 70 : 4,
+            Speed = 4,
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
 

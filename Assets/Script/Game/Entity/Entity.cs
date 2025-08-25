@@ -75,6 +75,7 @@ public partial class Entity
                 AddMob<BugMachine>(ID.SnareFlea); 
                 AddMob<GhoulMachine>(ID.Megumin);
                 AddMob<SlimeMachine>(ID.Slime);
+                AddMob<HarpyMachine>(ID.Harpy);
         }
 
         private static void AddMob<T>(ID stringID) where T : EntityMachine
@@ -163,7 +164,7 @@ public partial class Entity
                 if (method != null && method.ReturnType == typeof(Info))
                 {
                         Info info = (Info)method.Invoke(null, null);
-                        info.stringID = stringID;
+                        info.id = stringID;
                         info.position = worldPosition + entity.SpawnOffset;
                         return info;
                 }

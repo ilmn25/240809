@@ -32,30 +32,36 @@ public class MapLoad
     private static List<int> _triangles;
     private static List<Vector2> _uvs; 
     private static List<Vector3> _normals;
-    private static int[] _count; 
-    
-    public static async void Initialize()
-    {   
-        await Task.Delay(50);
-        OnChunkTraverse();  
-    }
-    
+    private static int[] _count;  
+ 
     public static void RefreshExistingChunk(Vector3Int chunkCoordinates)
     {
         if (!World.IsInWorldBounds(chunkCoordinates)) return;
         _ = LoadChunksOntoScreenAsync(chunkCoordinates, true);
     }
 
- 
+    public static void UnloadChunk(Vector3Int coord)
+    { 
+        Object.Destroy(ActiveChunks[coord].gameObject, 1);
+        EntityStaticLoad.UnloadEntitiesInChunk(coord); //static entities unload
+        EntityStaticLoad.ActiveEntities.Remove(coord);
+        //note: need to remove key from activechunks manually outside (depending on context)
+    }
+    public static void UnloadMap()
+    { 
+        foreach (var kvp in ActiveChunks)
+        {
+            UnloadChunk(kvp.Key);
+        }
+        ActiveChunks.Clear();
+    } 
     public static void OnChunkTraverse()
     {
         foreach (var kvp in ActiveChunks)
         {
             if (!Scene.InPlayerChunkRange(kvp.Key, Scene.RenderDistance))
             {
-                Object.Destroy(kvp.Value.gameObject, 1);
-                EntityStaticLoad.UnloadEntitiesInChunk(kvp.Key); //static entities load in 
-                EntityStaticLoad.ActiveEntities.Remove(kvp.Key);
+                UnloadChunk(kvp.Key);
                 _destroyList.Add(kvp.Key);
             }
         }

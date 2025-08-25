@@ -37,11 +37,20 @@ public class Node
     }
     
  
-    public List<Node> GetPathList()
+    public List<Node> GetPathList(bool jumpEnd)
     {
         Node currentNode = this;
         List<Node> pathList = new List<Node>();
-
+        
+        if (!jumpEnd)
+        {
+            while (currentNode != null)
+            {
+                if (currentNode.IsFloat) currentNode = currentNode.Parent;
+                else break;
+            } 
+        }
+        
         while (currentNode != null)
         {
             // Center the node position

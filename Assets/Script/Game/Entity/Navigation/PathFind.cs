@@ -69,7 +69,7 @@ public class PathFind
                 (delta.x == 0 && delta.y == 0 && Mathf.Abs(delta.z) <= 1))
             {
                 currentNode =  new Node(endPosition, currentNode, 0, 0, false,  Vector3Int.FloorToInt(endPosition - currentNode.Position));
-                return currentNode.GetPathList();
+                return currentNode.GetPathList(agent.Info.CanFly);
             }
             
             foreach (var direction in Node.Directions) //scan each direction
@@ -98,6 +98,6 @@ public class PathFind
             }
         }
 
-        return closestNode?.GetPathList(); // Return the path to the closest node 
+        return closestNode?.GetPathList(agent.Info.CanFly); // Return the path to the closest node 
     }
 }

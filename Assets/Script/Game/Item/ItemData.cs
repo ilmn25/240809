@@ -102,7 +102,7 @@ public partial class Item
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = Game.BuildMode? 70 : 4,
+                Speed = 4f,
                 Radius = 2,
                 Breaking = 1,
                 OperationType = OperationType.Mining
