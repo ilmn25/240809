@@ -2,29 +2,29 @@ using UnityEngine;
 
 public class GenTaskCrater : WorldGen
 {
-    private static readonly int centerX = World.Inst.Bounds.x/2;
-    private static readonly int centerZ = World.Inst.Bounds.z/2;
-    private static readonly int Radius = World.Inst.Bounds.z/6;
+    private static readonly int CenterX = World.Inst.Bounds.x/2;
+    private static readonly int CenterZ = World.Inst.Bounds.z/2;
+    private static readonly int Radius = 24;
     private const float Scale = 0.1f;
-    private const int Steps = 5;
+    private static readonly int Steps = 16;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id; 
+    private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
 
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         int chunkSize = World.ChunkSize;
 
         for (int x = 0; x < chunkSize; x++)
         {
-            int worldX = CurrentCoordinate.x + x;
-            int distanceX = Mathf.Abs(centerX - worldX);
+            int worldX = currentCoordinate.x + x;
+            int distanceX = Mathf.Abs(CenterX - worldX);
             float noiseX = worldX * Scale + Offset;
 
             for (int z = 0; z < chunkSize; z++)
             {
-                int worldZ = CurrentCoordinate.z + z;
-                int distanceZ = Mathf.Abs(centerZ - worldZ);
+                int worldZ = currentCoordinate.z + z;
+                int distanceZ = Mathf.Abs(CenterZ - worldZ);
                 float noiseZ = worldZ * Scale + Offset;
 
                 float distanceSquared = distanceX * distanceX + distanceZ * distanceZ;
@@ -34,7 +34,7 @@ public class GenTaskCrater : WorldGen
 
                 for (int y = 0; y < chunkSize + 4; y++)
                 {
-                    int worldY = CurrentCoordinate.y + y;
+                    int worldY = currentCoordinate.y + y;
                     float normalizedHeight = (float)worldY / WorldHeight;
                     float stepSize = 1f / Steps;
                     float stepProgress = normalizedHeight / stepSize;
@@ -54,15 +54,15 @@ public class GenTaskCrater : WorldGen
                     // Crater carving
                     if (y < chunkSize && distanceSquared <= taperedRadiusSquared)
                     {
-                        CurrentChunk[x, y, z] = 0;
+                        currentChunk[x, y, z] = 0;
                     }
 
                     // Dirt placement 4 blocks below
                     if (y >= 4 && y - 4 < chunkSize && distanceSquared <= taperedRadiusSquared)
                     {
-                        if (CurrentChunk[x, y - 4, z] != 0)
+                        if (currentChunk[x, y - 4, z] != 0)
                         {
-                            CurrentChunk[x, y - 4, z] = ID;
+                            currentChunk[x, y - 4, z] = Dirt;
                         }
                     }
                 }

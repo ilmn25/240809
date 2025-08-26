@@ -8,9 +8,9 @@ public class GenTaskMaze : WorldGen
     private static int _id;
     private static int ID => _id == 0 ? Block.ConvertID(global::ID.BackroomBlock) : _id;  
 
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        if (CurrentCoordinate.y != 0) return;
+        if (currentCoordinate.y != 0) return;
 
         bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize);
         
@@ -22,17 +22,13 @@ public class GenTaskMaze : WorldGen
                 for (int z = 0; z < World.ChunkSize; z++)
                 {
                     if (y < FloorHeight)
-                    {
-                        CurrentChunk[x, y, z] = ID; // Floor
-                    }
+                        currentChunk[x, y, z] = ID; // Floor
                     else if (y == WallHeight + FloorHeight)
-                    {
-                        CurrentChunk[x, y, z] = ID; // Ceiling
-                    }
+                        currentChunk[x, y, z] = ID; // Ceiling
                     else if (maze[x, z] && y < WallHeight + FloorHeight)
-                    {
-                        CurrentChunk[x, y, z] = ID; // Walls
-                    }
+                        currentChunk[x, y, z] = ID; // Walls
+                    else
+                        currentChunk[x, y, z] = 0; // air
                 }
             }
         }

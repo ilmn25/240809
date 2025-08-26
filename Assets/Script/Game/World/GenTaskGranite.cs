@@ -11,21 +11,21 @@ public class GenTaskGranite : WorldGen
     private static int _idGranite;
     private static int ID => _idGranite == 0 ? Block.ConvertID(global::ID.GraniteBlock) : _idGranite;
 
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         int chunkSize = World.ChunkSize;
 
         for (int x = 0; x < chunkSize; x++)
         {
-            int worldX = CurrentCoordinate.x + x;
+            int worldX = currentCoordinate.x + x;
 
             for (int z = 0; z < chunkSize; z++)
             {
-                int worldZ = CurrentCoordinate.z + z;
+                int worldZ = currentCoordinate.z + z;
 
                 for (int y = 0; y < chunkSize; y++)
                 {
-                    int worldY = CurrentCoordinate.y + y;
+                    int worldY = currentCoordinate.y + y;
 
                     // Only generate granite below a certain height
                     if (worldY > MaxGraniteHeight) continue;
@@ -38,9 +38,9 @@ public class GenTaskGranite : WorldGen
                     float noise = Perlin3D(nx, ny, nz);
 
                     // If noise is above threshold, place granite
-                    if (noise > Threshold && CurrentChunk[x, y, z] != 0)
+                    if (noise > Threshold && currentChunk[x, y, z] != 0)
                     {
-                        CurrentChunk[x, y, z] = ID;
+                        currentChunk[x, y, z] = ID;
                     }
                 }
             }

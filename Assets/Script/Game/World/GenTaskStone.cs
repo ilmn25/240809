@@ -1,3 +1,4 @@
+using System.Drawing;
 using UnityEngine;
 
 public class GenTaskStone : WorldGen
@@ -7,25 +8,26 @@ public class GenTaskStone : WorldGen
     private const float Scale = 0.05f;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID(global::ID.StoneBlock) : _id; 
+    private static int Stone => _id == 0 ? Block.ConvertID(ID.StoneBlock) : _id;
+    private const int VerticalScale  = World.ChunkSize;
     
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {
-            _x = Mathf.Abs(CurrentCoordinate.x + x) * Scale + Offset;
+            _x = Mathf.Abs(currentCoordinate.x + x) * Scale + Offset;
 
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                _z = Mathf.Abs(CurrentCoordinate.z + z) * Scale + Offset;
+                _z = Mathf.Abs(currentCoordinate.z + z) * Scale + Offset;
                 _value = Mathf.PerlinNoise(_x, _z);
-                _height = Mathf.FloorToInt(_value * (WorldHeight / 4)) + (WorldHeight * 3 / 4);
+                _height = Mathf.FloorToInt(_value * VerticalScale + WorldHeight);
                 
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    if (y + CurrentCoordinate.y <= _height - 5)
+                    if (y + currentCoordinate.y <= _height - 5)
                     {
-                        CurrentChunk[x, y, z] = ID;
+                        currentChunk[x, y, z] = Stone;
                     }
                 }
             }
