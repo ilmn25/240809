@@ -102,7 +102,7 @@ public class Terraform
         Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
         SpawnBlock();
         
-        Game.PlayerInfo.Storage.RemoveItem(Game.PlayerInfo.Equipment.ID);
+        Game.PlayerInfo.storage.RemoveItem(Game.PlayerInfo.Equipment.ID);
     }
 
     public static void SpawnBlock()
@@ -113,7 +113,7 @@ public class Terraform
                 World.SetBlock(_coordinate);
             else
             {
-                Game.PlayerInfo.Storage.CreateAndAddItem(Game.PlayerInfo.Equipment.ID);
+                Game.PlayerInfo.storage.CreateAndAddItem(Game.PlayerInfo.Equipment.ID);
                 World.SetBlock(_coordinate, global::Block.ConvertID(Game.PlayerInfo.Equipment.ID)); 
             }
             return;

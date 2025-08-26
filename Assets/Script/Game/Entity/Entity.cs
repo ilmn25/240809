@@ -114,14 +114,15 @@ public class Entity
                 Dictionary.Add(stringID, Item); 
         }
 
-        public static void SpawnItem(ID id, Vector3 worldPosition, int count = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)
+        public static void SpawnItem(ID id, Vector3 worldPosition, int amount = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)
         {
-                SpawnItem(new ItemSlot(id, count), worldPosition, stackOnSpawn, count, velocity, despawn);
+                SpawnItem(new ItemSlot(id, amount), worldPosition, stackOnSpawn, amount, velocity, despawn);
         }
 
         public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1) // amount to add, add all 999
-        { 
-                while (!slot.isEmpty())
+        {  
+                int target = slot.Stack - amount;
+                while (slot.Stack != target && !slot.isEmpty())
                 {
                         GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
                         gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + Item.SpawnOffset;
@@ -132,7 +133,7 @@ public class Entity
 
                         ItemInfo itemInfo = (ItemInfo)CreateInfo(slot.ID, worldPosition + Item.SpawnOffset);
                         itemInfo.item = new ItemSlot();
-                        itemInfo.item.Add(slot, amount);
+                        itemInfo.item.Add(slot, slot.Stack - target);
                         itemInfo.Velocity = velocity;
                         itemInfo.despawn = despawn;
                         

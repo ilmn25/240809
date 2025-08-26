@@ -49,15 +49,16 @@ public class WorldGen
             }
         } 
         
-        Vector3Int playerSpawnPoint = SpawnPoint;
         // while (!NavMap.Get(playerSpawnPoint)) playerSpawnPoint.y++; 
         
-        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
+        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
+        player.spawnPoint = SpawnPoint;
         World.Inst[SpawnPoint].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);
         
         if(Game.BuildMode)return;
-        player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerSpawnPoint);
+        player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
+        player.spawnPoint = SpawnPoint;
         player.CharSprite = ID.Yuuri;
         World.Inst[SpawnPoint].DynamicEntity.Add(player); 
         World.Inst.target.Add(player);

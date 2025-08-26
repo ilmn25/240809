@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // public class ActionTask
 // {
@@ -33,8 +34,8 @@ public class MobInfo : DynamicInfo
     public int MaxStuckCount = 250; 
     public int PointLostDistance = 5;
     public int NormalSkipAmount = 1;
-    public bool MustLandFirst = false;
-    public HitboxType TargetHitboxType;
+    public bool mustLandFirst = false;
+    public HitboxType targetHitboxType;
  
     [NonSerialized] public ItemSlot Equipment;
     

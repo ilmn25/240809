@@ -11,16 +11,16 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return new PlayerInfo()
         {  
             HitboxType = HitboxType.Friendly,
-            TargetHitboxType = HitboxType.Passive,
-            Storage = new Storage(9)
+            targetHitboxType = HitboxType.Passive,
+            storage = new Storage(9)
             {
                 Name = "Inventory"
             },
             HealthMax = 12,
             Defense = 0,
-            Mana = 100,
-            Sanity = 100,
-            Stamina = 100,
+            mana = 100,
+            sanity = 100,
+            stamina = 100,
             SpeedLogic = 4,
             SpeedGround = 4,
             SpeedAir = 5,
@@ -52,7 +52,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new EquipSelectState());   
         AddState(new InContainerState()
         {
-            Storage = Info.Storage
+            Storage = Info.storage
         });
     }
 
@@ -171,7 +171,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             {  
                 foreach (StructureInfo structureInfo in PlayerTask.Pending)
                 { 
-                    if (Info.Storage.SetTool(structureInfo.operationType))
+                    if (Info.storage.SetTool(structureInfo.operationType))
                     {
                         Info.Target = structureInfo;
                         Info.ActionType = IActionType.Hit; 
@@ -195,8 +195,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (Info.Equipment.Info.ProjectileInfo != null)
         {
             if (Info.Equipment.Info.ProjectileInfo.Ammo != ID.Null && 
-                Info.Storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
-            Info.Storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
+                Info.storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
+            Info.storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
         }
 
         base.Attack();

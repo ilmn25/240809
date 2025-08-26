@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum PlayerStatus {
     Active, 
@@ -11,12 +12,13 @@ public enum PlayerStatus {
 [System.Serializable]
 public class PlayerInfo : MobInfo
 { 
-    public Storage Storage;
-    public float Mana;
-    public float Sanity;
-    public int Hunger;
-    public int HungerMax = 20;
-    public float Stamina;   
+    public Storage storage;
+    public float mana;
+    public float sanity;
+    public int hunger;
+    public int hungerMax = 20;
+    public float stamina; 
+    public Vector3 spawnPoint;
     
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
@@ -29,7 +31,7 @@ public class PlayerInfo : MobInfo
     { 
         base.Initialize(); 
         IframesCurrent = 300;
-        Storage.info = this;
+        storage.info = this;
         _ = new CoroutineTask(HungerClock());
     }
 
@@ -43,14 +45,14 @@ public class PlayerInfo : MobInfo
     {
         while (!Destroyed)
         {
-            if (Hunger <= 0)  
+            yield return new WaitForSeconds(120);
+            if (hunger <= 0)  
             {
                 Health--;
                 Audio.PlaySFX(SfxID.HitPlayer);
             }
-            else Hunger--; 
-            GUIBar.Update(); 
-            yield return new WaitForSeconds(120);
+            else hunger--; 
+            GUIBar.Update();  
         } 
     }
     
@@ -98,11 +100,11 @@ public class PlayerInfo : MobInfo
             if (IframesCurrent != 1) return; 
             if (PlayerStatus == PlayerStatus.Dead)
             {
-                Machine.transform.position = WorldGen.SpawnPoint;
+                Machine.transform.position =  spawnPoint;
                 SpriteTool.gameObject.SetActive(true);   
             } 
             Health = HealthMax;
-            Hunger = HungerMax;
+            hunger = hungerMax;
             Velocity = Vector2.zero;
             PlayerStatus = PlayerStatus.Active;
             GUIBar.Update();

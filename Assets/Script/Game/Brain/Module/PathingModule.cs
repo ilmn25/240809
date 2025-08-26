@@ -128,7 +128,7 @@ public abstract class PathingModule : MobModule
     { 
         if (nextPoint != path.Count - 1)
         {
-            if (Info.MustLandFirst)
+            if (Info.mustLandFirst)
             {
                 if (!Info.IsGrounded)
                 {

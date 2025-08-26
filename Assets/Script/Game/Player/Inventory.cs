@@ -81,10 +81,10 @@ public class Inventory
         {
             if (_buffer != -1)
             {
-                Game.PlayerInfo.Storage.Key = _buffer;
+                Game.PlayerInfo.storage.Key = _buffer;
                 _buffer = -1;
             }
-            CurrentItem = Game.PlayerInfo.Storage.List[Game.PlayerInfo.Storage.Key];
+            CurrentItem = Game.PlayerInfo.storage.List[Game.PlayerInfo.storage.Key];
             if (CurrentItem is not { Stack: 0 })
             {
                 CurrentItemData = Item.GetItem(CurrentItem.ID);
