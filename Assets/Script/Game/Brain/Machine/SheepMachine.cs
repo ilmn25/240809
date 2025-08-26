@@ -30,8 +30,10 @@ public class SheepMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new EquipSelectState());
         
-        Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("baaa"); 
+        Dialogue dialogue = new Dialogue
+        {
+            Text = "baaaa", 
+        };
         AddState(new DialogueState(dialogue)); 
     }
 

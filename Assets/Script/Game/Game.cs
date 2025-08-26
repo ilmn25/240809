@@ -7,6 +7,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class Game : MonoBehaviour
 {
@@ -38,6 +39,7 @@ public class Game : MonoBehaviour
     public static GameObject GUIObject;
     public static GameObject GUIDialogue;
     public static GameObject GUIImage;
+    public static Image GUIImageRenderer;
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
     public static GameObject GUIInvCrafting;
@@ -141,6 +143,7 @@ public class Game : MonoBehaviour
         GUIDialogue = GUIObject.transform.Find("Dialogue").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GUIImage = GUIObject.transform.Find("Image").gameObject;
+        GUIImageRenderer = GUIImage.GetComponent<Image>();
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
         GUIInvCrafting = GUIInv.transform.Find("Crafting").gameObject;
         GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;

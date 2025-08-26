@@ -14,7 +14,7 @@ public class BedMachine: StructureMachine, IActionSecondaryInteract
         Game.PlayerInfo.spawnPoint = transform.position;
         Game.PlayerInfo.SpeedModifier = 0.001f;
         _target = Environment.CalculateTime(Environment.Length / 2);
-        Environment.Tick = 10;
+        Environment.TickSpeed = 10;
     }
 
     public override void OnUpdate()
@@ -24,7 +24,7 @@ public class BedMachine: StructureMachine, IActionSecondaryInteract
         {  
             Environment.Target = null;
             _target.Item1 = -1;
-            Environment.Tick = 1;
+            Environment.TickSpeed = 1;
             Game.PlayerInfo.SpeedModifier = 1;
         }
     }
@@ -63,9 +63,11 @@ public class SignMachine: StructureMachine, IActionSecondaryInteract
     public override void OnStart()
     {
         base.OnStart();
-        Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("illu was here\n25/08/26"); 
         
+        Dialogue dialogue = new Dialogue
+        {
+            Text = "illu was here\n25/08/26", 
+        };
         AddState(new MessageState(dialogue)); 
     }
 

@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[Serializable]
 public class Environment
 {
     public Color AmbientLight;
@@ -84,17 +86,21 @@ public class Environment
     };
      
     public static readonly int Length = 30000;
-    public static int Tick = 1;
+    public static int TickSpeed = 1;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static Environment _previous = Night;
-    private static Environment _current = Black;
-    private static Environment _weather = Sunrise;
+    private static Environment _current = Black; 
     public static Environment Target = null;
     private static int Time
     {
         get => World.Inst.time;
         set => World.Inst.time = value;
+    }
+    private static Environment Weather
+    {
+        get => World.Inst.weather;
+        set => World.Inst.weather = value;
     }
 
     private static void SetTarget(Environment target)
@@ -107,11 +113,11 @@ public class Environment
     }
     public static void Update()
     {
-        MoveTime(Tick);
+        MoveTime(TickSpeed);
 
         if (Target == null)
         {
-            SetTarget(_weather);
+            SetTarget(Weather);
         }
         else
         {
@@ -134,7 +140,7 @@ public class Environment
     {
         while (amount != 0)
         {  
-            Weather(); 
+            CheckWeather(); 
             Time++;
             amount--;
             if (Time == Length)
@@ -145,27 +151,27 @@ public class Environment
         }
     }
     
-    private static void Weather()
+    private static void CheckWeather()
     {
         if (Time == 0)
         { 
             if (Random.value < 0.5f)
-                _weather = Day;
+                Weather = Day;
             else
-                _weather = DayFog;
+                Weather = DayFog;
         } 
         else if (Time == Length * 12/24)
             if (Random.value < 0.8f)
-                _weather = Noon;
+                Weather = Noon;
             else
-                _weather = Rapture;
+                Weather = Rapture;
         else if (Time == Length * 17/24)
             if (Random.value < 0.7f)
-                _weather = Night;
+                Weather = Night;
             else
-                _weather = NightFull;
+                Weather = NightFull;
         else if (Time == Length * 23/24)
-            _weather = Sunrise;
+            Weather = Sunrise;
     }
 
     public static void Set(Color ambientLight, Color fogColor, Color spotLight, Color directionalLight,
