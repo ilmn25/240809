@@ -19,14 +19,14 @@ public class DialogueState : MobState {
         Audio.PlaySFX(SfxID.Notification);
         Info.PathingStatus = PathingStatus.Reached;
         Info.Direction = Vector3.zero; 
-        GUIDialogue.Dialogue = Dialogue;
-        GUIDialogue.Show(true);
+        Dialogue.Target = Dialogue;
+        Dialogue.Show(true);
         GUIMain.Show(false);
     }
     
     public override void OnUpdateState()
     {
-        if (!GUIDialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!Dialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
@@ -34,7 +34,7 @@ public class DialogueState : MobState {
 
     public override void OnExitState()
     {
-        GUIDialogue.Show(false);
+        Dialogue.Show(false);
     }
 }
 
@@ -53,14 +53,14 @@ public class MessageState : MobState {
             Info.CancelTarget();
             return;
         }
-        GUIDialogue.Dialogue = Dialogue;
-        GUIDialogue.Show(true);
+        Dialogue.Target = Dialogue;
+        Dialogue.Show(true);
         GUIMain.Show(false);
     }
     
     public override void OnUpdateState()
     {
-        if (!GUIDialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!Dialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
@@ -68,6 +68,6 @@ public class MessageState : MobState {
 
     public override void OnExitState()
     {
-        GUIDialogue.Show(false);
+        Dialogue.Show(false);
     }
 }

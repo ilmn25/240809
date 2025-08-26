@@ -4,24 +4,23 @@
 
     public class TextScroller
     {
-        public static CoroutineTask HandleScroll(TextMeshProUGUI textBox, int speed = 85, bool sound = false)
-        {
+        public static CoroutineTask HandleScroll(TextMeshProUGUI textBox, int speed = 85, SfxID sound = SfxID.Null)
+        { 
             string text = textBox.text;
-            AudioSource audioSource = sound? Audio.PlaySFX(SfxID.Text, true) : null;
+            textBox.text = "";  
+            AudioSource audioSource = sound != SfxID.Null? Audio.PlaySFX(sound, true) : null;
             
             CoroutineTask scrollTask =  new CoroutineTask(ScrollText(text, textBox, speed));
-            scrollTask.Finished += (bool isManual) => 
+            scrollTask.Finished += _ => 
             { 
                 Audio.StopSFX(audioSource);
-                audioSource = null;
+                textBox.text = text;
             }; 
             return scrollTask;
         }
 
         private static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed, CoroutineTask scrollTask = null)
-        {
-            textBox.text = "";  
-    
+        { 
             foreach (var letter in line.ToCharArray())        
             {  
                 textBox.text += letter;

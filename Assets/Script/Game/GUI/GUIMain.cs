@@ -85,13 +85,13 @@ public class GUIMain
         InfoPanel.Initialize();
         InfoPanel.Show(false);
         
-        GUIDialogue.Show(false);
+        Dialogue.Show(false);
         Show(false);
     }
  
     public static void Update()
     {
-        GUIDialogue.Update();
+        Dialogue.Update();
         Cursor.Update();
         StorageInv.Update();
         Storage.Update();

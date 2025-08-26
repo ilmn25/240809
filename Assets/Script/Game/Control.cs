@@ -117,7 +117,7 @@ public class Control
             Game.PlayerInfo.Target = ((EntityMachine)target).Info;  
             Game.PlayerInfo.ActionType = IActionType.Hit;
         }
-        else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
+        else if (Inst.ActionSecondaryNear.KeyDown() && !Dialogue.Showing)
         { 
             IActionSecondary target = GetNearestInteractable<IActionSecondaryPickUp>();
             if (target == null) return;

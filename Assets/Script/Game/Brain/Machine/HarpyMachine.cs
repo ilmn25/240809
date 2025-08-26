@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class HarpyMachine : MobMachine, IActionSecondaryInteract
+public class HarpyMachine : MobMachine
 {   
     public static Info CreateInfo()
     { 
@@ -21,8 +21,6 @@ public class HarpyMachine : MobMachine, IActionSecondaryInteract
     public override void OnStart()
     {
          
-        Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("go away femboy"); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -36,15 +34,9 @@ public class HarpyMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
-        AddState(new DialogueState(dialogue)); 
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
-
-    public void OnActionSecondary(Info info)
-    {
-        if (Info.Target != null) return;
-        SetState<DialogueState>();
-    }
+ 
     public override void OnUpdate()
     {
         HandleInput();

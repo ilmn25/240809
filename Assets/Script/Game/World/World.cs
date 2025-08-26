@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = System.Random;
 
 [Serializable]
@@ -23,6 +24,7 @@ public class World
     public List<PlayerInfo> target = new();
     public int day = 1;
     public int time;
+    public Environment weather = Environment.Sunrise;
     
     public World(int x, int y, int z)
     {

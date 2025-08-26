@@ -1,4 +1,5 @@
  
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GhoulMachine : MobMachine, IActionSecondaryInteract
@@ -15,9 +16,6 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     }
     public override void OnStart()
     {
-         
-        Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("go away femboy"); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -31,7 +29,28 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
+        
+        var dialogue = new Dialogue
+        {
+            Text = "go away femboy",
+            Sprite = Cache.LoadSprite("Sprite/Illu"),
+            Option = new Dictionary<string, Dialogue>
+            {
+                [""] = new() {
+                    Text = "......",
+                    Sprite = Cache.LoadSprite("Sprite/Illu"),
+                    Option = new Dictionary<string, Dialogue>
+                    {
+                        [""] = new() { 
+                            Text = "i said go away",
+                            Sprite = Cache.LoadSprite("Sprite/Illu"),
+                        }
+                    }
+                }
+            }
+        };
         AddState(new DialogueState(dialogue)); 
+        
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 

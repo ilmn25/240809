@@ -89,12 +89,13 @@ public class GUI
                 Showing = false;
             }
         } 
+        return;
+        IEnumerator Delay()
+        {
+            yield return null;
+            _textScrollTask = TextScroller.HandleScroll(Text);
+        }
     }
-    
-    IEnumerator Delay()
-    {
-        yield return null;
-        _textScrollTask = TextScroller.HandleScroll(Text);
-    }
+     
      
 }
