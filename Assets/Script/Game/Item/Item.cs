@@ -6,7 +6,7 @@ using UnityEngine;
 public partial class Item 
 {
     private static readonly Dictionary<ID, Item> Dictionary = new ();
-    public ID StringID; 
+    public ID ID; 
     public int StackSize;
     public ItemRarity Rarity; 
     
@@ -30,23 +30,23 @@ public partial class Item
 
     private string GetName()
     {
-        string rawName = StringID.ToString();
+        string rawName = ID.ToString();
         return System.Text.RegularExpressions.Regex.Replace(rawName, "(?<!^)([A-Z])", " $1").ToLower();
     }
 
     private static void AddMaterialDefinition(
-        ID stringID,
+        ID id,
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int time = 0,
         int stackSize = 15)
     {
-        Entity.AddItem(stringID);
+        Entity.AddItem(id);
 
         Item itemData = new Item()
         {
-            StringID = stringID,
+            ID = id,
             StackSize = stackSize,
             Rarity = ItemRarity.Common,
             Scale = 0.6f,
@@ -59,13 +59,13 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, time, null);
+            ItemRecipe.AddRecipe(id, materials, craftStack, time, null);
 
-        Dictionary[stringID] = itemData;
+        Dictionary[id] = itemData;
     }
 
     private static void AddBlockDefinition(
-        ID stringID,
+        ID id,
         int breakCost = 1,
         int breakThreshold = 1,
         SfxID sfx = SfxID.HitSand,
@@ -75,12 +75,12 @@ public partial class Item
         int time = 0,
         int stackSize = 100)
     {
-        Entity.AddItem(stringID);
-        Block.AddBlockDefinition(stringID, breakThreshold, breakCost);
+        Entity.AddItem(id);
+        Block.AddBlockDefinition(id, breakThreshold, breakCost);
 
         Item itemData = new Item()
         {
-            StringID = stringID,
+            ID = id,
             StackSize = stackSize,
             Rarity = ItemRarity.Common,
 
@@ -98,13 +98,13 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, time,null);
+            ItemRecipe.AddRecipe(id, materials, craftStack, time,null);
 
-        Dictionary[stringID] = itemData;
+        Dictionary[id] = itemData;
     }
 
     private static void AddToolDefinition(
-        ID stringID,
+        ID id,
         ItemGesture gesture,
         SfxID sfx = SfxID.Sword,
         int stackSize = 1,
@@ -126,11 +126,11 @@ public partial class Item
         string[] modifiers = null
     )
     {
-        Entity.AddItem(stringID);
+        Entity.AddItem(id);
 
         Item itemData = new Item()
         {
-            StringID = stringID,
+            ID = id,
             StackSize = stackSize,
             Rarity = rarity,
 
@@ -153,13 +153,13 @@ public partial class Item
         };
 
         if (materials != null)
-            ItemRecipe.AddRecipe(stringID, materials, craftStack, time, modifiers);
+            ItemRecipe.AddRecipe(id, materials, craftStack, time, modifiers);
 
-        Dictionary[stringID] = itemData;
+        Dictionary[id] = itemData;
     }
 
     private static void AddStructureDefinition(
-        ID stringID,
+        ID id,
         Dictionary<ID, int> materials,
         int time = 200,
         SfxID sfx = SfxID.HitSand,
@@ -167,7 +167,7 @@ public partial class Item
     {
         Item itemData = new Item()
         {
-            StringID = stringID,
+            ID = id,
             StackSize = 1,
             Rarity = ItemRarity.Common,
 
@@ -183,16 +183,16 @@ public partial class Item
         };
 
         if (materials != null)
-            StructureRecipe.AddRecipe(stringID, time, materials);
+            StructureRecipe.AddRecipe(id, time, materials);
 
-        Dictionary[stringID] = itemData;
+        Dictionary[id] = itemData;
     }
 
-    public static Item GetItem(ID stringID)
+    public static Item GetItem(ID id)
     {
-        if (Dictionary.ContainsKey(stringID))
+        if (Dictionary.ContainsKey(id))
         {
-            return Dictionary[stringID];
+            return Dictionary[id];
         }
         return null;
     }

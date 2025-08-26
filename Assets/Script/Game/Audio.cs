@@ -13,11 +13,12 @@ public class Audio
     private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>();
     public static void Initialize()
     {
-        Volume.Add(SfxID.HitMetal, 0.1f);
-        Volume.Add(SfxID.HitStone, 1.5f);
+        Volume.Add(SfxID.HitMetal, 0.3f);
+        Volume.Add(SfxID.HitStone, 4f);
         Volume.Add(SfxID.Footsteps1, 0.4f);
         Volume.Add(SfxID.Footsteps2, 0.4f);
         Volume.Add(SfxID.Text, 0.3f);
+        Volume.Add(SfxID.Sword, 0.2f);
         Volume.Add(SfxID.Wind, 0.7f);
         GameObject audioManager = new GameObject("Audio");
         _bgmSource = audioManager.AddComponent<AudioSource>();

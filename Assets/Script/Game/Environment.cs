@@ -83,19 +83,19 @@ public class Environment
         EnvParticles = EnvParticles.Leaf
     };
      
-    public static readonly int Length = 10000;
+    public static readonly int Length = 30000;
     public static int Tick = 1;
     private const int TransitionLength = 200;
-    private static int _currentTransitionTime; 
+    private static int _currentTransitionTime;  
+    private static Environment _previous = Night;
+    private static Environment _current = Black;
+    private static Environment _weather = Sunrise;
+    public static Environment Target = null;
     private static int Time
     {
         get => World.Inst.time;
         set => World.Inst.time = value;
     }
-    private static Environment _previous = Night;
-    private static Environment _current = Black;
-    private static Environment _weather = Sunrise;
-    public static Environment Target = null;
 
     private static void SetTarget(Environment target)
     {

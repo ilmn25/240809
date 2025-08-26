@@ -12,13 +12,13 @@ public class GUICraft : GUIStorage
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
-        if (item.Type == ItemType.Structure && StructureRecipe.IsCraftable(item.StringID))
+        if (item.Type == ItemType.Structure && StructureRecipe.IsCraftable(item.ID))
         {
-            StructureRecipe.Target =  StructureRecipe.Dictionary[item.StringID];
+            StructureRecipe.Target =  StructureRecipe.Dictionary[item.ID];
         } 
-        else if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
+        else if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.ID))
         {
-             ItemRecipe.CraftItem(item.StringID, !Input.GetKey(KeyCode.LeftShift));
+             ItemRecipe.CraftItem(item.ID, !Input.GetKey(KeyCode.LeftShift));
         }
     }
     
@@ -27,9 +27,9 @@ public class GUICraft : GUIStorage
         if (Storage.List[CurrentSlotKey].Stack == 0) return;
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
-        if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.StringID))
+        if (item.Type != ItemType.Structure && ItemRecipe.IsCraftable(item.ID))
         {
-            ItemRecipe.CraftItem(item.StringID);
+            ItemRecipe.CraftItem(item.ID);
         }
     }
 

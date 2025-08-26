@@ -15,7 +15,7 @@ public class MobSpawner
     };
     public static void Update()
     {
-        if (World.Inst.day < 2) return;
+        if (World.Inst.day < 2 || Game.BuildMode) return;
         _timer++;
         if (_timer == 5000)
         {
