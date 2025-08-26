@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StructureMachine : EntityMachine
+public class StructureMachine : EntityMachine, IActionPrimaryResource
 {
     protected SpriteRenderer SpriteRenderer;
     public override void OnSetup()

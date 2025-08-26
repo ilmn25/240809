@@ -10,7 +10,7 @@ class MobAttackSwing : MobState {
         _equipment = Info.Equipment.Info;
         Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
         Audio.PlaySFX(_equipment.Sfx);
-        Info.SpeedModifier = 0.3f;
+        Info.SpeedModifier = 0.5f;
     }
     
     public override void OnUpdateState()

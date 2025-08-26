@@ -9,10 +9,10 @@ public class GUIConverter : GUIStorage
         if (Storage.List[CurrentSlotKey].Stack == 0 || Info.isFull()) return;
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
-        if (ItemRecipe.IsCraftable(item.StringID))
+        if (ItemRecipe.IsCraftable(item.ID))
         {
-            ItemRecipe.TakeIngredients(item.StringID);
-            Info.Pending.Add(item.StringID);
+            ItemRecipe.TakeIngredients(item.ID);
+            Info.Pending.Add(item.ID);
         }
     }
     
@@ -21,10 +21,10 @@ public class GUIConverter : GUIStorage
         if (Storage.List[CurrentSlotKey].Stack == 0 || Info.isFull()) return;
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
-        if (ItemRecipe.IsCraftable(item.StringID))
+        if (ItemRecipe.IsCraftable(item.ID))
         {
-            ItemRecipe.TakeIngredients(item.StringID);
-            Info.Pending.Add(item.StringID);
+            ItemRecipe.TakeIngredients(item.ID);
+            Info.Pending.Add(item.ID);
         }
     }
     

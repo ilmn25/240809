@@ -81,7 +81,7 @@ public class MobInfo : DynamicInfo
                 SpriteTool.gameObject.SetActive(true);
                 SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
                 SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
-                SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.StringID);
+                SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.ID);
                 SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
                 Machine.SetState<EquipSelectState>();
             } 

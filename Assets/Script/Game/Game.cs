@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -80,25 +81,27 @@ public class Game : MonoBehaviour
     }
 
     private void Update()
-    {  
-        
-        QualitySettings.vSyncCount = 0; // fps limit doesnt work if not, somewhere something is setting it to 1
-        if (Control.Inst.Pause.KeyDown())
-        {
-            World.Save(0);
-            Application.Quit();
+    {   
+        if (Control.Inst.Pause.KeyDown()) _ = new CoroutineTask(Quit());
             // EditorApplication.isPlaying = false;
-        }
         
         Terraform.Update();
         GUIMain.Update();
         Inventory.Update();
         Control.Update();
         MapCull.Update();
-        ViewPort.Update(); 
-        if (!BuildMode) MobSpawner.Update();
+        ViewPort.Update();  
         Environment.Update();
-         
+        MobSpawner.Update();
+        return;
+        
+        IEnumerator Quit()
+        {
+            Environment.Target = Environment.Black;
+            yield return new WaitForSeconds(2);
+            World.Save(0);
+            Application.Quit();
+        }
     }
     private void FixedUpdate()
     { 

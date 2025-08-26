@@ -45,7 +45,8 @@ public partial class Item
         AddMaterialDefinition(ID.Cytoplasm);
         AddMaterialDefinition(ID.Acorn);
         AddMaterialDefinition(ID.Paper);
-        AddMaterialDefinition(ID.Fabric);
+        AddMaterialDefinition(ID.Wool);
+        AddMaterialDefinition(ID.Fabric, materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500);
         AddMaterialDefinition(ID.Flint);
         AddMaterialDefinition(ID.MetalChunks);
         AddMaterialDefinition(ID.Charcoal, materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
@@ -69,7 +70,7 @@ public partial class Item
 
         // Tools
         AddToolDefinition(
-            stringID: ID.SteelSword,
+            id: ID.SteelSword,
             gesture: ItemGesture.Swing,
             speed: 1.3f,
             range: 1,
@@ -87,7 +88,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.Blueprint,
+            id: ID.Blueprint,
             gesture: ItemGesture.Swing,
             sfx: SfxID.Null,
             speed: 4f,
@@ -98,7 +99,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.StonePickaxe,
+            id: ID.StonePickaxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -116,7 +117,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.StoneHatchet,
+            id: ID.StoneHatchet,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -134,7 +135,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.MetalAxe,
+            id: ID.MetalAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -152,7 +153,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.DiamondAxe,
+            id: ID.DiamondAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
@@ -170,7 +171,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.Hammer,
+            id: ID.Hammer,
             gesture: ItemGesture.Swing,
             speed: 1.8f,
             range: 4f,
@@ -188,7 +189,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.Spear,
+            id: ID.Spear,
             gesture: ItemGesture.Swing,
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
@@ -211,7 +212,7 @@ public partial class Item
             rotationOffset: 45
         );
         AddToolDefinition(
-            stringID: ID.Minigun,
+            id: ID.Minigun,
             gesture: ItemGesture.Shoot,
             speed: 2f,
             sfx: SfxID.Minigun,
@@ -232,7 +233,7 @@ public partial class Item
         );
 
         AddToolDefinition(
-            stringID: ID.Pistol,
+            id: ID.Pistol,
             gesture: ItemGesture.Shoot,
             speed: 0.6f,
             sfx: SfxID.Pistol,

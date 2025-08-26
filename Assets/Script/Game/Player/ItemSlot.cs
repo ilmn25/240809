@@ -14,7 +14,7 @@ public class ItemSlot
     {
         get
         {
-            if (_item == null || _item.StringID != ID)
+            if (_item == null || _item.ID != ID)
                 _item = Item.GetItem(ID);
             return _item;
         }

@@ -26,10 +26,10 @@ public class Terraform
         else if (Inventory.CurrentItemData.Type == ItemType.Block)
         {
             Block.SetActive(true);
-            if (Block.name != Inventory.CurrentItemData.StringID.ToString())
+            if (Block.name != Inventory.CurrentItemData.ID.ToString())
             {
-                Block.name = Inventory.CurrentItemData.StringID.ToString();
-                BlockPreview.Set(Block, Inventory.CurrentItemData.StringID);
+                Block.name = Inventory.CurrentItemData.ID.ToString();
+                BlockPreview.Set(Block, Inventory.CurrentItemData.ID);
                 Block.transform.localScale = Vector3.one;
             }  
         } 

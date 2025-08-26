@@ -43,6 +43,7 @@ public class StructureInfo : Info
              info.Equipment.Info.ProjectileInfo.OperationType != operationType || 
              info.Equipment.Info.ProjectileInfo.Breaking < threshold) return;
         
+        Helper.Log();
         Health -= info.Equipment.Info.ProjectileInfo.Breaking;
         if (Health <= 0)
         { 
