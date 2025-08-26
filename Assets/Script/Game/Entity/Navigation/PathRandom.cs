@@ -25,8 +25,8 @@ public class PathRandom
             scanCount = agent.PathingTarget == PathingTarget.Evade ? agent.Info.DistStrafe : agent.Info.DistEscape;
             
             Vector3 dest = agent.Machine.transform.position - agent.Info.Target.position;
-            dest.y = 0;
-            offset = Vector3Int.FloorToInt(dest.normalized) * scanCount; 
+            dest.y = agent.Info.position.y - 10;
+            offset = Vector3Int.FloorToInt(dest.normalized) * (scanCount + 1); 
         }
  
         Vector3Int startPosition =

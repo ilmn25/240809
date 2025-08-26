@@ -28,7 +28,7 @@ public class SlimeMachine : MobMachine
             DecelerationTime = 0,
             AccelerationTime = 0.1f,
             NormalSkipAmount = 3,
-            MustLandFirst = true,
+            mustLandFirst = true,
             MaxStuckCount = 700,
             PointLostDistance = 7,
             

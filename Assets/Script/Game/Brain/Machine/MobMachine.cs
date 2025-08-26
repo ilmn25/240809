@@ -26,7 +26,7 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
             Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
                 Info.AimPosition,
                 Info.Equipment.Info.ProjectileInfo,
-                Info.TargetHitboxType, Info);
+                Info.targetHitboxType, Info);
         } 
         switch (Info.Equipment.Info.Gesture)
         {

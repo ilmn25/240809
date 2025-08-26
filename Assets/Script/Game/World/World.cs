@@ -19,7 +19,7 @@ public class World
     public readonly Vector3Int Length;
     public readonly Vector3Int Bounds;
     public static int Seed;
- 
+  
     public List<PlayerInfo> target = new();
     public int day = 1;
     public int time;

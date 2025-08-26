@@ -10,7 +10,7 @@ public static class Helper
 
     static Helper()
     {
-        SavePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
+        SavePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
     }
     public static Vector3 AddToVector(Vector3 vector, float x, float y, float z)
     {

@@ -97,7 +97,7 @@ public class Game : MonoBehaviour
         MapCull.Update();
         ViewPort.Update(); 
         if (!BuildMode) MobSpawner.Update();
-        DayNightCycle.Update();
+        Environment.Update();
          
     }
     private void FixedUpdate()

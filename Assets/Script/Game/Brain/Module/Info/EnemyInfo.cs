@@ -11,7 +11,7 @@ public class EnemyInfo : MobInfo
         // _textMeshPro = Machine.transform.Find("text").GetComponent<TextMeshPro>();
         Health = HealthMax;
         HitboxType = HitboxType.Enemy;
-        TargetHitboxType = HitboxType.Player; 
+        targetHitboxType = HitboxType.Player; 
         ActionType = IActionType.Hit;
         // Target = Game.PlayerInfo;
     }

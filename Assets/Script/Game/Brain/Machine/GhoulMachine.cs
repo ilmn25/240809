@@ -9,7 +9,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         {
             HealthMax = 16,
             Defense = 1, 
-            DistAttack = 1,
+            DistAttack = 2,
             DistRoam = 7 
         };  
     }
@@ -49,7 +49,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
             {
                 if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
-                    if (Random.value < 0.7f)
+                    if (Random.value < 0.9f)
                     {
                         Info.AimPosition = Info.Target.position;
                         Attack();

@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class DayNightCycle
+public class Environment
 {
     public Color AmbientLight;
     public Color FogColor;
@@ -10,7 +10,15 @@ public class DayNightCycle
     public Color BackgroundColor;
     public EnvParticles EnvParticles = EnvParticles.Null;
     
-    public static DayNightCycle Rapture = new DayNightCycle()
+    public static Environment Black = new Environment()
+    {
+        AmbientLight = Color.black,
+        FogColor = Color.black,
+        SpotLight = Color.black,
+        DirectionalLight = Color.black,
+        BackgroundColor = Color.black,
+    };
+    public static Environment Rapture = new Environment()
     {
         AmbientLight = Helper.GetColor(39, 38, 64),
         FogColor = Helper.GetColor(97, 39, 39),
@@ -19,7 +27,7 @@ public class DayNightCycle
         BackgroundColor = Helper.GetColor(190, 130, 134),
         EnvParticles = EnvParticles.Leaf
     };
-    public static DayNightCycle Day = new DayNightCycle()
+    public static Environment Day = new Environment()
     {
         AmbientLight = Helper.GetColor(225, 225, 225),
         FogColor = Helper.GetColor(117, 110, 138),
@@ -28,7 +36,7 @@ public class DayNightCycle
         BackgroundColor = Helper.GetColor(116, 113, 137),
         EnvParticles = EnvParticles.Leaf
     };
-    public static DayNightCycle DayFog = new DayNightCycle()
+    public static Environment DayFog = new Environment()
     {
         AmbientLight = Helper.GetColor(38, 37, 63),
         FogColor = Helper.GetColor(146, 146, 146),
@@ -38,7 +46,7 @@ public class DayNightCycle
         EnvParticles = EnvParticles.Snow
     };
     
-    public static DayNightCycle Noon = new DayNightCycle()
+    public static Environment Noon = new Environment()
     {
         AmbientLight = Helper.GetColor(255, 184, 184),
         FogColor = Helper.GetColor(118, 105, 105),
@@ -48,7 +56,7 @@ public class DayNightCycle
         EnvParticles = EnvParticles.Leaf
     };
 
-    public static DayNightCycle Night = new DayNightCycle()
+    public static Environment Night = new Environment()
     {
         AmbientLight = Helper.GetColor(38, 37, 63),
         FogColor = Color.black,
@@ -57,7 +65,7 @@ public class DayNightCycle
         BackgroundColor = Helper.GetColor(45, 50, 63),
         EnvParticles = EnvParticles.Rain
     };
-    public static DayNightCycle NightFull = new DayNightCycle()
+    public static Environment NightFull = new Environment()
     {
         AmbientLight = Helper.GetColor(38, 37, 63),
         FogColor = Color.black,
@@ -65,7 +73,7 @@ public class DayNightCycle
         DirectionalLight = Helper.GetColor(91, 56, 255),
         BackgroundColor = Helper.GetColor(45, 50, 63) 
     };
-    public static DayNightCycle Sunrise = new DayNightCycle()
+    public static Environment Sunrise = new Environment()
     {
         AmbientLight = Helper.GetColor(38, 37, 63),
         FogColor = Color.black,
@@ -75,7 +83,8 @@ public class DayNightCycle
         EnvParticles = EnvParticles.Leaf
     };
      
-    private const int Length = 10000;
+    public static readonly int Length = 10000;
+    public static int Tick = 1;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime; 
     private static int Time
@@ -83,11 +92,14 @@ public class DayNightCycle
         get => World.Inst.time;
         set => World.Inst.time = value;
     }
-    private static DayNightCycle _previous = Night;
-    private static DayNightCycle _current = Sunrise;
+    private static Environment _previous = Night;
+    private static Environment _current = Black;
+    private static Environment _weather = Sunrise;
+    public static Environment Target = null;
 
-    private static void SetTarget(DayNightCycle target)
+    private static void SetTarget(Environment target)
     {
+        if (target == _current) return;
         _previous = _current;
         _current = target;
         _currentTransitionTime = 0;
@@ -95,37 +107,65 @@ public class DayNightCycle
     }
     public static void Update()
     {
-        if (Time == 0)
+        MoveTime(Tick);
+
+        if (Target == null)
         {
-            World.Inst.day++;
+            SetTarget(_weather);
+        }
+        else
+        {
+            SetTarget(Target);
+        }
+         
+        if (_currentTransitionTime < TransitionLength - 1)
+        {
+            _currentTransitionTime++;
+            float t = Mathf.InverseLerp(0, TransitionLength, _currentTransitionTime % TransitionLength);
+            Set(Color.Lerp(_previous.AmbientLight, _current.AmbientLight, t), 
+                Color.Lerp(_previous.FogColor, _current.FogColor, t),
+                Color.Lerp(_previous.SpotLight, _current.SpotLight, t),
+                Color.Lerp(_previous.DirectionalLight, _current.DirectionalLight, t),
+                Color.Lerp(_previous.BackgroundColor, _current.BackgroundColor, t)); 
+        }
+    }
+
+    public static void MoveTime(int amount)
+    {
+        while (amount != 0)
+        {  
+            Weather(); 
+            Time++;
+            amount--;
+            if (Time == Length)
+            {
+                Time = 0;
+                World.Inst.day++;
+            } 
+        }
+    }
+    
+    private static void Weather()
+    {
+        if (Time == 0)
+        { 
             if (Random.value < 0.5f)
-                SetTarget(Day);
+                _weather = Day;
             else
-                SetTarget(DayFog);
+                _weather = DayFog;
         } 
         else if (Time == Length * 12/24)
-            if (Random.value < 0.7f)
-                SetTarget(Noon);
+            if (Random.value < 0.8f)
+                _weather = Noon;
             else
-                SetTarget(Rapture);
+                _weather = Rapture;
         else if (Time == Length * 17/24)
             if (Random.value < 0.7f)
-                SetTarget(Night);
+                _weather = Night;
             else
-                SetTarget(NightFull);
+                _weather = NightFull;
         else if (Time == Length * 23/24)
-            SetTarget(Sunrise);
-        
-        Time++; 
-        if (Time == Length) Time = 0;
-        if (_currentTransitionTime < TransitionLength - 1) _currentTransitionTime++;
-        
-        float t = Mathf.InverseLerp(0, TransitionLength, _currentTransitionTime % TransitionLength);
-        Set(Color.Lerp(_previous.AmbientLight, _current.AmbientLight, t), 
-            Color.Lerp(_previous.FogColor, _current.FogColor, t),
-            Color.Lerp(_previous.SpotLight, _current.SpotLight, t),
-            Color.Lerp(_previous.DirectionalLight, _current.DirectionalLight, t),
-            Color.Lerp(_previous.BackgroundColor, _current.BackgroundColor, t)); 
+            _weather = Sunrise;
     }
 
     public static void Set(Color ambientLight, Color fogColor, Color spotLight, Color directionalLight,
@@ -136,5 +176,13 @@ public class DayNightCycle
         Game.SpotLight.color = spotLight;
         Game.DirectionalLight.color = directionalLight;
         Game.Camera.backgroundColor = backgroundColor;
+    }
+
+    public static (int day, int time) CalculateTime(int amount)
+    {
+        int target = Time + amount;
+        int day = target / Length + World.Inst.day;
+        int time = target % Length;
+        return (day, time);
     }
 }

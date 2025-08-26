@@ -35,7 +35,7 @@ public class MobAttackPounce : MobState
         if (_delay > 5)
         {
             Projectile.Spawn(Info.SpriteToolTrack.position,Info.AimPosition,
-                _projectileInfo, Info.TargetHitboxType, Info);
+                _projectileInfo, Info.targetHitboxType, Info);
         }
 
         if (Info.IsGrounded)

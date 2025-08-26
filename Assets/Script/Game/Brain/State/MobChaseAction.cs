@@ -34,6 +34,7 @@ class MobChaseAction : MobState {
                 {
                     (Info.Target as ItemInfo).OnActionSecondary(Info);
                     Info.CancelTarget();
+                    Machine.SetState<EquipSelectState>();
                 }
                 else if (Info.ActionType == IActionType.Hit && !Info.Target.Destroyed)
                 {
