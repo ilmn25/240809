@@ -76,5 +76,14 @@ public enum ID
     Meat,
     CookedMeat,
     Cytoplasm,
-    Harpy
+    Harpy,
+    Bed,
+    Sign,
+    Portal,
+    Table,
+    Acorn,
+    Fabric,
+    Chicken,
+    Sheep,
+    Wool
 }

@@ -36,7 +36,7 @@ public class GroundMovementModule : MovementModule
         if (Info.Direction != Vector3.zero)
         {  
             //! speeding up to start
-            Info.SpeedCurrent = Mathf.Lerp(Info.SpeedCurrent, Info.SpeedTarget, DeltaTime / Info.AccelerationTime);
+            Info.SpeedCurrent = Mathf.Lerp(Info.SpeedCurrent, Info.SpeedTarget, DeltaTime / Info.AccelerationTime); 
             // if (Info.IsPlayer)Utility.Log(Info.SpeedTarget, Info.Direction);
             if (Info.Direction.x != 0 && Info.Direction.z != 0)
             {

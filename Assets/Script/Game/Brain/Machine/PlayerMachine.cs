@@ -43,7 +43,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddModule(new GroundAnimationModule()); 
         AddModule(new GroundMovementModule()); 
         AddModule(new GroundPathingModule()); 
-        AddModule(new PlayerTerraformModule());  
         
         AddState(new DeadState());
         AddState(new MobAttackSwing());
@@ -125,12 +124,12 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                                 Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
-                                PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
+                                Terraform.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
                                     true);
                                 if (Control.Inst.ActionPrimary.Key())
                                 {
                                     Audio.PlaySFX(SfxID.Item);
-                                    PlayerTerraformModule.HandleMapBreak(); 
+                                    Terraform.HandleMapBreak(); 
                                 } 
                             }
 
@@ -146,12 +145,12 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                             if (Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
                                 Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
                             {
-                                PlayerTerraformModule.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
+                                Terraform.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
                                     false);
                                 if (Control.Inst.ActionSecondary.Key())
                                 {
                                     SetState<MobAttackSwing>();
-                                    PlayerTerraformModule.HandleMapPlace();
+                                    Terraform.HandleMapPlace();
                                 }
                             }
 

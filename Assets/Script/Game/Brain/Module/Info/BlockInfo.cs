@@ -9,7 +9,7 @@ public class BlockInfo : StructureInfo
     public override void OnDestroy(MobInfo info)
     { 
         World.SetBlock(Vector3Int.FloorToInt(position), Block.ConvertID(blockID));
-        PlayerTerraformModule.PendingBlocks.Remove(Vector3Int.FloorToInt(Machine.transform.position)); 
+        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(Machine.transform.position)); 
     }
 }
 
@@ -20,6 +20,6 @@ public class BreakBlockInfo : StructureInfo
     public override void OnDestroy(MobInfo info)
     { 
         World.SetBlock(Vector3Int.FloorToInt(position));
-        PlayerTerraformModule.PendingBlocks.Remove(Vector3Int.FloorToInt(Machine.transform.position)); 
+        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(Machine.transform.position)); 
     }
 }

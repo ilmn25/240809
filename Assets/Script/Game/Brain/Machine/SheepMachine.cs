@@ -1,7 +1,7 @@
  
 using UnityEngine;
 
-public class GhoulMachine : MobMachine, IActionSecondaryInteract
+public class SheepMachine : MobMachine, IActionSecondaryInteract
 {   
     public static Info CreateInfo()
     { 
@@ -9,15 +9,15 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         {
             HealthMax = 16,
             Defense = 1, 
-            DistAttack = 1,
-            DistRoam = 7 
+            SpeedGround = 4,
+            SpeedAir = 7,
+            PathAir = 3,
+            DistAttack = 7,
+            DistRoam = 3 
         };  
     }
     public override void OnStart()
     {
-         
-        Dialogue dialogue = new Dialogue(); 
-        dialogue.Lines.Add("go away femboy"); 
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -25,14 +25,14 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         AddModule(new SpriteOrbitModule());
 
         AddState(new MobIdle());
-        AddState(new MobChase());
         AddState(new MobRoam());
-        AddState(new MobEvade());
+        AddState(new MobEscape());
         AddState(new MobHit());
-        AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
+        
+        Dialogue dialogue = new Dialogue(); 
+        dialogue.Lines.Add("baaa"); 
         AddState(new DialogueState(dialogue)); 
-        Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
     public void OnActionSecondary(Info info)
@@ -49,21 +49,11 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
             {
                 if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
-                    if (Random.value < 0.7f)
-                    {
-                        Info.AimPosition = Info.Target.position;
-                        Attack();
-                    } 
-                    else
-                        SetState<MobEvade>();
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
-                    SetState<MobRoam>();
-                }
+                    SetState<MobEscape>();
+                } 
                 else
                 {
-                    SetState<MobChase>();
+                    SetState<MobRoam>();
                 }
             }
             else

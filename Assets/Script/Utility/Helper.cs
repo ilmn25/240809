@@ -63,6 +63,10 @@ public static class Helper
         return (Time.deltaTime < Game.MaxDeltaTime) ? Time.deltaTime : Game.MaxDeltaTime;
     }
  
+    public static Color GetColor(float r, float g, float b)
+    {
+        return new Color(r / 255f, g / 255f, b / 255f);
+    }
 
     public static void FileSave<T>(T data, string filePath)
     {

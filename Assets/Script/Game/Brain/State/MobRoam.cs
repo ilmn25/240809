@@ -7,4 +7,4 @@ class MobRoam : MobState {
     public override void OnUpdateState() {
         if (Info.PathingStatus != PathingStatus.Pending) Machine.SetState<DefaultState>();
     }
-}
+} 

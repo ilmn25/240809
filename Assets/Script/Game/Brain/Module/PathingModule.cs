@@ -156,7 +156,12 @@ public abstract class PathingModule : MobModule
             }  
             Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
         }
-        else Info.Direction = Vector3.zero;
+        else
+        {
+            if (Vector3.Distance(path[nextPoint].Position, Machine.transform.position) > 0.05f)
+                Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
+            else Info.Direction = Vector3.zero;
+        }
         return nextPoint;
     }
 

@@ -36,9 +36,7 @@ public class BugMachine : MobMachine
     }
 
     public override void OnUpdate()
-    {
-        HandleInput();
-
+    { 
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)
@@ -80,22 +78,7 @@ public class BugMachine : MobMachine
                 } 
             }
         }
-    }
-    
-    void HandleInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            Info.Target = Game.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Reached; 
-            SetState<DefaultState>();
-        } 
-        else if (Input.GetKeyDown(KeyCode.T))
-            Info.Target = null;
-        else if (Input.GetKeyDown(KeyCode.U))
-            transform.position = Game.Player.transform.position;
-    }
-
+    } 
     public void OnDrawGizmos()
     {
         if (Camera.current != Camera.main)
