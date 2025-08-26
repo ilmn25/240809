@@ -89,8 +89,9 @@ public class PlayerInfo : MobInfo
             {
                 if (Target != null) AimPosition = Target.position; 
                 
-                SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
+                SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2; 
             } 
+            SpeedTarget *= SpeedModifier;
         }
         else
         { 

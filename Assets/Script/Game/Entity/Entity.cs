@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-public partial class Entity
+public class Entity
 { 
         public static readonly Dictionary<ID, Entity> Dictionary = new Dictionary<ID, Entity>();
         
@@ -39,8 +39,12 @@ public partial class Entity
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);
                 AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Game.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide); 
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexNoCollide);
+                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide);  
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexCollide);
+                AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Game.IndexSemiCollide);
+                AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Game.IndexSemiCollide);
+                AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Game.IndexSemiCollide);
+                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Game.IndexCollide); 
                 
                 Dictionary.Add(ID.Block, new Entity
                 {
@@ -72,6 +76,7 @@ public partial class Entity
                 });
                 AddMob<HunterMachine>(ID.Chito); 
                 AddMob<HunterMachine>(ID.Yuuri);
+                AddMob<SheepMachine>(ID.Sheep);
                 AddMob<BugMachine>(ID.SnareFlea); 
                 AddMob<GhoulMachine>(ID.Megumin);
                 AddMob<SlimeMachine>(ID.Slime);

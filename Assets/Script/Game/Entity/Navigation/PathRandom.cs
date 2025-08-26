@@ -28,8 +28,6 @@ public class PathRandom
             dest.y = 0;
             offset = Vector3Int.FloorToInt(dest.normalized) * scanCount; 
         }
-        if (agent.Info.CanFly) offset.y = (int) agent.Info.position.y + 100;
-        else offset.y = (int) agent.Info.position.y;
  
         Vector3Int startPosition =
             NavMap.GetRelativePosition(Vector3Int.FloorToInt(agent.Info.position));

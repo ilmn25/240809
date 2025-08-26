@@ -15,6 +15,7 @@ public class DynamicInfo : Info
     public float SpeedLogic = 5;
     public float SpeedGround = 5;
     public float SpeedAir = 10;  
+    public float SpeedModifier = 1;  
     public float Gravity = -40f;
     public float JumpVelocity = 10f;
     public bool CanFly = false;

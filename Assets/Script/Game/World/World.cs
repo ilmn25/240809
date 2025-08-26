@@ -21,6 +21,8 @@ public class World
     public static int Seed;
  
     public List<PlayerInfo> target = new();
+    public int day = 1;
+    public int time;
     
     public World(int x, int y, int z)
     {

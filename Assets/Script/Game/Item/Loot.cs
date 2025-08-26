@@ -35,26 +35,32 @@ public class Loot
         loot = CreateTable(ID.Tree);
         loot.Add(1, 4, ID.Log);
         loot.Add(0.5f, 1, ID.Log); 
-        loot.Add(0.5f, 1, ID.Log); 
+        loot.Add(0.5f, 1, ID.Acorn); 
         
         loot = CreateTable(ID.Megumin);
         loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
         
         loot = CreateTable(ID.Chito);
-        loot.Add(0.7f, 10, ID.Bullet); 
+        loot.Add(0.7f, 5, ID.Bullet); 
         loot.Add(0.1f, 1, ID.Pistol); 
         
         loot = CreateTable(ID.SnareFlea);
         loot.Add(0.5f, 6, ID.Sticks); 
         loot = CreateTable(ID.Slime);
-        loot.Add(1, 2, ID.Slag); 
+        loot.Add(1, 2, ID.Cytoplasm); 
         
         loot = CreateTable(ID.Yuuri);
-        loot.Add(0.7f, 10, ID.Bullet);  
+        loot.Add(0.7f, 5, ID.Bullet);  
         loot.Add(0.1f, 1, ID.Pistol); 
         loot = CreateTable(ID.Harpy);
-        loot.Add(0.7f, 10, ID.Bullet);  
-        loot.Add(0.1f, 1, ID.Pistol); 
+        loot.Add(1, 2, ID.Chicken);  
+        loot.Add(0.5f, 1, ID.Wool); 
+        loot = CreateTable(ID.Sheep);
+        loot.Add(1, 1, ID.Meat);  
+        loot.Add(0.5f, 1, ID.Meat);  
+        loot.Add(0.5f, 1, ID.Wool); 
+        loot.Add(0.5f, 1, ID.Wool); 
+        loot.Add(0.5f, 1, ID.Wool); 
          
     }
 

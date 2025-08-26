@@ -42,7 +42,7 @@ public class EntityStaticLoad
         {
             entity = Entity.Dictionary[info.id];
             currentInstance = ObjectPool.GetObject(entity.PrefabName, info.id);
-            currentInstance.transform.position = info.position;
+            currentInstance.transform.position = info.position; 
             currentEntityMachine = (EntityMachine)
                 (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
             ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  

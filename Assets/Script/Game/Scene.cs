@@ -33,8 +33,11 @@ public class Scene
         PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
-            new CoroutineTask(WorldGen.GenerateNearbyChunks(PlayerChunkPosition)); 
-            World.LoadWorld();
+            CoroutineTask mapGenTask = new CoroutineTask(WorldGen.GenerateNearbyChunks(PlayerChunkPosition)); 
+            mapGenTask.Finished += (bool isManual) => 
+            { 
+                World.LoadWorld();
+            };  
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }
     }

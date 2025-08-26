@@ -37,3 +37,37 @@ public class DialogueState : MobState {
         GUIDialogue.Show(false);
     }
 }
+
+public class MessageState : MobState {
+    public Dialogue Dialogue; 
+
+    public MessageState(Dialogue dialogue)
+    {
+        Dialogue = dialogue;
+    }
+
+    public override void OnEnterState()
+    {
+        if (Game.GUIDialogue.activeSelf)
+        {
+            Info.CancelTarget();
+            return;
+        }
+        GUIDialogue.Dialogue = Dialogue;
+        GUIDialogue.Show(true);
+        GUIMain.Show(false);
+    }
+    
+    public override void OnUpdateState()
+    {
+        if (!GUIDialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+            Machine.SetState<DefaultState>();
+        }
+    }
+     
+
+    public override void OnExitState()
+    {
+        GUIDialogue.Show(false);
+    }
+}

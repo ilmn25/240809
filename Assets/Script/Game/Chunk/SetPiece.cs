@@ -73,8 +73,11 @@ public class SetPiece
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position) , minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.position -= new Vector3Int(minX, minY, minZ);
-                    setPiece.StaticEntity.Add(entity.ToSetPieceInfo());  
+                    setPiece.StaticEntity.Add(new SetEntity()
+                    {
+                        id = entity.id,
+                        position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
+                    });
                 }
             }
 
@@ -83,8 +86,11 @@ public class SetPiece
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position), minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    entity.position -= new Vector3Int(minX, minY, minZ);
-                    setPiece.DynamicEntity.Add(entity.ToSetPieceInfo()); 
+                    setPiece.DynamicEntity.Add(new SetEntity()
+                    {
+                        id = entity.id,
+                        position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
+                    });
                 }
             }
         }

@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
             
-    public static bool BuildMode = true;
+    public static bool BuildMode = false;
     public static bool Fly = false;
     
     public static LayerMask MaskMap;  
@@ -75,8 +75,7 @@ public class Game : MonoBehaviour
         MapCull.Initialize(); 
         Scene.Initialize();
         ViewPort.Initialize();
-        PlayerTerraformModule.Block = ObjectPool.GetObject(ID.BlockPrefab);
-        PlayerTerraformModule.Block.SetActive(false);
+        Terraform.Initialize();
         Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
     }
 
@@ -91,6 +90,7 @@ public class Game : MonoBehaviour
             // EditorApplication.isPlaying = false;
         }
         
+        Terraform.Update();
         GUIMain.Update();
         Inventory.Update();
         Control.Update();

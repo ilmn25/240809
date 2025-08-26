@@ -8,10 +8,12 @@ using Debug = UnityEngine.Debug;
 public class WorldGen
 {
     protected static System.Random Random;
-    // public static readonly Vector3Int Size = new Vector3Int(15, 6, 15);
-    public static readonly Vector3Int Size = new Vector3Int(5, 4, 5);
+    public static readonly Vector3Int Size = new Vector3Int(30, 6, 30);
+    // public static readonly Vector3Int Size = new Vector3Int(5, 4, 5);
     public static readonly Vector3Int SpawnPoint = 
-        new (World.ChunkSize * 2, World.ChunkSize * (Size.y - 1), World.ChunkSize * 2); 
+        new (Size.x * (World.ChunkSize - 4), 
+            World.ChunkSize * (Size.y - 1),
+            Size.z * (World.ChunkSize - 4)); 
  
     protected static readonly bool Flat = false; 
     protected static readonly int WorldHeight = (Size.y - 2) * World.ChunkSize;

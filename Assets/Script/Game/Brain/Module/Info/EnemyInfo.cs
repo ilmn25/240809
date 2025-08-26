@@ -22,6 +22,7 @@ public class EnemyInfo : MobInfo
         // _textMeshPro.text = Health.ToString();
         FaceTarget = Target != null;
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
+        SpeedTarget *= SpeedModifier;
         if (Health <= 0)
         { 
             Loot.Gettable(((EntityMachine)Machine).Info.id).Spawn(Machine.transform.position);

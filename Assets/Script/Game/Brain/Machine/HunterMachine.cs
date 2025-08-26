@@ -33,11 +33,10 @@ public class HunterMachine : MobMachine
         AddState(new MobAttackShoot());
         AddState(new EquipSelectState()); 
         Info.SetEquipment(new ItemSlot(ID.Pistol));
-    } 
-    
+    }
+
     public override void OnUpdate()
     {
-        HandleInput(); 
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)
@@ -55,7 +54,7 @@ public class HunterMachine : MobMachine
                         SetState<MobAttackReload>();
                         _ammo = AmmoMax;
                     }
-                } 
+                }
                 else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();
@@ -66,7 +65,7 @@ public class HunterMachine : MobMachine
                 }
             }
             else
-            { 
+            {
                 if (Random.value > 0.5f)
                     SetState<MobRoam>();
                 else
@@ -76,7 +75,7 @@ public class HunterMachine : MobMachine
 
             bool InRangeAndVisible()
             {
-                Vector3 origin = transform.position + Vector3.up * 0.3f; 
+                Vector3 origin = transform.position + Vector3.up * 0.3f;
                 float distance = Vector3.Distance(origin, Info.Target.position);
 
                 // Debug.DrawRay(origin, direction * distance, Color.red, 0.1f); // Lasts 0.1 seconds
@@ -88,25 +87,12 @@ public class HunterMachine : MobMachine
                 {
                     return hit.distance >= distance - 0.2f;
                 }
-        
+
                 return true;
             }
         }
     }
-    
-    void HandleInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            Info.Target = Game.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Reached; 
-            SetState<DefaultState>();
-        } 
-        else if (Input.GetKeyDown(KeyCode.T))
-            Info.Target = null;
-        else if (Input.GetKeyDown(KeyCode.U))
-            transform.position = Game.Player.transform.position;
-    }
+
     public void OnDrawGizmos()
     {
         if (Camera.current != Camera.main)

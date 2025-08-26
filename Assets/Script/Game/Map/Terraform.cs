@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTerraformModule : Module
+public class Terraform
 {
     public static List<Vector3Int> PendingBlocks = new ();
     public static GameObject Block;
@@ -10,8 +10,14 @@ public class PlayerTerraformModule : Module
     private static Vector3Int _coordinate;
 
     public static readonly int PreviewSpeed = 10; 
+
+    public static void Initialize()
+    {
+        Block = ObjectPool.GetObject(ID.BlockPrefab);
+        Block.SetActive(false); 
+    }
     
-    private static void EventSlotUpdate()
+    private static void SlotUpdate()
     {
         if (Inventory.CurrentItemData == null)
         {
@@ -43,9 +49,9 @@ public class PlayerTerraformModule : Module
         }
     }
     
-    public override void Update()
+    public static void Update()
     {
-        EventSlotUpdate();
+        SlotUpdate();
         // if (GUI.Active) return;
   
         if ( Control.Inst.DigUp.KeyDown())
@@ -160,5 +166,5 @@ public class PlayerTerraformModule : Module
         }
  
         return Vector3Int.FloorToInt(adjustedPoint);
-    }
+    } 
 }

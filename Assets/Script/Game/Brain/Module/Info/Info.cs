@@ -10,15 +10,7 @@ public class Info : EntityModule
     public ID id;
     public Vector3 position;
     [NonSerialized] public bool Destroyed = false;
-    [NonSerialized] public bool IsInRenderRange;
-    public SetEntity ToSetPieceInfo()
-    {
-        return new SetEntity()
-        {
-            id = id,
-            position = Vector3Int.FloorToInt(position)
-        };
-    }
+    [NonSerialized] public bool IsInRenderRange; 
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
     public virtual void AbstractHit(MobInfo info) { }
     public void Destroy() {Destroyed = true;}

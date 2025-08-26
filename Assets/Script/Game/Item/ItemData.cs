@@ -37,11 +37,15 @@ public partial class Item
         AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing);
         AddMaterialDefinition(ID.Sulphur);
+        AddMaterialDefinition(ID.Chicken);
         AddMaterialDefinition(ID.Meat);
         AddMaterialDefinition(ID.CookedMeat, materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddMaterialDefinition(ID.Gravel);
         AddMaterialDefinition(ID.Sticks);
         AddMaterialDefinition(ID.Cytoplasm);
+        AddMaterialDefinition(ID.Acorn);
+        AddMaterialDefinition(ID.Paper);
+        AddMaterialDefinition(ID.Fabric);
         AddMaterialDefinition(ID.Flint);
         AddMaterialDefinition(ID.MetalChunks);
         AddMaterialDefinition(ID.Charcoal, materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
