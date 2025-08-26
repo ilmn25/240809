@@ -11,9 +11,9 @@ using Random = System.Random;
 public class World
 {
     public delegate void Vector3IntEvent(Vector3Int position);
-    public static event Vector3IntEvent MapUpdated;
+    public static event Vector3IntEvent MapUpdated; 
+    public const int ChunkSize = 15;
     [NonSerialized] public static World Inst;
-    [NonSerialized] public static readonly int ChunkSize = 15;
      
     private Chunk[] _chunks; 
     public readonly Vector3Int Length;

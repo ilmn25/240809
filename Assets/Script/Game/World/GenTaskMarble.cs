@@ -7,25 +7,26 @@ public class GenTaskMarble : WorldGen
     private const float Scale = 0.05f;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID(global::ID.MarbleBlock) : _id; 
     
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    private static int Marble => _id == 0 ? Block.ConvertID(ID.MarbleBlock) : _id;
+    
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {
-            _x = (CurrentCoordinate.x + x) * Scale + Offset;
+            _x = (currentCoordinate.x + x) * Scale + Offset;
 
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                _z = (CurrentCoordinate.z + z) * Scale + Offset;
+                _z = (currentCoordinate.z + z) * Scale + Offset;
                 _value = Mathf.PerlinNoise(_x, _z);
-                _height = Mathf.FloorToInt(_value * (WorldHeight / 4));
+                _height = Mathf.FloorToInt(_value * World.ChunkSize);
                 
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    if (y + CurrentCoordinate.y <= _height)
+                    if (y + currentCoordinate.y <= _height)
                     {
-                        CurrentChunk[x, y, z] = ID;
+                        currentChunk[x, y, z] = Marble;
                     }
                 }
             }

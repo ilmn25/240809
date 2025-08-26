@@ -7,27 +7,29 @@ public class GenTaskSand : WorldGen
     private const float Scale = 0.03f;
     private static readonly float Offset = GetOffset();
     private static int _id;
-    private static int ID => _id == 0 ? Block.ConvertID(global::ID.SandBlock) : _id; 
+    private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
+    private const int VerticalScale  = World.ChunkSize;
+
     
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {
-            _x = (CurrentCoordinate.x + x) * Scale + Offset;
+            _x = (currentCoordinate.x + x) * Scale + Offset;
 
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                if (GenBiome.GetBiomeType(CurrentCoordinate.x + x, CurrentCoordinate.z + z) != BiomeType.Desert) continue; 
-                _z = (CurrentCoordinate.z + z) * Scale + Offset;
+                if (GenBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Desert) continue; 
+                _z = (currentCoordinate.z + z) * Scale + Offset;
                 _value = Mathf.PerlinNoise(_x, _z);
-                _height = Mathf.FloorToInt(_value * (WorldHeight / 4)) + WorldHeight * 3 / 4;
+                _height = Mathf.FloorToInt(_value * VerticalScale + WorldHeight);
                 
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    if (CurrentChunk[x, y, z] != 0 &&
-                        y + CurrentCoordinate.y > _height - 15)
+                    if (currentChunk[x, y, z] != 0 &&
+                        y + currentCoordinate.y > _height - 15)
                     {
-                        CurrentChunk[x, y, z] = ID;
+                        currentChunk[x, y, z] = Sand;
                     }
                 }
             }
