@@ -45,19 +45,7 @@ public class World
         EntityDynamicLoad.OnChunkTraverse();
         MapLoad.OnChunkTraverse();
     }
-    
-    public static void Save(int id)
-    {
-        UnloadWorld();
-        Helper.FileSave(Inst, "World" + id);
-    }
-
-    public static void Load(int id)
-    { 
-        Inst = Helper.FileLoad<World>("World" + id);
-        if (Inst == null) WorldGen.GenerateWorld(); 
-    }
-
+ 
     private int GetIndex(int chunkX, int chunkY, int chunkZ)
     {
         return chunkX + Length.x * (chunkY + Length.y * chunkZ);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,12 +21,30 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
-    public static void Initialize()
+    public static void Load(int id)
     {  
-        World.Load(0); 
+        World.Inst = Helper.FileLoad<World>("World" + id);
+        if (World.Inst == null) WorldGen.GenerateWorld();
+        
+        NavMap.Initialize();
         Control.SetPlayer(0); 
-        Game.ViewPortObject.transform.position = Game.PlayerInfo.position;
-        GUIBar.Update();
+        Game.ViewPortObject.transform.position = Game.PlayerInfo.position; 
+        Game.SceneMode = SceneMode.Game;
+        _playerChunkPositionPrevious = Vector3Int.down;
+        Environment.Target = EnvironmentType.Null;
+    }
+
+    public static void Save(int id)
+    {
+        _ = new CoroutineTask(Quit());
+        return;
+        IEnumerator Quit()
+        {
+            Environment.Target = EnvironmentType.Black;
+            yield return new WaitForSeconds(2);
+            World.UnloadWorld();
+            Helper.FileSave(World.Inst, "World" + id); 
+        }
     }
     
     public static void Update()
@@ -40,7 +59,6 @@ public class Scene
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }
     }
-     
     
     public static bool InPlayerChunkRange(Vector3 position, float distance)
     {

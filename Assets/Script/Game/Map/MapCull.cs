@@ -32,7 +32,6 @@ public class MapCull
     {
         new CoroutineTask(YCheckRoutine());
         ViewPort.OnOrbitRotate += HandleObstructionCheck; 
-        _chunkPositionPrevious = Scene.PlayerChunkPosition;
         HandleLight(false); 
     }
     
@@ -67,6 +66,7 @@ public class MapCull
     {
         while (true)
         {
+            while (!Game.Player) yield return new WaitForSeconds(2);
             yield return new WaitForSeconds(0.05f);
             HandleObstructionCheck();
             HandleCheck();

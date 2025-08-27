@@ -3,7 +3,6 @@ using System.Collections;
 
 public class SpotLightModule : MonoBehaviour
 {
-    private const float DELAY = 4.0f; // Delay in seconds before starting the calls
     private const int ENABLE_THRESHOLD = 200; // Number of frames shouldEnable needs to be true
     private Light _light;
     private Vector3 _offset;
@@ -11,7 +10,7 @@ public class SpotLightModule : MonoBehaviour
     private float _intensity;
     private int _enableCounter = 0;
 
-    private void Start()
+    private void Start()    
     {
         _light = GetComponent<Light>();
         _intensity = _light.intensity;
@@ -20,10 +19,9 @@ public class SpotLightModule : MonoBehaviour
 
     private IEnumerator WaitAndStart()
     { 
-        yield return new WaitForSeconds(DELAY);
         while (true)
         {
-            if (!Game.Player) yield return new WaitForSeconds(0.5f);
+            while (!Game.Player) yield return new WaitForSeconds(2);
             _offset = Game.Player.transform.position - transform.position;
             _offset.y = 0; // Ignore the y-axis
             _offset.Normalize();
