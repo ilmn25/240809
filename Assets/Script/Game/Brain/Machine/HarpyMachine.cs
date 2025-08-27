@@ -8,7 +8,6 @@ public class HarpyMachine : MobMachine
         return new EnemyInfo()
         {
             HealthMax = 16,
-            Defense = 1, 
             DistAttack = 1,
             DistRoam = 7,
             PathJump = 10,

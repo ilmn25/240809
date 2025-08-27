@@ -10,7 +10,6 @@ public class BugMachine : MobMachine
         return new EnemyInfo()
         {
             HealthMax = 15,
-            Defense = 1,
             DistAttack = 8,
             PathJump = 2,
             PathAir = 6,

@@ -69,8 +69,17 @@ public class MobInfo : DynamicInfo
                                    Camera.main.WorldToScreenPoint(Machine.transform.position)).normalized;
             }
         }
-    }   
+    }
 
+    public Vector3 GetDirection()
+    {
+        Vector3 direction = SpriteToolTrack.right;
+        if (SpriteToolTrack.lossyScale.x < 0f) 
+            direction *= -1;
+        direction.y = 0;
+        direction.Normalize();
+        return direction;
+    }
     public void SetEquipment(ItemSlot target)
     { 
         if (target != null)

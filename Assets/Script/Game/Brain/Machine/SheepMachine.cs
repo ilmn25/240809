@@ -8,9 +8,8 @@ public class SheepMachine : MobMachine, IActionSecondaryInteract
         return new EnemyInfo()
         {
             HealthMax = 16,
-            Defense = 1, 
-            SpeedGround = 4,
-            SpeedAir = 7,
+            SpeedGround = 7,
+            SpeedAir = 8,
             PathAir = 3,
             DistAttack = 7,
             DistRoam = 3 
@@ -51,7 +50,12 @@ public class SheepMachine : MobMachine, IActionSecondaryInteract
             {
                 if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
                 {
-                    SetState<MobEscape>();
+                    if (Random.value < 0.8f)
+                    {
+                        SetState<MobEscape>();
+                    } 
+                    else
+                        SetState<MobRoam>(); 
                 } 
                 else
                 {

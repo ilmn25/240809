@@ -9,7 +9,6 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         return new EnemyInfo()
         {
             HealthMax = 16,
-            Defense = 1, 
             DistAttack = 2,
             DistRoam = 7 
         };  

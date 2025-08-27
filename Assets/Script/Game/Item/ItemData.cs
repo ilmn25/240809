@@ -13,20 +13,20 @@ public partial class Item
 
         // Blocks
         AddBlockDefinition(ID.BrickBlock, 150, 1, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
-        loot = Loot.CreateTable(ID.BrickBlock);
+        loot = new (ID.BrickBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
         AddBlockDefinition(ID.MarbleBlock, 200, 1, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.DirtBlock, 80, 1, SfxID.HitStone);
-        loot = Loot.CreateTable(ID.DirtBlock);
+        loot = new (ID.DirtBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.BackroomBlock, 200, 2, SfxID.HitStone, materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.StoneBlock, 150, 1, SfxID.HitStone);
-        loot = Loot.CreateTable(ID.StoneBlock);
+        loot = new (ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);
         loot.Add(0.5f, 1, ID.MetalChunks);
@@ -76,10 +76,10 @@ public partial class Item
             range: 1,
             projectileInfo: new SwingProjectileInfo {
                 Damage = 2,
-                Knockback = 15,
+                Knockback = 11,
                 CritChance = 10,
-                Speed = 1.3f,
-                Radius = 2f,
+                Speed = 1f,
+                Radius = 1.5f,
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
@@ -218,12 +218,13 @@ public partial class Item
             sfx: SfxID.Minigun,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = ID.BulletProjectile,
-                Damage = 1000,
+                Damage = 3,
                 Knockback = 5,
                 CritChance = 10,
                 LifeSpan = 10000,
                 Speed = 60,
                 Radius = 0.1f,
+                Ammo = ID.Bullet,
                 Penetration = 1, 
             },
             materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
@@ -239,7 +240,7 @@ public partial class Item
             sfx: SfxID.Pistol,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = ID.BulletProjectile,
-                Damage = 1,
+                Damage = 5,
                 Knockback = 6,
                 CritChance = 10,
                 LifeSpan = 10000,
