@@ -70,7 +70,6 @@ public class Game : MonoBehaviour
         Control.Initialize();  
         Item.Initialize();
         Entity.Initialize(); 
-        Loot.Initialize();
         GUIMain.Initialize(); 
         WorldGen.Initialize(); 
         Audio.Initialize();
@@ -99,7 +98,7 @@ public class Game : MonoBehaviour
         
         IEnumerator Quit()
         {
-            Environment.Target = Environment.Black;
+            Environment.Target = EnvironmentType.Black;
             yield return new WaitForSeconds(2);
             World.Save(0);
             Application.Quit();

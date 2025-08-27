@@ -22,7 +22,7 @@ public class BedMachine: StructureMachine, IActionSecondaryInteract
         if (_target.Item1 == -1) return;
         if (_target.Item1 <= World.Inst.day && _target.Item2 <= World.Inst.time)
         {  
-            Environment.Target = null;
+            Environment.Target = EnvironmentType.Null;
             _target.Item1 = -1;
             Environment.TickSpeed = 1;
             Game.PlayerInfo.SpeedModifier = 1;
@@ -44,13 +44,13 @@ public class PortalMachine: StructureMachine, IActionSecondaryInteract
 
     private IEnumerator Portal()
     {
-        Environment.Target = Environment.Black; 
+        Environment.Target = EnvironmentType.Black; 
         Game.PlayerInfo.SpeedModifier = 0.001f;
         yield return new WaitForSeconds(2);
         Game.Player.transform.position = new Vector3Int(2, 50, 2); 
         yield return new WaitForSeconds(3);
         Game.PlayerInfo.SpeedModifier = 1;
-        Environment.Target = null; 
+        Environment.Target = EnvironmentType.Null; 
     }
 }
 public class SignMachine: StructureMachine, IActionSecondaryInteract

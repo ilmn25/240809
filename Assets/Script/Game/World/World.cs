@@ -24,7 +24,7 @@ public class World
     public List<PlayerInfo> target = new();
     public int day = 1;
     public int time;
-    public Environment weather = Environment.Sunrise;
+    public EnvironmentType weather = EnvironmentType.Sunrise;
     
     public World(int x, int y, int z)
     {

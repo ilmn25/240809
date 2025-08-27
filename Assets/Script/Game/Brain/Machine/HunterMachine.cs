@@ -9,7 +9,6 @@ public class HunterMachine : MobMachine
         {
             HealthMax = 12,
             SpeedGround = 4,
-            Defense = 1, 
             DistAttack = 18,
         }; 
     }

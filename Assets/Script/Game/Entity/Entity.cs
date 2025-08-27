@@ -28,7 +28,20 @@ public class Entity
         
         public static void Initialize()
         {
+                Loot loot;
                 AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Game.IndexCollide);
+                loot = new (ID.Tree);
+                loot.Add(1, 4, ID.Log);
+                loot.Add(0.5f, 1, ID.Log); 
+                loot.Add(0.5f, 1, ID.Acorn); 
+                
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexCollide);
+                loot = new (ID.Slab);
+                loot.Add(1, 2, ID.Flint); 
+                loot.Add(0.5f, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Flint);
+                loot.Add(0.5f, 1, ID.Flint);
+                
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
@@ -37,15 +50,58 @@ public class Entity
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Game.IndexCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
+                
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);
+                loot = new (ID.Chest);
+                loot.Add(1, 1, ID.MetalChunks);
+                loot.Add(1, 3, ID.Brick); 
+                loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
+                loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
+                
                 AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Game.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide);  
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexCollide);
+                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide);   
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Game.IndexSemiCollide);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Game.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Game.IndexSemiCollide);
                 AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Game.IndexCollide); 
+                 
+                AddMob<PlayerMachine>(ID.Player);
                 
+                AddMob<HunterMachine>(ID.Chito); 
+                loot = new (ID.Chito);
+                loot.Add(0.7f, 5, ID.Bullet); 
+                loot.Add(0.1f, 1, ID.Pistol); 
+                
+                AddMob<HunterMachine>(ID.Yuuri);
+                loot = new (ID.Yuuri);
+                loot.Add(0.7f, 5, ID.Bullet);  
+                loot.Add(0.1f, 1, ID.Pistol);  
+                
+                AddMob<SheepMachine>(ID.Sheep);
+                loot = new (ID.Sheep);
+                loot.Add(1, 1, ID.Meat);  
+                loot.Add(0.5f, 1, ID.Meat);  
+                loot.Add(0.5f, 1, ID.Wool); 
+                loot.Add(0.5f, 1, ID.Wool); 
+                loot.Add(0.5f, 1, ID.Wool); 
+                
+                AddMob<BugMachine>(ID.SnareFlea); 
+                loot = new (ID.SnareFlea);
+                loot.Add(0.5f, 6, ID.Sticks); 
+                
+                AddMob<GhoulMachine>(ID.Megumin);
+                loot = new (ID.Megumin);
+                loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
+                
+                AddMob<SlimeMachine>(ID.Slime);
+                loot =  new (ID.Slime);
+                loot.Add(1, 2, ID.Cytoplasm); 
+                
+                AddMob<HarpyMachine>(ID.Harpy);
+                loot = new (ID.Harpy);
+                loot.Add(1, 2, ID.Chicken);  
+                loot.Add(0.5f, 1, ID.Wool);   
+                 
                 Dictionary.Add(ID.Block, new Entity
                 {
                         Bounds = Vector3Int.one,
@@ -64,23 +120,7 @@ public class Entity
                         StaticLoad = true,
                         SpawnOffset = Floor,
                 });
-                
-                Dictionary.Add(ID.Player, new Entity  
-                {
-                        Bounds = Vector3.one * 0.7f,
-                        Collision = Game.IndexSemiCollide,
-                        PrefabName = ID.MobPrefab,
-                        Machine = typeof(PlayerMachine),
-                        StaticLoad = false,
-                        SpawnOffset = MidAir,
-                });
-                AddMob<HunterMachine>(ID.Chito); 
-                AddMob<HunterMachine>(ID.Yuuri);
-                AddMob<SheepMachine>(ID.Sheep);
-                AddMob<BugMachine>(ID.SnareFlea); 
-                AddMob<GhoulMachine>(ID.Megumin);
-                AddMob<SlimeMachine>(ID.Slime);
-                AddMob<HarpyMachine>(ID.Harpy);
+                 
         }
 
         private static void AddMob<T>(ID stringID) where T : EntityMachine

@@ -1,16 +1,29 @@
 using UnityEngine;
 
+
 class MobAttackSwing : MobState {
     
     private Item _equipment;
+
+    public void Attack()
+    {
+        if (_equipment.ProjectileInfo != null)
+        {
+            Vector3 direction = Info.GetDirection();
+            Projectile.Spawn(Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
+                Info.AimPosition,
+                _equipment.ProjectileInfo,
+                Info.targetHitboxType, Info);
+        } 
+    }
+    
     public override void OnEnterState()
     { 
-        Info.Animator.speed = 1f;  
-        Info.Animator.Play("EquipSwing", 0, 0f);
-        _equipment = Info.Equipment.Info;
-        Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
-        Audio.PlaySFX(_equipment.Sfx);
-        Info.SpeedModifier = 0.5f;
+        Info.Animator.speed = Game.PlayerInfo == Info ? 0.7f : 0.2f;
+        Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0); 
+        _equipment = Info.Equipment.Info; 
+        Info.SpeedModifier = 0.2f;
+        Info.Animator.Play("EquipSwingTelegraph", 0, 0f);  
     }
     
     public override void OnUpdateState()
@@ -18,9 +31,17 @@ class MobAttackSwing : MobState {
         AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
         if (stateInfo.normalizedTime >= 1f)
         {
-            if (stateInfo.IsName("EquipSwing"))
+            if (stateInfo.IsName("EquipSwingTelegraph"))
+            {  
+                Info.Animator.speed = 1;
+                Info.Animator.Play("EquipSwing", 0, 0f);
+                Attack();
+            }
+            else if (stateInfo.IsName("EquipSwing"))
             {  
                 Info.Animator.speed = Game.BuildMode? 70 : _equipment.Speed;
+                Audio.PlaySFX(_equipment.Sfx); 
+                Info.SpeedModifier = 0.85f;
                 Info.Animator.Play("EquipSwingCooldown", 0, 0f);
             }
             else if (stateInfo.IsName("EquipSwingCooldown"))
@@ -35,7 +56,7 @@ class MobAttackSwing : MobState {
     public override void OnExitState()
     {
         Info.Animator.speed = 1f;
-        Info.Animator.Play("EquipIdle", 0, 0f); 
+        Info.Animator.Play("EquipIdle", 0, 0f);  
         Info.SpeedModifier = 1f;
     }
 }

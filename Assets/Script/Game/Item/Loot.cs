@@ -17,58 +17,10 @@ public class LootEntry
 public class Loot
 { 
     private static readonly Dictionary<ID, Loot> Dictionary = new Dictionary<ID, Loot>();
-    private readonly List<LootEntry> _table = new List<LootEntry>();
-    public static void Initialize()
+    private readonly List<LootEntry> _table = new List<LootEntry>(); 
+    public Loot(ID id)
     {
-        Loot loot = CreateTable(ID.Chest);
-        loot.Add(1, 1, ID.MetalChunks);
-        loot.Add(1, 3, ID.Brick); 
-        loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
-        loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
-        
-        loot = CreateTable(ID.Slab);
-        loot.Add(1, 2, ID.Flint); 
-        loot.Add(0.5f, 1, ID.Gravel);
-        loot.Add(0.5f, 1, ID.Flint);
-        loot.Add(0.5f, 1, ID.Flint);
-        
-        loot = CreateTable(ID.Tree);
-        loot.Add(1, 4, ID.Log);
-        loot.Add(0.5f, 1, ID.Log); 
-        loot.Add(0.5f, 1, ID.Acorn); 
-        
-        loot = CreateTable(ID.Megumin);
-        loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
-        
-        loot = CreateTable(ID.Chito);
-        loot.Add(0.7f, 5, ID.Bullet); 
-        loot.Add(0.1f, 1, ID.Pistol); 
-        
-        loot = CreateTable(ID.SnareFlea);
-        loot.Add(0.5f, 6, ID.Sticks); 
-        loot = CreateTable(ID.Slime);
-        loot.Add(1, 2, ID.Cytoplasm); 
-        
-        loot = CreateTable(ID.Yuuri);
-        loot.Add(0.7f, 5, ID.Bullet);  
-        loot.Add(0.1f, 1, ID.Pistol); 
-        loot = CreateTable(ID.Harpy);
-        loot.Add(1, 2, ID.Chicken);  
-        loot.Add(0.5f, 1, ID.Wool); 
-        loot = CreateTable(ID.Sheep);
-        loot.Add(1, 1, ID.Meat);  
-        loot.Add(0.5f, 1, ID.Meat);  
-        loot.Add(0.5f, 1, ID.Wool); 
-        loot.Add(0.5f, 1, ID.Wool); 
-        loot.Add(0.5f, 1, ID.Wool); 
-         
-    }
-
-    public static Loot CreateTable(ID id)
-    {
-        Loot loot = new Loot();
-        Dictionary.Add(id, loot);
-        return loot;
+        Dictionary.Add(id, this);
     }
     
     public static Loot Gettable(ID id)

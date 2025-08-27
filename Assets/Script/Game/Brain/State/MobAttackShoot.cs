@@ -15,14 +15,17 @@ public class MobAttackShoot : MobState
         Info.Animator.speed = Info.Equipment.Info.Speed; 
         Info.Animator.Play("EquipShoot", 0, 0f);
          
-        Info.SpeedModifier = 0.5f;
+        Info.SpeedModifier = 0.3f;
+
+        Vector3 direction = Info.GetDirection();
         
-        Vector3 direction = Info.SpriteToolTrack.right;
-        if (Info.SpriteToolTrack.lossyScale.x < 0f) 
-            direction *= -1;
-        direction.y = 0;
-        direction.Normalize();
+        Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
+            Info.AimPosition,
+            Info.Equipment.Info.ProjectileInfo,
+            Info.targetHitboxType, Info);
+        
         ViewPort.StartScreenShake(1, 0.035f, direction);
+        
         Entity.SpawnItem(ID.Casing, Info.position + Vector3.up * 0.5f, 1, false, 
             (Vector3.up -direction) * 5, 15000);
     }

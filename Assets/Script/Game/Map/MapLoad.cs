@@ -72,23 +72,46 @@ public class MapLoad
         }
         _destroyList.Clear();
 
+        OnTraverseLoad();
+    }
+
+    private static void OnTraverseLoad()
+    {
+        List<Vector3Int> offsets = new List<Vector3Int>();
+
         for (int x = -Scene.RenderRange; x <= Scene.RenderRange; x++)
         {
             for (int y = -Scene.RenderRange; y <= Scene.RenderRange; y++)
             {
                 for (int z = -Scene.RenderRange; z <= Scene.RenderRange; z++)
                 {
-                    _traverseCheckPosition = new Vector3Int(
-                        Scene.PlayerChunkPosition.x + x * World.ChunkSize,
-                        Scene.PlayerChunkPosition.y + y * World.ChunkSize,
-                        Scene.PlayerChunkPosition.z + z * World.ChunkSize
-                    );
-                    if (!ActiveChunks.ContainsKey(_traverseCheckPosition) && World.IsInWorldBounds(_traverseCheckPosition))
-                        _ = LoadChunksOntoScreenAsync(_traverseCheckPosition);
+                    offsets.Add(new Vector3Int(x, y, z));
                 }
             }
-        } 
+        }
+        
+        offsets.Sort((a, b) =>
+        {
+            int aScore = a.x * a.x + a.z * a.z + a.y * a.y * 2; 
+            int bScore = b.x * b.x + b.z * b.z + b.y * b.y * 2;
+            return aScore.CompareTo(bScore);
+        });
+
+        foreach (var offset in offsets)
+        {
+            Vector3Int chunkPos = new Vector3Int(
+                Scene.PlayerChunkPosition.x + offset.x * World.ChunkSize,
+                Scene.PlayerChunkPosition.y + offset.y * World.ChunkSize,
+                Scene.PlayerChunkPosition.z + offset.z * World.ChunkSize
+            );
+
+            if (!ActiveChunks.ContainsKey(chunkPos) && World.IsInWorldBounds(chunkPos))
+            {
+                _ = LoadChunksOntoScreenAsync(chunkPos);
+            }
+        }
     }
+    
     public static CancellationTokenSource CancellationTokenSourceKillGame = new CancellationTokenSource();
     private static async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)
     { 
