@@ -5,9 +5,16 @@ using UnityEngine;
  
 public class NavMap
 {
-    private static readonly BitArray BitMap = new (
-        World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z);
+    private static BitArray _bitMap;
     private static readonly List<Vector3Int> LoadedChunks = new ();
+
+    public static void Initialize()
+    {
+        _bitMap = new (
+            World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z);
+        LoadedChunks.Clear();
+    }
+    
     private static int GetIndex(int x, int y, int z)
     {
         return x + World.Inst.Bounds.x * (y + World.Inst.Bounds.y * z);
@@ -48,19 +55,19 @@ public class NavMap
     public static bool Get(Vector3Int worldPosition)
     {
         if (!World.IsInWorldBounds(worldPosition)) return true;
-        return BitMap[GetIndex(worldPosition)];
+        return _bitMap[GetIndex(worldPosition)];
     }
 
     public static void Set(Vector3Int worldPosition, bool value, bool isAir = false)
     {
         if (isAir && !World.IsInWorldBounds(worldPosition)) return;
-        BitMap[GetIndex(worldPosition)] = value; 
+        _bitMap[GetIndex(worldPosition)] = value; 
     }
     
     public static void Set(int x, int y, int z, bool value, bool isAir = false)
     {
         if (isAir && !World.IsInWorldBounds(x, y, z)) return;
-        BitMap[GetIndex(x, y, z)] = value;
+        _bitMap[GetIndex(x, y, z)] = value;
     }
 
     public static void SetEntity(Entity entity, Vector3 position, bool isAir)

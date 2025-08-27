@@ -7,24 +7,26 @@ using Debug = UnityEngine.Debug;
 
 public class WorldGen
 {
-    protected static System.Random Random;
-    public static readonly Vector3Int Size = new Vector3Int(60, 30, 60);
-    // public static readonly Vector3Int Size = new Vector3Int(5, 4, 5);
-    public static readonly Vector3Int SpawnPoint = 
-        new (Size.x * (World.ChunkSize - 2), 
-            World.ChunkSize * (Size.y - 1),
-            Size.z * (World.ChunkSize - 2)); 
+    protected static System.Random Random = new (World.Seed);
+    public static Vector3Int Size;
+    protected static int WorldHeight;
+    public static Vector3Int SpawnPoint;
  
-    protected static readonly bool Flat = false; 
-    protected static readonly int WorldHeight = (Size.y - 3) * World.ChunkSize;
-    
+    protected static readonly bool Flat = false;  
+
+    public static void SetSize(Vector3Int size)
+    {
+        Size = size;
+        WorldHeight = (Size.y - 3) * World.ChunkSize;
+        SpawnPoint = 
+            new (Size.x * (World.ChunkSize - 2), 
+                World.ChunkSize * (Size.y - 1),
+                Size.z * (World.ChunkSize - 2)); 
+    }
     public static float GetOffset()
     {
         return (float)Random.NextDouble() * 1000;
-    }
-    public static void Initialize() {
-        Random = new System.Random(World.Seed);
-    }
+    } 
 
     public static void GenerateWorld()
     { 

@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
+public enum SceneMode {Menu, Game}
 public class Game : MonoBehaviour
 {
     public const float MaxDeltaTime = 0.03f; 
@@ -16,6 +17,7 @@ public class Game : MonoBehaviour
             
     public static bool BuildMode = false;
     public static bool Fly = false;
+    public static SceneMode SceneMode = SceneMode.Menu;
     
     public static LayerMask MaskMap;  
     public static LayerMask MaskStatic;
@@ -46,17 +48,14 @@ public class Game : MonoBehaviour
     public static GameObject GUIInfoPanel;
     public static GameObject GUICursor;
     public static GameObject GUICursorInfo;
-    public static GameObject GUICursorSlot; 
-
-
+    public static GameObject GUICursorSlot;
+ 
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
         Application.targetFrameRate = 100;
         Application.runInBackground = true;
         SetConstants(); 
-        // PlayerData.Load();  
-        
         
         SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), new Vector3SerializationSurrogate());
@@ -64,28 +63,26 @@ public class Game : MonoBehaviour
         Helper.BinaryFormatter.SurrogateSelector = surrogateSelector; 
     }
 
-    private void Start()
+    public void Start()
     {  
-        EnvParticle.Initialize();  
+        ViewPort.Initialize(); 
+        Audio.Initialize();
         Control.Initialize();  
+         
         Item.Initialize();
         Entity.Initialize(); 
-        GUIMain.Initialize(); 
-        WorldGen.Initialize(); 
-        Audio.Initialize();
         Block.Initialize();   
-        MapCull.Initialize(); 
-        Scene.Initialize();
-        ViewPort.Initialize();
-        Terraform.Initialize();
+        
+        GUIMain.Initialize();    
+        EnvParticle.Initialize();    
+        Terraform.Initialize();  
+        MapCull.Initialize();
+         
         Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
-    }
-
+    } 
     private void Update()
     {   
-        if (Control.Inst.Pause.KeyDown()) _ = new CoroutineTask(Quit());
-            // EditorApplication.isPlaying = false;
-        
+        if (SceneMode != SceneMode.Game || !Player) return;
         Terraform.Update();
         GUIMain.Update();
         Inventory.Update();
@@ -93,17 +90,9 @@ public class Game : MonoBehaviour
         MapCull.Update();
         ViewPort.Update();  
         Environment.Update();
-        MobSpawner.Update();
-        return;
-        
-        IEnumerator Quit()
-        {
-            Environment.Target = EnvironmentType.Black;
-            yield return new WaitForSeconds(2);
-            World.Save(0);
-            Application.Quit();
-        }
-    }
+        MobSpawner.Update(); 
+    } 
+    
     private void FixedUpdate()
     { 
         Scene.Update(); 
