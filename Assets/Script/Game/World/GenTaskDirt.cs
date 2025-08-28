@@ -19,7 +19,7 @@ public class GenTaskDirt : WorldGen
 
             for (int z = 0; z < World.ChunkSize; z++)
             { 
-                if (GenBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Grass) continue; 
+                if (GenHelpBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Grass) continue; 
                 _z = (currentCoordinate.z + z) * Scale + Offset;
 
                 _value = Mathf.PerlinNoise(_x, _z);

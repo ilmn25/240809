@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum BiomeType {Desert, Grass}
-public class GenBiome : WorldGen
+public class GenHelpBiome : WorldGen
 {
     private static readonly float DrynessOffset = GetOffset();
     private static readonly float Scale = 0.01f;

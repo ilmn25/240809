@@ -21,19 +21,38 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
+    public static void New(Vector3Int size, Type type)
+    {
+        World.Inst = new World(size, type);  
+        WorldGen.Initialize();
+        WorldGen.GenerateWorld();
+        Play();
+    }
+    
     public static void Load(int id)
     {  
         World.Inst = Helper.FileLoad<World>("World" + id);
-        if (World.Inst == null) WorldGen.GenerateWorld();
-        
-        NavMap.Initialize();
-        Control.SetPlayer(0); 
-        Game.ViewPortObject.transform.position = Game.PlayerInfo.position; 
-        Game.SceneMode = SceneMode.Game;
-        _playerChunkPositionPrevious = Vector3Int.down;
-        Environment.Target = EnvironmentType.Null;
+        if (World.Inst == null) return;
+        WorldGen.Initialize();
+        Play();
     }
 
+    private static void Play()
+    { 
+        _ = new CoroutineTask(Start());
+        return;
+        IEnumerator Start()
+        { 
+            NavMap.Initialize();
+            Control.SetPlayer(0); 
+            Game.ViewPortObject.transform.position = Game.PlayerInfo.position; 
+            Game.SceneMode = SceneMode.Game;
+            _playerChunkPositionPrevious = Vector3Int.down; 
+            yield return new WaitForSeconds(3);
+            Environment.Target = EnvironmentType.Null;
+        }
+    }
+    
     public static void Save(int id)
     {
         _ = new CoroutineTask(Quit());
