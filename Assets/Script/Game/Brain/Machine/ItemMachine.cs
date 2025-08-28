@@ -43,10 +43,10 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             }
         } 
         
-        ItemInfo.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + ItemInfo.id);
+        ItemInfo.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + ItemInfo.item.ID);
         AddModule(new ItemSpriteCullModule()); 
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
-        transform.localScale = Vector3.one * Item.GetItem(ItemInfo.id).Scale;
+        transform.localScale = Vector3.one * ItemInfo.item.Info.Scale;
         if (ItemInfo.Velocity == default) 
             ItemInfo.Velocity = new Vector3(Random.Range(-3, 3), 0, Random.Range(-3, 3));  
     }

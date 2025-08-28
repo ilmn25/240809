@@ -10,7 +10,7 @@ public partial class Item
     public static void Initialize()
     {
         Loot loot;
-
+  
         // Blocks
         AddBlockDefinition(ID.BrickBlock, 150, 1, SfxID.HitMetal, materials: new Dictionary<ID, int> { { ID.Gravel, 3 } });
         loot = new (ID.BrickBlock);
@@ -32,6 +32,7 @@ public partial class Item
         loot.Add(0.5f, 1, ID.MetalChunks);
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone);
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone);
+        AddBlockDefinition(ID.Blueprint);
 
         // Materials
         AddMaterialDefinition(ID.Bullet, materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
@@ -86,17 +87,7 @@ public partial class Item
             materials: new Dictionary<ID, int> { { ID.Flint, 5 }, { ID.Stake, 2 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
-
-        AddToolDefinition(
-            id: ID.Blueprint,
-            gesture: ItemGesture.Swing,
-            sfx: SfxID.Null,
-            speed: 4f,
-            range: 7f,
-            durability: -1,
-            materials: new Dictionary<ID, int> { { ID.Log, 2 } },
-            holdoutOffset: new Vector2(0.65f, 0)
-        );
+ 
 
         AddToolDefinition(
             id: ID.StonePickaxe,

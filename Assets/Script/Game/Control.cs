@@ -18,8 +18,6 @@ public class Control
     public readonly ControlKey SwapChar = new (KeyCode.BackQuote);
     public readonly ControlKey Pause = new (KeyCode.Escape);
     public readonly ControlKey FullScreen = new (KeyCode.F11);
-    public readonly ControlKey DigUp = new (KeyCode.Z);
-    public readonly ControlKey DigDown = new (KeyCode.X);
     public readonly ControlKey ActionPrimary = new (KeyCode.Mouse0);
     public readonly ControlKey ActionSecondary = new (KeyCode.Mouse1);
     public readonly ControlKey ActionPrimaryNear = new (KeyCode.G);
@@ -189,7 +187,7 @@ public class Control
             //     Info.ActionTarget = IActionTarget.Hit;
             // }
     
-            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Game.Player)
+            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Game.Player && Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)

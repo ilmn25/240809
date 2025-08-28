@@ -12,12 +12,7 @@ public class ItemInfo : Info
     [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
     public override void Initialize()
-    {
-        if (item == null) item = new ItemSlot
-        {
-            ID = id,
-            Stack = 1,
-        };
+    { 
         SpriteRenderer = Machine.transform.GetComponent<SpriteRenderer>();
     }
 
