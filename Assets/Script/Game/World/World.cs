@@ -12,10 +12,11 @@ using Random = System.Random;
 public class World
 {
     public delegate void Vector3IntEvent(Vector3Int position);
-    public static event Vector3IntEvent MapUpdated; 
-    public const int ChunkSize = 15;
+    public static event Vector3IntEvent MapUpdated;  
+    public const int ChunkSize = 15; 
     [NonSerialized] public static World Inst;
-     
+ 
+    public Type WorldGen;
     private Chunk[] _chunks; 
     public readonly Vector3Int Length;
     public readonly Vector3Int Bounds;
@@ -26,11 +27,12 @@ public class World
     public int time;
     public EnvironmentType weather = EnvironmentType.Sunrise;
     
-    public World(int x, int y, int z)
+    public World(Vector3Int size, Type worldGen)
     {
-        Bounds = new Vector3Int(x * ChunkSize, y * ChunkSize, z * ChunkSize);
-        Length = new Vector3Int(x, y, z);
-        _chunks = new Chunk[x * y * z];
+        WorldGen = worldGen;
+        Bounds = new Vector3Int(size.x * ChunkSize, size.y * ChunkSize, size.z * ChunkSize);
+        Length = size;
+        _chunks = new Chunk[size.x * size.y * size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
     }
 

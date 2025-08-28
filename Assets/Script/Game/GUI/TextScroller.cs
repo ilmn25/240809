@@ -17,14 +17,15 @@
                 textBox.text = text;
             }; 
             return scrollTask;
-        }
-
-        private static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed, CoroutineTask scrollTask = null)
-        { 
-            foreach (var letter in line.ToCharArray())        
-            {  
-                textBox.text += letter;
-                yield return new WaitForSeconds(1f / speed);
+            
+            IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed, CoroutineTask scrollTask = null)
+            { 
+                foreach (var letter in line.ToCharArray())        
+                {  
+                    textBox.text += letter;
+                    yield return new WaitForSeconds(1f / speed);
+                }
             }
         }
+ 
     }

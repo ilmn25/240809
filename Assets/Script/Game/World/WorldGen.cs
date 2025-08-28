@@ -2,26 +2,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class WorldGen
 {
-    protected static System.Random Random = new (World.Seed);
-    public static Vector3Int Size;
+    protected static readonly System.Random Random = new (World.Seed);
+    protected static Vector3Int SpawnPoint;
+    private static Vector3Int _size; 
     protected static int WorldHeight;
-    public static Vector3Int SpawnPoint;
- 
-    protected static readonly bool Flat = false;  
-
-    public static void SetSize(Vector3Int size)
+    private static MethodInfo _runMethod;
+    
+    public static void Initialize()
     {
-        Size = size;
-        WorldHeight = (Size.y - 3) * World.ChunkSize;
-        SpawnPoint = 
-            new (Size.x * (World.ChunkSize - 2), 
-                World.ChunkSize * (Size.y - 1),
-                Size.z * (World.ChunkSize - 2)); 
+        _size = World.Inst.Length;
+        WorldHeight = (_size.y - 3) * World.ChunkSize;
+        SpawnPoint = (_size - Vector3Int.one) * World.ChunkSize;  
+        _runMethod = World.Inst.WorldGen.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
     }
     public static float GetOffset()
     {
@@ -29,8 +27,7 @@ public class WorldGen
     } 
 
     public static void GenerateWorld()
-    { 
-        World.Inst = new World(Size.x, Size.y, Size.z); 
+    {  
         Vector3Int position;
         for (int x = -Scene.GenRange; x <= Scene.GenRange; x++)
         {
@@ -50,25 +47,7 @@ public class WorldGen
                 }
             }
         } 
-        
-        // while (!NavMap.Get(playerSpawnPoint)) playerSpawnPoint.y++; 
-        
-        PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
-        player.spawnPoint = SpawnPoint;
-        World.Inst[SpawnPoint].DynamicEntity.Add(player); 
-        World.Inst.target.Add(player);
-        
-        if(Game.BuildMode)return;
-        player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
-        player.spawnPoint = SpawnPoint;
-        player.CharSprite = ID.Yuuri;
-        World.Inst[SpawnPoint].DynamicEntity.Add(player); 
-        World.Inst.target.Add(player);
-
-        // player = (PlayerInfo) Entity.CreateInfo(ID.Player, playerPos);
-        // player.CharSprite = ID.Yuuri;
-        // World.Inst[playerPos].DynamicEntity.Add(player); 
-        // World.Inst.target.Add(player);  
+         
     }
 
     public static IEnumerator GenerateNearbyChunks(Vector3Int center)
@@ -95,34 +74,10 @@ public class WorldGen
         }
     }
 
-    public static void Generate(Vector3Int coordinates)
+    public static void Generate(Vector3Int currentCoordinate)
     {
-        Chunk CurrentChunk = new Chunk();
-        World.Inst[coordinates] = CurrentChunk;
-
-        if (!Flat && !Game.BuildMode)
-        {
-            // Stopwatch stopwatch = new Stopwatch();
-            // stopwatch.Start();
-            GenTaskStone.Run(coordinates, CurrentChunk);
-            GenTaskGranite.Run(coordinates, CurrentChunk);  
-            GenTaskMarble.Run(coordinates, CurrentChunk);
-            GenTaskDirt.Run(coordinates, CurrentChunk);
-            GenTaskSand.Run(coordinates, CurrentChunk);
-            GenTaskMaze.Run(coordinates, CurrentChunk);
-            GenTaskCrater.Run(coordinates, CurrentChunk);
-            GenTaskCaves.Run(coordinates, CurrentChunk);
-            GenTaskHouse.Run(coordinates, CurrentChunk);
-            GenTaskThrone.Run(coordinates, CurrentChunk);
-            GenTaskEntity.Run(coordinates, CurrentChunk);
-            // stopwatch.Stop();
-            // Debug.Log($"Generation completed in {stopwatch.ElapsedMilliseconds} ms");
-            return;
-        } 
-
-        if (coordinates.y == 0)
-            for (int z = 0; z < World.ChunkSize; z++)
-                for (int x = 0; x < World.ChunkSize; x++)
-                    CurrentChunk[x, 0, z] = 1;
+        Chunk currentChunk = new Chunk();
+        World.Inst[currentCoordinate] = currentChunk;
+        _runMethod.Invoke(null, new object[] { currentCoordinate, currentChunk });
     }   
 }
