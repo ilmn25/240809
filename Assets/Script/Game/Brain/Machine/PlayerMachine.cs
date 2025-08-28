@@ -80,25 +80,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
              Input.GetKeyDown(KeyCode.Space)))
         { 
             Info.CancelTarget();
-        }
-        //
-        // if (Input.GetKeyDown(KeyCode.N))
-        // {
-        //     Info.Storage.AddItem(ID.Log, 15);
-        //     Info.Storage.AddItem(ID.Gravel, 15);
-        //     Info.Storage.AddItem(ID.Flint, 15);
-        //     Info.Storage.AddItem(ID.Sticks, 15);
-        //     Info.Storage.AddItem(ID.Stake, 15);
-        // } 
-        // if (Input.GetKeyDown(KeyCode.M)) 
-        //     Entity.Spawn(ID.Megumin, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        // if (Input.GetKeyDown(KeyCode.L)) 
-        //     Entity.Spawn(ID.SnareFlea, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        // if (Input.GetKeyDown(KeyCode.K))
-        // {
-        //     Entity.Spawn(ID.Chito, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        //     Entity.Spawn(ID.Yuuri, Vector3Int.FloorToInt(transform.position + Vector3.up));
-        // } 
+        } 
     }
     
     public override void OnUpdate()
@@ -119,41 +101,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 {
                     switch (Info.Equipment?.Info.Type)
                     {
-                        case ItemType.Tool:
-                            if (Info.Equipment.Info.Name == "blueprint" &&
-                                Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                                Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
-                            {
-                                Terraform.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
-                                    true);
-                                if (Control.Inst.ActionPrimary.Key())
-                                {
-                                    Audio.PlaySFX(SfxID.Item);
-                                    Terraform.HandleMapBreak(); 
-                                } 
-                            }
-
-                            if (Control.Inst.ActionPrimary.Key() || Control.Inst.DigUp.Key() ||
-                                Control.Inst.DigDown.Key())
-                            {
+                        case ItemType.Tool: 
+                            if (Control.Inst.ActionPrimary.Key())
                                 Attack();
-                            }
-
-                            break;
-
-                        case ItemType.Block:
-                            if (Helper.isLayer(Control.MouseLayer, Game.IndexMap) &&
-                                Scene.InPlayerBlockRange(Control.MousePosition, Info.GetRange()))
-                            {
-                                Terraform.HandlePositionInfo(Control.MousePosition, Control.MouseDirection,
-                                    false);
-                                if (Control.Inst.ActionSecondary.Key())
-                                {
-                                    SetState<MobAttackSwing>();
-                                    Terraform.HandleMapPlace();
-                                }
-                            }
-
                             break;
                     }
                 } 

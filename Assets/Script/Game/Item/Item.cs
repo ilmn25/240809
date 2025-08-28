@@ -42,7 +42,6 @@ public partial class Item
         int time = 0,
         int stackSize = 15)
     {
-        Entity.AddItem(id);
 
         Item itemData = new Item()
         {
@@ -75,7 +74,7 @@ public partial class Item
         int time = 0,
         int stackSize = 100)
     {
-        Entity.AddItem(id);
+        Entity.AddBlock(id);
         Block.AddBlockDefinition(id, breakThreshold, breakCost);
 
         Item itemData = new Item()
@@ -126,7 +125,6 @@ public partial class Item
         string[] modifiers = null
     )
     {
-        Entity.AddItem(id);
 
         Item itemData = new Item()
         {

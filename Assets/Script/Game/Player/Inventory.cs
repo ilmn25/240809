@@ -89,11 +89,15 @@ public class Inventory
             {
                 CurrentItemData = Item.GetItem(CurrentItem.ID);
                 Game.PlayerInfo.SetEquipment(CurrentItem);
+                
+                if (CurrentItemData.ID == ID.Blueprint || CurrentItem.Info.Type == ItemType.Block) 
+                    Terraform.BlockUpdate(CurrentItem.ID);
             } 
         }
         if (CurrentItem is { Stack: 0 })
         {
             CurrentItemData = null;     
+            Terraform.BlockUpdate();
             Game.PlayerInfo.SetEquipment(null);
         }
     }

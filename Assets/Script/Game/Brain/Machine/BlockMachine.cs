@@ -10,36 +10,23 @@ public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecond
 
     public override void OnSetup()
     {
-        transform.localScale = Vector3.one * 1.04f; 
-        BlockPreview.Set(gameObject, Info.blockID);
+        if (Info.id == ID.Blueprint)
+        {
+            transform.localScale = Vector3.one * 1.04f; 
+            BlockPreview.Set(gameObject, ID.OverlayBlock); 
+        }
+        else
+        {
+            transform.localScale = Vector3.one; 
+            BlockPreview.Set(gameObject, Info.id);
+        }
     }
     
     public void OnActionSecondary(Info info)
     {
-        Entity.SpawnItem(Info.blockID, transform.position);
-        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(this.transform.position));
+        if (Info.id != ID.Blueprint) Entity.SpawnItem(Info.id, transform.position);
+        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(transform.position));
         Audio.PlaySFX(SfxID.Item);
         Info.Destroy();
     }
-}
-public class BreakBlockMachine : EntityMachine, IActionPrimaryResource, IActionSecondaryInteract
-{
-    public new BreakBlockInfo Info => GetModule<BreakBlockInfo>();
-    public static Info CreateInfo()
-    {
-        return new BreakBlockInfo();
-    }
-
-    public override void OnSetup()
-    {
-        transform.localScale = Vector3.one * 1.04f; 
-        BlockPreview.Set(gameObject, ID.OverlayBlock);
-    }
-
-    public void OnActionSecondary(Info info)
-    {
-        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(this.transform.position));
-        Audio.PlaySFX(SfxID.Item);
-        Info.Destroy();
-    }
-}
+} 

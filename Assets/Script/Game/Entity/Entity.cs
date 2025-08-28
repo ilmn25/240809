@@ -15,17 +15,17 @@ public class Entity
         
         public static Vector3 MidAir = new Vector3(0.5f, 0.3f, 0.5f);
         public static Vector3 Floor = new Vector3(0.5f, 0f, 0.5f);
-         
-        private static readonly Entity Item = new Entity
-        {
-                Bounds = Vector3Int.zero,
-                Collision = Game.IndexNoCollide,
-                PrefabName = ID.ItemPrefab,
-                Machine = typeof(ItemMachine),
-                StaticLoad = false,
-                SpawnOffset = MidAir
-        };  
+          
         
+        private static readonly Entity Block = new Entity
+        {
+                Bounds = Vector3Int.one,
+                Collision = Game.IndexSemiCollide,
+                PrefabName = ID.BlockPrefab,
+                Machine = typeof(BlockMachine),
+                StaticLoad = true,
+                SpawnOffset = Floor,
+        }; 
         public static void Initialize()
         {
                 Loot loot;
@@ -101,31 +101,22 @@ public class Entity
                 loot = new (ID.Harpy);
                 loot.Add(1, 2, ID.Chicken);  
                 loot.Add(0.5f, 1, ID.Wool);   
-                 
-                Dictionary.Add(ID.Block, new Entity
+                  
+                Dictionary.Add(ID.ItemPrefab, new Entity
                 {
-                        Bounds = Vector3Int.one,
-                        Collision = Game.IndexSemiCollide,
-                        PrefabName = ID.BlockPrefab,
-                        Machine = typeof(BlockMachine),
-                        StaticLoad = true,
-                        SpawnOffset = Floor,
-                });
-                Dictionary.Add(ID.BreakBlock, new Entity
-                {
-                        Bounds = Vector3Int.one,
+                        Bounds = Vector3Int.zero,
                         Collision = Game.IndexNoCollide,
-                        PrefabName = ID.BlockPrefab,
-                        Machine = typeof(BreakBlockMachine),
-                        StaticLoad = true,
-                        SpawnOffset = Floor,
-                });
+                        PrefabName = ID.ItemPrefab,
+                        Machine = typeof(ItemMachine),
+                        StaticLoad = false,
+                        SpawnOffset = MidAir
+                });  
                  
         }
 
-        private static void AddMob<T>(ID stringID) where T : EntityMachine
+        private static void AddMob<T>(ID id) where T : EntityMachine
         {
-                Dictionary.Add(stringID, new Entity
+                Dictionary.Add(id, new Entity
                 {
                         Bounds = Vector3.one * 0.7f,
                         Collision = Game.IndexSemiCollide,
@@ -136,9 +127,9 @@ public class Entity
                 });
         }
 
-        private static void AddStructure<T>(ID stringID, Vector3Int bounds, int collision) where T : EntityMachine
+        private static void AddStructure<T>(ID id, Vector3Int bounds, int collision) where T : EntityMachine
         {
-                Dictionary.Add(stringID, new Entity
+                Dictionary.Add(id, new Entity
                 {
                         Bounds = bounds,
                         Collision = collision,
@@ -148,10 +139,10 @@ public class Entity
                         SpawnOffset = Floor,
                 });
         }
-
-        public static void AddItem(ID stringID)
+ 
+        public static void AddBlock(ID id)
         {
-                Dictionary.Add(stringID, Item); 
+                Dictionary.Add(id, Block); 
         }
 
         public static void SpawnItem(ID id, Vector3 worldPosition, int amount = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)
@@ -161,17 +152,18 @@ public class Entity
 
         public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1) // amount to add, add all 999
         {  
+                Entity entity = Dictionary[ID.ItemPrefab];
                 int target = slot.Stack - amount;
                 while (slot.Stack != target && !slot.isEmpty())
                 {
                         GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
-                        gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + Item.SpawnOffset;
+                        gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + entity.SpawnOffset;
 
                         EntityMachine currentEntityMachine = 
-                                (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>());
+                                gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>();
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
 
-                        ItemInfo itemInfo = (ItemInfo)CreateInfo(slot.ID, worldPosition + Item.SpawnOffset);
+                        ItemInfo itemInfo = (ItemInfo)CreateInfo(ID.ItemPrefab, worldPosition);
                         itemInfo.item = new ItemSlot();
                         itemInfo.item.Add(slot, slot.Stack - target);
                         itemInfo.Velocity = velocity;
@@ -183,10 +175,10 @@ public class Entity
         }
 
         
-        public static Info Spawn(ID stringID, Vector3 worldPosition)
+        public static Info Spawn(ID id, Vector3Int worldPosition)
         {
-                Entity entity = Dictionary[stringID];
-                GameObject gameObject = ObjectPool.GetObject(entity.PrefabName, stringID);
+                Entity entity = Dictionary[id];
+                GameObject gameObject = ObjectPool.GetObject(entity.PrefabName, id);
                 gameObject.transform.position = worldPosition + entity.SpawnOffset;   
         
                 EntityMachine currentEntityMachine = (EntityMachine)
@@ -196,25 +188,42 @@ public class Entity
                         EntityStaticLoad.InviteEntity(currentEntityMachine, entity); 
                 else
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
-                Info info = CreateInfo(stringID, worldPosition);
+                Info info = CreateInfo(id, worldPosition);
                 currentEntityMachine.Initialize(info);
                 return info;
-        }
+        } 
 
-        public static Info CreateInfo(ID stringID, Vector3 worldPosition)
+        public static Info CreateInfo(ID id, Vector3 worldPosition)
         {
-                Entity entity = Dictionary[stringID];
-
-                MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
-
-                if (method != null && method.ReturnType == typeof(Info))
+                if (!Dictionary.ContainsKey(id)) //TODO
                 {
-                        Info info = (Info)method.Invoke(null, null);
-                        info.id = stringID;
-                        info.position = worldPosition + entity.SpawnOffset;
-                        return info;
+                        Entity entity = Dictionary[ID.ItemPrefab];
+
+                        MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+
+                        if (method != null && method.ReturnType == typeof(Info))
+                        {
+                                ItemInfo info = (ItemInfo)method.Invoke(null, null);
+                                info.id = ID.ItemPrefab;
+                                info.item = new ItemSlot(id);
+                                info.position = worldPosition + entity.SpawnOffset;
+                                return info;
+                        }
                 }
-                
+                else
+                {
+                        Entity entity = Dictionary[id];
+
+                        MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+
+                        if (method != null && method.ReturnType == typeof(Info))
+                        {
+                                Info info = (Info)method.Invoke(null, null);
+                                info.id = id;
+                                info.position = worldPosition + entity.SpawnOffset;
+                                return info;
+                        }
+                } 
                 Debug.Log("error making info");
                 return null;
         }
