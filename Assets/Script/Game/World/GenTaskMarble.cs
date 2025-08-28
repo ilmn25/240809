@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskMarble : WorldGen
+public class GenTaskMarble : Gen
 {
     private static float _x, _z, _value;
     private static int _height;

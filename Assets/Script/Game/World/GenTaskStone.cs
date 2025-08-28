@@ -1,7 +1,7 @@
 using System.Drawing;
 using UnityEngine;
 
-public class GenTaskStone : WorldGen
+public class GenTaskStone : Gen
 {
     private static float _x, _z, _value;
     private static int _height;

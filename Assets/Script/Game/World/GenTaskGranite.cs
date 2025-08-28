@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskGranite : WorldGen
+public class GenTaskGranite : Gen
 {
     private const float Scale = 0.3f;
     private const float Threshold = 0.5f;

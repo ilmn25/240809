@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenSuperFlat : WorldGen
+public class GenSuperFlat : Gen
 {
     private static int _id;
     private static int Brick => _id == 0 ? Block.ConvertID(ID.BrickBlock) : _id;

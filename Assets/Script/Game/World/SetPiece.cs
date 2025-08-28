@@ -2,14 +2,35 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
-public class SetPiece
+[System.Serializable]
+public partial class SetPiece
 {
+    public int[] map;
+    public int size;
+    public List<Info> staticEntity = new ();
+    public List<Info> dynamicEntity = new ();
+
+    public SetPiece(int size)
+    {
+        this.size = size;
+        map = new int[size * size * size];
+    }
     
+    public int this[int x, int y, int z]
+    {
+        get => map[x + size * (y + size * z)];
+        set => map[x + size * (y + size * z)] = value;
+    }
+}
+
+public partial class SetPiece
+{ 
     public static Vector3Int Pos1;
     public static Vector3Int Pos2;
      
-    public static void SaveSetPieceFile(SerializableChunk setPiece, string fileName)
+    public static void SaveSetPieceFile(SetPiece setPiece, string fileName)
     {
         string json = JsonConvert.SerializeObject(setPiece, new JsonSerializerSettings
         {
@@ -19,16 +40,16 @@ public class SetPiece
         File.WriteAllText(path, json);
     }
 
-    public static SerializableChunk LoadSetPieceFile(string fileName)
+    public static SetPiece LoadSetPieceFile(string fileName)
     { 
         TextAsset textAsset = Resources.Load<TextAsset>("Set/" + fileName);
-        return JsonConvert.DeserializeObject<SerializableChunk>(textAsset.text, new JsonSerializerSettings
+        return JsonConvert.DeserializeObject<SetPiece>(textAsset.text, new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.Auto
         });
     }
     
-    public static SerializableChunk Copy()
+    public static SetPiece Copy()
     { 
         int minX = Mathf.Min(Pos1.x, Pos2.x);
         int minY = Mathf.Min(Pos1.y, Pos2.y);
@@ -37,7 +58,7 @@ public class SetPiece
         int maxY = Mathf.Max(Pos1.y, Pos2.y);
         int maxZ = Mathf.Max(Pos1.z, Pos2.z);
 
-        SerializableChunk setPiece = new SerializableChunk(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
+        SetPiece setPiece = new SetPiece(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
         Vector3Int min = new Vector3Int(minX, minY, minZ);
         Vector3Int chunkPos, worldPos, localPos, blockPos;
         List<Vector3Int> scannedChunks = new List<Vector3Int>();
@@ -73,7 +94,7 @@ public class SetPiece
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position) , minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    setPiece.StaticEntity.Add(new SetEntity()
+                    setPiece.staticEntity.Add(new Info()
                     {
                         id = entity.id,
                         position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
@@ -86,7 +107,7 @@ public class SetPiece
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position), minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    setPiece.DynamicEntity.Add(new SetEntity()
+                    setPiece.dynamicEntity.Add(new Info()
                     {
                         id = entity.id,
                         position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
@@ -98,29 +119,29 @@ public class SetPiece
         return setPiece;
     }
     
-    public static void Paste(Vector3Int position, SerializableChunk setPiece)
+    public static void Paste(Vector3Int position, SetPiece setPiece)
     {  
         Vector3Int chunkPos, worldPos;
         
-        foreach (SetEntity entity in setPiece.StaticEntity)
+        foreach (Info entity in setPiece.staticEntity)
         {
-            worldPos = position + entity.position;
+            worldPos = position + Vector3Int.FloorToInt(entity.position);
             if (World.IsInWorldBounds(worldPos))
             {
                 chunkPos = World.GetChunkCoordinate(worldPos); 
-                if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                 World.Inst[chunkPos].StaticEntity.Add(
                     Entity.CreateInfo(entity.id, worldPos));
             } 
         }
  
-        foreach (SetEntity entity in setPiece.DynamicEntity)
+        foreach (Info entity in setPiece.dynamicEntity)
         { 
-            worldPos = position + entity.position;
+            worldPos = position + Vector3Int.FloorToInt(entity.position);
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
-                if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                 World.Inst[chunkPos].DynamicEntity.Add(
                     Entity.CreateInfo(entity.id, worldPos));
             }  
@@ -139,7 +160,7 @@ public class SetPiece
                         if (World.IsInWorldBounds(worldPos))
                         {
                             chunkPos = World.GetChunkCoordinate(worldPos);
-                            if (World.Inst[chunkPos] == null) WorldGen.Generate(chunkPos);
+                            if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                             World.Inst[chunkPos][World.GetBlockCoordinate(worldPos)] = blockID; 
                         } 
                     }

@@ -16,9 +16,9 @@ public class World
     public const int ChunkSize = 15; 
     [NonSerialized] public static World Inst;
  
-    public Type WorldGen;
+    public Type Gen;
     private Chunk[] _chunks; 
-    public readonly Vector3Int Length;
+    public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
     public static int Seed;
   
@@ -27,11 +27,11 @@ public class World
     public int time;
     public EnvironmentType weather = EnvironmentType.Sunrise;
     
-    public World(Vector3Int size, Type worldGen)
+    public World(Vector3Int size, Type gen)
     {
-        WorldGen = worldGen;
+        Gen = gen;
         Bounds = new Vector3Int(size.x * ChunkSize, size.y * ChunkSize, size.z * ChunkSize);
-        Length = size;
+        Size = size;
         _chunks = new Chunk[size.x * size.y * size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
     }
@@ -50,14 +50,14 @@ public class World
  
     private int GetIndex(int chunkX, int chunkY, int chunkZ)
     {
-        return chunkX + Length.x * (chunkY + Length.y * chunkZ);
+        return chunkX + Size.x * (chunkY + Size.y * chunkZ);
     }
 
     private bool IsInRange(int chunkX, int chunkY, int chunkZ)
     {
-        return chunkX >= 0 && chunkX < Length.x &&
-               chunkY >= 0 && chunkY < Length.y &&
-               chunkZ >= 0 && chunkZ < Length.z;
+        return chunkX >= 0 && chunkX < Size.x &&
+               chunkY >= 0 && chunkY < Size.y &&
+               chunkZ >= 0 && chunkZ < Size.z;
     }
 
     public Chunk this[Vector3Int position]

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenAbyss : WorldGen
+public class GenAbyss : Gen
 {
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     { 

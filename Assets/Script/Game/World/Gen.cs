@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class WorldGen
+public class Gen
 {
     protected static readonly System.Random Random = new (World.Seed);
     protected static Vector3Int SpawnPoint;
@@ -16,10 +16,10 @@ public class WorldGen
     
     public static void Initialize()
     {
-        _size = World.Inst.Length;
+        _size = World.Inst.Size;
         WorldHeight = (_size.y - 3) * World.ChunkSize;
         SpawnPoint = (_size - Vector3Int.one) * World.ChunkSize;  
-        _runMethod = World.Inst.WorldGen.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
+        _runMethod = World.Inst.Gen.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
     }
     public static float GetOffset()
     {

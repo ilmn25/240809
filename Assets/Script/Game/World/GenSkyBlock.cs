@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class GenSkyBlock : WorldGen
+public class GenSkyBlock : Gen
 {
-    private static readonly SerializableChunk SkyBlock = SetPiece.LoadSetPieceFile("SkyBlock");
+    private static readonly SetPiece SkyBlock = SetPiece.LoadSetPieceFile("SkyBlock");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (currentCoordinate == SpawnPoint)

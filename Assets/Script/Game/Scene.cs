@@ -24,8 +24,8 @@ public class Scene
     public static void New(Vector3Int size, Type type)
     {
         World.Inst = new World(size, type);  
-        WorldGen.Initialize();
-        WorldGen.GenerateWorld();
+        Gen.Initialize();
+        Gen.GenerateWorld();
         Play();
     }
     
@@ -33,7 +33,7 @@ public class Scene
     {  
         World.Inst = Helper.FileLoad<World>("World" + id);
         if (World.Inst == null) return;
-        WorldGen.Initialize();
+        Gen.Initialize();
         Play();
     }
 
@@ -71,7 +71,7 @@ public class Scene
         PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
-            CoroutineTask mapGenTask = new CoroutineTask(WorldGen.GenerateNearbyChunks(PlayerChunkPosition));
+            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition));
             if (Vector3.Distance(_playerChunkPositionPrevious, PlayerChunkPosition) > World.ChunkSize * 2)
                 mapGenTask.Finished += (bool _) => { World.LoadWorld();};
             else World.LoadWorld();
