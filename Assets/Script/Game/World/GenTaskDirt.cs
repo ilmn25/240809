@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskDirt : WorldGen
+public class GenTaskDirt : Gen
 {
     private static float _x, _z, _value;
     private static int _height;

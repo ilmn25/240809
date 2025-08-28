@@ -33,12 +33,12 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         {
             Text = "go away femboy",
             Sprite = Cache.LoadSprite("Sprite/Illu"),
-            Option = new Dictionary<string, Dialogue>
+            Next = new Dictionary<string, Dialogue>
             {
                 [""] = new() {
                     Text = "......",
                     Sprite = Cache.LoadSprite("Sprite/Illu"),
-                    Option = new Dictionary<string, Dialogue>
+                    Next = new Dictionary<string, Dialogue>
                     {
                         [""] = new() { 
                             Text = "i said go away",

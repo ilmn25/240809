@@ -30,7 +30,7 @@ public class PlayerInfo : MobInfo
     public override void Initialize()
     { 
         base.Initialize(); 
-        IframesCurrent = 300;
+        IframesCurrent = 150;
         storage.info = this;
         _ = new CoroutineTask(HungerClock());
     }

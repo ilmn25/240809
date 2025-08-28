@@ -16,7 +16,7 @@ public class Dialogue
     
     public string Text;
     public Sprite Sprite;
-    public Dictionary<string, Dialogue> Option;
+    public Dictionary<string, Dialogue> Next;
     public static void Show(bool isShow)
     {
         if (isShow)
@@ -24,9 +24,7 @@ public class Dialogue
             if (!Showing)
             {
                 Showing = true;
-                Scroll(); 
-                _ = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
-                    new Vector3(220, -95, 203), EaseSpeed));
+                SetDialogue();  
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
                     0.9f, EaseSpeed)); 
@@ -38,8 +36,7 @@ public class Dialogue
             if (Showing)
             { 
                 Showing = false;
-                new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
-                    new Vector3(500, -95, 203), EaseSpeed));
+                SetSprite();
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
                     0, EaseSpeed));
@@ -59,40 +56,44 @@ public class Dialogue
             { 
                 Audio.PlaySFX(SfxID.Text); 
                 
-                if (_scrollTask.Running)
-                {
-                    _scrollTask.Stop(); 
-                }                  
+                if (_scrollTask.Running) _scrollTask.Stop(); 
                 else
                 {
-                    if (Target.Option != null)
+                    if (Target.Next != null)
                     {
-                        foreach (KeyValuePair<string, Dialogue> option in Target.Option)
-                        {
+                        foreach (KeyValuePair<string, Dialogue> option in Target.Next)
                             if (option.Key == "") Target = option.Value;
-                        }
-                        Scroll();
+                        SetDialogue();
                     }
                     else
-                    {
                         Show(false);
-                    } 
                 }
             }
         }
     }
     
-    private static void Scroll()
+    private static void SetDialogue()
     {
-        if (Target.Sprite)
-        {
-            Game.GUIImage.SetActive(true);
-            Game.GUIImageRenderer.sprite = Target.Sprite;
-        }
-        else Game.GUIImage.SetActive(false);
-        
+        SetSprite(Target.Sprite);
         Game.GUIDialogueText.text = Target.Text;
         _scrollTask = TextScroller.HandleScroll(Game.GUIDialogueText, sound: SfxID.Text);
+    }
+
+    private static void SetSprite(Sprite sprite = null)
+    {
+        if (sprite)
+        {  
+            Game.GUIImageRenderer.sprite = Target.Sprite; 
+            if (Game.GUIImageRenderer.transform.position != new Vector3(220, -95, 203))
+                _ = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
+                    new Vector3(220, -95, 203), EaseSpeed)); 
+        }
+        else
+        {
+            if (Game.GUIImageRenderer.transform.position != new Vector3(500, -95, 203))
+                _ = new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
+                    new Vector3(500, -95, 203), EaseSpeed));
+        }
     }
 }
 

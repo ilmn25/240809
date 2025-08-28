@@ -15,6 +15,7 @@ using UnityEngine.Serialization;
 // }
 
 public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
+ 
 [System.Serializable]
 public class MobInfo : DynamicInfo
 { 

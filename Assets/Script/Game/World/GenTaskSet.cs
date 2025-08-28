@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class GenTaskThrone : WorldGen
+public class GenTaskThrone : Gen
 {
     private static int _id;
-    private static int DirtBlock => _id == 0 ? Block.ConvertID(global::ID.DirtBlock) : _id;
-    private static readonly SerializableChunk Throne = SetPiece.LoadSetPieceFile("Throne");
+    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
+    private static readonly SetPiece Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (UnityEngine.Random.Range(0, 10) != 0) return; 
@@ -25,13 +25,13 @@ public class GenTaskThrone : WorldGen
         }
     }
 }
-public class GenTaskHouse : WorldGen
+public class GenTaskHouse : Gen
 {
     private static int _id;
     private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
-    private static SerializableChunk House = SetPiece.LoadSetPieceFile("House");
+    private static readonly SetPiece House = SetPiece.LoadSetPieceFile("House");
     
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (UnityEngine.Random.Range(0, 15) != 0) return; 
         for (int x = 0; x < World.ChunkSize - 9; x++)
@@ -40,10 +40,10 @@ public class GenTaskHouse : WorldGen
             { 
                 for (int z = 0; z < World.ChunkSize - 9; z++)
                 {
-                    if (CurrentChunk[x, y, z] == DirtBlock && CurrentChunk[x, y + 1, z] == 0 && 
-                        CurrentChunk[x + 9, y, z + 9] == DirtBlock && CurrentChunk[x + 9, y + 1, z + 9] == 0)
+                    if (currentChunk[x, y, z] == DirtBlock && currentChunk[x, y + 1, z] == 0 && 
+                        currentChunk[x + 9, y, z + 9] == DirtBlock && currentChunk[x + 9, y + 1, z + 9] == 0)
                     {
-                        SetPiece.Paste(CurrentCoordinate + new Vector3Int(x, y, z), House);
+                        SetPiece.Paste(currentCoordinate + new Vector3Int(x, y, z), House);
                         return;
                     }
                 }

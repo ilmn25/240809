@@ -1,30 +1,25 @@
 using UnityEngine;
 
-public class GenTaskCaves : WorldGen
+public class GenTaskCaves : Gen
 {
     private const float Scale = 0.03f;
-    private static readonly float Offset = GetOffset();
-    private static DensityGenerator _densityGen = new DensityGenerator
-    {
-        noiseScale = 0.1f,
-        threshold = 0.4f // You can tweak this for cave density
-    };
-    public static void Run(Vector3Int CurrentCoordinate, Chunk CurrentChunk)
+    private static readonly float Offset = GetOffset(); 
+    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {
-            float caveX = (CurrentCoordinate.x + x) * Scale + Offset;
+            float caveX = (currentCoordinate.x + x) * Scale + Offset;
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                float caveZ = (CurrentCoordinate.z + z) * Scale + Offset;
+                float caveZ = (currentCoordinate.z + z) * Scale + Offset;
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
-                    float caveY = (CurrentCoordinate.y + y) * Scale + Offset; 
+                    float caveY = (currentCoordinate.y + y) * Scale + Offset; 
                     float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
 
                     if (caveNoiseValue > 0.35f)
                     {
-                        CurrentChunk[x, y, z] = 0; // Empty space for caves
+                        currentChunk[x, y, z] = 0; // Empty space for caves
                     }
                     
                     // Convert local chunk coordinates to world position

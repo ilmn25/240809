@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskCrater : WorldGen
+public class GenTaskCrater : Gen
 {
     private static readonly int CenterX = World.Inst.Bounds.x/2;
     private static readonly int CenterZ = World.Inst.Bounds.z/2;

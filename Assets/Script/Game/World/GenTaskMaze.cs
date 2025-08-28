@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskMaze : WorldGen
+public class GenTaskMaze : Gen
 {
     private const int WallHeight = 5;
     private const int FloorHeight = 2;
