@@ -4,7 +4,7 @@ public class GenTaskThrone : Gen
 {
     private static int _id;
     private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
-    private static readonly SetPiece Throne = SetPiece.LoadSetPieceFile("Throne");
+    private static readonly Chunk Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (UnityEngine.Random.Range(0, 10) != 0) return; 
@@ -29,7 +29,7 @@ public class GenTaskHouse : Gen
 {
     private static int _id;
     private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
-    private static readonly SetPiece House = SetPiece.LoadSetPieceFile("House");
+    private static readonly Chunk House = SetPiece.LoadSetPieceFile("House");
     
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {

@@ -239,7 +239,7 @@ public class Console : MonoBehaviour
         }
     } 
 
-    private SetPiece _chunk;
+    private Chunk _chunk;
     private void SetPieceCommands()
     {
         if (_command.Length < 2)
@@ -265,7 +265,7 @@ public class Console : MonoBehaviour
             World.LoadWorld();
             Output("copied");
             
-            if (_command.Length < 3) return;
+            if (_command.Length < 2) return;
             SetPiece.SaveSetPieceFile(_chunk, _command[2]);
             Output("saved as" + _command[2]);
         } 
