@@ -10,7 +10,7 @@ public partial class Item
     public int StackSize;
     public ItemRarity Rarity; 
     
-    public float Scale; 
+    public float Scale = 1; 
     public SfxID Sfx; 
     
     public ItemType Type; 

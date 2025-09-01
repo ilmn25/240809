@@ -1,56 +1,39 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEditor;
 using UnityEngine.Serialization;
+ 
 
-[System.Serializable]
-public partial class SetPiece
-{
-    public int[] map;
-    public int size;
-    public List<Info> staticEntity = new ();
-    public List<Info> dynamicEntity = new ();
-
-    public SetPiece(int size)
-    {
-        this.size = size;
-        map = new int[size * size * size];
-    }
-    
-    public int this[int x, int y, int z]
-    {
-        get => map[x + size * (y + size * z)];
-        set => map[x + size * (y + size * z)] = value;
-    }
-}
-
-public partial class SetPiece
+public class SetPiece
 { 
     public static Vector3Int Pos1;
     public static Vector3Int Pos2;
      
-    public static void SaveSetPieceFile(SetPiece setPiece, string fileName)
+    public static void SaveSetPieceFile(Chunk setPiece, string fileName)
     {
-        string json = JsonConvert.SerializeObject(setPiece, new JsonSerializerSettings
+        string path = Path.Combine(Application.dataPath, "Resources/Set", fileName + ".bytes");
+
+        using (FileStream stream = new FileStream(path, FileMode.Create))
         {
-            TypeNameHandling = TypeNameHandling.Auto
-        });
-        string path = Path.Combine(Application.dataPath, "Resources/Set", fileName + ".json");
-        File.WriteAllText(path, json);
+            Helper.BinaryFormatter.Serialize(stream, setPiece);
+        }
     }
 
-    public static SetPiece LoadSetPieceFile(string fileName)
-    { 
+    public static Chunk LoadSetPieceFile(string fileName)
+    {
         TextAsset textAsset = Resources.Load<TextAsset>("Set/" + fileName);
-        return JsonConvert.DeserializeObject<SetPiece>(textAsset.text, new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.Auto
-        });
+        using (MemoryStream stream = new MemoryStream(textAsset.bytes))
+        { 
+            return (Chunk)Helper.BinaryFormatter.Deserialize(stream);
+        }
     }
     
-    public static SetPiece Copy()
+    public static Chunk Copy()
     { 
+        Info info;
         int minX = Mathf.Min(Pos1.x, Pos2.x);
         int minY = Mathf.Min(Pos1.y, Pos2.y);
         int minZ = Mathf.Min(Pos1.z, Pos2.z);
@@ -58,7 +41,7 @@ public partial class SetPiece
         int maxY = Mathf.Max(Pos1.y, Pos2.y);
         int maxZ = Mathf.Max(Pos1.z, Pos2.z);
 
-        SetPiece setPiece = new SetPiece(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
+        Chunk setPiece = new Chunk(Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) + 1);
         Vector3Int min = new Vector3Int(minX, minY, minZ);
         Vector3Int chunkPos, worldPos, localPos, blockPos;
         List<Vector3Int> scannedChunks = new List<Vector3Int>();
@@ -94,11 +77,9 @@ public partial class SetPiece
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position) , minX, minY, minZ, maxX, maxY, maxZ))
                 {
-                    setPiece.staticEntity.Add(new Info()
-                    {
-                        id = entity.id,
-                        position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
-                    });
+                    info = (Info)Helper.Clone(entity);
+                    info.position = entity.position - new Vector3Int(minX, minY, minZ);
+                    setPiece.StaticEntity.Add(info);
                 }
             }
 
@@ -106,12 +87,10 @@ public partial class SetPiece
             foreach (Info entity in chunk.DynamicEntity)
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position), minX, minY, minZ, maxX, maxY, maxZ))
-                {
-                    setPiece.dynamicEntity.Add(new Info()
-                    {
-                        id = entity.id,
-                        position = Vector3Int.FloorToInt(entity.position - new Vector3Int(minX, minY, minZ))
-                    });
+                { 
+                    info = (Info)Helper.Clone(entity);
+                    info.position = entity.position - new Vector3Int(minX, minY, minZ);
+                    setPiece.DynamicEntity.Add(info);
                 }
             }
         }
@@ -119,31 +98,34 @@ public partial class SetPiece
         return setPiece;
     }
     
-    public static void Paste(Vector3Int position, SetPiece setPiece)
-    {  
+    public static void Paste(Vector3Int position, Chunk setPiece)
+    {
+        Info info;
         Vector3Int chunkPos, worldPos;
         
-        foreach (Info entity in setPiece.staticEntity)
+        foreach (Info entity in setPiece.StaticEntity)
         {
             worldPos = position + Vector3Int.FloorToInt(entity.position);
             if (World.IsInWorldBounds(worldPos))
-            {
+            { 
                 chunkPos = World.GetChunkCoordinate(worldPos); 
                 if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
-                World.Inst[chunkPos].StaticEntity.Add(
-                    Entity.CreateInfo(entity.id, worldPos));
+                info = (Info)Helper.Clone(entity);
+                info.position += position;
+                World.Inst[chunkPos].StaticEntity.Add(info);
             } 
         }
  
-        foreach (Info entity in setPiece.dynamicEntity)
+        foreach (Info entity in setPiece.DynamicEntity)
         { 
             worldPos = position + Vector3Int.FloorToInt(entity.position);
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
                 if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
-                World.Inst[chunkPos].DynamicEntity.Add(
-                    Entity.CreateInfo(entity.id, worldPos));
+                info = (Info)Helper.Clone(entity);
+                info.position += position;
+                World.Inst[chunkPos].DynamicEntity.Add(info);
             }  
         }
  
@@ -175,4 +157,5 @@ public partial class SetPiece
                coord.y >= minY && coord.y <= maxY &&
                coord.z >= minZ && coord.z <= maxZ;
     }
+    
 }

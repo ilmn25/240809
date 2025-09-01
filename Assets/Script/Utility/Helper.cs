@@ -1,17 +1,16 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public static class Helper
 {
-    private static readonly string SavePath;
+    private static readonly string SavePath = 
+        System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
+    private const string SaveFormat = ".ilmn";
     public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
-
-    static Helper()
-    {
-        SavePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
-    }
+ 
     public static Vector3 AddToVector(Vector3 vector, float x, float y, float z)
     {
         return new Vector3(vector.x + x, vector.y + y, vector.z + z);
@@ -70,7 +69,7 @@ public static class Helper
 
     public static void FileSave<T>(T data, string filePath)
     {
-        using (FileStream file = File.Create(SavePath + filePath + ".dat"))
+        using (FileStream file = File.Create(SavePath + filePath + SaveFormat))
         {
             BinaryFormatter.Serialize(file, data);
         }
@@ -78,9 +77,9 @@ public static class Helper
 
     public static T FileLoad<T>(string filePath)
     {
-        if (File.Exists(SavePath + filePath + ".dat"))
+        if (File.Exists(SavePath + filePath + SaveFormat))
         {
-            using (FileStream file = File.Open(SavePath + filePath + ".dat", FileMode.Open))
+            using (FileStream file = File.Open(SavePath + filePath + SaveFormat, FileMode.Open))
             {
                 return (T)BinaryFormatter.Deserialize(file);
             }
@@ -92,5 +91,21 @@ public static class Helper
     public static bool IsInLayerMask(GameObject obj, LayerMask mask)
     {
         return ((1 << obj.layer) & mask) != 0;
+    }
+    
+    public static object Clone(object source)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+
+        Type type = source.GetType(); // This gets the actual subclass type
+        object clone = Activator.CreateInstance(type);
+
+        foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+        {
+            if (field.IsNotSerialized) continue;
+            field.SetValue(clone, field.GetValue(source));
+        }
+
+        return clone;
     }
 }
