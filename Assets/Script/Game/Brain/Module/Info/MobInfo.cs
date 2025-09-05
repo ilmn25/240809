@@ -1,19 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
-
-// public class ActionTask
-// {
-//     [NonSerialized] public IActionType ActionType;
-//     [NonSerialized] public Info SourceInfo; 
-//     [NonSerialized] public Info TargetInfo; 
-//
-//     public Vector3 GetPosition()
-//     { 
-//         return TargetInfo.position;
-//     }
-// }
-
+using UnityEngine.Serialization; 
 public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
  
 [System.Serializable]

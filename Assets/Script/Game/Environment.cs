@@ -100,13 +100,13 @@ public class Environment
     public static EnvironmentType Target = EnvironmentType.Null;
     private static int Time
     {
-        get => World.Inst.time;
-        set => World.Inst.time = value;
+        get => SaveData.Inst.time;
+        set => SaveData.Inst.time = value;
     }
     private static EnvironmentType Weather
     {
-        get => World.Inst.weather;
-        set => World.Inst.weather = value;
+        get => SaveData.Inst.weather;
+        set => SaveData.Inst.weather = value;
     }
 
     private static void SetTarget(EnvironmentType target)
@@ -154,7 +154,7 @@ public class Environment
             if (Time == Length)
             {
                 Time = 0;
-                World.Inst.day++;
+                SaveData.Inst.day++;
             } 
         }
     }
@@ -195,7 +195,7 @@ public class Environment
     public static (int day, int time) CalculateTime(int amount)
     {
         int target = Time + amount;
-        int day = target / Length + World.Inst.day;
+        int day = target / Length + SaveData.Inst.day;
         int time = target % Length;
         return (day, time);
     }

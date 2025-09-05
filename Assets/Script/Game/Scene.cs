@@ -21,28 +21,13 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
 
-    public static void New(Vector3Int size, Type type)
-    {
-        World.Inst = new World(size, type);  
-        Gen.Initialize();
-        Gen.GenerateWorld();
-        Play();
-    }
-    
-    public static void Load(int id)
+    public static void LoadWorld()
     {  
-        World.Inst = Helper.FileLoad<World>("World" + id);
-        if (World.Inst == null) return;
-        Gen.Initialize();
-        Play();
-    }
-
-    private static void Play()
-    { 
         _ = new CoroutineTask(Start());
         return;
         IEnumerator Start()
-        { 
+        {
+            Gen.Initialize();
             NavMap.Initialize();
             Control.SetPlayer(0); 
             Game.ViewPortObject.transform.position = Game.PlayerInfo.position; 
@@ -53,16 +38,16 @@ public class Scene
         }
     }
     
-    public static void Save(int id)
+    public static void UnloadWorld()
     {
         _ = new CoroutineTask(Quit());
         return;
         IEnumerator Quit()
-        {
+        { 
             Environment.Target = EnvironmentType.Black;
             yield return new WaitForSeconds(2);
             World.UnloadWorld();
-            Helper.FileSave(World.Inst, "World" + id); 
+            Helper.FileSave(World.Inst, Save.SavePath + SaveData.Inst.current);  
         }
     }
     

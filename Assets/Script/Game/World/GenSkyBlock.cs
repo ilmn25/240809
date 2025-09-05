@@ -3,7 +3,12 @@ using UnityEngine;
 public class GenSkyBlock : Gen
 {
     private static readonly Chunk SkyBlock = SetPiece.LoadSetPieceFile("SkyBlock");
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public GenSkyBlock ()
+    {
+        DefaultSize = Vector3Int.one;
+    }
+
+    protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (currentCoordinate == SpawnPoint)
         {

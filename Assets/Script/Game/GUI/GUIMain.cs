@@ -4,7 +4,7 @@ using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
-public class GUIMain 
+public static class GUIMain 
 { 
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
@@ -145,20 +145,7 @@ public class GUIMain
         Crafting.OnRefreshSlot?.Invoke(Crafting, null);
         Converter.OnRefreshSlot?.Invoke(Converter, null);
         GUICursor.UpdateCursorSlot();
-    }
-
-    public static IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed = 75)
-    {
-        textBox.text = ""; 
-    
-        foreach (var letter in line.ToCharArray())        
-        { 
-            textBox.text += letter;
-            yield return new WaitForSeconds(1f / speed);
-        }
-      
-    }
-
+    } 
     public static IEnumerator Scale(bool show, float duration, GameObject target, float scale, float easeSpeed = 0.5f)
     { 
         Vector3 initialScale = target.transform.localScale;
