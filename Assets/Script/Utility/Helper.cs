@@ -7,7 +7,7 @@ using UnityEngine;
 public static class Helper
 {
     private static readonly string SavePath = 
-        System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\";
+        System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\Save\\";
     private const string SaveFormat = ".ilmn";
     public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
  
@@ -67,19 +67,31 @@ public static class Helper
         return new Color(r / 255f, g / 255f, b / 255f);
     }
 
-    public static void FileSave<T>(T data, string filePath)
+    public static void FileSave<T>(T data, string filePath, string fileformat = SaveFormat)
     {
-        using (FileStream file = File.Create(SavePath + filePath + SaveFormat))
+        string path = SavePath + filePath + fileformat;
+        CreateDirectory(path);
+        using (FileStream file = File.Create(path))
         {
             BinaryFormatter.Serialize(file, data);
         }
     }
 
-    public static T FileLoad<T>(string filePath)
+    private static void CreateDirectory(string path)
     {
-        if (File.Exists(SavePath + filePath + SaveFormat))
+        string folderPath = Path.GetDirectoryName(path);
+        if (folderPath != null && !Directory.Exists(folderPath))
         {
-            using (FileStream file = File.Open(SavePath + filePath + SaveFormat, FileMode.Open))
+            Directory.CreateDirectory(folderPath);
+        }
+    }
+    public static T FileLoad<T>(string filePath, string fileformat = SaveFormat)
+    {
+        string path = SavePath + filePath + fileformat;
+        CreateDirectory(path);
+        if (File.Exists(path))
+        {
+            using (FileStream file = File.Open(SavePath + filePath + fileformat, FileMode.Open))
             {
                 return (T)BinaryFormatter.Deserialize(file);
             }
@@ -87,7 +99,35 @@ public static class Helper
         // Debug.LogWarning("File " + filePath + " does not exist");
         return default;
     }
-
+    
+    public static void SaveScreenShot(string filePath)
+    { 
+        Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        texture.Apply();
+        SaveImage(texture, filePath);
+    }
+    
+    public static void SaveImage(Texture2D texture, string filePath)
+    {
+        string path = SavePath + filePath + ".png";
+        CreateDirectory(path);
+        File.WriteAllBytes(path, texture.EncodeToPNG());
+    }
+    
+    public static Sprite LoadImage(string filePath)
+    {
+        string path = SavePath + filePath + ".png";
+        CreateDirectory(path);
+        Texture2D texture = new Texture2D(2, 2);
+        texture.LoadImage(File.ReadAllBytes(path));
+        return Sprite.Create(
+            texture,
+            new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f) // Pivot at center
+        );
+    }
+    
     public static bool IsInLayerMask(GameObject obj, LayerMask mask)
     {
         return ((1 << obj.layer) & mask) != 0;

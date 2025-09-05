@@ -5,7 +5,12 @@ public class GenSuperFlat : Gen
     private static int _id;
     private static int Brick => _id == 0 ? Block.ConvertID(ID.BrickBlock) : _id;
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public GenSuperFlat ()
+    {
+        DefaultSize = new Vector3Int(15, 4, 15);
+    }
+
+    protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (currentCoordinate == SpawnPoint)
         {

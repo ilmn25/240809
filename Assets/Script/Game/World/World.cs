@@ -7,7 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = System.Random;
-
+ 
 [Serializable]
 public class World
 {
@@ -16,23 +16,20 @@ public class World
     public const int ChunkSize = 15; 
     [NonSerialized] public static World Inst;
  
-    public Type Gen;
+    public GenType GenType;
     private Chunk[] _chunks; 
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
     public static int Seed;
-  
+
     public List<PlayerInfo> target = new();
-    public int day = 1;
-    public int time;
-    public EnvironmentType weather = EnvironmentType.Sunrise;
     
-    public World(Vector3Int size, Type gen)
+    public World(GenType genType)
     {
-        Gen = gen;
-        Bounds = new Vector3Int(size.x * ChunkSize, size.y * ChunkSize, size.z * ChunkSize);
-        Size = size;
-        _chunks = new Chunk[size.x * size.y * size.z];
+        GenType = genType; 
+        Size = Gen.Dictionary[genType].DefaultSize;
+        Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
+        _chunks = new Chunk[Size.x * Size.y * Size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
     }
 

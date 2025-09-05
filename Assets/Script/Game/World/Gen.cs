@@ -6,20 +6,48 @@ using System.Reflection;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+[Serializable]
+public enum GenType
+{
+    Abyss, SkyBlock, SuperFlat
+}
 public class Gen
 {
+    public Vector3Int DefaultSize;
+    protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
+    
     protected static readonly System.Random Random = new (World.Seed);
     protected static Vector3Int SpawnPoint;
     private static Vector3Int _size; 
     protected static int WorldHeight;
-    private static MethodInfo _runMethod;
-    
+    private static Gen _target;
+
+    public static readonly Dictionary<GenType, Gen> Dictionary = new ()
+    {
+        {GenType.Abyss, new GenAbyss()},
+        {GenType.SkyBlock, new GenSkyBlock()},
+        {GenType.SuperFlat, new GenSuperFlat()},
+    };
     public static void Initialize()
     {
-        _size = World.Inst.Size;
-        WorldHeight = (_size.y - 3) * World.ChunkSize;
-        SpawnPoint = (_size - Vector3Int.one) * World.ChunkSize;  
-        _runMethod = World.Inst.Gen.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
+        World.Inst = Helper.FileLoad<World>(Save.SavePath + SaveData.Inst.current);
+        if (World.Inst == null)
+        {
+            World.Inst = new World(SaveData.Inst.current);     
+            SetVariables();
+            GenerateWorld();
+        }
+        else SetVariables();
+        
+        return;
+        
+        void SetVariables()
+        {
+            _target = Dictionary[SaveData.Inst.current];
+            _size = World.Inst.Size;
+            WorldHeight = (_size.y - 3) * World.ChunkSize;
+            SpawnPoint = (_size - Vector3Int.one) * World.ChunkSize;  
+        }
     }
     public static float GetOffset()
     {
@@ -78,6 +106,6 @@ public class Gen
     {
         Chunk currentChunk = new Chunk();
         World.Inst[currentCoordinate] = currentChunk;
-        _runMethod.Invoke(null, new object[] { currentCoordinate, currentChunk });
+        _target.GenChunk(currentCoordinate, currentChunk);
     }   
 }

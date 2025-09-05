@@ -73,6 +73,7 @@ public class Game : MonoBehaviour
         Entity.Initialize(); 
         Block.Initialize();   
         
+        Save.Initialize();    
         GUIMain.Initialize();    
         EnvParticle.Initialize();    
         Terraform.Initialize();  
@@ -102,13 +103,13 @@ public class Game : MonoBehaviour
     {
         Block.Dispose();
         // PlayerData.Save();
-        Control.Save(); 
+        Control.Save();  
+        Save.Quit();  
         MapLoad.CancellationTokenSourceKillGame.Cancel();
     }
 
     public static void SetConstants()
-    { 
-        
+    {  
         MaskMap  = LayerMask.GetMask("Map"); 
         MaskStatic  = LayerMask.GetMask("Collide", "Map"); 
         MaskEntity = LayerMask.GetMask("Collide", "NoCollide", "SemiCollide");
@@ -139,5 +140,4 @@ public class Game : MonoBehaviour
         GUICursorInfo = GUICursor.transform.Find("Info").gameObject;    
         GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
     }
- 
 }

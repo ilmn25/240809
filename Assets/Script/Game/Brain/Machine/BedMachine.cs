@@ -10,7 +10,7 @@ public class BedMachine: StructureMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (World.Inst.weather == EnvironmentType.Day) return;
+        if (SaveData.Inst.weather == EnvironmentType.Day) return;
         _ = new CoroutineTask(Sleep());
         return;
 

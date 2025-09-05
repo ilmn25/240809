@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public enum EnvParticles {Null, Rain, Leaf, Snow}
 
-public class EnvParticle
+public static class EnvParticle
 {
     private static readonly Dictionary<EnvParticles, GameObject> List = new ();
     public static void Initialize()

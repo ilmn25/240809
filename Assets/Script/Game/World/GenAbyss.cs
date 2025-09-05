@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public GenAbyss ()
+    {
+        DefaultSize = new Vector3Int(60, 30, 60);
+    }
+
+    protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     { 
         if (currentCoordinate == SpawnPoint)
         {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Terraform
+public static class Terraform
 {
     private const int PreviewSpeed = 10; 
     

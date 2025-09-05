@@ -150,7 +150,7 @@ public class Console : MonoBehaviour
                 break; 
             case "time":
                 if (_command.Length > 1) Environment.MoveTime(int.Parse(_command[1]));
-                Output(World.Inst.day + " : " + World.Inst.time);
+                Output(SaveData.Inst.day + " : " + SaveData.Inst.time);
                 break; 
             case "set":
                 SetPieceCommands();
@@ -171,28 +171,35 @@ public class Console : MonoBehaviour
                 _showInfo = true;
                 break;
             case "abyss": 
-                Scene.New(new Vector3Int(60, 30, 60), typeof(GenAbyss)); 
+                Save.NewSave(_command[1], GenType.Abyss); 
                 break;   
             case "skyblock": 
-                Scene.New(Vector3Int.one, typeof(GenSkyBlock)); 
+                Save.NewSave(_command[1], GenType.SkyBlock); 
                 break;   
             case "flat": 
-                Scene.New(new Vector3Int(15, 4, 15), typeof(GenSuperFlat)); 
+                Save.NewSave(_command[1], GenType.SuperFlat); 
                 break;   
             case "save": 
                 Output("unloaded");  
-                Scene.Save(int.Parse(_command[1])); 
+                Save.SaveSave(); 
                 break;   
             case "load": 
                 Output("loaded");  
-                Scene.Load(int.Parse(_command[1])); 
+                Save.LoadSave(_command[1]); 
                 break;    
+            case "start":
+                Scene.LoadWorld();
+                break;   
+            case "saves":
+                foreach (var data in Save.Inst.List)
+                    Output(data.Key + " : " + data.Value.time);
+                break;   
             default: 
                 Output("Invalid command");
                 break;  
         } 
     }
-
+  
     private void Output(string output)
     {
         _output = output + "\n" + _output;
