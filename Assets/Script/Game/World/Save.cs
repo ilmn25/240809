@@ -15,6 +15,7 @@ public class Save
     public static void Initialize()
     {
         Inst = Helper.FileLoad<Save>("Main") ?? new();
+        GUILoad.RefreshList();
     }
     public static void Quit()
     {

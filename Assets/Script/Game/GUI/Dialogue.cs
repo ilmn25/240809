@@ -86,13 +86,13 @@ public class Dialogue
             Game.GUIImageRenderer.sprite = Target.Sprite; 
             if (Game.GUIImageRenderer.transform.position != new Vector3(220, -95, 203))
                 _ = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
-                    new Vector3(220, -95, 203), EaseSpeed)); 
+                    new Vector3(220, -95, 160), EaseSpeed)); 
         }
         else
         {
             if (Game.GUIImageRenderer.transform.position != new Vector3(500, -95, 203))
                 _ = new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
-                    new Vector3(500, -95, 203), EaseSpeed));
+                    new Vector3(500, -95, 160), EaseSpeed));
         }
     }
 }

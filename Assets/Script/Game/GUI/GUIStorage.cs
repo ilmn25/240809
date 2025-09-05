@@ -100,7 +100,7 @@ public class  GUIStorage : GUI
         
         if (currentSlotKey == -1)
         {
-            GUIMain.Cursor.Set();
+            GUIMain.Cursor.SetItemSlotInfo();
             GUIMain.InfoPanel.Set();
             return;
         } 
@@ -110,7 +110,7 @@ public class  GUIStorage : GUI
             SetInfoPanel(slot);
             return;
         }
-        GUIMain.Cursor.Set();
+        GUIMain.Cursor.SetItemSlotInfo();
         GUIMain.InfoPanel.Set();
     }
     protected virtual void SetInfoPanel(ItemSlot itemSlot) { }

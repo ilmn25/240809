@@ -74,7 +74,7 @@ public class GUI
                 Showing = true;
             }  
             _textScrollTask?.Stop();
-            new CoroutineTask(Delay());
+            if (Text) _ = new CoroutineTask(Delay());
         }
         else
         {
@@ -96,6 +96,4 @@ public class GUI
             _textScrollTask = TextScroller.HandleScroll(Text);
         }
     }
-     
-     
 }

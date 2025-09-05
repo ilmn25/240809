@@ -17,6 +17,8 @@ public static class GUIMain
     public static GUIConverter Converter;
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
+    public static GUIMenu GUIMenu;
+    public static GUILoad GUILoad;
 
     public static bool Showing = true;
     public static bool IsHover;
@@ -24,6 +26,10 @@ public static class GUIMain
     {
         Inventory.SlotUpdate += RefreshStorage;
         // GUICraft.Initialize(); 
+        GUIMenu = new GUIMenu(); 
+        GUILoad = new GUILoad();
+        GUILoad.Show(false);
+        
         Cursor = new GUICursor();
         Cursor.Initialize();
         Cursor.Show(false);
@@ -88,10 +94,16 @@ public static class GUIMain
         Dialogue.Show(false);
         Show(false);
     }
- 
-    public static void Update()
+
+    public static void UpdateMenu()
     {
-        Dialogue.Update();
+        GUIMenu.Update();
+        GUILoad.Update();
+    }
+
+    public static void Update()
+    { 
+        Dialogue.Update(); 
         Cursor.Update();
         StorageInv.Update();
         Storage.Update();
@@ -128,7 +140,7 @@ public static class GUIMain
                 Showing = false;
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
-                Cursor.Set();
+                Cursor.SetItemSlotInfo();
                 // _showTask.Finished += (bool isManual) => 
                 // {
                 //     Game.GUIInv.SetActive(false);

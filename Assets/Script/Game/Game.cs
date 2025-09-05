@@ -50,6 +50,11 @@ public class Game : MonoBehaviour
     public static GameObject GUICursorInfo;
     public static GameObject GUICursorSlot;
  
+    public static GameObject GUIMainMenu;
+    public static GUIButton GUIMainMenuButtonNew;
+    public static GUIButton GUIMainMenuButtonLoad;
+    public static GUIButton GUIMainMenuButtonExit; 
+    public static GameObject GUILoadMenu;
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
@@ -83,6 +88,7 @@ public class Game : MonoBehaviour
     } 
     private void Update()
     {   
+        GUIMain.UpdateMenu();
         if (SceneMode != SceneMode.Game || !Player) return;
         Terraform.Update();
         GUIMain.Update();
@@ -136,8 +142,17 @@ public class Game : MonoBehaviour
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
         GUIInvCrafting = GUIInv.transform.Find("Crafting").gameObject;
         GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;
+        
         GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;
         GUICursorInfo = GUICursor.transform.Find("Info").gameObject;    
         GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
+        
+        GUIMainMenu = GUIObject.transform.Find("MainMenu").gameObject;
+        GUIMainMenuButtonNew = GUIMainMenu.transform.Find("New").GetComponent<GUIButton>();
+        GUIMainMenuButtonLoad = GUIMainMenu.transform.Find("Load").GetComponent<GUIButton>();
+        GUIMainMenuButtonExit = GUIMainMenu.transform.Find("Exit").GetComponent<GUIButton>();
+        GUILoadMenu = GUIObject.transform.Find("LoadMenu").gameObject;
     }
+    
+ 
 }

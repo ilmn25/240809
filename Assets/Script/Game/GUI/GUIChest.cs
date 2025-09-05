@@ -80,7 +80,7 @@ public class GUIChest : GUIStorage
     }
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.Set(itemSlot, false);
+        GUIMain.Cursor.SetItemSlotInfo(itemSlot, false);
         // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
     }
 }

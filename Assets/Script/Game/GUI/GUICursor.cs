@@ -32,7 +32,7 @@ public class GUICursor : GUI
         Rect.anchoredPosition = mousePosition;
     }
 
-    public void Set(ItemSlot item = null, bool ingredient = false)
+    public void SetItemSlotInfo(ItemSlot item = null, bool ingredient = false)
     {
         if (item == null)
         {
@@ -41,6 +41,18 @@ public class GUICursor : GUI
         }
         Text.text = item.Info.Name;
         _infoSlotText.text = item.ToString(ingredient);
+        Show(true); 
+    } 
+    
+    public void Set(string title = "", string description = "")
+    {
+        if (title == "")
+        {
+            Show(false);
+            return;
+        }
+        Text.text = title;
+        _infoSlotText.text = description;
         Show(true); 
     } 
     
