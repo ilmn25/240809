@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -89,10 +90,11 @@ public class Environment
             BackgroundColor = Helper.GetColor(75, 59, 55),
             EnvParticles = EnvParticles.Leaf
         });
+        _ = new CoroutineTask(Clock());
     }       
      
-    public static readonly int Length = 30000;
-    public static int TickSpeed = 1;
+    public const int Length = 360;
+    private const int Speed = 1;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous;
@@ -117,18 +119,22 @@ public class Environment
         _currentTransitionTime = 0;
         EnvParticle.Set(Environments[target].EnvParticles);
     }
-    public static void Update()
-    {
-        MoveTime(TickSpeed);
 
+    public static IEnumerator Clock()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(Speed);
+            MoveTime(1);
+        } 
+    }
+
+    public static void Update() 
+    {
         if (Target == EnvironmentType.Null)
-        {
             SetTarget(Weather);
-        }
         else
-        {
             SetTarget(Target);
-        }
          
         if (_currentTransitionTime < TransitionLength - 1)
         {
@@ -192,11 +198,11 @@ public class Environment
         Game.Camera.backgroundColor = backgroundColor;
     }
 
-    public static (int day, int time) CalculateTime(int amount)
-    {
-        int target = Time + amount;
-        int day = target / Length + SaveData.Inst.day;
-        int time = target % Length;
-        return (day, time);
-    }
+    // public static (int day, int time) CalculateTime(int amount)
+    // {
+    //     int target = Time + amount;
+    //     int day = target / Length + SaveData.Inst.day;
+    //     int time = target % Length;
+    //     return (day, time);
+    // }
 }

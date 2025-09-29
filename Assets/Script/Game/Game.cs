@@ -69,7 +69,13 @@ public class Game : MonoBehaviour
     }
 
     public void Start()
-    {  
+    {
+        Environment.Set(Environment.Environments[EnvironmentType.Black].AmbientLight,
+            Environment.Environments[EnvironmentType.Black].FogColor,
+            Environment.Environments[EnvironmentType.Black].SpotLight,
+            Environment.Environments[EnvironmentType.Black].DirectionalLight,
+            Environment.Environments[EnvironmentType.Black].BackgroundColor);
+        
         ViewPort.Initialize(); 
         Audio.Initialize();
         Control.Initialize();  
@@ -85,6 +91,9 @@ public class Game : MonoBehaviour
         MapCull.Initialize();
          
         Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
+
+        SaveData.Inst = new(GenType.SkyBlock);
+        Scene.LoadWorld();
     } 
     private void Update()
     {   
@@ -112,6 +121,7 @@ public class Game : MonoBehaviour
         Control.Save();  
         Save.Quit();  
         MapLoad.CancellationTokenSourceKillGame.Cancel();
+        Helper.DeleteFolder(Save.TempPath);
     }
 
     public static void SetConstants()

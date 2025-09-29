@@ -42,6 +42,7 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
                 
+                AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Game.IndexCollide);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
                 AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);

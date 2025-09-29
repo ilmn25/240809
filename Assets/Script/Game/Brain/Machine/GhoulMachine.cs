@@ -31,7 +31,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         
         var dialogue = new Dialogue
         {
-            Text = "go away femboy",
+            Text = "awdasaaksjdlkasjdklasjdasd dawdajdkjdsa",
             Sprite = Cache.LoadSprite("Sprite/Illu"),
             Next = new Dictionary<string, Dialogue>
             {
@@ -41,7 +41,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
                     Next = new Dictionary<string, Dialogue>
                     {
                         [""] = new() { 
-                            Text = "i said go away",
+                            Text = "awdasdadaskjdasfkajdkjdsa",
                             Sprite = Cache.LoadSprite("Sprite/Illu"),
                         }
                     }

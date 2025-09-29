@@ -21,7 +21,7 @@ public class SpotLightModule : MonoBehaviour
     { 
         while (true)
         {
-            while (!Game.Player) yield return new WaitForSeconds(2);
+            while (Game.SceneMode == SceneMode.Menu) yield return null;
             _offset = Game.Player.transform.position - transform.position;
             _offset.y = 0; // Ignore the y-axis
             _offset.Normalize();

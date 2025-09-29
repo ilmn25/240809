@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -98,8 +99,27 @@ public static class Helper
         }
         // Debug.LogWarning("File " + filePath + " does not exist");
         return default;
+    } 
+
+    public static void CloneFolder(string sourcePath, string destPath)
+    {
+        string source = SavePath + sourcePath;
+        string dest = SavePath + destPath;
+        DeleteFolder(destPath); 
+        Directory.CreateDirectory(source);
+        Directory.CreateDirectory(dest);
+        foreach (string filePath in Directory.GetFiles(source))
+        {
+            File.Copy(filePath, dest + Path.GetFileName(filePath), true);
+        }
     }
-    
+    public static void DeleteFolder(string path)
+    {
+        string fullPath = SavePath + path;
+        if (Directory.Exists(fullPath))
+            Directory.Delete(fullPath, true);
+    }
+
     public static void SaveScreenShot(string filePath)
     { 
         Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
@@ -119,6 +139,7 @@ public static class Helper
     {
         string path = SavePath + filePath + ".png";
         CreateDirectory(path);
+        if (!File.Exists(path)) return null;
         Texture2D texture = new Texture2D(2, 2);
         texture.LoadImage(File.ReadAllBytes(path));
         return Sprite.Create(
@@ -133,19 +154,58 @@ public static class Helper
         return ((1 << obj.layer) & mask) != 0;
     }
     
+
+    
     public static object Clone(object source)
     {
-        if (source == null) throw new ArgumentNullException(nameof(source));
+        return Clone(source, new Dictionary<object, object>());
+    }
 
-        Type type = source.GetType(); // This gets the actual subclass type
+    private static object Clone(object source, Dictionary<object, object> visited)
+    {
+        if (source == null) return null;
+
+        Type type = source.GetType();
+
+        if (type.IsPrimitive || type == typeof(string) || type.IsEnum)
+            return source;
+
+        if (visited.TryGetValue(source, out var existing))
+            return existing;
+
+        // Handle arrays
+        if (type.IsArray)
+        {
+            Type elementType = type.GetElementType();
+            Array sourceArray = (Array)source;
+            Array clonedArray = Array.CreateInstance(elementType, sourceArray.Length);
+            visited[source] = clonedArray;
+
+            for (int i = 0; i < sourceArray.Length; i++)
+            {
+                object element = sourceArray.GetValue(i);
+                object clonedElement = Clone(element, visited);
+                clonedArray.SetValue(clonedElement, i);
+            }
+
+            return clonedArray;
+        }
+
+        // Handle normal objects
         object clone = Activator.CreateInstance(type);
+        visited[source] = clone;
 
-        foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+        foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
             if (field.IsNotSerialized) continue;
-            field.SetValue(clone, field.GetValue(source));
+
+            object value = field.GetValue(source);
+            object copied = Clone(value, visited);
+            field.SetValue(clone, copied);
         }
 
         return clone;
     }
+
+
 }

@@ -20,37 +20,48 @@ public class Scene
     public static readonly int GenRange = 7; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
-
+    public static bool Busy;
+    public static void SwitchWorld(SaveData saveData)
+    {  
+        if (Busy) return;
+        Busy = true;
+        new CoroutineTask(Quit()).Finished += _ => {
+            Save.LoadSave(saveData); 
+            new CoroutineTask(Start()).Finished += _ => { Busy = false; };
+        };
+    }
+    
     public static void LoadWorld()
     {  
-        _ = new CoroutineTask(Start());
-        return;
-        IEnumerator Start()
-        {
-            Gen.Initialize();
-            NavMap.Initialize();
-            Control.SetPlayer(0); 
-            Game.ViewPortObject.transform.position = Game.PlayerInfo.position; 
-            Game.SceneMode = SceneMode.Game;
-            _playerChunkPositionPrevious = Vector3Int.down; 
-            yield return new WaitForSeconds(3);
-            Environment.Target = EnvironmentType.Null;
-        }
+        if (Busy) return;
+        Busy = true;
+        new CoroutineTask(Start()).Finished += _ => { Busy = false; };
     }
+     
     
-    public static void UnloadWorld()
+    private static IEnumerator Start()
     {
-        _ = new CoroutineTask(Quit());
-        return;
-        IEnumerator Quit()
-        { 
-            Environment.Target = EnvironmentType.Black;
-            yield return new WaitForSeconds(2);
-            World.UnloadWorld();
-            Helper.FileSave(World.Inst, Save.SavePath + SaveData.Inst.current);  
-        }
+        Gen.Initialize();
+        NavMap.Initialize();
+        Control.SetPlayer(0); 
+        Game.ViewPortObject.transform.position = Game.PlayerInfo.position;  
+        _playerChunkPositionPrevious = Vector3Int.down; 
+        yield return new WaitForSeconds(2);
+        Game.SceneMode = SceneMode.Game;
+        Environment.Target = EnvironmentType.Null;
     }
-    
+    private static IEnumerator Quit()
+    {     
+        Environment.Target = EnvironmentType.Black;
+        yield return new WaitForSeconds(2);
+        Game.SceneMode = SceneMode.Menu;
+        if (World.Inst != null)
+        {
+            World.UnloadWorld();
+            Helper.FileSave(World.Inst, Save.TempPath + SaveData.Inst.current); 
+        }
+        World.Inst = null;
+    }
     public static void Update()
     { 
         PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);

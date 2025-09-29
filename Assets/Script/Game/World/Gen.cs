@@ -30,7 +30,7 @@ public class Gen
     };
     public static void Initialize()
     {
-        World.Inst = Helper.FileLoad<World>(Save.SavePath + SaveData.Inst.current);
+        World.Inst = Helper.FileLoad<World>(Save.TempPath + SaveData.Inst.current);
         if (World.Inst == null)
         {
             World.Inst = new World(SaveData.Inst.current);     

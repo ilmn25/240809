@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -74,11 +75,11 @@ public class EntityDynamicLoad
         Entity entity;
         EntityMachine currentEntityMachine;
         GameObject currentInstance;
-        List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity;
+        List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity; 
         foreach (Info info in chunkEntityList)
-        {   
+        { 
             entity = Entity.Dictionary[info.id];
-            
+
             if (entity.PrefabName == ID.ItemPrefab)
                 currentInstance = ObjectPool.GetObject(entity.PrefabName);
             else                
@@ -90,7 +91,7 @@ public class EntityDynamicLoad
             _activeEntities.Add(currentEntityMachine); 
             currentEntityMachine.Initialize(info);
         }
-        chunkEntityList.Clear();
+        World.Inst[chunkCoordinate].DynamicEntity.Clear(); 
     } 
 }
  

@@ -85,5 +85,6 @@ public enum ID
     Fabric,
     Chicken,
     Sheep,
-    Wool
+    Wool,
+    Computer
 }

@@ -11,6 +11,8 @@ public class Storage
         public int Key;
         public Info info;
         public string Name;
+
+        public Storage(){}
         public Storage(int size)
         {
                 List = new List<ItemSlot>(size);

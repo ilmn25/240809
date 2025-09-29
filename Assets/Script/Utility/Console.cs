@@ -161,6 +161,10 @@ public class Console : MonoBehaviour
             case "fly":
                 Game.Fly = !Game.Fly;
                 break;   
+            case "flat":
+                Save.NewSave(GenType.SuperFlat);  
+                GUIMain.GUIMenu.Show(false);
+                break;   
             case "fps": 
                 Application.targetFrameRate = int.Parse(_command[1]);
                 break;  
@@ -169,31 +173,11 @@ public class Console : MonoBehaviour
                 break;   
             case "info":
                 _showInfo = true;
-                break;
-            case "abyss": 
-                Save.NewSave(_command[1], GenType.Abyss); 
-                break;   
-            case "skyblock": 
-                Save.NewSave(_command[1], GenType.SkyBlock); 
-                break;   
-            case "flat": 
-                Save.NewSave(_command[1], GenType.SuperFlat); 
-                break;   
+                break; 
             case "save": 
                 Output("unloaded");  
-                Save.SaveSave(); 
-                break;   
-            case "load": 
-                Output("loaded");  
-                Save.LoadSave(_command[1]); 
-                break;    
-            case "start":
-                Scene.LoadWorld();
-                break;   
-            case "saves":
-                foreach (var data in Save.Inst.List)
-                    Output(data.Key + " : " + data.Value.time);
-                break;   
+                Save.CloneSave(); 
+                break;     
             default: 
                 Output("Invalid command");
                 break;  

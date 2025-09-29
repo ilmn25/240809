@@ -9,7 +9,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
     {
         return new ItemInfo();
     }
-    private ItemInfo ItemInfo => (ItemInfo)Info; 
+    private ItemInfo ItemInfo => (ItemInfo)Info;
 
     private static readonly Collider[] CollisionArray = new Collider[40];
     private static int _collisionCount; 
@@ -45,7 +45,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
         
         ItemInfo.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + ItemInfo.item.ID);
         AddModule(new ItemSpriteCullModule()); 
-        transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
+        transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0); 
         transform.localScale = Vector3.one * ItemInfo.item.Info.Scale;
         if (ItemInfo.Velocity == default) 
             ItemInfo.Velocity = new Vector3(Random.Range(-3, 3), 0, Random.Range(-3, 3));  
@@ -61,7 +61,6 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             transform.position += new Vector3(0, 5, 0) * _deltaTime;
             return;
         }
-
         ItemInfo.Velocity += Gravity * _deltaTime * Vector3.down;
         ItemInfo.Velocity.y = Mathf.Max(ItemInfo.Velocity.y, -Gravity); 
         Vector3 newPosition = transform.position + ItemInfo.Velocity * _deltaTime;
