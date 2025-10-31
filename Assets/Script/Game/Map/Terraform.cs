@@ -50,17 +50,17 @@ public static class Terraform
     public static void Update()
     {
         if (Target == ID.Null) return;
-        if (Helper.isLayer(Control.MouseLayer, Game.IndexMap) && 
-            Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+        if (Helper.isLayer(Control.MouseLayer, Main.IndexMap) && 
+            Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         { 
             HandleCoord(); 
  
             if (Control.Inst.ActionSecondary.Key())
             {
-                Game.PlayerInfo.Machine.SetState<MobAttackSwing>();
+                Main.PlayerInfo.Machine.SetState<MobAttackSwing>();
                 Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
                 SpawnBlock();
-                if (Target != ID.Blueprint) Game.PlayerInfo.storage.RemoveItem(Target);
+                if (Target != ID.Blueprint) Main.PlayerInfo.storage.RemoveItem(Target);
             }
         }
         _blockObj.transform.position = Vector3.Lerp(_blockObj.transform.position, _coordinate + 
@@ -69,13 +69,13 @@ public static class Terraform
   
     public static void SpawnBlock()
     {
-        if (Game.BuildMode)
+        if (Main.BuildMode)
         {
             if (Target == ID.Blueprint)
                 World.SetBlock(_coordinate);
             else
             {
-                Game.PlayerInfo.storage.CreateAndAddItem(Target);
+                Main.PlayerInfo.storage.CreateAndAddItem(Target);
                 World.SetBlock(_coordinate, Block.ConvertID(Target)); 
             }
             return;

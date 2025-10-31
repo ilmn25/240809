@@ -36,7 +36,7 @@ public class GUI
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     ParentRect,
                     Input.mousePosition,
-                    Game.GUICamera,
+                    Main.GUICamera,
                     out _dragOffset
                 );
                 IsDrag = true;
@@ -47,7 +47,7 @@ public class GUI
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     ParentRect,
                     Input.mousePosition,
-                    Game.GUICamera,
+                    Main.GUICamera,
                     out Vector2 mousePosition
                 );
 

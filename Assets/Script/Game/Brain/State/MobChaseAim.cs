@@ -26,7 +26,7 @@ class MobChaseAim : MobState {
         if (distance > Info.DistAttack) return false;
 
         if (Physics.Raycast(origin, (Info.Target.position - origin).normalized,
-                out RaycastHit hit, distance, Game.MaskMap))
+                out RaycastHit hit, distance, Main.MaskMap))
         {
             return hit.distance >= distance - 0.2f;
         }

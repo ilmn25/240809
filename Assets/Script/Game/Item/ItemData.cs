@@ -88,7 +88,6 @@ public partial class Item
             holdoutOffset: new Vector2(0.6f, 0)
         );
  
-
         AddToolDefinition(
             id: ID.StonePickaxe,
             gesture: ItemGesture.Swing,

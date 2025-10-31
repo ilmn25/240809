@@ -69,7 +69,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (transform.position.y < -50)
         {
             MapCull.ForceRevertMesh(); 
-            transform.position = new Vector3(Game.Player.transform.position.x , World.Inst.Bounds.y + 40, Game.Player.transform.position.z);
+            transform.position = new Vector3(Main.Player.transform.position.x , World.Inst.Bounds.y + 40, Main.Player.transform.position.z);
         }
          
         if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact &&
@@ -86,9 +86,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     public override void OnUpdate()
     {   
         Info.position = transform.position;
-        if (Game.PlayerInfo == Info)
+        if (Main.PlayerInfo == Info)
         { 
-            Game.Player = gameObject;
+            Main.Player = gameObject;
             HandleInput();
             
             if (IsCurrentState<DefaultState>())
@@ -111,13 +111,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
         else if (IsCurrentState<DefaultState>()) 
         { 
-            if (Info.Target == null && Game.PlayerInfo.PlayerStatus == PlayerStatus.Active)
+            if (Info.Target == null && Main.PlayerInfo.PlayerStatus == PlayerStatus.Active)
             {  
-                Info.Target = Game.PlayerInfo;
+                Info.Target = Main.PlayerInfo;
                 Info.ActionType = IActionType.Follow;
             } 
             
-            if (Info.Target == Game.PlayerInfo && PlayerTask.Pending.Count != 0)
+            if (Info.Target == Main.PlayerInfo && PlayerTask.Pending.Count != 0)
             {  
                 foreach (StructureInfo structureInfo in PlayerTask.Pending)
                 { 

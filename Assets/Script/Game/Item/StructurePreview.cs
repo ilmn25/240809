@@ -30,7 +30,7 @@ public class StructurePreviewState : State
         public override void OnEnterState()
         { 
                 _spriteRenderer.sprite = Cache.LoadSprite("Sprite/" + StructureRecipe.Target.StringID); 
-                Machine.transform.position = Game.Player.transform.position;
+                Machine.transform.position = Main.Player.transform.position;
         }
         public override void OnUpdateState()
         {

@@ -16,19 +16,19 @@ public class GUICursor : GUI
         ShowSpeed = 0.25f;
         HideSpeed = 0.1f;
         
-        Rect = Game.GUICursor.GetComponent<RectTransform>();
-        GameObject = Game.GUICursorInfo;
+        Rect = Main.GUICursor.GetComponent<RectTransform>();
+        GameObject = Main.GUICursorInfo;
         base.Initialize();        
-        _infoSlotText = Game.GUICursorInfo.transform.Find("Info").GetComponent<TextMeshProUGUI>(); 
-        Text = Game.GUICursorInfo.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
-        _cursorSlotText = Game.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
-        _cursorSlotImage = Game.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
+        _infoSlotText = Main.GUICursorInfo.transform.Find("Info").GetComponent<TextMeshProUGUI>(); 
+        Text = Main.GUICursorInfo.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
+        _cursorSlotText = Main.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        _cursorSlotImage = Main.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
     }
 
     public void Update()
     {
         RectTransformUtility.ScreenPointToLocalPointInRectangle(ParentRect, Input.mousePosition,  
-            Game.GUICamera,out Vector2 mousePosition);
+            Main.GUICamera,out Vector2 mousePosition);
         Rect.anchoredPosition = mousePosition;
     }
 
@@ -60,11 +60,11 @@ public class GUICursor : GUI
     { 
         if (Data.Stack == 0)
         {
-            Game.GUICursorSlot.SetActive(false);
+            Main.GUICursorSlot.SetActive(false);
         }
         else
         {
-            Game.GUICursorSlot.SetActive(true);
+            Main.GUICursorSlot.SetActive(true);
             _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.ID}");
             _cursorSlotText.text = Data.Stack.ToString();
         } 

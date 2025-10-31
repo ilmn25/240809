@@ -75,7 +75,7 @@ public class PlayerInfo : MobInfo
 
             FaceTarget = Equipment != null || Target != null;
 
-            if (Game.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+            if (Main.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
             {
                 TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
                 
@@ -138,7 +138,7 @@ public class PlayerInfo : MobInfo
 
         if (Control.Inst.Jump.KeyDown())
         {
-            if (Game.Fly)
+            if (Main.Fly)
                 Velocity.y = JumpVelocity;
             else 
                 _jumpGraceTimer = JumpGraceTime; // Reset jump grace timer when jump key is pressed

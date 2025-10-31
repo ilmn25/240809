@@ -26,9 +26,9 @@ public class Dialogue
                 Showing = true;
                 SetDialogue();  
                 _scaleTask?.Stop();
-                _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Game.GUIDialogue, 
+                _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Main.GUIDialogue, 
                     0.9f, EaseSpeed)); 
-                Game.GUIDialogue.SetActive(true);
+                Main.GUIDialogue.SetActive(true);
             }
         }
         else
@@ -38,12 +38,12 @@ public class Dialogue
                 Showing = false;
                 SetSprite();
                 _scaleTask?.Stop();
-                _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Game.GUIDialogue, 
+                _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Main.GUIDialogue, 
                     0, EaseSpeed));
                 _scaleTask.Finished += _ =>
                 {
                     if (_scrollTask != null && _scrollTask.Running) _scrollTask.Stop();
-                    Game.GUIDialogue.SetActive(false); 
+                    Main.GUIDialogue.SetActive(false); 
                 }; 
             }
         }
@@ -75,23 +75,23 @@ public class Dialogue
     private static void SetDialogue()
     {
         SetSprite(Target.Sprite);
-        Game.GUIDialogueText.text = Target.Text;
-        _scrollTask = TextScroller.HandleScroll(Game.GUIDialogueText, sound: SfxID.Text);
+        Main.GUIDialogueText.text = Target.Text;
+        _scrollTask = TextScroller.HandleScroll(Main.GUIDialogueText, sound: SfxID.Text);
     }
 
     private static void SetSprite(Sprite sprite = null)
     {
         if (sprite)
         {  
-            Game.GUIImageRenderer.sprite = Target.Sprite; 
-            if (Game.GUIImageRenderer.transform.position != new Vector3(220, -95, 203))
-                _ = new CoroutineTask(GUIMain.Slide(true, 0.2f, Game.GUIImage, 
+            Main.GUIImageRenderer.sprite = Target.Sprite; 
+            if (Main.GUIImageRenderer.transform.position != new Vector3(220, -95, 203))
+                _ = new CoroutineTask(GUIMain.Slide(true, 0.2f, Main.GUIImage, 
                     new Vector3(220, -95, 160), EaseSpeed)); 
         }
         else
         {
-            if (Game.GUIImageRenderer.transform.position != new Vector3(500, -95, 203))
-                _ = new CoroutineTask(GUIMain.Slide(false, 0.1f, Game.GUIImage, 
+            if (Main.GUIImageRenderer.transform.position != new Vector3(500, -95, 203))
+                _ = new CoroutineTask(GUIMain.Slide(false, 0.1f, Main.GUIImage, 
                     new Vector3(500, -95, 160), EaseSpeed));
         }
     }

@@ -72,7 +72,7 @@ public class NavMap
 
     public static void SetEntity(Entity entity, Vector3 position, bool isAir)
     {
-        if (entity.Collision != Game.IndexCollide) return; 
+        if (entity.Collision != Main.IndexCollide) return; 
         int entityX = Mathf.FloorToInt(position.x);
         int entityY = Mathf.FloorToInt(position.y);
         int entityZ = Mathf.FloorToInt(position.z);

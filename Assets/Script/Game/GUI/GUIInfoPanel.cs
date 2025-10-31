@@ -7,9 +7,9 @@ public class GUIInfoPanel : GUI
     
     public new void Initialize()
     {
-        _infoText = Game.GUIInfoPanel.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
-        Rect = Game.GUIInfoPanel.GetComponent<RectTransform>();
-        GameObject = Game.GUIInfoPanel.gameObject;
+        _infoText = Main.GUIInfoPanel.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
+        Rect = Main.GUIInfoPanel.GetComponent<RectTransform>();
+        GameObject = Main.GUIInfoPanel.gameObject;
         GameObject.AddComponent<HoverModule>().GUI = this;
         Position = new Vector2(-360, -125);
         base.Initialize();

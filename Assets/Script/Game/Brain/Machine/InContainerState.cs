@@ -13,7 +13,7 @@ public class InContainerState : State
     public override void OnUpdateState()
     {
         if (!GUIMain.Showing || GUIMain.Storage.Storage != Storage ||
-            Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+            Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

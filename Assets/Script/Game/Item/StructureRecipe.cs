@@ -24,7 +24,7 @@ public class StructureRecipe
         {
                 foreach (var ingredient in Dictionary[stringID].Ingredients)
                 {
-                        if (Game.PlayerInfo.storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
+                        if (Main.PlayerInfo.storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
                 } 
                 return true;
         }
@@ -39,7 +39,7 @@ public class StructureRecipe
                 info.SfxDestroy = SfxID.HitMetal;
                 foreach (var ingredient in Target.Ingredients)
                 {
-                        Game.PlayerInfo.storage.RemoveItem(ingredient.Key, ingredient.Value);
+                        Main.PlayerInfo.storage.RemoveItem(ingredient.Key, ingredient.Value);
                 } 
                 GUIMain.RefreshStorage();
         }

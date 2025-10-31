@@ -67,15 +67,15 @@ public class DynamicInfo : Info
         }
         KnockbackCounter = 0;
         
-        int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Game.MaskEntity);
+        int hitCount = Physics.OverlapSphereNonAlloc(Machine.transform.position, EntityCollisionRadius, ColliderArray, Main.MaskEntity);
         for (int i = 0; i < hitCount; i++)
         {
             Collider col = ColliderArray[i];
 
-            if (col.gameObject == Machine.gameObject || col.gameObject.layer != Game.IndexSemiCollide)
+            if (col.gameObject == Machine.gameObject || col.gameObject.layer != Main.IndexSemiCollide)
                 continue;
             
-            if (Game.Player && col.gameObject == Game.Player)
+            if (Main.Player && col.gameObject == Main.Player)
                 KnockBack(col.transform.position, 1, true);
             else
                 KnockBack(col.transform.position, 2 , true);
@@ -106,7 +106,7 @@ public class DynamicInfo : Info
         switch (projectile.TargetHitBoxType)
         {
             case HitboxType.Player:  
-                if (this != Game.PlayerInfo) return false;
+                if (this != Main.PlayerInfo) return false;
                 break;
             case HitboxType.Friendly: // enemy kill friendly 
                 if (HitboxType == HitboxType.Enemy) return false;

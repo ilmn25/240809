@@ -11,7 +11,7 @@ public static class EnvParticle
         foreach (EnvParticles target in Enum.GetValues(typeof(EnvParticles)))
         {
             if (target == EnvParticles.Null) continue;
-            List.Add(target, Game.ViewPortObject.transform.Find(target.ToString()).gameObject); 
+            List.Add(target, Main.ViewPortObject.transform.Find(target.ToString()).gameObject); 
         }
     }
 

@@ -77,14 +77,14 @@ public class HarpyMachine : MobMachine
     {
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Info.Target = Game.PlayerInfo;
+            Info.Target = Main.PlayerInfo;
             Info.PathingStatus = PathingStatus.Reached; 
             SetState<DefaultState>();
         } 
         else if (Input.GetKeyDown(KeyCode.T))
             Info.Target = null;
         else if (Input.GetKeyDown(KeyCode.U))
-            transform.position = Game.Player.transform.position;
+            transform.position = Main.Player.transform.position;
     }
 
     public void OnDrawGizmos()

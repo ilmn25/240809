@@ -14,7 +14,7 @@ public class GUIBar
                 GameObject obj = new GameObject("Bar", typeof(RectTransform));
                 RectTransform rectTransform = obj.GetComponent<RectTransform>();
 
-                rectTransform.SetParent(Game.GUIObject.transform, false);
+                rectTransform.SetParent(Main.GUIObject.transform, false);
                 rectTransform.localPosition = position;
                 rectTransform.localScale = Vector3.one * 0.6f;
 
@@ -51,15 +51,15 @@ public class GUIHealthBar : GUIBar
                 for (int i = 0; i < Bar.Count; i += 1)
                 {
                         int target = i * 2 + 2; 
-                        if (target > Game.PlayerInfo.HealthMax)
+                        if (target > Main.PlayerInfo.HealthMax)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/Null");
                         }
-                        else if (target <= Game.PlayerInfo.Health)
+                        else if (target <= Main.PlayerInfo.Health)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartFull");
                         }
-                        else if (target - 1 <= Game.PlayerInfo.Health)
+                        else if (target - 1 <= Main.PlayerInfo.Health)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartHalf");
                         }
@@ -79,15 +79,15 @@ public class GUIHungerBar : GUIBar
                 for (int i = 0; i < Bar.Count; i += 1)
                 {
                         int target = i * 2 + 2; 
-                        if (target > Game.PlayerInfo.hungerMax)
+                        if (target > Main.PlayerInfo.hungerMax)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/Null");
                         }
-                        else if (target <= Game.PlayerInfo.hunger)
+                        else if (target <= Main.PlayerInfo.hunger)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerFull");
                         }
-                        else if (target - 1 <= Game.PlayerInfo.hunger)
+                        else if (target - 1 <= Main.PlayerInfo.hunger)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerHalf");
                         }

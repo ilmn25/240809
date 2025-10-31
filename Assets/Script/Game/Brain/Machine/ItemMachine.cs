@@ -22,7 +22,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
         if (ItemInfo.StackOnSpawn)
         {
             ItemInfo nearbyItem;
-            _collisionCount = Physics.OverlapSphereNonAlloc(transform.position, 2, CollisionArray, Game.MaskEntity);
+            _collisionCount = Physics.OverlapSphereNonAlloc(transform.position, 2, CollisionArray, Main.MaskEntity);
             for (int i = 0; i < _collisionCount; i++)
             { 
                 Collider col = CollisionArray[i];
@@ -78,7 +78,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
 
         bool IsMovable(Vector3 pos)
         {  
-            _collisionCount = Physics.OverlapSphereNonAlloc(pos + new Vector3(0,0.2f,0), CollisionRange, CollisionArray, Game.MaskStatic);
+            _collisionCount = Physics.OverlapSphereNonAlloc(pos + new Vector3(0,0.2f,0), CollisionRange, CollisionArray, Main.MaskStatic);
 
             return !(_collisionCount > 0);
         } 

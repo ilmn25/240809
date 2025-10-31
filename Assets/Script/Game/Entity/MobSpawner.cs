@@ -15,14 +15,14 @@ public class MobSpawner
     };
     public static void Update()
     {
-        if (SaveData.Inst.day < 2 || Game.BuildMode) return;
+        if (SaveData.Inst.day < 2 || Main.BuildMode) return;
         _timer++;
         if (_timer == 5000)
         {
             _timer = 0;
             float angle = Random.Range(0f, Mathf.PI * 2f);
             Vector3Int position = Vector3Int.FloorToInt(
-                Game.PlayerInfo.position + 
+                Main.PlayerInfo.position + 
                 new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * (Scene.RenderDistance + 5));
             while (!NavMap.Get(position))
                 position.y++; 

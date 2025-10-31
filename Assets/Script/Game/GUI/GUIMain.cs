@@ -130,7 +130,7 @@ public static class GUIMain
                 Showing = true;
                 RefreshStorage();
                 _showTask?.Stop();
-                _showTask = new CoroutineTask(Scale(true, ShowDuration, Game.GUIInv, 0.7f));
+                _showTask = new CoroutineTask(Scale(true, ShowDuration, Main.GUIInv, 0.7f));
             }
         }
         else
@@ -139,7 +139,7 @@ public static class GUIMain
             {
                 Showing = false;
                 _showTask?.Stop();
-                _showTask = new CoroutineTask(Scale(false, HideDuration, Game.GUIInv, 0));
+                _showTask = new CoroutineTask(Scale(false, HideDuration, Main.GUIInv, 0));
                 Cursor.SetItemSlotInfo();
                 // _showTask.Finished += (bool isManual) => 
                 // {

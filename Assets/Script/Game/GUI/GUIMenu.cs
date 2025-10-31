@@ -7,23 +7,23 @@ public class GUIMenu : GUI
 { 
     public GUIMenu()
     { 
-        Text = Game.GUIMainMenu.transform.Find("Text").GetComponent<TextMeshProUGUI>();
-        GameObject = Game.GUIMainMenu;
+        Text = Main.GUIMainMenu.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        GameObject = Main.GUIMainMenu;
     }
     public void Update()
     {
         if (!Control.Inst.ActionPrimary.KeyDown()) return;
-        if (Game.GUIMainMenuButtonNew.IsHovered)
+        if (Main.GUIMainMenuButtonNew.IsHovered)
         {
             Save.NewSave(GenType.Abyss);  
             Show(false);
         }
-        else if (Game.GUIMainMenuButtonLoad.IsHovered)
+        else if (Main.GUIMainMenuButtonLoad.IsHovered)
         {
             GUIMain.GUILoad.Show(true);
             Show(false);
         }
-        else if (Game.GUIMainMenuButtonExit.IsHovered)
+        else if (Main.GUIMainMenuButtonExit.IsHovered)
         {
             _ = new CoroutineTask(Quit());
             IEnumerator Quit()

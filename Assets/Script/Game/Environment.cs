@@ -193,9 +193,9 @@ public class Environment
     {
         RenderSettings.ambientLight = ambientLight;
         RenderSettings.fogColor = fogColor;
-        Game.SpotLight.color = spotLight;
-        Game.DirectionalLight.color = directionalLight;
-        Game.Camera.backgroundColor = backgroundColor;
+        Main.SpotLight.color = spotLight;
+        Main.DirectionalLight.color = directionalLight;
+        Main.Camera.backgroundColor = backgroundColor;
     }
 
     // public static (int day, int time) CalculateTime(int amount)

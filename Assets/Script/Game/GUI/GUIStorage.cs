@@ -26,7 +26,7 @@ public class  GUIStorage : GUI
     public new void Initialize()
     {  
         GameObject = Object.Instantiate(Resources.Load<GameObject>($"Prefab/GUIStorage"),
-            Game.GUIInv.transform);
+            Main.GUIInv.transform);
         Text = GameObject.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GameObject.GetComponent<HoverModule>().GUI = this;
         Rect = GameObject.GetComponent<RectTransform>();

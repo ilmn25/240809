@@ -29,7 +29,7 @@ public partial class ViewPort
 
     public static void Initialize()
     {  
-        Game.Camera.transparencySortMode = TransparencySortMode.CustomAxis; 
+        Main.Camera.transparencySortMode = TransparencySortMode.CustomAxis; 
         _screenWidth = Screen.width;
         _screenHeight = Screen.height;
 
@@ -38,7 +38,7 @@ public partial class ViewPort
 
     public static void Update()
     {   
-        Game.Camera.fieldOfView = Mathf.Lerp(Game.Camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
+        Main.Camera.fieldOfView = Mathf.Lerp(Main.Camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
         
         HandlePlayerFollow(); 
         HandleCameraSway();
@@ -59,7 +59,7 @@ public partial class ViewPort
             UpdateOrbit();
             OnOrbitRotate?.Invoke();
         }
-        else Game.ViewPortObject.transform.rotation = Quaternion.Lerp(Game.ViewPortObject.transform.rotation, Quaternion.Euler(0, OrbitRotation, 0), Time.deltaTime * 7);
+        else Main.ViewPortObject.transform.rotation = Quaternion.Lerp(Main.ViewPortObject.transform.rotation, Quaternion.Euler(0, OrbitRotation, 0), Time.deltaTime * 7);
 
         HandleOrbit();
     }
@@ -108,14 +108,14 @@ public partial class ViewPort
     {
         if (_isOrbiting)
         {
-            if (Quaternion.Angle(Game.ViewPortObject.transform.rotation, _targetRotation) > 0.1f)
+            if (Quaternion.Angle(Main.ViewPortObject.transform.rotation, _targetRotation) > 0.1f)
             {
-                CurrentRotation = Quaternion.Lerp(Game.ViewPortObject.transform.rotation, _targetRotation, Time.deltaTime * 7);
+                CurrentRotation = Quaternion.Lerp(Main.ViewPortObject.transform.rotation, _targetRotation, Time.deltaTime * 7);
                 UpdateOrbitRotate?.Invoke();
             }
             else
             {
-                Game.ViewPortObject.transform.rotation = _targetRotation; // Ensure final rotation is exact
+                Main.ViewPortObject.transform.rotation = _targetRotation; // Ensure final rotation is exact
                 _isOrbiting = false;
             }
         }
@@ -126,7 +126,7 @@ public partial class ViewPort
         int zAxis = (OrbitRotation >= -90 && OrbitRotation <= 90) ? 1 : -1;
         int xAxis = (OrbitRotation > 0) ? 1 : -1;
 
-        Game.Camera.transparencySortAxis = new Vector3(xAxis, 0, zAxis);
+        Main.Camera.transparencySortAxis = new Vector3(xAxis, 0, zAxis);
     }
 
     private static void HandleCameraSway()
@@ -140,16 +140,16 @@ public partial class ViewPort
         float newRotationY =  angleX * TiltDegreeY;
         float newRotationX =  angleY * TiltDegreeX;
 
-        Game.CameraObject.transform.localRotation = Quaternion.Lerp(Game.CameraObject.transform.localRotation, 
+        Main.CameraObject.transform.localRotation = Quaternion.Lerp(Main.CameraObject.transform.localRotation, 
             Quaternion.Euler(45 - newRotationX, newRotationY , 0), Time.deltaTime * TiltSpeed);
-        Game.CameraObject.transform.localPosition = Vector3.Lerp(Game.CameraObject.transform.localPosition, 
+        Main.CameraObject.transform.localPosition = Vector3.Lerp(Main.CameraObject.transform.localPosition, 
             new Vector3(newRotationY * PanDegree, Distance, -Distance), Time.deltaTime * TiltSpeed);
     }
 
     private static void HandlePlayerFollow()
     {
-        Game.ViewPortObject.transform.position = Vector3.Lerp(Game.ViewPortObject.transform.position, 
-            Game.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ShakeOffset;
+        Main.ViewPortObject.transform.position = Vector3.Lerp(Main.ViewPortObject.transform.position, 
+            Main.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ShakeOffset;
     }
  
 }

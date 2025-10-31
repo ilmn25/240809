@@ -60,7 +60,7 @@ public static class Helper
 
     public static float GetDeltaTime()
     {
-        return (Time.deltaTime < Game.MaxDeltaTime) ? Time.deltaTime : Game.MaxDeltaTime;
+        return (Time.deltaTime < Main.MaxDeltaTime) ? Time.deltaTime : Main.MaxDeltaTime;
     }
  
     public static Color GetColor(float r, float g, float b)

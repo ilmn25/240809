@@ -8,7 +8,7 @@ public class SwingProjectileInfo : ProjectileInfo
     { 
         Vector3 direction = (projectile.Destination - projectile.transform.position).normalized;
         Vector3 center = projectile.transform.position + direction * (Radius * 0.5f);
-        int hitCount = Physics.OverlapSphereNonAlloc(center, Radius / 2, HitBuffer, Game.MaskEntity);
+        int hitCount = Physics.OverlapSphereNonAlloc(center, Radius / 2, HitBuffer, Main.MaskEntity);
         Info info;
         for (int i = 0; i < hitCount; i++)
         {
@@ -29,7 +29,7 @@ public class ContactDamageProjectileInfo : ProjectileInfo
     {
         Collider[] _hitBuffer = new Collider[16];
         int hitCount =
-            Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, _hitBuffer, Game.MaskEntity);
+            Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, _hitBuffer, Main.MaskEntity);
 
         for (int i = 0; i < hitCount; i++)
         {

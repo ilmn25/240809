@@ -68,7 +68,7 @@ public abstract class MovementModule : DynamicModule
     
     protected void HandleMove()
     { 
-        if (Game.BuildMode && Info != Game.PlayerInfo) NewPosition = Machine.transform.position;
+        if (Main.BuildMode && Info != Main.PlayerInfo) NewPosition = Machine.transform.position;
         
         if (Info.Velocity.y > Info.Gravity) //terminal velocity
         {
@@ -120,6 +120,6 @@ public abstract class MovementModule : DynamicModule
         
         return !(Physics.OverlapBoxNonAlloc(newPosition + _colliderCenter, 
             _colliderSize, ColliderArray, Quaternion.identity, 
-            Game.MaskStatic) > 0);
+            Main.MaskStatic) > 0);
     } 
 }

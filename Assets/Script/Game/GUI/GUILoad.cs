@@ -9,14 +9,14 @@ public class GUILoad : GUI
 
     public GUILoad()
     { 
-        GameObject = Game.GUILoadMenu;
-        Rect = Game.GUILoadMenu.GetComponent<RectTransform>();
+        GameObject = Main.GUILoadMenu;
+        Rect = Main.GUILoadMenu.GetComponent<RectTransform>();
         for (int i = 0; i < Save.Inst.List.Count; i++) AddToList(i);
     } 
 
     public static void AddToList(int i)
     {
-        GameObject obj = Object.Instantiate(Resources.Load<GameObject>("Prefab/GUISave"), Game.GUILoadMenu.transform);
+        GameObject obj = Object.Instantiate(Resources.Load<GameObject>("Prefab/GUISave"), Main.GUILoadMenu.transform);
         obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, i * -100 + 150, 130);
         obj.GetComponent<GUISave>().ID = i; 
     }

@@ -19,7 +19,7 @@ class MobAttackSwing : MobState {
     
     public override void OnEnterState()
     { 
-        Info.Animator.speed = Game.PlayerInfo == Info ? 0.7f : 0.3f;
+        Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
         Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0); 
         _equipment = Info.Equipment.Info; 
         Info.SpeedModifier = 0.25f;
@@ -39,7 +39,7 @@ class MobAttackSwing : MobState {
             }
             else if (stateInfo.IsName("EquipSwing"))
             {  
-                Info.Animator.speed = Game.BuildMode? 70 : _equipment.Speed;
+                Info.Animator.speed = Main.BuildMode? 70 : _equipment.Speed;
                 Audio.PlaySFX(_equipment.Sfx); 
                 Info.SpeedModifier = 0.8f;
                 Info.Animator.Play("EquipSwingCooldown", 0, 0f);

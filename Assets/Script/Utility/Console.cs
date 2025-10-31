@@ -103,13 +103,13 @@ public class Console : MonoBehaviour
         if (_showInfo)
         {
             UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-                "FPS: " + Mathf.Ceil(_fps) + "\n" + Game.PlayerInfo.position, GUIStyle);
+                "FPS: " + Mathf.Ceil(_fps) + "\n" + Main.PlayerInfo.position, GUIStyle);
         }
         
-        if (!Game.BuildMode || !Game.Player) return;
+        if (!Main.BuildMode || !Main.Player) return;
 
-        _lines[12].SetPosition(0, Game.PlayerInfo.position);
-        _lines[12].SetPosition(1, Game.PlayerInfo.position + new Vector3(1, 0, 1));
+        _lines[12].SetPosition(0, Main.PlayerInfo.position);
+        _lines[12].SetPosition(1, Main.PlayerInfo.position + new Vector3(1, 0, 1));
         
         if (SetPiece.Pos1 == Vector3Int.zero || SetPiece.Pos2 == Vector3Int.zero) return;
         
@@ -156,10 +156,10 @@ public class Console : MonoBehaviour
                 SetPieceCommands();
                 break; 
             case "air":
-                Output(NavMap.Get(Vector3Int.FloorToInt(Game.PlayerInfo.position))? "is air" : "not air");
+                Output(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position))? "is air" : "not air");
                 break;  
             case "fly":
-                Game.Fly = !Game.Fly;
+                Main.Fly = !Main.Fly;
                 break;   
             case "flat":
                 Save.NewSave(GenType.SuperFlat);  
@@ -200,14 +200,14 @@ public class Console : MonoBehaviour
 
         if (_command[0] == "i")
         {
-            Game.PlayerInfo.storage.CreateAndAddItem(id, count);
+            Main.PlayerInfo.storage.CreateAndAddItem(id, count);
             Inventory.RefreshInventory(); 
         }
         else
         {
             for (int i = 0; i < count; i++)
             {
-                Entity.Spawn(id, Vector3Int.FloorToInt(Game.PlayerInfo.position));
+                Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
             } 
         }
     }
@@ -219,14 +219,14 @@ public class Console : MonoBehaviour
             !int.TryParse(_command[2], out int y) ||
             !int.TryParse(_command[3], out int z)) return;
         
-        Game.PlayerInfo.Machine.transform.position += new Vector3(x, y, z);
+        Main.PlayerInfo.Machine.transform.position += new Vector3(x, y, z);
     }
     private void Gather()
     {
         foreach (PlayerInfo info in World.Inst.target)
         {
-            info.position = Game.PlayerInfo.Machine.transform.position;
-            if (info.Machine) info.Machine.transform.position = Game.PlayerInfo.Machine.transform.position;
+            info.position = Main.PlayerInfo.Machine.transform.position;
+            if (info.Machine) info.Machine.transform.position = Main.PlayerInfo.Machine.transform.position;
         }
     } 
 
@@ -235,9 +235,9 @@ public class Console : MonoBehaviour
     {
         if (_command.Length < 2)
         {
-            Game.BuildMode = !Game.BuildMode;
-            if (!Game.BuildMode) HideLines();
-            Output("build mode: " + Game.BuildMode);
+            Main.BuildMode = !Main.BuildMode;
+            if (!Main.BuildMode) HideLines();
+            Output("build mode: " + Main.BuildMode);
         }
         else if (_command[1] == "1")
         { 
@@ -277,7 +277,7 @@ public class Console : MonoBehaviour
                 _chunk = SetPiece.LoadSetPieceFile(_command[2]);
                 Output("loaded" + _command[2]);
             };
-            SetPiece.Paste(Vector3Int.FloorToInt(Game.Player.transform.position) + new Vector3Int (1, 0, 1), _chunk);   
+            SetPiece.Paste(Vector3Int.FloorToInt(Main.Player.transform.position) + new Vector3Int (1, 0, 1), _chunk);   
             World.UnloadWorld();
             World.LoadWorld();
             Output("pasted");
@@ -289,7 +289,7 @@ public class Console : MonoBehaviour
         {
             if (_command.Length < 3)
             {
-                pos = Vector3Int.FloorToInt(Game.Player.transform.position) + offset;
+                pos = Vector3Int.FloorToInt(Main.Player.transform.position) + offset;
             }
             else if (!(!int.TryParse(_command[2], out int x) ||
                        !int.TryParse(_command[3], out int y) ||

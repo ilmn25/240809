@@ -11,7 +11,7 @@ public class DialogueState : MobState {
 
     public override void OnEnterState()
     {
-        if (Game.GUIDialogue.activeSelf)
+        if (Main.GUIDialogue.activeSelf)
         {
             Info.CancelTarget();
             return;
@@ -26,7 +26,7 @@ public class DialogueState : MobState {
     
     public override void OnUpdateState()
     {
-        if (!Dialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!Dialogue.Showing || Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
@@ -48,7 +48,7 @@ public class MessageState : MobState {
 
     public override void OnEnterState()
     {
-        if (Game.GUIDialogue.activeSelf)
+        if (Main.GUIDialogue.activeSelf)
         {
             Info.CancelTarget();
             return;
@@ -60,7 +60,7 @@ public class MessageState : MobState {
     
     public override void OnUpdateState()
     {
-        if (!Dialogue.Showing || Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
+        if (!Dialogue.Showing || Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

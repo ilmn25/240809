@@ -20,7 +20,7 @@ public class Entity
         private static readonly Entity Block = new Entity
         {
                 Bounds = Vector3Int.one,
-                Collision = Game.IndexSemiCollide,
+                Collision = Main.IndexSemiCollide,
                 PrefabName = ID.BlockPrefab,
                 Machine = typeof(BlockMachine),
                 StaticLoad = true,
@@ -29,42 +29,42 @@ public class Entity
         public static void Initialize()
         {
                 Loot loot;
-                AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Game.IndexCollide);
+                AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.Tree);
                 loot.Add(1, 4, ID.Log);
                 loot.Add(0.5f, 1, ID.Log); 
                 loot.Add(0.5f, 1, ID.Acorn); 
                 
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Game.IndexCollide);
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Slab);
                 loot.Add(1, 2, ID.Flint); 
                 loot.Add(0.5f, 1, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
                 
-                AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Game.IndexCollide);
-                AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Game.IndexCollide);
-                AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Game.IndexCollide);
-                AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Game.IndexCollide);
-                AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Game.IndexCollide);
-                AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Game.IndexCollide);
-                AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Game.IndexCollide);
-                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Game.IndexCollide);
-                AddStructure<StationMachine>(ID.Station, Vector3Int.one, Game.IndexCollide);
+                AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
+                AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
+                AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Main.IndexCollide);
+                AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Main.IndexCollide);
+                AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Main.IndexCollide);
+                AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Main.IndexCollide);
+                AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexCollide);
+                AddStructure<StationMachine>(ID.Station, Vector3Int.one, Main.IndexCollide);
                 
-                AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Game.IndexCollide);
+                AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Chest);
                 loot.Add(1, 1, ID.MetalChunks);
                 loot.Add(1, 3, ID.Brick); 
                 loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 
-                AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Game.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Game.IndexNoCollide);   
-                AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Game.IndexSemiCollide);
-                AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Game.IndexSemiCollide);
-                AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Game.IndexSemiCollide);
-                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Game.IndexCollide); 
+                AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Main.IndexNoCollide);
+                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Main.IndexNoCollide);   
+                AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide); 
                  
                 AddMob<PlayerMachine>(ID.Player);
                 
@@ -106,7 +106,7 @@ public class Entity
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {
                         Bounds = Vector3Int.zero,
-                        Collision = Game.IndexNoCollide,
+                        Collision = Main.IndexNoCollide,
                         PrefabName = ID.ItemPrefab,
                         Machine = typeof(ItemMachine),
                         StaticLoad = false,
@@ -120,7 +120,7 @@ public class Entity
                 Dictionary.Add(id, new Entity
                 {
                         Bounds = Vector3.one * 0.7f,
-                        Collision = Game.IndexSemiCollide,
+                        Collision = Main.IndexSemiCollide,
                         PrefabName = ID.MobPrefab,
                         Machine = typeof(T),
                         StaticLoad = false,

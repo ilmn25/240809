@@ -12,7 +12,7 @@ class MobChaseAction : MobState {
     }
     
     public override void OnUpdateState() {
-        if (Game.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
+        if (Main.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
         {
             Info.CancelTarget();
             return;

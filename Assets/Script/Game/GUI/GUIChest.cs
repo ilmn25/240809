@@ -18,7 +18,7 @@ public class GUIChest : GUIStorage
                 }
                 else
                 {
-                    Entity.SpawnItem(Storage.List[CurrentSlotKey], Game.PlayerInfo.position); 
+                    Entity.SpawnItem(Storage.List[CurrentSlotKey], Main.PlayerInfo.position); 
                 }
                 //doesnt account for full inventory
             }

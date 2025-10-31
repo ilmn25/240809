@@ -32,7 +32,7 @@ public class InComputerState : State
 
     public override void OnUpdateState()
     {
-        if (Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 36) { 
+        if (Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 36) { 
             Machine.SetState<DefaultState>();
         }
     }

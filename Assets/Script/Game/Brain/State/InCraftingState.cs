@@ -12,7 +12,7 @@ public class InCraftingState : State
     public override void OnUpdateState()
     {
         if (!GUIMain.Showing || GUIMain.Crafting.Storage != ((ContainerInfo)Info).Storage ||
-            Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 36) { //walk away from npc
+            Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 36) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }
@@ -39,7 +39,7 @@ public class InConverterState : State
     public override void OnUpdateState()
     {
         if (!GUIMain.Showing || GUIMain.Converter.Info != Info ||
-            Helper.SquaredDistance(Game.Player.transform.position, Machine.transform.position) > 36) { //walk away from npc
+            Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 36) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
     }

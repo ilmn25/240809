@@ -15,11 +15,11 @@ public class PortalMachine: StructureMachine, IActionSecondaryInteract
         IEnumerator Portal()
         {
             Environment.Target = EnvironmentType.Black; 
-            Game.PlayerInfo.SpeedModifier = 0.001f;
+            Main.PlayerInfo.SpeedModifier = 0.001f;
             yield return new WaitForSeconds(2);
-            Game.Player.transform.position = new Vector3Int(2, 50, 2); 
+            Main.Player.transform.position = new Vector3Int(2, 50, 2); 
             yield return new WaitForSeconds(3);
-            Game.PlayerInfo.SpeedModifier = 1;
+            Main.PlayerInfo.SpeedModifier = 1;
             Environment.Target = EnvironmentType.Null; 
         }
     }

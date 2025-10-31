@@ -66,7 +66,7 @@ public class MapCull
     {
         while (true)
         {
-            while (!Game.Player) yield return new WaitForSeconds(2);
+            while (!Main.Player) yield return new WaitForSeconds(2);
             yield return new WaitForSeconds(0.05f);
             HandleObstructionCheck();
             HandleCheck();
@@ -140,9 +140,9 @@ public class MapCull
 
     static void HandleLight(bool flag)
     {
-        Game.LightIndoor.SetActive(flag);
-        Game.LightSelf.SetActive(flag); 
-        Game.Volume.profile = flag? Resources.Load<VolumeProfile>("Shader/Preset/VolumeIndoor") : Resources.Load<VolumeProfile>("Shader/Preset/VolumeOutdoor"); 
+        Main.LightIndoor.SetActive(flag);
+        Main.LightSelf.SetActive(flag); 
+        Main.Volume.profile = flag? Resources.Load<VolumeProfile>("Shader/Preset/VolumeIndoor") : Resources.Load<VolumeProfile>("Shader/Preset/VolumeOutdoor"); 
     }
 
     static void HandleObstructionCheck()
@@ -153,7 +153,7 @@ public class MapCull
             return;
         }
         
-        _playerPosition = Game.ViewPortObject.transform.position;
+        _playerPosition = Main.ViewPortObject.transform.position;
         if (_currentCullMode == CullMode.On)
         {
             YCheck = true;
@@ -163,10 +163,10 @@ public class MapCull
         
         Vector3 cameraPosition = _playerPosition +  (Quaternion.Euler(0, ViewPort.OrbitRotation, 0) * new Vector3(0, ViewPort.Distance, -ViewPort.Distance));
         if (Physics.Raycast(new Ray(_playerPosition + Vector3.up * 0.9f,  cameraPosition - (_playerPosition + Vector3.up * 0.9f))
-                , out _, Vector3.Distance(_playerPosition + Vector3.up * 0.9f, cameraPosition), Game.MaskMap))
+                , out _, Vector3.Distance(_playerPosition + Vector3.up * 0.9f, cameraPosition), Main.MaskMap))
         {
             // head then feet check
-            if (Physics.Raycast(new Ray(_playerPosition,  cameraPosition - _playerPosition), out _, Vector3.Distance(_playerPosition, cameraPosition), Game.MaskMap))
+            if (Physics.Raycast(new Ray(_playerPosition,  cameraPosition - _playerPosition), out _, Vector3.Distance(_playerPosition, cameraPosition), Main.MaskMap))
             {
                 YCheck = true;
                 // YThreshold = _visionHeight;
@@ -174,10 +174,10 @@ public class MapCull
             }
         }
         
-        if (Physics.Raycast(new Ray(_playerPosition, ForwardDirection), out _, 50, Game.MaskMap) &&
-            Physics.Raycast(new Ray(_playerPosition, BackwardDirection), out _, 50, Game.MaskMap) &&
-            Physics.Raycast(new Ray(_playerPosition, LeftDirection), out _, 50, Game.MaskMap) &&
-            Physics.Raycast(new Ray(_playerPosition, RightDirection), out _, 50, Game.MaskMap)) {
+        if (Physics.Raycast(new Ray(_playerPosition, ForwardDirection), out _, 50, Main.MaskMap) &&
+            Physics.Raycast(new Ray(_playerPosition, BackwardDirection), out _, 50, Main.MaskMap) &&
+            Physics.Raycast(new Ray(_playerPosition, LeftDirection), out _, 50, Main.MaskMap) &&
+            Physics.Raycast(new Ray(_playerPosition, RightDirection), out _, 50, Main.MaskMap)) {
             YCheck = true;
             // YThreshold = _visionHeight;
             return;

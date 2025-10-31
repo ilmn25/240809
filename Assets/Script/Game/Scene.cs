@@ -44,17 +44,17 @@ public class Scene
         Gen.Initialize();
         NavMap.Initialize();
         Control.SetPlayer(0); 
-        Game.ViewPortObject.transform.position = Game.PlayerInfo.position;  
+        Main.ViewPortObject.transform.position = Main.PlayerInfo.position;  
         _playerChunkPositionPrevious = Vector3Int.down; 
         yield return new WaitForSeconds(2);
-        Game.SceneMode = SceneMode.Game;
+        Main.SceneMode = SceneMode.Game;
         Environment.Target = EnvironmentType.Null;
     }
     private static IEnumerator Quit()
     {     
         Environment.Target = EnvironmentType.Black;
         yield return new WaitForSeconds(2);
-        Game.SceneMode = SceneMode.Menu;
+        Main.SceneMode = SceneMode.Menu;
         if (World.Inst != null)
         {
             World.UnloadWorld();
@@ -64,7 +64,7 @@ public class Scene
     }
     public static void Update()
     { 
-        PlayerChunkPosition = World.GetChunkCoordinate(Game.ViewPortObject.transform.position);
+        PlayerChunkPosition = World.GetChunkCoordinate(Main.ViewPortObject.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
             CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition));
@@ -87,7 +87,7 @@ public class Scene
 
     public static bool InPlayerBlockRange(Vector3 position, float distance)
     {
-        Vector3 playerPos = Game.ViewPortObject.transform.position;
+        Vector3 playerPos = Main.ViewPortObject.transform.position;
 
         return position.x >= playerPos.x - distance &&
                position.x <= playerPos.x + distance &&

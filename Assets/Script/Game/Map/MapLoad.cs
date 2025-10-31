@@ -153,7 +153,7 @@ public class MapLoad
         {
             _gameObject = new("chunk");
             _gameObject.isStatic = true; 
-            _gameObject.layer = Game.IndexMap;
+            _gameObject.layer = Main.IndexMap;
             _gameObject.transform.position = _chunkCoordinate; 
 
             _gameObject.AddComponent<MeshFilter>();
@@ -240,8 +240,8 @@ public class MapLoad
             Debug.LogError($"An exception occurred in MeshMathJob: {ex.Message}");
         } 
     }
-          
-    public struct MeshMathJob : IJob
+
+    private struct MeshMathJob : IJob
     {
         // const
         [DeallocateOnJobCompletion]

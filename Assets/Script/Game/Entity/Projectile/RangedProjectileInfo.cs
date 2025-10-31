@@ -26,7 +26,7 @@ public class RangedProjectileInfo : ProjectileInfo
             int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
             for (int i = 0; i < hitCount; i++)
             {
-                if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Game.MaskMap))
+                if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Main.MaskMap))
                 {
                     Audio.PlaySFX(SfxID.HitStone);
                     if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);

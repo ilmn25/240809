@@ -21,11 +21,11 @@ public class Inventory
         {
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                Entity.SpawnItem(CurrentItem, Game.Player.transform.position); 
+                Entity.SpawnItem(CurrentItem, Main.Player.transform.position); 
             }
             else
             {
-                Entity.SpawnItem(CurrentItem, Game.Player.transform.position, amount : 1); 
+                Entity.SpawnItem(CurrentItem, Main.Player.transform.position, amount : 1); 
             } 
             RefreshInventory();
         }
@@ -77,18 +77,18 @@ public class Inventory
         }
          
 
-        if (Game.PlayerInfo.Machine && Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+        if (Main.PlayerInfo.Machine && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         {
             if (_buffer != -1)
             {
-                Game.PlayerInfo.storage.Key = _buffer;
+                Main.PlayerInfo.storage.Key = _buffer;
                 _buffer = -1;
             }
-            CurrentItem = Game.PlayerInfo.storage.List[Game.PlayerInfo.storage.Key];
+            CurrentItem = Main.PlayerInfo.storage.List[Main.PlayerInfo.storage.Key];
             if (CurrentItem is not { Stack: 0 })
             {
                 CurrentItemData = Item.GetItem(CurrentItem.ID);
-                Game.PlayerInfo.SetEquipment(CurrentItem);
+                Main.PlayerInfo.SetEquipment(CurrentItem);
                 
                 if (CurrentItemData.ID == ID.Blueprint || CurrentItem.Info.Type == ItemType.Block) 
                     Terraform.BlockUpdate(CurrentItem.ID);
@@ -98,7 +98,7 @@ public class Inventory
         {
             CurrentItemData = null;     
             Terraform.BlockUpdate();
-            Game.PlayerInfo.SetEquipment(null);
+            Main.PlayerInfo.SetEquipment(null);
         }
     }
 

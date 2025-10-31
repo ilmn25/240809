@@ -71,10 +71,10 @@ public class Control
 
     public static void SetPlayer(int i)
     {
-        Game.PlayerInfo = World.Inst.target[i];
-        Game.PlayerInfo.PathingStatus = PathingStatus.Stuck;
-        Game.Player = null;
-        GUIMain.StorageInv.Storage = Game.PlayerInfo.storage;
+        Main.PlayerInfo = World.Inst.target[i];
+        Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
+        Main.Player = null;
+        GUIMain.StorageInv.Storage = Main.PlayerInfo.storage;
         GUIBar.Update();
         CurrentPlayerIndex = i;
     }
@@ -112,15 +112,15 @@ public class Control
         { 
             IActionPrimaryResource target = GetNearestInteractable<IActionPrimaryResource>();
             if (target == null) return;
-            Game.PlayerInfo.Target = ((EntityMachine)target).Info;  
-            Game.PlayerInfo.ActionType = IActionType.Hit;
+            Main.PlayerInfo.Target = ((EntityMachine)target).Info;  
+            Main.PlayerInfo.ActionType = IActionType.Hit;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !Dialogue.Showing)
         { 
             IActionSecondary target = GetNearestInteractable<IActionSecondaryPickUp>();
             if (target == null) return;
-            Game.PlayerInfo.Target = ((EntityMachine)target).Info;   
-            Game.PlayerInfo.ActionType = IActionType.PickUp;
+            Main.PlayerInfo.Target = ((EntityMachine)target).Info;   
+            Main.PlayerInfo.ActionType = IActionType.PickUp;
         }
         // else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         // { 
@@ -137,15 +137,15 @@ public class Control
 
     private static T GetNearestInteractable<T>() where T : class, IAction
     {
-        Collider[] hitColliders = Physics.OverlapBox(Game.Player.transform.position, Vector3.one * InteractRange, Quaternion.identity, Game.MaskEntity);
+        Collider[] hitColliders = Physics.OverlapBox(Main.Player.transform.position, Vector3.one * InteractRange, Quaternion.identity, Main.MaskEntity);
         float distance, nearestDistance = InteractRange * InteractRange;
         T target, nearTarget = null;
         foreach (Collider collider in hitColliders)
         {
-            if (collider.gameObject == Game.Player) continue;
+            if (collider.gameObject == Main.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
-            distance = Helper.SquaredDistance(collider.transform.position, Game.Player.transform.position);
+            distance = Helper.SquaredDistance(collider.transform.position, Main.Player.transform.position);
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;
@@ -173,13 +173,13 @@ public class Control
     
     private static void HandleInput()
     {
-        if (MouseLayer != -1 && MouseLayer != Game.MaskMap)
+        if (MouseLayer != -1 && MouseLayer != Main.MaskMap)
         {
             MouseTarget = _mouseRaycastInfo.collider.transform;
         }
         else MouseTarget = null;
         
-        if (MouseTarget && Vector3.Distance(MousePosition, Game.ViewPortObject.transform.position) < InteractRange)
+        if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
         {
             // if (Inst.ActionPrimary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IHitBox>()) != null)
             // {
@@ -187,23 +187,23 @@ public class Control
             //     Info.ActionTarget = IActionTarget.Hit;
             // }
     
-            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Game.Player && Game.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
                 {
-                    Game.PlayerInfo.Target = ((EntityMachine)action).Info;
+                    Main.PlayerInfo.Target = ((EntityMachine)action).Info;
                     if (action is IActionSecondaryPickUp)
-                        Game.PlayerInfo.ActionType = IActionType.PickUp;
+                        Main.PlayerInfo.ActionType = IActionType.PickUp;
                     else
-                        Game.PlayerInfo.ActionType = IActionType.Interact;
+                        Main.PlayerInfo.ActionType = IActionType.Interact;
                 } 
             }
         } 
     }
     private static void HandleRaycast()
     { 
-        Ray ray = Game.Camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Main.Camera.ScreenPointToRay(Input.mousePosition);
         
         if (MapCull.YCheck)
         {
@@ -213,7 +213,7 @@ public class Control
             
             if (!NavMap.Get(Vector3Int.FloorToInt(thresholdPoint) + Vector3Int.down))
             { 
-                MouseLayer = Game.MaskMap;
+                MouseLayer = Main.MaskMap;
                 MousePosition = Vector3Int.FloorToInt(thresholdPoint); ;
                 MouseDirection = Vector3.down;
                 return;
