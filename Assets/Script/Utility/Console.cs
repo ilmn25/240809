@@ -277,7 +277,7 @@ public class Console : MonoBehaviour
 
         if (_command[0] == "i")
         {
-            Main.PlayerInfo.storage.CreateAndAddItem(id, count);
+            Main.PlayerInfo.Storage.CreateAndAddItem(id, count);
             Inventory.RefreshInventory(); 
         }
         else
