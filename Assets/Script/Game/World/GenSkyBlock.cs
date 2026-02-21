@@ -14,7 +14,7 @@ public class GenSkyBlock : Gen
         {
             Vector3Int spawnPoint = currentCoordinate + new Vector3Int(3, 4, 3);
             PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player,spawnPoint);
-            player.spawnPoint = spawnPoint;
+            player.SpawnPoint = spawnPoint;
             World.Inst[spawnPoint].DynamicEntity.Add(player); 
             World.Inst.target.Add(player);
             

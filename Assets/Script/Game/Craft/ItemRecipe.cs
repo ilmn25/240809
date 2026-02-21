@@ -31,7 +31,7 @@ public partial class ItemRecipe
     {
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            if (Main.PlayerInfo.storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
+            if (Main.PlayerInfo.Storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
         } 
         return true;
     }
@@ -50,7 +50,7 @@ public partial class ItemRecipe
         
         if (craftedItem.Stack > 0)
         { 
-            Main.PlayerInfo.storage.AddItem(craftedItem, Main.PlayerInfo.storage.Key);
+            Main.PlayerInfo.Storage.AddItem(craftedItem, Main.PlayerInfo.Storage.Key);
             Inventory.RefreshInventory();
         }  
     }
@@ -60,7 +60,7 @@ public partial class ItemRecipe
         Audio.PlaySFX(SfxID.Item);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            Main.PlayerInfo.storage.RemoveItem(ingredient.Key, ingredient.Value);
+            Main.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
         }
     }
 }

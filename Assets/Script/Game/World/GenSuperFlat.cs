@@ -15,7 +15,7 @@ public class GenSuperFlat : Gen
         if (currentCoordinate == SpawnPoint)
         {
             PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player,SpawnPoint);
-            player.spawnPoint = SpawnPoint;
+            player.SpawnPoint = SpawnPoint;
             World.Inst[SpawnPoint].DynamicEntity.Add(player); 
             World.Inst.target.Add(player);
         } 

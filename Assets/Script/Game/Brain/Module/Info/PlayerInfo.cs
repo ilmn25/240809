@@ -1,37 +1,52 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Playables;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public enum PlayerStatus {
-    Active, 
-    Dead,
-    Loading,
+        Active,
+    Respawn
 }
 [System.Serializable]
 public class PlayerInfo : MobInfo
 { 
-    public Storage storage;
-    public float mana;
-    public float sanity;
-    public int hunger;
-    public int hungerMax = 20;
-    public float stamina; 
-    public Vector3 spawnPoint;
-    
+    public Storage Storage;
+    public float Mana;
+    public float Sanity;
+    public int Hunger;
+    public int HungerMax = 20;
+    public float Stamina; 
+    public Vector3 SpawnPoint;
+
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
-    [NonSerialized] public float AirTime;
-    [NonSerialized] private float _jumpGraceTimer;
-    [NonSerialized] private float _coyoteTimer;
-    [NonSerialized] public PlayerStatus PlayerStatus = PlayerStatus.Loading;
+    public float AirTime;
+    private float _jumpGraceTimer;
+    private float _coyoteTimer;
+    public PlayerStatus PlayerStatus = PlayerStatus.Respawn;
 
     public override void Initialize()
     { 
         base.Initialize(); 
         IframesCurrent = 150;
-        storage.info = this;
+        Storage.info = this;  
+
+        IEnumerator HungerClock()
+        {
+            while (!Destroyed)
+            {
+                yield return new WaitForSeconds(120);
+                if (Hunger <= 0)  
+                {
+                    Health--;
+                    Audio.PlaySFX(SfxID.HitPlayer);
+                }
+                else Hunger--; 
+                GUIBar.Update();  
+            } 
+        }
         _ = new CoroutineTask(HungerClock());
     }
 
@@ -39,85 +54,62 @@ public class PlayerInfo : MobInfo
     {
         GUIBar.Update(); 
         Machine.SetState<MobHit>();
-    }
+    } 
 
-    private IEnumerator HungerClock()
-    {
-        while (!Destroyed)
-        {
-            yield return new WaitForSeconds(120);
-            if (hunger <= 0)  
-            {
-                Health--;
-                Audio.PlaySFX(SfxID.HitPlayer);
-            }
-            else hunger--; 
-            GUIBar.Update();  
-        } 
-    }
-    
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        if (PlayerStatus == PlayerStatus.Active)
+        if (PlayerStatus == PlayerStatus.Respawn)
         {
-            if (Health <= 0)
-            {
-                Audio.PlaySFX(SfxID.DeathPlayer);
-                SpriteTool.gameObject.SetActive(false);
-                CancelTarget();
-                PlayerStatus = PlayerStatus.Dead;
-                GUIMain.Show(false);
-                Velocity = Vector2.zero; 
-                IframesCurrent = 500;
-                Machine.SetState<DeadState>();
-            }
+            if (IframesCurrent != 1) return;
 
-            FaceTarget = Equipment != null || Target != null;
-
-            if (Main.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
-            {
-                TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
-                
-                AimPosition = Control.MouseTarget ?
-                    Control.MouseTarget.transform.position + Vector3.up * 0.55f :
-                    Control.MousePosition + Vector3.up * 0.15f; 
-                
-                if (!IsInRenderRange) return;
-                SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
-                HandleMovement();
-            }
-            else
-            {
-                if (Target != null) AimPosition = Target.position; 
-                
-                SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2; 
-            } 
-            SpeedTarget *= SpeedModifier;
-        }
-        else
-        { 
-            if (IframesCurrent != 1) return; 
-            if (PlayerStatus == PlayerStatus.Dead)
-            {
-                Machine.transform.position =  spawnPoint;
-                SpriteTool.gameObject.SetActive(true);   
-            } 
+            Hunger = HungerMax;
             Health = HealthMax;
-            hunger = hungerMax;
             Velocity = Vector2.zero;
             PlayerStatus = PlayerStatus.Active;
             GUIBar.Update();
             Inventory.RefreshInventory();
             Machine.SetState<DefaultState>();
+        }
+        else if (Health <= 0 && PlayerStatus == PlayerStatus.Active)
+        {
+            Audio.PlaySFX(SfxID.DeathPlayer);
+            SpriteTool.gameObject.SetActive(false);
+            CancelTarget(); 
+            GUIMain.Show(false);
+            Velocity = Vector2.zero;
+            Machine.SetState<DeadState>();
         } 
+
+        FaceTarget = Equipment != null || Target != null;
+
+        if (Main.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+        {
+            TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
+
+            AimPosition = Control.MouseTarget ?
+                Control.MouseTarget.transform.position + Vector3.up * 0.55f :
+                Control.MousePosition + Vector3.up * 0.15f;
+
+            if (!IsInRenderRange) return;
+            SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
+            HandleMovement();
+        }
+        else
+        {
+            if (Target != null) AimPosition = Target.position;
+
+            SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
+        }
+        SpeedTarget *= SpeedModifier;
+ 
         
         //fall damage
         if (!IsGrounded && Velocity.y < -10) AirTime += 1;
         else {
             if (AirTime > 75)
             {
-                Health += (int)(Velocity.y * 3/ Gravity);
+                Health += (int)(Velocity.y * 3 / Gravity);
                 GUIBar.Update();
                 Audio.PlaySFX(SfxID.HitPlayer);
             }
@@ -186,4 +178,11 @@ public class PlayerInfo : MobInfo
     {
         return 1 * Inventory.CurrentItemData.Speed;
     } 
+
+    public void Respawn()
+    {
+        if (PlayerStatus == PlayerStatus.Respawn) return;
+        PlayerStatus = PlayerStatus.Respawn;
+        IframesCurrent = 150;
+    }
 }
