@@ -12,15 +12,15 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {  
             HitboxType = HitboxType.Friendly,
             targetHitboxType = HitboxType.Passive,
-            storage = new Storage(9)
+            Storage = new Storage(9)
             {
                 Name = "Inventory"
             },
             HealthMax = 12,
             Defense = 0,
-            mana = 100,
-            sanity = 100,
-            stamina = 100,
+            Mana = 100,
+            Sanity = 100,
+            Stamina = 100,
             SpeedLogic = 5,
             SpeedGround = 5,
             SpeedAir = 6,
@@ -52,7 +52,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new EquipSelectState());   
         AddState(new InContainerState()
         {
-            Storage = Info.storage
+            Storage = Info.Storage
         });
     }
 
@@ -121,7 +121,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             {  
                 foreach (StructureInfo structureInfo in PlayerTask.Pending)
                 { 
-                    if (Info.storage.SetTool(structureInfo.operationType))
+                    if (Info.Storage.SetTool(structureInfo.operationType))
                     {
                         Info.Target = structureInfo;
                         Info.ActionType = IActionType.Hit; 
@@ -145,8 +145,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (Info.Equipment.Info.ProjectileInfo != null)
         {
             if (Info.Equipment.Info.ProjectileInfo.Ammo != ID.Null && 
-                Info.storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
-            Info.storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
+                Info.Storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
+            Info.Storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
         }
 
         base.Attack();

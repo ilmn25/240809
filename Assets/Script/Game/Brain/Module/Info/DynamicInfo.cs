@@ -58,7 +58,6 @@ public class DynamicInfo : Info
             position = Machine.transform.position;
             IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
         }
-        
 
         if (KnockbackCounter != KnockbackInterval)
         {

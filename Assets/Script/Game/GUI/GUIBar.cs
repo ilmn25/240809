@@ -79,15 +79,15 @@ public class GUIHungerBar : GUIBar
                 for (int i = 0; i < Bar.Count; i += 1)
                 {
                         int target = i * 2 + 2; 
-                        if (target > Main.PlayerInfo.hungerMax)
+                        if (target > Main.PlayerInfo.HungerMax)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/Null");
                         }
-                        else if (target <= Main.PlayerInfo.hunger)
+                        else if (target <= Main.PlayerInfo.Hunger)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerFull");
                         }
-                        else if (target - 1 <= Main.PlayerInfo.hunger)
+                        else if (target - 1 <= Main.PlayerInfo.Hunger)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerHalf");
                         }

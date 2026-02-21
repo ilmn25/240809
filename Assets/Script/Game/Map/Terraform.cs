@@ -60,7 +60,7 @@ public static class Terraform
                 Main.PlayerInfo.Machine.SetState<MobAttackSwing>();
                 Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
                 SpawnBlock();
-                if (Target != ID.Blueprint) Main.PlayerInfo.storage.RemoveItem(Target);
+                if (Target != ID.Blueprint) Main.PlayerInfo.Storage.RemoveItem(Target);
             }
         }
         _blockObj.transform.position = Vector3.Lerp(_blockObj.transform.position, _coordinate + 
@@ -75,7 +75,7 @@ public static class Terraform
                 World.SetBlock(_coordinate);
             else
             {
-                Main.PlayerInfo.storage.CreateAndAddItem(Target);
+                Main.PlayerInfo.Storage.CreateAndAddItem(Target);
                 World.SetBlock(_coordinate, Block.ConvertID(Target)); 
             }
             return;

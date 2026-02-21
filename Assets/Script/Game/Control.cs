@@ -74,7 +74,7 @@ public class Control
         Main.PlayerInfo = World.Inst.target[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Main.Player = null;
-        GUIMain.StorageInv.Storage = Main.PlayerInfo.storage;
+        GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
         GUIBar.Update();
         CurrentPlayerIndex = i;
     }

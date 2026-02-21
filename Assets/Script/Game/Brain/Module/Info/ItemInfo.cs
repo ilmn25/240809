@@ -37,7 +37,7 @@ public class ItemInfo : Info
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
             Audio.PlaySFX(SfxID.Item);
-            ((PlayerInfo)info).storage.AddItem(item);
+            ((PlayerInfo)info).Storage.AddItem(item);
             Inventory.RefreshInventory();
             Destroy();
         }
