@@ -101,11 +101,11 @@ public class GroundAnimationModule : MobModule
                 if (Info == Main.PlayerInfo)
                 {
                     Audio.PlaySFX((SfxID)Random.Range((int)SfxID.Footsteps1, (int)SfxID.Footsteps2 + 1));
-                    SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, true);
+                    Particle.Create(Machine.transform.position, Particles.Dust, true);
                 }
                 else
                 {
-                    SmokeParticleHandler.CreateSmokeParticle(Machine.transform.position, false);
+                    Particle.Create(Machine.transform.position, Particles.Dust, false);
                 }
             }
         }
