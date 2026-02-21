@@ -31,6 +31,11 @@ public class ConverterInfo : ContainerInfo
         } 
     }
 
+    public bool IsConverting()
+    {
+        return Pending.Count > 0;
+    }
+
     public bool isFull()
     {
         return Pending.Count == Max;
