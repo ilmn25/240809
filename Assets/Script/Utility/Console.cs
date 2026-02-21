@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class Console : MonoBehaviour
 {
@@ -7,10 +8,14 @@ public class Console : MonoBehaviour
     public static GUIStyle GUIStyle; 
     public static bool IsTyping = false;
     private string _input = "";
+    private int _cursorPos = 0;
     private string _output = "";
     private bool _showInfo = false;
     private int _outputTimer = 0;
     private string[] _command;  
+
+    private readonly List<string> _history = new ();
+    private int _historyIndex = -1;
     
     private float _fps = 0.0f;
     private int _frameCount = 0;
@@ -33,10 +38,9 @@ public class Console : MonoBehaviour
         GUIStyle.fontSize = 24;
         GUIStyle.font = Resources.Load<Font>("Font/OrangeKid/OrangeKid");
         GUIStyle.normal.textColor = Color.white;
-        
         for (int i = 0; i < _lines.Length; i++)
         {
-            GameObject edgeObj = new GameObject("WireEdge_" + i);
+            GameObject edgeObj = new GameObject("WireEdge" + i);
             LineRenderer lr = edgeObj.AddComponent<LineRenderer>();
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.startColor = Helper.GetColor(101, 103, 155);
@@ -66,8 +70,11 @@ public class Console : MonoBehaviour
             {
                 if (c == '\b')
                 {
-                    if (_input.Length > 0)
-                        _input = _input.Substring(0, _input.Length - 1);
+                    if (_cursorPos > 0)
+                    {
+                        _input = _input.Remove(_cursorPos - 1, 1);
+                        _cursorPos--;
+                    }
                 }
                 else if (c == '\n' || c == '\r')
                 {
@@ -76,23 +83,80 @@ public class Console : MonoBehaviour
                 }
                 else
                 {
-                    _input += c;
+                    _input = _input.Insert(_cursorPos, c.ToString());
+                    _cursorPos++;
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                _cursorPos = Mathf.Max(0, _cursorPos - 1);
+            }
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                _cursorPos = Mathf.Min(_input.Length, _cursorPos + 1);
+            }
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                if (_cursorPos < _input.Length)
+                    _input = _input.Remove(_cursorPos, 1);
+            }
+
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                if (_history.Count > 0)
+                {
+                    if (_historyIndex == -1)
+                        _historyIndex = _history.Count;
+                    if (_historyIndex > 0)
+                        _historyIndex--;
+                    _input = _history[_historyIndex];
+                    _cursorPos = _input.Length;
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                if (_history.Count > 0 && _historyIndex != -1)
+                {
+                    _historyIndex++;
+                    if (_historyIndex >= _history.Count)
+                    {
+                        _historyIndex = -1;
+                        _input = string.Empty;
+                    }
+                    else
+                    {
+                        _input = _history[_historyIndex];
+                    }
+                    _cursorPos = _input.Length;
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                IsTyping = false;
+                _input = string.Empty;
+                _cursorPos = 0;
+                _historyIndex = -1;
             }
         }
         if (Input.GetKeyDown(KeyCode.Slash))
         {
             IsTyping = true;
             _input = "";
+            _cursorPos = 0;
         }
-         
+
+        if (Input.GetKeyDown(KeyCode.F1)) _showInfo = !_showInfo;
     }
 
     void OnGUI()
     {
         if (IsTyping)
         {
-            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), _input + "\n"+ _output, GUIStyle);
+            // show cursor in the input string
+            string displayInput = _input.Insert(_cursorPos, "|");
+            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), displayInput + "\n"+ _output, GUIStyle);
         }
         else if (_outputTimer != 0)
         {
@@ -103,7 +167,7 @@ public class Console : MonoBehaviour
         if (_showInfo)
         {
             UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-                "FPS: " + Mathf.Ceil(_fps) + "\n" + Main.PlayerInfo.position, GUIStyle);
+                "FPS: " + Mathf.Ceil(_fps) + "\nPosition: " + Main.PlayerInfo.position + "\nDay "+ SaveData.Inst.day + ", " + ((float)SaveData.Inst.time * 24f / Environment.Length).ToString("F2"), GUIStyle);
         }
         
         if (!Main.BuildMode || !Main.Player) return;
@@ -134,6 +198,13 @@ public class Console : MonoBehaviour
  
     private void ProcessInput()
     {
+        // add to history
+        if (!string.IsNullOrWhiteSpace(_input))
+        {
+            _history.Add(_input);
+            _historyIndex = -1;
+        }
+
         _command = _input.Split(' '); 
         Audio.PlaySFX(SfxID.Notification);
         switch (_command[0])
@@ -149,8 +220,13 @@ public class Console : MonoBehaviour
                 Gather();
                 break; 
             case "time":
-                if (_command.Length > 1) Environment.MoveTime(int.Parse(_command[1]));
-                Output(SaveData.Inst.day + " : " + SaveData.Inst.time);
+                if (_command.Length > 1 && int.TryParse(_command[1], out int hours))
+                {
+                    // convert hours into environment ticks (length/24 per hour)
+                    int ticks = Mathf.RoundToInt(hours * (Environment.Length / 24f));
+                    Environment.MoveTime(ticks);
+                }
+                Output("Day " + SaveData.Inst.day + ", " + ((float)SaveData.Inst.time * 24f / Environment.Length).ToString("F2"));
                 break; 
             case "set":
                 SetPieceCommands();
@@ -171,9 +247,6 @@ public class Console : MonoBehaviour
             case "shake": 
                 ViewPort.StartScreenShake(int.Parse(_command[1]), float.Parse(_command[2]));
                 break;   
-            case "info":
-                _showInfo = true;
-                break; 
             case "save": 
                 Output("unloaded");  
                 Save.CloneSave(); 
@@ -182,6 +255,10 @@ public class Console : MonoBehaviour
                 Output("Invalid command");
                 break;  
         } 
+
+        // reset input and cursor so next invocation starts fresh
+        _input = string.Empty;
+        _cursorPos = 0;
     }
   
     private void Output(string output)
