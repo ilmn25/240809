@@ -138,6 +138,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4170294413973456733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4170294413973456733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4170294413973456733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4170294413973456733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 4351419227311449733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
@@ -145,6 +161,30 @@ PrefabInstance:
     - target: {fileID: 4351419227311449733, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360117284312545226, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360117284312545226, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360117284312545226, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360117284312545226, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4606706174033834737, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 540
+      objectReference: {fileID: 0}
+    - target: {fileID: 4606706174033834737, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 4723000457588052497, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
