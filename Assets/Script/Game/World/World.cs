@@ -27,7 +27,7 @@ public class World
     public World(GenType genType)
     {
         GenType = genType; 
-        Size = Gen.Dictionary[genType].DefaultSize;
+        Size = Gen.Dictionary[genType].Size;
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
         _chunks = new Chunk[Size.x * Size.y * Size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
