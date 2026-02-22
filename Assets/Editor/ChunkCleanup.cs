@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-// simple editor helper that purges any leftover "Chunk" objects when the editor
+// simple editor helper that purges any leftover "chunk" objects when the editor
 // loads or exits play mode so they don't stick around in the scene permanently.
 [InitializeOnLoad]
 public static class ChunkCleanup
@@ -29,7 +29,7 @@ public static class ChunkCleanup
         GameObject[] all = Object.FindObjectsOfType<GameObject>();
         foreach (var go in all)
         {
-            if (go.name == "Chunk")
+            if (go.name == "chunk")
                 Object.DestroyImmediate(go);
         }
     }

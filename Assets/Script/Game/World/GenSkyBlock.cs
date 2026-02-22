@@ -3,9 +3,13 @@ using UnityEngine;
 public class GenSkyBlock : Gen
 {
     private static readonly Chunk SkyBlock = SetPiece.LoadSetPieceFile("SkyBlock");
+
+
     public GenSkyBlock ()
     {
-        DefaultSize = Vector3Int.one;
+        Size = Vector3Int.one;
+        WorldHeight = (Size.y - 3) * World.ChunkSize;
+        SpawnPoint = Vector3Int.zero;
     }
 
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)

@@ -2,16 +2,21 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
+    private static readonly Chunk Spawn = SetPiece.LoadSetPieceFile("Spawn");
+
+
     public GenAbyss ()
     {
-        DefaultSize = new Vector3Int(60, 30, 60);
+        Size = new Vector3Int(60, 30, 60);
+        WorldHeight = (Size.y - 3) * World.ChunkSize;
+        SpawnPoint = new Vector3Int(Size.x / 2, Size.y - 2, Size.z / 2) * World.ChunkSize;
     }
 
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     { 
         if (currentCoordinate == SpawnPoint)
         {
-            PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player,SpawnPoint);
+            PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
             player.SpawnPoint = SpawnPoint;
             World.Inst[SpawnPoint].DynamicEntity.Add(player); 
             World.Inst.target.Add(player);
@@ -21,6 +26,8 @@ public class GenAbyss : Gen
             player.CharSprite = ID.Sheep;
             World.Inst[SpawnPoint].DynamicEntity.Add(player); 
             World.Inst.target.Add(player);
+
+            SetPiece.Paste(currentCoordinate, Spawn);
         } 
         
         GenTaskStone.Run(currentCoordinate, currentChunk);
@@ -29,7 +36,7 @@ public class GenAbyss : Gen
         GenTaskDirt.Run(currentCoordinate, currentChunk);
         GenTaskSand.Run(currentCoordinate, currentChunk);
         GenTaskMaze.Run(currentCoordinate, currentChunk);
-        GenTaskCrater.Run(currentCoordinate, currentChunk);
+        // GenTaskCrater.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);
         GenTaskHouse.Run(currentCoordinate, currentChunk);
         GenTaskThrone.Run(currentCoordinate, currentChunk);

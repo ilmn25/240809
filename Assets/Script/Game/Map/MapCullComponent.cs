@@ -46,7 +46,7 @@ public class MapCullComponent : MonoBehaviour
     }  
     void CreateShadowMesh()
     {  
-        GameObject shadowObject = new GameObject("Shadow"); 
+        GameObject shadowObject = new GameObject("Shadow");
         shadowObject.transform.parent = transform;
         shadowObject.transform.position = transform.position;
 

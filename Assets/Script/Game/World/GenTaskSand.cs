@@ -22,7 +22,7 @@ public class GenTaskSand : Gen
                 if (GenHelpBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Desert) continue; 
                 _z = (currentCoordinate.z + z) * Scale + Offset;
                 _value = Mathf.PerlinNoise(_x, _z);
-                _height = Mathf.FloorToInt(_value * VerticalScale + WorldHeight);
+                _height = Mathf.FloorToInt(_value * VerticalScale + _target.WorldHeight);
                 
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
