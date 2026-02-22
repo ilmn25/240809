@@ -40,6 +40,7 @@ public class GenAbyss : Gen
         GenTaskCaves.Run(currentCoordinate, currentChunk);
         GenTaskHouse.Run(currentCoordinate, currentChunk);
         GenTaskThrone.Run(currentCoordinate, currentChunk);
+        GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskEntity.Run(currentCoordinate, currentChunk);
     }
     
