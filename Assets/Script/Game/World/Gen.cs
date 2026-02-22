@@ -13,14 +13,13 @@ public enum GenType
 }
 public class Gen
 {
-    public Vector3Int DefaultSize;
+    public Vector3Int Size { get; protected set; }
+    public Vector3Int SpawnPoint { get; protected set; } 
+    public int WorldHeight { get; protected set; }
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
     
     protected static readonly System.Random Random = new (World.Seed);
-    protected static Vector3Int SpawnPoint;
-    private static Vector3Int _size; 
-    protected static int WorldHeight;
-    private static Gen _target;
+    protected static Gen _target;
 
     public static readonly Dictionary<GenType, Gen> Dictionary = new ()
     {
@@ -44,15 +43,14 @@ public class Gen
         void SetVariables()
         {
             _target = Dictionary[SaveData.Inst.current];
-            _size = World.Inst.Size;
-            WorldHeight = (_size.y - 3) * World.ChunkSize;
-            SpawnPoint = (_size - Vector3Int.one) * World.ChunkSize;  
+            
         }
     }
     public static float GetOffset()
     {
-        return (float)Random.NextDouble() * 1000;
-    } 
+        return (float)Random.NextDouble() * 1000f;
+    }
+
 
     public static void GenerateWorld()
     {  
@@ -64,9 +62,9 @@ public class Gen
                 for (int z = -Scene.GenRange; z <= Scene.GenRange; z++)
                 {
                     position = new Vector3Int(
-                        SpawnPoint.x + x * World.ChunkSize,
-                        SpawnPoint.y + y * World.ChunkSize,
-                        SpawnPoint.z + z * World.ChunkSize);
+                        _target.SpawnPoint.x + x * World.ChunkSize,
+                        _target.SpawnPoint.y + y * World.ChunkSize,
+                        _target.SpawnPoint.z + z * World.ChunkSize);
 
                     if (World.Inst[position] == null)
                     {

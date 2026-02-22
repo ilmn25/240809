@@ -331,16 +331,12 @@ public class Console : MonoBehaviour
             World.UnloadWorld();
             _chunk = SetPiece.Copy();   
             World.LoadWorld();
-            Output("copied");
-            
-            if (_command.Length < 2) return;
-            SetPiece.SaveSetPieceFile(_chunk, _command[2]);
-            Output("saved as" + _command[2]);
+            Output("copied"); 
         } 
         else if (_command[1] == "save")
         {
             SetPiece.SaveSetPieceFile(_chunk, _command[2]);
-            Output("saved as" + _command[2]);
+            Output("saved as " + _command[2]);
         }
         else if (_command[1] == "load")
         { 
