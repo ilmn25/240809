@@ -18,7 +18,7 @@ public class WorkbenchMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        Storage storage = new Storage(9); 
+        Storage storage = new NoRefreshStorage(9);
         storage.CreateAndAddItem(ID.Spear);
         storage.CreateAndAddItem(ID.StonePickaxe); 
         storage.CreateAndAddItem(ID.Hammer); 

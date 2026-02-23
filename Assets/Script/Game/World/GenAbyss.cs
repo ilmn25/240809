@@ -11,8 +11,6 @@ public class GenAbyss : Gen
 
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     { 
-        // spawnpoint handling is delegated to a generation task that places the setpiece
-        // on the ground and creates players when the chunk containing the spawn is generated.
         GenTaskSpawn.Run(currentCoordinate, currentChunk);
         
         GenTaskStone.Run(currentCoordinate, currentChunk);

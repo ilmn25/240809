@@ -1,18 +1,26 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 [System.Serializable]
 public class Storage
 {
         public static readonly Dictionary<int, List<ItemSlot>> Dictionary = new Dictionary<int, List<ItemSlot>>();
-        
+
         public List<ItemSlot> List;
         public int ID;
         public int Key;
         public Info info;
+
         public string Name;
 
-        public Storage(){}
+        // when true, AddItem/RemoveItem won't trigger Inventory.RefreshInventory
+        [NonSerialized] public bool SuppressRefresh;
+
+        public Storage()
+        {
+        }
+
         public Storage(int size)
         {
                 List = new List<ItemSlot>(size);
@@ -23,9 +31,9 @@ public class Storage
         }
 
         public bool SetTool(OperationType operation)
-        { 
+        {
                 int targetKey = -1;
-                int targetBreaking =  0;
+                int targetBreaking = 0;
                 for (int i = 0; i < List.Count; i++)
                 {
                         Item item = Item.GetItem(List[i].ID);
@@ -37,11 +45,13 @@ public class Storage
                                 targetKey = i;
                         }
                 }
+
                 if (targetKey == -1) return false;
                 Key = targetKey;
                 ((MobInfo)info).SetEquipment(List[Key]);
                 return true;
         }
+
         public void Explode(Vector3 position)
         {
                 foreach (ItemSlot itemSlot in List)
@@ -49,10 +59,11 @@ public class Storage
                         if (itemSlot.isEmpty()) continue;
                         Entity.SpawnItem(itemSlot, Vector3Int.FloorToInt(position));
                 }
+
                 Dictionary.Remove(ID);
         }
-        
-        public void RemoveItem(ID stringID, int quantity = 1, int priority = 0)
+
+        public virtual void RemoveItem(ID stringID, int quantity = 1, int priority = 0)
         {
                 // Prioritize current slot
                 if (List[priority].ID == stringID)
@@ -62,8 +73,8 @@ public class Storage
                         quantity -= removableAmount;
                         if (List[priority].Stack <= 0) List[priority].clear();
                         if (quantity <= 0)
-                        { 
-                                // RefreshInventory();
+                        {
+                                if (!SuppressRefresh) Inventory.RefreshInventory();
                                 return;
                         }
                 }
@@ -80,27 +91,33 @@ public class Storage
                                 {
                                         slot.clear();
                                 }
+
                                 if (quantity <= 0)
                                 {
-                                        // RefreshInventory();
+                                        if (!SuppressRefresh) Inventory.RefreshInventory();
                                         return;
                                 }
                         }
-                } 
-                // RefreshInventory();
+                }
+
+                if (!SuppressRefresh) Inventory.RefreshInventory();
         }
 
         public void CreateAndAddItem(ID stringID, int count = 1)
         {
-               AddItem(new ItemSlot(stringID, count));
+                AddItem(new ItemSlot(stringID, count));
         }
 
-        public void AddItem(ItemSlot newItemSlot, int priority = 0)
-        {    
+        public virtual void AddItem(ItemSlot newItemSlot, int priority = 0)
+        {
                 if (List[priority].isSame(newItemSlot))
-                { 
+                {
                         List[priority].Add(newItemSlot);
-                        if (newItemSlot.isEmpty()) return;
+                        if (newItemSlot.isEmpty())
+                        {
+                                if (!SuppressRefresh) Inventory.RefreshInventory();
+                                return;
+                        }
                 }
 
                 foreach (var slot in List)
@@ -108,34 +125,40 @@ public class Storage
                         if (slot.isSame(newItemSlot))
                         {
                                 slot.Add(newItemSlot);
-                                if (newItemSlot.isEmpty()) return;
+                                if (newItemSlot.isEmpty())
+                                {
+                                        if (!SuppressRefresh) Inventory.RefreshInventory();
+                                        return;
+                                }
                         }
                 }
 
                 while (!newItemSlot.isEmpty())
-                { 
+                {
                         int slotID = GetEmptySlot();
                         if (slotID == -1)
                         {
                                 Entity.SpawnItem(newItemSlot, info.position);
                                 break;
-                        } 
+                        }
+
                         List[slotID].Add(newItemSlot);
                 }
 
-                // RefreshInventory();
+                if (!SuppressRefresh) Inventory.RefreshInventory();
         }
-        
+
         public int GetAmount(ID stringID)
         {
                 int count = 0;
                 foreach (var slot in List)
                 {
                         if (slot.ID == stringID)
-                        { 
+                        {
                                 count += slot.Stack;
                         }
                 }
+
                 return count;
         }
 
@@ -148,7 +171,13 @@ public class Storage
                         if (slotID == List.Count)
                                 return -1;
                 }
+
                 return slotID;
         }
+}
 
+// subclass that never refreshes the inventory
+public class NoRefreshStorage : Storage
+{
+    public NoRefreshStorage(int size) : base(size) { SuppressRefresh = true; }
 }
