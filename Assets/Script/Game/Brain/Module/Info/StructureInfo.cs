@@ -54,7 +54,9 @@ public class StructureInfo : Info
         }
         else
         {
-            Audio.PlaySFX(SfxHit); 
+            Audio.PlaySFX(SfxHit);
+            // spawn a hit particle effect at structure location
+            Particle.Create(position, Particles.Flakes, false);
             OnHit(info); 
         } 
     }

@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    private static readonly Chunk Spawn = SetPiece.LoadSetPieceFile("Spawn");
-
-
     public GenAbyss ()
     {
         Size = new Vector3Int(60, 30, 60);
@@ -14,21 +11,9 @@ public class GenAbyss : Gen
 
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     { 
-        if (currentCoordinate == SpawnPoint)
-        {
-            PlayerInfo player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
-            player.SpawnPoint = SpawnPoint;
-            World.Inst[SpawnPoint].DynamicEntity.Add(player); 
-            World.Inst.target.Add(player);
-            
-            player = (PlayerInfo) Entity.CreateInfo(ID.Player, SpawnPoint);
-            player.SpawnPoint = SpawnPoint;
-            player.CharSprite = ID.Sheep;
-            World.Inst[SpawnPoint].DynamicEntity.Add(player); 
-            World.Inst.target.Add(player);
-
-            SetPiece.Paste(currentCoordinate, Spawn);
-        } 
+        // spawnpoint handling is delegated to a generation task that places the setpiece
+        // on the ground and creates players when the chunk containing the spawn is generated.
+        GenTaskSpawn.Run(currentCoordinate, currentChunk);
         
         GenTaskStone.Run(currentCoordinate, currentChunk);
         GenTaskGranite.Run(currentCoordinate, currentChunk);  
