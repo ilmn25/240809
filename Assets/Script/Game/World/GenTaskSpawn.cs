@@ -28,7 +28,7 @@ public class GenTaskSpawn : Gen
         World.Inst.target.Add(player);
 
         // paste the spawn setpiece with its origin on the computed ground
-        SetPiece.Paste(spawnPos, Spawn);
+        // SetPiece.Paste(spawnPos, Spawn);
     }
 
     // copied logic from GenTaskWall to locate the first air block above solid ground

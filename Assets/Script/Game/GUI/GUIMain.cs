@@ -51,7 +51,7 @@ public static class GUIMain
         Storage.Initialize();
         Storage.Show(false);
 
-        Storage storage = new Storage(9)
+        Storage storage = new NoRefreshStorage(9)
         {
             Name = "Crafting",
         };
@@ -138,6 +138,15 @@ public static class GUIMain
             if (Showing)
             {
                 Showing = false;
+
+                // return any item held on cursor to inventory (or drop if full)
+                if (!GUICursor.Data.isEmpty())
+                {
+                    // try add to player storage; AddItem will drop leftover automatically
+                    Main.PlayerInfo.Storage.AddItem(GUICursor.Data);
+                    GUICursor.UpdateCursorSlot();
+                }
+
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(false, HideDuration, Main.GUIInv, 0));
                 Cursor.SetItemSlotInfo();
