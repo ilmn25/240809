@@ -1,14 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Particles {Smoke, Dust}
+public enum Particles {Smoke, Dust,
+    Flakes
+}
 public class Particle
 {
     private static readonly Queue<GameObject> Pool = new ();
+    private static readonly Dictionary<Particles, int> ParticleInfo = new()
+    {
+        [Particles.Smoke] = 2,
+        [Particles.Flakes] = 2, 
+    };
+
     private const int PoolSize = 20;
     private static int _count = 0;
     private static GameObject _particle;
-
+ 
     static Particle()
     {
         GameObject prefab = Resources.Load<GameObject>("Prefab/Particle");
@@ -22,13 +30,16 @@ public class Particle
 
     public static void Create(Vector3 position, Particles id, bool force)
     {
+        int max = 0;
+        ParticleInfo.TryGetValue(id, out max); 
+
         if (force || _count < PoolSize * 0.8f)
         {
             _particle = GetFromPool();
             if (_particle)
             {
                 _particle.SetActive(true);
-                _particle.GetComponent<ParticleComponent>().Spawn(position, id);
+                _particle.GetComponent<ParticleComponent>().Spawn(position, id, max);
                 if (!force) _count++;
             }
         }

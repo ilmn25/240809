@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class Control
 {
-    private const int InteractRange = 16;
+    private const int InteractRange = 2;
     public static Control Inst = new Control(); 
     public static int CurrentPlayerIndex = 0;
     
