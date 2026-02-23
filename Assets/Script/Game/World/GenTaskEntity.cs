@@ -34,11 +34,11 @@ public class GenTaskEntity : Gen
                                 {
                                     currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
                                 }
-                                else if (rng <= 0.2005)
+                                else if (rng <= 0.25)
                                 {
                                     currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Sticks, position));
                                 }
-                                else if (rng <= 0.201)
+                                else if (rng <= 0.3)
                                 {
                                     currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Flint, position));
                                 }

@@ -11,11 +11,12 @@ public class ParticleComponent : MonoBehaviour
         _animator = GetComponent<Animator>();
     }
 
-    public void Spawn(Vector3 position, Particles id)
+    public void Spawn(Vector3 position, Particles id, int max)
     {
         transform.position = position;
         transform.rotation = ViewPort.CurrentRotation;
-        _animator.Play("Particle" + id, 0, 0f);;
+        string variation = max > 0 ? UnityEngine.Random.Range(1, max+1).ToString() : "";
+        _animator.Play("Particle" + id + variation, 0, 0f);
         CheckFinish();
     }
 
