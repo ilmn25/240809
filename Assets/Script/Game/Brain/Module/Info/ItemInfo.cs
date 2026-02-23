@@ -7,7 +7,7 @@ public class ItemInfo : Info
 {
     public ItemSlot item;
     public int despawn;
-    [NonSerialized] public bool StackOnSpawn = true;
+    [NonSerialized] public bool StackOnSpawn = false;
     [NonSerialized] public Vector3 Velocity;
     [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
