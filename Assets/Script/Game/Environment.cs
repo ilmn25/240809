@@ -93,8 +93,8 @@ public class Environment
         _ = new CoroutineTask(Clock());
     }       
      
-    public const int Length = 360;
-    private const int Speed = 1;
+    public const int Length = 60 * 19;
+    private const float Speed = 0.25f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous;
@@ -174,12 +174,12 @@ public class Environment
             else
                 Weather = EnvironmentType.DaySnow;
         } 
-        else if (Time == Length * 12/24)
+        else if (Time == 60 * 11)
             if (Random.value < 0.8f)
                 Weather = EnvironmentType.Sunset;
             else
                 Weather = EnvironmentType.Rapture;
-        else if (Time == Length * 17/24)
+        else if (Time == 60 * 14)
             if (Random.value < 0.7f)
                 Weather = EnvironmentType.NightRainy;
             else
