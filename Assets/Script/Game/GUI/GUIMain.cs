@@ -111,6 +111,7 @@ public static class GUIMain
         Crafting.Update();
         Converter.Update();
         InfoPanel.UpdateDrag();
+        UpdateHudText();
 
         if (Control.Inst.Inv.KeyDown())
         { 
@@ -119,6 +120,26 @@ public static class GUIMain
             else
                 Show(true);
         }
+    }
+
+    private static void UpdateHudText()
+    {
+        if (Scene.Busy)
+        {
+            Main.GUIHudText.text = string.Empty;
+            return;
+        }
+
+        int minutes = (SaveData.Inst.time + 300) % 1440; // 5:00 AM start, wrap at midnight
+
+        int hours24 = minutes / 60;
+        int mins = minutes % 60;
+        int hours12 = hours24 % 12;
+        if (hours12 == 0) hours12 = 12;
+        string ampm = hours24 >= 12 ? "PM" : "AM";
+
+        int playerIndex = Control.CurrentPlayerIndex + 1;
+        Main.GUIHudText.text = $"Day {SaveData.Inst.day}, {hours12}:{mins:00} {ampm}\nControlling Player {playerIndex}";
     }
 
     public static void Show(bool isShow)
