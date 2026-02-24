@@ -36,6 +36,7 @@ public class Main : MonoBehaviour
     public static Camera Camera;
     public static Camera GUICamera;
     public static GameObject GUIObject;
+    public static TextMeshProUGUI GUIHudText;
     public static GameObject GUIDialogue;
     public static GameObject GUIImage;
     public static Image GUIImageRenderer;
@@ -142,6 +143,7 @@ public class Main : MonoBehaviour
         GUICamera = GameObject.Find("HudCamera").GetComponent<Camera>();
         
         GUIObject = GameObject.Find("GUI");
+        GUIHudText = GUIObject.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
         GUIDialogue = GUIObject.transform.Find("Dialogue").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GUIImage = GUIObject.transform.Find("Image").gameObject;

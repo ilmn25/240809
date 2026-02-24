@@ -167,7 +167,7 @@ public class Console : MonoBehaviour
         if (_showInfo)
         {
             UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-                "FPS: " + Mathf.Ceil(_fps) + "\nPosition: " + Main.PlayerInfo.position + "\nDay "+ SaveData.Inst.day + ", " + ((float)SaveData.Inst.time * 24f / Environment.Length).ToString("F2"), GUIStyle);
+                "FPS: " + Mathf.Ceil(_fps) + "\nPosition: " + Main.PlayerInfo.position + "\nDay " + SaveData.Inst.day, GUIStyle);
         }
         
         if (!Main.BuildMode || !Main.Player) return;
@@ -220,13 +220,8 @@ public class Console : MonoBehaviour
                 Gather();
                 break; 
             case "time":
-                if (_command.Length > 1 && int.TryParse(_command[1], out int hours))
-                {
-                    // convert hours into environment ticks (length/24 per hour)
-                    int ticks = Mathf.RoundToInt(hours * (Environment.Length / 24f));
-                    Environment.MoveTime(ticks);
-                }
-                Output("Day " + SaveData.Inst.day + ", " + ((float)SaveData.Inst.time * 24f / Environment.Length).ToString("F2"));
+                if (_command.Length > 1 && int.TryParse(_command[1], out int units))
+                    Environment.MoveTime(units * 60);
                 break; 
             case "set":
                 SetPieceCommands();
