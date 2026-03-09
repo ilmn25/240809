@@ -3,7 +3,7 @@ public class TreeMachine : StructureMachine
     public static Info CreateInfo()
     {
         return new SpriteStructureInfo() {
-            Health = 100,
+            Health = 40,
             Loot = ID.Tree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
