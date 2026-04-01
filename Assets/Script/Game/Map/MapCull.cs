@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 
 public class MapCull
 { 
+    private const float CULL_RESET_TIME = 5f;
     private static readonly int CullSyncDelay = 3;  
     private static readonly float AngleOffset = 12; // Angle in degrees 
     private static bool _delayBuffer;
@@ -27,6 +28,7 @@ public class MapCull
     private static readonly Vector3 RightDirection = Quaternion.Euler(0, 5, AngleOffset) * Vector3.up;
     
     private static Vector3 _playerPosition;
+    private static float _lastCullEnterTime = -Mathf.Infinity;
  
     public static void Initialize()
     {
@@ -89,6 +91,12 @@ public class MapCull
             
             if (!_yCheckPrevious && YCheck) // enter
             {
+                if (float.IsInfinity(_lastCullEnterTime) || Time.time - _lastCullEnterTime > CULL_RESET_TIME)
+                {
+                    YThreshold = Mathf.FloorToInt(Main.Player.transform.position.y) + 2;
+                }
+
+                _lastCullEnterTime = Time.time;
                 // HandleLight(true);
                 UpdateYCullDelayed(YCheck);
             }
