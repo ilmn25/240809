@@ -81,6 +81,7 @@ public class Inventory
         {
             if (_buffer != -1)
             {
+                Audio.PlaySFX(SfxID.Text);
                 Main.PlayerInfo.Storage.Key = _buffer;
                 _buffer = -1;
             }
