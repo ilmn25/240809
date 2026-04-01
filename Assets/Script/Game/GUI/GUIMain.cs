@@ -115,6 +115,7 @@ public static class GUIMain
 
         if (Control.Inst.Inv.KeyDown())
         { 
+            Audio.PlaySFX(SfxID.Text);
             if (Showing)
                 Show(false);
             else

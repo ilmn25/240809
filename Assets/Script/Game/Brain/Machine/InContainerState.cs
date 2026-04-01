@@ -7,7 +7,7 @@ public class InContainerState : State
         GUIMain.Storage.Storage = Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
-        GUIMain.Storage.Show(true, !GUIMain.Showing);
+        GUIMain.Storage.Show(Storage != Main.PlayerInfo.Storage, !GUIMain.Showing);
     }
 
     public override void OnUpdateState()

@@ -75,6 +75,8 @@ public class Control
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Main.Player = null;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
+        GUIMain.Storage.Show(GUIMain.Storage.Storage != Main.PlayerInfo.Storage);
+        Inventory.RefreshInventory();
         GUIBar.Update();
         CurrentPlayerIndex = i;
     }
@@ -83,6 +85,7 @@ public class Control
     {
         if (Inst.SwapChar.KeyDown())
         { 
+            Audio.PlaySFX(SfxID.Text);
             if (CurrentPlayerIndex == World.Inst.target.Count - 1)
                 SetPlayer(0);
             else
