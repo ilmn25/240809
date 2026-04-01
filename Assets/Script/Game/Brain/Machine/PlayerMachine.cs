@@ -6,6 +6,17 @@ using UnityEngine;
 public class PlayerMachine : MobMachine, IActionSecondaryInteract
 {
     private new PlayerInfo Info => GetModule<PlayerInfo>();
+
+    private bool EnsureCompatibleToolForTarget()
+    {
+        if (Info.Target is not StructureInfo structureTarget) return true;
+
+        if (Info.Storage.SetTool(structureTarget.operationType)) return true;
+
+        Info.CancelTarget();
+        return false;
+    }
+
     public static Info CreateInfo()
     { 
         return new PlayerInfo()
@@ -86,6 +97,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     public override void OnUpdate()
     {   
         Info.position = transform.position;
+
         if (Main.PlayerInfo == Info)
         { 
             Main.Player = gameObject;
@@ -111,13 +123,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
         else if (IsCurrentState<DefaultState>()) 
         { 
-            if (Info.Target == null && Main.PlayerInfo.PlayerStatus == PlayerStatus.Active)
-            {  
-                Info.Target = Main.PlayerInfo;
-                Info.ActionType = IActionType.Follow;
-            } 
-            
-            if (Info.Target == Main.PlayerInfo && PlayerTask.Pending.Count != 0)
+            // Validate current structure target if it exists
+            if (Info.Target is StructureInfo && Info.ActionType is IActionType.Hit or IActionType.Dig)
+            {
+                EnsureCompatibleToolForTarget();
+            }
+
+            // If no target or only following player, search pending tasks
+            if ((Info.Target == null || Info.Target == Main.PlayerInfo) && PlayerTask.Pending.Count != 0)
             {  
                 foreach (StructureInfo structureInfo in PlayerTask.Pending)
                 { 
@@ -128,6 +141,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                         return;
                     } 
                 } 
+            }
+            
+            // If no task found, follow player
+            if (Info.Target == null && Main.PlayerInfo.PlayerStatus == PlayerStatus.Active)
+            {  
+                Info.Target = Main.PlayerInfo;
+                Info.ActionType = IActionType.Follow;
             } 
             
             SetState<MobChaseAction>();
@@ -136,6 +156,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     public override void Attack()
     {
+        if (Main.PlayerInfo != Info && !EnsureCompatibleToolForTarget())
+        {
+            return;
+        }
+
         if (Info.Equipment == null)
         {
             Info.Target = null;
