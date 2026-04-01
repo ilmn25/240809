@@ -140,8 +140,8 @@ public static class GUIMain
             string name = Regex.Replace(target.id.ToString(), "(?<!^)([A-Z])", " $1");
             return target switch
             {
-                DynamicInfo d => $"Target: {name} | HP {Mathf.Max(0, d.Health)}/{Mathf.Max(1, d.HealthMax)}",
-                StructureInfo s => $"Target: {name} | HP {Mathf.Max(0, Mathf.CeilToInt(s.Health))}",
+                DynamicInfo i => $"Target: {name} | {i.Health} HP",
+                StructureInfo i => $"Target: {name} | {i.Health} HP",
                 _ => ""
             };
         }
