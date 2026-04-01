@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -125,23 +126,38 @@ public static class GUIMain
 
     private static void UpdateHudText()
     {
+        string BuildTimeHudText()
+        {
+            int minutes = (SaveData.Inst.time + 300) % 1440; // 5:00 AM start, wrap at midnight
+            int hours24 = minutes / 60;
+            int hours12 = hours24 % 12 == 0 ? 12 : hours24 % 12;
+            return $"Day {SaveData.Inst.day}, {hours12}:{minutes % 60:00} {(hours24 >= 12 ? "PM" : "AM")}";
+        }
+
+        string BuildTargetHudText(Info target)
+        {
+            if (target == null) return "";
+            string name = Regex.Replace(target.id.ToString(), "(?<!^)([A-Z])", " $1");
+            return target switch
+            {
+                DynamicInfo d => $"Target: {name} | HP {Mathf.Max(0, d.Health)}/{Mathf.Max(1, d.HealthMax)}",
+                StructureInfo s => $"Target: {name} | HP {Mathf.Max(0, Mathf.CeilToInt(s.Health))}",
+                _ => ""
+            };
+        }
+    
         if (Scene.Busy)
         {
             Main.GUIHudText.text = string.Empty;
             return;
         }
 
-        int minutes = (SaveData.Inst.time + 300) % 1440; // 5:00 AM start, wrap at midnight
-
-        int hours24 = minutes / 60;
-        int mins = minutes % 60;
-        int hours12 = hours24 % 12;
-        if (hours12 == 0) hours12 = 12;
-        string ampm = hours24 >= 12 ? "PM" : "AM";
-
         int playerIndex = Control.CurrentPlayerIndex + 1;
         int slotId = Main.PlayerInfo?.Storage != null ? Main.PlayerInfo.Storage.Key + 1 : 1;
-        Main.GUIHudText.text = $"Day {SaveData.Inst.day}, {hours12}:{mins:00} {ampm}\nControlling Player {playerIndex} | Slot {slotId}";
+        Main.GUIHudText.text =
+            $"{BuildTimeHudText()}\n" +
+            $"Controlling Player {playerIndex} | Slot {slotId}\n" +
+            BuildTargetHudText(Main.PlayerInfo?.Target);
     }
 
     public static void Show(bool isShow)
