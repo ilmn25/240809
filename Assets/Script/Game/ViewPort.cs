@@ -4,7 +4,7 @@ using UnityEngine;
 public partial class ViewPort 
 {
     public const float Distance = 26;
-    private const int MaxFOV = 100;
+    private const int MaxFOV = 50;
     private const float TiltDegreeX = 0.15f;
     private const float TiltDegreeY = 0.2f;
     private const float PanDegree = 1f;
