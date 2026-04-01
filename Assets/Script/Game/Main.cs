@@ -42,7 +42,6 @@ public class Main : MonoBehaviour
     public static Image GUIImageRenderer;
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
-    public static GameObject GUIInvCrafting;
     public static GameObject GUIInfoPanel;
     public static GameObject GUICursor;
     public static GameObject GUICursorInfo;
@@ -149,7 +148,6 @@ public class Main : MonoBehaviour
         GUIImage = GUIObject.transform.Find("Image").gameObject;
         GUIImageRenderer = GUIImage.GetComponent<Image>();
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
-        GUIInvCrafting = GUIInv.transform.Find("Crafting").gameObject;
         GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;
         
         GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;

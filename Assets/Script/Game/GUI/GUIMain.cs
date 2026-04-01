@@ -140,7 +140,8 @@ public static class GUIMain
         string ampm = hours24 >= 12 ? "PM" : "AM";
 
         int playerIndex = Control.CurrentPlayerIndex + 1;
-        Main.GUIHudText.text = $"Day {SaveData.Inst.day}, {hours12}:{mins:00} {ampm}\nControlling Player {playerIndex}";
+        int slotId = Main.PlayerInfo?.Storage != null ? Main.PlayerInfo.Storage.Key + 1 : 1;
+        Main.GUIHudText.text = $"Day {SaveData.Inst.day}, {hours12}:{mins:00} {ampm}\nControlling Player {playerIndex} | Slot {slotId}";
     }
 
     public static void Show(bool isShow)
