@@ -122,6 +122,8 @@ public class DynamicInfo : Info
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
+        projectile.SourceInfo.Target = this;
+        projectile.SourceInfo.ActionType = IActionType.Hit;
         OnHit(projectile);
         return true;
     }
