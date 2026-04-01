@@ -40,8 +40,9 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         if (GUIStorage.ScaleTask is { Running: true }) return;
         if (GUIStorage.IsDrag) return;
-            GUIStorage.SetInfoPanel(slotNumber);
-            ScaleSlot(1.1f);
+        Audio.PlaySFX(SfxID.Text);
+        GUIStorage.SetInfoPanel(slotNumber);
+        ScaleSlot(1.1f);
     }
  
     public void OnPointerExit(PointerEventData eventData)
