@@ -262,12 +262,18 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 160
       objectReference: {fileID: 0}
+    - target: {fileID: 8537155615167916684, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8577204264634343715, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       propertyPath: m_Name
       value: Viewport
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8537155615167916684, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+    - {fileID: 993151572700263047, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7561836799891614748, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       insertIndex: -1
