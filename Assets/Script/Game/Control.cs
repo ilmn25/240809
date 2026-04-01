@@ -75,7 +75,6 @@ public class Control
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Main.Player = null;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
-        GUIMain.Storage.Show(GUIMain.Storage.Storage != Main.PlayerInfo.Storage);
         Inventory.RefreshInventory();
         GUIBar.Update();
         CurrentPlayerIndex = i;
