@@ -143,6 +143,8 @@ public class Main : MonoBehaviour
         
         GUIObject = GameObject.Find("GUI");
         GUIHudText = GUIObject.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
+        GUIHudText.enableWordWrapping = false;
+        GUIHudText.overflowMode = TextOverflowModes.Overflow;
         GUIDialogue = GUIObject.transform.Find("Dialogue").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GUIImage = GUIObject.transform.Find("Image").gameObject;

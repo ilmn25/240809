@@ -42,4 +42,9 @@ public class ItemInfo : Info
             Destroy();
         }
     }
+
+    public override string ToString()
+    {
+        return string.Empty;
+    }
 }

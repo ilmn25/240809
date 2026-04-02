@@ -132,4 +132,9 @@ public class DynamicInfo : Info
         position.y = Machine.transform.position.y;
         Velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
     }
+
+    public override string ToString()
+    {
+        return $"Attacking: {FormatId(id)} | HP {Health}/{HealthMax}";
+    }
 }

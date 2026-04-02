@@ -76,13 +76,13 @@ public class ItemSlot
                     switch (Info.ProjectileInfo.OperationType)
                     {
                         case OperationType.Building:
-                            text += " \nbuilding: " + Info.ProjectileInfo.Breaking;
+                            text += " \nbuilding " + Info.ProjectileInfo.Breaking;
                             break;
                         case OperationType.Mining:
-                            text += " \nmining: " + Info.ProjectileInfo.Breaking;
+                            text += " \nmining " + Info.ProjectileInfo.Breaking;
                             break;
                         case OperationType.Cutting:
-                            text += " \nbreaking: " + Info.ProjectileInfo.Breaking;
+                            text += " \nbreaking " + Info.ProjectileInfo.Breaking;
                             break;
                     }
                 }  
