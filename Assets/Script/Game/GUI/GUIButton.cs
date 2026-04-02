@@ -15,6 +15,7 @@ public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        Audio.PlaySFX(SfxID.Text);
         ScaleSlot(1.1f);
         IsHovered = true;
         if (Info != null) GUIMain.Cursor.Set(_text.text, Info);
