@@ -77,25 +77,21 @@ public class MobInfo : DynamicInfo
             return;
         }
 
-        if (target != null)
-        { 
-            if (Equipment == null || Equipment != target)
-            {
-                Equipment = target;
-                SpriteTool.gameObject.SetActive(true);
-                SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
-                SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
-                SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.ID);
-                SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
-                // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
-                if (Machine != null && Machine.IsCurrentState<DefaultState>())
-                    Machine.SetState<EquipSelectState>();
-            } 
-        }
-        else
+        if (target == null)
         {
             Equipment = null;
             SpriteTool.gameObject.SetActive(false);
+            return;
         }
+
+        Equipment = target;
+        SpriteTool.gameObject.SetActive(true);
+        SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
+        SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
+        SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.ID);
+        SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
+        // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
+        if (Machine != null && Machine.IsCurrentState<DefaultState>())
+            Machine.SetState<EquipSelectState>();
     }
 }
