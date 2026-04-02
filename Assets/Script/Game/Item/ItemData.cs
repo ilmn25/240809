@@ -32,7 +32,11 @@ public partial class Item
         loot.Add(0.5f, 1, ID.MetalChunks);
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.");
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
-        AddBlockDefinition(ID.Blueprint, description: "Blueprint used to learn new crafting recipes.");
+        AddBlockDefinition(
+            ID.Blueprint,
+            description: "Blueprint used to learn new crafting recipes.",
+            materials: new Dictionary<ID, int> { { ID.Log, 2 }, { ID.Charcoal, 1 } }
+        );
 
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);

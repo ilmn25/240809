@@ -62,4 +62,16 @@ public class StructureInfo : Info
     }
     public virtual void OnHit(MobInfo info) { }
     public virtual void OnDestroy(MobInfo info) { }
+
+    public override string ToString()
+    {
+        string action = operationType switch
+        {
+            OperationType.Mining => "Mining",
+            OperationType.Building => "Building",
+            OperationType.Cutting => "Cutting",
+            _ => "Destroying",
+        };
+        return $"{action}: {FormatId(id)} | HP {Health}";
+    }
 }

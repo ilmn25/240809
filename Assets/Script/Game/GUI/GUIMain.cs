@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -136,14 +135,7 @@ public static class GUIMain
 
         string BuildTargetHudText(Info target)
         {
-            if (target == null) return "";
-            string name = Regex.Replace(target.id.ToString(), "(?<!^)([A-Z])", " $1");
-            return target switch
-            {
-                DynamicInfo i => $"Target: {name} | {i.Health} HP",
-                StructureInfo i => $"Target: {name} | {i.Health} HP",
-                _ => ""
-            };
+            return target?.ToString() ?? "";
         }
     
         if (Scene.Busy)
