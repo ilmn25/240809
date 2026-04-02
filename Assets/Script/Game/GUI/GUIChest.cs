@@ -47,7 +47,7 @@ public class GUIChest : GUIStorage
             } 
         } 
         Audio.PlaySFX(SfxID.Item);
-        Inventory.RefreshInventory();
+        Storage.NotifyChanged();
     }
 
     protected override void ActionSecondaryDown()
@@ -60,7 +60,7 @@ public class GUIChest : GUIStorage
             {
                 GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
                 Audio.PlaySFX(SfxID.Item);
-                Inventory.RefreshInventory();
+                Storage.NotifyChanged();
             }
         }
     }
@@ -74,7 +74,7 @@ public class GUIChest : GUIStorage
             {
                 GUICursor.Data.Add(itemSlot, 1);
                 Audio.PlaySFX(SfxID.Item);
-                Inventory.RefreshInventory();
+                Storage.NotifyChanged();
             }
         }
     }

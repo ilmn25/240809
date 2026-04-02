@@ -13,6 +13,28 @@ public class Inventory
     public static readonly int InventorySlotAmount = 9;
 
     public static event Action SlotUpdate; 
+
+    private static void SyncCurrentItemState()
+    {  
+        CurrentItem = Main.PlayerInfo.Storage.List[Main.PlayerInfo.Storage.Key];
+        if (CurrentItem is { Stack: > 0 })
+        {
+            CurrentItemData = Item.GetItem(CurrentItem.ID); 
+
+            Main.PlayerInfo.SetEquipment(CurrentItem);
+
+            if (CurrentItemData.ID == ID.Blueprint || CurrentItem.Info.Type == ItemType.Block)
+                Terraform.BlockUpdate(CurrentItem.ID);
+            else
+                Terraform.BlockUpdate();
+
+            return;
+        }
+
+        CurrentItemData = null;
+        Terraform.BlockUpdate();
+        Main.PlayerInfo.SetEquipment(null);
+    }
  
     
     public static void Update()
@@ -84,22 +106,9 @@ public class Inventory
                 Audio.PlaySFX(SfxID.Text);
                 Main.PlayerInfo.Storage.Key = _buffer;
                 _buffer = -1;
+                SyncCurrentItemState();
+                RefreshInventory();
             }
-            CurrentItem = Main.PlayerInfo.Storage.List[Main.PlayerInfo.Storage.Key];
-            if (CurrentItem is not { Stack: 0 })
-            {
-                CurrentItemData = Item.GetItem(CurrentItem.ID);
-                Main.PlayerInfo.SetEquipment(CurrentItem);
-                
-                if (CurrentItemData.ID == ID.Blueprint || CurrentItem.Info.Type == ItemType.Block) 
-                    Terraform.BlockUpdate(CurrentItem.ID);
-            } 
-        }
-        if (CurrentItem is { Stack: 0 })
-        {
-            CurrentItemData = null;     
-            Terraform.BlockUpdate();
-            Main.PlayerInfo.SetEquipment(null);
         }
     }
 
@@ -111,6 +120,7 @@ public class Inventory
 
     public static void RefreshInventory()
     {  
+        SyncCurrentItemState();
         SlotUpdate?.Invoke();  
     }
  

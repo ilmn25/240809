@@ -29,6 +29,13 @@ public class Storage
                 int id = Dictionary.Count;
                 Dictionary.Add(id, List);
         }
+        public void NotifyChanged()
+        {
+                if (info is not MobInfo mobInfo || List == null || List.Count == 0) return;
+                ItemSlot selectedSlot = List[Key];
+                mobInfo.SetEquipment(selectedSlot is { Stack: > 0 } ? selectedSlot : null);
+                if (!SuppressRefresh) Inventory.RefreshInventory();
+        }
 
         public bool SetTool(OperationType operation)
         {
@@ -74,7 +81,7 @@ public class Storage
                         if (List[priority].Stack <= 0) List[priority].clear();
                         if (quantity <= 0)
                         {
-                                if (!SuppressRefresh) Inventory.RefreshInventory();
+                                NotifyChanged();
                                 return;
                         }
                 }
@@ -94,13 +101,13 @@ public class Storage
 
                                 if (quantity <= 0)
                                 {
-                                        if (!SuppressRefresh) Inventory.RefreshInventory();
+                                        NotifyChanged();
                                         return;
                                 }
                         }
                 }
 
-                if (!SuppressRefresh) Inventory.RefreshInventory();
+                NotifyChanged();
         }
 
         public void CreateAndAddItem(ID stringID, int count = 1)
@@ -115,7 +122,7 @@ public class Storage
                         List[priority].Add(newItemSlot);
                         if (newItemSlot.isEmpty())
                         {
-                                if (!SuppressRefresh) Inventory.RefreshInventory();
+                                NotifyChanged();
                                 return;
                         }
                 }
@@ -127,7 +134,7 @@ public class Storage
                                 slot.Add(newItemSlot);
                                 if (newItemSlot.isEmpty())
                                 {
-                                        if (!SuppressRefresh) Inventory.RefreshInventory();
+                                        NotifyChanged();
                                         return;
                                 }
                         }
@@ -145,7 +152,7 @@ public class Storage
                         List[slotID].Add(newItemSlot);
                 }
 
-                if (!SuppressRefresh) Inventory.RefreshInventory();
+                NotifyChanged();
         }
 
         public int GetAmount(ID stringID)
