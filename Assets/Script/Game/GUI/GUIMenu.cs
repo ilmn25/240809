@@ -15,16 +15,19 @@ public class GUIMenu : GUI
         if (!Control.Inst.ActionPrimary.KeyDown()) return;
         if (Main.GUIMainMenuButtonNew.IsHovered)
         {
+            Audio.PlaySFX(SfxID.Text);
             Save.NewSave(GenType.Abyss);  
             Show(false);
         }
         else if (Main.GUIMainMenuButtonLoad.IsHovered)
         {
+            Audio.PlaySFX(SfxID.Text);
             GUIMain.GUILoad.Show(true);
             Show(false);
         }
         else if (Main.GUIMainMenuButtonExit.IsHovered)
         {
+            Audio.PlaySFX(SfxID.Text);
             _ = new CoroutineTask(Quit());
             IEnumerator Quit()
             {
