@@ -69,7 +69,14 @@ public class MobInfo : DynamicInfo
         return direction;
     }
     public void SetEquipment(ItemSlot target)
-    { 
+    {
+        // SetEquipment can be called during scene/player switching before DynamicInfo.Initialize assigns tool references.
+        if (SpriteTool == null || SpriteToolTrack == null || SpriteToolRenderer == null)
+        {
+            Equipment = target;
+            return;
+        }
+
         if (target != null)
         { 
             if (Equipment == null || Equipment != target)
@@ -80,7 +87,9 @@ public class MobInfo : DynamicInfo
                 SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
                 SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.ID);
                 SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
-                Machine.SetState<EquipSelectState>();
+                // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
+                if (Machine != null && Machine.IsCurrentState<DefaultState>())
+                    Machine.SetState<EquipSelectState>();
             } 
         }
         else
