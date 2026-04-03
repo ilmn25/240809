@@ -12,7 +12,8 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     
     public override void Attack()
     {  
-        if (Info.Target != null && !Info.Target.IsInRenderRange) 
+        bool hasProjectileAttack = Info.Equipment != null && Info.Equipment.Info.ProjectileInfo != null;
+        if (!hasProjectileAttack && Info.Target != null && !Info.Target.IsInRenderRange) 
             Info.Target.AbstractHit(Info);
        
         switch (Info.Equipment.Info.Gesture)

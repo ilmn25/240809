@@ -27,6 +27,12 @@ public class GenTaskSpawn : Gen
         World.Inst[spawnPos].DynamicEntity.Add(player);
         World.Inst.target.Add(player);
 
+        player = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPos);
+        player.SpawnPoint = spawnPos;
+        player.CharSprite = ID.Yuuri;
+        World.Inst[spawnPos].DynamicEntity.Add(player);
+        World.Inst.target.Add(player);
+
         // paste the spawn setpiece with its origin on the computed ground
         // SetPiece.Paste(spawnPos, Spawn);
     }
