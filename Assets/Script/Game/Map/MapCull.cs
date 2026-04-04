@@ -79,9 +79,9 @@ public class MapCull
     {
         if (Time.frameCount > CullSyncFrame + 1)
         { 
-            if (YThreshold < (int)_playerPosition.y - 10)
+            if (YThreshold < (int)_playerPosition.y)
             {
-                YThreshold = (int)_playerPosition.y - 10;
+                YThreshold = (int)_playerPosition.y;
             }
             else if (YThreshold > (int)_playerPosition.y + 10)
             {
