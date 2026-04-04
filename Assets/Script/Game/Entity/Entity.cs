@@ -37,9 +37,8 @@ public class Entity
                 
                 AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Slab);
-                loot.Add(1, 2, ID.Flint); 
+                loot.Add(1, 2, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Gravel);
-                loot.Add(0.5f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);

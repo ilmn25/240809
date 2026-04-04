@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum Particles {Smoke, Dust,
-    Flakes
+    HitDust, Fire
 }
 public class Particle
 {
@@ -10,7 +10,8 @@ public class Particle
     private static readonly Dictionary<Particles, int> ParticleInfo = new()
     {
         [Particles.Smoke] = 2,
-        [Particles.Flakes] = 2, 
+        [Particles.HitDust] = 2, 
+        [Particles.Fire] = 0,
     };
 
     private const int PoolSize = 20;
@@ -38,6 +39,9 @@ public class Particle
             _particle = GetFromPool();
             if (_particle)
             {
+                _particle.transform.position = new Vector3(0, 0, -0.05f);
+                _particle.transform.rotation = Quaternion.identity;
+                _particle.transform.localScale = Vector3.one;
                 _particle.SetActive(true);
                 _particle.GetComponent<ParticleComponent>().Spawn(position, id, max);
                 if (!force) _count++;

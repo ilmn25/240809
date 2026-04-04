@@ -12,10 +12,15 @@ public abstract class ConverterMachine: StructureMachine, IActionSecondaryIntera
         {
             while (gameObject.activeSelf)
             {
-                yield return new WaitForSeconds(3) ;
-                if (((ConverterInfo) Info).IsConverting()) Particle.Create(transform.position, Particles.Smoke, false);
-            } 
+                yield return new WaitForSeconds(3);
+                if (((ConverterInfo)Info).IsConverting())
+                {
+                    Particle.Create(transform.position, Particles.Smoke, false);
+                    Particle.Create(transform.position, Particles.Fire, false);
+                }
+            }
         }
+
         StartCoroutine(Enumerator());
     } 
 
