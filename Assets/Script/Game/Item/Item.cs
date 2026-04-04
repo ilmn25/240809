@@ -181,7 +181,9 @@ public partial class Item
         };
 
         if (materials != null)
-            StructureRecipe.AddRecipe(id, time, materials);
+        {
+            ItemRecipe.AddRecipe(id, materials, 1, time, null);
+        }
 
         Dictionary[id] = itemData;
     }
