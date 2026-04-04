@@ -24,8 +24,10 @@ public static class Terraform
         if (Target == ID.Null)
         {
             _blockObj.SetActive(false);
-        } 
-        else if (Inventory.CurrentItemData.ID == ID.Blueprint)
+            return;
+        }
+
+        if (Inventory.CurrentItemData.ID == ID.Blueprint)
         {
             _blockObj.SetActive(true); 
             if (_blockObj.name != "overlay")
@@ -34,6 +36,16 @@ public static class Terraform
                 BlockPreview.Set(_blockObj, ID.OverlayBlock);
                 _blockObj.transform.localScale = Vector3.one * 1.04f;
             } 
+        }
+        else if (Inventory.CurrentItemData.Type == ItemType.Structure)
+        {
+            _blockObj.SetActive(true);
+            if (_blockObj.name != "overlay")
+            {
+                _blockObj.name = "overlay";
+                BlockPreview.Set(_blockObj, ID.OverlayBlock);
+                _blockObj.transform.localScale = Vector3.one;
+            }
         }
         else  
         {
@@ -50,6 +62,8 @@ public static class Terraform
     public static void Update()
     {
         if (Target == ID.Null) return;
+        Item currentItemData = Inventory.CurrentItemData;
+
         if (Helper.isLayer(Control.MouseLayer, Main.IndexMap) && 
             Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         { 
@@ -57,18 +71,32 @@ public static class Terraform
  
             if (Control.Inst.ActionSecondary.Key())
             {
+                bool isStructure = currentItemData.Type == ItemType.Structure;
                 Main.PlayerInfo.Machine.SetState<MobAttackSwing>();
-                Audio.PlaySFX(Inventory.CurrentItemData.Sfx);
-                SpawnBlock();
-                if (Target != ID.Blueprint) Main.PlayerInfo.Storage.RemoveItem(Target);
+                Audio.PlaySFX(currentItemData.Sfx);
+                SpawnBlock(isStructure);
+                if (currentItemData.Type == ItemType.Block)
+                    Main.PlayerInfo.Storage.RemoveItem(Target, 1, Main.PlayerInfo.Storage.Key);
             }
         }
         _blockObj.transform.position = Vector3.Lerp(_blockObj.transform.position, _coordinate + 
             new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
     }
   
-    public static void SpawnBlock()
+    public static void SpawnBlock(bool isStructure)
     {
+        if (isStructure)
+        {
+            ConstructionInfo info = (ConstructionInfo)Entity.Spawn(ID.Construction, _coordinate);
+            info.structureID = Target;
+            info.Health = ItemRecipe.GetRecipe(Target).Time;
+            info.operationType = OperationType.Building;
+            info.SfxHit = SfxID.HitMetal;
+            info.SfxDestroy = SfxID.HitMetal;
+            Main.PlayerInfo.Storage.RemoveItem(Target, 1, Main.PlayerInfo.Storage.Key);
+            return;
+        }
+
         if (Main.BuildMode)
         {
             if (Target == ID.Blueprint)

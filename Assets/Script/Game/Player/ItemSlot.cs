@@ -33,13 +33,14 @@ public class ItemSlot
         if (Info.Type == ItemType.Structure)
         {
             text += "structure";
-            StructureRecipe recipe = StructureRecipe.Dictionary[ID];
+            ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
             text += " \n \nbuild time: " + recipe.Time + "s";
             text += " \ningredients: ";
-            foreach (var ingredient in recipe.Ingredients)
-            {
-                text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
-            }
+            if (recipe != null)
+                foreach (var ingredient in recipe.Ingredients)
+                {
+                    text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
+                }
             text += "\n \n" + Info.Description;
         }
         else 

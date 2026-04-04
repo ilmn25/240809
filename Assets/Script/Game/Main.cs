@@ -86,8 +86,6 @@ public class Main : MonoBehaviour
         EnvParticle.Initialize();    
         Terraform.Initialize();  
         MapCull.Initialize();
-         
-        Instantiate(Resources.Load<GameObject>($"Prefab/StructurePreviewPrefab")).AddComponent<StructurePreviewMachine>();
 
         SaveData.Inst = new(GenType.SkyBlock);
         Scene.LoadWorld();
