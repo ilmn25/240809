@@ -13,6 +13,8 @@ public class MapLoad
     private enum Dir { Px, Nx, Py, Ny, Pz, Nz}
     public static Dictionary<Vector3Int, MapCullComponent> ActiveChunks = new Dictionary<Vector3Int, MapCullComponent>();
     private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1); 
+    private static readonly List<Vector3Int> _traverseOffsets = new List<Vector3Int>();
+    private static int _cachedTraverseRange = int.MinValue;
     
     private static Vector3Int _traverseCheckPosition;
     private static List<Vector3Int> _destroyList = new List<Vector3Int>();
@@ -77,27 +79,32 @@ public class MapLoad
 
     private static void OnTraverseLoad()
     {
-        List<Vector3Int> offsets = new List<Vector3Int>();
-
-        for (int x = -Scene.RenderRange; x <= Scene.RenderRange; x++)
+        int renderRange = Scene.RenderRange;
+        if (_cachedTraverseRange != renderRange)
         {
-            for (int y = -Scene.RenderRange; y <= Scene.RenderRange; y++)
+            _cachedTraverseRange = renderRange;
+            _traverseOffsets.Clear();
+
+            for (int x = -renderRange; x <= renderRange; x++)
             {
-                for (int z = -Scene.RenderRange; z <= Scene.RenderRange; z++)
+                for (int y = -renderRange; y <= renderRange; y++)
                 {
-                    offsets.Add(new Vector3Int(x, y, z));
+                    for (int z = -renderRange; z <= renderRange; z++)
+                    {
+                        _traverseOffsets.Add(new Vector3Int(x, y, z));
+                    }
                 }
             }
-        }
-        
-        offsets.Sort((a, b) =>
-        {
-            int aScore = a.x * a.x + a.z * a.z + a.y * a.y * 2; 
-            int bScore = b.x * b.x + b.z * b.z + b.y * b.y * 2;
-            return aScore.CompareTo(bScore);
-        });
 
-        foreach (var offset in offsets)
+            _traverseOffsets.Sort((a, b) =>
+            {
+                int aScore = a.x * a.x + a.z * a.z + a.y * a.y * 2;
+                int bScore = b.x * b.x + b.z * b.z + b.y * b.y * 2;
+                return aScore.CompareTo(bScore);
+            });
+        }
+
+        foreach (var offset in _traverseOffsets)
         {
             Vector3Int chunkPos = new Vector3Int(
                 Scene.PlayerChunkPosition.x + offset.x * World.ChunkSize,
@@ -132,7 +139,6 @@ public class MapLoad
         }
         catch (Exception ex)
         {
-            _semaphoreSlim.Release();
             throw new Exception("An exception occurred while queuing the task.", ex);
         } 
         finally
@@ -419,42 +425,38 @@ public class MapLoad
             }
  
  
-            Vector2Int tile = GetTileRect(textureIndex);
-            Vector2[] _spriteUVs = new Vector2[]
-            {
-                new Vector2(tile.x, tile.y),
-                new Vector2(tile.x + TileSize, tile.y),
-                new Vector2(tile.x + TileSize, tile.y + TileSize),
-                new Vector2(tile.x, tile.y + TileSize)
-            };
-
             _textureRect = TextureRectDictionary[_blockID];
 
-            // Calculate the new UVs based on the original rect's position and size
-            for (int i = 0; i < _spriteUVs.Length; i++)
-            {
-                _spriteUVs[i] = new Vector2(
-                    (_spriteUVs[i].x / TextureAtlasWidth) + _textureRect.x,
-                    (_spriteUVs[i].y / TextureAtlasHeight) + _textureRect.y
-                );
-            }
- 
-            // Add each UV coordinate individually
-            for (int i = 0; i < _spriteUVs.Length; i++)
-            {
-                Uvs.Add(_spriteUVs[i]);
-                Normals.Add(_normal);
-                Vertices.Add(FaceVertices[i]);
+            Vector2Int tile = GetTileRect(textureIndex);
+            float baseX = _textureRect.x;
+            float baseY = _textureRect.y;
+            float widthScale = 1f / TextureAtlasWidth;
+            float heightScale = 1f / TextureAtlasHeight;
 
-                if (direction == Dir.Py) 
-                {
-                    VerticesShadow.Add(FaceVerticesShadow[i]);
-                }
-                else
-                {
-                    VerticesShadow.Add(FaceVertices[i]);
-                }
-            } 
+            AddFaceVertexData(0,
+                new Vector2(tile.x * widthScale + baseX, tile.y * heightScale + baseY), direction);
+            AddFaceVertexData(1,
+                new Vector2((tile.x + TileSize) * widthScale + baseX, tile.y * heightScale + baseY), direction);
+            AddFaceVertexData(2,
+                new Vector2((tile.x + TileSize) * widthScale + baseX, (tile.y + TileSize) * heightScale + baseY), direction);
+            AddFaceVertexData(3,
+                new Vector2(tile.x * widthScale + baseX, (tile.y + TileSize) * heightScale + baseY), direction);
+        }
+
+        void AddFaceVertexData(int faceIndex, Vector2 uv, Dir direction)
+        {
+            Uvs.Add(uv);
+            Normals.Add(_normal);
+            Vertices.Add(FaceVertices[faceIndex]);
+
+            if (direction == Dir.Py)
+            {
+                VerticesShadow.Add(FaceVerticesShadow[faceIndex]);
+            }
+            else
+            {
+                VerticesShadow.Add(FaceVertices[faceIndex]);
+            }
         }
 
         Vector2Int GetTileRect(int index)

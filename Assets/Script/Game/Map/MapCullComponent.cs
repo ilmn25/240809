@@ -20,6 +20,15 @@ public class MapCullComponent : MonoBehaviour
     private MeshFilter _meshFilter; 
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;  
+    private NativeArray<Vector3> _nativeVertices;
+    private NativeArray<Vector3> _nativeNormals;
+    private NativeArray<int> _nativeTriangles;
+    private NativeArray<Vector2> _nativeUvs;
+    private NativeArray<int> _nativeCount;
+    private NativeList<Vector3> _culledVerticesNative;
+    private NativeList<Vector3> _culledNormalsNative;
+    private NativeList<int> _culledTrianglesNative;
+    private NativeList<Vector2> _culledUVsNative;
     
     private int CULL_DISTANCE = 2; 
     private Vector3Int _selfChunkPosition;
@@ -29,6 +38,7 @@ public class MapCullComponent : MonoBehaviour
     {   
         CULL_DISTANCE= World.ChunkSize * CULL_DISTANCE;
         _mesh = new Mesh();    
+        EnsureCullOutputBuffers();
 
         _meshFilter = GetComponent<MeshFilter>();  
         _meshRenderer = GetComponent<MeshRenderer>(); 
@@ -65,11 +75,22 @@ public class MapCullComponent : MonoBehaviour
             _normals = _meshData.normals;
             _triangles = _meshData.triangles;   
 
-            Mesh shadowMesh = new Mesh();
+            CacheNativeBuffers();
+
+            Mesh shadowMesh = _shadowMeshFilter.sharedMesh;
+            if (shadowMesh == null)
+            {
+                shadowMesh = new Mesh();
+            }
+            else
+            {
+                shadowMesh.Clear();
+            }
+
             shadowMesh.SetVertices(_verticesShadow);
             shadowMesh.SetTriangles(_meshData.triangles, 0);   
             shadowMesh.SetNormals(_meshData.normals); 
-            _shadowMeshFilter.mesh = shadowMesh;
+            _shadowMeshFilter.sharedMesh = shadowMesh;
 
             CullMeshAsync();     
             _meshCollider.sharedMesh = _meshData;
@@ -139,11 +160,19 @@ public class MapCullComponent : MonoBehaviour
  
     async void HandleCullMesh()
     {   
-        _mesh = new Mesh();
-        _mesh.SetVertices(_culledVertices);
-        _mesh.SetTriangles(_culledTriangles, 0);  
-        _mesh.SetUVs(0, _culledUVs);
-        _mesh.SetNormals(_culledNormals);     
+        if (_mesh == null)
+        {
+            _mesh = new Mesh();
+        }
+        else
+        {
+            _mesh.Clear();
+        }
+
+        _mesh.SetVertices(_culledVerticesNative.AsArray());
+        _mesh.SetTriangles(_culledTrianglesNative.AsArray().ToArray(), 0);
+        _mesh.SetUVs(0, _culledUVsNative.AsArray());
+        _mesh.SetNormals(_culledNormalsNative.AsArray());
          
         while (Time.frameCount < MapCull.CullSyncFrame) await Task.Yield();
         
@@ -177,59 +206,79 @@ public class MapCullComponent : MonoBehaviour
     }  
     void HandleCullMath()
     {
-        NativeArray<Vector3> vertices = new NativeArray<Vector3>(_vertices, Allocator.TempJob);
-        NativeArray<Vector3> normals = new NativeArray<Vector3>(_normals, Allocator.TempJob);
-        NativeArray<int> triangles = new NativeArray<int>(_triangles, Allocator.TempJob);
-        NativeArray<Vector2> uvs = new NativeArray<Vector2>(_uvs, Allocator.TempJob);
-        NativeArray<int> count = new NativeArray<int>(_count, Allocator.TempJob);
+        EnsureCullOutputBuffers();
+        _culledVerticesNative.Clear();
+        _culledNormalsNative.Clear();
+        _culledTrianglesNative.Clear();
+        _culledUVsNative.Clear();
+
         var job = new HandleCullMathJob
         { 
             chunkSize = World.ChunkSize, 
             yThreshold = MapCull.YThreshold - _selfChunkPosition.y,
 
             meshLoadData = MeshLoadData.Create(_selfChunkPosition),
-            vertices = vertices,
-            normals = normals,
-            triangles = triangles,
-            uvs = uvs, 
-            count = count,
+            vertices = _nativeVertices,
+            normals = _nativeNormals,
+            triangles = _nativeTriangles,
+            uvs = _nativeUvs, 
+            count = _nativeCount,
 
-            culledVertices  = new NativeList<Vector3>(Allocator.TempJob),
-            culledNormals  = new NativeList<Vector3>(Allocator.TempJob),
-            culledTriangles = new NativeList<int>(Allocator.TempJob),
-            culledUVs = new NativeList<Vector2>(Allocator.TempJob), 
+            culledVertices = _culledVerticesNative,
+            culledNormals = _culledNormalsNative,
+            culledTriangles = _culledTrianglesNative,
+            culledUVs = _culledUVsNative,
 
-            vertexMap = new NativeHashMap<int, int>(vertices.Length, Allocator.TempJob), 
+            vertexMap = new NativeHashMap<int, int>(_nativeVertices.Length, Allocator.TempJob), 
         };
 
         JobHandle handle = job.Schedule();
         handle.Complete();
 
-        // Use the results from the job
-        _culledVertices = new List<Vector3>(job.culledVertices.ToArray());
-        _culledNormals = new List<Vector3>(job.culledNormals.ToArray());
-        _culledTriangles = new List<int>(job.culledTriangles.ToArray());
-        _culledUVs = new List<Vector2>(job.culledUVs.ToArray()); 
-        // Dispose of the native collections 
-        job.culledVertices.Dispose();
-        job.culledNormals.Dispose();
-        job.culledTriangles.Dispose();
-        job.culledUVs.Dispose(); 
-
         job.vertexMap.Dispose(); 
     }
-
-
-
-    private List<Vector3> _culledVertices;
-    private List<Vector3> _culledNormals;
-    private List<int> _culledTriangles;
-    private List<Vector2> _culledUVs;
  
     private Vector3[] _vertices;
     private Vector3[] _normals; 
     private int[] _triangles;
     private Vector2[] _uvs;
+
+    private void CacheNativeBuffers()
+    {
+        DisposeNativeBuffers();
+
+        _nativeVertices = new NativeArray<Vector3>(_vertices, Allocator.Persistent);
+        _nativeNormals = new NativeArray<Vector3>(_normals, Allocator.Persistent);
+        _nativeTriangles = new NativeArray<int>(_triangles, Allocator.Persistent);
+        _nativeUvs = new NativeArray<Vector2>(_uvs, Allocator.Persistent);
+        _nativeCount = new NativeArray<int>(_count, Allocator.Persistent);
+    }
+
+    private void DisposeNativeBuffers()
+    {
+        if (_nativeVertices.IsCreated) _nativeVertices.Dispose();
+        if (_nativeNormals.IsCreated) _nativeNormals.Dispose();
+        if (_nativeTriangles.IsCreated) _nativeTriangles.Dispose();
+        if (_nativeUvs.IsCreated) _nativeUvs.Dispose();
+        if (_nativeCount.IsCreated) _nativeCount.Dispose();
+        if (_culledVerticesNative.IsCreated) _culledVerticesNative.Dispose();
+        if (_culledNormalsNative.IsCreated) _culledNormalsNative.Dispose();
+        if (_culledTrianglesNative.IsCreated) _culledTrianglesNative.Dispose();
+        if (_culledUVsNative.IsCreated) _culledUVsNative.Dispose();
+    }
+
+    private void EnsureCullOutputBuffers()
+    {
+        if (!_culledVerticesNative.IsCreated) _culledVerticesNative = new NativeList<Vector3>(Allocator.Persistent);
+        if (!_culledNormalsNative.IsCreated) _culledNormalsNative = new NativeList<Vector3>(Allocator.Persistent);
+        if (!_culledTrianglesNative.IsCreated) _culledTrianglesNative = new NativeList<int>(Allocator.Persistent);
+        if (!_culledUVsNative.IsCreated) _culledUVsNative = new NativeList<Vector2>(Allocator.Persistent);
+    }
+
+    private void OnDestroy()
+    {
+        DisposeNativeBuffers();
+    }
 
 
  
@@ -242,15 +291,10 @@ public class MapCullComponent : MonoBehaviour
 
         [DeallocateOnJobCompletion]
         public NativeMap3D<int> meshLoadData;
-        [DeallocateOnJobCompletion]
         public NativeArray<Vector3> vertices;
-        [DeallocateOnJobCompletion]
         public NativeArray<Vector3> normals;
-        [DeallocateOnJobCompletion]
         public NativeArray<int> triangles;
-        [DeallocateOnJobCompletion]
         public NativeArray<Vector2> uvs;  
-        [DeallocateOnJobCompletion]
         public NativeArray<int> count; 
 
         public NativeList<Vector3> culledVertices;
