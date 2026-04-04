@@ -23,18 +23,28 @@ public class MapLoad
     private static GameObject _gameObject;
     private static MeshRenderer _meshRenderer;
     private static MapCullComponent _mapCullComponent;
+    private static ChunkMeshNativeData _builtNativeMeshData;
     
     // input
     private static Vector3Int _chunkCoordinate;
     private static Chunk _chunk;  
 
-    // output
-    private static List<Vector3> _vertices;
-    private static List<Vector3> _verticesShadow;
-    private static List<int> _triangles;
-    private static List<Vector2> _uvs; 
-    private static List<Vector3> _normals;
-    private static int[] _count;  
+    private static readonly List<int> _meshTrianglesManagedCache = new List<int>();
+
+    private static void CopyNativeArrayToList(NativeArray<int> source, List<int> destination)
+    {
+        destination.Clear();
+        int len = source.Length;
+        if (destination.Capacity < len)
+        {
+            destination.Capacity = len;
+        }
+
+        for (int i = 0; i < len; i++)
+        {
+            destination.Add(source[i]);
+        }
+    }
  
     public static void RefreshExistingChunk(Vector3Int chunkCoordinates)
     {
@@ -132,7 +142,6 @@ public class MapLoad
                 if (_chunk != Chunk.Zero)
                 {
                     await Task.Run(() => LoadMeshMath()); 
-                    await Task.Delay(10);
                     LoadMeshObject(replace);
                 }  else Helper.Log("Chunk in queue is zero");
             }
@@ -149,11 +158,17 @@ public class MapLoad
  
     private static void LoadMeshObject(bool replace = false)
     {
+        if (_builtNativeMeshData == null || !_builtNativeMeshData.IsCreated)
+        {
+            return;
+        }
+
         _mesh = new Mesh();
-        _mesh.SetVertices(_vertices);
-        _mesh.SetTriangles(_triangles, 0);
-        _mesh.SetUVs(0, _uvs);
-        _mesh.SetNormals(_normals); 
+        _mesh.SetVertices(_builtNativeMeshData.Vertices);
+        CopyNativeArrayToList(_builtNativeMeshData.Triangles, _meshTrianglesManagedCache);
+        _mesh.SetTriangles(_meshTrianglesManagedCache, 0);
+        _mesh.SetUVs(0, _builtNativeMeshData.Uvs);
+        _mesh.SetNormals(_builtNativeMeshData.Normals);
  
         if (!replace)
         {
@@ -167,9 +182,7 @@ public class MapLoad
             _meshRenderer.material = Block.MeshMaterial; 
 
             _mapCullComponent = _gameObject.AddComponent<MapCullComponent>();  
-            _mapCullComponent._meshData = _mesh;
-            _mapCullComponent._verticesShadow = _verticesShadow;
-            _mapCullComponent._count = _count;
+            _mapCullComponent.SetMeshData(_mesh, _builtNativeMeshData);
             ActiveChunks.Add(_chunkCoordinate, _mapCullComponent);
         } 
         else 
@@ -179,17 +192,22 @@ public class MapLoad
             _meshRenderer.material = Block.MeshMaterial; 
 
             _mapCullComponent = _gameObject.GetComponent<MapCullComponent>();  
-            _mapCullComponent._meshData = _mesh;
-            _mapCullComponent._verticesShadow = _verticesShadow;
-            _mapCullComponent._count = _count;
+            _mapCullComponent.SetMeshData(_mesh, _builtNativeMeshData);
             _mapCullComponent.HandleAssignment(); 
         } 
+
+        _builtNativeMeshData = null;
     }
  
     private static void LoadMeshMath()
     { 
         try
         {    
+            int chunkSize = World.ChunkSize;
+            int maxFaces = chunkSize * chunkSize * chunkSize * 6;
+            int maxFaceVertices = maxFaces * 4;
+            int maxFaceIndices = maxFaces * 6;
+
             // Initialize local temp arrays 
             MeshMathJob job = new MeshMathJob
             {
@@ -207,12 +225,12 @@ public class MapLoad
                 MeshLoadData = MeshLoadData.Create(_chunkCoordinate),
 
                 // output
-                Vertices = new NativeList<Vector3>(Allocator.TempJob),
-                VerticesShadow = new NativeList<Vector3>(Allocator.TempJob),
-                Triangles = new NativeList<int>(Allocator.TempJob),
-                Uvs = new NativeList<Vector2>(Allocator.TempJob),
-                Normals = new NativeList<Vector3>(Allocator.TempJob),
-                Count = new NativeList<int>(Allocator.TempJob),
+                Vertices = new NativeList<Vector3>(maxFaceVertices, Allocator.TempJob),
+                VerticesShadow = new NativeList<Vector3>(maxFaceVertices, Allocator.TempJob),
+                Triangles = new NativeList<int>(maxFaceIndices, Allocator.TempJob),
+                Uvs = new NativeList<Vector2>(maxFaceVertices, Allocator.TempJob),
+                Normals = new NativeList<Vector3>(maxFaceVertices, Allocator.TempJob),
+                Count = new NativeList<int>(chunkSize, Allocator.TempJob),
                 
                 // local temp
                 FaceVertices = new NativeArray<Vector3>(4, Allocator.TempJob),
@@ -225,12 +243,14 @@ public class MapLoad
 
             jobHandle.Complete();
 
-            _vertices = new List<Vector3>(job.Vertices.ToArray());
-            _verticesShadow = new List<Vector3>(job.VerticesShadow.ToArray());
-            _triangles = new List<int>(job.Triangles.ToArray());
-            _uvs = new List<Vector2>(job.Uvs.ToArray());
-            _normals = new List<Vector3>(job.Normals.ToArray());   
-            _count = job.Count.ToArray();
+            _builtNativeMeshData?.Dispose();
+            _builtNativeMeshData = ChunkMeshNativeData.CreateFromJobOutput(
+                job.Vertices,
+                job.VerticesShadow,
+                job.Triangles,
+                job.Uvs,
+                job.Normals,
+                job.Count);
             
             // Dispose of the native arrays and lists 
             job.Vertices.Dispose();
@@ -244,7 +264,7 @@ public class MapLoad
         catch (Exception ex)
         {
             Debug.LogError($"An exception occurred in MeshMathJob: {ex.Message}");
-        } 
+        }
     }
 
     private struct MeshMathJob : IJob
@@ -297,11 +317,14 @@ public class MapLoad
         private int _edgeValue;
         [DeallocateOnJobCompletion]
         private int _cornerValue;  
-        [DeallocateOnJobCompletion] 
-        private Rect _textureRect;
+        private float _invTextureAtlasWidth;
+        private float _invTextureAtlasHeight;
   
         public void Execute()
-        {   
+        {
+            _invTextureAtlasWidth = 1f / TextureAtlasWidth;
+            _invTextureAtlasHeight = 1f / TextureAtlasHeight;
+
             for (int y = 0; y < ChunkSize; y++)
             {
                 Count.Add(y == 0? 0 : Count[y-1]);
@@ -314,13 +337,20 @@ public class MapLoad
                         if (_blockID != 0)
                         {
                             _blockPosition = new Vector3Int(x, y, z);
+                            Rect blockTextureRect = TextureRectDictionary[_blockID];
+                            bool topEmpty = MeshLoadData[x, y + 1, z] == 0;
+                            bool bottomEmpty = MeshLoadData[x, y - 1, z] == 0;
+                            bool rightEmpty = MeshLoadData[x + 1, y, z] == 0;
+                            bool leftEmpty = MeshLoadData[x - 1, y, z] == 0;
+                            bool frontEmpty = MeshLoadData[x, y, z + 1] == 0;
+                            bool backEmpty = MeshLoadData[x, y, z - 1] == 0;
 
-                            if (MeshLoadData[x, y + 1, z] == 0) HandleMeshFace(Dir.Py, HandleMeshAutoTile(x, y, z, Dir.Py)); // Top
-                            if (MeshLoadData[x, y - 1, z] == 0) HandleMeshFace(Dir.Ny, 1); // Bottom
-                            if (MeshLoadData[x + 1, y, z] == 0) HandleMeshFace(Dir.Px, HandleMeshAutoTile(x, y, z, Dir.Px)); // Right
-                            if (MeshLoadData[x - 1, y, z] == 0) HandleMeshFace(Dir.Nx, HandleMeshAutoTile(x, y, z, Dir.Nx)); // Left
-                            if (MeshLoadData[x, y, z + 1] == 0) HandleMeshFace(Dir.Pz, HandleMeshAutoTile(x, y, z, Dir.Pz)); // Front
-                            if (MeshLoadData[x, y, z - 1] == 0) HandleMeshFace(Dir.Nz, HandleMeshAutoTile(x, y, z, Dir.Nz)); // Back
+                            if (topEmpty) HandleMeshFace(Dir.Py, HandleMeshAutoTile(x, y, z, Dir.Py, topEmpty), blockTextureRect); // Top
+                            if (bottomEmpty) HandleMeshFace(Dir.Ny, 1, blockTextureRect); // Bottom
+                            if (rightEmpty) HandleMeshFace(Dir.Px, HandleMeshAutoTile(x, y, z, Dir.Px, rightEmpty), blockTextureRect); // Right
+                            if (leftEmpty) HandleMeshFace(Dir.Nx, HandleMeshAutoTile(x, y, z, Dir.Nx, leftEmpty), blockTextureRect); // Left
+                            if (frontEmpty) HandleMeshFace(Dir.Pz, HandleMeshAutoTile(x, y, z, Dir.Pz, frontEmpty), blockTextureRect); // Front
+                            if (backEmpty) HandleMeshFace(Dir.Nz, HandleMeshAutoTile(x, y, z, Dir.Nz, backEmpty), blockTextureRect); // Back
                         }
                     }
                 }
@@ -328,11 +358,12 @@ public class MapLoad
             }
         }
 
-        void HandleMeshFace(Dir direction, int textureIndex)
+        void HandleMeshFace(Dir direction, int textureIndex, Rect textureRect)
         {
             Count[_blockPosition.y]++;
             int vertexIndex = Vertices.Length; 
             _normal = Vector3.zero;
+            bool useTopShadow = direction == Dir.Py;
 
             if (direction == Dir.Py) // top
             {
@@ -423,33 +454,27 @@ public class MapLoad
                 Triangles.Add(vertexIndex + 2);
                 _normal = new Vector3(1, 0, 0);
             }
- 
- 
-            _textureRect = TextureRectDictionary[_blockID];
-
             Vector2Int tile = GetTileRect(textureIndex);
-            float baseX = _textureRect.x;
-            float baseY = _textureRect.y;
-            float widthScale = 1f / TextureAtlasWidth;
-            float heightScale = 1f / TextureAtlasHeight;
+            float baseX = textureRect.x;
+            float baseY = textureRect.y;
 
             AddFaceVertexData(0,
-                new Vector2(tile.x * widthScale + baseX, tile.y * heightScale + baseY), direction);
+                new Vector2(tile.x * _invTextureAtlasWidth + baseX, tile.y * _invTextureAtlasHeight + baseY), useTopShadow);
             AddFaceVertexData(1,
-                new Vector2((tile.x + TileSize) * widthScale + baseX, tile.y * heightScale + baseY), direction);
+                new Vector2((tile.x + TileSize) * _invTextureAtlasWidth + baseX, tile.y * _invTextureAtlasHeight + baseY), useTopShadow);
             AddFaceVertexData(2,
-                new Vector2((tile.x + TileSize) * widthScale + baseX, (tile.y + TileSize) * heightScale + baseY), direction);
+                new Vector2((tile.x + TileSize) * _invTextureAtlasWidth + baseX, (tile.y + TileSize) * _invTextureAtlasHeight + baseY), useTopShadow);
             AddFaceVertexData(3,
-                new Vector2(tile.x * widthScale + baseX, (tile.y + TileSize) * heightScale + baseY), direction);
+                new Vector2(tile.x * _invTextureAtlasWidth + baseX, (tile.y + TileSize) * _invTextureAtlasHeight + baseY), useTopShadow);
         }
 
-        void AddFaceVertexData(int faceIndex, Vector2 uv, Dir direction)
+        void AddFaceVertexData(int faceIndex, Vector2 uv, bool useTopShadow)
         {
             Uvs.Add(uv);
             Normals.Add(_normal);
             Vertices.Add(FaceVertices[faceIndex]);
 
-            if (direction == Dir.Py)
+            if (useTopShadow)
             {
                 VerticesShadow.Add(FaceVerticesShadow[faceIndex]);
             }
@@ -468,7 +493,7 @@ public class MapLoad
         }
           
 
-        int HandleMeshAutoTile(int x, int y, int z, Dir mode)
+        int HandleMeshAutoTile(int x, int y, int z, Dir mode, bool isSideEmpty)
         {
             _spriteNumber = 0;
             _edgeValue = 0;
@@ -476,56 +501,54 @@ public class MapLoad
 
             if (mode == Dir.Py) // Top
             {
-                bool isPy = MeshLoadData[x, y + 1, z] == 0;
-
                 if ((MeshLoadData[x, y, z + 1] != 0)
-                    || (isPy && MeshLoadData[x, y + 1, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y + 1, z + 1] != 0))
                 {
                     _edgeValue += 1; // Top
                 }
 
                 if ((MeshLoadData[x + 1, y, z] != 0)
-                    || (isPy && MeshLoadData[x + 1, y + 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y + 1, z] != 0))
                 {
                     _edgeValue += 2; // Right
                 }
 
                 if ((MeshLoadData[x, y, z - 1] != 0)
-                    || (isPy && MeshLoadData[x, y + 1, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y + 1, z - 1] != 0))
                 {
                     _edgeValue += 4; // Bottom
                 }
 
                 if ((MeshLoadData[x - 1, y, z] != 0)
-                    || (isPy && MeshLoadData[x - 1, y + 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y + 1, z] != 0))
                 {
                     _edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
                 if (((MeshLoadData[x - 1, y, z + 1] != 0)
-                    || (isPy && MeshLoadData[x - 1, y + 1, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 1; // Top-Left
                 }
 
                 if (((MeshLoadData[x + 1, y, z + 1] != 0)
-                    || (isPy && MeshLoadData[x + 1, y + 1, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 2) != 0)
                 {
                     _cornerValue += 2; // Top-Right
                 }
 
                 if (((MeshLoadData[x + 1, y, z - 1] != 0)
-                    || (isPy && MeshLoadData[x + 1, y + 1, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 2) != 0 && (_edgeValue & 4) != 0)
                 {
                     _cornerValue += 4; // Bottom-Right
                 }
 
                 if (((MeshLoadData[x - 1, y, z - 1] != 0)
-                    || (isPy && MeshLoadData[x - 1, y + 1, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 4) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 8; // Bottom-Left
@@ -533,28 +556,26 @@ public class MapLoad
             }  
             else if (mode == Dir.Nx) // Negative X (Left side of the cube)
             {
-                bool isNx = MeshLoadData[x - 1, y, z] == 0;
-
                 if ((MeshLoadData[x, y + 1, z] != 0)
-                    || (isNx && MeshLoadData[x - 1, y + 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y + 1, z] != 0))
                 {
                     _edgeValue += 1; // Top
                 }
 
                 if ((MeshLoadData[x, y, z + 1] != 0)
-                    || (isNx && MeshLoadData[x - 1, y, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y, z + 1] != 0))
                 {
                     _edgeValue += 2; // Right
                 }
 
                 if ((MeshLoadData[x, y - 1, z] != 0)
-                    || (isNx && MeshLoadData[x - 1, y - 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y - 1, z] != 0))
                 {
                     _edgeValue += 4; // Bottom
                 }
 
                 if ((MeshLoadData[x, y, z - 1] != 0)
-                    || (isNx && MeshLoadData[x - 1, y, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y, z - 1] != 0))
                 {
                     _edgeValue += 8; // Left
                 }
@@ -562,27 +583,27 @@ public class MapLoad
                 // Calculate corner values
                 
                 if (((MeshLoadData[x, y + 1, z - 1] != 0)
-                     || (isNx && MeshLoadData[x - 1, y + 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 1; // Top-Left
                 }
                 if (((MeshLoadData[x, y + 1, z + 1] != 0)
-                     || (isNx && MeshLoadData[x - 1, y + 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 2) != 0)
                 {
                     _cornerValue += 2; // Top-Right
                 }
 
                 if (((MeshLoadData[x, y - 1, z + 1] != 0)
-                     || (isNx && MeshLoadData[x - 1, y - 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y - 1, z + 1] != 0))
                     && (_edgeValue & 2) != 0 && (_edgeValue & 4) != 0)
                 {
                     _cornerValue += 4; // Bottom-Right
                 }
 
                 if (((MeshLoadData[x, y - 1, z - 1] != 0)
-                     || (isNx && MeshLoadData[x - 1, y - 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y - 1, z - 1] != 0))
                     && (_edgeValue & 4) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 8; // Bottom-Left
@@ -590,28 +611,26 @@ public class MapLoad
             }
             else if (mode == Dir.Px) // Positive X (Right side of the cube)
             {
-                bool isPx = MeshLoadData[x + 1, y, z] == 0;
-
                 if ((MeshLoadData[x, y + 1, z] != 0)
-                    || (isPx && MeshLoadData[x + 1, y + 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y + 1, z] != 0))
                 {
                     _edgeValue += 1; // Top
                 }
 
                 if ((MeshLoadData[x, y, z + 1] != 0)
-                    || (isPx && MeshLoadData[x + 1, y, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y, z + 1] != 0))
                 {
                     _edgeValue += 2; // Right
                 }
 
                 if ((MeshLoadData[x, y - 1, z] != 0)
-                    || (isPx && MeshLoadData[x + 1, y - 1, z] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y - 1, z] != 0))
                 {
                     _edgeValue += 4; // Bottom
                 }
 
                 if ((MeshLoadData[x, y, z - 1] != 0)
-                    || (isPx && MeshLoadData[x + 1, y, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y, z - 1] != 0))
                 {
                     _edgeValue += 8; // Left
                 }
@@ -620,28 +639,28 @@ public class MapLoad
                 // Calculate corner values
 
                 if (((MeshLoadData[x, y + 1, z - 1] != 0)
-                     || (isPx && MeshLoadData[x + 1, y + 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 1; // Top-Left
                 }
                 
                 if (((MeshLoadData[x, y + 1, z + 1] != 0)
-                     || (isPx && MeshLoadData[x + 1, y + 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 2) != 0)
                 {
                     _cornerValue += 2; // Top-Right
                 }
 
                 if (((MeshLoadData[x, y - 1, z + 1] != 0)
-                     || (isPx && MeshLoadData[x + 1, y - 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y - 1, z + 1] != 0))
                     && (_edgeValue & 2) != 0 && (_edgeValue & 4) != 0)
                 {
                     _cornerValue += 4; // Bottom-Right
                 }
 
                 if (((MeshLoadData[x, y - 1, z - 1] != 0)
-                     || (isPx && MeshLoadData[x + 1, y - 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y - 1, z - 1] != 0))
                     && (_edgeValue & 4) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 8; // Bottom-Left
@@ -649,56 +668,54 @@ public class MapLoad
             }
             else if (mode == Dir.Pz) // Positive Z (Front of the cube)
             {
-                bool isPz = MeshLoadData[x, y, z + 1] == 0;
-
                 if ((MeshLoadData[x, y + 1, z] != 0)
-                    || (isPz && MeshLoadData[x, y + 1, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y + 1, z + 1] != 0))
                 {
                     _edgeValue += 1; // Top
                 }
 
                 if ((MeshLoadData[x + 1, y, z] != 0)
-                    || (isPz && MeshLoadData[x + 1, y, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y, z + 1] != 0))
                 {
                     _edgeValue += 2; // Right
                 }
 
                 if ((MeshLoadData[x, y - 1, z] != 0)
-                    || (isPz && MeshLoadData[x, y - 1, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y - 1, z + 1] != 0))
                 {
                     _edgeValue += 4; // Bottom
                 }
 
                 if ((MeshLoadData[x - 1, y, z] != 0)
-                    || (isPz && MeshLoadData[x - 1, y, z + 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y, z + 1] != 0))
                 {
                     _edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
                 if (((MeshLoadData[x - 1, y + 1, z] != 0)
-                     || (isPz && MeshLoadData[x - 1, y + 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 1; // Top-Left
                 }
 
                 if (((MeshLoadData[x + 1, y + 1, z] != 0)
-                     || (isPz && MeshLoadData[x + 1, y + 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y + 1, z + 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 2) != 0)
                 {
                     _cornerValue += 2; // Top-Right
                 }
 
                 if (((MeshLoadData[x + 1, y - 1, z] != 0)
-                     || (isPz && MeshLoadData[x + 1, y - 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y - 1, z + 1] != 0))
                     && (_edgeValue & 2) != 0 && (_edgeValue & 4) != 0)
                 {
                     _cornerValue += 4; // Bottom-Right
                 }
 
                 if (((MeshLoadData[x - 1, y - 1, z] != 0)
-                     || (isPz && MeshLoadData[x - 1, y - 1, z + 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y - 1, z + 1] != 0))
                     && (_edgeValue & 4) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 8; // Bottom-Left
@@ -706,56 +723,54 @@ public class MapLoad
             }
             else if (mode == Dir.Nz) // Negative Z (Back of the cube)
             {
-                bool isNz = MeshLoadData[x, y, z - 1] == 0;
-
                 if ((MeshLoadData[x, y + 1, z] != 0)
-                    || (isNz && MeshLoadData[x, y + 1, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y + 1, z - 1] != 0))
                 {
                     _edgeValue += 1; // Top
                 }
 
                 if ((MeshLoadData[x + 1, y, z] != 0)
-                    || (isNz && MeshLoadData[x + 1, y, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x + 1, y, z - 1] != 0))
                 {
                     _edgeValue += 2; // Right
                 }
 
                 if ((MeshLoadData[x, y - 1, z] != 0)
-                    || (isNz && MeshLoadData[x, y - 1, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x, y - 1, z - 1] != 0))
                 {
                     _edgeValue += 4; // Bottom
                 }
 
                 if ((MeshLoadData[x - 1, y, z] != 0)
-                    || (isNz && MeshLoadData[x - 1, y, z - 1] != 0))
+                    || (isSideEmpty && MeshLoadData[x - 1, y, z - 1] != 0))
                 {
                     _edgeValue += 8; // Left
                 }
 
                 // Calculate corner values
                 if (((MeshLoadData[x - 1, y + 1, z] != 0)
-                     || (isNz && MeshLoadData[x - 1, y + 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 1; // Top-Left
                 }
 
                 if (((MeshLoadData[x + 1, y + 1, z] != 0)
-                     || (isNz && MeshLoadData[x + 1, y + 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y + 1, z - 1] != 0))
                     && (_edgeValue & 1) != 0 && (_edgeValue & 2) != 0)
                 {
                     _cornerValue += 2; // Top-Right
                 }
 
                 if (((MeshLoadData[x + 1, y - 1, z] != 0)
-                     || (isNz && MeshLoadData[x + 1, y - 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x + 1, y - 1, z - 1] != 0))
                     && (_edgeValue & 2) != 0 && (_edgeValue & 4) != 0)
                 {
                     _cornerValue += 4; // Bottom-Right
                 }
 
                 if (((MeshLoadData[x - 1, y - 1, z] != 0)
-                     || (isNz && MeshLoadData[x - 1, y - 1, z - 1] != 0))
+                     || (isSideEmpty && MeshLoadData[x - 1, y - 1, z - 1] != 0))
                     && (_edgeValue & 4) != 0 && (_edgeValue & 8) != 0)
                 {
                     _cornerValue += 8; // Bottom-Left
