@@ -7,28 +7,23 @@ using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.Profiling;
 // i fucking hate this script
 public class MapCullComponent : MonoBehaviour
 {  
     public Mesh _meshData;
-    public List<Vector3> _verticesShadow;
-    public int[] _count;
+    public ChunkMeshNativeData _nativeMeshData;
 
     private MeshCollider _meshCollider;
     private MeshFilter _shadowMeshFilter;
     private MeshFilter _meshFilter; 
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;  
-    private NativeArray<Vector3> _nativeVertices;
-    private NativeArray<Vector3> _nativeNormals;
-    private NativeArray<int> _nativeTriangles;
-    private NativeArray<Vector2> _nativeUvs;
-    private NativeArray<int> _nativeCount;
     private NativeList<Vector3> _culledVerticesNative;
     private NativeList<Vector3> _culledNormalsNative;
     private NativeList<int> _culledTrianglesNative;
     private NativeList<Vector2> _culledUVsNative;
+    private readonly List<int> _shadowTrianglesManagedCache = new List<int>();
+    private readonly List<int> _culledTrianglesManagedCache = new List<int>();
     
     private int CULL_DISTANCE = 2; 
     private Vector3Int _selfChunkPosition;
@@ -47,6 +42,17 @@ public class MapCullComponent : MonoBehaviour
         _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         _meshRenderer.enabled = false;    
         _selfChunkPosition = Vector3Int.FloorToInt(transform.position);
+    }
+
+    public void SetMeshData(Mesh meshData, ChunkMeshNativeData nativeMeshData)
+    {
+        if (_nativeMeshData != null && _nativeMeshData != nativeMeshData)
+        {
+            _nativeMeshData.Dispose();
+        }
+
+        _meshData = meshData;
+        _nativeMeshData = nativeMeshData;
     }
 
     void Start() { 
@@ -70,12 +76,10 @@ public class MapCullComponent : MonoBehaviour
     {
         try
         {
-            _uvs = _meshData.uv;
-            _vertices = _meshData.vertices;
-            _normals = _meshData.normals;
-            _triangles = _meshData.triangles;   
-
-            CacheNativeBuffers();
+            if (_meshData == null || _nativeMeshData == null || !_nativeMeshData.IsCreated)
+            {
+                return;
+            }
 
             Mesh shadowMesh = _shadowMeshFilter.sharedMesh;
             if (shadowMesh == null)
@@ -87,9 +91,10 @@ public class MapCullComponent : MonoBehaviour
                 shadowMesh.Clear();
             }
 
-            shadowMesh.SetVertices(_verticesShadow);
-            shadowMesh.SetTriangles(_meshData.triangles, 0);   
-            shadowMesh.SetNormals(_meshData.normals); 
+            shadowMesh.SetVertices(_nativeMeshData.VerticesShadow);
+            CopyNativeArrayToList(_nativeMeshData.Triangles, _shadowTrianglesManagedCache);
+            shadowMesh.SetTriangles(_shadowTrianglesManagedCache, 0);
+            shadowMesh.SetNormals(_nativeMeshData.Normals);
             _shadowMeshFilter.sharedMesh = shadowMesh;
 
             CullMeshAsync();     
@@ -159,18 +164,12 @@ public class MapCullComponent : MonoBehaviour
 
  
     async void HandleCullMesh()
-    {   
-        if (_mesh == null)
-        {
-            _mesh = new Mesh();
-        }
-        else
-        {
-            _mesh.Clear();
-        }
+    {
+        _mesh = new Mesh();
 
         _mesh.SetVertices(_culledVerticesNative.AsArray());
-        _mesh.SetTriangles(_culledTrianglesNative.AsArray().ToArray(), 0);
+        CopyNativeArrayToList(_culledTrianglesNative.AsArray(), _culledTrianglesManagedCache);
+        _mesh.SetTriangles(_culledTrianglesManagedCache, 0);
         _mesh.SetUVs(0, _culledUVsNative.AsArray());
         _mesh.SetNormals(_culledNormalsNative.AsArray());
          
@@ -206,6 +205,11 @@ public class MapCullComponent : MonoBehaviour
     }  
     void HandleCullMath()
     {
+        if (_nativeMeshData == null || !_nativeMeshData.IsCreated)
+        {
+            return;
+        }
+
         EnsureCullOutputBuffers();
         _culledVerticesNative.Clear();
         _culledNormalsNative.Clear();
@@ -218,49 +222,48 @@ public class MapCullComponent : MonoBehaviour
             yThreshold = MapCull.YThreshold - _selfChunkPosition.y,
 
             meshLoadData = MeshLoadData.Create(_selfChunkPosition),
-            vertices = _nativeVertices,
-            normals = _nativeNormals,
-            triangles = _nativeTriangles,
-            uvs = _nativeUvs, 
-            count = _nativeCount,
+            vertices = _nativeMeshData.Vertices,
+            normals = _nativeMeshData.Normals,
+            triangles = _nativeMeshData.Triangles,
+            uvs = _nativeMeshData.Uvs,
+            count = _nativeMeshData.Count,
 
             culledVertices = _culledVerticesNative,
             culledNormals = _culledNormalsNative,
             culledTriangles = _culledTrianglesNative,
             culledUVs = _culledUVsNative,
 
-            vertexMap = new NativeHashMap<int, int>(_nativeVertices.Length, Allocator.TempJob), 
+            vertexMap = new NativeHashMap<int, int>(_nativeMeshData.Vertices.Length, Allocator.TempJob), 
         };
 
         JobHandle handle = job.Schedule();
         handle.Complete();
 
-        job.vertexMap.Dispose(); 
+        job.vertexMap.Dispose();
     }
  
-    private Vector3[] _vertices;
-    private Vector3[] _normals; 
-    private int[] _triangles;
-    private Vector2[] _uvs;
-
-    private void CacheNativeBuffers()
+    private static void CopyNativeArrayToList(NativeArray<int> source, List<int> destination)
     {
-        DisposeNativeBuffers();
+        destination.Clear();
+        int len = source.Length;
+        if (destination.Capacity < len)
+        {
+            destination.Capacity = len;
+        }
 
-        _nativeVertices = new NativeArray<Vector3>(_vertices, Allocator.Persistent);
-        _nativeNormals = new NativeArray<Vector3>(_normals, Allocator.Persistent);
-        _nativeTriangles = new NativeArray<int>(_triangles, Allocator.Persistent);
-        _nativeUvs = new NativeArray<Vector2>(_uvs, Allocator.Persistent);
-        _nativeCount = new NativeArray<int>(_count, Allocator.Persistent);
+        for (int i = 0; i < len; i++)
+        {
+            destination.Add(source[i]);
+        }
     }
 
     private void DisposeNativeBuffers()
     {
-        if (_nativeVertices.IsCreated) _nativeVertices.Dispose();
-        if (_nativeNormals.IsCreated) _nativeNormals.Dispose();
-        if (_nativeTriangles.IsCreated) _nativeTriangles.Dispose();
-        if (_nativeUvs.IsCreated) _nativeUvs.Dispose();
-        if (_nativeCount.IsCreated) _nativeCount.Dispose();
+        if (_nativeMeshData != null)
+        {
+            _nativeMeshData.Dispose();
+            _nativeMeshData = null;
+        }
         if (_culledVerticesNative.IsCreated) _culledVerticesNative.Dispose();
         if (_culledNormalsNative.IsCreated) _culledNormalsNative.Dispose();
         if (_culledTrianglesNative.IsCreated) _culledTrianglesNative.Dispose();
