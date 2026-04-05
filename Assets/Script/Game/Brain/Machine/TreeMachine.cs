@@ -1,10 +1,10 @@
-public class TreeMachine : StructureMachine
+public abstract class TreeMachine : StructureMachine
 {
-    public static Info CreateInfo()
+    protected static Info CreateInfo(ID loot)
     {
         return new SpriteStructureInfo() {
             Health = 40,
-            Loot = ID.Tree,
+            Loot = loot,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,

@@ -45,7 +45,8 @@ public enum ID
     Pistol,
     
     Slab,
-    Tree,
+    PineTree,
+    BirchTree,
     Megumin,
     Chito,
     SnareFlea,

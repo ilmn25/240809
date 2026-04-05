@@ -9,7 +9,7 @@ public class SawmillMachine: ConverterMachine
         return new ConverterInfo()
         {
             Health = 500,
-            Loot = ID.Tree,
+            Loot = ID.PineTree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
