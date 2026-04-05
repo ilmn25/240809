@@ -21,6 +21,7 @@ public class WorkbenchMachine: CraftingMachine
         Storage storage = new NoRefreshStorage(9);
         storage.CreateAndAddItem(ID.Spear);
         storage.CreateAndAddItem(ID.StonePickaxe); 
+        storage.CreateAndAddItem(ID.StoneHatchet);
         storage.CreateAndAddItem(ID.Hammer); 
         return new ContainerInfo()
         {
