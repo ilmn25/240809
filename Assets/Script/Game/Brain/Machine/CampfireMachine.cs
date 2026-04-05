@@ -8,7 +8,7 @@ public class CampfireMachine: ConverterMachine
         return new ConverterInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Campfire,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage

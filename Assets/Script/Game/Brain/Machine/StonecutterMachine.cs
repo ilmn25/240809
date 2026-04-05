@@ -8,7 +8,7 @@ public class StonecutterMachine: ConverterMachine
         return new ConverterInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Stonecutter,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
