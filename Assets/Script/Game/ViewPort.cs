@@ -39,10 +39,11 @@ public partial class ViewPort
     public static void Update()
     {   
         Main.Camera.fieldOfView = Mathf.Lerp(Main.Camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
+
+        ScreenShake.Update();
         
         HandlePlayerFollow(); 
         HandleCameraSway();
-        HandleScreenShake();
 
         if (Control.Inst.OrbitLeft.KeyDown())
         { 
@@ -149,7 +150,7 @@ public partial class ViewPort
     private static void HandlePlayerFollow()
     {
         Main.ViewPortObject.transform.position = Vector3.Lerp(Main.ViewPortObject.transform.position, 
-            Main.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ShakeOffset;
+            Main.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ScreenShake.Offset;
     }
  
 }

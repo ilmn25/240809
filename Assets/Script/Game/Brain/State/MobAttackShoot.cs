@@ -23,8 +23,9 @@ public class MobAttackShoot : MobState
             Info.AimPosition,
             Info.Equipment.Info.ProjectileInfo,
             Info.targetHitboxType, Info);
-        
-        ViewPort.StartScreenShake(1, 0.035f, direction);
+
+        if (Main.PlayerInfo == Info)
+            ScreenShake.Shake(40f, 0.035f, 1f / 60f, direction);
         
         Entity.SpawnItem(ID.Casing, Info.position + Vector3.up * 0.5f, 1, false, 
             (Vector3.up -direction) * 5, 15000);

@@ -240,7 +240,19 @@ public class Console : MonoBehaviour
                 Application.targetFrameRate = int.Parse(_command[1]);
                 break;  
             case "shake": 
-                ViewPort.StartScreenShake(int.Parse(_command[1]), float.Parse(_command[2]));
+                if (_command.Length == 4 &&
+                    float.TryParse(_command[1], out float shakeSpeed) &&
+                    float.TryParse(_command[2], out float shakeStrength) &&
+                    float.TryParse(_command[3], out float shakeDuration))
+                {
+                    ScreenShake.Shake(shakeSpeed, shakeStrength, shakeDuration);
+                }
+                else if (_command.Length == 3 &&
+                    float.TryParse(_command[1], out float shakeMagnitude) &&
+                    float.TryParse(_command[2], out float shakeTime))
+                {
+                    ScreenShake.Shake(40f, shakeMagnitude, shakeTime);
+                }
                 break;   
             case "save": 
                 Output("unloaded");  
