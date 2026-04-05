@@ -135,7 +135,19 @@ public static class GUIMain
 
         string BuildTargetHudText(Info target)
         {
-            return target?.ToString() ?? "";
+            if (target == null)
+                return "";
+
+            string text = target.ToString();
+
+            if (target is StructureInfo structureInfo &&
+                Main.PlayerInfo?.Equipment?.Info?.ProjectileInfo != null &&
+                Main.PlayerInfo.Equipment.Info.ProjectileInfo.Breaking < structureInfo.threshold)
+            {
+                text += " (tool too weak)";
+            }
+
+            return text;
         }
     
         if (Scene.Busy)

@@ -7,6 +7,14 @@ StonePickaxe = Workbench, 2 Sticks + 4 Flint
 StoneHatchet = Workbench, 2 Sticks + 3 Flint
 Hammer = Workbench, 2 Sticks + 2 Flint
 
+## Tool Thresholds
+
+StoneHatchet = Cutting 1 (minimum tree-harvest cutting tool)
+StonePickaxe = Mining 1 (minimum stone/ore mining tool)
+MetalAxe = Cutting 2
+Hammer = Building 3
+DiamondAxe = Cutting 4
+
 ## Station Recipes
 
 Blueprint = Station, 2 Log + 1 Charcoal
@@ -43,12 +51,12 @@ MetalAxe = Anvil, 2 Steel + 5 Stake
  
 ## Raw Materials and Sources
 
-Log = Tree harvest, requires a StoneHatchet or stronger cutting tool
+Log = Tree harvest, requires a cutting tool (StoneHatchet or stronger; minimum Cutting Breaking 1) 
 Acorn = Tree harvest, dropped from trees
-Flint = Dirt surface loot and Slab mining
+Flint = Dirt surface loot and Slab mining; requires a mining tool (StonePickaxe or stronger; minimum Mining Breaking 1)
 Sticks = Dirt surface loot
-Gravel = Slab mining, StoneBlock mining, DirtBlock mining
-MetalChunks = StoneBlock mining
+Gravel = Slab mining, StoneBlock mining, DirtBlock mining; requires a mining tool (StonePickaxe or stronger; minimum Mining Breaking 1) 
+MetalChunks = StoneBlock mining; requires a mining tool (StonePickaxe or stronger; minimum Mining Breaking 1)(tool too weak)
 Wool = Sheep drop
 Meat = Sheep and Harpy drops
 Cytoplasm = Slime drop
@@ -86,10 +94,10 @@ Pistol = NA, 2 WoodBlock
 3. Craft a Station using 15 Log + 5 Flint once you have 15 Log.
 4. At the Station, craft a Workbench using 15 Log.
 5. At the Workbench, craft a StoneHatchet using 2 Sticks + 3 Flint.
-6. Use the StoneHatchet to chop trees and gather the Logs needed for all later builds.
+6. Use the StoneHatchet to chop trees and gather the Logs needed for all later builds. This is the minimum cutting tool for tree harvest.
 7. At the Workbench, craft a StonePickaxe using 2 Sticks + 4 Flint.
 8. At the Workbench, craft a Hammer using 2 Sticks + 2 Flint.
-9. Use the StonePickaxe to mine 15 Gravel and 9 MetalChunks.
+9. Use the StonePickaxe to mine 15 Gravel and 9 MetalChunks. This is the minimum mining tool for stone/ore mining.
 10. Gather 15 Log with the StoneHatchet.
 11. Craft a Campfire using 4 Gravel + 1 Flint + 15 Log.
 12. Use the Campfire to craft 18 Charcoal from 36 Log (2 Log each).
