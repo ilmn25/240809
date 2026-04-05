@@ -25,7 +25,7 @@ public class WorkbenchMachine: CraftingMachine
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Workbench,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage

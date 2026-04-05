@@ -8,7 +8,7 @@ public class FurnaceMachine: ConverterMachine
         return new ConverterInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Furnace,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
