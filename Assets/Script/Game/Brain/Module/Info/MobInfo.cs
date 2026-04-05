@@ -70,6 +70,9 @@ public class MobInfo : DynamicInfo
     }
     public void SetEquipment(ItemSlot target)
     {
+        if (ReferenceEquals(target, Equipment))
+            return;
+
         // SetEquipment can be called during scene/player switching before DynamicInfo.Initialize assigns tool references.
         if (SpriteTool == null || SpriteToolTrack == null || SpriteToolRenderer == null)
         {
