@@ -93,8 +93,8 @@ public class Environment
         _ = new CoroutineTask(Clock());
     }       
      
-    public const int Length = 60 * 19;
-    private const float Speed = 0.25f;
+    public const int Length = 60 * 24;
+    private const float Speed = 0.4f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous;

@@ -55,8 +55,8 @@ public class AnimationHierarchyEditor : EditorWindow {
 	private string sNewRoot = "SomeNewObject/Root";
 
 	void OnGUI() {
-		if (Event.current.type == EventType.ValidateCommand) {
-			switch (Event.current.commandName) {
+		if (UnityEngine.Event.current.type == EventType.ValidateCommand) {
+			switch (UnityEngine.Event.current.commandName) {
 			case "UndoRedoPerformed":
 				FillModel();
 				break;
