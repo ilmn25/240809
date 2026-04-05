@@ -90,7 +90,7 @@ public class  GUIStorage : GUI
             }
         }
     }
-    
+
     protected virtual void ActionPrimaryDown() {}
     protected virtual void ActionSecondaryDown() {} 
     protected virtual void ActionSecondaryKey() {} 
