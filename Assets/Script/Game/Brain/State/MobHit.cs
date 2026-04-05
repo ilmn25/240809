@@ -6,7 +6,7 @@ class MobHit : MobState {
     { 
         Info.Animator.speed = 3f;  
         Info.Animator.Play("Hit", 0, 0f);   
-        ViewPort.StartScreenShake(1, 0.05f);
+        ScreenShake.Shake(40f, 0.05f, 1f / 60f);
     }
     
     public override void OnUpdateState() {
