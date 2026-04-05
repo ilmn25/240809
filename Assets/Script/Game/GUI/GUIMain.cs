@@ -54,11 +54,11 @@ public static class GUIMain
         Storage storage = new NoRefreshStorage(9)
         {
             Name = "Crafting",
-        };
-        storage.CreateAndAddItem(ID.Station);
+        }; 
         storage.CreateAndAddItem(ID.CrudePickaxe);
         storage.CreateAndAddItem(ID.CrudeHatchet);
-        storage.CreateAndAddItem(ID.Hammer);
+        storage.CreateAndAddItem(ID.CrudeMallet);
+        storage.CreateAndAddItem(ID.Station);
         storage.CreateAndAddItem(ID.Campfire);
         HandCrafting = new GUICraft()
         {

@@ -115,7 +115,7 @@ public partial class Item
         AddToolDefinition(
             id: ID.CrudePickaxe,
             gesture: ItemGesture.Swing,
-            speed: 1.8f,
+            speed: 2.4f,
             range: 4f,
             projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
@@ -126,7 +126,7 @@ public partial class Item
                 Breaking = 1,
                 OperationType = OperationType.Mining
             },
-            durability: 100,
+            durability: 60,
             description: "A rough pickaxe for early mining.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
             holdoutOffset: new Vector2(0.65f, 0)
@@ -154,7 +154,7 @@ public partial class Item
         AddToolDefinition(
             id: ID.CrudeHatchet,
             gesture: ItemGesture.Swing,
-            speed: 1.8f,
+            speed: 2.4f,
             range: 4f,
             projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
@@ -165,7 +165,7 @@ public partial class Item
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
-            durability: 100,
+            durability: 60,
             description: "A rough hatchet for early woodcutting.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
@@ -225,6 +225,26 @@ public partial class Item
             },
             description: "Hammer used for building and weapon crafting.",
             materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
+            holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.CrudeMallet,
+            gesture: ItemGesture.Swing,
+            speed: 2.8f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 1,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 2,
+                Radius = 2,
+                Breaking = 3,
+                OperationType = OperationType.Building
+            },
+            durability: 60,
+            description: "A rough mallet for basic building work.",
+            materials: new Dictionary<ID, int> { { ID.Flint, 1 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
 

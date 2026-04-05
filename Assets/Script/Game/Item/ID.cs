@@ -90,4 +90,5 @@ public enum ID
     BirchTree,
     CrudePickaxe,
     CrudeHatchet,
+    CrudeMallet,
 }
