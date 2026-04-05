@@ -51,6 +51,16 @@ public class Loot
             }
         }
     }
+
+    public void SpawnOneRandom(Vector3 position)
+    {
+        if (_table.Count == 0) return;
+        
+        Vector3Int worldPosition = Vector3Int.FloorToInt(position);
+        var entry = _table[Random.Range(0, _table.Count)];
+        ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
+        Entity.SpawnItem(itemID, worldPosition);
+    }
     
     public void AddToContainer(Storage storage)
     { 
