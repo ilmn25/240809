@@ -45,8 +45,7 @@ public enum ID
     Pistol,
     
     Slab,
-    PineTree,
-    BirchTree,
+    PineTree, 
     Megumin,
     Chito,
     SnareFlea,
@@ -87,5 +86,6 @@ public enum ID
     Chicken,
     Sheep,
     Wool,
-    Computer
+    Computer,
+    BirchTree,
 }
