@@ -25,7 +25,8 @@ public class StructureInfo : Info
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.SourceInfo.targetHitboxType == HitboxType.Player ||
+        if (projectile.SourceInfo.Equipment == null ||
+            projectile.SourceInfo.targetHitboxType == HitboxType.Player ||
             projectile.SourceInfo.Equipment.Info.ProjectileInfo.OperationType != operationType ||
             projectile.SourceInfo.Equipment.Info.ProjectileInfo.Breaking < threshold)
         { 
@@ -40,6 +41,7 @@ public class StructureInfo : Info
     public override void AbstractHit(MobInfo info)
     {
         if ( info.targetHitboxType == HitboxType.Player ||
+             info.Equipment == null ||
              info.Equipment.Info.ProjectileInfo.OperationType != operationType || 
              info.Equipment.Info.ProjectileInfo.Breaking < threshold) return;
         
