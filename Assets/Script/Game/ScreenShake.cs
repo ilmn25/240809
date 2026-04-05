@@ -1,41 +1,58 @@
 using UnityEngine;
 
-public partial class ViewPort
+public static class ScreenShake
 {
-    private static int _shakeDuration;
-    private const int ShakeInterval = 2;
-    private static float _currentShakeTime;
-    private static int _currentShakeInterval;
+    private static float _speed;
+    private static float _strength;
+    private static float _duration;
+    private static float _timeRemaining;
     private static Vector3 _direction;
-    
-    private static float _shakeMagnitude = 0.1f; 
-    public static Vector3 ShakeOffset;
-    
-    private static void HandleScreenShake()
+
+    public static Vector3 Offset { get; private set; }
+
+    public static void Shake(float speed, float strength, float duration)
     {
-        if (_currentShakeTime != 0)
+        Shake(speed, strength, duration, Vector3.zero);
+    }
+
+    public static void Shake(float speed, float strength, float duration, Vector3 direction)
+    {
+        _speed = Mathf.Max(0f, speed);
+        _strength = Mathf.Max(0f, strength);
+        _duration = Mathf.Max(0f, duration);
+        _timeRemaining = _duration;
+        _direction = direction;
+
+        if (_duration <= 0f || _strength <= 0f)
         {
-            _currentShakeInterval++;
-            if (_currentShakeInterval == ShakeInterval)
-            { 
-                ShakeOffset = (_direction == default ? Random.insideUnitSphere : _direction) * 
-                              (_shakeMagnitude * (_currentShakeTime / _shakeDuration));
-                _currentShakeTime --;
-                _currentShakeInterval = 0;
-            }  
-        }
-        else
-        {
-            _currentShakeInterval = 0;
-            ShakeOffset = Vector3.zero;
+            Offset = Vector3.zero;
         }
     }
 
-    public static void StartScreenShake(int duration, float magnitude, Vector3 direction = default)
+    public static void Update()
     {
-        _direction = direction; 
-        _shakeDuration = duration;
-        _shakeMagnitude = magnitude;
-        _currentShakeTime = _shakeDuration;
+        if (_timeRemaining <= 0f || _duration <= 0f || _strength <= 0f)
+        {
+            Offset = Vector3.zero;
+            return;
+        }
+
+        _timeRemaining = Mathf.Max(0f, _timeRemaining - Time.deltaTime);
+        float decay = _timeRemaining / _duration;
+
+        if (_direction == Vector3.zero)
+        {
+            float t = Time.time * _speed;
+            Vector3 noise = new Vector3(
+                Mathf.PerlinNoise(t, 0.37f) * 2f - 1f,
+                Mathf.PerlinNoise(0.73f, t) * 2f - 1f,
+                Mathf.PerlinNoise(t, 1.13f) * 2f - 1f
+            );
+            Offset = noise * (_strength * decay);
+        }
+        else
+        {
+            Offset = _direction.normalized * (_strength * decay);
+        }
     }
 }
