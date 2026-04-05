@@ -98,8 +98,14 @@ public class SetPiece
         return setPiece;
     }
     
-    public static void Paste(Vector3Int position, Chunk setPiece)
+    public static void Paste(Vector3Int position, Chunk setPiece, bool setCorners = false)
     {
+        if (setCorners)
+        {
+            Pos1 = position;
+            Pos2 = position + Vector3Int.one * (setPiece.size - 1);
+        }
+
         Info info;
         Vector3Int chunkPos, worldPos;
         
