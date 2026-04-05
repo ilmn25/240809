@@ -88,4 +88,6 @@ public enum ID
     Wool,
     Computer,
     BirchTree,
+    CrudePickaxe,
+    CrudeHatchet,
 }

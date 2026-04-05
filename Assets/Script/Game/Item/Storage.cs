@@ -183,7 +183,7 @@ public class Storage
         }
 }
 
-// subclass that never refreshes the inventory
+[Serializable]
 public class NoRefreshStorage : Storage
 {
     public NoRefreshStorage(int size) : base(size) { SuppressRefresh = true; }

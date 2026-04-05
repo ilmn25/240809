@@ -113,6 +113,26 @@ public partial class Item
         );
 
         AddToolDefinition(
+            id: ID.CrudePickaxe,
+            gesture: ItemGesture.Swing,
+            speed: 1.8f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 1,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 4f,
+                Radius = 2,
+                Breaking = 1,
+                OperationType = OperationType.Mining
+            },
+            durability: 100,
+            description: "A rough pickaxe for early mining.",
+            materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
+            holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
             id: ID.StoneHatchet,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
@@ -128,6 +148,26 @@ public partial class Item
             },
             description: "Stone hatchet for chopping wood.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
+            holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.CrudeHatchet,
+            gesture: ItemGesture.Swing,
+            speed: 1.8f,
+            range: 4f,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 1,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 2,
+                Radius = 2,
+                Breaking = 1,
+                OperationType = OperationType.Cutting
+            },
+            durability: 100,
+            description: "A rough hatchet for early woodcutting.",
+            materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
 
