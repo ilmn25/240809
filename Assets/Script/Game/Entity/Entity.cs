@@ -29,11 +29,18 @@ public class Entity
         public static void Initialize()
         {
                 Loot loot;
-                AddStructure<TreeMachine>(ID.Tree, new Vector3Int(1, 3, 1), Main.IndexCollide);
-                loot = new (ID.Tree);
+
+                AddStructure<PineTreeMachine>(ID.PineTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
+                loot = new (ID.PineTree);
                 loot.Add(1, 4, ID.Log);
-                loot.Add(0.5f, 1, ID.Log); 
-                loot.Add(0.5f, 1, ID.Acorn); 
+                loot.Add(0.5f, 1, ID.Log);
+                loot.Add(0.5f, 1, ID.Acorn);
+
+                AddStructure<BirchTreeMachine>(ID.BirchTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
+                loot = new (ID.BirchTree);
+                loot.Add(1, 6, ID.Log);
+                loot.Add(0.8f, 2, ID.Log);
+                loot.Add(0.6f, 1, ID.Acorn);
                 
                 AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Slab);

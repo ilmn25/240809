@@ -24,7 +24,8 @@ public class GenTaskEntity : Gen
                             { 
                                 if (rng <= 0.02)
                                 {
-                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Tree,position));
+                                    ID treeID = rng <= 0.016 ? ID.PineTree : ID.BirchTree;
+                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
                                 }
                                 else if (rng <= 0.04)
                                 {

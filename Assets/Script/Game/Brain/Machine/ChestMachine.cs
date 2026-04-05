@@ -30,7 +30,7 @@ public class LootChestMachine : ChestMachine
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.Tree,
+            Loot = ID.PineTree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
@@ -45,7 +45,7 @@ public class BasicChestMachine : ChestMachine
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.Tree,
+            Loot = ID.PineTree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
