@@ -11,7 +11,7 @@ public class StationMachine: CraftingMachine
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Station,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
@@ -28,7 +28,7 @@ public class AnvilMachine: CraftingMachine
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Anvil,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage

@@ -47,7 +47,8 @@ public class StructureInfo : Info
         if (Health <= 0)
         { 
             Audio.PlaySFX(SfxDestroy);  
-            if (Loot != ID.Null) global::Loot.Gettable(Loot).Spawn(position); 
+            if (Loot != ID.Null)
+                global::Loot.Gettable(Loot).Spawn(position);
             OnDestroy(info);
             PlayerTask.Pending.Remove(this);
             Destroy();
@@ -60,6 +61,7 @@ public class StructureInfo : Info
             OnHit(info); 
         } 
     }
+
     public virtual void OnHit(MobInfo info) { }
     public virtual void OnDestroy(MobInfo info) { }
 

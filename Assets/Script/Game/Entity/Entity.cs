@@ -57,6 +57,46 @@ public class Entity
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Main.IndexCollide);
+
+                loot = new (ID.Station);
+                loot.Add(1, 3, ID.Log);
+                loot.Add(0.5f, 4, ID.Log);
+                loot.Add(1, 1, ID.Flint);
+                loot.Add(0.5f, 1, ID.Flint);
+
+                loot = new (ID.Workbench);
+                loot.Add(1, 3, ID.Log);
+                loot.Add(0.5f, 4, ID.Log);
+
+                loot = new (ID.Stonecutter);
+                loot.Add(0.5f, 1, ID.Steel);
+                loot.Add(0.5f, 1, ID.Steel);
+                loot.Add(1, 1, ID.Slag);
+                loot.Add(0.5f, 2, ID.Slag);
+                loot.Add(1, 1, ID.Plank);
+                loot.Add(0.5f, 1, ID.Plank);
+
+                loot = new (ID.Sawmill);
+                loot.Add(1, 1, ID.Slag);
+                loot.Add(0.5f, 2, ID.Slag);
+                loot.Add(1, 1, ID.Log);
+                loot.Add(0.5f, 1, ID.Log);
+
+                loot = new (ID.Campfire);
+                loot.Add(1, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Gravel);
+                loot.Add(1, 3, ID.Log);
+                loot.Add(0.5f, 4, ID.Log);
+
+                loot = new (ID.Furnace);
+                loot.Add(1, 1, ID.Log);
+                loot.Add(0.5f, 1, ID.Log);
+                loot.Add(1, 3, ID.Gravel);
+                loot.Add(0.5f, 4, ID.Gravel);
+
+                loot = new (ID.Anvil);
+                loot.Add(1, 2, ID.Steel);
+                loot.Add(0.5f, 2, ID.Steel);
                 
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Chest);
