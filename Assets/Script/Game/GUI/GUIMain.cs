@@ -56,7 +56,8 @@ public static class GUIMain
             Name = "Crafting",
         };
         storage.CreateAndAddItem(ID.Station);
-        storage.CreateAndAddItem(ID.StoneHatchet);
+        storage.CreateAndAddItem(ID.CrudePickaxe);
+        storage.CreateAndAddItem(ID.CrudeHatchet);
         storage.CreateAndAddItem(ID.Hammer);
         storage.CreateAndAddItem(ID.Campfire);
         HandCrafting = new GUICraft()
