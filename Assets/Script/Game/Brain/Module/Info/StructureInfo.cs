@@ -56,8 +56,17 @@ public class StructureInfo : Info
         else
         {
             Audio.PlaySFX(SfxHit);
-            // spawn a hit particle effect at structure location
             Particle.Create(position, Particles.HitDust, false);
+            
+            if (Loot != ID.Null && Health < 25 && UnityEngine.Random.Range(0, 14) == 0)
+            {
+                Vector3 offset = new Vector3(
+                    UnityEngine.Random.value > 0.5f ? 0.65f : -0.65f,
+                    1.8f,
+                    UnityEngine.Random.value > 0.5f ? 0.65f : -0.65f);
+                global::Loot.Gettable(Loot).SpawnOneRandom(position + offset);
+            }
+            
             OnHit(info); 
         } 
     }

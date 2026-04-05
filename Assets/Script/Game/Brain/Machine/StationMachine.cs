@@ -4,10 +4,11 @@ public class StationMachine: CraftingMachine
     {
         Storage storage = new Storage(9);
         storage.CreateAndAddItem(ID.Blueprint);   
+        storage.CreateAndAddItem(ID.Furnace);
         storage.CreateAndAddItem(ID.Workbench);
+        storage.CreateAndAddItem(ID.Anvil);
         storage.CreateAndAddItem(ID.Sawmill);
         storage.CreateAndAddItem(ID.Stonecutter);
-        storage.CreateAndAddItem(ID.Furnace); 
         return new ContainerInfo()
         {
             Health = 500,
