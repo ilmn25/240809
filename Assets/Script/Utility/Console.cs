@@ -333,19 +333,20 @@ public class Console : MonoBehaviour
             SetPiece.SaveSetPieceFile(_chunk, _command[2]);
             Output("saved as " + _command[2]);
         }
-        else if (_command[1] == "load")
-        { 
-            _chunk = SetPiece.LoadSetPieceFile(_command[2]); 
-            Output("loaded" + _command[2]);
-        }
         else if (_command[1] == "paste")
         {
-            if (_command.Length > 2)
+            if (_command.Length < 3) return;
+
+            bool setCorners = _command.Length > 3 && _command[3] == "c";
+            if (_command[2] != ".")
             {
                 _chunk = SetPiece.LoadSetPieceFile(_command[2]);
                 Output("loaded" + _command[2]);
-            };
-            SetPiece.Paste(Vector3Int.FloorToInt(Main.Player.transform.position) + new Vector3Int (1, 0, 1), _chunk);   
+            }
+
+            Vector3Int pastePosition = Vector3Int.FloorToInt(Main.Player.transform.position) + new Vector3Int(1, 0, 1);
+            SetPiece.Paste(pastePosition, _chunk, setCorners);
+
             World.UnloadWorld();
             World.LoadWorld();
             Output("pasted");
