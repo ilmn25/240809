@@ -35,6 +35,7 @@ public class Entity
                 loot.Add(1, 4, ID.Log);
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
+                loot.Add(0.5f, 1, ID.Sticks);
 
                 AddStructure<BirchTreeMachine>(ID.BirchTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.BirchTree);

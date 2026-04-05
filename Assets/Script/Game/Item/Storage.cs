@@ -70,19 +70,21 @@ public class Storage
                 Dictionary.Remove(ID);
         }
 
-        public virtual void RemoveItem(ID stringID, int quantity = 1, int priority = 0)
+        public virtual int RemoveItem(ID stringID, int quantity = 1, int priority = 0)
         {
+                int remaining = quantity;
+                
                 // Prioritize current slot
                 if (List[priority].ID == stringID)
                 {
-                        int removableAmount = Math.Min(quantity, List[priority].Stack);
+                        int removableAmount = Math.Min(remaining, List[priority].Stack);
                         List[priority].Stack -= removableAmount;
-                        quantity -= removableAmount;
+                        remaining -= removableAmount;
                         if (List[priority].Stack <= 0) List[priority].clear();
-                        if (quantity <= 0)
+                        if (remaining <= 0)
                         {
                                 NotifyChanged();
-                                return;
+                                return 0;
                         }
                 }
 
@@ -91,23 +93,24 @@ public class Storage
                 {
                         if (slot.ID == stringID)
                         {
-                                int removableAmount = Math.Min(quantity, slot.Stack);
+                                int removableAmount = Math.Min(remaining, slot.Stack);
                                 slot.Stack -= removableAmount;
-                                quantity -= removableAmount;
+                                remaining -= removableAmount;
                                 if (slot.Stack <= 0)
                                 {
                                         slot.clear();
                                 }
 
-                                if (quantity <= 0)
+                                if (remaining <= 0)
                                 {
                                         NotifyChanged();
-                                        return;
+                                        return 0;
                                 }
                         }
                 }
 
                 NotifyChanged();
+                return remaining;
         }
 
         public void CreateAndAddItem(ID stringID, int count = 1)

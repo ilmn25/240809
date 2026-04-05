@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
  
 public partial class ItemRecipe 
 {
@@ -31,7 +32,16 @@ public partial class ItemRecipe
     {
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            if (Main.PlayerInfo.Storage.GetAmount(ingredient.Key) < ingredient.Value) return false;
+            int needed = ingredient.Value;
+            int available = Main.PlayerInfo.Storage.GetAmount(ingredient.Key);
+            
+            // Also check opened storage if the chest GUI is visible
+            if (GUIMain.Storage != null && GUIMain.Storage.Showing)
+            {
+                available += GUIMain.Storage.Storage.GetAmount(ingredient.Key);
+            }
+            
+            if (available < needed) return false;
         } 
         return true;
     }
@@ -61,7 +71,14 @@ public partial class ItemRecipe
         Audio.PlaySFX(SfxID.Item);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            Main.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
+            // Try to remove from player inventory first
+            int missing = Main.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
+            
+            // If items are still missing, remove from the visible opened storage
+            if (missing > 0 && GUIMain.Storage != null && GUIMain.Storage.Showing)
+            {
+                GUIMain.Storage.Storage.RemoveItem(ingredient.Key, missing);
+            }
         }
     }
 }
