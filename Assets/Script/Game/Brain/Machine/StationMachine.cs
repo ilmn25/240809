@@ -9,7 +9,7 @@ public class StationMachine: CraftingMachine
         storage.CreateAndAddItem(ID.Anvil);
         storage.CreateAndAddItem(ID.Sawmill);
         storage.CreateAndAddItem(ID.Stonecutter);
-        return new ContainerInfo()
+        return new CraftInfo()
         {
             Health = 500,
             Loot = ID.Station,
@@ -26,7 +26,7 @@ public class AnvilMachine: CraftingMachine
         Storage storage = new Storage(9);
         storage.CreateAndAddItem(ID.SteelSword);
         storage.CreateAndAddItem(ID.MetalAxe);
-        return new ContainerInfo()
+        return new CraftInfo()
         {
             Health = 500,
             Loot = ID.Anvil,
