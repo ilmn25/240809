@@ -1,11 +1,11 @@
-public class FurnaceMachine: ConverterMachine
+public class FurnaceMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        Storage storage = new NoRefreshStorage(3);
+        Storage storage = new NoRefreshStorage(9);
         storage.CreateAndAddItem(ID.Slag);    
         storage.CreateAndAddItem(ID.Steel);    
-        return new ConverterInfo()
+        return new CraftInfo()
         {
             Health = 500,
             Loot = ID.Furnace,
