@@ -38,6 +38,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
         if (GUIStorage.IsDrag) return;
         if (GUIStorage.Storage.List[slotNumber].Stack != 0)
@@ -48,6 +49,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
  
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
         GUIStorage.SetInfoPanel();
         ScaleSlot(1f);
