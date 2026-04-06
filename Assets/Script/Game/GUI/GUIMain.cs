@@ -32,7 +32,7 @@ public static class GUIMain
         {
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(-91, 170), 
+            Position = new Vector2(297, 110), 
         };
         StorageInv.Initialize();
         
@@ -40,7 +40,7 @@ public static class GUIMain
         {
             RowAmount = Inventory.InventoryRowAmount,
             SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(-92, 74), 
+            Position = new Vector2(295, 18), 
         };
         Storage.Initialize();
         Storage.Show(false);
@@ -60,7 +60,7 @@ public static class GUIMain
             DefaultStorage = storage,
             RowAmount = 1,
             SlotAmount = 9,
-            Position = new Vector2(297, 169), 
+            Position = new Vector2(300, 205), 
         };
         GUICraft.Initialize();
          
