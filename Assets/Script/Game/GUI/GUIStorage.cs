@@ -55,6 +55,13 @@ public class  GUIStorage : GUI
     
     public void Update()
     {
+        if (!GUIMain.Showing || !Showing)
+        {
+            if (CurrentSlotKey != -1)
+                SetInfoPanel();
+            return;
+        }
+
         if (ScaleTask is { Running: true }) return;
         if (CurrentSlotKey == -1 || IsDrag)
         {
