@@ -35,6 +35,8 @@ public class Entity
                 loot.Add(1, 4, ID.Log);
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
+                loot.Add(1, 1, ID.Sticks);
+                loot.Add(0.7f, 1, ID.Sticks);
                 loot.Add(0.5f, 1, ID.Sticks);
 
                 AddStructure<BirchTreeMachine>(ID.BirchTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
@@ -42,11 +44,16 @@ public class Entity
                 loot.Add(1, 6, ID.Log);
                 loot.Add(0.8f, 2, ID.Log);
                 loot.Add(0.6f, 1, ID.Acorn);
+                loot.Add(1, 1, ID.Sticks);
+                loot.Add(0.7f, 1, ID.Sticks);
+                loot.Add(0.5f, 1, ID.Sticks);
                 
                 AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Slab);
                 loot.Add(1, 2, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Gravel);
+                loot.Add(1, 1, ID.Flint);
+                loot.Add(0.7f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
