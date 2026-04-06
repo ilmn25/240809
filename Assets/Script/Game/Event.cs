@@ -1,40 +1,103 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Event
+public static class Event
 {
-    public virtual void OnHour(int hour)
+    public static event Action<int, int> HourlyTriggered;
+    public static event Action Updated;
+
+    static Event()
     {
+        RaidEvent.Subscribe();
+        RainEvent.Subscribe();
+        LeafEvent.Subscribe();
+        WeatherEvent.Subscribe();
     }
 
-    public virtual void Update()
+    public static void TriggerHourly(int hour, int day)
     {
+        HourlyTriggered?.Invoke(hour, day);
+    }
+
+    public static void TriggerUpdate()
+    {
+        Updated?.Invoke();
     }
 }
+ 
 
-public class WeatherEvent : Event
+public static class WeatherEvent
 {
-    private ID _entityID = ID.Slime;
+    private const int SpawnChance = 5;
+    private const ID EntityID = ID.Slime;
 
-    public override void Update()
+    public static void Subscribe()
     {
-        if (Random.Range(0, 100) < 5 && Main.PlayerInfo != null)
+        Event.Updated += OnUpdate;
+    }
+
+    private static void OnUpdate()
+    {
+        if (Random.Range(0, 100) < SpawnChance && Main.PlayerInfo != null)
         {
             Vector3Int spawnPosition = Vector3Int.FloorToInt(Main.PlayerInfo.position);
-            Entity.Spawn(_entityID, spawnPosition);
+            Entity.Spawn(EntityID, spawnPosition);
         }
     }
 }
 
-public class Raid : Event
+public static class RaidEvent
 {
-    private ID _entityID = ID.Megumin;
+    private const ID EntityID = ID.Megumin;
 
-    public override void OnHour(int hour)
+    public static void Subscribe()
     {
-        if (hour == 19 && SaveData.Inst.day % 3 == 0 && Main.PlayerInfo != null)
+        Event.HourlyTriggered += OnHour;
+    }
+
+    private static void OnHour(int hour, int day)
+    {
+        if (hour == 19 && day % 3 == 0)
         {
-            Vector3Int spawnPosition = Vector3Int.FloorToInt(Main.PlayerInfo.position);
-            Entity.Spawn(_entityID, spawnPosition);
+            Entity.Spawn(EntityID, Vector3Int.FloorToInt(Main.PlayerInfo.position) + Vector3Int.up * 5);
         }
+    }
+}
+
+public static class RainEvent
+{
+    private const int ToggleChance = 25;
+
+    public static void Subscribe()
+    {
+        Event.HourlyTriggered += OnHour;
+    }
+
+    private static void OnHour(int hour, int day)
+    {
+        if (Random.Range(0, 100) >= ToggleChance) return;
+
+        EnvParticles particleType = Environment.Target == EnvironmentType.DaySnow
+            ? EnvParticles.Snow
+            : EnvParticles.Rain;
+        EnvParticle.Set(particleType);
+    }
+}
+
+public static class LeafEvent
+{
+    private const int ToggleChance = 30;
+
+    public static void Subscribe()
+    {
+        Event.HourlyTriggered += OnHour;
+    }
+
+    private static void OnHour(int hour, int day)
+    {
+        if (Random.Range(0, 100) >= ToggleChance) return;
+ 
+        EnvParticle.Set(EnvParticles.Leaf);
     }
 }

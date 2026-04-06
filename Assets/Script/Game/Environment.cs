@@ -16,7 +16,6 @@ public class Environment
     public Color SpotLight;
     public Color DirectionalLight;
     public Color BackgroundColor;
-    public EnvParticles EnvParticles = EnvParticles.Null;
 
     static Environment()
     {
@@ -34,8 +33,7 @@ public class Environment
             FogColor = Helper.GetColor(97, 39, 39),
             SpotLight = Helper.GetColor(161, 77, 77),
             DirectionalLight = Helper.GetColor(255, 68, 47),
-            BackgroundColor = Helper.GetColor(190, 130, 134),
-            EnvParticles = EnvParticles.Leaf
+            BackgroundColor = Helper.GetColor(190, 130, 134)
         });
         Environments.Add(EnvironmentType.Day, new Environment
         {
@@ -43,17 +41,15 @@ public class Environment
             FogColor = Helper.GetColor(117, 110, 138),
             SpotLight = Helper.GetColor(197, 142, 88),
             DirectionalLight = Helper.GetColor(135, 124, 121),
-            BackgroundColor = Helper.GetColor(116, 113, 137),
-            EnvParticles = EnvParticles.Leaf
-        });;
+            BackgroundColor = Helper.GetColor(116, 113, 137)
+        });
         Environments.Add(EnvironmentType.DaySnow, new Environment
         {
             AmbientLight = Helper.GetColor(38, 37, 63),
             FogColor = Helper.GetColor(146, 146, 146),
             SpotLight = Helper.GetColor(97, 97, 97),
             DirectionalLight = Helper.GetColor(105, 101, 159),
-            BackgroundColor = Helper.GetColor(131, 131, 135),
-            EnvParticles = EnvParticles.Snow
+            BackgroundColor = Helper.GetColor(131, 131, 135)
         });
         Environments.Add(EnvironmentType.Sunset, new Environment
         {
@@ -61,8 +57,7 @@ public class Environment
             FogColor = Helper.GetColor(118, 105, 105),
             SpotLight = Helper.GetColor(103, 70, 66),
             DirectionalLight = Helper.GetColor(255, 184, 56),
-            BackgroundColor = Helper.GetColor(188, 111, 77),
-            EnvParticles = EnvParticles.Leaf
+            BackgroundColor = Helper.GetColor(188, 111, 77)
         });
         Environments.Add(EnvironmentType.NightRainy, new Environment
         {
@@ -70,8 +65,7 @@ public class Environment
             FogColor = Color.black,
             SpotLight = Helper.GetColor(97, 97, 97),
             DirectionalLight = Helper.GetColor(91, 56, 255),
-            BackgroundColor = Helper.GetColor(45, 50, 63),
-            EnvParticles = EnvParticles.Rain
+            BackgroundColor = Helper.GetColor(45, 50, 63)
         });
         Environments.Add(EnvironmentType.NightBright, new Environment
         {
@@ -87,8 +81,7 @@ public class Environment
             FogColor = Color.black,
             SpotLight = Helper.GetColor(154, 90, 69),
             DirectionalLight = Helper.GetColor(254, 57, 90),
-            BackgroundColor = Helper.GetColor(75, 59, 55),
-            EnvParticles = EnvParticles.Leaf
+            BackgroundColor = Helper.GetColor(75, 59, 55)
         });
         _ = new CoroutineTask(Clock());
     }       
@@ -117,7 +110,6 @@ public class Environment
         _previous = _current;
         _current = target;
         _currentTransitionTime = 0;
-        EnvParticle.Set(Environments[target].EnvParticles);
     }
 
     public static IEnumerator Clock()
@@ -161,7 +153,12 @@ public class Environment
             {
                 Time = 0;
                 SaveData.Inst.day++;
-            } 
+            }
+
+            if (Time % 60 == 0)
+            {
+                Event.TriggerHourly(Time / 60, SaveData.Inst.day);
+            }
         }
     }
     

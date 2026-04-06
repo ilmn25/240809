@@ -166,8 +166,10 @@ public class Console : MonoBehaviour
 
         if (_showInfo)
         {
+            Vector3Int pos = Vector3Int.FloorToInt(Main.PlayerInfo.position);
             UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-                "FPS: " + Mathf.Ceil(_fps) + "\nPosition: " + Main.PlayerInfo.position + "\nDay " + SaveData.Inst.day, GUIStyle);
+                "FPS: " + Mathf.Ceil(_fps) + "\n" +
+                $"X:{pos.x} \nY:{pos.y} \nZ:{pos.z}", GUIStyle);
         }
         
         if (!Main.BuildMode || !Main.Player) return;
