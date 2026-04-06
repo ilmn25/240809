@@ -6,6 +6,7 @@ public enum EnvParticles {Null, Rain, Leaf, Snow}
 public static class EnvParticle
 {
     private static readonly Dictionary<EnvParticles, GameObject> List = new ();
+
     public static void Initialize()
     {
         foreach (EnvParticles target in Enum.GetValues(typeof(EnvParticles)))
@@ -15,13 +16,16 @@ public static class EnvParticle
         }
     }
 
-    public static void Set(EnvParticles target)
+    public static bool Set(EnvParticles target)
     {
-        foreach (GameObject gameObject in List.Values)
+        if (target == EnvParticles.Null)
         {
-            gameObject.SetActive(false);
+            return false;
         }
-        if (target == EnvParticles.Null) return;
-        List[target].SetActive(true);
+
+        GameObject particleObject = List[target];
+        bool currentlyActive = particleObject.activeSelf;
+        particleObject.SetActive(!currentlyActive);
+        return !currentlyActive;
     }
 }
