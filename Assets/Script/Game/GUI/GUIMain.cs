@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.ComponentModel;
-using TMPro;
 using UnityEngine;
 
 public static class GUIMain 
@@ -12,9 +9,7 @@ public static class GUIMain
     private static CoroutineTask _showTask; 
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
-    public static GUIStorage HandCrafting;
-    public static GUIStorage Crafting;
-    public static GUIConverter Converter;
+    public static GUICraft GUICraft;
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
     public static GUIMenu GUIMenu;
@@ -25,7 +20,6 @@ public static class GUIMain
     public static void Initialize()
     {
         Inventory.SlotUpdate += RefreshStorage;
-        // GUICraft.Initialize(); 
         GUIMenu = new GUIMenu(); 
         GUILoad = new GUILoad();
         GUILoad.Show(false);
@@ -60,32 +54,15 @@ public static class GUIMain
         storage.CreateAndAddItem(ID.CrudeMallet);
         storage.CreateAndAddItem(ID.Station);
         storage.CreateAndAddItem(ID.Campfire);
-        HandCrafting = new GUICraft()
+        GUICraft = new GUICraft()
         {
             Storage = storage,
+            DefaultStorage = storage,
             RowAmount = 1,
             SlotAmount = 9,
             Position = new Vector2(297, 169), 
         };
-        HandCrafting.Initialize();
-        
-        Crafting = new GUICraft()
-        {
-            RowAmount = 1,
-            SlotAmount = Inventory.InventorySlotAmount,
-            Position = new Vector2(297, 77), 
-        };
-        Crafting.Initialize();
-        Crafting.Show(false);
-        
-        Converter = new GUIConverter()
-        {
-            RowAmount = 1,
-            SlotAmount = 3,
-            Position = new Vector2(297, -15), 
-        };
-        Converter.Initialize();
-        Converter.Show(false);
+        GUICraft.Initialize();
          
         
         InfoPanel = new GUIInfoPanel();
@@ -108,9 +85,7 @@ public static class GUIMain
         Cursor.Update();
         StorageInv.Update();
         Storage.Update();
-        HandCrafting.Update();
-        Crafting.Update();
-        Converter.Update();
+        GUICraft.Update();
         InfoPanel.UpdateDrag();
         UpdateHudText();
 
@@ -206,9 +181,7 @@ public static class GUIMain
     {
         StorageInv.OnRefreshSlot?.Invoke(StorageInv, null);
         Storage.OnRefreshSlot?.Invoke(Storage, null);
-        HandCrafting.OnRefreshSlot?.Invoke(HandCrafting, null);
-        Crafting.OnRefreshSlot?.Invoke(Crafting, null);
-        Converter.OnRefreshSlot?.Invoke(Converter, null);
+        GUICraft.OnRefreshSlot?.Invoke(GUICraft, null);
         GUICursor.UpdateCursorSlot();
     } 
     public static IEnumerator Scale(bool show, float duration, GameObject target, float scale, float easeSpeed = 0.5f)
