@@ -47,24 +47,6 @@ public static class WeatherEvent
     }
 }
 
-public static class RaidEvent
-{
-    private const ID EntityID = ID.Megumin;
-
-    public static void Subscribe()
-    {
-        Event.HourlyTriggered += OnHour;
-    }
-
-    private static void OnHour(int hour, int day)
-    {
-        if (hour == 19 && day % 3 == 0)
-        {
-            Entity.Spawn(EntityID, Vector3Int.FloorToInt(Main.PlayerInfo.position) + Vector3Int.up * 5);
-        }
-    }
-}
-
 public static class RainEvent
 {
     private const int ToggleChance = 25;
