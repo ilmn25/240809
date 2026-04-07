@@ -91,4 +91,5 @@ public enum ID
     CrudePickaxe,
     CrudeHatchet,
     CrudeMallet,
+    ImprovisedPlanter,
 }

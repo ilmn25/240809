@@ -38,7 +38,7 @@ public static class RaidEvent
         new(ID.Megumin, "A great dread is nearly here...", 7, 10),
     };
 
-    public static void Subscribe() => Event.HourlyTriggered += OnHour;
+    public static void Subscribe() => Environment.HourlyTriggered += OnHour;
 
     private static void OnHour(int hour, int day)
     {

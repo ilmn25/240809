@@ -11,6 +11,7 @@ public enum EnvironmentType
 public class Environment
 {
     public static Dictionary<EnvironmentType, Environment> Environments = new ();
+    public static event Action<int, int> HourlyTriggered;
     public Color AmbientLight;
     public Color FogColor;
     public Color SpotLight;
@@ -157,9 +158,14 @@ public class Environment
 
             if (Time % 60 == 0)
             {
-                Event.TriggerHourly(Time / 60, SaveData.Inst.day);
+                TriggerHourly(Time / 60, SaveData.Inst.day);
             }
         }
+    }
+
+    private static void TriggerHourly(int hour, int day)
+    {
+        HourlyTriggered?.Invoke(hour, day);
     }
     
     private static void CheckWeather()
