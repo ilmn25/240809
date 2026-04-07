@@ -9,7 +9,7 @@ public static class Helper
 {
     private static readonly string SavePath = 
         System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads\\Save\\";
-    private const string SaveFormat = ".ilmn";
+    private const string SaveFormat = ".data";
     public static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
  
     public static Vector3 AddToVector(Vector3 vector, float x, float y, float z)
