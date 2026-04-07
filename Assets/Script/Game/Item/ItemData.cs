@@ -72,6 +72,7 @@ public partial class Item
         AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Gravel, 15 } }, 100, description: "Smelts metal materials into slag and steel.");
         AddStructureDefinition(ID.Anvil, new Dictionary<ID, int> { { ID.Steel, 8 }, { ID.Hammer, 1}}, 100, description: "Forges steel weapons and tools at higher quality.");
         AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 100, description: "Unlocks blueprint-based crafting options.");
+        AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Feed it an acorn to grow a log.");
 
         // Tools
         AddToolDefinition(
