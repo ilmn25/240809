@@ -12,7 +12,6 @@ public class Save
     public readonly List<SaveData> List = new();
     public static string TempPath => "RunTime\\";  
     public const string WorldRuntimeFile = "World";
-    public const string PlayerRuntimeFile = "Players";
     
     public static void Initialize()
     {
@@ -63,21 +62,33 @@ public class Save
         World.UnloadWorld();
         World.Inst.RemovePlayersFromChunks();
 
+        if (SaveData.Inst.players == null)
+        {
+            SaveData.Inst.players = new List<PlayerInfo>();
+        }
+        SaveData.Inst.players.RemoveAll(player => player == null);
+
+        if (Main.PlayerInfo != null)
+        {
+            SaveData.Inst.spawnPosition = Main.PlayerInfo.SpawnPoint;
+        }
+        else if (SaveData.Inst.spawnPosition == Vector3.zero && SaveData.Inst.players.Count > 0)
+        {
+            SaveData.Inst.spawnPosition = SaveData.Inst.players[0].SpawnPoint;
+        }
+
         Helper.FileSave(World.Inst, TempPath + WorldRuntimeFile);
-        Helper.FileSave(BuildPlayerRuntimeData(), TempPath + PlayerRuntimeFile);
     }
 
     public static void LoadRuntimePlayers()
     {
         if (World.Inst == null || SaveData.Inst == null) return;
 
-        World.Inst.target = new List<PlayerInfo>();
+        SaveData.Inst.players = new List<PlayerInfo>();
 
-        PlayerRuntimeData playerData = Helper.FileLoad<PlayerRuntimeData>(TempPath + PlayerRuntimeFile);
-        Vector3 spawnPosition = ResolveSpawnPosition(playerData);
-        SaveData.Inst.spawnPosition = spawnPosition;
+        Vector3 spawnPosition = ResolveSpawnPosition();
 
-        if (playerData == null || playerData.players == null || playerData.players.Count == 0)
+        if (SaveData.Inst.players == null || SaveData.Inst.players.Count == 0)
         {
             foreach (PlayerInfo player in CreateDefaultPlayers(spawnPosition))
             {
@@ -87,7 +98,7 @@ public class Save
             return;
         }
 
-        foreach (PlayerInfo player in playerData.players)
+        foreach (PlayerInfo player in SaveData.Inst.players)
         {
             QueuePlayerForSpawn(player, spawnPosition);
         }
@@ -97,7 +108,7 @@ public class Save
     {
         player.position = spawnPosition;
         player.SpawnPoint = spawnPosition;
-        World.Inst.target.Add(player);
+        SaveData.Inst.players.Add(player);
 
         Vector3Int spawnChunk = World.GetChunkCoordinate(spawnPosition);
         if (World.Inst[spawnChunk] == null)
@@ -134,47 +145,16 @@ public class Save
         return players;
     }
 
-    private static Vector3 ResolveSpawnPosition(PlayerRuntimeData playerData)
+    private static Vector3 ResolveSpawnPosition()
     {
-        if (playerData != null)
-        {
-            return playerData.spawnPosition;
-        }
-
         if (SaveData.Inst.spawnPosition != Vector3.zero)
         {
             return SaveData.Inst.spawnPosition;
         }
 
-        return Gen.GetDefaultSpawnPosition();
-    }
-
-    private static PlayerRuntimeData BuildPlayerRuntimeData()
-    {
-        Vector3 spawnPosition = SaveData.Inst.spawnPosition;
-        if (Main.PlayerInfo != null)
-        {
-            spawnPosition = Main.PlayerInfo.SpawnPoint;
-        }
-
-        PlayerRuntimeData data = new PlayerRuntimeData
-        {
-            spawnPosition = spawnPosition,
-            players = new List<PlayerInfo>()
-        };
-
-        if (data.spawnPosition == Vector3.zero && World.Inst.target.Count > 0)
-        {
-            data.spawnPosition = World.Inst.target[0].SpawnPoint;
-        }
-
-        foreach (PlayerInfo player in World.Inst.target)
-        {
-            if (player == null) continue;
-            data.players.Add(player);
-        }
-
-        return data;
+        Vector3 spawnPosition = Gen.GetDefaultSpawnPosition();
+        SaveData.Inst.spawnPosition = spawnPosition;
+        return spawnPosition;
     }
 }
 
@@ -189,18 +169,12 @@ public class SaveData
     public EnvironmentType weather = EnvironmentType.Sunrise;
     public GenType current;
     public Vector3 spawnPosition;
+    public List<PlayerInfo> players = new();
 
     public SaveData(){}
     public SaveData(GenType gen)
     {
         current = gen;
     }
-}
-
-[Serializable]
-public class PlayerRuntimeData
-{
-    public Vector3 spawnPosition;
-    public List<PlayerInfo> players = new();
 }
 

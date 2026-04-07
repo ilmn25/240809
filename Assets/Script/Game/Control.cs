@@ -71,7 +71,7 @@ public class Control
 
     public static void SetPlayer(int i)
     {
-        Main.PlayerInfo = World.Inst.target[i];
+        Main.PlayerInfo = SaveData.Inst.players[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         Main.Player = null;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
@@ -85,7 +85,7 @@ public class Control
         if (Inst.SwapChar.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
-            if (CurrentPlayerIndex == World.Inst.target.Count - 1)
+            if (CurrentPlayerIndex == SaveData.Inst.players.Count - 1)
                 SetPlayer(0);
             else
                 SetPlayer(CurrentPlayerIndex + 1);
