@@ -34,7 +34,6 @@ public class ItemSlot
         {
             text += "structure";
             ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-            text += " \n \nbuild time: " + recipe.Time + "s";
             text += " \ningredients: ";
             if (recipe != null)
                 foreach (var ingredient in recipe.Ingredients)
