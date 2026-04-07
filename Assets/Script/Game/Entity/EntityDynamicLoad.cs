@@ -62,8 +62,11 @@ public class EntityDynamicLoad
         Vector3Int entityChunkPosition;
         foreach (EntityMachine entityMachine in _activeEntities)
         {
+            if (entityMachine.Info is PlayerInfo)
+                continue;
+
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
-            if (entityMachine.Info is not PlayerInfo && World.IsInWorldBounds(entityChunkPosition))
+            if (World.IsInWorldBounds(entityChunkPosition))
                 World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
             removeList.Add(entityMachine);
         }
