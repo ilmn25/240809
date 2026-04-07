@@ -39,16 +39,36 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         }
 
         if (Info.IsPlanted)
+        {
+            ShowPlanterMessage($"I should come back in {GetHoursLeftToGrow()} hours");
             return;
+        }
 
         if (!TryConsumeSelectedSeed(playerInfo))
+        {
+            ShowPlanterMessage("I can plant acorns in this");
             return;
+        }
 
         Info.IsPlanted = true;
         Info.IsGrown = false;
         Info.GrowAtDay = SaveData.Inst.day + 1;
         Info.GrowAtHour = SaveData.Inst.time / 60;
         RefreshSprite(force: true);
+    }
+
+    private int GetHoursLeftToGrow()
+    {
+        int currentHour = SaveData.Inst.time / 60;
+        int remainingHours = (Info.GrowAtDay - SaveData.Inst.day) * 24 + (Info.GrowAtHour - currentHour);
+        return Mathf.Max(1, remainingHours);
+    }
+
+    private static void ShowPlanterMessage(string message)
+    {
+        Dialogue.Target = new Dialogue { Text = message };
+        Dialogue.Show(true);
+        Audio.PlaySFX(SfxID.Notification);
     }
 
     protected virtual bool TryConsumeSelectedSeed(PlayerInfo actor)
