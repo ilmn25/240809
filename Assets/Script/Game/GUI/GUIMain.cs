@@ -45,15 +45,7 @@ public static class GUIMain
         Storage.Initialize();
         Storage.Show(false);
 
-        Storage storage = new NoRefreshStorage(9)
-        {
-            Name = "Crafting",
-        }; 
-        storage.CreateAndAddItem(ID.CrudePickaxe);
-        storage.CreateAndAddItem(ID.CrudeHatchet);
-        storage.CreateAndAddItem(ID.CrudeMallet);
-        storage.CreateAndAddItem(ID.Station);
-        storage.CreateAndAddItem(ID.Campfire);
+        Storage storage = CraftInfo.GetPlayerPool();
         GUICraft = new GUICraft()
         {
             Storage = storage,
