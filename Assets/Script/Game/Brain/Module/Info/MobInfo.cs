@@ -91,7 +91,13 @@ public class MobInfo : DynamicInfo
         SpriteTool.gameObject.SetActive(true);
         SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
         SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
-        SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + Equipment.Info.ID);
+        
+        // Display Blueprint sprite for structures and chalk
+        string spriteName = Equipment.Info.ID.ToString();
+        if (Equipment.ID == ID.Chalk || Equipment.Info.Type == ItemType.Structure)
+            spriteName = "Blueprint";
+        
+        SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + spriteName);
         SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
         // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
         if (Machine != null && Machine.IsCurrentState<DefaultState>())

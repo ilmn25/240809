@@ -23,7 +23,7 @@ public class Inventory
 
             Main.PlayerInfo.SetEquipment(CurrentItem);
 
-            if (CurrentItemData.ID == ID.Blueprint || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
+            if (CurrentItemData.ID == ID.Chalk || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
                 Terraform.BlockUpdate(CurrentItem.ID);
             else
                 Terraform.BlockUpdate();
