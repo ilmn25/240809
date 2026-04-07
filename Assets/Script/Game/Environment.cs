@@ -200,12 +200,5 @@ public class Environment
         Main.DirectionalLight.color = directionalLight;
         Main.Camera.backgroundColor = backgroundColor;
     }
-
-    // public static (int day, int time) CalculateTime(int amount)
-    // {
-    //     int target = Time + amount;
-    //     int day = target / Length + SaveData.Inst.day;
-    //     int time = target % Length;
-    //     return (day, time);
-    // }
+ 
 }

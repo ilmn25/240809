@@ -95,10 +95,7 @@ public static class GUIMain
     {
         string BuildTimeHudText()
         {
-            int minutes = (SaveData.Inst.time + 300) % 1440; // 5:00 AM start, wrap at midnight
-            int hours24 = minutes / 60;
-            int hours12 = hours24 % 12 == 0 ? 12 : hours24 % 12;
-            return $"Day {SaveData.Inst.day}, {hours12}:{minutes % 60:00} {(hours24 >= 12 ? "PM" : "AM")}";
+            return $"Day {SaveData.Inst.day}, {Helper.FormatTime(SaveData.Inst.time)}";
         }
 
         string BuildTargetHudText(Info target)

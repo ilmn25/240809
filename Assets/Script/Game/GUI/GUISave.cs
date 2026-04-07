@@ -25,7 +25,10 @@ public class GUISave : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             return;
         }
         SaveData save = Save.Inst.List[ID]; 
-        _text.text = ID + ". " + save.current + "\nDay " + save.day + ", " + save.weather;
+        string timeText = Helper.FormatTime(save.time);
+        _text.text = "DAY " + save.day + ", " + timeText + "\n" +
+                     save.players.Count + " PEOPLE ALIVE AT " + save.current + "\n" +
+                     "SAVE ID " + save.id;
         Sprite sprite = Helper.LoadImage(Save.Inst.List[ID].Path + "Preview");
         if (sprite)
         {

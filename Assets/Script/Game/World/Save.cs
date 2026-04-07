@@ -83,12 +83,13 @@ public class Save
     public static void LoadRuntimePlayers()
     {
         if (World.Inst == null || SaveData.Inst == null) return;
+        List<PlayerInfo> loadedPlayers = SaveData.Inst.players ?? new List<PlayerInfo>();
+        loadedPlayers.RemoveAll(player => player == null);
+        Vector3 spawnPosition = ResolveSpawnPosition();
 
         SaveData.Inst.players = new List<PlayerInfo>();
 
-        Vector3 spawnPosition = ResolveSpawnPosition();
-
-        if (SaveData.Inst.players == null || SaveData.Inst.players.Count == 0)
+        if (loadedPlayers.Count == 0)
         {
             foreach (PlayerInfo player in CreateDefaultPlayers(spawnPosition))
             {
@@ -98,7 +99,7 @@ public class Save
             return;
         }
 
-        foreach (PlayerInfo player in SaveData.Inst.players)
+        foreach (PlayerInfo player in loadedPlayers)
         {
             QueuePlayerForSpawn(player, spawnPosition);
         }
