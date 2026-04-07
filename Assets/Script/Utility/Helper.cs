@@ -68,6 +68,16 @@ public static class Helper
         return new Color(r / 255f, g / 255f, b / 255f);
     }
 
+    public static string FormatTime(int time)
+    {
+        int minutes = (time + 300) % 1440; // 5:00 AM start, wrap at midnight
+        int hours24 = minutes / 60;
+        int hour12 = hours24 % 12;
+        if (hour12 == 0) hour12 = 12;
+        string suffix = hours24 >= 12 ? "PM" : "AM";
+        return $"{hour12}:{minutes % 60:00} {suffix}";
+    }
+
     public static void FileSave<T>(T data, string filePath, string fileformat = SaveFormat)
     {
         string path = SavePath + filePath + fileformat;
