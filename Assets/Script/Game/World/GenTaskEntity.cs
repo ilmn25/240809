@@ -47,11 +47,11 @@ public class GenTaskEntity : Gen
                             }
                             else if (rng <= (chance += DirtSticksChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Sticks, position));
+                                currentChunk.DynamicEntity.Add(Entity.CreateInfo(ID.Sticks, position));
                             }
                             else if (rng <= (chance += DirtFlintChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Flint, position));
+                                currentChunk.DynamicEntity.Add(Entity.CreateInfo(ID.Flint, position));
                             }
                         }
                         else
