@@ -72,7 +72,7 @@ public static class RaidEvent
 
     private static void SpawnRaidEnemy(ID enemyID)
     {
-        if (Main.PlayerInfo == null || World.Inst.target.Count == 0) return;
+        if (Main.PlayerInfo == null || SaveData.Inst.players.Count == 0) return;
 
         Vector3Int playerPos = Vector3Int.FloorToInt(Main.PlayerInfo.position);
         float angle = Random.Range(0f, Mathf.PI * 2f);
@@ -85,9 +85,9 @@ public static class RaidEvent
         Vector3Int spawnPos = playerPos + Vector3Int.FloorToInt(offset);
         var spawnedEntity = Entity.Spawn(enemyID, spawnPos);
 
-        if (spawnedEntity is MobInfo mobInfo && World.Inst.target.Count > 0)
+        if (spawnedEntity is MobInfo mobInfo && SaveData.Inst.players.Count > 0)
         {
-            mobInfo.Target = World.Inst.target[Random.Range(0, World.Inst.target.Count)];
+            mobInfo.Target = SaveData.Inst.players[Random.Range(0, SaveData.Inst.players.Count)];
         }
     }
 

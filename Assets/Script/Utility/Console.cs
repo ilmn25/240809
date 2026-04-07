@@ -309,7 +309,7 @@ public class Console : MonoBehaviour
     }
     private void Gather()
     {
-        foreach (PlayerInfo info in World.Inst.target)
+        foreach (PlayerInfo info in SaveData.Inst.players)
         {
             info.position = Main.PlayerInfo.Machine.transform.position;
             if (info.Machine) info.Machine.transform.position = Main.PlayerInfo.Machine.transform.position;
