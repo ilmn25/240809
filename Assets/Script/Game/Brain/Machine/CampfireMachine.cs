@@ -2,16 +2,6 @@ public class CampfireMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        Storage storage = new NoRefreshStorage(9);
-        storage.CreateAndAddItem(ID.Charcoal);
-        storage.CreateAndAddItem(ID.CookedMeat);
-        return new CraftInfo()
-        {
-            Health = 500,
-            Loot = ID.Campfire,
-            SfxHit = SfxID.HitStone,
-            SfxDestroy = SfxID.HitStone,
-            Storage = storage
-        };
+        return CraftInfo.CreateStructureInfo(ID.Campfire, 500, SfxID.HitStone, SfxID.HitStone);
     }
 }

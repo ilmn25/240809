@@ -6,11 +6,11 @@ public class InCraftState : State
     {
         Audio.PlaySFX(SfxID.Text);
 
-        _craftInfo = ((CraftingMachine)Machine).GetCraftInfo();
-        CraftInfo craftInfo = _craftInfo;
-        EnsureSlotCount(craftInfo.Storage, GUIMain.GUICraft.SlotAmount);
+        _craftInfo = (CraftInfo)Info;
+        Storage storage = _craftInfo.GetStoragePool();
+        EnsureSlotCount(storage, GUIMain.GUICraft.SlotAmount);
 
-        GUIMain.GUICraft.UseCraftingStorage(craftInfo.Storage);
+        GUIMain.GUICraft.UseCraftingInfo(_craftInfo);
 
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
@@ -19,8 +19,6 @@ public class InCraftState : State
 
     public override void OnUpdateState()
     {
-        CraftInfo craftInfo = _craftInfo ?? ((CraftingMachine)Machine).GetCraftInfo();
-
         if (!GUIMain.Showing ||
             Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 36)
         {
@@ -28,15 +26,13 @@ public class InCraftState : State
             return;
         }
 
-        if (GUIMain.GUICraft.Storage != craftInfo.Storage)
+        if (GUIMain.GUICraft.ActiveCraftInfo != _craftInfo)
             Machine.SetState<DefaultState>();
     }
 
     public override void OnExitState()
     {
-        CraftInfo craftInfo = _craftInfo ?? ((CraftingMachine)Machine).GetCraftInfo();
-
-        if (GUIMain.GUICraft.Storage == craftInfo.Storage)
+        if (GUIMain.GUICraft.ActiveCraftInfo == _craftInfo)
         {
             GUIMain.GUICraft.UseDefaultStorage();
             GUIMain.RefreshStorage();

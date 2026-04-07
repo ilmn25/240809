@@ -3,27 +3,18 @@ using UnityEngine;
 public class GUICraft : GUIStorage
 {
     public Storage DefaultStorage;
+    public CraftInfo ActiveCraftInfo { get; private set; }
 
     public void UseDefaultStorage()
     {
+        ActiveCraftInfo = null;
         Storage = DefaultStorage;
     }
 
-    public void UseCraftingStorage(Storage storage)
+    public void UseCraftingInfo(CraftInfo craftInfo)
     {
-        Storage = storage;
-    }
-
-    private CraftInfo CraftInfo => Storage.info as CraftInfo ?? CreateCraftInfoFallback();
-
-    private CraftInfo CreateCraftInfoFallback()
-    {
-        CraftInfo craftInfo = new CraftInfo()
-        {
-            Storage = Storage,
-        };
-        Storage.info = craftInfo;
-        return craftInfo;
+        ActiveCraftInfo = craftInfo;
+        Storage = craftInfo.GetStoragePool();
     }
 
     protected override void ActionPrimaryDown()
@@ -47,27 +38,18 @@ public class GUICraft : GUIStorage
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
         if (!ItemRecipe.IsCraftable(item.ID))
             return;
-
-        ItemRecipe.TakeIngredients(item.ID);
-
-        if (ItemRecipe.Dictionary[item.ID].Time == 0)
+ 
+        if (ItemRecipe.Dictionary[item.ID].Time == 0 || item.Type == ItemType.Structure)
         {
             ItemRecipe.CraftItem(item.ID);
             return;
         }
 
-        CraftInfo.Pending.Add(item.ID);
-    }
+        if (ActiveCraftInfo == null)
+            return;
 
-    private void SpawnCraftedItem(ID itemID)
-    {
-        Vector3 spawnBase = CraftInfo.Machine != null ? CraftInfo.Machine.transform.position : Main.Player.transform.position;
-        Vector3 offset = new Vector3(
-            Random.value > 0.5f ? 0.65f : -0.65f,
-            1.8f,
-            Random.value > 0.5f ? 0.65f : -0.65f);
-
-        Entity.SpawnItem(itemID, spawnBase + offset, stackOnSpawn: false);
+        ItemRecipe.TakeIngredients(item.ID);
+        ActiveCraftInfo.Pending.Add(item.ID);
     }
 
     protected override void SetInfoPanel(ItemSlot itemSlot)

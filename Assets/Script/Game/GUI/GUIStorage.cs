@@ -15,7 +15,7 @@ public class  GUIStorage : GUI
     public Storage Storage; 
     public int RowAmount = 1;
     public int SlotAmount = 9;
-    private string Name => Storage.Name ?? Storage.info.id.ToString();
+    private string Name => Storage.Name ?? Storage.info?.id.ToString() ?? "Storage";
     protected int CurrentSlotKey = -1;  
 
     private void OnRefresh(object sender, EventArgs e)
