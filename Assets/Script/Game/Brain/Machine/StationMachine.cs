@@ -9,6 +9,7 @@ public class StationMachine: CraftingMachine
         storage.CreateAndAddItem(ID.Anvil);
         storage.CreateAndAddItem(ID.Sawmill);
         storage.CreateAndAddItem(ID.Stonecutter);
+        storage.CreateAndAddItem(ID.ImprovisedPlanter);
         return new CraftInfo()
         {
             Health = 500,
