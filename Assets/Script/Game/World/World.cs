@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Unity.Mathematics;
@@ -22,7 +23,7 @@ public class World
     public readonly Vector3Int Bounds;
     public static int Seed;
 
-    public List<PlayerInfo> target = new();
+    [NonSerialized] public List<PlayerInfo> target = new();
     
     public World(GenType genType)
     {
@@ -31,6 +32,24 @@ public class World
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
         _chunks = new Chunk[Size.x * Size.y * Size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
+    }
+
+    [OnDeserialized]
+    private void OnDeserialized(StreamingContext context)
+    {
+        target = new List<PlayerInfo>();
+    }
+
+    public void RemovePlayersFromChunks()
+    {
+        if (_chunks == null) return;
+
+        foreach (Chunk chunk in _chunks)
+        {
+            if (chunk == null) continue;
+            chunk.DynamicEntity.RemoveAll(info => info is PlayerInfo);
+            chunk.StaticEntity.RemoveAll(info => info is PlayerInfo);
+        }
     }
 
     public static void UnloadWorld()

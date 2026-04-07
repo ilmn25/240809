@@ -26,7 +26,7 @@ public class EntityDynamicLoad
             
             if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
-                if (World.IsInWorldBounds(entityChunkPosition))
+                if (entityMachine.Info is not PlayerInfo && World.IsInWorldBounds(entityChunkPosition))
                     World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
                 removeList.Add(entityMachine);
             }
@@ -63,7 +63,7 @@ public class EntityDynamicLoad
         foreach (EntityMachine entityMachine in _activeEntities)
         {
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
-            if (World.IsInWorldBounds(entityChunkPosition))
+            if (entityMachine.Info is not PlayerInfo && World.IsInWorldBounds(entityChunkPosition))
                 World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
             removeList.Add(entityMachine);
         }

@@ -42,6 +42,7 @@ public class Scene
     private static IEnumerator Start()
     {
         Gen.Initialize();
+        Save.LoadRuntimePlayers();
         NavMap.Initialize();
         Control.SetPlayer(0); 
         Main.ViewPortObject.transform.position = Main.PlayerInfo.position;  
@@ -57,8 +58,7 @@ public class Scene
         Main.SceneMode = SceneMode.Menu;
         if (World.Inst != null)
         {
-            World.UnloadWorld();
-            Helper.FileSave(World.Inst, Save.TempPath + SaveData.Inst.current); 
+            Save.SaveRuntimeState();
         }
         World.Inst = null;
     }

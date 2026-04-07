@@ -29,7 +29,7 @@ public class Gen
     };
     public static void Initialize()
     {
-        World.Inst = Helper.FileLoad<World>(Save.TempPath + SaveData.Inst.current);
+        World.Inst = Helper.FileLoad<World>(Save.TempPath + Save.WorldRuntimeFile);
         if (World.Inst == null)
         {
             World.Inst = new World(SaveData.Inst.current);     
@@ -49,6 +49,11 @@ public class Gen
     public static float GetOffset()
     {
         return (float)Random.NextDouble() * 1000f;
+    }
+
+    public static Vector3Int GetDefaultSpawnPosition()
+    {
+        return Dictionary[SaveData.Inst.current].SpawnPoint;
     }
 
 
