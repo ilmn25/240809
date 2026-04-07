@@ -48,7 +48,7 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Sticks);
                 loot.Add(0.5f, 1, ID.Sticks);
                 
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexCollide);
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexSemiCollide);
                 loot = new (ID.Slab);
                 loot.Add(1, 2, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Gravel);
@@ -63,8 +63,8 @@ public class Entity
                 AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Main.IndexCollide);
                 AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Main.IndexCollide);
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
-                AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexCollide);
-                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Main.IndexCollide);
 
                 loot = new (ID.Station);

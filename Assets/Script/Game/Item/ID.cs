@@ -34,7 +34,7 @@ public enum ID
 
     // Tools
     SteelSword,
-    Blueprint,
+    Chalk,
     StonePickaxe,
     StoneHatchet,
     MetalAxe,

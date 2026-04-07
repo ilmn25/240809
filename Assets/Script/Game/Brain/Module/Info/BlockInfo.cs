@@ -11,7 +11,7 @@ public class BlockInfo : StructureInfo
         Terraform.PendingBlocks.Add(Coordinate);
         PlayerTask.Pending.Add(this);
         Block block;
-        if (id == ID.Blueprint)
+        if (id == ID.Chalk)
         {
             block = Block.GetBlock(World.GetBlock(Coordinate));
             operationType = OperationType.Mining;
@@ -31,7 +31,7 @@ public class BlockInfo : StructureInfo
 
     public override void OnDestroy(MobInfo info)
     { 
-        if (id == ID.Blueprint)
+        if (id == ID.Chalk)
             World.SetBlock(Vector3Int.FloorToInt(position));
         else
             World.SetBlock(Vector3Int.FloorToInt(position), Block.ConvertID(id));
@@ -41,7 +41,7 @@ public class BlockInfo : StructureInfo
     public override string ToString()
     {
         string name;
-        if (id != ID.Blueprint)
+        if (id != ID.Chalk)
         {
             name = FormatId(id);
         }

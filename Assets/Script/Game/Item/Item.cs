@@ -176,6 +176,7 @@ public partial class Item
 
             Speed = 1,
             Range = 5,
+            HoldoutOffset = new Vector2(0.5f, 0),
 
             Description = description
         };
