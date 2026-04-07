@@ -12,7 +12,8 @@ public class Dialogue
     private static CoroutineTask _scrollTask;
     public static Dialogue Target;
     public static bool Showing = true;
-    private static CoroutineTask _scaleTask;  
+    private static CoroutineTask _scaleTask;
+    private static int _frameClosedAt = -1;
     
     public string Text;
     public Sprite Sprite;
@@ -21,6 +22,9 @@ public class Dialogue
     {
         if (isShow)
         {
+            if (_frameClosedAt == Time.frameCount)
+                return;
+
             if (!Showing)
             {
                 Showing = true;
@@ -36,6 +40,7 @@ public class Dialogue
             if (Showing)
             { 
                 Showing = false;
+                _frameClosedAt = Time.frameCount;
                 SetSprite();
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Main.GUIDialogue, 

@@ -6,10 +6,12 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
     protected new PlanterInfo Info => GetModule<PlanterInfo>();
 
     private int _visualStage = -1;
+    private readonly Dialogue _messageDialogue = new();
 
     public override void OnStart()
     {
         base.OnStart();
+        AddState(new MessageState(_messageDialogue));
         Environment.HourlyTriggered += OnHour;
         EnsureGrowthSchedule();
         TryGrowForTime(SaveData.Inst.time / 60, SaveData.Inst.day);
@@ -64,11 +66,13 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         return Mathf.Max(1, remainingHours);
     }
 
-    private static void ShowPlanterMessage(string message)
+    private void ShowPlanterMessage(string message)
     {
-        Dialogue.Target = new Dialogue { Text = message };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
+        _messageDialogue.Text = message;
+        if (IsCurrentState<DefaultState>())
+            SetState<MessageState>();
+        else
+            SetState<DefaultState>();
     }
 
     protected virtual bool TryConsumeSelectedSeed(PlayerInfo actor)
