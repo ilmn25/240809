@@ -63,6 +63,7 @@ public class Entity
                 AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Main.IndexCollide);
                 AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Main.IndexCollide);
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
+                AddStructure<FieldStationMachine>(ID.FieldStation, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<StationMachine>(ID.Station, Vector3Int.one, Main.IndexCollide);
@@ -110,6 +111,10 @@ public class Entity
                 loot = new (ID.ImprovisedPlanter);
                 loot.Add(1, 2, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
+
+                loot = new (ID.FieldStation);
+                loot.Add(1, 2, ID.Log);
+                loot.Add(0.5f, 2, ID.Sticks);
                 
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Chest);

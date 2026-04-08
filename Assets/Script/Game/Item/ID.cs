@@ -92,4 +92,5 @@ public enum ID
     CrudeHatchet,
     CrudeMallet,
     ImprovisedPlanter,
+    FieldStation,
 }
