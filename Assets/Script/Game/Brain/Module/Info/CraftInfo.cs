@@ -12,7 +12,8 @@ public class CraftInfo : SpriteStructureInfo
     private static readonly Storage FurnacePool = CreateNoRefreshPool(ID.Slag, ID.Steel);
     private static readonly Storage SawmillPool = CreateNoRefreshPool(ID.Plank, ID.Stake, ID.Chest);
     private static readonly Storage StonecutterPool = CreateNoRefreshPool(ID.Brick, ID.BrickBlock);
-    private static readonly Storage StationPool = CreatePool(ID.Chalk, ID.Furnace, ID.Workbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.ImprovisedPlanter);
+    private static readonly Storage StationPool = CreatePool(ID.Chalk, ID.Furnace, ID.Workbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
+    private static readonly Storage FieldStationPool = CreatePool(ID.ImprovisedPlanter);
     private static readonly Storage AnvilPool = CreatePool(ID.SteelSword, ID.MetalAxe);
 
     public readonly List<ID> Pending = new List<ID>();
@@ -89,6 +90,7 @@ public class CraftInfo : SpriteStructureInfo
             ID.Sawmill => SawmillPool,
             ID.Stonecutter => StonecutterPool,
             ID.Station => StationPool,
+            ID.FieldStation => FieldStationPool,
             ID.Anvil => AnvilPool,
             _ => null,
         };

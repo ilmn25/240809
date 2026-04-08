@@ -12,3 +12,11 @@ public class AnvilMachine: CraftingMachine
         return CraftInfo.CreateStructureInfo(ID.Anvil, 500, SfxID.HitStone, SfxID.HitStone);
     }
 }
+
+public class FieldStationMachine: CraftingMachine
+{
+    public static Info CreateInfo()
+    {
+        return CraftInfo.CreateStructureInfo(ID.FieldStation, 500, SfxID.HitStone, SfxID.HitStone);
+    }
+}
