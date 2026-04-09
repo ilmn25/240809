@@ -51,12 +51,6 @@ public class Gen
         return (float)Random.NextDouble() * 1000f;
     }
 
-    public static Vector3Int GetDefaultSpawnPosition()
-    {
-        return Dictionary[SaveData.Inst.current].SpawnPoint;
-    }
-
-
     public static void GenerateWorld()
     {  
         Vector3Int position;

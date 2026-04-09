@@ -17,7 +17,7 @@ public class GenSuperFlat : Gen
     {
         if (currentCoordinate == SpawnPoint)
         {
-            SaveData.Inst.spawnPosition = SpawnPoint;
+            World.Inst.SpawnPoint = SpawnPoint;
         } 
         
         if (currentCoordinate.y == 0)

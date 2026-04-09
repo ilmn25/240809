@@ -12,7 +12,7 @@ public class GenTaskSpawn : Gen
         // compute surface y at the spawn location
         int surfaceY = FindSurfaceY(spawnWorld.x, spawnWorld.z, currentCoordinate);
         Vector3Int spawnPos = new Vector3Int(spawnWorld.x, surfaceY, spawnWorld.z);
-        SaveData.Inst.spawnPosition = spawnPos;
+        World.Inst.SpawnPoint = spawnPos;
 
     }
 

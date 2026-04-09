@@ -18,6 +18,7 @@ public class World
     [NonSerialized] public static World Inst;
  
     public GenType GenType;
+    public Vector3Int SpawnPoint;
     private Chunk[] _chunks; 
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
@@ -28,6 +29,7 @@ public class World
         GenType = genType; 
         Size = Gen.Dictionary[genType].Size;
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
+        SpawnPoint = Gen.Dictionary[genType].SpawnPoint;
         _chunks = new Chunk[Size.x * Size.y * Size.z];
         Seed = UnityEngine.Random.Range(1, 1000);
     }
