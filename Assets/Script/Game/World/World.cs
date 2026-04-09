@@ -12,19 +12,13 @@ using Random = System.Random;
 [Serializable]
 public class World
 {
-    private static readonly Dictionary<GenType, Vector3Int> SizesByType = new()
-    {
-        { GenType.Abyss, new Vector3Int(60, 30, 60) },
-        { GenType.SkyBlock, Vector3Int.one },
-        { GenType.SuperFlat, new Vector3Int(15, 4, 15) }
-    };
-
-    public static Vector3Int GetSize(GenType genType) => SizesByType[genType];
+    public static Vector3Int GetSize(GenType genType) => Gen.Dictionary[genType].GetSize();
+    public static Vector3Int GetSpawnPoint(GenType genType) => Gen.Dictionary[genType].GetSpawnPoint();
 
     public delegate void Vector3IntEvent(Vector3Int position);
     public static event Vector3IntEvent MapUpdated;  
     public const int ChunkSize = 15; 
-    [NonSerialized] public static World Inst;
+    public static World Inst => SaveData.Inst.worlds[SaveData.Inst.current];
  
     public GenType GenType;
     public Vector3Int SpawnPoint;
@@ -32,12 +26,13 @@ public class World
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
 
+    public World() {}  // for cloning
     public World(GenType genType)
     {
         GenType = genType; 
         Size = GetSize(genType);
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
-        SpawnPoint = Vector3Int.zero;
+        SpawnPoint = GetSpawnPoint(genType);
         _chunks = new Chunk[Size.x * Size.y * Size.z];
     }
 

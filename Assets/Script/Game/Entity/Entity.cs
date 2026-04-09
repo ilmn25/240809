@@ -258,6 +258,26 @@ public class Entity
                 return info;
         } 
 
+        public static EntityMachine SpawnFromInfo(Info info)
+        {
+                Entity entity = Dictionary[info.id];
+                GameObject gameObject = entity.PrefabName == ID.ItemPrefab
+                        ? ObjectPool.GetObject(entity.PrefabName)
+                        : ObjectPool.GetObject(entity.PrefabName, info.id);
+                gameObject.transform.position = info.position;
+
+                EntityMachine currentEntityMachine = (EntityMachine)
+                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
+
+                if (entity.StaticLoad)
+                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
+                else
+                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
+
+                currentEntityMachine.Initialize(info);
+                return currentEntityMachine;
+        }
+
         public static Info CreateInfo(ID id, Vector3 worldPosition)
         {
                 if (!Dictionary.ContainsKey(id)) //TODO
