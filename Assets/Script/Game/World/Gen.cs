@@ -18,7 +18,7 @@ public class Gen
     public int WorldHeight { get; protected set; }
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
     
-    protected static readonly System.Random Random = new (World.Seed);
+    protected static System.Random Random = new (SaveData.Inst?.seed ?? 0);
     protected static Gen _target;
 
     public static readonly Dictionary<GenType, Gen> Dictionary = new ()
@@ -27,24 +27,12 @@ public class Gen
         {GenType.SkyBlock, new GenSkyBlock()},
         {GenType.SuperFlat, new GenSuperFlat()},
     };
-    public static void Initialize()
+    public static void Initialize(GenType genType)
     {
-        World.Inst = Helper.FileLoad<World>(Save.TempPath + Save.WorldRuntimeFile);
-        if (World.Inst == null)
-        {
-            World.Inst = new World(SaveData.Inst.current);     
-            SetVariables();
-            GenerateWorld();
-        }
-        else SetVariables();
-        
-        return;
-        
-        void SetVariables()
-        {
-            _target = Dictionary[SaveData.Inst.current];
-            
-        }
+        World.Inst = new World(genType);
+        Random = new System.Random(SaveData.Inst.seed);
+        _target = Dictionary[genType];
+        GenerateWorld();
     }
     public static float GetOffset()
     {

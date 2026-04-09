@@ -11,8 +11,6 @@ public class GenAbyss : Gen
 
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     { 
-        GenTaskSpawn.Run(currentCoordinate, currentChunk);
-        
         GenTaskStone.Run(currentCoordinate, currentChunk);
         GenTaskGranite.Run(currentCoordinate, currentChunk);  
         GenTaskMarble.Run(currentCoordinate, currentChunk);
