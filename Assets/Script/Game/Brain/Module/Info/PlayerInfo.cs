@@ -14,7 +14,7 @@ public class PlayerInfo : MobInfo
     public int Hunger;
     public int HungerMax = 20;
     public float Stamina; 
-    public Vector3 SpawnPoint;
+public Vector3 SpawnPoint;
 
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 

@@ -24,12 +24,6 @@ public class Save
         Helper.FileSave(Inst, "Main");
     }
     
-    public static void NewSave(GenType gen)
-    { 
-        SaveData.Inst = new SaveData(gen);
-        Scene.SwitchWorld(gen);
-    }
-    
     public static void CloneSave()
     {
         _ = new CoroutineTask(CloneSaveCoroutine());
@@ -70,7 +64,6 @@ public class SaveData
     {
         current = gen;
         seed = UnityEngine.Random.Range(1, 1000000);
-        Vector3 spawnPosition = Vector3.zero;
 
         players = new List<PlayerInfo>();
         worlds = new Dictionary<GenType, World>()
@@ -79,6 +72,8 @@ public class SaveData
             { GenType.SkyBlock, new World(GenType.SkyBlock) },
             { GenType.SuperFlat, new World(GenType.SuperFlat) }
         };
+
+        Vector3 spawnPosition = worlds[gen].SpawnPoint;
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         first.SpawnPoint = spawnPosition;
