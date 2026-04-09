@@ -73,7 +73,12 @@ public class SaveData
         Vector3 spawnPosition = Vector3.zero;
 
         players = new List<PlayerInfo>();
-        worlds = new Dictionary<GenType, World>();
+        worlds = new Dictionary<GenType, World>()
+        {
+            { GenType.Abyss, new World(GenType.Abyss) },
+            { GenType.SkyBlock, new World(GenType.SkyBlock) },
+            { GenType.SuperFlat, new World(GenType.SuperFlat) }
+        };
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         first.SpawnPoint = spawnPosition;
