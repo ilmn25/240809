@@ -17,7 +17,7 @@ public class GenSkyBlock : Gen
         if (currentCoordinate == SpawnPoint)
         {
             Vector3Int spawnPoint = currentCoordinate + new Vector3Int(3, 4, 3);
-            SaveData.Inst.spawnPosition = spawnPoint;
+            World.Inst.SpawnPoint = spawnPoint;
             
             SetPiece.Paste(currentCoordinate + Vector3Int.one, SkyBlock);
         } 
