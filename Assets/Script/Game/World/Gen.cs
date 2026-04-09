@@ -13,8 +13,6 @@ public enum GenType
 }
 public class Gen
 {
-    public Vector3Int Size { get; protected set; }
-    public Vector3Int SpawnPoint { get; protected set; } 
     public int WorldHeight { get; protected set; }
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
     
@@ -32,35 +30,11 @@ public class Gen
         World.Inst = new World(genType);
         Random = new System.Random(SaveData.Inst.seed);
         _target = Dictionary[genType];
-        GenerateWorld();
+        _target.WorldHeight = (World.Inst.Size.y - 3) * World.ChunkSize;
     }
     public static float GetOffset()
     {
         return (float)Random.NextDouble() * 1000f;
-    }
-
-    public static void GenerateWorld()
-    {  
-        Vector3Int position;
-        for (int x = -Scene.GenRange; x <= Scene.GenRange; x++)
-        {
-            for (int y = -Scene.GenRange; y <= Scene.GenRange; y++)
-            {
-                for (int z = -Scene.GenRange; z <= Scene.GenRange; z++)
-                {
-                    position = new Vector3Int(
-                        _target.SpawnPoint.x + x * World.ChunkSize,
-                        _target.SpawnPoint.y + y * World.ChunkSize,
-                        _target.SpawnPoint.z + z * World.ChunkSize);
-
-                    if (World.Inst[position] == null)
-                    {
-                        Generate(position);
-                    }
-                }
-            }
-        } 
-         
     }
 
     public static IEnumerator GenerateNearbyChunks(Vector3Int center)

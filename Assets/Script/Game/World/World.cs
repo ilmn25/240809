@@ -12,6 +12,15 @@ using Random = System.Random;
 [Serializable]
 public class World
 {
+    private static readonly Dictionary<GenType, Vector3Int> SizesByType = new()
+    {
+        { GenType.Abyss, new Vector3Int(60, 30, 60) },
+        { GenType.SkyBlock, Vector3Int.one },
+        { GenType.SuperFlat, new Vector3Int(15, 4, 15) }
+    };
+
+    public static Vector3Int GetSize(GenType genType) => SizesByType[genType];
+
     public delegate void Vector3IntEvent(Vector3Int position);
     public static event Vector3IntEvent MapUpdated;  
     public const int ChunkSize = 15; 
@@ -26,22 +35,10 @@ public class World
     public World(GenType genType)
     {
         GenType = genType; 
-        Size = Gen.Dictionary[genType].Size;
+        Size = GetSize(genType);
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
-        SpawnPoint = Gen.Dictionary[genType].SpawnPoint;
+        SpawnPoint = Vector3Int.zero;
         _chunks = new Chunk[Size.x * Size.y * Size.z];
-    }
-
-    public void RemovePlayersFromChunks()
-    {
-        if (_chunks == null) return;
-
-        foreach (Chunk chunk in _chunks)
-        {
-            if (chunk == null) continue;
-            chunk.DynamicEntity.RemoveAll(info => info is PlayerInfo);
-            chunk.StaticEntity.RemoveAll(info => info is PlayerInfo);
-        }
     }
 
     public static void UnloadWorld()

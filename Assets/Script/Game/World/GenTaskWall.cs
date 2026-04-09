@@ -12,7 +12,7 @@ public class GenTaskWall : Gen
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        Vector3Int center = _target.SpawnPoint;
+        Vector3Int center = World.Inst.SpawnPoint;
         // no vertical filtering; wall will be placed relative to surface height below
 
         for (int x = 0; x < World.ChunkSize; x++)
