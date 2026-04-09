@@ -70,11 +70,11 @@ public class Save
 
         if (Main.PlayerInfo != null)
         {
-            SaveData.Inst.spawnPosition = Main.PlayerInfo.SpawnPoint;
+            World.Inst.SpawnPoint = Vector3Int.FloorToInt(Main.PlayerInfo.SpawnPoint);
         }
-        else if (SaveData.Inst.spawnPosition == Vector3.zero && SaveData.Inst.players.Count > 0)
+        else if (World.Inst.SpawnPoint == Vector3Int.zero && SaveData.Inst.players.Count > 0)
         {
-            SaveData.Inst.spawnPosition = SaveData.Inst.players[0].SpawnPoint;
+            World.Inst.SpawnPoint = Vector3Int.FloorToInt(SaveData.Inst.players[0].SpawnPoint);
         }
 
         Helper.FileSave(World.Inst, TempPath + WorldRuntimeFile);
@@ -85,7 +85,12 @@ public class Save
         if (World.Inst == null || SaveData.Inst == null) return;
         List<PlayerInfo> loadedPlayers = SaveData.Inst.players ?? new List<PlayerInfo>();
         loadedPlayers.RemoveAll(player => player == null);
-        Vector3 spawnPosition = ResolveSpawnPosition();
+        if (World.Inst.SpawnPoint == Vector3Int.zero)
+        {
+            World.Inst.SpawnPoint = Gen.Dictionary[SaveData.Inst.current].SpawnPoint;
+        }
+
+        Vector3 spawnPosition = World.Inst.SpawnPoint;
 
         SaveData.Inst.players = new List<PlayerInfo>();
 
@@ -145,18 +150,6 @@ public class Save
 
         return players;
     }
-
-    private static Vector3 ResolveSpawnPosition()
-    {
-        if (SaveData.Inst.spawnPosition != Vector3.zero)
-        {
-            return SaveData.Inst.spawnPosition;
-        }
-
-        Vector3 spawnPosition = Gen.GetDefaultSpawnPosition();
-        SaveData.Inst.spawnPosition = spawnPosition;
-        return spawnPosition;
-    }
 }
 
 [Serializable]
@@ -169,7 +162,6 @@ public class SaveData
     public int time;
     public EnvironmentType weather = EnvironmentType.Sunrise;
     public GenType current;
-    public Vector3 spawnPosition;
     public List<PlayerInfo> players = new();
 
     public SaveData(){}
