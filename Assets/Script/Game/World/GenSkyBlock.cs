@@ -4,17 +4,9 @@ public class GenSkyBlock : Gen
 {
     private static readonly Chunk SkyBlock = SetPiece.LoadSetPieceFile("SkyBlock");
 
-
-    public GenSkyBlock ()
-    {
-        Size = Vector3Int.one;
-        WorldHeight = (Size.y - 3) * World.ChunkSize;
-        SpawnPoint = Vector3Int.zero;
-    }
-
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        if (currentCoordinate == SpawnPoint)
+        if (currentCoordinate == Vector3Int.zero)
         {
             Vector3Int spawnPoint = currentCoordinate + new Vector3Int(3, 4, 3);
             World.Inst.SpawnPoint = spawnPoint;

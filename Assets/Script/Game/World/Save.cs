@@ -63,6 +63,7 @@ public class SaveData
     public GenType current;
     public int seed;
     public List<PlayerInfo> players = new();
+    public Dictionary<GenType, World> worlds = new();
 
     public SaveData(){}
     public SaveData(GenType gen)
@@ -72,6 +73,7 @@ public class SaveData
         Vector3 spawnPosition = Vector3.zero;
 
         players = new List<PlayerInfo>();
+        worlds = new Dictionary<GenType, World>();
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         first.SpawnPoint = spawnPosition;
