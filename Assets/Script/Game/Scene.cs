@@ -52,7 +52,17 @@ public class Scene
     
     private static IEnumerator Start()
     {
-        Gen.Initialize(SaveData.Inst.current);
+        SaveData.Inst.worlds ??= new Dictionary<GenType, World>();
+        if (SaveData.Inst.worlds.TryGetValue(SaveData.Inst.current, out World existingWorld) && existingWorld != null)
+        {
+            World.Inst = existingWorld;
+        }
+        else
+        {
+            Gen.Initialize(SaveData.Inst.current);
+            SaveData.Inst.worlds[SaveData.Inst.current] = World.Inst;
+        }
+
         Vector3 spawnPosition = World.Inst.SpawnPoint;
         SaveData.Inst.players.RemoveAll(player => player == null);
         Vector3Int spawnChunk = World.GetChunkCoordinate(spawnPosition);
@@ -76,6 +86,11 @@ public class Scene
         Environment.Target = EnvironmentType.Black;
         yield return new WaitForSeconds(2);
         Main.SceneMode = SceneMode.Menu;
+        if (World.Inst != null)
+        {
+            SaveData.Inst.worlds ??= new Dictionary<GenType, World>();
+            SaveData.Inst.worlds[SaveData.Inst.current] = World.Inst;
+        }
         World.Inst = null;
     }
     public static void Update()
