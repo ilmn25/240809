@@ -28,26 +28,16 @@ public class EntityStaticLoad
 
     public static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
     {  
-        Entity entity;
-        EntityMachine currentEntityMachine;
-        GameObject currentInstance;
         List<Info> activeEntities = World.Inst[chunkCoordinate].StaticEntity;
         // Find the key once
         if (!ActiveEntities.ContainsKey(chunkCoordinate))
         {
             ActiveEntities[chunkCoordinate] = (activeEntities, new List<EntityMachine>());
-        }
-
+        } 
         foreach (Info info in activeEntities)
         {
-            entity = Entity.Dictionary[info.id];
-            currentInstance = ObjectPool.GetObject(entity.PrefabName, info.id);
-            currentInstance.transform.position = info.position; 
-            currentEntityMachine = (EntityMachine)
-                (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine));
-            ActiveEntities[chunkCoordinate].Item2.Add(currentEntityMachine);  
+            Entity.SpawnFromInfo(info);
             info.IsInRenderRange = true;
-            currentEntityMachine.Initialize(info);
         }
         activeEntities.Clear();
     } 

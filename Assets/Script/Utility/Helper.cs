@@ -172,7 +172,7 @@ public static class Helper
     }
 
     private static object Clone(object source, Dictionary<object, object> visited)
-    {
+    {  
         if (source == null) return null;
 
         Type type = source.GetType();

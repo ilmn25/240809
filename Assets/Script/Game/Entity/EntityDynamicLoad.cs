@@ -75,25 +75,9 @@ public class EntityDynamicLoad
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
     {
-        Entity entity;
-        EntityMachine currentEntityMachine;
-        GameObject currentInstance;
         List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity; 
         foreach (Info info in chunkEntityList)
-        { 
-            entity = Entity.Dictionary[info.id];
-
-            if (entity.PrefabName == ID.ItemPrefab)
-                currentInstance = ObjectPool.GetObject(entity.PrefabName);
-            else                
-                currentInstance = ObjectPool.GetObject(entity.PrefabName, info.id);
-            currentInstance.transform.position = info.position;
-            // Utility.Log(chunkCoordinate, entityData.position.ToVector3Int(), currentInstance.transform.position);
-            currentEntityMachine = (EntityMachine)
-                (currentInstance.GetComponent<EntityMachine>() ?? currentInstance.AddComponent(entity.Machine)); 
-            _activeEntities.Add(currentEntityMachine); 
-            currentEntityMachine.Initialize(info);
-        }
+            Entity.SpawnFromInfo(info);
         World.Inst[chunkCoordinate].DynamicEntity.Clear(); 
     } 
 }

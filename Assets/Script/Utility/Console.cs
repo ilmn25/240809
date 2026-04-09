@@ -235,7 +235,7 @@ public class Console : MonoBehaviour
                 Main.Fly = !Main.Fly;
                 break;   
             case "flat":
-                Save.NewSave(GenType.SuperFlat);  
+                Scene.SwitchSave(new SaveData(GenType.SuperFlat));  
                 GUIMain.GUIMenu.Show(false);
                 break;   
             case "fps": 
