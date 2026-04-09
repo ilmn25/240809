@@ -22,7 +22,6 @@ public class World
     private Chunk[] _chunks; 
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
-    public static int Seed;
 
     public World(GenType genType)
     {
@@ -31,7 +30,6 @@ public class World
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
         SpawnPoint = Gen.Dictionary[genType].SpawnPoint;
         _chunks = new Chunk[Size.x * Size.y * Size.z];
-        Seed = UnityEngine.Random.Range(1, 1000);
     }
 
     public void RemovePlayersFromChunks()

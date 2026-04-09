@@ -116,7 +116,6 @@ public class Main : MonoBehaviour
         Control.Save();  
         Save.Quit();  
         MapLoad.CancellationTokenSourceKillGame.Cancel();
-        Helper.DeleteFolder(Save.TempPath);
     }
 
     public static void SetConstants()
