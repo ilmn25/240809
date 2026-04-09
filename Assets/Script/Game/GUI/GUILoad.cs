@@ -37,7 +37,7 @@ public class GUILoad : GUI
  
         if (Control.Inst.ActionPrimary.KeyDown() && Target != -1)
         {  
-            Scene.SwitchWorld(Save.Inst.List[Target]);
+            Scene.SwitchSave(Save.Inst.List[Target]);
             Show(false); 
         } 
     }

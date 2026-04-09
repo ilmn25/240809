@@ -21,13 +21,24 @@ public class Scene
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
     public static bool Busy;
-    public static void SwitchWorld(SaveData saveData)
+
+    public static void SwitchWorld(GenType genType)
     {  
         if (Busy) return;
         Busy = true;
         new CoroutineTask(Quit()).Finished += _ => {
-            Save.LoadSave(saveData); 
+            SaveData.Inst.current = genType;
             new CoroutineTask(Start()).Finished += _ => { Busy = false; };
+        };
+    }
+
+    public static void SwitchSave(SaveData saveData)
+    {
+        if (Busy) return;
+        Busy = true;
+        new CoroutineTask(Quit()).Finished += _ => {
+            Save.LoadSave(saveData);
+            new CoroutineTask(Start()).Finished += __ => { Busy = false; };
         };
     }
     
@@ -41,8 +52,17 @@ public class Scene
     
     private static IEnumerator Start()
     {
-        Gen.Initialize();
-        Save.LoadRuntimePlayers();
+        Gen.Initialize(SaveData.Inst.current);
+        Vector3 spawnPosition = World.Inst.SpawnPoint;
+        SaveData.Inst.players.RemoveAll(player => player == null);
+        Vector3Int spawnChunk = World.GetChunkCoordinate(spawnPosition);
+        foreach (PlayerInfo player in SaveData.Inst.players)
+        {
+            player.position = spawnPosition;
+            player.SpawnPoint = spawnPosition;
+            World.Inst[spawnChunk].DynamicEntity.Add(player);
+        }
+
         NavMap.Initialize();
         Control.SetPlayer(0); 
         Main.ViewPortObject.transform.position = Main.PlayerInfo.position;  
@@ -56,10 +76,6 @@ public class Scene
         Environment.Target = EnvironmentType.Black;
         yield return new WaitForSeconds(2);
         Main.SceneMode = SceneMode.Menu;
-        if (World.Inst != null)
-        {
-            Save.SaveRuntimeState();
-        }
         World.Inst = null;
     }
     public static void Update()
