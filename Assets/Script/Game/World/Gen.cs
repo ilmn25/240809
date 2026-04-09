@@ -27,7 +27,7 @@ public class Gen
     };
     public static void Initialize(GenType genType)
     {
-        World.Inst = new World(genType);
+        World.Inst = SaveData.Inst.worlds[genType];
         Random = new System.Random(SaveData.Inst.seed);
         _target = Dictionary[genType];
         _target.WorldHeight = (World.Inst.Size.y - 3) * World.ChunkSize;

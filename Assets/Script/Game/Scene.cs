@@ -22,10 +22,14 @@ public class Scene
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
     public static bool Busy;
 
-    public static void SwitchWorld(GenType genType)
+    public static void SwitchWorld(GenType genType, Vector3? spawnPoint = null)
     {  
         if (Busy) return;
         Busy = true;
+        if (spawnPoint.HasValue)
+        {
+            SaveData.Inst.worlds[genType].SpawnPoint = (Vector3Int)spawnPoint.Value;
+        }
         new CoroutineTask(Quit()).Finished += _ => {
             SaveData.Inst.current = genType;
             new CoroutineTask(Start()).Finished += _ => { Busy = false; };
@@ -52,17 +56,7 @@ public class Scene
     
     private static IEnumerator Start()
     {
-        SaveData.Inst.worlds ??= new Dictionary<GenType, World>();
-        if (SaveData.Inst.worlds.TryGetValue(SaveData.Inst.current, out World existingWorld) && existingWorld != null)
-        {
-            World.Inst = existingWorld;
-        }
-        else
-        {
-            Gen.Initialize(SaveData.Inst.current);
-            SaveData.Inst.worlds[SaveData.Inst.current] = World.Inst;
-        }
-
+        Gen.Initialize(SaveData.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
         SaveData.Inst.players.RemoveAll(player => player == null);
         Vector3Int spawnChunk = World.GetChunkCoordinate(spawnPosition);
