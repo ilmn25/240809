@@ -7,8 +7,18 @@ public class EntityDynamicLoad
 
     private static List<EntityMachine> _activeEntities = new List<EntityMachine>();
 
-    public static void ForgetEntity(EntityMachine entity) { _activeEntities.Remove(entity); }
-    public static void InviteEntity(EntityMachine entity) { _activeEntities.Add(entity); }
+    public static void ForgetEntity(EntityMachine entity)
+    {
+        if (entity == null) return;
+        while (_activeEntities.Remove(entity)) { }
+    }
+
+    public static void InviteEntity(EntityMachine entity)
+    {
+        if (entity == null) return;
+        if (_activeEntities.Contains(entity)) return;
+        _activeEntities.Add(entity);
+    }
 
     public static void OnChunkTraverse()
     {
@@ -26,14 +36,13 @@ public class EntityDynamicLoad
             
             if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
-                if (entityMachine.Info is not PlayerInfo && World.IsInWorldBounds(entityChunkPosition))
+                if (World.IsInWorldBounds(entityChunkPosition))
                     World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
                 removeList.Add(entityMachine);
             }
         }
         foreach (var entityMachine in removeList) entityMachine.Unload();
     }
-
 
     private static void ScanAndLoad()
     {
@@ -62,9 +71,6 @@ public class EntityDynamicLoad
         Vector3Int entityChunkPosition;
         foreach (EntityMachine entityMachine in _activeEntities)
         {
-            if (entityMachine.Info is PlayerInfo)
-                continue;
-
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             if (World.IsInWorldBounds(entityChunkPosition))
                 World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);

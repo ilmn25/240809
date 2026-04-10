@@ -40,7 +40,7 @@ public class Gen
 
     public static IEnumerator GenerateNearbyChunks(Vector3Int center, int range)
     {
-        Vector3Int position;
+        Vector3Int position; 
         for (int x = -range; x <= range; x++)
         {
             for (int y = -range; y <= range; y++)

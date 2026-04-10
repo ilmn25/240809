@@ -16,8 +16,8 @@ public class Scene
     private static Vector3Int _playerChunkPositionPrevious;
 
     public static readonly int RenderRange = 2;
-    public static readonly int LogicRange = 4; 
-    public static readonly int GenRange = 7; 
+    public static readonly int LogicRange = 3; 
+    public static readonly int GenRange = 4; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
     public static bool Busy;
@@ -27,10 +27,8 @@ public class Scene
         if (Busy) return;
         Busy = true;
         if (spawnPoint.HasValue)
-        {
             Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
-        }
-        new CoroutineTask(Quit()).Finished += _ => {
+        new CoroutineTask(Quit(false)).Finished += _ => {
             Save.Inst.current = genType;
             Start(); 
         };
@@ -40,7 +38,7 @@ public class Scene
     {
         if (Busy) return;
         Busy = true;
-        new CoroutineTask(Quit()).Finished += _ => {
+        new CoroutineTask(Quit(true)).Finished += _ => {
             Saves.LoadSave(save);
             Start();
         };
@@ -57,37 +55,38 @@ public class Scene
     {
         Gen.Initialize(Save.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
-        Save.Inst.players.RemoveAll(player => player == null);
         foreach (PlayerInfo player in Save.Inst.players)
         {
             player.position = spawnPosition; 
-            player.SpawnPoint = spawnPosition;
-            if (player.Machine == null)
-                Entity.SpawnFromInfo(player);
-        }
+            if (player.Machine == null) Entity.SpawnFromInfo(player, false);
+        } 
         NavMap.Initialize();
         Control.SetPlayer(0); 
         _playerChunkPositionPrevious = Vector3Int.down;  
     }
-    private static IEnumerator Quit()
+    private static IEnumerator Quit(bool includePlayers)
     {     
-        Environment.Target = EnvironmentType.Black;
+        Environment.Target = EnvironmentType.Black; 
         yield return new WaitForSeconds(2);
+        if (includePlayers)
+            foreach (PlayerInfo player in Save.Inst.players)
+                ObjectPool.ReturnObject(player.Machine.gameObject);
+        World.UnloadWorld();
         Main.SceneMode = SceneMode.Menu;
     }
     public static void Update()
-    {  
+    {   
         if (!Main.Player) return;
         PlayerChunkPosition = World.GetChunkCoordinate(Main.Player.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
-        {
+        { 
             CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition, GenRange));
             if (_playerChunkPositionPrevious == Vector3Int.down)
                 mapGenTask.Finished += (bool _) => { 
                     Main.SceneMode = SceneMode.Game;
                     Environment.Target = EnvironmentType.Null;
                     Busy = false;
-                };
+                }; 
             mapGenTask.Finished += (bool _) => { World.LoadWorld(); };
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }
