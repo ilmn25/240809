@@ -45,6 +45,7 @@ public class Saves
     public static void LoadSave(Save save)
     {   
         Save.Inst = save.id == null? save : Helper.FileLoad<Save>(save.Path + SaveDataFile);
+        Main.PlayerInfo = Save.Inst.players[0];
     } 
 }
 
@@ -79,23 +80,16 @@ public class Save
         Vector3 spawnPosition = worlds[gen].SpawnPoint;
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        first.SpawnPoint = spawnPosition;
         players.Add(first);
 
-        if (gen != GenType.Abyss)
-        {
-            return;
-        }
-
-        PlayerInfo second = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        second.SpawnPoint = spawnPosition;
-        second.CharSprite = ID.Sheep;
-        players.Add(second);
-
+        if (gen != GenType.Abyss) return;
         PlayerInfo third = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        third.SpawnPoint = spawnPosition;
         third.CharSprite = ID.Yuuri;
         players.Add(third);
+
+        PlayerInfo second = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
+        second.CharSprite = ID.Sheep;
+        players.Add(second);
     }
 }
 

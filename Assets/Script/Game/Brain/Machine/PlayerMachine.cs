@@ -100,7 +100,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         if (Main.PlayerInfo == Info)
         { 
-            Main.Player = gameObject;
             HandleInput();
             
             if (IsCurrentState<DefaultState>())
