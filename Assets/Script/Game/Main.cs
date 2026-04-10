@@ -24,7 +24,7 @@ public class Main : MonoBehaviour
     public static int IndexNoCollide;
     public static int IndexSemiCollide; 
     
-    public static GameObject Player;
+    public static GameObject Player => PlayerInfo.Machine?.gameObject;
     public static PlayerInfo PlayerInfo;
     public static GameObject ViewPortObject;
     public static GameObject CameraObject;

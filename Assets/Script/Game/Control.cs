@@ -73,7 +73,6 @@ public class Control
     {
         Main.PlayerInfo = global::Save.Inst.players[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
-        Main.Player = null;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
         Inventory.RefreshInventory();
         GUIBar.Update();

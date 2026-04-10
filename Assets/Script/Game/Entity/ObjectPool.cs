@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ObjectPool
 {
@@ -25,10 +26,14 @@ public class ObjectPool
 
     public static void ReturnObject(GameObject obj)
     { 
+        if (obj == null) return;
         obj.SetActive(false);
         
         if (!_pools.ContainsKey(obj.name))
             _pools[obj.name] = new Queue<GameObject>();
+
+        if (_pools[obj.name].Contains(obj))
+            return;
 
         _pools[obj.name].Enqueue(obj);
     }

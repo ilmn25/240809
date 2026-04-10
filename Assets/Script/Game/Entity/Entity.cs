@@ -258,7 +258,7 @@ public class Entity
                 return info;
         } 
 
-        public static EntityMachine SpawnFromInfo(Info info)
+        public static EntityMachine SpawnFromInfo(Info info, bool invite = false)
         {
                 Entity entity = Dictionary[info.id];
                 GameObject gameObject = entity.PrefabName == ID.ItemPrefab
@@ -271,7 +271,7 @@ public class Entity
 
                 if (entity.StaticLoad)
                         EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
-                else
+                else if (invite)
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
 
                 currentEntityMachine.Initialize(info);
