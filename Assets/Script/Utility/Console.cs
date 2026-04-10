@@ -234,6 +234,17 @@ public class Console : MonoBehaviour
             case "fly":
                 Main.Fly = !Main.Fly;
                 break;   
+            case "world":
+                if (_command.Length > 1 && Enum.TryParse(_command[1], true, out GenType genType))
+                {
+                    Scene.SwitchWorld(genType);
+                    Output($"switched to {genType}");
+                }
+                else
+                {
+                    Output("Usage: world <Abyss|SkyBlock|SuperFlat>");
+                }
+                break;
             case "flat":
                 Scene.SwitchSave(new Save(GenType.SuperFlat));  
                 GUIMain.GUIMenu.Show(false);
@@ -257,7 +268,7 @@ public class Console : MonoBehaviour
                 }
                 break;   
             case "save": 
-                Output("unloaded");  
+                Output("saved");  
                 Saves.SaveGame(); 
                 break;     
             default: 

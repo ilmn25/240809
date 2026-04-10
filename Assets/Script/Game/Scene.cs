@@ -32,7 +32,7 @@ public class Scene
         }
         new CoroutineTask(Quit()).Finished += _ => {
             Save.Inst.current = genType;
-            new CoroutineTask(Start()).Finished += _ => { Busy = false; };
+            Start(); 
         };
     }
 
@@ -42,7 +42,7 @@ public class Scene
         Busy = true;
         new CoroutineTask(Quit()).Finished += _ => {
             Saves.LoadSave(save);
-            new CoroutineTask(Start()).Finished += __ => { Busy = false; };
+            Start();
         };
     }
     
@@ -50,11 +50,10 @@ public class Scene
     {  
         if (Busy) return;
         Busy = true;
-        new CoroutineTask(Start()).Finished += _ => { Busy = false; };
+        Start();
     }
-     
     
-    private static IEnumerator Start()
+    private static void Start()
     {
         Gen.Initialize(Save.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
@@ -68,10 +67,7 @@ public class Scene
         }
         NavMap.Initialize();
         Control.SetPlayer(0); 
-        _playerChunkPositionPrevious = Vector3Int.down; 
-        yield return new WaitForSeconds(2);
-        Main.SceneMode = SceneMode.Game;
-        Environment.Target = EnvironmentType.Null;
+        _playerChunkPositionPrevious = Vector3Int.down;  
     }
     private static IEnumerator Quit()
     {     
@@ -85,7 +81,13 @@ public class Scene
         PlayerChunkPosition = World.GetChunkCoordinate(Main.Player.transform.position);
         if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
-            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition));
+            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition, GenRange));
+            if (_playerChunkPositionPrevious == Vector3Int.down)
+                mapGenTask.Finished += (bool _) => { 
+                    Main.SceneMode = SceneMode.Game;
+                    Environment.Target = EnvironmentType.Null;
+                    Busy = false;
+                };
             mapGenTask.Finished += (bool _) => { World.LoadWorld(); };
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }

@@ -10,11 +10,11 @@ public class Saves
 {
     public static Saves Inst; 
     public readonly List<Save> List = new();
-    private const string SaveDataFile = "SaveData";
+    private const string SaveDataFile = "Save";
     
     public static void Initialize()
     {
-        Inst = Helper.FileLoad<Saves>("Main");
+        Inst = Helper.FileLoad<Saves>("SaveList");
         if (Inst == null)
         {
             Inst = new(); 
@@ -22,17 +22,18 @@ public class Saves
     }
     public static void Quit()
     {
-        Helper.FileSave(Inst, "Main");
+        Helper.FileSave(Inst, "SaveList");
     }
     
     public static void SaveGame()
     {
         _ = new CoroutineTask(SaveGameCoroutine());
         IEnumerator SaveGameCoroutine()
-        {
+        { 
             yield return new WaitForEndOfFrame();  
+            World.UnloadWorld();
             Save data = Save.Inst;
-            data.id = DateTime.Now.ToString("yyMMddHHmmss");
+            data.id = DateTime.Now.ToString("yyMMddHHmmssfff");
             Inst.List.Add(data);
             Helper.FileSave(data, data.Path + SaveDataFile);
             Helper.SaveScreenShot(data.Path + "Preview");
