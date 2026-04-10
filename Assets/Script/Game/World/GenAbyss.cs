@@ -12,7 +12,6 @@ public class GenAbyss : Gen
         GenTaskMarble.Run(currentCoordinate, currentChunk);
         GenTaskDirt.Run(currentCoordinate, currentChunk);
         GenTaskSand.Run(currentCoordinate, currentChunk);
-        GenTaskMaze.Run(currentCoordinate, currentChunk);
         // GenTaskCrater.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);
         // GenTaskHouse.Run(currentCoordinate, currentChunk);
