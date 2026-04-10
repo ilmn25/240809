@@ -96,13 +96,13 @@ public class Environment
     public static EnvironmentType Target = EnvironmentType.Null;
     private static int Time
     {
-        get => SaveData.Inst.time;
-        set => SaveData.Inst.time = value;
+        get => Save.Inst.time;
+        set => Save.Inst.time = value;
     }
     private static EnvironmentType Weather
     {
-        get => SaveData.Inst.weather;
-        set => SaveData.Inst.weather = value;
+        get => Save.Inst.weather;
+        set => Save.Inst.weather = value;
     }
 
     private static void SetTarget(EnvironmentType target)
@@ -153,12 +153,12 @@ public class Environment
             if (Time == Length)
             {
                 Time = 0;
-                SaveData.Inst.day++;
+                Save.Inst.day++;
             }
 
             if (Time % 60 == 0)
             {
-                TriggerHourly(Time / 60, SaveData.Inst.day);
+                TriggerHourly(Time / 60, Save.Inst.day);
             }
         }
     }

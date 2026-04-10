@@ -18,7 +18,7 @@ public class Gen
     public virtual Vector3Int GetSize() => Vector3Int.one;
     public virtual Vector3Int GetSpawnPoint() => Vector3Int.zero;
     
-    protected static System.Random Random = new (SaveData.Inst?.seed ?? 0);
+    protected static System.Random Random = new (Save.Inst?.seed ?? 0);
     protected static Gen _target;
 
     public static readonly Dictionary<GenType, Gen> Dictionary = new ()
@@ -29,7 +29,7 @@ public class Gen
     };
     public static void Initialize(GenType genType)
     {
-        Random = new System.Random(SaveData.Inst.seed);
+        Random = new System.Random(Save.Inst.seed);
         _target = Dictionary[genType];
         _target.WorldHeight = (World.Inst.Size.y - 3) * World.ChunkSize;
     }

@@ -11,7 +11,7 @@ public class GUILoad : GUI
     { 
         GameObject = Main.GUILoadMenu;
         Rect = Main.GUILoadMenu.GetComponent<RectTransform>();
-        for (int i = 0; i < Save.Inst.List.Count; i++) AddToList(i);
+        for (int i = 0; i < Saves.Inst.List.Count; i++) AddToList(i);
     } 
 
     public static void AddToList(int i)
@@ -37,7 +37,7 @@ public class GUILoad : GUI
  
         if (Control.Inst.ActionPrimary.KeyDown() && Target != -1)
         {  
-            Scene.SwitchSave(Save.Inst.List[Target]);
+            Scene.SwitchSave(Saves.Inst.List[Target]);
             Show(false); 
         } 
     }

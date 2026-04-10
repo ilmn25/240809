@@ -19,17 +19,17 @@ public class GUISave : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     } 
     private void Refresh()
     {
-        if (ID > Save.Inst.List.Count)
+        if (ID > Saves.Inst.List.Count)
         {
             Destroy(this);
             return;
         }
-        SaveData save = Save.Inst.List[ID]; 
+        Save save = Saves.Inst.List[ID]; 
         string timeText = Helper.FormatTime(save.time);
         _text.text = "DAY " + save.day + ", " + timeText + "\n" +
                      save.players.Count + " PEOPLE ALIVE AT " + save.current + "\n" +
                      "SAVE ID " + save.id;
-        Sprite sprite = Helper.LoadImage(Save.Inst.List[ID].Path + "Preview");
+        Sprite sprite = Helper.LoadImage(Saves.Inst.List[ID].Path + "Preview");
         if (sprite)
         {
             _image.enabled = true;
