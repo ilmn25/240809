@@ -95,7 +95,7 @@ public static class GUIMain
     {
         string BuildTimeHudText()
         {
-            return $"Day {SaveData.Inst.day}, {Helper.FormatTime(SaveData.Inst.time)}";
+            return $"Day {Save.Inst.day}, {Helper.FormatTime(Save.Inst.time)}";
         }
 
         string BuildTargetHudText(Info target)

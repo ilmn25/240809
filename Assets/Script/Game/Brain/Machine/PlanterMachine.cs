@@ -14,7 +14,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         AddState(new MessageState(_messageDialogue));
         Environment.HourlyTriggered += OnHour;
         EnsureGrowthSchedule();
-        TryGrowForTime(SaveData.Inst.time / 60, SaveData.Inst.day);
+        TryGrowForTime(Save.Inst.time / 60, Save.Inst.day);
         RefreshSprite(force: true);
     }
 
@@ -54,15 +54,15 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
         Info.IsPlanted = true;
         Info.IsGrown = false;
-        Info.GrowAtDay = SaveData.Inst.day + 1;
-        Info.GrowAtHour = SaveData.Inst.time / 60;
+        Info.GrowAtDay = Save.Inst.day + 1;
+        Info.GrowAtHour = Save.Inst.time / 60;
         RefreshSprite(force: true);
     }
 
     private int GetHoursLeftToGrow()
     {
-        int currentHour = SaveData.Inst.time / 60;
-        int remainingHours = (Info.GrowAtDay - SaveData.Inst.day) * 24 + (Info.GrowAtHour - currentHour);
+        int currentHour = Save.Inst.time / 60;
+        int remainingHours = (Info.GrowAtDay - Save.Inst.day) * 24 + (Info.GrowAtHour - currentHour);
         return Mathf.Max(1, remainingHours);
     }
 
@@ -123,8 +123,8 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         if (Info.GrowAtDay > 0 && Info.GrowAtHour >= 0)
             return;
 
-        Info.GrowAtDay = SaveData.Inst.day + 1;
-        Info.GrowAtHour = SaveData.Inst.time / 60;
+        Info.GrowAtDay = Save.Inst.day + 1;
+        Info.GrowAtHour = Save.Inst.time / 60;
     }
 
     private void TryGrowForTime(int hour, int day)

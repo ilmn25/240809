@@ -235,7 +235,7 @@ public class Console : MonoBehaviour
                 Main.Fly = !Main.Fly;
                 break;   
             case "flat":
-                Scene.SwitchSave(new SaveData(GenType.SuperFlat));  
+                Scene.SwitchSave(new Save(GenType.SuperFlat));  
                 GUIMain.GUIMenu.Show(false);
                 break;   
             case "fps": 
@@ -258,7 +258,7 @@ public class Console : MonoBehaviour
                 break;   
             case "save": 
                 Output("unloaded");  
-                Save.CloneSave(); 
+                Saves.SaveGame(); 
                 break;     
             default: 
                 Output("Invalid command");
@@ -309,7 +309,7 @@ public class Console : MonoBehaviour
     }
     private void Gather()
     {
-        foreach (PlayerInfo info in SaveData.Inst.players)
+        foreach (PlayerInfo info in Save.Inst.players)
         {
             info.position = Main.PlayerInfo.Machine.transform.position;
             if (info.Machine) info.Machine.transform.position = Main.PlayerInfo.Machine.transform.position;
