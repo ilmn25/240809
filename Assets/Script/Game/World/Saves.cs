@@ -6,14 +6,15 @@ using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
 
 [Serializable]
-public class Save
+public class Saves
 {
-    public static Save Inst; 
-    public readonly List<SaveData> List = new();
+    public static Saves Inst; 
+    public readonly List<Save> List = new();
+    private const string SaveDataFile = "SaveData";
     
     public static void Initialize()
     {
-        Inst = Helper.FileLoad<Save>("Main");
+        Inst = Helper.FileLoad<Saves>("Main");
         if (Inst == null)
         {
             Inst = new(); 
@@ -24,31 +25,32 @@ public class Save
         Helper.FileSave(Inst, "Main");
     }
     
-    public static void CloneSave()
+    public static void SaveGame()
     {
-        _ = new CoroutineTask(CloneSaveCoroutine());
-        IEnumerator CloneSaveCoroutine()
+        _ = new CoroutineTask(SaveGameCoroutine());
+        IEnumerator SaveGameCoroutine()
         {
             yield return new WaitForEndOfFrame();  
-            SaveData data = (SaveData)Helper.Clone(SaveData.Inst);
+            Save data = Save.Inst;
             data.id = DateTime.Now.ToString("yyMMddHHmmss");
             Inst.List.Add(data);
+            Helper.FileSave(data, data.Path + SaveDataFile);
             Helper.SaveScreenShot(data.Path + "Preview");
             GUILoad.AddToList(Inst.List.Count - 1); 
             World.LoadWorld(); 
         }
     }
     
-    public static void LoadSave(SaveData saveData)
+    public static void LoadSave(Save save)
     {   
-        SaveData.Inst = (SaveData)Helper.Clone(saveData);
+        Save.Inst = save.id == null? save : Helper.FileLoad<Save>(save.Path + SaveDataFile);
     } 
 }
 
 [Serializable]
-public class SaveData
+public class Save
 {
-    public static SaveData Inst;
+    public static Save Inst;
     public string Path => id + "\\";
     public string id;
     public int day = 1;
@@ -59,8 +61,8 @@ public class SaveData
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
 
-    public SaveData(){}
-    public SaveData(GenType gen)
+    public Save(){}
+    public Save(GenType gen)
     {
         current = gen;
         seed = UnityEngine.Random.Range(1, 1000000);

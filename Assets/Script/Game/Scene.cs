@@ -28,20 +28,20 @@ public class Scene
         Busy = true;
         if (spawnPoint.HasValue)
         {
-            SaveData.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
+            Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
         }
         new CoroutineTask(Quit()).Finished += _ => {
-            SaveData.Inst.current = genType;
+            Save.Inst.current = genType;
             new CoroutineTask(Start()).Finished += _ => { Busy = false; };
         };
     }
 
-    public static void SwitchSave(SaveData saveData)
+    public static void SwitchSave(Save save)
     {
         if (Busy) return;
         Busy = true;
         new CoroutineTask(Quit()).Finished += _ => {
-            Save.LoadSave(saveData);
+            Saves.LoadSave(save);
             new CoroutineTask(Start()).Finished += __ => { Busy = false; };
         };
     }
@@ -56,10 +56,10 @@ public class Scene
     
     private static IEnumerator Start()
     {
-        Gen.Initialize(SaveData.Inst.current);
+        Gen.Initialize(Save.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
-        SaveData.Inst.players.RemoveAll(player => player == null);
-        foreach (PlayerInfo player in SaveData.Inst.players)
+        Save.Inst.players.RemoveAll(player => player == null);
+        foreach (PlayerInfo player in Save.Inst.players)
         {
             player.position = spawnPosition; 
             player.SpawnPoint = spawnPosition;

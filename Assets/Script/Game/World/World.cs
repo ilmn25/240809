@@ -18,7 +18,7 @@ public class World
     public delegate void Vector3IntEvent(Vector3Int position);
     public static event Vector3IntEvent MapUpdated;  
     public const int ChunkSize = 15; 
-    public static World Inst => SaveData.Inst.worlds[SaveData.Inst.current];
+    public static World Inst => Save.Inst.worlds[Save.Inst.current];
  
     public GenType GenType;
     public Vector3Int SpawnPoint;

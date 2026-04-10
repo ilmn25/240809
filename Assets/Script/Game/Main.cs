@@ -81,13 +81,13 @@ public class Main : MonoBehaviour
         Entity.Initialize(); 
         Block.Initialize();   
         
-        Save.Initialize();    
+        Saves.Initialize();    
         GUIMain.Initialize();    
         EnvParticle.Initialize();    
         Terraform.Initialize();  
         MapCull.Initialize();
 
-        SaveData.Inst = new(GenType.SkyBlock);
+        Save.Inst = new(GenType.SkyBlock);
         Scene.LoadWorld();
     } 
     private void Update()
@@ -114,7 +114,7 @@ public class Main : MonoBehaviour
         Block.Dispose();
         // PlayerData.Save();
         Control.Save();  
-        Save.Quit();  
+        Saves.Quit();  
         MapLoad.CancellationTokenSourceKillGame.Cancel();
     }
 
