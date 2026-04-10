@@ -74,7 +74,8 @@ public class Save
         {
             { GenType.Abyss, new World(GenType.Abyss) },
             { GenType.SkyBlock, new World(GenType.SkyBlock) },
-            { GenType.SuperFlat, new World(GenType.SuperFlat) }
+            { GenType.SuperFlat, new World(GenType.SuperFlat) },
+            { GenType.Backrooms, new World(GenType.Backrooms) }
         };
 
         Vector3 spawnPosition = worlds[gen].SpawnPoint;

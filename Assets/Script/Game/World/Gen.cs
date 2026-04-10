@@ -9,7 +9,7 @@ using Debug = UnityEngine.Debug;
 [Serializable]
 public enum GenType
 {
-    Abyss, SkyBlock, SuperFlat
+    Abyss, SkyBlock, SuperFlat, Backrooms
 }
 public class Gen
 {
@@ -26,6 +26,7 @@ public class Gen
         {GenType.Abyss, new GenAbyss()},
         {GenType.SkyBlock, new GenSkyBlock()},
         {GenType.SuperFlat, new GenSuperFlat()},
+        {GenType.Backrooms, new GenBackrooms()},
     };
     public static void Initialize(GenType genType)
     {
