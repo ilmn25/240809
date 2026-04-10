@@ -38,14 +38,14 @@ public class Gen
         return (float)Random.NextDouble() * 1000f;
     }
 
-    public static IEnumerator GenerateNearbyChunks(Vector3Int center)
+    public static IEnumerator GenerateNearbyChunks(Vector3Int center, int range)
     {
         Vector3Int position;
-        for (int x = -Scene.GenRange; x <= Scene.GenRange; x++)
+        for (int x = -range; x <= range; x++)
         {
-            for (int y = -Scene.GenRange; y <= Scene.GenRange; y++)
+            for (int y = -range; y <= range; y++)
             {
-                for (int z = -Scene.GenRange; z <= Scene.GenRange; z++)
+                for (int z = -range; z <= range; z++)
                 {
                     position = new Vector3Int(
                         center.x + x * World.ChunkSize,
