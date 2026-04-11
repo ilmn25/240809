@@ -13,7 +13,6 @@ public enum GenType
 }
 public class Gen
 {
-    public int WorldHeight { get; protected set; }
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
     public virtual Vector3Int GetSize() => Vector3Int.one;
     public virtual Vector3Int GetSpawnPoint() => Vector3Int.zero;
@@ -32,7 +31,6 @@ public class Gen
     {
         Random = new System.Random(Save.Inst.seed);
         _target = Dictionary[genType];
-        _target.WorldHeight = (World.Inst.Size.y - 3) * World.ChunkSize;
     }
     public static float GetOffset()
     {
