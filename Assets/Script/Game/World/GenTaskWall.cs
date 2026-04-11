@@ -40,7 +40,7 @@ public class GenTaskWall : Gen
                 int localZ = z;
 
                 // first look upward for any solid block
-                while (scanChunk.y <= _target.WorldHeight)
+                while (scanChunk.y <= (World.Inst.Size.y - 3) * World.ChunkSize)
                 {
                     Chunk scan = World.Inst[scanChunk];
                     if (scan != null)

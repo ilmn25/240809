@@ -35,7 +35,7 @@ public class GenTaskCrater : Gen
                 for (int y = 0; y < chunkSize + 4; y++)
                 {
                     int worldY = currentCoordinate.y + y;
-                    float normalizedHeight = (float)worldY / _target.WorldHeight;
+                    float normalizedHeight = (float)worldY / ((World.Inst.Size.y - 3) * World.ChunkSize);
                     float stepSize = 1f / Steps;
                     float stepProgress = normalizedHeight / stepSize;
 
