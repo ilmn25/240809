@@ -10,6 +10,17 @@ public static class ScreenShake
 
     public static Vector3 Offset { get; private set; }
 
+    public static Vector3 SampleNoiseOffset(float speed, float strength, float ySeed = 0.73f, float zSeed = 1.13f)
+    {
+        float t = Time.time * Mathf.Max(0f, speed);
+        Vector3 noise = new Vector3(
+            Mathf.PerlinNoise(t, 0.37f) * 2f - 1f,
+            Mathf.PerlinNoise(ySeed, t) * 2f - 1f,
+            Mathf.PerlinNoise(t, zSeed) * 2f - 1f
+        );
+        return noise * Mathf.Max(0f, strength);
+    }
+
     public static void Shake(float speed, float strength, float duration)
     {
         Shake(speed, strength, duration, Vector3.zero);
@@ -42,13 +53,7 @@ public static class ScreenShake
 
         if (_direction == Vector3.zero)
         {
-            float t = Time.time * _speed;
-            Vector3 noise = new Vector3(
-                Mathf.PerlinNoise(t, 0.37f) * 2f - 1f,
-                Mathf.PerlinNoise(0.73f, t) * 2f - 1f,
-                Mathf.PerlinNoise(t, 1.13f) * 2f - 1f
-            );
-            Offset = noise * (_strength * decay);
+            Offset = SampleNoiseOffset(_speed, _strength * decay);
         }
         else
         {
