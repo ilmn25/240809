@@ -57,8 +57,9 @@ public class Scene
         Vector3 spawnPosition = World.Inst.SpawnPoint;
         foreach (PlayerInfo player in Save.Inst.players)
         {
-            player.position = spawnPosition; 
+            player.position = spawnPosition;
             if (player.Machine == null) Entity.SpawnFromInfo(player, false);
+            player.Machine.transform.position = spawnPosition;
         } 
         NavMap.Initialize();
         Control.SetPlayer(0); 
