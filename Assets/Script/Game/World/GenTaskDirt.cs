@@ -23,7 +23,7 @@ public class GenTaskDirt : Gen
                 _z = (currentCoordinate.z + z) * Scale + Offset;
 
                 _value = Mathf.PerlinNoise(_x, _z);
-                _height = Mathf.FloorToInt(_value * VerticalScale + _target.WorldHeight);
+                _height = Mathf.FloorToInt(_value * VerticalScale + (World.Inst.Size.y - 3) * World.ChunkSize);
                 
                 for (int y = 0; y < World.ChunkSize; y++)
                 {

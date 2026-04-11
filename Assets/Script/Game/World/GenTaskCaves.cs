@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GenTaskCaves : Gen
 {
-    private const float Scale = 0.03f;
+    private const float Scale = 0.06f;
     private static readonly float Offset = GetOffset(); 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -17,7 +17,7 @@ public class GenTaskCaves : Gen
                     float caveY = (currentCoordinate.y + y) * Scale + Offset; 
                     float caveNoiseValue = Mathf.PerlinNoise(caveX, caveY) * Mathf.PerlinNoise(caveY, caveZ);
 
-                    if (caveNoiseValue > 0.35f)
+                    if (caveNoiseValue > 0.55f)
                     {
                         currentChunk[x, y, z] = 0; // Empty space for caves
                     }
