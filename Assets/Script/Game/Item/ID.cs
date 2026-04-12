@@ -1,7 +1,7 @@
 public enum ID
 {
+    // put new IDs at the end of the list to avoid breaking save files
     Null,
-    // Blocks
     BrickBlock,
     MarbleBlock,
     DirtBlock,
@@ -10,8 +10,6 @@ public enum ID
     StoneBlock,
     WoodBlock,
     GraniteBlock,
-
-    // Materials
     Bullet,
     Gravel,
     Sticks,
@@ -23,16 +21,12 @@ public enum ID
     Slag,
     Paper,
     Brick,
-
-    // Structures
     Chest,
     Workbench,
     WoodenToolbench,
     Stonecutter,
-    Furnace,
+    Furnace, 
     BlueprintStation,
-
-    // Tools
     SteelSword,
     Chalk,
     StonePickaxe,
@@ -43,7 +37,6 @@ public enum ID
     Spear,
     Minigun,
     Pistol,
-    
     Slab,
     PineTree, 
     Megumin,
@@ -104,4 +97,8 @@ public enum ID
     SandSlab,
     SandDebris,
     Sand,
+    Glass,
+    Smelter,
+    MasonryWorkbench,
+    Shell,
 }

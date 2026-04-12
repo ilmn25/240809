@@ -4,6 +4,7 @@ public class GenTaskEntity : Gen
 {
     private static int _id;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
+    private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
 
     private const double DirtTreeChance = 0.02;
     private const double DirtBushChance = 0.02;
@@ -16,6 +17,7 @@ public class GenTaskEntity : Gen
     private const double SurfaceChestChance = 0.0004;
     private const double SurfaceSlabChance = 0.0196;
     private const double SurfaceSandStructureChance = 0.0196;
+    private const double FloorShellChance = 0.00015;
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -73,6 +75,7 @@ public class GenTaskEntity : Gen
                         {
                             double chance = SurfaceChestChance;
                             bool isDesert = GenHelpBiome.GetBiomeType(position.x, position.z) == BiomeType.Desert;
+                            bool isSand = currentChunk[x, y, z] == Sand;
                             if (rng <= chance)
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Chest, position));
@@ -85,6 +88,10 @@ public class GenTaskEntity : Gen
                             else if (rng <= (chance += SurfaceSlabChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
+                            }
+                            else if (isSand && rng <= (chance += FloorShellChance))
+                            {
+                                currentChunk.DynamicEntity.Add(Entity.CreateInfo(ID.Shell, position));
                             }
                         }
                     }

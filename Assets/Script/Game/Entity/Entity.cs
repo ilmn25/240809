@@ -75,9 +75,11 @@ public class Entity
                 AddStructure<CarpenterWorkbenchMachine>(ID.CarpenterWorkbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<LoomMachine>(ID.Loom, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Main.IndexCollide);
+                AddStructure<SmelterMachine>(ID.Smelter, Vector3Int.one, Main.IndexCollide);
                 AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Main.IndexCollide);
                 AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Main.IndexCollide);
                 AddStructure<SawmillMachine>(ID.Sawmill, Vector3Int.one, Main.IndexCollide);
+                AddStructure<MasonryWorkbenchMachine>(ID.MasonryWorkbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FieldStationMachine>(ID.FieldStation, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
