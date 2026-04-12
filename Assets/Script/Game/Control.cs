@@ -14,8 +14,8 @@ public class Control
     public static Transform MouseTarget;
     public static int MouseLayer; // -1 means hit void
     
-    public readonly ControlKey Inv = new (KeyCode.Tab);
-    public readonly ControlKey SwapChar = new (KeyCode.BackQuote);
+    public readonly ControlKey Inv = new (KeyCode.I);
+    public readonly ControlKey SwapChar = new (KeyCode.Tab);
     public readonly ControlKey Pause = new (KeyCode.Escape);
     public readonly ControlKey FullScreen = new (KeyCode.F11);
     public readonly ControlKey ActionPrimary = new (KeyCode.Mouse0);
@@ -33,7 +33,6 @@ public class Control
     public readonly ControlKey Jump = new (KeyCode.Space); 
     public readonly ControlKey Sprint = new (KeyCode.LeftShift); 
     public readonly ControlKey Drop = new (KeyCode.R);
-    public readonly ControlKey Hotbar = new (KeyCode.Tilde);
     public readonly ControlKey Hotbar1 = new (KeyCode.Alpha1);
     public readonly ControlKey Hotbar2 = new (KeyCode.Alpha2);
     public readonly ControlKey Hotbar3 = new (KeyCode.Alpha3);

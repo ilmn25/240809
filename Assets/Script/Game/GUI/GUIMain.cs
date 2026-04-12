@@ -62,7 +62,7 @@ public static class GUIMain
         InfoPanel.Show(false);
         
         Dialogue.Show(false);
-        Show(false);
+        Show(true);
     }
 
     public static void UpdateMenu()
