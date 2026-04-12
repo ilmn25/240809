@@ -93,4 +93,7 @@ public enum ID
     CrudeMallet,
     ImprovisedPlanter,
     FieldStation,
+    CarpenterWorkbench,
+    Loom,
+    CookedChicken,
 }
