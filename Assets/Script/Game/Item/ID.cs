@@ -26,8 +26,8 @@ public enum ID
 
     // Structures
     Chest,
-    Station,
     Workbench,
+    WoodenToolbench,
     Stonecutter,
     Furnace,
     BlueprintStation,
