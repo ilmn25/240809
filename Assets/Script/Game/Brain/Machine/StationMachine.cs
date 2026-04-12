@@ -1,8 +1,8 @@
-public class StationMachine: CraftingMachine
+public class WorkbenchMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        return CraftInfo.CreateStructureInfo(ID.Station, 500, SfxID.HitStone, SfxID.HitStone);
+        return CraftInfo.CreateStructureInfo(ID.Workbench, 500, SfxID.HitStone, SfxID.HitStone);
     }
 }
 public class AnvilMachine: CraftingMachine
