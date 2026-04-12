@@ -101,4 +101,7 @@ public enum ID
     CopperChunks,
     Copper,
     Chicken,
+    SandSlab,
+    SandDebris,
+    Sand,
 }

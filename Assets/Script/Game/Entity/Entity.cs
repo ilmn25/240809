@@ -55,6 +55,20 @@ public class Entity
                 loot.Add(1, 1, ID.Flint);
                 loot.Add(0.7f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
+
+                AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide);
+                loot = new (ID.SandSlab);
+                loot.Add(1, 2, ID.Sand);
+                loot.Add(0.7f, 1, ID.Sand);
+                loot.Add(0.5f, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Flint);
+
+                AddStructure<SandDebrisMachine>(ID.SandDebris, Vector3Int.one, Main.IndexSemiCollide);
+                loot = new (ID.SandDebris);
+                loot.Add(1, 2, ID.Sand);
+                loot.Add(0.7f, 1, ID.Sand);
+                loot.Add(0.5f, 1, ID.Mud);
+                loot.Add(0.3f, 1, ID.Flint);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<WoodenToolbenchMachine>(ID.WoodenToolbench, Vector3Int.one, Main.IndexCollide);

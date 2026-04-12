@@ -15,6 +15,7 @@ public class GenTaskEntity : Gen
 
     private const double SurfaceChestChance = 0.0004;
     private const double SurfaceSlabChance = 0.0196;
+    private const double SurfaceSandStructureChance = 0.0196;
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -71,10 +72,16 @@ public class GenTaskEntity : Gen
                         else
                         {
                             double chance = SurfaceChestChance;
+                            bool isDesert = GenHelpBiome.GetBiomeType(position.x, position.z) == BiomeType.Desert;
                             if (rng <= chance)
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Chest, position));
                             } 
+                            else if (isDesert && rng <= (chance += SurfaceSandStructureChance))
+                            {
+                                ID spawnID = Random.NextDouble() <= 0.5 ? ID.SandSlab : ID.SandDebris;
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(spawnID, position));
+                            }
                             else if (rng <= (chance += SurfaceSlabChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
