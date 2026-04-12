@@ -160,6 +160,11 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Wool); 
                 loot.Add(0.5f, 1, ID.Wool); 
                 loot.Add(0.5f, 1, ID.Wool); 
+
+                AddMob<ChickenMachine>(ID.Chicken);
+                loot = new (ID.Chicken);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.5f, 1, ID.Foul);
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);
@@ -175,7 +180,7 @@ public class Entity
                 
                 AddMob<HarpyMachine>(ID.Harpy);
                 loot = new (ID.Harpy);
-                loot.Add(1, 2, ID.Chicken);  
+                loot.Add(1, 2, ID.Foul);  
                 loot.Add(0.5f, 1, ID.Wool);   
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
