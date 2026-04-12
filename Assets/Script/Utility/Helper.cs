@@ -118,6 +118,53 @@ public static class Helper
         return default;
     } 
 
+    public static byte[] SerializeObject<T>(T value)
+    {
+        using var stream = new MemoryStream();
+        BinaryFormatter.Serialize(stream, value);
+        return stream.ToArray();
+    }
+
+    public static T DeserializeObject<T>(byte[] data)
+    {
+        using var stream = new MemoryStream(data);
+        return (T)BinaryFormatter.Deserialize(stream);
+    }
+
+    public static byte[][] SplitBytes(byte[] data, int chunkSize)
+    {
+        int total = (data.Length + chunkSize - 1) / chunkSize;
+        byte[][] chunks = new byte[total][];
+
+        for (int i = 0; i < total; i++)
+        {
+            int offset = i * chunkSize;
+            int length = Math.Min(chunkSize, data.Length - offset);
+            chunks[i] = new byte[length];
+            Array.Copy(data, offset, chunks[i], 0, length);
+        }
+
+        return chunks;
+    }
+
+    public static byte[] CombineChunks(Dictionary<int, byte[]> chunks, int totalChunks)
+    {
+        int totalSize = 0;
+        for (int i = 0; i < totalChunks; i++)
+            totalSize += chunks[i].Length;
+
+        byte[] combined = new byte[totalSize];
+        int dest = 0;
+        for (int i = 0; i < totalChunks; i++)
+        {
+            byte[] part = chunks[i];
+            Array.Copy(part, 0, combined, dest, part.Length);
+            dest += part.Length;
+        }
+
+        return combined;
+    }
+
     public static void CloneFolder(string sourcePath, string destPath)
     {
         string source = SavePath + sourcePath;

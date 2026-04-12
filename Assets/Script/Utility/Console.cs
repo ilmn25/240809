@@ -310,10 +310,9 @@ public class Console : MonoBehaviour
         else
             hostAddress = _command[1];
 
-        MirrorAutoHost.RegisterClientHandler();
         NetworkManager.singleton.networkAddress = hostAddress;
         NetworkManager.singleton.StartClient();
-        Print($"Connected, type any text to send");
+        MirrorAutoHost.RegisterClientHandler();
     }
 
     private static void ShowHostIp()
