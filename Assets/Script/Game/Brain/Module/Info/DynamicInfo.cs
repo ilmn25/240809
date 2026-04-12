@@ -135,6 +135,6 @@ public class DynamicInfo : Info
 
     public override string ToString()
     {
-        return $"Attacking: {FormatId(id)} | HP {Health}/{HealthMax}";
+        return $"Attacking: {Helper.ToDisplayName(id)} | HP {Health}/{HealthMax}";
     }
 }

@@ -85,6 +85,6 @@ public class StructureInfo : Info
             OperationType.Cutting => "Cutting",
             _ => "Destroying",
         };
-        return $"{action}: {FormatId(id)} | HP {Health}";
+        return $"{action}: {Helper.ToDisplayName(id)} | HP {Health}";
     }
 }
