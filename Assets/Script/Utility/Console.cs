@@ -1,26 +1,28 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using Mirror;
 
 public class Console : MonoBehaviour
 {
-    private readonly LineRenderer[] _lines = new LineRenderer[13];
+    private static readonly LineRenderer[] _lines = new LineRenderer[13];
     public static GUIStyle GUIStyle; 
     public static bool IsTyping = false;
-    private string _input = "";
-    private int _cursorPos = 0;
-    private string _output = "";
-    private bool _showInfo = false;
-    private int _outputTimer = 0;
-    private string[] _command;  
+    private static string _input = "";
+    private static int _cursorPos = 0;
+    public static string Output = "";
+    private static bool _showInfo = false;
+    public static int OutputTimer = 0;
+    private static string[] _command;  
 
-    private readonly List<string> _history = new ();
-    private int _historyIndex = -1;
+    private static readonly List<string> _history = new ();
+    private static int _historyIndex = -1;
     
-    private float _fps = 0.0f;
-    private int _frameCount = 0;
-    private float _elapsedTime = 0.0f;
-    private void FPS()
+    private static float _fps = 0.0f;
+    private static int _frameCount = 0;
+    private static float _elapsedTime = 0.0f;
+    private static void FPS()
     {
         _frameCount++;
         _elapsedTime += Time.unscaledDeltaTime;
@@ -53,7 +55,7 @@ public class Console : MonoBehaviour
 
         HideLines();
     }
-    private void HideLines()
+    private static void HideLines()
     {
         foreach (LineRenderer line in _lines)
         {
@@ -156,12 +158,12 @@ public class Console : MonoBehaviour
         {
             // show cursor in the input string
             string displayInput = _input.Insert(_cursorPos, "|");
-            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), displayInput + "\n"+ _output, GUIStyle);
+            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), displayInput + "\n" + Output, GUIStyle);
         }
-        else if (_outputTimer != 0)
+        else if (OutputTimer != 0)
         {
-            _outputTimer--;
-            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), _output, GUIStyle);
+            OutputTimer--;
+            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), Output, GUIStyle);
         }
 
         if (_showInfo)
@@ -198,7 +200,7 @@ public class Console : MonoBehaviour
         }
     }
  
-    private void ProcessInput()
+    private static void ProcessInput()
     {
         // add to history
         if (!string.IsNullOrWhiteSpace(_input))
@@ -229,7 +231,7 @@ public class Console : MonoBehaviour
                 SetPieceCommands();
                 break; 
             case "air":
-                Output(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position))? "is air" : "not air");
+                Print(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position))? "is air" : "not air");
                 break;  
             case "fly":
                 Main.Fly = !Main.Fly;
@@ -238,11 +240,11 @@ public class Console : MonoBehaviour
                 if (_command.Length > 1 && Enum.TryParse(_command[1], true, out GenType genType))
                 {
                     Scene.SwitchWorld(genType);
-                    Output($"switched to {genType}");
+                    Print($"switched to {genType}");
                 }
                 else
                 {
-                    Output("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms>");
+                    Print("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms");
                 }
                 break;
             case "flat":
@@ -267,12 +269,19 @@ public class Console : MonoBehaviour
                     ScreenShake.Shake(40f, shakeMagnitude, shakeTime);
                 }
                 break;   
+            case "join":
+                JoinHost();
+                break;
+            case "host":
+                ShowHostIp();
+                break;
             case "save": 
-                Output("saved");  
+                Print("saved");  
                 Saves.SaveGame(); 
                 break;     
             default: 
-                Output("Invalid command");
+                if (string.IsNullOrWhiteSpace(_input)) return;
+                SendNetworkMessage();
                 break;  
         } 
 
@@ -281,13 +290,60 @@ public class Console : MonoBehaviour
         _cursorPos = 0;
     }
   
-    private void Output(string output)
+    private static void SendNetworkMessage()
     {
-        _output = output + "\n" + _output;
-        _outputTimer = 600;
+        string text = _input.Trim();
+        if (!NetworkClient.isConnected)
+        {
+            Print("Not connected to host.");
+            return;
+        }
+
+        MirrorAutoHost.SendClientTextMessage(text);
+    }
+
+    private static void JoinHost()
+    {
+        string hostAddress;
+        if (_command.Length < 2)
+            hostAddress = "127.0.0.1";
+        else
+            hostAddress = _command[1];
+
+        MirrorAutoHost.RegisterClientHandler();
+        NetworkManager.singleton.networkAddress = hostAddress;
+        NetworkManager.singleton.StartClient();
+        Print($"Connected, type any text to send");
+    }
+
+    private static void ShowHostIp()
+    {
+        MirrorAutoHost.StartHostIfNeeded();
+
+        string ip = null;
+        try
+        {
+            foreach (var addr in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            {
+                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(addr))
+                {
+                    ip = addr.ToString();
+                    break;
+                }
+            }
+        }
+        catch { }
+
+        Print($"Host IP: {ip} ({(NetworkServer.active ? "host" : "not host")})");
+    }
+
+    public static void Print(string output)
+    {
+        Output = output + "\n" + Output;
+        OutputTimer = 600;
     }
     
-    private void SpawnEntityOrItem()
+    private static void SpawnEntityOrItem()
     {
         if (_command.Length < 2 || !Enum.TryParse(_command[1], out ID id)) return;
         
@@ -309,7 +365,7 @@ public class Console : MonoBehaviour
         }
     }
 
-    private void Teleport()
+    private static void Teleport()
     {
         if (_command.Length < 4 ||
             !int.TryParse(_command[1], out int x) ||
@@ -318,7 +374,7 @@ public class Console : MonoBehaviour
         
         Main.PlayerInfo.Machine.transform.position += new Vector3(x, y, z);
     }
-    private void Gather()
+    private static void Gather()
     {
         foreach (PlayerInfo info in Save.Inst.players)
         {
@@ -327,36 +383,36 @@ public class Console : MonoBehaviour
         }
     } 
 
-    private Chunk _chunk;
-    private void SetPieceCommands()
+    private static Chunk _chunk;
+    private static void SetPieceCommands()
     {
         if (_command.Length < 2)
         {
             Main.BuildMode = !Main.BuildMode;
             if (!Main.BuildMode) HideLines();
-            Output("build mode: " + Main.BuildMode);
+            Print("build mode: " + Main.BuildMode);
         }
         else if (_command[1] == "1")
         { 
             SetPiece.Pos1 = SetPosition(SetPiece.Pos1,  new Vector3Int(1, 0, 1));
-            Output("set as corner 1" + SetPiece.Pos1); 
+            Print("set as corner 1" + SetPiece.Pos1); 
         }  
         else if (_command[1] == "2")
         { 
             SetPiece.Pos2 = SetPosition(SetPiece.Pos2,  new Vector3Int(-1, 0, -1));
-            Output("set as corner 2:" + SetPiece.Pos2); 
+            Print("set as corner 2:" + SetPiece.Pos2); 
         }  
         else if (_command[1] == "copy")
         {
             World.UnloadWorld();
             _chunk = SetPiece.Copy();   
             World.LoadWorld();
-            Output("copied"); 
+            Print("copied"); 
         } 
         else if (_command[1] == "save")
         {
             SetPiece.SaveSetPieceFile(_chunk, _command[2]);
-            Output("saved as " + _command[2]);
+            Print("saved as " + _command[2]);
         }
         else if (_command[1] == "paste")
         {
@@ -366,7 +422,7 @@ public class Console : MonoBehaviour
             if (_command[2] != ".")
             {
                 _chunk = SetPiece.LoadSetPieceFile(_command[2]);
-                Output("loaded" + _command[2]);
+                Print("loaded" + _command[2]);
             }
 
             Vector3Int pastePosition = Vector3Int.FloorToInt(Main.Player.transform.position) + new Vector3Int(1, 0, 1);
@@ -374,7 +430,7 @@ public class Console : MonoBehaviour
 
             World.UnloadWorld();
             World.LoadWorld();
-            Output("pasted");
+            Print("pasted");
         }
 
         return;
