@@ -96,4 +96,8 @@ public enum ID
     CarpenterWorkbench,
     Loom,
     CookedChicken,
+    Mud,
+    MulchBlock,
+    CopperChunks,
+    Copper,
 }
