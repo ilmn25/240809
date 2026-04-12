@@ -44,10 +44,10 @@ public partial class Item
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.");
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.");
-        AddMaterialDefinition(ID.Chicken, "Fresh poultry meat from wild fowl.");
+        AddMaterialDefinition(ID.Foul, "Fresh poultry meat from wild fowl.");
         AddMaterialDefinition(ID.Meat, "Raw meat, can be cooked for better healing.");
         AddMaterialDefinition(ID.CookedMeat, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
-        AddMaterialDefinition(ID.CookedChicken, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Chicken, 1 } }, time:2000);
+        AddMaterialDefinition(ID.CookedChicken, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
         AddMaterialDefinition(ID.Mud, "Wet earth used for mulch and ground work.");
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
         AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");

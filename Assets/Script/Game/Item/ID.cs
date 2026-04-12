@@ -83,7 +83,7 @@ public enum ID
     Table,
     Acorn,
     Fabric,
-    Chicken,
+    Foul,
     Sheep,
     Wool,
     Computer,
@@ -100,4 +100,5 @@ public enum ID
     MulchBlock,
     CopperChunks,
     Copper,
+    Chicken,
 }
