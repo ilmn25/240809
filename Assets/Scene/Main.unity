@@ -287,7 +287,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7561836799891614748, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 954685898}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8577204264634343715, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 975653911}
+    - targetCorrespondingSourceObject: {fileID: 8577204264634343715, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 975653910}
   m_SourcePrefab: {fileID: 100100000, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
 --- !u!1 &234116539
 GameObject:
@@ -534,6 +540,80 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1265818449659559512, guid: 55b19ca73f6ddae4ea7f68cf675f8dac, type: 3}
   m_PrefabInstance: {fileID: 1778275138}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &975653906 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8577204264634343715, guid: 3d7ce4ac2a52a704c94d3b53bb217f2a, type: 3}
+  m_PrefabInstance: {fileID: 138701765}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &975653910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975653906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 7777
+  NoDelay: 1
+  SendTimeout: 5000
+  ReceiveTimeout: 30000
+  serverMaxMessageSize: 16384
+  serverMaxReceivesPerTick: 10000
+  serverSendQueueLimitPerConnection: 10000
+  serverReceiveQueueLimitPerConnection: 10000
+  clientMaxMessageSize: 16384
+  clientMaxReceivesPerTick: 1000
+  clientSendQueueLimit: 10000
+  clientReceiveQueueLimit: 10000
+--- !u!114 &975653911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975653906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 1
+  runInBackground: 1
+  headlessStartMode: 0
+  editorAutoStart: 0
+  sendRate: 60
+  offlineScene: 
+  onlineScene: 
+  offlineSceneLoadDelay: 0
+  transport: {fileID: 975653910}
+  networkAddress: localhost
+  maxConnections: 100
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
+  authenticator: {fileID: 0}
+  playerPrefab: {fileID: 0}
+  autoCreatePlayer: 0
+  playerSpawnMethod: 0
+  spawnPrefabs: []
+  exceptionsDisconnect: 1
+  snapshotSettings:
+    bufferTimeMultiplier: 2
+    bufferLimit: 32
+    catchupNegativeThreshold: -1
+    catchupPositiveThreshold: 1
+    catchupSpeed: 0.019999999552965164
+    slowdownSpeed: 0.03999999910593033
+    driftEmaDuration: 1
+    dynamicAdjustment: 1
+    dynamicAdjustmentTolerance: 1
+    deliveryTimeEmaDuration: 2
+  evaluationMethod: 0
+  evaluationInterval: 3
+  timeInterpolationGui: 0
 --- !u!1001 &1125613718
 PrefabInstance:
   m_ObjectHideFlags: 0
