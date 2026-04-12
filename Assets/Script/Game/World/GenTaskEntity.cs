@@ -53,6 +53,10 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.DynamicEntity.Add(Entity.CreateInfo(ID.Flint, position));
                             }
+                            else if (rng <= (chance += SurfaceSlabChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
+                            }
                         }
                         else
                         {
