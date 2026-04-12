@@ -20,7 +20,7 @@ public partial class Item
         AddBlockDefinition(ID.MarbleBlock, 200, 1, SfxID.HitMetal, description: "Polished marble block with a pristine look.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.DirtBlock, 80, 1, SfxID.HitStone, description: "Basic dirt block, useful for filling and farming.");
         loot = new (ID.DirtBlock);
-        loot.Add(1, 3, ID.Gravel);
+        loot.Add(1, 3, ID.Mud);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, description: "Fine sand block used for glassmaking and terrain.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
@@ -30,6 +30,8 @@ public partial class Item
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);
         loot.Add(0.5f, 1, ID.MetalChunks);
+        loot.Add(0.5f, 1, ID.CopperChunks);
+        loot.Add(0.5f, 1, ID.CopperChunks);
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.");
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         AddBlockDefinition(
@@ -46,6 +48,7 @@ public partial class Item
         AddMaterialDefinition(ID.Meat, "Raw meat, can be cooked for better healing.");
         AddMaterialDefinition(ID.CookedMeat, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddMaterialDefinition(ID.CookedChicken, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Chicken, 1 } }, time:2000);
+        AddMaterialDefinition(ID.Mud, "Wet earth used for mulch and ground work.");
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
         AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");
         AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
@@ -55,6 +58,8 @@ public partial class Item
         AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500);
         AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
         AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.");
+        AddMaterialDefinition(ID.CopperChunks, "Chunks of copper ore for smelting.");
+        AddMaterialDefinition(ID.Copper, "Strong forged copper for crafting and building.", materials: new Dictionary<ID, int> { { ID.CopperChunks, 3 }, { ID.Charcoal, 2 } }, time:2000);
         AddMaterialDefinition(ID.Charcoal, "Burned wood fuel for smelting.", materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
         AddMaterialDefinition(ID.Steel, "Strong forged metal for high-tier items.", materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 }, {ID.Charcoal, 2} }, time:2000);
         AddMaterialDefinition(ID.Brick, "Refined brick piece for sturdy construction.", materials: new Dictionary<ID, int> { { ID.Slag, 3 } }, time:1500);
@@ -71,6 +76,7 @@ public partial class Item
         AddStructureDefinition(ID.Loom, new Dictionary<ID, int> { { ID.Plank, 6 }, { ID.Sticks, 2 } }, 100, description: "Weaves wool into fabric.");
         AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.");
         AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.");
+        AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
         AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 6 }, { ID.Plank, 5 }}, 100, description: "Cuts stone into refined brick parts quickly.");
         AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100, description: "Transforms logs into planks and stakes for building.");
         AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100, description: "Cooks meat and creates charcoal while giving light.");
