@@ -45,6 +45,7 @@ public partial class Item
         AddMaterialDefinition(ID.Chicken, "Fresh poultry meat from wild fowl.");
         AddMaterialDefinition(ID.Meat, "Raw meat, can be cooked for better healing.");
         AddMaterialDefinition(ID.CookedMeat, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
+        AddMaterialDefinition(ID.CookedChicken, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Chicken, 1 } }, time:2000);
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
         AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");
         AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
@@ -66,6 +67,10 @@ public partial class Item
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
         AddStructureDefinition(ID.Station, new Dictionary<ID, int> { { ID.Log, 15 }, { ID.Flint, 5 } }, 100, description: "A station to build other machines.");
         AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");
+        AddStructureDefinition(ID.CarpenterWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.Plank, 5 } }, 100, description: "Crafts beds, looms and signs.");
+        AddStructureDefinition(ID.Loom, new Dictionary<ID, int> { { ID.Plank, 6 }, { ID.Sticks, 2 } }, 100, description: "Weaves wool into fabric.");
+        AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.");
+        AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.");
         AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 6 }, { ID.Plank, 5 }}, 100, description: "Cuts stone into refined brick parts quickly.");
         AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100, description: "Transforms logs into planks and stakes for building.");
         AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100, description: "Cooks meat and creates charcoal while giving light.");

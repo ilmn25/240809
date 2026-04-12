@@ -41,3 +41,19 @@ public class WorkbenchMachine: CraftingMachine
         return CraftInfo.CreateStructureInfo(ID.Workbench, 500, SfxID.HitStone, SfxID.HitStone);
     }
 }
+
+public class CarpenterWorkbenchMachine: CraftingMachine
+{
+    public static Info CreateInfo()
+    {
+        return CraftInfo.CreateStructureInfo(ID.CarpenterWorkbench, 500, SfxID.HitStone, SfxID.HitStone);
+    }
+}
+
+public class LoomMachine: CraftingMachine
+{
+    public static Info CreateInfo()
+    {
+        return CraftInfo.CreateStructureInfo(ID.Loom, 500, SfxID.HitStone, SfxID.HitStone);
+    }
+}

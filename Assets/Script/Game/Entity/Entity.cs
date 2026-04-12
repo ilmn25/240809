@@ -58,6 +58,8 @@ public class Entity
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
+                AddStructure<CarpenterWorkbenchMachine>(ID.CarpenterWorkbench, Vector3Int.one, Main.IndexCollide);
+                AddStructure<LoomMachine>(ID.Loom, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Main.IndexCollide);
                 AddStructure<StonecutterMachine>(ID.Stonecutter, Vector3Int.one, Main.IndexCollide);
                 AddStructure<CampfireMachine>(ID.Campfire, Vector3Int.one, Main.IndexCollide);
@@ -77,6 +79,15 @@ public class Entity
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);
                 loot.Add(0.5f, 4, ID.Log);
+
+                loot = new (ID.CarpenterWorkbench);
+                loot.Add(1, 3, ID.Log);
+                loot.Add(0.5f, 2, ID.Plank);
+
+                loot = new (ID.Loom);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(0.5f, 2, ID.Sticks);
+                loot.Add(0.5f, 1, ID.Wool);
 
                 loot = new (ID.Stonecutter);
                 loot.Add(0.5f, 1, ID.Steel);
