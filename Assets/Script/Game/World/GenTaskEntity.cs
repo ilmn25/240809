@@ -8,6 +8,8 @@ public class GenTaskEntity : Gen
     private const double DirtTreeChance = 0.02;
     private const double DirtBushChance = 0.02;
     private const double DirtGrassChance = 0.16;
+    private const double DirtSheepChance = 0.0005;
+    private const double DirtChickenChance = 0.0005;
     private const double DirtSticksChance = 0.01;
     private const double DirtFlintChance = 0.01;
 
@@ -45,6 +47,14 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
                             }
+                            else if (rng <= (chance += DirtSheepChance))
+                            {
+                                SpawnMobGroup(currentChunk, position, ID.Sheep);
+                            }
+                            else if (rng <= (chance += DirtChickenChance))
+                            {
+                                SpawnMobGroup(currentChunk, position, ID.Chicken);
+                            }
                             else if (rng <= (chance += DirtSticksChance))
                             {
                                 currentChunk.DynamicEntity.Add(Entity.CreateInfo(ID.Sticks, position));
@@ -73,6 +83,15 @@ public class GenTaskEntity : Gen
                     }
                 }
             }
+        }
+    }
+
+    private static void SpawnMobGroup(Chunk currentChunk, Vector3Int position, ID mobID)
+    {
+        int groupCount = Random.Next(1, 4);
+        for (int i = 0; i < groupCount; i++)
+        {
+            currentChunk.DynamicEntity.Add(Entity.CreateInfo(mobID, position));
         }
     }
 }
