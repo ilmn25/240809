@@ -7,7 +7,7 @@ public class ConstructionInfo : SpriteStructureInfo
 
     public override string ToString()
     {
-        return $"Building {FormatId(structureID)} | {Health:0.#} Left";
+        return $"Building {Helper.ToDisplayName(structureID)} | {Health:0.#} Left";
     }
 
     public override void OnDestroy(MobInfo info)

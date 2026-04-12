@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class Helper
@@ -76,6 +77,12 @@ public static class Helper
         if (hour12 == 0) hour12 = 12;
         string suffix = hours24 >= 12 ? "PM" : "AM";
         return $"{hour12}:{minutes % 60:00} {suffix}";
+    }
+
+    public static string ToDisplayName(ID id, bool lowercase = false)
+    {
+        string text = Regex.Replace(id.ToString(), "(?<!^)([A-Z])", " $1");
+        return lowercase ? text.ToLower() : text;
     }
 
     public static void FileSave<T>(T data, string filePath, string fileformat = SaveFormat)

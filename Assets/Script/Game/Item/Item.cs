@@ -25,14 +25,8 @@ public partial class Item
     public Vector2 HoldoutOffset;
     public float RotationOffset = 90;
      
-    public string Name => GetName(); 
+    public string Name => Helper.ToDisplayName(ID, lowercase: true);
     public string Description;
-
-    private string GetName()
-    {
-        string rawName = ID.ToString();
-        return System.Text.RegularExpressions.Regex.Replace(rawName, "(?<!^)([A-Z])", " $1").ToLower();
-    }
 
     private static void AddMaterialDefinition(
         ID id,
