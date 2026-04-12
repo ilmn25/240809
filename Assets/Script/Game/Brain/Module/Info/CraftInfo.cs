@@ -6,15 +6,15 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-    private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Station, ID.Campfire, ID.MulchBlock);
-    private static readonly Storage WorkbenchPool = CreateNoRefreshPool(ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
+    private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Workbench, ID.Campfire, ID.MulchBlock);
+    private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
     private static readonly Storage CampfirePool = CreateNoRefreshPool(ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
     private static readonly Storage CarpenterPool = CreateNoRefreshPool(ID.Bed, ID.Loom, ID.Sign);
     private static readonly Storage LoomPool = CreateNoRefreshPool(ID.Fabric);
     private static readonly Storage FurnacePool = CreateNoRefreshPool(ID.Slag, ID.Steel, ID.Copper);
     private static readonly Storage SawmillPool = CreateNoRefreshPool(ID.Plank, ID.Stake, ID.Chest);
     private static readonly Storage StonecutterPool = CreateNoRefreshPool(ID.Brick, ID.BrickBlock);
-    private static readonly Storage StationPool = CreatePool(ID.Chalk, ID.Furnace, ID.Workbench, ID.CarpenterWorkbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
+    private static readonly Storage WorkbenchPool = CreatePool(ID.Chalk, ID.Furnace, ID.WoodenToolbench, ID.CarpenterWorkbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
     private static readonly Storage FieldStationPool = CreatePool(ID.ImprovisedPlanter);
     private static readonly Storage AnvilPool = CreatePool(ID.SteelSword, ID.MetalAxe);
 
@@ -86,14 +86,14 @@ public class CraftInfo : SpriteStructureInfo
     {
         return structureId switch
         {
-            ID.Workbench => WorkbenchPool,
+            ID.WoodenToolbench => WoodenToolbenchPool,
             ID.CarpenterWorkbench => CarpenterPool,
             ID.Loom => LoomPool,
             ID.Campfire => CampfirePool,
             ID.Furnace => FurnacePool,
             ID.Sawmill => SawmillPool,
             ID.Stonecutter => StonecutterPool,
-            ID.Station => StationPool,
+            ID.Workbench => WorkbenchPool,
             ID.FieldStation => FieldStationPool,
             ID.Anvil => AnvilPool,
             _ => null,
