@@ -7,16 +7,16 @@ using Random = UnityEngine.Random;
 public class CraftInfo : SpriteStructureInfo
 {
     private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Workbench, ID.Campfire, ID.MulchBlock);
-    private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
-    private static readonly Storage CampfirePool = CreateNoRefreshPool(ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
-    private static readonly Storage CarpenterPool = CreateNoRefreshPool(ID.Bed, ID.Loom, ID.Sign);
-    private static readonly Storage LoomPool = CreateNoRefreshPool(ID.Fabric);
-    private static readonly Storage FurnacePool = CreateNoRefreshPool(ID.Slag, ID.Steel, ID.Copper);
-    private static readonly Storage SawmillPool = CreateNoRefreshPool(ID.Plank, ID.Stake, ID.Chest);
-    private static readonly Storage StonecutterPool = CreateNoRefreshPool(ID.Brick, ID.BrickBlock);
-    private static readonly Storage WorkbenchPool = CreatePool(ID.Chalk, ID.Furnace, ID.WoodenToolbench, ID.CarpenterWorkbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
-    private static readonly Storage FieldStationPool = CreatePool(ID.ImprovisedPlanter);
-    private static readonly Storage AnvilPool = CreatePool(ID.SteelSword, ID.MetalAxe);
+    private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.WoodenToolbench), ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
+    private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
+    private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign);
+    private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric);
+    private static readonly Storage FurnacePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Furnace), ID.Slag, ID.Steel, ID.Copper);
+    private static readonly Storage SawmillPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Sawmill), ID.Plank, ID.Stake, ID.Chest);
+    private static readonly Storage StonecutterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Stonecutter), ID.Brick, ID.BrickBlock);
+    private static readonly Storage WorkbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Workbench), ID.Chalk, ID.Furnace, ID.WoodenToolbench, ID.CarpenterWorkbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
+    private static readonly Storage FieldStationPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.FieldStation), ID.ImprovisedPlanter);
+    private static readonly Storage AnvilPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Anvil), ID.SteelSword, ID.MetalAxe);
 
     public readonly List<ID> Pending = new List<ID>();
     public int Max = 10;
@@ -109,6 +109,13 @@ public class CraftInfo : SpriteStructureInfo
         return storage;
     }
 
+    private static Storage CreatePool(string name, params ID[] recipes)
+    {
+        Storage storage = CreatePool(recipes);
+        storage.Name = name;
+        return storage;
+    }
+
     private static Storage CreateNoRefreshPool(params ID[] recipes)
     {
         Storage storage = new NoRefreshStorage(9);
@@ -124,4 +131,5 @@ public class CraftInfo : SpriteStructureInfo
         storage.Name = name;
         return storage;
     }
+
 }

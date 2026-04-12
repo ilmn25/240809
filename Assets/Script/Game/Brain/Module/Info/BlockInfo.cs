@@ -43,12 +43,12 @@ public class BlockInfo : StructureInfo
         string name;
         if (id != ID.Chalk)
         {
-            name = FormatId(id);
+            name = Helper.ToDisplayName(id);
         }
         else
         {
             Block block = Block.GetBlock(World.GetBlock(Coordinate));
-            name = block != null ? FormatId(block.StringID) : FormatId(id);
+            name = block != null ? Helper.ToDisplayName(block.StringID) : Helper.ToDisplayName(id);
         }
 
         if (operationType != OperationType.Building)
