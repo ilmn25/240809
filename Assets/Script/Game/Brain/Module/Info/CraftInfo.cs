@@ -8,11 +8,13 @@ public class CraftInfo : SpriteStructureInfo
 {
     private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Station, ID.Campfire);
     private static readonly Storage WorkbenchPool = CreateNoRefreshPool(ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
-    private static readonly Storage CampfirePool = CreateNoRefreshPool(ID.Charcoal, ID.CookedMeat);
+    private static readonly Storage CampfirePool = CreateNoRefreshPool(ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
+    private static readonly Storage CarpenterPool = CreateNoRefreshPool(ID.Bed, ID.Loom, ID.Sign);
+    private static readonly Storage LoomPool = CreateNoRefreshPool(ID.Fabric);
     private static readonly Storage FurnacePool = CreateNoRefreshPool(ID.Slag, ID.Steel);
     private static readonly Storage SawmillPool = CreateNoRefreshPool(ID.Plank, ID.Stake, ID.Chest);
     private static readonly Storage StonecutterPool = CreateNoRefreshPool(ID.Brick, ID.BrickBlock);
-    private static readonly Storage StationPool = CreatePool(ID.Chalk, ID.Furnace, ID.Workbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
+    private static readonly Storage StationPool = CreatePool(ID.Chalk, ID.Furnace, ID.Workbench, ID.CarpenterWorkbench, ID.Anvil, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
     private static readonly Storage FieldStationPool = CreatePool(ID.ImprovisedPlanter);
     private static readonly Storage AnvilPool = CreatePool(ID.SteelSword, ID.MetalAxe);
 
@@ -85,6 +87,8 @@ public class CraftInfo : SpriteStructureInfo
         return structureId switch
         {
             ID.Workbench => WorkbenchPool,
+            ID.CarpenterWorkbench => CarpenterPool,
+            ID.Loom => LoomPool,
             ID.Campfire => CampfirePool,
             ID.Furnace => FurnacePool,
             ID.Sawmill => SawmillPool,
