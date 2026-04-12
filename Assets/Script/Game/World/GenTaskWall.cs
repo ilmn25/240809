@@ -5,7 +5,7 @@ public class GenTaskWall : Gen
     private static int _id;
     private static int Brick => _id == 0 ? Block.ConvertID(ID.BrickBlock) : _id;
     private const int Thickness = 2;
-    private const int RadiusChunks = 2;
+    private const int RadiusChunks = 4;
     // how far the wall extends relative to spawn point
     private const int AboveSpawn = 5;
     private const int BelowSpawn = 4;
