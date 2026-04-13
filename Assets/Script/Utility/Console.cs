@@ -302,7 +302,7 @@ public class Console : MonoBehaviour
             return;
         }
 
-        MirrorAutoHost.SendClientTextMessage(text);
+        Server.SendClientTextMessage(text);
     }
 
     private static void Join()
@@ -314,12 +314,12 @@ public class Console : MonoBehaviour
             hostAddress = _command[1];
 
         NetworkManager.singleton.networkAddress = hostAddress; 
-        MirrorAutoHost.StartClient();
+        Server.StartClient();
     }
 
     private static void Host()
     {
-        MirrorAutoHost.StartHost();
+        Server.StartHost();
         PrintIP();
     }
 
