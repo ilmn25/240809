@@ -1,21 +1,11 @@
 using Mirror;
 using UnityEngine;
 
-public class WorldSync : NetworkBehaviour
+public class EnvironmentSync : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnDayChanged))] public int day;
     [SyncVar(hook = nameof(OnTimeChanged))] public int time;
     [SyncVar(hook = nameof(OnWeatherChanged))] public EnvironmentType weather;
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-    }
 
     private void Update()
     {

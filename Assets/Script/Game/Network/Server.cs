@@ -13,7 +13,7 @@ public struct HostToClientSnapshotChunkMessage : NetworkMessage
     public byte[] chunk;
 }
 
-public static class MirrorAutoHost
+public static class Server
 {
     private const int MaxSnapshotChunkSize = 12000;
     private static bool handlersRegistered;
