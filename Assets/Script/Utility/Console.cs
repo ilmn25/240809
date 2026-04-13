@@ -270,10 +270,10 @@ public class Console : MonoBehaviour
                 }
                 break;   
             case "join":
-                JoinHost();
+                Join();
                 break;
             case "host":
-                ShowHostIp();
+                Host();
                 break;
             case "save": 
                 Print("saved");  
@@ -302,7 +302,7 @@ public class Console : MonoBehaviour
         MirrorAutoHost.SendClientTextMessage(text);
     }
 
-    private static void JoinHost()
+    private static void Join()
     {
         string hostAddress;
         if (_command.Length < 2)
@@ -310,14 +310,13 @@ public class Console : MonoBehaviour
         else
             hostAddress = _command[1];
 
-        NetworkManager.singleton.networkAddress = hostAddress;
-        NetworkManager.singleton.StartClient();
-        MirrorAutoHost.RegisterClientHandler();
+        NetworkManager.singleton.networkAddress = hostAddress; 
+        MirrorAutoHost.StartClient();
     }
 
-    private static void ShowHostIp()
+    private static void Host()
     {
-        MirrorAutoHost.StartHostIfNeeded();
+        MirrorAutoHost.StartHost();
 
         string ip = null;
         try

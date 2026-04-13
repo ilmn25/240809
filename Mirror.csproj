@@ -46,8 +46,8 @@
      <Compile Include="Assets\Mirror\Core\NetworkReaderPool.cs" />
      <Compile Include="Assets\Mirror\Core\Tools\Mathd.cs" />
      <Compile Include="Assets\Mirror\Core\Attributes.cs" />
-     <Compile Include="Assets\Mirror\Core\Tools\Vector4Long.cs" />
      <Compile Include="Assets\Mirror\Core\RemoteCalls.cs" />
+     <Compile Include="Assets\Mirror\Core\Tools\Vector4Long.cs" />
      <Compile Include="Assets\Mirror\Core\NetworkConnectionToServer.cs" />
      <Compile Include="Assets\Mirror\Core\NetworkClient_TimeInterpolation.cs" />
      <Compile Include="Assets\Mirror\Core\NetworkMessages.cs" />
@@ -83,8 +83,8 @@
      <Compile Include="Assets\Mirror\Core\LagCompensation\Capture.cs" />
      <Compile Include="Assets\Mirror\Core\NetworkWriterPool.cs" />
      <Compile Include="Assets\Mirror\Core\SyncList.cs" />
-     <Compile Include="Assets\Mirror\Core\NetworkAuthenticator.cs" />
      <Compile Include="Assets\Mirror\Core\Threading\ConcurrentPool.cs" />
+     <Compile Include="Assets\Mirror\Core\NetworkAuthenticator.cs" />
      <Compile Include="Assets\Mirror\Core\SyncSet.cs" />
      <Compile Include="Assets\Mirror\Core\NetworkBehaviourSyncVar.cs" />
      <Compile Include="Assets\Mirror\Core\Tools\DeltaCompression.cs" />
@@ -371,14 +371,29 @@
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.CecilX">
+        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CecilX.Mdb">
+        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
         <HintPath>C:\Users\user\Desktop\unity\240809\Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Mirror.BouncyCastle.Cryptography">
+        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CecilX.Pdb">
+        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="unityplastic">
         <HintPath>C:\Users\user\Desktop\unity\240809\Library\PackageCache\com.unity.collab-proxy@2.7.1\Lib\Editor\unityplastic.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
         <HintPath>C:\Users\user\Desktop\unity\240809\Library\PackageCache\com.unity.collab-proxy@2.7.1\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CecilX.Rocks">
+        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Plastic.Newtonsoft.Json">
         <HintPath>C:\Users\user\Desktop\unity\240809\Library\PackageCache\com.unity.collab-proxy@2.7.1\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
@@ -388,21 +403,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
         <HintPath>C:\Users\user\Desktop\unity\240809\Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CecilX">
-        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CecilX.Rocks">
-        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="Mirror.BouncyCastle.Cryptography">
-        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Transports\Encryption\Plugins\BouncyCastle\Mirror.BouncyCastle.Cryptography.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CecilX.Mdb">
-        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.CecilX.Pdb">
-        <HintPath>C:\Users\user\Desktop\unity\240809\Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
