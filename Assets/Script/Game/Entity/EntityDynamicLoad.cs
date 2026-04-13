@@ -22,6 +22,7 @@ public class EntityDynamicLoad
 
     public static void OnChunkTraverse()
     {
+        if (!Helper.IsHost()) return;
         ScanAndUnload();
         ScanAndLoad();
     }
@@ -67,6 +68,8 @@ public class EntityDynamicLoad
       
     public static void UnloadWorld()
     {
+        if (!Helper.IsHost()) return;
+
         List<EntityMachine> removeList = new List<EntityMachine>();
         Vector3Int entityChunkPosition;
         foreach (EntityMachine entityMachine in _activeEntities)

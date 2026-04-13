@@ -302,7 +302,7 @@ public class Console : MonoBehaviour
             return;
         }
 
-        Server.SendClientTextMessage(text);
+        Chat.SendClientTextMessage(text);
     }
 
     private static void Join()
