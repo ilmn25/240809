@@ -4,21 +4,10 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public struct ClientToServerTextMessage : NetworkMessage { public string text; }
-public struct ServerToClientTextMessage : NetworkMessage { public string text; }
-public struct HostToClientSnapshotChunkMessage : NetworkMessage
-{
-    public int index;
-    public int totalChunks;
-    public byte[] chunk;
-}
-
 public static class Server
 {
-    private const int MaxSnapshotChunkSize = 12000;
+    internal const int MaxSnapshotChunkSize = 12000;
     private static bool handlersRegistered;
-    private static readonly Dictionary<int, byte[]> receivedSnapshotChunks = new();
-    private static int expectedSnapshotChunks;
     private static GameObject networkPrefab;
 
     public static void StartHost()  
@@ -34,11 +23,6 @@ public static class Server
         RegisterHandlers(); 
     }
 
-    public static void SendClientTextMessage(string text)
-    {
-        NetworkClient.Send(new ClientToServerTextMessage { text = text });
-    }
-
     public static void RegisterHandlers()
     {
         if (handlersRegistered) return;
@@ -48,10 +32,10 @@ public static class Server
         NetworkManager.singleton.spawnPrefabs.Add(networkPrefab);
 
         NetworkClient.OnConnectedEvent += OnClientConnected;
-        NetworkClient.ReplaceHandler<ServerToClientTextMessage>(OnServerToClientTextMessage, false);
-        NetworkClient.ReplaceHandler<HostToClientSnapshotChunkMessage>(OnHostToClientSnapshotChunkMessage, false);
+        Chat.RegisterHandlers();
+        ChunkSync.RegisterHandlers();
+        EntitySync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += conn => NetworkManager.singleton.StartCoroutine(OnServerConnected(conn));
-        NetworkServer.ReplaceHandler<ClientToServerTextMessage>(OnClientToServerTextMessage, false);
         handlersRegistered = true;
     }
 
@@ -66,42 +50,8 @@ public static class Server
 
         if (conn == NetworkServer.localConnection || Save.Inst == null) yield break;
         World.UnloadWorld();
-        byte[] bytes = Helper.SerializeObject(Save.Inst);
-        byte[][] chunks = Helper.SplitBytes(bytes, MaxSnapshotChunkSize);
-        int totalChunks = chunks.Length;
-        for (int i = 0; i < totalChunks; i++)
-        {
-            conn.Send(new HostToClientSnapshotChunkMessage { index = i, totalChunks = totalChunks, chunk = chunks[i] });
-        }
+        ChunkSync.SendSaveChunks(conn, Save.Inst);
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
     }
-
-    private static void OnClientToServerTextMessage(NetworkConnectionToClient conn, ClientToServerTextMessage message)
-    {
-        int clientId = conn.connectionId + 1;
-        NetworkServer.SendToAll(new ServerToClientTextMessage { text = $"Client {clientId} > {message.text}" });
-    }
-
-    private static void OnServerToClientTextMessage(ServerToClientTextMessage message) => Console.Print(message.text);
-
-    private static void OnHostToClientSnapshotChunkMessage(HostToClientSnapshotChunkMessage message)
-    {
-        if (expectedSnapshotChunks == 0) expectedSnapshotChunks = message.totalChunks;
-        if (message.totalChunks != expectedSnapshotChunks)
-        {
-            expectedSnapshotChunks = message.totalChunks;
-            receivedSnapshotChunks.Clear();
-        }
-
-        receivedSnapshotChunks[message.index] = message.chunk;
-        if (receivedSnapshotChunks.Count < expectedSnapshotChunks) return;
-
-        byte[] allBytes = Helper.CombineChunks(receivedSnapshotChunks, expectedSnapshotChunks);
-        receivedSnapshotChunks.Clear();
-        expectedSnapshotChunks = 0;
-        Scene.SwitchSave(Helper.DeserializeObject<Save>(allBytes));
-        Console.Print("Received data from host, loading in...");
-    }
-
 }
