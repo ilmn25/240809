@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Mirror;
 
 public static class Helper
 {
@@ -62,6 +63,11 @@ public static class Helper
     public static float GetDeltaTime()
     {
         return (Time.deltaTime < Main.MaxDeltaTime) ? Time.deltaTime : Main.MaxDeltaTime;
+    }
+ 
+    public static bool IsHost()
+    {
+        return NetworkServer.active;
     }
  
     public static Color GetColor(float r, float g, float b)
