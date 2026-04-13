@@ -118,8 +118,8 @@ public class Environment
         while (true)
         {
             yield return new WaitForSeconds(Speed);
-            MoveTime(1);
-        } 
+            if (Helper.IsHost()) MoveTime(1);
+        }
     }
 
     public static void Update() 
@@ -145,6 +145,7 @@ public class Environment
 
     public static void MoveTime(int amount)
     {
+        if (!Helper.IsHost()) return;
         while (amount != 0)
         {  
             CheckWeather(); 
