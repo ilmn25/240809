@@ -275,6 +275,9 @@ public class Console : MonoBehaviour
             case "host":
                 Host();
                 break;
+            case "ip":
+                PrintIP();
+                break;
             case "save": 
                 Print("saved");  
                 Saves.SaveGame(); 
@@ -317,22 +320,21 @@ public class Console : MonoBehaviour
     private static void Host()
     {
         MirrorAutoHost.StartHost();
+        PrintIP();
+    }
 
+    private static void PrintIP()
+    { 
         string ip = null;
         try
         {
-            foreach (var addr in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            using (var client = new System.Net.WebClient())
             {
-                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(addr))
-                {
-                    ip = addr.ToString();
-                    break;
-                }
+                ip = client.DownloadString("https://api.ipify.org").Trim();
             }
         }
         catch { }
-
-        Print($"Host IP: {ip} ({(NetworkServer.active ? "host" : "not host")})");
+        Print($"Host IP: {ip}");
     }
 
     public static void Print(string output)
