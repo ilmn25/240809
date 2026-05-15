@@ -43,12 +43,9 @@ public static class Server
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)
     {
-        while (NetworkServer.active && conn != null && NetworkServer.connections.ContainsKey(conn.connectionId) && !conn.isReady)
+        while (!conn.isReady)
             yield return null;
-        if (!NetworkServer.active || conn == null || !NetworkServer.connections.ContainsKey(conn.connectionId) || !conn.isReady)
-            yield break;
-
-        if (conn == NetworkServer.localConnection || Save.Inst == null) yield break;
+ 
         World.UnloadWorld();
         ChunkSync.SendSaveChunks(conn, Save.Inst);
         World.LoadWorld();
