@@ -34,6 +34,8 @@ public class MobInfo : DynamicInfo
     [NonSerialized] public Vector3 AimPosition; 
     [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending;
 
+    // Animation inputs are serialized by EntitySync for remote clients.
+
     public void CancelTarget()
     {
         Target = null; 
@@ -45,6 +47,8 @@ public class MobInfo : DynamicInfo
     protected override void OnUpdate()
     { 
         base.OnUpdate();
+        // Server-side broadcasting is handled centrally by EntitySync's batch loop.
+
         if (Target != null)
         {
             if (Target.Destroyed)

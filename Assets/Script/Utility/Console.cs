@@ -270,10 +270,13 @@ public class Console : MonoBehaviour
                 }
                 break;   
             case "join":
-                Join();
+                Server.StartClient(_command.Length > 1 ? _command[1] : null);
                 break;
             case "host":
                 Host();
+                break;
+            case "unhost":
+                Server.StopHost();
                 break;
             case "ip":
                 PrintIP();
@@ -303,18 +306,6 @@ public class Console : MonoBehaviour
         }
 
         Chat.SendClientTextMessage(text);
-    }
-
-    private static void Join()
-    {
-        string hostAddress;
-        if (_command.Length < 2)
-            hostAddress = "127.0.0.1";
-        else
-            hostAddress = _command[1];
-
-        NetworkManager.singleton.networkAddress = hostAddress; 
-        Server.StartClient();
     }
 
     private static void Host()

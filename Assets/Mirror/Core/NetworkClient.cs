@@ -1642,6 +1642,8 @@ namespace Mirror
         // calling it every update() would require too much bandwidth.
         static void Broadcast()
         {
+            if (connection == null) return;
+
             // joined the world yet?
             if (!connection.isReady) return;
 

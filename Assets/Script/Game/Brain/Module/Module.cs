@@ -4,6 +4,8 @@ using System;
 public abstract class Module
 {
     [NonSerialized] public Machine Machine;
+    public enum UpdateMode { HostOnly, Everyone }
+    public UpdateMode updateMode = UpdateMode.HostOnly;
 
     public virtual void Initialize() {}
     public virtual void Update() {}

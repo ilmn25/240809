@@ -10,6 +10,7 @@ public abstract class State
     public Machine Machine;
     public State Parent;
     public Info Info => ((EntityMachine)Machine).Info;
+    public global::Module.UpdateMode updateMode = global::Module.UpdateMode.HostOnly;
  
     public virtual void Initialize() {}
     public virtual void OnEnterState() {}

@@ -84,13 +84,28 @@ public abstract class Machine : MonoBehaviour
     
     public virtual void Update()
     {  
-        OnUpdate();  
-        
-        if (StateCurrent != null) StateCurrent.OnUpdateState();
+        if (Helper.IsHost())
+        {
+            OnUpdate();
+            RunForMode(Module.UpdateMode.HostOnly);
+        }
+    }
+
+    // Run client-visible (Everyone) modules and states in LateUpdate so network-applied fields are available.
+    public virtual void LateUpdate()
+    {
+        RunForMode(Module.UpdateMode.Everyone);
+    }
+
+    private void RunForMode(Module.UpdateMode mode)
+    {
+        if (StateCurrent != null && StateCurrent.updateMode == mode)
+            StateCurrent.OnUpdateState();
 
         for (int i = 0; i < Modules.Count; i++)
         {
-            Modules[i].Update();
+            if (Modules[i].updateMode == mode)
+                Modules[i].Update();
         }
     }
 }

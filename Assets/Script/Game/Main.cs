@@ -86,9 +86,6 @@ public class Main : MonoBehaviour
         EnvParticle.Initialize();    
         Terraform.Initialize();  
         MapCull.Initialize();
-
-        Save.Inst = new(GenType.SkyBlock);
-        Scene.LoadWorld();
     } 
     private void Update()
     {   

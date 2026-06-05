@@ -1,41 +1,79 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using Mirror;
 using UnityEngine;
 
 public static class Server
 {
     internal const int MaxSnapshotChunkSize = 12000;
+    private const int DefaultHostPort = 7777;
     private static bool handlersRegistered;
+    private static readonly Action<NetworkConnectionToClient> serverConnectedHandler = conn => NetworkManager.singleton.StartCoroutine(OnServerConnected(conn));
     private static GameObject networkPrefab;
 
-    public static void StartHost()  
+    static Server()
     {
-        if (NetworkClient.isConnected || NetworkServer.active) return;
-        NetworkManager.singleton.StartHost(); 
-        RegisterHandlers(); 
+        networkPrefab = Resources.Load<GameObject>("Prefab/Network");
+        NetworkClient.RegisterPrefab(networkPrefab);
+        NetworkManager.singleton.spawnPrefabs.Add(networkPrefab);
     }
 
-    public static void StartClient()
+    public static bool StartHost()
     {
+        if (NetworkClient.isConnected)
+            NetworkManager.singleton.StopClient();
+
+        if (Save.Inst == null)
+            Save.Inst = new Save(GenType.SkyBlock);
+
+        PortTransport transport = Transport.active as PortTransport;
+        int port = transport != null ? transport.Port : DefaultHostPort;
+        while (IsPortInUse(port)) port++;
+        if (transport != null) transport.Port = (ushort)port;
+        NetworkManager.singleton.StartHost();
+        Scene.LoadWorld();
+        RegisterHandlers();
+        return true;
+    }
+
+    public static void StartClient(string address = null)
+    {
+        if (NetworkServer.active)
+            StopHost();
+
+        NetworkManager.singleton.networkAddress = string.IsNullOrWhiteSpace(address) ? "127.0.0.1" : address;
         NetworkManager.singleton.StartClient();
         RegisterHandlers(); 
     }
 
-    public static void RegisterHandlers()
+    public static void StopHost()
+    {
+        NetworkManager.singleton.StopHost();
+        UnregisterHandlers();
+        handlersRegistered = false;
+        if (Transport.active is PortTransport transport) transport.Port = DefaultHostPort;
+    }
+
+    private static void UnregisterHandlers()
+    {
+        NetworkClient.OnConnectedEvent -= OnClientConnected;
+        NetworkServer.OnConnectedEvent -= serverConnectedHandler;
+        NetworkClient.UnregisterHandler<ServerToClientTextMessage>();
+        NetworkServer.UnregisterHandler<ClientToServerTextMessage>();
+        NetworkClient.UnregisterHandler<HostToClientSnapshotChunkMessage>();
+        NetworkClient.UnregisterHandler<BatchEntityInfoMessage>();
+    }
+
+    private static void RegisterHandlers()
     {
         if (handlersRegistered) return;
-
-        networkPrefab = Resources.Load<GameObject>("Prefab/Network");
-        NetworkClient.RegisterPrefab(networkPrefab);
-        NetworkManager.singleton.spawnPrefabs.Add(networkPrefab);
-
         NetworkClient.OnConnectedEvent += OnClientConnected;
         Chat.RegisterHandlers();
         ChunkSync.RegisterHandlers();
         EntitySync.RegisterHandlers();
-        NetworkServer.OnConnectedEvent += conn => NetworkManager.singleton.StartCoroutine(OnServerConnected(conn));
+        NetworkServer.OnConnectedEvent += serverConnectedHandler;
         handlersRegistered = true;
     }
 
@@ -51,4 +89,12 @@ public static class Server
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
     }
+
+    private static bool IsPortInUse(int port)
+    {
+        try { IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties(); foreach (var endpoint in properties.GetActiveUdpListeners()) if (endpoint.Port == port) return true; foreach (var endpoint in properties.GetActiveTcpListeners()) if (endpoint.Port == port) return true; }
+        catch { }
+        return false;
+    }
+
 }

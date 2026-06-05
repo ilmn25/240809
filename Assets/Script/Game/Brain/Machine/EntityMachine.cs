@@ -50,7 +50,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
     public override void Update()
     {
         base.Update();
-        if (Info.Destroyed)
+            if (Info.Destroyed)
         {
             Unload();
         }

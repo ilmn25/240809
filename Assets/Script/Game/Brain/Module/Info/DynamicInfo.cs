@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 [System.Serializable]
 public class DynamicInfo : Info
 {
+    public DynamicInfo() { updateMode = UpdateMode.Everyone; }
     private const int KnockbackInterval = 3;
     public HitboxType HitboxType;
     public ID CharSprite = ID.Null;
@@ -54,10 +55,12 @@ public class DynamicInfo : Info
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() {
         if (Machine)
-        { 
+        {
             position = Machine.transform.position;
             IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
         }
+
+        if (!Helper.IsHost()) return;
 
         if (KnockbackCounter != KnockbackInterval)
         {
