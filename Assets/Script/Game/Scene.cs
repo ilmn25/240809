@@ -69,9 +69,10 @@ public class Scene
     {     
         Environment.Target = EnvironmentType.Black; 
         yield return new WaitForSeconds(2);
-        if (includePlayers)
+        if (includePlayers && Save.Inst != null)
             foreach (PlayerInfo player in Save.Inst.players)
-                ObjectPool.ReturnObject(player.Machine.gameObject);
+                if (player.Machine != null)
+                    ObjectPool.ReturnObject(player.Machine.gameObject);
         World.UnloadWorld();
         Main.SceneMode = SceneMode.Menu;
     }
