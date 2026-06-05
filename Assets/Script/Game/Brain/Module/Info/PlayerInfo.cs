@@ -7,7 +7,7 @@ public enum PlayerStatus {
 }
 [System.Serializable]
 public class PlayerInfo : MobInfo
-{ 
+{
     public Storage Storage;
     public float Mana;
     public float Sanity;

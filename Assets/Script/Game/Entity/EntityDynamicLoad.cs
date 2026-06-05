@@ -7,6 +7,11 @@ public class EntityDynamicLoad
 
     private static List<EntityMachine> _activeEntities = new List<EntityMachine>();
 
+    public static List<EntityMachine> GetActiveEntities()
+    {
+        return _activeEntities;
+    }
+
     public static void ForgetEntity(EntityMachine entity)
     {
         if (entity == null) return;
@@ -42,7 +47,11 @@ public class EntityDynamicLoad
                 removeList.Add(entityMachine);
             }
         }
-        foreach (var entityMachine in removeList) entityMachine.Unload();
+        foreach (var entityMachine in removeList)
+        {
+            EntitySync.BroadcastEntityUnload(entityMachine.Info);
+            entityMachine.Unload();
+        }
     }
 
     private static void ScanAndLoad()
@@ -79,7 +88,11 @@ public class EntityDynamicLoad
                 World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
             removeList.Add(entityMachine);
         }
-        foreach (var entityMachine in removeList) entityMachine.Unload();
+        foreach (var entityMachine in removeList)
+        {
+            EntitySync.BroadcastEntityUnload(entityMachine.Info);
+            entityMachine.Unload();
+        }
     }
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)

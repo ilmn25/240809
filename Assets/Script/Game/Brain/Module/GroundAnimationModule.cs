@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GroundAnimationModule : MobModule
 {
+    public GroundAnimationModule() { updateMode = UpdateMode.Everyone; }
     private const float BounceSpeed = 1.35f;
     private const float BounceRange = 0.125f;
     // private const float BounceSpeed = 1f;
@@ -33,12 +34,15 @@ public class GroundAnimationModule : MobModule
         if (Info is PlayerInfo && ((PlayerInfo)Info).PlayerStatus != PlayerStatus.Active) return;
         if (Info.IsInRenderRange)
         {
-            if (Info.FaceTarget)
+            bool faceTarget = Info.FaceTarget;
+            Vector3 targetScreenDir = Info.TargetScreenDir;
+
+            if (faceTarget)
             {
-                _animDirection = new Vector2Int((int)Mathf.Sign(Info.TargetScreenDir.x), 0);
+                _animDirection = new Vector2Int((int)Mathf.Sign(targetScreenDir.x), 0);
 
                 if (Info.Equipment != null)
-                    EquipTrackTarget();
+                    EquipTrackTarget(targetScreenDir);
             }
             else
             { 
@@ -50,9 +54,9 @@ public class GroundAnimationModule : MobModule
         } 
     }
  
-    public void EquipTrackTarget()
+    public void EquipTrackTarget(Vector3 targetScreenDir)
     {
-        float angle = Mathf.Atan2(Info.TargetScreenDir.y, Info.TargetScreenDir.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(targetScreenDir.y, targetScreenDir.x) * Mathf.Rad2Deg;
 
         if (angle > 90)
             angle = 180 - angle;
@@ -72,7 +76,8 @@ public class GroundAnimationModule : MobModule
     
     void SetDirectionToMovement()
     {
-        Vector2 rawDirection = new Vector2(Info.Direction.x, Info.Direction.z);
+        Vector3 direction = Info.Direction;
+        Vector2 rawDirection = new Vector2(direction.x, direction.z);
         rawDirection.Normalize();
 
         if (rawDirection != Vector2.zero)
@@ -87,11 +92,15 @@ public class GroundAnimationModule : MobModule
     private float _bounceTimer;
     void HandleBounceAndTrail()
     {
-        bool isMoving = Info.Direction.magnitude > 0.5 && Info.IsGrounded;
+        Vector3 direction = Info.Direction;
+        bool isGrounded = Info.IsGrounded;
+        float speedCurrent = Info.SpeedCurrent;
+        float speedTarget = Info.SpeedTarget;
+        bool isMoving = direction.magnitude > 0.5f && isGrounded;
 
         if (isMoving)
         { 
-            _bounceTimer += Time.deltaTime * BounceSpeed * Mathf.Clamp01((Info.SpeedCurrent * 1.5f) / Info.SpeedTarget);
+            _bounceTimer += Time.deltaTime * BounceSpeed * Mathf.Clamp01((speedCurrent * 1.5f) / Mathf.Max(speedTarget, 0.01f));
             float newY = Mathf.PingPong(_bounceTimer, BounceRange);
             Info.Sprite.localPosition = new Vector3(Info.Sprite.localPosition.x, newY, Info.Sprite.localPosition.z);
 
