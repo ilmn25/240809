@@ -21,6 +21,10 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public float[] animSpeedTarget;
     public bool[] animFaceTarget;
     public Vector3[] animTargetScreenDirs;
+
+    // One-shot animation trigger (shortNameHash of current Animator state, 0 = none)
+    public int[] animTriggers;
+    public float[] animNormalizedTimes;
 }
 
 public static class EntitySync
@@ -54,6 +58,9 @@ public static class EntitySync
     private class PendingUnload { public string uid; public int id; public Vector3 pos; }
     private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
 
+    /// <summary>Client-side: tracks last received animation hash per uid so we know when to play a new one-shot.</summary>
+    private static readonly Dictionary<string, int> _lastReceivedAnimHash = new Dictionary<string, int>();
+
     private static void OnBatchEntityInfoMessageReceived(BatchEntityInfoMessage message)
     {
         if (Helper.IsHost()) return;
@@ -71,6 +78,8 @@ public static class EntitySync
             float animSpeedTarg = message.animSpeedTarget[i];
             bool animFace = message.animFaceTarget[i];
             Vector3 animTargetScreen = message.animTargetScreenDirs[i];
+            int animTrigger = message.animTriggers?[i] ?? 0;
+            float animNormalizedTime = message.animNormalizedTimes?[i] ?? 0f;
             bool isExist = InfoMap.TryGetValue(uid, out Info targetInfo);
             if (!isExist)
             {
@@ -102,11 +111,33 @@ public static class EntitySync
                 dyn.IsGrounded = animGrounded;
                 dyn.SpeedCurrent = animSpeedCurr;
                 dyn.SpeedTarget = animSpeedTarg;
-                dyn.TargetScreenDir = animTargetScreen;
+                // Convert TargetScreenDir from world-aligned back to local screen-space
+                float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+                float cos = Mathf.Cos(orbitRad);
+                float sin = Mathf.Sin(orbitRad);
+                dyn.TargetScreenDir = new Vector3(
+                    animTargetScreen.x * cos - animTargetScreen.y * sin,
+                    animTargetScreen.x * sin + animTargetScreen.y * cos,
+                    0);
             }
             if (targetInfo is MobInfo mob)
             {
                 mob.FaceTarget = animFace;
+            }
+
+            // One-shot animation trigger: play if hash changed
+            if (animTrigger != 0 && targetInfo is DynamicInfo dynAnim)
+            {
+                int prevHash = _lastReceivedAnimHash.GetValueOrDefault(uid, 0);
+                if (animTrigger != prevHash && dynAnim.Animator != null && dynAnim.Animator.isActiveAndEnabled)
+                {
+                    dynAnim.Animator.Play(animTrigger, 0, animNormalizedTime);
+                }
+                _lastReceivedAnimHash[uid] = animTrigger;
+            }
+            else
+            {
+                _lastReceivedAnimHash.Remove(uid);
             }
         }
     }
@@ -127,6 +158,50 @@ public static class EntitySync
         List<float> animSpeedTarg = new List<float>();
         List<bool> animFace = new List<bool>();
         List<Vector3> animTargetScreens = new List<Vector3>();
+        List<int> animTriggers = new List<int>();
+        List<float> animNormalizedTimes = new List<float>();
+
+        void AddAnimData(DynamicInfo dyn)
+        {
+            animDirs.Add(dyn.Direction);
+            animGrounded.Add(dyn.IsGrounded);
+            animSpeedCurr.Add(dyn.SpeedCurrent);
+            animSpeedTarg.Add(dyn.SpeedTarget);
+            animFace.Add((dyn is MobInfo mob) ? mob.FaceTarget : false);
+            // Convert screen-space TargetScreenDir to world-aligned before syncing
+            Vector3 localDir = dyn.TargetScreenDir;
+            float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(-orbitRad);
+            float sin = Mathf.Sin(-orbitRad);
+            animTargetScreens.Add(new Vector3(
+                localDir.x * cos - localDir.y * sin,
+                localDir.x * sin + localDir.y * cos,
+                0));
+            // Read current Animator state for one-shot detection
+            if (dyn.Animator != null && dyn.Animator.isActiveAndEnabled)
+            {
+                AnimatorStateInfo state = dyn.Animator.GetCurrentAnimatorStateInfo(0);
+                animTriggers.Add(state.shortNameHash);
+                animNormalizedTimes.Add(state.normalizedTime);
+            }
+            else
+            {
+                animTriggers.Add(0);
+                animNormalizedTimes.Add(0f);
+            }
+        }
+
+        void AddZeroAnimData()
+        {
+            animDirs.Add(Vector3.zero);
+            animGrounded.Add(false);
+            animSpeedCurr.Add(0f);
+            animSpeedTarg.Add(0f);
+            animFace.Add(false);
+            animTargetScreens.Add(Vector3.zero);
+            animTriggers.Add(0);
+            animNormalizedTimes.Add(0f);
+        }
 
         foreach (var em in EntityDynamicLoad.GetActiveEntities())
         {
@@ -136,27 +211,10 @@ public static class EntitySync
             positions.Add(em.Info.position);
             destroyed.Add(em.Info.Destroyed);
 
-                // placeholder for alignment
-                // (no spawn bytes sent)
-
             if (em.Info is DynamicInfo dyn)
-            {
-                animDirs.Add(dyn.Direction);
-                animGrounded.Add(dyn.IsGrounded);
-                animSpeedCurr.Add(dyn.SpeedCurrent);
-                animSpeedTarg.Add(dyn.SpeedTarget);
-                animFace.Add((em.Info is MobInfo mob) ? mob.FaceTarget : false);
-                animTargetScreens.Add(dyn.TargetScreenDir);
-            }
+                AddAnimData(dyn);
             else
-            {
-                animDirs.Add(Vector3.zero);
-                animGrounded.Add(false);
-                animSpeedCurr.Add(0f);
-                animSpeedTarg.Add(0f);
-                animFace.Add(false);
-                animTargetScreens.Add(Vector3.zero);
-            }
+                AddZeroAnimData();
         }
 
         foreach (var kv in EntityStaticLoad.ActiveEntities)
@@ -169,28 +227,10 @@ public static class EntitySync
                 positions.Add(em.Info.position);
                 destroyed.Add(em.Info.Destroyed);
 
-                // no spawn bytes; clients will instantiate from minimal id/position
-                // add placeholder null to keep arrays aligned
-                // (we don't include spawn bytes)
-
                 if (em.Info is DynamicInfo dyn)
-                {
-                    animDirs.Add(dyn.Direction);
-                    animGrounded.Add(dyn.IsGrounded);
-                    animSpeedCurr.Add(dyn.SpeedCurrent);
-                    animSpeedTarg.Add(dyn.SpeedTarget);
-                    animFace.Add((em.Info is MobInfo mob) ? mob.FaceTarget : false);
-                    animTargetScreens.Add(dyn.TargetScreenDir);
-                }
+                    AddAnimData(dyn);
                 else
-                {
-                    animDirs.Add(Vector3.zero);
-                    animGrounded.Add(false);
-                    animSpeedCurr.Add(0f);
-                    animSpeedTarg.Add(0f);
-                    animFace.Add(false);
-                    animTargetScreens.Add(Vector3.zero);
-                }
+                    AddZeroAnimData();
             }
         }
 
@@ -203,13 +243,7 @@ public static class EntitySync
             ids.Add(pu.id);
             positions.Add(pu.pos);
             destroyed.Add(true);
-            // no spawn bytes
-            animDirs.Add(Vector3.zero);
-            animGrounded.Add(false);
-            animSpeedCurr.Add(0f);
-            animSpeedTarg.Add(0f);
-            animFace.Add(false);
-            animTargetScreens.Add(Vector3.zero);
+            AddZeroAnimData();
         }
         _pendingUnloads.Clear();
 
@@ -224,7 +258,9 @@ public static class EntitySync
             animSpeedCurrent = animSpeedCurr.ToArray(),
             animSpeedTarget = animSpeedTarg.ToArray(),
             animFaceTarget = animFace.ToArray(),
-            animTargetScreenDirs = animTargetScreens.ToArray()
+            animTargetScreenDirs = animTargetScreens.ToArray(),
+            animTriggers = animTriggers.ToArray(),
+            animNormalizedTimes = animNormalizedTimes.ToArray()
         });
     }
 

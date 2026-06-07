@@ -37,6 +37,9 @@ public struct PlayerSyncMessage : NetworkMessage
     public int equipmentId;
     public int equipmentDurability;
     public byte[] storageData;
+
+    public int animTrigger;
+    public float animNormalizedTime;
 }
 
 public struct YourConnectionIdMessage : NetworkMessage
@@ -58,6 +61,9 @@ public struct ClientToServerPlayerMessage : NetworkMessage
     public Vector3 aimPosition;
     public string targetUid;
     public int actionType;
+
+    public int animTrigger;
+    public float animNormalizedTime;
 }
 
 public static class PlayerSync
@@ -74,6 +80,13 @@ public static class PlayerSync
     private static int _myConnectionId = -1;
 
     private static bool _clientSceneInitialized = false;
+
+    /// <summary>Client-side: tracks last received animation hash per player uid.</summary>
+    private static readonly Dictionary<string, int> _lastPlayerAnimHash = new Dictionary<string, int>();
+
+    /// <summary>Host-side: remote client anim triggers queued for forwarding in next broadcast.</summary>
+    private static readonly Dictionary<string, int> _pendingForwardAnimTriggers = new Dictionary<string, int>();
+    private static readonly Dictionary<string, float> _pendingForwardAnimTimes = new Dictionary<string, float>();
 
     /// <summary>Host-side: is this player controlled by a remote client? (host skips input/movement for those)</summary>
     public static bool IsClaimedByRemoteClient(string uid)
@@ -152,6 +165,25 @@ public static class PlayerSync
     {
         byte[] storageBytes = !destroyed && player.Storage?.List != null
             ? Helper.SerializeObject(player.Storage.List) : null;
+
+        // For remote clients: use pending trigger queued from ClientToServerPlayerMessage.
+        // For host-controlled: read directly from Animator.
+        int animTrigger = 0;
+        float animNormalizedTime = 0f;
+        if (!destroyed && _pendingForwardAnimTriggers.TryGetValue(player.uid, out int pendingTrigger))
+        {
+            animTrigger = pendingTrigger;
+            animNormalizedTime = _pendingForwardAnimTimes.GetValueOrDefault(player.uid, 0f);
+            _pendingForwardAnimTriggers.Remove(player.uid);
+            _pendingForwardAnimTimes.Remove(player.uid);
+        }
+        else if (!destroyed && player.Animator != null && player.Animator.isActiveAndEnabled)
+        {
+            AnimatorStateInfo state = player.Animator.GetCurrentAnimatorStateInfo(0);
+            animTrigger = state.shortNameHash;
+            animNormalizedTime = state.normalizedTime;
+        }
+
         return new PlayerSyncMessage
         {
             playerIndex = index, uid = player.uid, id = (int)player.id,
@@ -163,11 +195,13 @@ public static class PlayerSync
             stamina = player.Stamina, playerStatus = (int)player.PlayerStatus,
             direction = player.Direction, isGrounded = player.IsGrounded,
             speedCurrent = player.SpeedCurrent, speedTarget = player.SpeedTarget,
-            faceTarget = player.FaceTarget, targetScreenDir = player.TargetScreenDir,
+            faceTarget = player.FaceTarget, targetScreenDir = ScreenToWorldAligned(player.TargetScreenDir),
             charSprite = (int)player.CharSprite,
             equipmentId = player.Equipment != null ? (int)player.Equipment.ID : 0,
             equipmentDurability = player.Equipment?.Durability ?? 0,
-            storageData = storageBytes
+            storageData = storageBytes,
+            animTrigger = animTrigger,
+            animNormalizedTime = animNormalizedTime
         };
     }
 
@@ -261,6 +295,21 @@ public static class PlayerSync
             }
         }
 
+        // Apply one-shot animation trigger if hash changed
+        if (msg.animTrigger != 0 && existing is PlayerInfo piAnim)
+        {
+            int prevHash = _lastPlayerAnimHash.GetValueOrDefault(msg.uid, 0);
+            if (msg.animTrigger != prevHash && piAnim.Animator != null && piAnim.Animator.isActiveAndEnabled)
+            {
+                piAnim.Animator.Play(msg.animTrigger, 0, msg.animNormalizedTime);
+            }
+            _lastPlayerAnimHash[msg.uid] = msg.animTrigger;
+        }
+        else
+        {
+            _lastPlayerAnimHash.Remove(msg.uid);
+        }
+
         // Remote client: ensure scene is active after the world has loaded.
         if (!_clientSceneInitialized && msg.playerIndex == 0 && !Scene.Busy)
         {
@@ -277,6 +326,14 @@ public static class PlayerSync
         if (Helper.IsHost() || !NetworkClient.isConnected || Main.PlayerInfo?.Machine == null) return;
 
         var p = Main.PlayerInfo;
+        int animTrigger = 0;
+        float animNormalizedTime = 0f;
+        if (p.Animator != null && p.Animator.isActiveAndEnabled)
+        {
+            AnimatorStateInfo state = p.Animator.GetCurrentAnimatorStateInfo(0);
+            animTrigger = state.shortNameHash;
+            animNormalizedTime = state.normalizedTime;
+        }
         NetworkClient.Send(new ClientToServerPlayerMessage
         {
             playerIndex = Control.CurrentPlayerIndex,
@@ -287,10 +344,12 @@ public static class PlayerSync
             speedCurrent = p.SpeedCurrent,
             speedTarget = p.SpeedTarget,
             faceTarget = p.FaceTarget,
-            targetScreenDir = p.TargetScreenDir,
+            targetScreenDir = ScreenToWorldAligned(p.TargetScreenDir),
             aimPosition = p.AimPosition,
             targetUid = p.Target?.uid ?? "",
-            actionType = (int)p.ActionType
+            actionType = (int)p.ActionType,
+            animTrigger = animTrigger,
+            animNormalizedTime = animNormalizedTime
         });
     }
 
@@ -347,12 +406,45 @@ public static class PlayerSync
             targetPlayer.SpeedCurrent = msg.speedCurrent;
             targetPlayer.SpeedTarget = msg.speedTarget;
             targetPlayer.FaceTarget = msg.faceTarget;
-            targetPlayer.TargetScreenDir = msg.targetScreenDir;
+            targetPlayer.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
             targetPlayer.AimPosition = msg.aimPosition;
             Info.Dictionary.TryGetValue(msg.targetUid, out Info t);
             targetPlayer.Target = t;
             targetPlayer.ActionType = (IActionType)msg.actionType;
+
+            // Queue anim trigger for forwarding in host's next broadcast
+            if (msg.animTrigger != 0)
+            {
+                _pendingForwardAnimTriggers[targetPlayer.uid] = msg.animTrigger;
+                _pendingForwardAnimTimes[targetPlayer.uid] = msg.animNormalizedTime;
+            }
         }
+    }
+
+    // ── Camera-relative helpers ────────────────────────────────────
+
+    /// <summary>Convert screen-space TargetScreenDir to world-aligned (camera-independent) for network sync.</summary>
+    private static Vector3 ScreenToWorldAligned(Vector3 screenDir)
+    {
+        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(orbitRad);
+        float sin = Mathf.Sin(orbitRad);
+        return new Vector3(
+            screenDir.x * cos + screenDir.y * sin,
+            -screenDir.x * sin + screenDir.y * cos,
+            0);
+    }
+
+    /// <summary>Convert world-aligned TargetScreenDir back to local screen-space on receipt.</summary>
+    private static Vector3 WorldAlignedToScreen(Vector3 worldDir)
+    {
+        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(orbitRad);
+        float sin = Mathf.Sin(orbitRad);
+        return new Vector3(
+            worldDir.x * cos - worldDir.y * sin,
+            worldDir.x * sin + worldDir.y * cos,
+            0);
     }
 
     // ── Copy helpers ───────────────────────────────────────────────
@@ -366,7 +458,7 @@ public static class PlayerSync
         pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
         pi.Direction = msg.direction; pi.IsGrounded = msg.isGrounded;
         pi.SpeedCurrent = msg.speedCurrent; pi.SpeedTarget = msg.speedTarget;
-        pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = msg.targetScreenDir;
+        pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
         pi.CharSprite = (ID)msg.charSprite;
         CopyStorage(pi, msg);
     }
@@ -399,5 +491,8 @@ public static class PlayerSync
         _playerControllers.Clear();
         _myConnectionId = -1;
         _clientSceneInitialized = false;
+        _lastPlayerAnimHash.Clear();
+        _pendingForwardAnimTriggers.Clear();
+        _pendingForwardAnimTimes.Clear();
     }
 }
