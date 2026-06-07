@@ -22,8 +22,8 @@ public class GroundMovementModule : MovementModule
     { 
         if (Info.Health <= 0) return;
 
-        // On client, only run local movement for the claimed player.
-        if (!Helper.IsHost() && !PlayerSync.IsClientControlled(Info.uid)) return;
+        // Host runs physics for all players. Client only runs for its own.
+        if (!Helper.IsHost() && !PlayerSync.CanLocalClientControl(Info.uid)) return;
 
         if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         

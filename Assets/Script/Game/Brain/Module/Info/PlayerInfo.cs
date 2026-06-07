@@ -79,11 +79,10 @@ public class PlayerInfo : MobInfo
         FaceTarget = Equipment != null || Target != null;
 
         bool isSelected = Main.PlayerInfo == this;
-        bool blockedByOther = Helper.IsHost() && PlayerSync.IsClientControlled(uid);
-        // On client, only process input for the claimed player
-        bool clientNotClaimed = !Helper.IsHost() && !PlayerSync.IsClientControlled(uid);
+        bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(uid);
+        bool claimedByOtherClient = !Helper.IsHost() && !PlayerSync.CanLocalClientControl(uid);
 
-        if (isSelected && !blockedByOther && !clientNotClaimed && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+        if (isSelected && !blockedByOther && !claimedByOtherClient && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
         {
             TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
             AimPosition = Control.MouseTarget ?

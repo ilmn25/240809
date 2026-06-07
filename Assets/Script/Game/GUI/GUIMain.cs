@@ -125,11 +125,13 @@ public static class GUIMain
         int playerIndex = Control.CurrentPlayerIndex + 1;
         int slotId = Main.PlayerInfo?.Storage != null ? Main.PlayerInfo.Storage.Key + 1 : 1;
 
-        bool isControlling = PlayerSync.IsClientControlled(Main.PlayerInfo?.uid ?? "");
-        if (Helper.IsHost()) isControlling = !isControlling;
-        string controlStatus = isControlling
-            ? $"Controlling Player {playerIndex}"
-            : $"Spectating Player {playerIndex}";
+        string uid = Main.PlayerInfo?.uid ?? "";
+        bool isSpectating = Helper.IsHost()
+            ? PlayerSync.IsClaimedByRemoteClient(uid)
+            : !PlayerSync.CanLocalClientControl(uid);
+        string controlStatus = isSpectating
+            ? $"Spectating Player {playerIndex}"
+            : $"Controlling Player {playerIndex}";
 
         Main.GUIHudText.text =
             $"{BuildTimeHudText()}\n" +

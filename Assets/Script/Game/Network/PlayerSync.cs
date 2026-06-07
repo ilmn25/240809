@@ -75,24 +75,20 @@ public static class PlayerSync
 
     private static bool _clientSceneInitialized = false;
 
-    /// <summary>
-    /// On host: is this uid controlled by a remote client?  (host skips movement for those)
-    /// On client: can WE control this uid?  (yes if free, or host confirmed our claim)
-    /// </summary>
-    public static bool IsClientControlled(string uid)
+    /// <summary>Host-side: is this player controlled by a remote client? (host skips input/movement for those)</summary>
+    public static bool IsClaimedByRemoteClient(string uid)
     {
-        if (string.IsNullOrEmpty(uid)) return false;
-        if (Helper.IsHost())
-            return _playerControllers.GetValueOrDefault(uid, -1) >= 1;
-        else
-        {
-            int controller = _playerControllers.GetValueOrDefault(uid, -1);
-            return controller == -1 || controller == _myConnectionId;
-        }
+        if (!Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
+        return _playerControllers.GetValueOrDefault(uid, -1) >= 1;
     }
 
-    /// <summary>Client calls this when pressing Tab.</summary>
-    public static void NotifyClientClaim(int playerIndex) { }
+    /// <summary>Client-side: can WE control this player? (free, or already ours)</summary>
+    public static bool CanLocalClientControl(string uid)
+    {
+        if (Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
+        int controller = _playerControllers.GetValueOrDefault(uid, -1);
+        return controller == -1 || controller == _myConnectionId;
+    }
 
     /// <summary>Host: register the player we're controlling (only if free).</summary>
     public static void HostClaimPlayer(string uid)
@@ -223,7 +219,7 @@ public static class PlayerSync
             return;
         }
 
-        // Track who controls this player from the broadcast (used by IsClientControlled)
+        // Track who controls this player from the broadcast (used by CanLocalClientControl)
         _playerControllers[msg.uid] = msg.controllingClientId;
 
         if (!InfoMap.TryGetValue(msg.uid, out Info existing))
@@ -247,7 +243,7 @@ public static class PlayerSync
         }
         else if (existing is PlayerInfo pi)
         {
-            if (IsClientControlled(msg.uid))
+            if (CanLocalClientControl(msg.uid))
             {
                 pi.Health = msg.health; pi.HealthMax = msg.healthMax;
                 pi.Mana = msg.mana; pi.Sanity = msg.sanity;
