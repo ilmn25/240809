@@ -95,6 +95,7 @@ public static class GUIMain
     {
         string BuildTimeHudText()
         {
+            if (Save.Inst == null) return "Day ?, ??:??";
             return $"Day {Save.Inst.day}, {Helper.FormatTime(Save.Inst.time)}";
         }
 
@@ -123,9 +124,16 @@ public static class GUIMain
 
         int playerIndex = Control.CurrentPlayerIndex + 1;
         int slotId = Main.PlayerInfo?.Storage != null ? Main.PlayerInfo.Storage.Key + 1 : 1;
+
+        bool isControlling = PlayerSync.IsClientControlled(Main.PlayerInfo?.uid ?? "");
+        if (Helper.IsHost()) isControlling = !isControlling;
+        string controlStatus = isControlling
+            ? $"Controlling Player {playerIndex}"
+            : $"Spectating Player {playerIndex}";
+
         Main.GUIHudText.text =
             $"{BuildTimeHudText()}\n" +
-            $"Controlling Player {playerIndex} | Slot {slotId}\n" +
+            $"{controlStatus} | Slot {slotId}\n" +
             BuildTargetHudText(Main.PlayerInfo?.Target);
     }
 

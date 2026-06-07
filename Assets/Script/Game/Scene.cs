@@ -55,15 +55,37 @@ public class Scene
     {
         Gen.Initialize(Save.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
+
         foreach (PlayerInfo player in Save.Inst.players)
-        {
             player.position = spawnPosition;
-            if (player.Machine == null) Entity.SpawnFromInfo(player, false);
-            player.Machine.transform.position = spawnPosition;
-        } 
+
+        if (Helper.IsHost())
+        {
+            foreach (PlayerInfo player in Save.Inst.players)
+            {
+                if (player.Machine == null) Entity.SpawnFromInfo(player, false);
+                player.Machine.transform.position = spawnPosition;
+            }
+            _playerChunkPositionPrevious = Vector3Int.down;
+        }
+        else
+        {
+            // Remote client: PlayerSync creates the player entity.
+            // Start map generation from player 0's position so the scene loads.
+            PlayerChunkPosition = World.GetChunkCoordinate(Save.Inst.players[0].position);
+            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition, GenRange));
+            mapGenTask.Finished += (bool _) => { Busy = false; };
+            mapGenTask.Finished += (bool _) => { World.LoadWorld(); };
+            _playerChunkPositionPrevious = PlayerChunkPosition;
+        }
+
         NavMap.Initialize();
-        Control.SetPlayer(0); 
-        _playerChunkPositionPrevious = Vector3Int.down;  
+        Control.SetPlayer(0);
+        if (Helper.IsHost())
+        {
+            PlayerInfo firstPlayer = global::Save.Inst.players[0];
+            PlayerSync.HostClaimPlayer(firstPlayer.uid);
+        }
     }
     private static IEnumerator Quit(bool includePlayers)
     {     

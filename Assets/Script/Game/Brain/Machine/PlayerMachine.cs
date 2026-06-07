@@ -98,7 +98,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     {   
         Info.position = transform.position;
 
-        if (Main.PlayerInfo == Info)
+        bool blockedByOther = Helper.IsHost() && PlayerSync.IsClientControlled(Info.uid);
+
+        if (Main.PlayerInfo == Info && !blockedByOther)
         { 
             HandleInput();
             
@@ -120,7 +122,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 } 
             } 
         }
-        else if (IsCurrentState<DefaultState>()) 
+        else if (IsCurrentState<DefaultState>() && !blockedByOther) 
         { 
             // Validate current structure target if it exists
             if (Info.Target is StructureInfo && Info.ActionType is IActionType.Hit or IActionType.Dig)

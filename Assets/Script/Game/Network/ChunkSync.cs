@@ -48,7 +48,11 @@ public static class ChunkSync
         byte[] allBytes = Helper.CombineChunks(receivedSnapshotChunks, expectedSnapshotChunks);
         receivedSnapshotChunks.Clear();
         expectedSnapshotChunks = 0;
-        Scene.SwitchSave(Helper.DeserializeObject<Save>(allBytes));
+        Save received = Helper.DeserializeObject<Save>(allBytes);
+        received.id = null;
+        // Set Save.Inst immediately so World.Inst is valid during the loading sequence.
+        Save.Inst = received;
+        Scene.SwitchSave(received);
         Console.Print("Received data from host, loading in...");
     }
 }

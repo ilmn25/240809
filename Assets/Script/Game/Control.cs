@@ -83,10 +83,27 @@ public class Control
         if (Inst.SwapChar.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
+            int next;
             if (CurrentPlayerIndex == global::Save.Inst.players.Count - 1)
-                SetPlayer(0);
+                next = 0;
             else
-                SetPlayer(CurrentPlayerIndex + 1);
+                next = CurrentPlayerIndex + 1;
+            int prevIndex = CurrentPlayerIndex;
+            SetPlayer(next);
+
+            if (!Helper.IsHost())
+            {
+                // Remote client: notify PlayerSync so it claims the new player
+                PlayerSync.NotifyClientClaim(next);
+            }
+            else
+            {
+                // Host: update _playerControllers so clients see the change
+                string prevUid = global::Save.Inst.players[prevIndex].uid;
+                string newUid = global::Save.Inst.players[next].uid;
+                PlayerSync.HostReleasePlayer(prevUid);
+                PlayerSync.HostClaimPlayer(newUid);
+            }
         }
         
         if (Inst.FullScreen.KeyDown())
@@ -187,7 +204,7 @@ public class Control
             //     Info.ActionTarget = IActionTarget.Hit;
             // }
     
-            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
