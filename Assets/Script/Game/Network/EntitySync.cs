@@ -78,8 +78,14 @@ public static class EntitySync
             float animSpeedTarg = message.animSpeedTarget[i];
             bool animFace = message.animFaceTarget[i];
             Vector3 animTargetScreen = message.animTargetScreenDirs[i];
-            int animTrigger = message.animTriggers?[i] ?? 0;
-            float animNormalizedTime = message.animNormalizedTimes?[i] ?? 0f;
+            int animTrigger = 0;
+            float animNormalizedTime = 0f;
+            if (message.animTriggers != null && i < message.animTriggers.Length)
+            {
+                animTrigger = message.animTriggers[i];
+                if (message.animNormalizedTimes != null && i < message.animNormalizedTimes.Length)
+                    animNormalizedTime = message.animNormalizedTimes[i];
+            }
             bool isExist = InfoMap.TryGetValue(uid, out Info targetInfo);
             if (!isExist)
             {
