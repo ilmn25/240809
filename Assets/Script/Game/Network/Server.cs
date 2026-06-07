@@ -59,25 +59,39 @@ public static class Server
     private static void UnregisterHandlers()
     {
         NetworkClient.OnConnectedEvent -= OnClientConnected;
+        NetworkClient.OnDisconnectedEvent -= OnClientDisconnected;
         NetworkServer.OnConnectedEvent -= serverConnectedHandler;
+        NetworkServer.OnDisconnectedEvent -= PlayerSync.OnServerDisconnected;
         NetworkClient.UnregisterHandler<ServerToClientTextMessage>();
         NetworkServer.UnregisterHandler<ClientToServerTextMessage>();
         NetworkClient.UnregisterHandler<HostToClientSnapshotChunkMessage>();
         NetworkClient.UnregisterHandler<BatchEntityInfoMessage>();
+        NetworkClient.UnregisterHandler<PlayerSyncMessage>();
+        NetworkClient.UnregisterHandler<YourConnectionIdMessage>();
+        NetworkServer.UnregisterHandler<ClientToServerPlayerMessage>();
     }
 
     private static void RegisterHandlers()
     {
         if (handlersRegistered) return;
         NetworkClient.OnConnectedEvent += OnClientConnected;
+        NetworkClient.OnDisconnectedEvent += OnClientDisconnected;
         Chat.RegisterHandlers();
         ChunkSync.RegisterHandlers();
         EntitySync.RegisterHandlers();
+        PlayerSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
+        NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;
         handlersRegistered = true;
     }
 
     private static void OnClientConnected() => Console.Print("Connected to host, type any text to send.");
+
+    private static void OnClientDisconnected()
+    {
+        Console.Print("Disconnected from host, cleaning up...");
+        PlayerSync.Clear();
+    }
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)
     {
@@ -88,6 +102,10 @@ public static class Server
         ChunkSync.SendSaveChunks(conn, Save.Inst);
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
+
+        // Send authoritative player state to the new client
+        PlayerSync.SendPlayerData(conn);
+        PlayerSync.SendConnectionId(conn);
     }
 
     private static bool IsPortInUse(int port)

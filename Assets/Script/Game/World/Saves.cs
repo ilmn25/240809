@@ -44,7 +44,7 @@ public class Saves
     
     public static void LoadSave(Save save)
     {   
-        Save.Inst = save.id == null? save : Helper.FileLoad<Save>(save.Path + SaveDataFile);
+        Save.Inst = save.id == null ? save : (Helper.FileLoad<Save>(save.Path + SaveDataFile) ?? save);
         Main.PlayerInfo = Save.Inst.players[0];
     } 
 }
@@ -82,12 +82,12 @@ public class Save
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         players.Add(first);
-
-        if (gen != GenType.Abyss) return;
+ 
         PlayerInfo third = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         third.CharSprite = ID.Yuuri;
         players.Add(third);
 
+        if (gen != GenType.Abyss) return;
         PlayerInfo second = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         second.CharSprite = ID.Sheep;
         players.Add(second);

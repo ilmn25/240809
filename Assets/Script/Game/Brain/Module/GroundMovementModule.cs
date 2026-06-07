@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class GroundMovementModule : MovementModule
 {  
-     
+    public GroundMovementModule() { updateMode = UpdateMode.Everyone; }
+
     private float _speedTarget;
     private float _speedAdjust; 
     private Vector3 _previousPosition;
@@ -20,6 +21,10 @@ public class GroundMovementModule : MovementModule
     public override void Update()
     { 
         if (Info.Health <= 0) return;
+
+        // On client, only run local movement for the claimed player.
+        if (!Helper.IsHost() && !PlayerSync.IsClientControlled(Info.uid)) return;
+
         if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         
         DeltaTime = Helper.GetDeltaTime();

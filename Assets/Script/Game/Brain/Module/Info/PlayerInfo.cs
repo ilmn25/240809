@@ -78,22 +78,24 @@ public class PlayerInfo : MobInfo
 
         FaceTarget = Equipment != null || Target != null;
 
-        if (Main.PlayerInfo == this && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+        bool isSelected = Main.PlayerInfo == this;
+        bool blockedByOther = Helper.IsHost() && PlayerSync.IsClientControlled(uid);
+        // On client, only process input for the claimed player
+        bool clientNotClaimed = !Helper.IsHost() && !PlayerSync.IsClientControlled(uid);
+
+        if (isSelected && !blockedByOther && !clientNotClaimed && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
         {
             TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
-
             AimPosition = Control.MouseTarget ?
                 Control.MouseTarget.transform.position + Vector3.up * 0.55f :
                 Control.MousePosition + Vector3.up * 0.15f;
-
             if (!IsInRenderRange) return;
             SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
             HandleMovement();
         }
-        else
+        else if (!isSelected && !blockedByOther)
         {
             if (Target != null) AimPosition = Target.position;
-
             SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
         }
         SpeedTarget *= SpeedModifier;
