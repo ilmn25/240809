@@ -98,7 +98,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     {   
         Info.position = transform.position;
 
-        bool blockedByOther = Helper.IsHost() && PlayerSync.IsClientControlled(Info.uid);
+        bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(Info.uid);
 
         if (Main.PlayerInfo == Info && !blockedByOther)
         { 

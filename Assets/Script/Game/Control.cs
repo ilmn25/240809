@@ -93,8 +93,7 @@ public class Control
 
             if (!Helper.IsHost())
             {
-                // Remote client: notify PlayerSync so it claims the new player
-                PlayerSync.NotifyClientClaim(next);
+                // Remote client: do nothing — host will see our ClientToServerPlayerMessage
             }
             else
             {
