@@ -80,6 +80,7 @@ public static class Server
         ChunkSync.RegisterHandlers();
         EntitySync.RegisterHandlers();
         PlayerSync.RegisterHandlers();
+        StorageSync.RegisterHandlers();
         EffectSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
         NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;

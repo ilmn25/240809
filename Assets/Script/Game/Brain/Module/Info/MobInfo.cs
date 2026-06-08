@@ -104,7 +104,9 @@ public class MobInfo : DynamicInfo
         SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + spriteName);
         SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
         // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
-        if (Machine != null && Machine.IsCurrentState<DefaultState>())
+        // Remote clients: skip EquipSelectState because state OnUpdateState never runs (host-only),
+        // which would permanently lock the player out of DefaultState and block all interactions.
+        if (Machine != null && Machine.IsCurrentState<DefaultState>() && Helper.IsHost())
             Machine.SetState<EquipSelectState>();
     }
 }

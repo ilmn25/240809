@@ -29,11 +29,10 @@ public class Particle
         }
     }
 
-    public static void Create(Vector3 position, Particles id, bool force)
+    public static void Create(Vector3 position, Particles id, bool force, bool sync = true)
     {
-        // Host: queue for network broadcast to all clients
-        if (Helper.IsHost())
-            EffectSync.EnqueueParticle(position, id, force);
+        // Queue for network broadcast (host → batch, client → server relay)
+        if (sync) EffectSync.EnqueueParticle(position, id, force);
 
         int max = 0;
         ParticleInfo.TryGetValue(id, out max); 

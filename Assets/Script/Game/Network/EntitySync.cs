@@ -61,6 +61,10 @@ public static class EntitySync
     /// <summary>Client-side: tracks last received animation hash per uid so we know when to play a new one-shot.</summary>
     private static readonly Dictionary<string, int> _lastReceivedAnimHash = new Dictionary<string, int>();
 
+    /// <summary>Host-side: container UIDs whose storage has already been sent to clients.
+    /// Prevents redundant StorageSyncMessage on every batch tick.</summary>
+    private static readonly HashSet<string> _containerStorageSent = new HashSet<string>();
+
     private static void OnBatchEntityInfoMessageReceived(BatchEntityInfoMessage message)
     {
         if (Helper.IsHost()) return;
@@ -156,7 +160,6 @@ public static class EntitySync
         List<int> ids = new List<int>();
         List<Vector3> positions = new List<Vector3>();
         List<bool> destroyed = new List<bool>();
-        // no full Info bytes list anymore
 
         List<Vector3> animDirs = new List<Vector3>();
         List<bool> animGrounded = new List<bool>();
@@ -166,7 +169,6 @@ public static class EntitySync
         List<Vector3> animTargetScreens = new List<Vector3>();
         List<int> animTriggers = new List<int>();
         List<float> animNormalizedTimes = new List<float>();
-
         void AddAnimData(DynamicInfo dyn)
         {
             animDirs.Add(dyn.Direction);
@@ -195,6 +197,7 @@ public static class EntitySync
                 animTriggers.Add(0);
                 animNormalizedTimes.Add(0f);
             }
+
         }
 
         void AddZeroAnimData()
@@ -221,6 +224,7 @@ public static class EntitySync
                 AddAnimData(dyn);
             else
                 AddZeroAnimData();
+
         }
 
         foreach (var kv in EntityStaticLoad.ActiveEntities)
@@ -268,6 +272,23 @@ public static class EntitySync
             animTriggers = animTriggers.ToArray(),
             animNormalizedTimes = animNormalizedTimes.ToArray()
         });
+
+        // Send initial storage for NEW container entities (StorageSync only sends on modification).
+        // The batch message creates the entity on the client; storage follows immediately
+        // so Mirror's in-order delivery guarantees the entity exists when StorageSync is applied.
+        void SendContainerStorageFor(EntityMachine em)
+        {
+            if (em == null || em.Info is not ContainerInfo container || container.Storage?.List == null) return;
+            if (!_containerStorageSent.Add(container.uid)) return; // already sent once
+            NetworkServer.SendToAll(new StorageSyncMessage
+            {
+                entityUid = container.uid,
+                storageData = Helper.SerializeObject(container.Storage.List)
+            });
+        }
+        foreach (var em in EntityDynamicLoad.GetActiveEntities()) SendContainerStorageFor(em);
+        foreach (var kv in EntityStaticLoad.ActiveEntities)
+            foreach (var em in kv.Value.Item2) SendContainerStorageFor(em);
     }
 
     private static IEnumerator BatchLoop()
@@ -284,6 +305,11 @@ public static class EntitySync
     {
         if (!Helper.IsHost() || !NetworkServer.active || info == null) return;
         _pendingUnloads.Add(new PendingUnload { uid = info.uid, id = (int)info.id, pos = info.position });
+    }
+
+    public static void Clear()
+    {
+        _containerStorageSent.Clear();
     }
 
     // Single-entity handler removed; batching only.

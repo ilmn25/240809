@@ -196,23 +196,20 @@ public class Control
         else MouseTarget = null;
         
         if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
-        {
-            // if (Inst.ActionPrimary.KeyDown() && (Info.Action = MouseTarget.GetComponent<IHitBox>()) != null)
-            // {
-            //     Info.Target = MouseTarget;
-            //     Info.ActionTarget = IActionTarget.Hit;
-            // }
+        { 
     
             if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
                 {
-                    Main.PlayerInfo.Target = ((EntityMachine)action).Info;
-                    if (action is IActionSecondaryPickUp)
-                        Main.PlayerInfo.ActionType = IActionType.PickUp;
-                    else
-                        Main.PlayerInfo.ActionType = IActionType.Interact;
+                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo item)
+                    {
+                        item.OnActionSecondary(Main.PlayerInfo);
+                        PlayerSync.SetPendingDestroyUid(item.uid);
+                    }
+                    else if (action is IActionSecondaryInteract interact)
+                        interact.OnActionSecondary(Main.PlayerInfo);
                 } 
             }
         } 
