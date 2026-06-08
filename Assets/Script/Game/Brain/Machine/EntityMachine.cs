@@ -17,7 +17,12 @@ public abstract class EntityMachine : Machine, IInfoProvider
         States.Clear();
         StateCurrent = State.DefaultState;
         StatePrevious = State.DefaultState;
-        AddModule(info); 
+        AddModule(info);
+        // Track by uid so the server can find and destroy entities (e.g. client pickup relay).
+        // Deserialized Info objects (from chunk saves) may have null uid — assign one.
+        if (string.IsNullOrEmpty(info.uid))
+            info.uid = Guid.NewGuid().ToString("N");
+        Info.Dictionary[info.uid] = info;
         if (!_initialSetup)
         { 
             _initialSetup = true;
@@ -36,6 +41,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
       
     public void Unload()
     { 
+        Info.Dictionary.Remove(Info.uid);
         Info.Machine = null;
         if (Entity.StaticLoad)
         {
@@ -50,8 +56,11 @@ public abstract class EntityMachine : Machine, IInfoProvider
     public override void Update()
     {
         base.Update();
-            if (Info.Destroyed)
+        if (Info != null && Info.Destroyed)
         {
+            // Broadcast destruction to remote clients so they remove the entity too.
+            // Covers all destroy paths: ItemMachine merge stacking, BlockMachine, despawn, etc.
+            EntitySync.BroadcastEntityUnload(Info);
             Unload();
         }
     }

@@ -68,6 +68,7 @@ public class Storage
 
         public void Explode(Vector3 position)
         {
+                if (!Helper.IsHost()) return;
                 foreach (ItemSlot itemSlot in List)
                 {
                         if (itemSlot.isEmpty()) continue;
@@ -155,7 +156,8 @@ public class Storage
                         int slotID = GetEmptySlot();
                         if (slotID == -1)
                         {
-                                Entity.SpawnItem(newItemSlot, info.position);
+                                if (Helper.IsHost())
+                                    Entity.SpawnItem(newItemSlot, info.position);
                                 break;
                         }
 

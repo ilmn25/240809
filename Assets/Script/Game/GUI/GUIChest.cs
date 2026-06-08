@@ -26,7 +26,7 @@ public class GUIChest : GUIStorage
                         Storage.info.uid, Storage,
                         GUIMain.Storage.Storage.info.uid, GUIMain.Storage.Storage);
                 }
-                else
+                else if (Helper.IsHost())
                 {
                     Entity.SpawnItem(Storage.List[CurrentSlotKey], Main.PlayerInfo.position); 
                 }

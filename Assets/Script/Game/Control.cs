@@ -1,4 +1,5 @@
 using System;
+using Mirror;
 using UnityEngine;
  
 [Serializable]
@@ -132,11 +133,29 @@ public class Control
             Main.PlayerInfo.ActionType = IActionType.Hit;
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !Dialogue.Showing)
-        { 
+        {
             IActionSecondary target = GetNearestInteractable<IActionSecondaryPickUp>();
             if (target == null) return;
-            Main.PlayerInfo.Target = ((EntityMachine)target).Info;   
-            Main.PlayerInfo.ActionType = IActionType.PickUp;
+            var info = ((EntityMachine)target).Info;
+
+            if (Helper.IsHost())
+            {
+                // Host: state machine handles pathfinding + pickup via MobChaseAction
+                Main.PlayerInfo.Target = info;
+                Main.PlayerInfo.ActionType = IActionType.PickUp;
+            }
+            else if (NetworkClient.isConnected && info is ItemInfo item)
+            {
+                // Client: pick up immediately (range check inside OnActionSecondary)
+                item.OnActionSecondary(Main.PlayerInfo);
+                PlayerSync.SetPendingDestroyUid(item.uid);
+                // Play equip animation (MobChaseAction → EquipSelectState doesn't run on clients)
+                if (Main.PlayerInfo.Animator != null)
+                {
+                    Main.PlayerInfo.Animator.speed = 1f;
+                    Main.PlayerInfo.Animator.Play("EquipSelect", 0, 0f);
+                }
+            }
         }
         // else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
         // { 
