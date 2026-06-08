@@ -124,6 +124,8 @@ public class Environment
 
     public static void Update() 
     {
+        if (Save.Inst == null) return;
+
         if (Target == EnvironmentType.Null)
             SetTarget(Weather);
         else
