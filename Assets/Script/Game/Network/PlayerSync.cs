@@ -80,7 +80,8 @@ public static class PlayerSync
 
     /// <summary>Host: uid → connectionId. Free = no entry / -1, host = 0, remote = ≥1.
     /// Client: same, populated from broadcast.</summary>
-    private static readonly Dictionary<string, int> _playerControllers = new Dictionary<string, int>();
+    internal static readonly Dictionary<string, int> PlayerControllers = new Dictionary<string, int>();
+    private static Dictionary<string, int> _playerControllers => PlayerControllers;
 
     /// <summary>Client: my own connection ID (set by host on connect). -1 until set.</summary>
     public static int MyConnectionId => _myConnectionId;
@@ -96,7 +97,6 @@ public static class PlayerSync
 
     /// <summary>Client sets this when picking up an item; batch loop reads and clears it.</summary>
     private static string _pendingDestroyUid = "";
-
     public static void SetPendingDestroyUid(string uid) { _pendingDestroyUid = uid; }
 
     private class PendingUnload { public string uid; public int id; public Vector3 pos; }
@@ -525,6 +525,13 @@ public static class PlayerSync
         {
             _pendingForwardAnimTriggers[targetPlayer.uid] = msg.animTrigger;
             _pendingForwardAnimTimes[targetPlayer.uid] = msg.animNormalizedTime;
+            // Host client ignores PlayerSync broadcast (Helper.IsHost return),
+            // so apply the animation directly here for the host's visual.
+            if (Helper.IsHost() && targetPlayer.Animator != null && targetPlayer.Animator.isActiveAndEnabled)
+            {
+                targetPlayer.Animator.speed = 1f;
+                targetPlayer.Animator.Play(msg.animTrigger, 0, msg.animNormalizedTime);
+            }
         }
     }
 

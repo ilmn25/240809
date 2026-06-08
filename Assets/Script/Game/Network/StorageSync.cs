@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Mirror;
+using UnityEngine;
 
 /// <summary>
 /// Unified, immediate storage sync.  Removes storage from the 25 ms batch loops
@@ -28,7 +29,6 @@ public static class StorageSync
         NetworkServer.ReplaceHandler<StorageSyncMessage>(OnServerStorageSync, false);
         // Host → Client (immediate broadcast)
         NetworkClient.ReplaceHandler<StorageSyncMessage>(OnClientStorageSync, false);
-
         // Auto-sync any storage modification via Storage.OnChanged
         Storage.OnChanged += OnStorageChanged;
     }
@@ -96,8 +96,6 @@ public static class StorageSync
             NetworkClient.Send(msg);
         }
     }
-
-    // ── Host handler ──────────────────────────────────────────────
 
     /// <summary>Subscribed to Storage.OnChanged — auto-syncs any storage modification.</summary>
     private static void OnStorageChanged(Storage storage)

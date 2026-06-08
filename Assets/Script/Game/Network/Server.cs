@@ -67,6 +67,7 @@ public static class Server
         NetworkClient.UnregisterHandler<HostToClientSnapshotChunkMessage>();
         NetworkClient.UnregisterHandler<BatchEntityInfoMessage>();
         NetworkClient.UnregisterHandler<PlayerSyncMessage>();
+        DropSync.UnregisterHandlers();
         NetworkClient.UnregisterHandler<YourConnectionIdMessage>();
         NetworkServer.UnregisterHandler<ClientToServerPlayerMessage>();
     }
@@ -81,6 +82,7 @@ public static class Server
         EntitySync.RegisterHandlers();
         PlayerSync.RegisterHandlers();
         StorageSync.RegisterHandlers();
+        DropSync.RegisterHandlers();
         EffectSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
         NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;

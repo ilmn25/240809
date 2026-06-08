@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 public class Inventory 
@@ -41,14 +42,31 @@ public class Inventory
     { 
         if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
         {
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Helper.IsHost())
             {
-                Entity.SpawnItem(CurrentItem, Main.Player.transform.position); 
+                // Host: spawn locally + sync storage
+                if (Input.GetKey(KeyCode.LeftControl))
+                    Entity.SpawnItem(CurrentItem, Main.Player.transform.position);
+                else
+                    Entity.SpawnItem(CurrentItem, Main.Player.transform.position, amount: 1);
+                Main.PlayerInfo.Storage.NotifyChanged();
             }
-            else
+            else if (NetworkClient.isConnected)
             {
-                Entity.SpawnItem(CurrentItem, Main.Player.transform.position, amount : 1); 
-            } 
+                // Client: modify local storage, then tell the server to spawn the world entity.
+                // Storage.OnChanged → StorageSync.Send() broadcasts the storage change.
+                int dropAmount = Input.GetKey(KeyCode.LeftControl) ? CurrentItem.Stack : 1;
+                ID itemID = CurrentItem.ID;
+                CurrentItem.Stack -= dropAmount;
+                if (CurrentItem.Stack <= 0) CurrentItem.clear();
+                Main.PlayerInfo.Storage.NotifyChanged();
+                NetworkClient.Send(new ClientDropItemMessage
+                {
+                    itemID = itemID,
+                    count = dropAmount,
+                    position = Main.PlayerInfo.position
+                });
+            }
             RefreshInventory();
         }
 

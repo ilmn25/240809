@@ -104,10 +104,16 @@ public static class EntitySync
             }
             if (destroyed)
             {
-                ((EntityMachine)targetInfo.Machine).Unload();
+                if (targetInfo.Machine != null)
+                    ((EntityMachine)targetInfo.Machine).Unload();
                 InfoMap.Remove(uid);
                 continue;
             }
+
+            // Entity might have been destroyed locally (pickup via F/right-click in client-authoritative mode).
+            // If Machine was nulled by Unload(), just skip — the server will broadcast the destroy soon.
+            if (targetInfo.Machine == null)
+                continue;
 
             // Update minimal authoritative fields
             targetInfo.position = pos;
@@ -216,7 +222,9 @@ public static class EntitySync
         {
             if (em == null) continue;
             uids.Add(em.Info.uid);
-            ids.Add((int)em.Info.id);
+            // For items, send the actual item ID (e.g. ID.Log) instead of the generic ID.ItemPrefab
+            // so the client can reconstruct the ItemInfo with a proper ItemSlot.
+            ids.Add((int)(em.Info is ItemInfo { item: not null } ii ? ii.item.ID : em.Info.id));
             positions.Add(em.Info.position);
             destroyed.Add(em.Info.Destroyed);
 
@@ -225,23 +233,6 @@ public static class EntitySync
             else
                 AddZeroAnimData();
 
-        }
-
-        foreach (var kv in EntityStaticLoad.ActiveEntities)
-        {
-            foreach (var em in kv.Value.Item2)
-            {
-                if (em == null) continue;
-                uids.Add(em.Info.uid);
-                ids.Add((int)em.Info.id);
-                positions.Add(em.Info.position);
-                destroyed.Add(em.Info.Destroyed);
-
-                if (em.Info is DynamicInfo dyn)
-                    AddAnimData(dyn);
-                else
-                    AddZeroAnimData();
-            }
         }
 
         if (uids.Count == 0) return;
