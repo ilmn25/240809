@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+
+// ── Message structs ─────────────────────────────────────────────────────
 
 /// <summary>
 /// Host broadcasts all players.  Client sends its controlled player.
@@ -68,6 +71,8 @@ public struct ClientToServerPlayerMessage : NetworkMessage
 
 public static class PlayerSync
 {
+    #region Fields
+
     public static readonly Dictionary<string, Info> InfoMap = new Dictionary<string, Info>();
     public static float BroadcastInterval = 0.025f;
     public static float ClientSendInterval => BroadcastInterval;
@@ -78,7 +83,6 @@ public static class PlayerSync
 
     /// <summary>Client: my own connection ID (set by host on connect). -1 until set.</summary>
     private static int _myConnectionId = -1;
-
     private static bool _clientSceneInitialized = false;
 
     /// <summary>Client-side: tracks last received animation hash per player uid.</summary>
@@ -87,6 +91,17 @@ public static class PlayerSync
     /// <summary>Host-side: remote client anim triggers queued for forwarding in next broadcast.</summary>
     private static readonly Dictionary<string, int> _pendingForwardAnimTriggers = new Dictionary<string, int>();
     private static readonly Dictionary<string, float> _pendingForwardAnimTimes = new Dictionary<string, float>();
+
+    private class PendingUnload { public string uid; public int id; public Vector3 pos; }
+    private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Controller queries
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Controller Queries
 
     /// <summary>Host-side: is this player controlled by a remote client? (host skips input/movement for those)</summary>
     public static bool IsClaimedByRemoteClient(string uid)
@@ -120,8 +135,13 @@ public static class PlayerSync
             _playerControllers.Remove(uid);
     }
 
-    private class PendingUnload { public string uid; public int id; public Vector3 pos; }
-    private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Registration & connection management
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Registration
 
     public static void RegisterHandlers()
     {
@@ -135,14 +155,34 @@ public static class PlayerSync
         }
     }
 
-    // ── Host sends all players ─────────────────────────────────────
-
     /// <summary>Host sends a client its own connectionId so it can check the broadcast.</summary>
     public static void SendConnectionId(NetworkConnectionToClient conn)
     {
         if (!NetworkServer.active || conn == null) return;
         conn.Send(new YourConnectionIdMessage { connectionId = conn.connectionId });
     }
+
+    /// <summary>Clean up when a remote client disconnects.</summary>
+    public static void OnServerDisconnected(NetworkConnectionToClient conn)
+    {
+        if (!NetworkServer.active || conn == null) return;
+        string oldUid = null;
+        foreach (var kv in _playerControllers)
+            if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
+        if (oldUid != null)
+        {
+            Console.Print($"Client {conn.connectionId} disconnected, released player {oldUid}");
+            _playerControllers.Remove(oldUid);
+        }
+    }
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Host: send
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Host Send
 
     public static void BroadcastPlayerUnload(Info info)
     {
@@ -166,23 +206,7 @@ public static class PlayerSync
         byte[] storageBytes = !destroyed && player.Storage?.List != null
             ? Helper.SerializeObject(player.Storage.List) : null;
 
-        // For remote clients: use pending trigger queued from ClientToServerPlayerMessage.
-        // For host-controlled: read directly from Animator.
-        int animTrigger = 0;
-        float animNormalizedTime = 0f;
-        if (!destroyed && _pendingForwardAnimTriggers.TryGetValue(player.uid, out int pendingTrigger))
-        {
-            animTrigger = pendingTrigger;
-            animNormalizedTime = _pendingForwardAnimTimes.GetValueOrDefault(player.uid, 0f);
-            _pendingForwardAnimTriggers.Remove(player.uid);
-            _pendingForwardAnimTimes.Remove(player.uid);
-        }
-        else if (!destroyed && player.Animator != null && player.Animator.isActiveAndEnabled)
-        {
-            AnimatorStateInfo state = player.Animator.GetCurrentAnimatorStateInfo(0);
-            animTrigger = state.shortNameHash;
-            animNormalizedTime = state.normalizedTime;
-        }
+        var (animTrigger, animNormalizedTime) = ResolveAnimState(player, destroyed);
 
         return new PlayerSyncMessage
         {
@@ -205,6 +229,36 @@ public static class PlayerSync
         };
     }
 
+    /// <summary>
+    /// For remote clients: use pending trigger queued from ClientToServerPlayerMessage.
+    /// For host-controlled: read directly from Animator.
+    /// </summary>
+    private static (int trigger, float time) ResolveAnimState(PlayerInfo player, bool destroyed)
+    {
+        if (destroyed) return (0, 0f);
+
+        if (_pendingForwardAnimTriggers.TryGetValue(player.uid, out int pendingTrigger))
+        {
+            float time = _pendingForwardAnimTimes.GetValueOrDefault(player.uid, 0f);
+            _pendingForwardAnimTriggers.Remove(player.uid);
+            _pendingForwardAnimTimes.Remove(player.uid);
+            return (pendingTrigger, time);
+        }
+
+        return ReadAnimatorState(player);
+    }
+
+    /// <summary>Read current Animator shortNameHash and normalizedTime.</summary>
+    private static (int trigger, float time) ReadAnimatorState(PlayerInfo player)
+    {
+        if (player.Animator != null && player.Animator.isActiveAndEnabled)
+        {
+            AnimatorStateInfo state = player.Animator.GetCurrentAnimatorStateInfo(0);
+            return (state.shortNameHash, state.normalizedTime);
+        }
+        return (0, 0f);
+    }
+
     private static void SendPlayerBatch()
     {
         if (!NetworkServer.active || Save.Inst == null) return;
@@ -225,115 +279,20 @@ public static class PlayerSync
         while (true) { yield return new WaitForSeconds(BroadcastInterval); if (NetworkServer.active) SendPlayerBatch(); }
     }
 
-    // ── Client receives its connection ID from host ────────────────
+    #endregion
 
-    private static void OnYourConnectionIdReceived(YourConnectionIdMessage msg)
-    {
-        _myConnectionId = msg.connectionId;
-    }
+    // ═══════════════════════════════════════════════════════════════
+    //  Client: send
+    // ═══════════════════════════════════════════════════════════════
 
-    // ── Client receives host broadcast ─────────────────────────────
-
-    private static void OnPlayerSyncMessageReceived(PlayerSyncMessage msg)
-    {
-        if (Helper.IsHost()) return;
-
-        if (Save.Inst == null) return;
-        if (Scene.Busy) return;
-
-        if (msg.destroyed)
-        {
-            _playerControllers.Remove(msg.uid);
-            if (InfoMap.TryGetValue(msg.uid, out Info dead))
-            {
-                EntitySync.InfoMap.Remove(msg.uid);
-                if (dead.Machine != null) ((EntityMachine)dead.Machine).Unload();
-                InfoMap.Remove(msg.uid);
-            }
-            return;
-        }
-
-        // Track who controls this player from the broadcast (used by CanLocalClientControl)
-        _playerControllers[msg.uid] = msg.controllingClientId;
-
-        if (!InfoMap.TryGetValue(msg.uid, out Info existing))
-        {
-            PlayerInfo pi = (Save.Inst != null && msg.playerIndex >= 0 && msg.playerIndex < Save.Inst.players.Count)
-                ? Save.Inst.players[msg.playerIndex]
-                : (PlayerInfo)Entity.CreateInfo((ID)msg.id, msg.position);
-            pi.uid = msg.uid; pi.position = msg.position;
-            CopyAll(pi, msg);
-            InfoMap[msg.uid] = pi;
-
-            if (pi.Machine == null)
-                Entity.SpawnFromInfo(pi, true);
-            else
-                pi.Machine.transform.position = msg.position;
-
-            if (msg.playerIndex == 0 && (Main.PlayerInfo == null || Main.PlayerInfo.Machine == null))
-                Main.PlayerInfo = pi;
-
-            EntitySync.InfoMap[msg.uid] = pi;
-        }
-        else if (existing is PlayerInfo pi)
-        {
-            if (CanLocalClientControl(msg.uid))
-            {
-                pi.Health = msg.health; pi.HealthMax = msg.healthMax;
-                pi.Mana = msg.mana; pi.Sanity = msg.sanity;
-                pi.Hunger = msg.hunger; pi.HungerMax = msg.hungerMax;
-                pi.Stamina = msg.stamina;
-                pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
-                pi.CharSprite = (ID)msg.charSprite;
-                CopyStorage(pi, msg);
-            }
-            else
-            {
-                pi.position = msg.position;
-                CopyAll(pi, msg);
-                if (pi.Machine != null) pi.Machine.transform.position = msg.position;
-            }
-        }
-
-        // Apply one-shot animation trigger if hash changed
-        if (msg.animTrigger != 0 && existing is PlayerInfo piAnim)
-        {
-            int prevHash = _lastPlayerAnimHash.GetValueOrDefault(msg.uid, 0);
-            if (msg.animTrigger != prevHash && piAnim.Animator != null && piAnim.Animator.isActiveAndEnabled)
-            {
-                piAnim.Animator.Play(msg.animTrigger, 0, msg.animNormalizedTime);
-            }
-            _lastPlayerAnimHash[msg.uid] = msg.animTrigger;
-        }
-        else
-        {
-            _lastPlayerAnimHash.Remove(msg.uid);
-        }
-
-        // Remote client: ensure scene is active after the world has loaded.
-        if (!_clientSceneInitialized && msg.playerIndex == 0 && !Scene.Busy)
-        {
-            _clientSceneInitialized = true;
-            Main.SceneMode = SceneMode.Game;
-            Environment.Target = EnvironmentType.Null;
-        }
-    }
-
-    // ── Client sends its controlled player to host ─────────────────
+    #region Client Send
 
     private static void SendClientPlayerBatch()
     {
         if (Helper.IsHost() || !NetworkClient.isConnected || Main.PlayerInfo?.Machine == null) return;
 
         var p = Main.PlayerInfo;
-        int animTrigger = 0;
-        float animNormalizedTime = 0f;
-        if (p.Animator != null && p.Animator.isActiveAndEnabled)
-        {
-            AnimatorStateInfo state = p.Animator.GetCurrentAnimatorStateInfo(0);
-            animTrigger = state.shortNameHash;
-            animNormalizedTime = state.normalizedTime;
-        }
+        var (animTrigger, animNormalizedTime) = ReadAnimatorState(p);
         NetworkClient.Send(new ClientToServerPlayerMessage
         {
             playerIndex = Control.CurrentPlayerIndex,
@@ -358,70 +317,210 @@ public static class PlayerSync
         while (true) { yield return new WaitForSeconds(ClientSendInterval); if (NetworkClient.isConnected) SendClientPlayerBatch(); }
     }
 
-    /// <summary>Clean up when a remote client disconnects.</summary>
-    public static void OnServerDisconnected(NetworkConnectionToClient conn)
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Client: receive (handlers run on remote clients only)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Client Receive
+
+    private static void OnYourConnectionIdReceived(YourConnectionIdMessage msg)
     {
-        if (!NetworkServer.active || conn == null) return;
-        string oldUid = null;
-        foreach (var kv in _playerControllers)
-            if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
-        if (oldUid != null)
+        _myConnectionId = msg.connectionId;
+    }
+
+    private static void OnPlayerSyncMessageReceived(PlayerSyncMessage msg)
+    {
+        if (Helper.IsHost()) return;
+        if (Save.Inst == null || Scene.Busy) return;
+
+        if (msg.destroyed)
         {
-            Console.Print($"Client {conn.connectionId} disconnected, released player {oldUid}");
-            _playerControllers.Remove(oldUid);
+            HandleDestroyedPlayer(msg);
+            return;
+        }
+
+        _playerControllers[msg.uid] = msg.controllingClientId;
+
+        if (!InfoMap.TryGetValue(msg.uid, out Info existing))
+            HandleNewPlayer(msg);
+        else if (existing is PlayerInfo pi)
+            HandleExistingPlayer(msg, pi);
+
+        HandleAnimationTrigger(msg, existing);
+        TryInitializeScene(msg);
+    }
+
+    private static void HandleDestroyedPlayer(PlayerSyncMessage msg)
+    {
+        _playerControllers.Remove(msg.uid);
+        if (InfoMap.TryGetValue(msg.uid, out Info dead))
+        {
+            EntitySync.InfoMap.Remove(msg.uid);
+            if (dead.Machine != null) ((EntityMachine)dead.Machine).Unload();
+            InfoMap.Remove(msg.uid);
         }
     }
 
-    // ── Host receives client's claim / state ───────────────────────
+    private static void HandleNewPlayer(PlayerSyncMessage msg)
+    {
+        PlayerInfo pi = (Save.Inst != null && msg.playerIndex >= 0 && msg.playerIndex < Save.Inst.players.Count)
+            ? Save.Inst.players[msg.playerIndex]
+            : (PlayerInfo)Entity.CreateInfo((ID)msg.id, msg.position);
+        pi.uid = msg.uid;
+        pi.position = msg.position;
+        CopyAll(pi, msg);
+        InfoMap[msg.uid] = pi;
+
+        if (pi.Machine == null)
+            Entity.SpawnFromInfo(pi, true);
+        else
+            pi.Machine.transform.position = msg.position;
+
+        if (msg.playerIndex == 0 && (Main.PlayerInfo == null || Main.PlayerInfo.Machine == null))
+            Main.PlayerInfo = pi;
+
+        EntitySync.InfoMap[msg.uid] = pi;
+    }
+
+    private static void HandleExistingPlayer(PlayerSyncMessage msg, PlayerInfo pi)
+    {
+        if (CanLocalClientControl(msg.uid))
+        {
+            // Local player: only sync server-authoritative fields (stats, storage)
+            pi.Health = msg.health; pi.HealthMax = msg.healthMax;
+            pi.Mana = msg.mana; pi.Sanity = msg.sanity;
+            pi.Hunger = msg.hunger; pi.HungerMax = msg.hungerMax;
+            pi.Stamina = msg.stamina;
+            pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
+            pi.CharSprite = (ID)msg.charSprite;
+            CopyStorage(pi, msg);
+        }
+        else
+        {
+            // Remote player: full state sync
+            pi.position = msg.position;
+            CopyAll(pi, msg);
+            if (pi.Machine != null) pi.Machine.transform.position = msg.position;
+        }
+    }
+
+    private static void HandleAnimationTrigger(PlayerSyncMessage msg, Info existing)
+    {
+        if (msg.animTrigger != 0 && existing is PlayerInfo piAnim)
+        {
+            int prevHash = _lastPlayerAnimHash.GetValueOrDefault(msg.uid, 0);
+            if (msg.animTrigger != prevHash && piAnim.Animator != null && piAnim.Animator.isActiveAndEnabled)
+            {
+                piAnim.Animator.Play(msg.animTrigger, 0, msg.animNormalizedTime);
+            }
+            _lastPlayerAnimHash[msg.uid] = msg.animTrigger;
+        }
+        else
+        {
+            _lastPlayerAnimHash.Remove(msg.uid);
+        }
+    }
+
+    /// <summary>Remote client: ensure scene is active after the world has loaded.</summary>
+    private static void TryInitializeScene(PlayerSyncMessage msg)
+    {
+        if (!_clientSceneInitialized && msg.playerIndex == 0 && !Scene.Busy)
+        {
+            _clientSceneInitialized = true;
+            Main.SceneMode = SceneMode.Game;
+            Environment.Target = EnvironmentType.Null;
+        }
+    }
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Host: receive (handlers run on host only)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Host Receive
 
     private static void OnClientToServerPlayerMessageReceived(NetworkConnectionToClient _, ClientToServerPlayerMessage msg)
     {
         if (!NetworkServer.active || Save.Inst == null) return;
+        if (msg.playerIndex < 0 || msg.playerIndex >= Save.Inst.players.Count) return;
 
-        if (msg.playerIndex >= 0 && msg.playerIndex < Save.Inst.players.Count)
+        PlayerInfo targetPlayer = Save.Inst.players[msg.playerIndex];
+        if (targetPlayer.Machine == null) return;
+
+        if (!TryClaimPlayer(_, targetPlayer)) return;
+
+        ApplyClientState(targetPlayer, msg);
+        QueueForwardAnim(targetPlayer, msg);
+
+        // If the host is spectating a player that just became free, auto-claim it
+        TryHostClaimCurrentPlayer();
+    }
+
+    /// <summary>If the host's current player is unclaimed, claim it so clients don't think it's free.</summary>
+    private static void TryHostClaimCurrentPlayer()
+    {
+        if (!Helper.IsHost() || Main.PlayerInfo == null) return;
+        string currentUid = Main.PlayerInfo.uid;
+        int owner = _playerControllers.GetValueOrDefault(currentUid, -1);
+        if (owner == -1)
+            HostClaimPlayer(currentUid);
+    }
+
+    /// <summary>Claim the player if free; returns false if another connection already controls it.</summary>
+    private static bool TryClaimPlayer(NetworkConnectionToClient conn, PlayerInfo targetPlayer)
+    {
+        int currentOwner = _playerControllers.GetValueOrDefault(targetPlayer.uid, -1);
+        if (currentOwner != -1 && currentOwner != conn.connectionId)
+            return false;
+
+        if (currentOwner == -1)
         {
-            PlayerInfo targetPlayer = Save.Inst.players[msg.playerIndex];
-            if (targetPlayer.Machine == null) return;
+            // Release any previous claim from this connection
+            string oldUid = null;
+            foreach (var kv in _playerControllers)
+                if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
+            if (oldUid != null) _playerControllers.Remove(oldUid);
 
-            // Only take control if the player is free (-1) or already ours
-            int currentOwner = _playerControllers.GetValueOrDefault(targetPlayer.uid, -1);
-            if (currentOwner != -1 && currentOwner != _.connectionId) return;
+            _playerControllers[targetPlayer.uid] = conn.connectionId;
+        }
+        return true;
+    }
 
-            if (currentOwner == -1)
-            {
-                // Claim the free player: release any previous claim from this connection
-                string oldUid = null;
-                foreach (var kv in _playerControllers)
-                    if (kv.Value == _.connectionId) { oldUid = kv.Key; break; }
-                if (oldUid != null) _playerControllers.Remove(oldUid);
+    private static void ApplyClientState(PlayerInfo targetPlayer, ClientToServerPlayerMessage msg)
+    {
+        targetPlayer.position = msg.position;
+        targetPlayer.Machine.transform.position = msg.position;
+        targetPlayer.Direction = msg.direction;
+        targetPlayer.IsGrounded = msg.isGrounded;
+        targetPlayer.SpeedCurrent = msg.speedCurrent;
+        targetPlayer.SpeedTarget = msg.speedTarget;
+        targetPlayer.FaceTarget = msg.faceTarget;
+        targetPlayer.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
+        targetPlayer.AimPosition = msg.aimPosition;
+        Info.Dictionary.TryGetValue(msg.targetUid, out Info t);
+        targetPlayer.Target = t;
+        targetPlayer.ActionType = (IActionType)msg.actionType;
+    }
 
-                _playerControllers[targetPlayer.uid] = _.connectionId;
-            }
-
-            // Always apply the client's state
-            targetPlayer.position = msg.position;
-            targetPlayer.Machine.transform.position = msg.position;
-            targetPlayer.Direction = msg.direction;
-            targetPlayer.IsGrounded = msg.isGrounded;
-            targetPlayer.SpeedCurrent = msg.speedCurrent;
-            targetPlayer.SpeedTarget = msg.speedTarget;
-            targetPlayer.FaceTarget = msg.faceTarget;
-            targetPlayer.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
-            targetPlayer.AimPosition = msg.aimPosition;
-            Info.Dictionary.TryGetValue(msg.targetUid, out Info t);
-            targetPlayer.Target = t;
-            targetPlayer.ActionType = (IActionType)msg.actionType;
-
-            // Queue anim trigger for forwarding in host's next broadcast
-            if (msg.animTrigger != 0)
-            {
-                _pendingForwardAnimTriggers[targetPlayer.uid] = msg.animTrigger;
-                _pendingForwardAnimTimes[targetPlayer.uid] = msg.animNormalizedTime;
-            }
+    private static void QueueForwardAnim(PlayerInfo targetPlayer, ClientToServerPlayerMessage msg)
+    {
+        if (msg.animTrigger != 0)
+        {
+            _pendingForwardAnimTriggers[targetPlayer.uid] = msg.animTrigger;
+            _pendingForwardAnimTimes[targetPlayer.uid] = msg.animNormalizedTime;
         }
     }
 
-    // ── Camera-relative helpers ────────────────────────────────────
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Helpers
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Helpers
 
     /// <summary>Convert screen-space TargetScreenDir to world-aligned (camera-independent) for network sync.</summary>
     private static Vector3 ScreenToWorldAligned(Vector3 screenDir)
@@ -446,8 +545,6 @@ public static class PlayerSync
             worldDir.x * sin + worldDir.y * cos,
             0);
     }
-
-    // ── Copy helpers ───────────────────────────────────────────────
 
     private static void CopyAll(PlayerInfo pi, PlayerSyncMessage msg)
     {
@@ -479,6 +576,14 @@ public static class PlayerSync
         else pi.SetEquipment(null);
     }
 
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    //  Cleanup
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Cleanup
+
     public static void Clear()
     {
         foreach (var kv in InfoMap)
@@ -495,4 +600,6 @@ public static class PlayerSync
         _pendingForwardAnimTriggers.Clear();
         _pendingForwardAnimTimes.Clear();
     }
+
+    #endregion
 }
