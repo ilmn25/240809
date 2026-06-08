@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 public class GUIChest : GUIStorage
@@ -14,7 +15,16 @@ public class GUIChest : GUIStorage
             {
                 if (GUIMain.Storage.Showing)
                 {
+                    // Suppress the auto-sync hook during bulk transfer
+                    Storage.SuppressSync = true;
+                    GUIMain.Storage.Storage.SuppressSync = true;
                     GUIMain.Storage.Storage.AddItem(Storage.List[CurrentSlotKey]);
+                    Storage.SuppressSync = false;
+                    GUIMain.Storage.Storage.SuppressSync = false;
+                    // Atomic two‑way transfer via StorageSync
+                    StorageSync.SendTransfer(
+                        Storage.info.uid, Storage,
+                        GUIMain.Storage.Storage.info.uid, GUIMain.Storage.Storage);
                 }
                 else
                 {
@@ -24,7 +34,16 @@ public class GUIChest : GUIStorage
             }
             else
             {
+                // Suppress the auto-sync hook during bulk transfer
+                Storage.SuppressSync = true;
+                GUIMain.StorageInv.Storage.SuppressSync = true;
                 GUIMain.StorageInv.Storage.AddItem(Storage.List[CurrentSlotKey]);
+                Storage.SuppressSync = false;
+                GUIMain.StorageInv.Storage.SuppressSync = false;
+                // Atomic two‑way transfer via StorageSync
+                StorageSync.SendTransfer(
+                    Storage.info.uid, Storage,
+                    GUIMain.StorageInv.Storage.info.uid, GUIMain.StorageInv.Storage);
                 //doesnt account for full inventory
             } 
         }
@@ -48,8 +67,9 @@ public class GUIChest : GUIStorage
         } 
         Audio.PlaySFX(SfxID.Item);
         Storage.NotifyChanged();
+        // Single‑storage sync is handled by Storage.OnChanged hook
     }
-
+    
     protected override void ActionSecondaryDown()
     {
         if (!Input.GetKey(KeyCode.LeftShift)) return;
@@ -61,20 +81,7 @@ public class GUIChest : GUIStorage
                 GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
                 Audio.PlaySFX(SfxID.Item);
                 Storage.NotifyChanged();
-            }
-        }
-    }
-
-    protected override void ActionSecondaryKey()
-    {
-        ItemSlot itemSlot = Storage.List[CurrentSlotKey];
-        if (!itemSlot.isEmpty())
-        {
-            if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
-            {
-                GUICursor.Data.Add(itemSlot, 1);
-                Audio.PlaySFX(SfxID.Item);
-                Storage.NotifyChanged();
+                // Sync is handled by Storage.OnChanged hook
             }
         }
     }

@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 public class GUICraft : GUIStorage
@@ -42,6 +43,7 @@ public class GUICraft : GUIStorage
         if (ItemRecipe.Dictionary[item.ID].Time == 0 || item.Type == ItemType.Structure)
         {
             ItemRecipe.CraftItem(item.ID);
+            SyncCraftStorage();
             return;
         }
 
@@ -50,6 +52,14 @@ public class GUICraft : GUIStorage
 
         ItemRecipe.TakeIngredients(item.ID);
         ActiveCraftInfo.Pending.Add(item.ID);
+        SyncCraftStorage();
+    }
+
+    /// <summary>Sync crafting station pool + pending queue to host (immediate).</summary>
+    private void SyncCraftStorage()
+    {
+        if (ActiveCraftInfo == null) return;
+        StorageSync.SendCraftUpdate(ActiveCraftInfo.uid, Storage, ActiveCraftInfo.Pending);
     }
 
     protected override void SetInfoPanel(ItemSlot itemSlot)

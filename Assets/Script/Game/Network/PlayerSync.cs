@@ -39,7 +39,6 @@ public struct PlayerSyncMessage : NetworkMessage
 
     public int equipmentId;
     public int equipmentDurability;
-    public byte[] storageData;
 
     public int animTrigger;
     public float animNormalizedTime;
@@ -62,12 +61,14 @@ public struct ClientToServerPlayerMessage : NetworkMessage
     public bool faceTarget;
     public Vector3 targetScreenDir;
     public Vector3 aimPosition;
-    public string targetUid;
-    public int actionType;
 
     public int animTrigger;
     public float animNormalizedTime;
+
+    public string destroyUid;        // item the client destroyed (pickup)
 }
+
+// Storage sync moved to StorageSyncMessage (see StorageSync.cs)
 
 public static class PlayerSync
 {
@@ -82,6 +83,7 @@ public static class PlayerSync
     private static readonly Dictionary<string, int> _playerControllers = new Dictionary<string, int>();
 
     /// <summary>Client: my own connection ID (set by host on connect). -1 until set.</summary>
+    public static int MyConnectionId => _myConnectionId;
     private static int _myConnectionId = -1;
     private static bool _clientSceneInitialized = false;
 
@@ -91,6 +93,11 @@ public static class PlayerSync
     /// <summary>Host-side: remote client anim triggers queued for forwarding in next broadcast.</summary>
     private static readonly Dictionary<string, int> _pendingForwardAnimTriggers = new Dictionary<string, int>();
     private static readonly Dictionary<string, float> _pendingForwardAnimTimes = new Dictionary<string, float>();
+
+    /// <summary>Client sets this when picking up an item; batch loop reads and clears it.</summary>
+    private static string _pendingDestroyUid = "";
+
+    public static void SetPendingDestroyUid(string uid) { _pendingDestroyUid = uid; }
 
     private class PendingUnload { public string uid; public int id; public Vector3 pos; }
     private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
@@ -198,14 +205,20 @@ public static class PlayerSync
             PlayerInfo player = Save.Inst.players[i];
             if (player.Machine == null) continue;
             conn.Send(BuildMessage(i, player, false));
+            // Send initial storage for this player (StorageSync only sends on modification)
+            if (player.Storage?.List != null)
+            {
+                conn.Send(new StorageSyncMessage
+                {
+                    entityUid = player.uid,
+                    storageData = Helper.SerializeObject(player.Storage.List)
+                });
+            }
         }
     }
 
     private static PlayerSyncMessage BuildMessage(int index, PlayerInfo player, bool destroyed)
     {
-        byte[] storageBytes = !destroyed && player.Storage?.List != null
-            ? Helper.SerializeObject(player.Storage.List) : null;
-
         var (animTrigger, animNormalizedTime) = ResolveAnimState(player, destroyed);
 
         return new PlayerSyncMessage
@@ -223,7 +236,6 @@ public static class PlayerSync
             charSprite = (int)player.CharSprite,
             equipmentId = player.Equipment != null ? (int)player.Equipment.ID : 0,
             equipmentDurability = player.Equipment?.Durability ?? 0,
-            storageData = storageBytes,
             animTrigger = animTrigger,
             animNormalizedTime = animNormalizedTime
         };
@@ -293,6 +305,8 @@ public static class PlayerSync
 
         var p = Main.PlayerInfo;
         var (animTrigger, animNormalizedTime) = ReadAnimatorState(p);
+        string destroyUid = _pendingDestroyUid;
+        _pendingDestroyUid = "";
         NetworkClient.Send(new ClientToServerPlayerMessage
         {
             playerIndex = Control.CurrentPlayerIndex,
@@ -305,10 +319,9 @@ public static class PlayerSync
             faceTarget = p.FaceTarget,
             targetScreenDir = ScreenToWorldAligned(p.TargetScreenDir),
             aimPosition = p.AimPosition,
-            targetUid = p.Target?.uid ?? "",
-            actionType = (int)p.ActionType,
             animTrigger = animTrigger,
-            animNormalizedTime = animNormalizedTime
+            animNormalizedTime = animNormalizedTime,
+            destroyUid = destroyUid
         });
     }
 
@@ -388,14 +401,14 @@ public static class PlayerSync
     {
         if (CanLocalClientControl(msg.uid))
         {
-            // Local player: only sync server-authoritative fields (stats, storage)
+            // Local player: only sync server-authoritative fields (stats).
+            // Inventory is client-authoritative — don't overwrite with host broadcast.
             pi.Health = msg.health; pi.HealthMax = msg.healthMax;
             pi.Mana = msg.mana; pi.Sanity = msg.sanity;
             pi.Hunger = msg.hunger; pi.HungerMax = msg.hungerMax;
             pi.Stamina = msg.stamina;
             pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
             pi.CharSprite = (ID)msg.charSprite;
-            CopyStorage(pi, msg);
         }
         else
         {
@@ -455,6 +468,10 @@ public static class PlayerSync
         ApplyClientState(targetPlayer, msg);
         QueueForwardAnim(targetPlayer, msg);
 
+        // Client-authoritative: destroy item on host (pickup)
+        if (!string.IsNullOrEmpty(msg.destroyUid) && Info.Dictionary.TryGetValue(msg.destroyUid, out Info target))
+            target.Destroy();
+
         // If the host is spectating a player that just became free, auto-claim it
         TryHostClaimCurrentPlayer();
     }
@@ -500,9 +517,6 @@ public static class PlayerSync
         targetPlayer.FaceTarget = msg.faceTarget;
         targetPlayer.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
         targetPlayer.AimPosition = msg.aimPosition;
-        Info.Dictionary.TryGetValue(msg.targetUid, out Info t);
-        targetPlayer.Target = t;
-        targetPlayer.ActionType = (IActionType)msg.actionType;
     }
 
     private static void QueueForwardAnim(PlayerInfo targetPlayer, ClientToServerPlayerMessage msg)
@@ -513,6 +527,8 @@ public static class PlayerSync
             _pendingForwardAnimTimes[targetPlayer.uid] = msg.animNormalizedTime;
         }
     }
+
+    // Storage sync moved to StorageSync (see StorageSync.cs)
 
     #endregion
 
@@ -556,25 +572,9 @@ public static class PlayerSync
         pi.Direction = msg.direction; pi.IsGrounded = msg.isGrounded;
         pi.SpeedCurrent = msg.speedCurrent; pi.SpeedTarget = msg.speedTarget;
         pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
-        pi.CharSprite = (ID)msg.charSprite;
-        CopyStorage(pi, msg);
     }
 
-    private static void CopyStorage(PlayerInfo pi, PlayerSyncMessage msg)
-    {
-        if (msg.storageData?.Length > 0 && pi.Storage != null)
-        {
-            var list = Helper.DeserializeObject<List<ItemSlot>>(msg.storageData);
-            if (list != null) pi.Storage.List = list;
-        }
-        if (msg.equipmentId > 0 && pi.Storage != null)
-        {
-            foreach (var s in pi.Storage.List)
-                if ((int)s.ID == msg.equipmentId && s.Stack > 0)
-                { s.Durability = msg.equipmentDurability; pi.SetEquipment(s); break; }
-        }
-        else pi.SetEquipment(null);
-    }
+    // CopyStorage removed — storage is now handled by StorageSync
 
     #endregion
 
@@ -599,6 +599,8 @@ public static class PlayerSync
         _lastPlayerAnimHash.Clear();
         _pendingForwardAnimTriggers.Clear();
         _pendingForwardAnimTimes.Clear();
+        EntitySync.Clear();
+        StorageSync.Clear();
     }
 
     #endregion

@@ -16,6 +16,12 @@ public class Storage
 
         // when true, AddItem/RemoveItem won't trigger Inventory.RefreshInventory
         [NonSerialized] public bool SuppressRefresh;
+        // when true, Storage.NotifyChanged won't fire Storage.OnChanged (used during bulk transfers)
+        [NonSerialized] public bool SuppressSync;
+
+        /// <summary>Fires when the storage contents change.  StorageSync subscribes to this
+        /// to immediately sync inventory changes to the host.</summary>
+        public static event Action<Storage> OnChanged;
 
         public Storage()
         {
@@ -31,6 +37,7 @@ public class Storage
         }
         public void NotifyChanged()
         {
+                if (!SuppressSync) OnChanged?.Invoke(this);
                 if (info is not MobInfo mobInfo || List == null || List.Count == 0) return;
                 ItemSlot selectedSlot = List[Key];
                 mobInfo.SetEquipment(selectedSlot is { Stack: > 0 } ? selectedSlot : null);
