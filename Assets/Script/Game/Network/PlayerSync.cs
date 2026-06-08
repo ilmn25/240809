@@ -66,6 +66,8 @@ public struct ClientToServerPlayerMessage : NetworkMessage
     public float animNormalizedTime;
 
     public string destroyUid;        // item the client destroyed (pickup)
+
+    public int selectedSlot;         // inventory slot index (-1 = none) the client has selected
 }
 
 // Storage sync moved to StorageSyncMessage (see StorageSync.cs)
@@ -321,7 +323,8 @@ public static class PlayerSync
             aimPosition = p.AimPosition,
             animTrigger = animTrigger,
             animNormalizedTime = animNormalizedTime,
-            destroyUid = destroyUid
+            destroyUid = destroyUid,
+            selectedSlot = p.Storage != null ? p.Storage.Key : -1
         });
     }
 
@@ -468,6 +471,15 @@ public static class PlayerSync
         ApplyClientState(targetPlayer, msg);
         QueueForwardAnim(targetPlayer, msg);
 
+        // Client-authoritative: equipment (held item) — by slot index so the server
+        // reads the actual ItemSlot from storage, letting ReferenceEquals short-circuit.
+        // This mirrors Storage.NotifyChanged() but without its side effects.
+        var storage = targetPlayer.Storage;
+        ItemSlot equipped = storage != null && (uint)msg.selectedSlot < (uint)storage.List.Count
+            ? storage.List[msg.selectedSlot]
+            : null;
+        targetPlayer.SetEquipment(equipped is { Stack: > 0 } ? equipped : null);
+
         // Client-authoritative: destroy item on host (pickup)
         if (!string.IsNullOrEmpty(msg.destroyUid) && Info.Dictionary.TryGetValue(msg.destroyUid, out Info target))
             target.Destroy();
@@ -545,29 +557,8 @@ public static class PlayerSync
 
     #region Helpers
 
-    /// <summary>Convert screen-space TargetScreenDir to world-aligned (camera-independent) for network sync.</summary>
-    private static Vector3 ScreenToWorldAligned(Vector3 screenDir)
-    {
-        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(orbitRad);
-        float sin = Mathf.Sin(orbitRad);
-        return new Vector3(
-            screenDir.x * cos + screenDir.y * sin,
-            -screenDir.x * sin + screenDir.y * cos,
-            0);
-    }
-
-    /// <summary>Convert world-aligned TargetScreenDir back to local screen-space on receipt.</summary>
-    private static Vector3 WorldAlignedToScreen(Vector3 worldDir)
-    {
-        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(orbitRad);
-        float sin = Mathf.Sin(orbitRad);
-        return new Vector3(
-            worldDir.x * cos - worldDir.y * sin,
-            worldDir.x * sin + worldDir.y * cos,
-            0);
-    }
+    private static Vector3 ScreenToWorldAligned(Vector3 screenDir) => EntitySync.ScreenToWorldAligned(screenDir);
+    private static Vector3 WorldAlignedToScreen(Vector3 worldDir) => EntitySync.WorldAlignedToScreen(worldDir);
 
     private static void CopyAll(PlayerInfo pi, PlayerSyncMessage msg)
     {
@@ -579,9 +570,25 @@ public static class PlayerSync
         pi.Direction = msg.direction; pi.IsGrounded = msg.isGrounded;
         pi.SpeedCurrent = msg.speedCurrent; pi.SpeedTarget = msg.speedTarget;
         pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
-    }
 
-    // CopyStorage removed — storage is now handled by StorageSync
+        // Equipment sync (visual held item) — only apply when the values actually changed
+        // to avoid re-setting the sprite/position every 25ms broadcast.
+        int curId = pi.Equipment != null ? (int)pi.Equipment.ID : 0;
+        int curDur = pi.Equipment?.Durability ?? 0;
+        if (msg.equipmentId != curId || msg.equipmentDurability != curDur)
+        {
+            if (msg.equipmentId > 0)
+            {
+                var slot = new ItemSlot((ID)msg.equipmentId, 1);
+                slot.Durability = msg.equipmentDurability;
+                pi.SetEquipment(slot);
+            }
+            else
+            {
+                pi.SetEquipment(null);
+            }
+        }
+    }
 
     #endregion
 
@@ -607,7 +614,6 @@ public static class PlayerSync
         _pendingForwardAnimTriggers.Clear();
         _pendingForwardAnimTimes.Clear();
         EntitySync.Clear();
-        StorageSync.Clear();
     }
 
     #endregion

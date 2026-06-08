@@ -165,8 +165,7 @@ public static class StorageSync
         if (list != null) storage.List = list;
     }
 
-    /// <summary>Cleanup (called from PlayerSync.Clear).</summary>
-    public static void Clear() { }
+
 
     private static Info ResolveInfo(string uid)
     {

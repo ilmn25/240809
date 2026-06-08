@@ -102,13 +102,7 @@ public static class EffectSync
             sourceConnectionIds = sourceIds
         };
 
-        // Send to ALL connections (including host's local client).
-        // The receive handler filters out particles whose sourceConnectionId
-        // matches the receiving client's own connectionId.
-        foreach (var conn in NetworkServer.connections.Values)
-        {
-            conn.Send(msg);
-        }
+        NetworkServer.SendToAll(msg);
     }
 
     private static void OnServerClientParticle(NetworkConnectionToClient conn, ClientParticleMessage msg)

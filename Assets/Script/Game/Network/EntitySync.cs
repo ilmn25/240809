@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using Mirror;
 using UnityEngine;
 
@@ -25,6 +24,9 @@ public struct BatchEntityInfoMessage : NetworkMessage
     // One-shot animation trigger (shortNameHash of current Animator state, 0 = none)
     public int[] animTriggers;
     public float[] animNormalizedTimes;
+
+    // Item stack count (0 = not an item / no stack)
+    public int[] itemAmounts;
 }
 
 public static class EntitySync
@@ -32,17 +34,6 @@ public static class EntitySync
     public static readonly Dictionary<string, Info> InfoMap = new Dictionary<string, Info>();
     // batch send interval
     public static float BroadcastInterval = 0.025f;
-
-    [System.Serializable]
-    private struct AnimationState
-    {
-        public Vector3 Direction;
-        public bool IsGrounded;
-        public float SpeedCurrent;
-        public float SpeedTarget;
-        public bool FaceTarget;
-        public Vector3 TargetScreenDir;
-    }
 
     public static void RegisterHandlers()
     {
@@ -97,6 +88,14 @@ public static class EntitySync
                 Info info = Entity.CreateInfo((ID)id, pos);
                 info.uid = uid;
                 info.position = pos;
+                // Ensure ItemInfo has a valid item slot (batch sends item ID but CreateInfo
+                // may leave item null if the ID is in Entity.Dictionary)
+                if (info is ItemInfo itemInfo && (itemInfo.item == null || itemInfo.item.ID == ID.Null))
+                {
+                    itemInfo.item = new ItemSlot((ID)id);
+                    if (message.itemAmounts != null && i < message.itemAmounts.Length && message.itemAmounts[i] > 1)
+                        itemInfo.item.Stack = message.itemAmounts[i];
+                }
                 InfoMap[uid] = info;
                 Entity.SpawnFromInfo(info, true);
                 isExist = true;
@@ -127,14 +126,7 @@ public static class EntitySync
                 dyn.IsGrounded = animGrounded;
                 dyn.SpeedCurrent = animSpeedCurr;
                 dyn.SpeedTarget = animSpeedTarg;
-                // Convert TargetScreenDir from world-aligned back to local screen-space
-                float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
-                float cos = Mathf.Cos(orbitRad);
-                float sin = Mathf.Sin(orbitRad);
-                dyn.TargetScreenDir = new Vector3(
-                    animTargetScreen.x * cos - animTargetScreen.y * sin,
-                    animTargetScreen.x * sin + animTargetScreen.y * cos,
-                    0);
+                dyn.TargetScreenDir = WorldAlignedToScreen(animTargetScreen);
             }
             if (targetInfo is MobInfo mob)
             {
@@ -175,6 +167,7 @@ public static class EntitySync
         List<Vector3> animTargetScreens = new List<Vector3>();
         List<int> animTriggers = new List<int>();
         List<float> animNormalizedTimes = new List<float>();
+        List<int> itemAmounts = new List<int>();
         void AddAnimData(DynamicInfo dyn)
         {
             animDirs.Add(dyn.Direction);
@@ -182,15 +175,7 @@ public static class EntitySync
             animSpeedCurr.Add(dyn.SpeedCurrent);
             animSpeedTarg.Add(dyn.SpeedTarget);
             animFace.Add((dyn is MobInfo mob) ? mob.FaceTarget : false);
-            // Convert screen-space TargetScreenDir to world-aligned before syncing
-            Vector3 localDir = dyn.TargetScreenDir;
-            float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
-            float cos = Mathf.Cos(-orbitRad);
-            float sin = Mathf.Sin(-orbitRad);
-            animTargetScreens.Add(new Vector3(
-                localDir.x * cos - localDir.y * sin,
-                localDir.x * sin + localDir.y * cos,
-                0));
+            animTargetScreens.Add(ScreenToWorldAligned(dyn.TargetScreenDir));
             // Read current Animator state for one-shot detection
             if (dyn.Animator != null && dyn.Animator.isActiveAndEnabled)
             {
@@ -227,6 +212,7 @@ public static class EntitySync
             ids.Add((int)(em.Info is ItemInfo { item: not null } ii ? ii.item.ID : em.Info.id));
             positions.Add(em.Info.position);
             destroyed.Add(em.Info.Destroyed);
+            itemAmounts.Add(em.Info is ItemInfo { item: not null } ia ? ia.item.Stack : 0);
 
             if (em.Info is DynamicInfo dyn)
                 AddAnimData(dyn);
@@ -235,18 +221,20 @@ public static class EntitySync
 
         }
 
-        if (uids.Count == 0) return;
-
-        // append pending unloads
+        // append pending unloads (processed BEFORE the empty check so that
+        // the last entity's destroy is always broadcast to clients)
         foreach (var pu in _pendingUnloads)
         {
             uids.Add(pu.uid);
             ids.Add(pu.id);
             positions.Add(pu.pos);
             destroyed.Add(true);
+            itemAmounts.Add(0);
             AddZeroAnimData();
         }
         _pendingUnloads.Clear();
+
+        if (uids.Count == 0) return;
 
         NetworkServer.SendToAll(new BatchEntityInfoMessage
         {
@@ -261,7 +249,8 @@ public static class EntitySync
             animFaceTarget = animFace.ToArray(),
             animTargetScreenDirs = animTargetScreens.ToArray(),
             animTriggers = animTriggers.ToArray(),
-            animNormalizedTimes = animNormalizedTimes.ToArray()
+            animNormalizedTimes = animNormalizedTimes.ToArray(),
+            itemAmounts = itemAmounts.ToArray()
         });
 
         // Send initial storage for NEW container entities (StorageSync only sends on modification).
@@ -296,6 +285,32 @@ public static class EntitySync
     {
         if (!Helper.IsHost() || !NetworkServer.active || info == null) return;
         _pendingUnloads.Add(new PendingUnload { uid = info.uid, id = (int)info.id, pos = info.position });
+    }
+
+    // ── Shared coordinate transforms ─────────────────────────────
+
+    /// <summary>Convert screen-space direction to world-aligned (camera-independent).</summary>
+    public static Vector3 ScreenToWorldAligned(Vector3 screenDir)
+    {
+        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(orbitRad);
+        float sin = Mathf.Sin(orbitRad);
+        return new Vector3(
+            screenDir.x * cos + screenDir.y * sin,
+            -screenDir.x * sin + screenDir.y * cos,
+            0);
+    }
+
+    /// <summary>Convert world-aligned direction back to local screen-space.</summary>
+    public static Vector3 WorldAlignedToScreen(Vector3 worldDir)
+    {
+        float orbitRad = ViewPort.OrbitRotation * Mathf.Deg2Rad;
+        float cos = Mathf.Cos(orbitRad);
+        float sin = Mathf.Sin(orbitRad);
+        return new Vector3(
+            worldDir.x * cos - worldDir.y * sin,
+            worldDir.x * sin + worldDir.y * cos,
+            0);
     }
 
     public static void Clear()
