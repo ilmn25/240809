@@ -183,4 +183,9 @@ public static class StorageSync
 
         return null;
     }
+
+    public static void Clear()
+    {
+        Storage.OnChanged -= OnStorageChanged;
+    }
 }

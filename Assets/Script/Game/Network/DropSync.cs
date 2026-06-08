@@ -29,6 +29,11 @@ public static class DropSync
         _registered = false;
     }
 
+    public static void Clear()
+    {
+        _registered = false;
+    }
+
     private static void OnServerDropItem(NetworkConnectionToClient conn, ClientDropItemMessage msg)
     {
         if (!NetworkServer.active) return;

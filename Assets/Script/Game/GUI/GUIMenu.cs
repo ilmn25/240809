@@ -16,7 +16,8 @@ public class GUIMenu : GUI
         if (Main.GUIMainMenuButtonNew.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
-            Scene.SwitchSave(new Save(GenType.Abyss));  
+            Save.Inst = new Save(GenType.Abyss);
+            Server.StartHost();
             Show(false);
         }
         else if (Main.GUIMainMenuButtonLoad.IsHovered)

@@ -37,7 +37,8 @@ public class GUILoad : GUI
  
         if (Control.Inst.ActionPrimary.KeyDown() && Target != -1)
         {  
-            Scene.SwitchSave(Saves.Inst.List[Target]);
+            Saves.LoadSave(Saves.Inst.List[Target]);
+            Server.StartHost();
             Show(false); 
         } 
     }

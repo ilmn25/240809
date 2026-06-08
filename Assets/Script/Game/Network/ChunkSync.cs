@@ -53,6 +53,11 @@ public static class ChunkSync
         // Set Save.Inst immediately so World.Inst is valid during the loading sequence.
         Save.Inst = received;
         Scene.SwitchSave(received);
-        Console.Print("Received data from host, loading in...");
+    }
+
+    public static void Clear()
+    {
+        receivedSnapshotChunks.Clear();
+        expectedSnapshotChunks = 0;
     }
 }

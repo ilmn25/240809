@@ -89,12 +89,38 @@ public static class Server
         handlersRegistered = true;
     }
 
-    private static void OnClientConnected() => Console.Print("Connected to host, type any text to send.");
+    private static void OnClientConnected() => Console.Print("Connected to host");
 
     private static void OnClientDisconnected()
     {
-        Console.Print("Disconnected from host, cleaning up...");
+        Console.Print("Disconnected from host");
+
+        // Clear HUD text, then switch to menu — stops game logic updates.
+        // Environment.Update() still runs (called before the SceneMode guard in Main.Update()),
+        // so the fade continues.
+        if (Main.GUIHudText != null) Main.GUIHudText.text = "";
+        Main.SceneMode = SceneMode.Menu;
+
+        // Fade to black, then clean up players/world after it completes
+        _ = new CoroutineTask(DisconnectCleanup());
+    }
+
+    private static IEnumerator DisconnectCleanup()
+    {
+        Environment.Target = EnvironmentType.Black;
+        yield return new WaitForSeconds(2f);
+
+        ChunkSync.Clear();
+        DropSync.Clear();
+        EffectSync.Clear();
         PlayerSync.Clear();
+        StorageSync.Clear();
+        handlersRegistered = false;
+        Scene.Busy = false;
+        World.UnloadWorld();
+
+        // Reset environment so a future game doesn't stay black
+        Environment.Target = EnvironmentType.Null;
     }
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)
@@ -110,6 +136,10 @@ public static class Server
         // Send authoritative player state to the new client
         PlayerSync.SendPlayerData(conn);
         PlayerSync.SendConnectionId(conn);
+
+        // Notify all clients
+        int userId = conn.connectionId + 1;
+        NetworkServer.SendToAll(new ServerToClientTextMessage { text = $"User {userId} connected" });
     }
 
     private static bool IsPortInUse(int port)

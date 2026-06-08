@@ -90,6 +90,7 @@ public class Main : MonoBehaviour
     private void Update()
     {   
         GUIMain.UpdateMenu();
+        Environment.Update();
         if (SceneMode != SceneMode.Game || !Player) return;
         Terraform.Update();
         GUIMain.Update();
@@ -97,7 +98,6 @@ public class Main : MonoBehaviour
         Control.Update();
         MapCull.Update();
         ViewPort.Update();  
-        Environment.Update();
         MobSpawner.Update(); 
     } 
     

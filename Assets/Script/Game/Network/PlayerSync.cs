@@ -180,9 +180,15 @@ public static class PlayerSync
             if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
         if (oldUid != null)
         {
-            Console.Print($"Client {conn.connectionId} disconnected, released player {oldUid}");
+            Console.Print($"Client {conn.connectionId} disconnected");
             _playerControllers.Remove(oldUid);
         }
+
+        int userId = conn.connectionId + 1;
+        var msg = new ServerToClientTextMessage { text = $"User {userId} disconnected" };
+        foreach (var kv in NetworkServer.connections)
+            if (kv.Value != conn)
+                kv.Value.Send(msg);
     }
 
     #endregion
