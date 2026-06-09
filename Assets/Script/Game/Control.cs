@@ -121,10 +121,24 @@ public class Control
         HandleRaycast(); 
         
         HandleInput();
+
+        if (Inst.ActionPrimary.KeyDown() && !GUIMain.IsHover &&
+            Main.PlayerInfo?.Equipment?.Info.Type == ItemType.Tool &&
+            Main.PlayerInfo.Machine is EntityMachine em &&
+            (Helper.IsHost() || PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid)))
+        {
+            em.Attack();
+        }
     }
 
     private static void HandleActionButton()
     {
+        // Spectating clients cannot interact
+        if (!Helper.IsHost() && NetworkClient.isConnected &&
+            Main.PlayerInfo != null &&
+            !PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid))
+            return;
+
         if (Inst.ActionPrimaryNear.KeyDown())
         { 
             IActionPrimaryResource target = GetNearestInteractable<IActionPrimaryResource>();

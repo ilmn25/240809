@@ -1,12 +1,15 @@
 using UnityEngine;
 
 class MobHit : MobState {
+
+    public MobHit() { updateMode = global::Module.UpdateMode.Everyone; }
     
     public override void OnEnterState()
     { 
         Info.Animator.speed = 3f;  
         Info.Animator.Play("Hit", 0, 0f);   
-        ScreenShake.Shake(40f, 0.05f, 1f / 60f);
+        if (Main.PlayerInfo == Info)
+            ScreenShake.Shake(40f, 0.05f, 1f / 60f);
     }
     
     public override void OnUpdateState() {

@@ -157,7 +157,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     public override void Attack()
     {
-        if (Main.PlayerInfo != Info && !EnsureCompatibleToolForTarget())
+        if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid) && !EnsureCompatibleToolForTarget())
         {
             return;
         }
@@ -176,7 +176,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
 
         base.Attack();
-        
+
         if (Info.Equipment.Durability != -1)
         {
             Info.Equipment.Durability--;
@@ -184,8 +184,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             {
                 Info.Equipment.clear();
                 Info.SetEquipment(null);
-            } 
-        }  
+            }
+            Info.Storage.NotifyChanged();
+        }
     }
     public void OnDrawGizmos()
     {

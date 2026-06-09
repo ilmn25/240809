@@ -133,7 +133,10 @@ public static class PlayerSync
         if (!NetworkServer.active || string.IsNullOrEmpty(uid)) return;
         int owner = _playerControllers.GetValueOrDefault(uid, -1);
         if (owner == -1 || owner == 0)
+        {
             _playerControllers[uid] = 0;
+            ResetPlayerAnimatorToIdle(uid);
+        }
     }
 
     /// <summary>Host: release the player we were controlling.</summary>
@@ -141,7 +144,10 @@ public static class PlayerSync
     {
         if (!NetworkServer.active || string.IsNullOrEmpty(uid)) return;
         if (_playerControllers.GetValueOrDefault(uid, -1) == 0)
+        {
             _playerControllers.Remove(uid);
+            ResetPlayerAnimatorToIdle(uid);
+        }
     }
 
     #endregion
@@ -180,15 +186,9 @@ public static class PlayerSync
             if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
         if (oldUid != null)
         {
-            Console.Print($"Client {conn.connectionId} disconnected");
             _playerControllers.Remove(oldUid);
+            ResetPlayerAnimatorToIdle(oldUid);
         }
-
-        int userId = conn.connectionId + 1;
-        var msg = new ServerToClientTextMessage { text = $"User {userId} disconnected" };
-        foreach (var kv in NetworkServer.connections)
-            if (kv.Value != conn)
-                kv.Value.Send(msg);
     }
 
     #endregion
@@ -370,7 +370,9 @@ public static class PlayerSync
         else if (existing is PlayerInfo pi)
             HandleExistingPlayer(msg, pi);
 
-        HandleAnimationTrigger(msg, existing);
+        // Client handles its own animation — skip host broadcast for locally-controlled player
+        if (!CanLocalClientControl(msg.uid))
+            HandleAnimationTrigger(msg, existing);
         TryInitializeScene(msg);
     }
 
@@ -480,11 +482,15 @@ public static class PlayerSync
         // Client-authoritative: equipment (held item) — by slot index so the server
         // reads the actual ItemSlot from storage, letting ReferenceEquals short-circuit.
         // This mirrors Storage.NotifyChanged() but without its side effects.
+        // Also sync Storage.Key so HostClaimPlayer → SetPlayer → SyncCurrentItemState
+        // reads from the correct slot and doesn't clear the equipment.
         var storage = targetPlayer.Storage;
         ItemSlot equipped = storage != null && (uint)msg.selectedSlot < (uint)storage.List.Count
             ? storage.List[msg.selectedSlot]
             : null;
         targetPlayer.SetEquipment(equipped is { Stack: > 0 } ? equipped : null);
+        if (storage != null && msg.selectedSlot >= 0)
+            storage.Key = msg.selectedSlot;
 
         // Client-authoritative: destroy item on host (pickup)
         if (!string.IsNullOrEmpty(msg.destroyUid) && Info.Dictionary.TryGetValue(msg.destroyUid, out Info target))
@@ -517,7 +523,11 @@ public static class PlayerSync
             string oldUid = null;
             foreach (var kv in _playerControllers)
                 if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
-            if (oldUid != null) _playerControllers.Remove(oldUid);
+            if (oldUid != null)
+            {
+                _playerControllers.Remove(oldUid);
+                ResetPlayerAnimatorToIdle(oldUid);
+            }
 
             _playerControllers[targetPlayer.uid] = conn.connectionId;
         }
@@ -594,6 +604,20 @@ public static class PlayerSync
                 pi.SetEquipment(null);
             }
         }
+    }
+
+    /// <summary>
+    /// Reset a player's Animator to the EquipIdle state.
+    /// Called when a player's controller is released (host release, remote client disconnect/swap)
+    /// to prevent the Animator from being stuck playing a non-idle clip that was set by QueueForwardAnim.
+    /// </summary>
+    private static void ResetPlayerAnimatorToIdle(string uid)
+    {
+        if (string.IsNullOrEmpty(uid)) return;
+        if (!InfoMap.TryGetValue(uid, out Info info) || info is not PlayerInfo pi) return;
+        if (pi.Animator == null || !pi.Animator.isActiveAndEnabled) return;
+        pi.Animator.speed = 1f;
+        pi.Animator.Play("EquipIdle", 0, 0f);
     }
 
     #endregion

@@ -26,7 +26,7 @@ public static class Server
             NetworkManager.singleton.StopClient();
 
         if (Save.Inst == null)
-            Save.Inst = new Save(GenType.SkyBlock);
+            Save.Inst = new Save(GenType.SuperFlat);
 
         PortTransport transport = Transport.active as PortTransport;
         int port = transport != null ? transport.Port : DefaultHostPort;
@@ -84,6 +84,7 @@ public static class Server
         StorageSync.RegisterHandlers();
         DropSync.RegisterHandlers();
         EffectSync.RegisterHandlers();
+        ProjectileSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
         NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;
         handlersRegistered = true;
