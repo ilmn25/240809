@@ -19,10 +19,11 @@ public class MobAttackShoot : MobState
 
         Vector3 direction = Info.GetDirection();
         
-        Projectile.Spawn(Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
+        ProjectileSync.SpawnProjectile(Info,
+            Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
             Info.AimPosition,
             Info.Equipment.Info.ProjectileInfo,
-            Info.targetHitboxType, Info);
+            Info.targetHitboxType, Info.Equipment.ID);
 
         if (Main.PlayerInfo == Info)
             ScreenShake.Shake(40f, 0.035f, 1f / 60f, direction);

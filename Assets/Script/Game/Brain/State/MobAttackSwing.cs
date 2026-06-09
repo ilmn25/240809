@@ -2,7 +2,9 @@ using UnityEngine;
 
 
 class MobAttackSwing : MobState {
-    
+
+    public MobAttackSwing() { updateMode = global::Module.UpdateMode.Everyone; }
+
     private Item _equipment;
 
     public void Attack()
@@ -10,10 +12,11 @@ class MobAttackSwing : MobState {
         if (_equipment.ProjectileInfo != null)
         {
             Vector3 direction = Info.GetDirection();
-            Projectile.Spawn(Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
+            ProjectileSync.SpawnProjectile(Info,
+                Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
                 Info.AimPosition,
                 _equipment.ProjectileInfo,
-                Info.targetHitboxType, Info);
+                Info.targetHitboxType, Info.Equipment.ID);
         } 
     }
     
@@ -27,7 +30,10 @@ class MobAttackSwing : MobState {
     }
     
     public override void OnUpdateState()
-    { 
+    {
+        // Client: only run for locally-controlled player
+        if (!Helper.IsHost() && Main.PlayerInfo != Info) return;
+
         AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
         if (stateInfo.normalizedTime >= 1f)
         {

@@ -39,7 +39,13 @@ public class Inventory
  
     
     public static void Update()
-    { 
+    {
+        // Spectating clients cannot use inventory (drop, hotkeys)
+        if (!Helper.IsHost() && NetworkClient.isConnected &&
+            Main.PlayerInfo != null &&
+            !PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid))
+            return;
+
         if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
         {
             if (Helper.IsHost())
