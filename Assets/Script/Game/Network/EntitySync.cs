@@ -4,15 +4,13 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-// Single-entity message removed; batching only.
-
 public struct BatchEntityInfoMessage : NetworkMessage
 {
     public string[] uids;
     public int[] ids;
     public Vector3[] positions;
     public bool[] destroyed;
-    /// <summary>Owner connection ID for each entity. Empty = host-owned.</summary>
+    /// <summary>Owner connection ID per entity: "0"=host, "-1"=free, "1"+=client.</summary>
     public string[] ownerIds;
 
     // Animation/runtime primitive arrays
@@ -50,21 +48,15 @@ public struct ClientEntityUpdateMessage : NetworkMessage
 public static class EntitySync
 {
     public static readonly Dictionary<string, Info> InfoMap = new Dictionary<string, Info>();
-    // batch send interval
     public static float BroadcastInterval = 0.025f;
 
     public static void RegisterHandlers()
     {
         NetworkClient.ReplaceHandler<BatchEntityInfoMessage>(OnBatchEntityInfoMessageReceived, false);
         NetworkClient.ReplaceHandler<ClientEntityUpdateMessage>(OnClientEntityUpdateReceived, false);
-        // Host relays owner-client updates to other clients
         NetworkServer.ReplaceHandler<ClientEntityUpdateMessage>(OnRelayClientEntityUpdate, false);
-
-        // Start batch loop using CoroutineTask when running in play mode.
         if (Application.isPlaying)
-        {
             _ = new CoroutineTask(BatchLoop());
-        }
     }
 
     private class PendingSpawn { public Info info; }
@@ -195,72 +187,74 @@ public static class EntitySync
     }
 
     // Collect all currently loaded entities and send them in one batched message.
+    // Reusable batch buffers to reduce per-tick allocations
+    private static readonly List<string> _batchUids = new List<string>();
+    private static readonly List<int> _batchIds = new List<int>();
+    private static readonly List<Vector3> _batchPositions = new List<Vector3>();
+    private static readonly List<bool> _batchDestroyed = new List<bool>();
+    private static readonly List<Vector3> _batchAnimDirs = new List<Vector3>();
+    private static readonly List<bool> _batchAnimGrounded = new List<bool>();
+    private static readonly List<float> _batchAnimSpeedCurr = new List<float>();
+    private static readonly List<float> _batchAnimSpeedTarg = new List<float>();
+    private static readonly List<bool> _batchAnimFace = new List<bool>();
+    private static readonly List<Vector3> _batchAnimTargetScreens = new List<Vector3>();
+    private static readonly List<int> _batchAnimTriggers = new List<int>();
+    private static readonly List<float> _batchAnimNormalizedTimes = new List<float>();
+    private static readonly List<int> _batchItemAmounts = new List<int>();
+    private static readonly List<int> _batchItemDurabilities = new List<int>();
+    private static readonly List<string> _batchOwnerIds = new List<string>();
+
     public static void SendBatch()
     {
         if (!NetworkServer.active) return;
-        List<string> uids = new List<string>();
-        List<int> ids = new List<int>();
-        List<Vector3> positions = new List<Vector3>();
-        List<bool> destroyed = new List<bool>();
-
-        List<Vector3> animDirs = new List<Vector3>();
-        List<bool> animGrounded = new List<bool>();
-        List<float> animSpeedCurr = new List<float>();
-        List<float> animSpeedTarg = new List<float>();
-        List<bool> animFace = new List<bool>();
-        List<Vector3> animTargetScreens = new List<Vector3>();
-        List<int> animTriggers = new List<int>();
-        List<float> animNormalizedTimes = new List<float>();
-        List<int> itemAmounts = new List<int>();
-        List<int> itemDurabilities = new List<int>();
-        List<string> ownerIds = new List<string>();
+        _batchUids.Clear(); _batchIds.Clear(); _batchPositions.Clear(); _batchDestroyed.Clear();
+        _batchAnimDirs.Clear(); _batchAnimGrounded.Clear(); _batchAnimSpeedCurr.Clear();
+        _batchAnimSpeedTarg.Clear(); _batchAnimFace.Clear(); _batchAnimTargetScreens.Clear();
+        _batchAnimTriggers.Clear(); _batchAnimNormalizedTimes.Clear();
+        _batchItemAmounts.Clear(); _batchItemDurabilities.Clear(); _batchOwnerIds.Clear();
         void AddAnimData(DynamicInfo dyn)
         {
-            animDirs.Add(dyn.Direction);
-            animGrounded.Add(dyn.IsGrounded);
-            animSpeedCurr.Add(dyn.SpeedCurrent);
-            animSpeedTarg.Add(dyn.SpeedTarget);
-            animFace.Add((dyn is MobInfo mob) ? mob.FaceTarget : false);
-            animTargetScreens.Add(ScreenToWorldAligned(dyn.TargetScreenDir));
-            // Read current Animator state for one-shot detection
+            _batchAnimDirs.Add(dyn.Direction);
+            _batchAnimGrounded.Add(dyn.IsGrounded);
+            _batchAnimSpeedCurr.Add(dyn.SpeedCurrent);
+            _batchAnimSpeedTarg.Add(dyn.SpeedTarget);
+            _batchAnimFace.Add((dyn is MobInfo mob) ? mob.FaceTarget : false);
+            _batchAnimTargetScreens.Add(ScreenToWorldAligned(dyn.TargetScreenDir));
             if (dyn.Animator != null && dyn.Animator.isActiveAndEnabled)
             {
                 AnimatorStateInfo state = dyn.Animator.GetCurrentAnimatorStateInfo(0);
-                animTriggers.Add(state.shortNameHash);
-                animNormalizedTimes.Add(state.normalizedTime);
+                _batchAnimTriggers.Add(state.shortNameHash);
+                _batchAnimNormalizedTimes.Add(state.normalizedTime);
             }
             else
             {
-                animTriggers.Add(0);
-                animNormalizedTimes.Add(0f);
+                _batchAnimTriggers.Add(0);
+                _batchAnimNormalizedTimes.Add(0f);
             }
-
         }
 
         void AddZeroAnimData()
         {
-            animDirs.Add(Vector3.zero);
-            animGrounded.Add(false);
-            animSpeedCurr.Add(0f);
-            animSpeedTarg.Add(0f);
-            animFace.Add(false);
-            animTargetScreens.Add(Vector3.zero);
-            animTriggers.Add(0);
-            animNormalizedTimes.Add(0f);
+            _batchAnimDirs.Add(Vector3.zero);
+            _batchAnimGrounded.Add(false);
+            _batchAnimSpeedCurr.Add(0f);
+            _batchAnimSpeedTarg.Add(0f);
+            _batchAnimFace.Add(false);
+            _batchAnimTargetScreens.Add(Vector3.zero);
+            _batchAnimTriggers.Add(0);
+            _batchAnimNormalizedTimes.Add(0f);
         }
 
         void AddEntityToBatch(EntityMachine em)
         {
             if (em == null || em.Info == null) return;
-            uids.Add(em.Info.uid);
-            ownerIds.Add(em.Info.ownerId);
-            // For items, send the actual item ID (e.g. ID.Log) instead of the generic ID.ItemPrefab
-            // so the client can reconstruct the ItemInfo with a proper ItemSlot.
-            ids.Add((int)(em.Info is ItemInfo { item: not null } ii ? ii.item.ID : em.Info.id));
-            positions.Add(em.Info.position);
-            destroyed.Add(em.Info.Destroyed);
-            itemAmounts.Add(em.Info is ItemInfo { item: not null } ia ? ia.item.Stack : 0);
-            itemDurabilities.Add(em.Info is ItemInfo { item: not null } ida ? ida.item.Durability : 0);
+            _batchUids.Add(em.Info.uid);
+            _batchOwnerIds.Add(em.Info.ownerId);
+            _batchIds.Add((int)(em.Info is ItemInfo { item: not null } ii ? ii.item.ID : em.Info.id));
+            _batchPositions.Add(em.Info.position);
+            _batchDestroyed.Add(em.Info.Destroyed);
+            _batchItemAmounts.Add(em.Info is ItemInfo { item: not null } ia ? ia.item.Stack : 0);
+            _batchItemDurabilities.Add(em.Info is ItemInfo { item: not null } ida ? ida.item.Durability : 0);
 
             if (em.Info is DynamicInfo dyn)
                 AddAnimData(dyn);
@@ -268,7 +262,7 @@ public static class EntitySync
                 AddZeroAnimData();
         }
 
-        foreach (var em in EntityDynamicLoad.GetActiveEntities())
+        foreach (var em in EntityDynamicLoad.ActiveEntities)
             AddEntityToBatch(em);
 
         // Pending spawns: one-shot entities (e.g. newly placed structures) that
@@ -284,36 +278,36 @@ public static class EntitySync
         // the last entity's destroy is always broadcast to clients)
         foreach (var pu in _pendingUnloads)
         {
-            uids.Add(pu.uid);
-            ownerIds.Add(""); // host-owned; unload doesn't need owner
-            ids.Add(pu.id);
-            positions.Add(pu.pos);
-            destroyed.Add(true);
-            itemAmounts.Add(0);
-            itemDurabilities.Add(0);
+            _batchUids.Add(pu.uid);
+            _batchOwnerIds.Add("");
+            _batchIds.Add(pu.id);
+            _batchPositions.Add(pu.pos);
+            _batchDestroyed.Add(true);
+            _batchItemAmounts.Add(0);
+            _batchItemDurabilities.Add(0);
             AddZeroAnimData();
         }
         _pendingUnloads.Clear();
 
-        if (uids.Count == 0) return;
+        if (_batchUids.Count == 0) return;
 
         NetworkServer.SendToAll(new BatchEntityInfoMessage
         {
-            uids = uids.ToArray(),
-            ids = ids.ToArray(),
-            positions = positions.ToArray(),
-            destroyed = destroyed.ToArray(),
-            ownerIds = ownerIds.ToArray(),
-            animDirections = animDirs.ToArray(),
-            animIsGrounded = animGrounded.ToArray(),
-            animSpeedCurrent = animSpeedCurr.ToArray(),
-            animSpeedTarget = animSpeedTarg.ToArray(),
-            animFaceTarget = animFace.ToArray(),
-            animTargetScreenDirs = animTargetScreens.ToArray(),
-            animTriggers = animTriggers.ToArray(),
-            animNormalizedTimes = animNormalizedTimes.ToArray(),
-            itemAmounts = itemAmounts.ToArray(),
-            itemDurabilities = itemDurabilities.ToArray()
+            uids = _batchUids.ToArray(),
+            ids = _batchIds.ToArray(),
+            positions = _batchPositions.ToArray(),
+            destroyed = _batchDestroyed.ToArray(),
+            ownerIds = _batchOwnerIds.ToArray(),
+            animDirections = _batchAnimDirs.ToArray(),
+            animIsGrounded = _batchAnimGrounded.ToArray(),
+            animSpeedCurrent = _batchAnimSpeedCurr.ToArray(),
+            animSpeedTarget = _batchAnimSpeedTarg.ToArray(),
+            animFaceTarget = _batchAnimFace.ToArray(),
+            animTargetScreenDirs = _batchAnimTargetScreens.ToArray(),
+            animTriggers = _batchAnimTriggers.ToArray(),
+            animNormalizedTimes = _batchAnimNormalizedTimes.ToArray(),
+            itemAmounts = _batchItemAmounts.ToArray(),
+            itemDurabilities = _batchItemDurabilities.ToArray()
         });
 
         // Send initial storage for NEW container entities (StorageSync only sends on modification).
@@ -329,18 +323,92 @@ public static class EntitySync
                 storageData = Helper.SerializeObject(container.Storage.List)
             });
         }
-        foreach (var em in EntityDynamicLoad.GetActiveEntities()) SendContainerStorageFor(em);
+        foreach (var em in EntityDynamicLoad.ActiveEntities) SendContainerStorageFor(em);
         foreach (var kv in EntityStaticLoad.ActiveEntities)
             foreach (var em in kv.Value.Item2) SendContainerStorageFor(em);
     }
 
+    /// <summary>Host: assign entity ownership based on player proximity.</summary>
+    private static void UpdateOwnership()
+    {
+        if (!Helper.IsHost()) return;
+        foreach (var em in EntityDynamicLoad.ActiveEntities)
+        {
+            if (em.Info == null || em.Info.ownerId == "-1") continue;
+            Vector3 pos = em.transform.position;
+            string currentId = em.Info.ownerId;
+
+            string closestRenderUid = null;
+            string logicFallbackUid = null;
+            float closestRender = float.MaxValue;
+
+            foreach (var player in Save.Inst.players)
+            {
+                if (player.Machine == null) continue;
+                float dist = Vector3.Distance(pos, player.Machine.transform.position);
+
+                if (dist <= Scene.RenderDistance)
+                {
+                    if (dist < closestRender) { closestRender = dist; closestRenderUid = player.uid; }
+                }
+                else if (dist <= Scene.LogicDistance && logicFallbackUid == null)
+                    logicFallbackUid = player.uid;
+            }
+
+            // DynamicEntity load/unload is handled by EntityDynamicLoad — ownership only transfers here
+            string newOwnerId = null;
+            if (closestRenderUid != null)
+            {
+                int cId = PlayerSync.PlayerControllers.GetValueOrDefault(closestRenderUid, -1);
+                newOwnerId = cId >= 1 ? cId.ToString() : "0";
+            }
+            else
+            {
+                // Check if current owner (if it's a client) still has logic range
+                if (currentId != "0")
+                {
+                    var currentPlayer = Save.Inst.players.Find(p =>
+                    {
+                        int cId = PlayerSync.PlayerControllers.GetValueOrDefault(p.uid, -1);
+                        return cId.ToString() == currentId;
+                    });
+                    if (currentPlayer?.Machine != null &&
+                        Vector3.Distance(pos, currentPlayer.Machine.transform.position) <= Scene.LogicDistance)
+                        continue; // keep current owner
+                }
+                // Try any player in logic range
+                if (logicFallbackUid != null)
+                {
+                    int cId = PlayerSync.PlayerControllers.GetValueOrDefault(logicFallbackUid, -1);
+                    newOwnerId = cId >= 1 ? cId.ToString() : "0";
+                }
+                else
+                    continue; // host-owned or free — keep as-is
+            }
+            if (newOwnerId != null && em.Info.ownerId != newOwnerId)
+            {
+                Console.Print($"Owner {em.Info.ownerId} → {newOwnerId} for {em.Info.id}");
+                em.Info.ownerId = newOwnerId;
+            }
+        }
+    }
+
     private static IEnumerator BatchLoop()
     {
+        float ownershipTimer = 0f;
         while (true)
         {
             yield return new WaitForSeconds(BroadcastInterval);
             if (NetworkServer.active)
+            {
+                ownershipTimer += BroadcastInterval;
+                if (ownershipTimer >= 0.5f)
+                {
+                    UpdateOwnership();
+                    ownershipTimer = 0f;
+                }
                 SendBatch();
+            }
             else
                 ClientSendUpdate();
         }
