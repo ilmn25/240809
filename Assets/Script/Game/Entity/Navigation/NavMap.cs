@@ -8,6 +8,8 @@ public class NavMap
     private static BitArray _bitMap;
     private static readonly List<Vector3Int> LoadedChunks = new ();
 
+    public static IReadOnlyList<Vector3Int> GetLoadedChunks() => LoadedChunks;
+
     public static void Initialize()
     {
         _bitMap = new (
@@ -23,9 +25,10 @@ public class NavMap
     {
         return coordinate.x + World.Inst.Bounds.x * (coordinate.y + World.Inst.Bounds.y * coordinate.z);
     } 
-    public static void SetChunk(Vector3Int coordinate)
+    /// <summary>Process a chunk into NavMap. Returns true if new data was loaded (false if already done).</summary>
+    public static bool SetChunk(Vector3Int coordinate)
     { 
-        if (!World.IsInWorldBounds(coordinate) || LoadedChunks.Contains(coordinate)) return;
+        if (!World.IsInWorldBounds(coordinate) || LoadedChunks.Contains(coordinate)) return false;
         LoadedChunks.Add(coordinate);
         Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z]; 
         if (chunk != null)
@@ -45,6 +48,7 @@ public class NavMap
                 SetEntity(Entity.Dictionary[entity.id], entity.position, false);
             }
         }
+        return true;
     }
 
     public static Vector3Int GetRelativePosition(Vector3Int coordinate)
@@ -70,6 +74,66 @@ public class NavMap
         _bitMap[GetIndex(x, y, z)] = value;
     }
 
+    /// <summary>
+    /// Pack a chunk's NavMap bits (air=true) into a byte array for network transfer.
+    /// ChunkSize³ bits → ceil(ChunkSize³ / 8) bytes.
+    /// </summary>
+    public static byte[] PackChunk(Vector3Int chunkCoord)
+    {
+        int bitsPerChunk = World.ChunkSize * World.ChunkSize * World.ChunkSize;
+        int byteCount = (bitsPerChunk + 7) / 8;
+        byte[] data = new byte[byteCount];
+
+        int bitIndex = 0;
+        for (int x = 0; x < World.ChunkSize; x++)
+        {
+            for (int y = 0; y < World.ChunkSize; y++)
+            {
+                for (int z = 0; z < World.ChunkSize; z++)
+                {
+                    int worldX = chunkCoord.x + x;
+                    int worldY = chunkCoord.y + y;
+                    int worldZ = chunkCoord.z + z;
+                    if (_bitMap[GetIndex(worldX, worldY, worldZ)])
+                        data[bitIndex >> 3] |= (byte)(1 << (bitIndex & 7));
+                    bitIndex++;
+                }
+            }
+        }
+        return data;
+    }
+
+    /// <summary>
+    /// Apply NavMap chunk data received from the host.  Marks the chunk as loaded
+    /// so local SetChunk calls (which would re-read from possibly-stale chunk data) are skipped.
+    /// </summary>
+    public static void ApplySyncData(Vector3Int chunkCoord, byte[] data)
+    {
+        if (_bitMap == null) return; // scene not yet initialized
+        if (!World.IsInWorldBounds(chunkCoord)) return;
+
+        // Mark as loaded to prevent local SetChunk from re-processing.
+        if (!LoadedChunks.Contains(chunkCoord))
+            LoadedChunks.Add(chunkCoord);
+
+        int bitIndex = 0;
+        for (int x = 0; x < World.ChunkSize; x++)
+        {
+            for (int y = 0; y < World.ChunkSize; y++)
+            {
+                for (int z = 0; z < World.ChunkSize; z++)
+                {
+                    bool isAir = (data[bitIndex >> 3] & (1 << (bitIndex & 7))) != 0;
+                    int worldX = chunkCoord.x + x;
+                    int worldY = chunkCoord.y + y;
+                    int worldZ = chunkCoord.z + z;
+                    _bitMap[GetIndex(worldX, worldY, worldZ)] = isAir;
+                    bitIndex++;
+                }
+            }
+        }
+    }
+
     public static void SetEntity(Entity entity, Vector3 position, bool isAir)
     {
         if (entity.Collision != Main.IndexCollide) return; 
@@ -93,4 +157,5 @@ public class NavMap
             }
         }
     }
+
 } 

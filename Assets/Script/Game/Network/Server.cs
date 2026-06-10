@@ -85,6 +85,7 @@ public static class Server
         DropSync.RegisterHandlers();
         EffectSync.RegisterHandlers();
         ProjectileSync.RegisterHandlers();
+        NavMapSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
         NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;
         handlersRegistered = true;

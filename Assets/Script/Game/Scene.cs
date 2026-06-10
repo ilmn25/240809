@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using Mirror;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -80,6 +81,8 @@ public class Scene
         }
 
         NavMap.Initialize();
+        if (!Helper.IsHost() && NetworkClient.isConnected)
+            NavMapSync.RequestFullSync();
         Control.SetPlayer(0);
         if (Helper.IsHost())
         {
