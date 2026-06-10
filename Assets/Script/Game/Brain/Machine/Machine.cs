@@ -87,7 +87,7 @@ public abstract class Machine : MonoBehaviour
         if (Helper.IsHost())
         {
             OnUpdate();
-            RunForMode(Module.UpdateMode.HostOnly);
+            RunForMode(Module.UpdateMode.OwnerOnly);
         }
     }
 
@@ -97,7 +97,7 @@ public abstract class Machine : MonoBehaviour
         RunForMode(Module.UpdateMode.Everyone);
     }
 
-    private void RunForMode(Module.UpdateMode mode)
+    protected void RunForMode(Module.UpdateMode mode)
     {
         if (StateCurrent != null && StateCurrent.updateMode == mode)
             StateCurrent.OnUpdateState();

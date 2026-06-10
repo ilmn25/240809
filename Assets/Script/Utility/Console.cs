@@ -351,7 +351,7 @@ public class Console : MonoBehaviour
         {
             for (int i = 0; i < count; i++)
             {
-                Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
+                Info info = Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
             } 
         }
     }

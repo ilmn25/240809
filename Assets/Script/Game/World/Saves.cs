@@ -81,14 +81,17 @@ public class Save
         Vector3 spawnPosition = worlds[gen].SpawnPoint;
 
         PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
+        first.ownerId = "-1";
         players.Add(first);
  
         PlayerInfo third = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
+        third.ownerId = "-1";
         third.CharSprite = ID.Yuuri;
         players.Add(third);
 
         if (gen != GenType.Abyss) return;
         PlayerInfo second = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
+        second.ownerId = "-1";
         second.CharSprite = ID.Sheep;
         players.Add(second);
     }

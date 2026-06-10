@@ -98,7 +98,7 @@ public class Control
             }
             else
             {
-                // Host: update _playerControllers so clients see the change
+                // Host: update player ownership so clients see the change
                 string prevUid = global::Save.Inst.players[prevIndex].uid;
                 string newUid = global::Save.Inst.players[next].uid;
                 PlayerSync.HostReleasePlayer(prevUid);

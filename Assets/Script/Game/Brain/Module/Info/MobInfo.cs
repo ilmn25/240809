@@ -106,7 +106,7 @@ public class MobInfo : DynamicInfo
         // Avoid interrupting interaction states (e.g. InContainerState) when inventory data refreshes.
         // Remote clients: skip EquipSelectState because state OnUpdateState never runs (host-only),
         // which would permanently lock the player out of DefaultState and block all interactions.
-        if (Machine != null && Machine.IsCurrentState<DefaultState>() && Helper.IsHost())
+        if (Machine != null && Machine.IsCurrentState<DefaultState>() && IsOwner())
             Machine.SetState<EquipSelectState>();
     }
 }

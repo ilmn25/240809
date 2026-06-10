@@ -55,7 +55,12 @@ public abstract class EntityMachine : Machine, IInfoProvider
 
     public override void Update()
     {
-        base.Update();
+        // Only the owner runs AI/pathfinding/host-only modules
+        if (Info != null && Info.IsOwner())
+        {
+            OnUpdate();
+            RunForMode(Module.UpdateMode.OwnerOnly);
+        }
         if (Info != null && Info.Destroyed)
         {
             // Broadcast destruction to remote clients so they remove the entity too.
