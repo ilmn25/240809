@@ -68,7 +68,8 @@ public class EntityDynamicLoad
                         Scene.PlayerChunkPosition.y + y * World.ChunkSize,
                         Scene.PlayerChunkPosition.z + z * World.ChunkSize
                     );
-                    NavMap.SetChunk(chunkCoordinate);
+                    if (NavMap.SetChunk(chunkCoordinate))
+                        NavMapSync.BroadcastChunk(chunkCoordinate);
                     LoadEntitiesInChunk(chunkCoordinate); 
                 }
             }

@@ -155,7 +155,9 @@ public class World
         Vector3Int chunkCoordinate = GetChunkCoordinate(coordinate);
          
         Inst[chunkCoordinate][blockCoordinate] = blockID;
-        NavMap.Set(coordinate, blockID == 0);
+        bool isAir = blockID == 0;
+        NavMap.Set(coordinate, isAir);
+        NavMapSync.BroadcastBlockUpdate(coordinate, isAir);
         
         if (MapUpdated != null) MapUpdated(coordinate);
         
