@@ -15,7 +15,7 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
             while (gameObject.activeSelf)
             {
                 yield return new WaitForSeconds(3);
-                if (info.IsConverting())
+                if (info.IsConverting() && Helper.IsHost())
                 {
                     Particle.Create(transform.position, Particles.Smoke, false);
                     Particle.Create(transform.position, Particles.Fire, false);
