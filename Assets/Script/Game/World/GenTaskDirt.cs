@@ -5,7 +5,7 @@ public class GenTaskDirt : Gen
     private static float _x, _z, _value;
     private static int _height;
     private const float Scale = 0.05f;
-    private static readonly float Offset = GetOffset();
+    private static readonly float Offset = GetDeterministicOffset("Dirt");
     private static int _id;
     
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;

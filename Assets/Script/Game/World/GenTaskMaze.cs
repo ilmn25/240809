@@ -12,7 +12,8 @@ public class GenTaskMaze : Gen
     {
         if (currentCoordinate.y != 0) return;
 
-        bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize);
+        System.Random rng = CreateChunkRandom("Maze", currentCoordinate);
+        bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize, rng);
         
         for (int y = 0; y < World.ChunkSize; y++)
         {
@@ -35,7 +36,7 @@ public class GenTaskMaze : Gen
     }
     
     
-    private static bool[,] HandleMazeAlgorithm(int width, int height)
+    private static bool[,] HandleMazeAlgorithm(int width, int height, System.Random rng)
     {
         bool[,] maze = new bool[width, height];
 
@@ -53,7 +54,7 @@ public class GenTaskMaze : Gen
         {
             for (int z = 0; z < height; z += 8)
             {
-                if (Random.NextDouble() < 0.8) // 30% chance to remove a wall section
+                if (rng.NextDouble() < 0.8) // 30% chance to remove a wall section
                 {
                     // Remove vertical wall section
                     for (int i = 0; i < 8 && x + i < width; i++)
