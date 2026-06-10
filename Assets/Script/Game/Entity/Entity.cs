@@ -281,12 +281,14 @@ public class Entity
                 EntityMachine currentEntityMachine = (EntityMachine)
                         (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
 
+                Info info = CreateInfo(id, worldPosition);
                 if (entity.StaticLoad)
-                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity); 
+                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
                 else
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
-                Info info = CreateInfo(id, worldPosition);
                 currentEntityMachine.Initialize(info);
+                if (Helper.IsHost() && entity.StaticLoad)
+                        EntitySync.BroadcastEntitySpawn(info);
                 return info;
         } 
 

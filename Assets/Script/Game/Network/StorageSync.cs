@@ -170,9 +170,14 @@ public static class StorageSync
     private static Info ResolveInfo(string uid)
     {
         // EntitySync.InfoMap is populated on the client by batch handler;
-        // on the host it also contains chests / structures / crafting stations
-        // because EntitySync.SendBatch() iterates active entities.
+        // on the host it contains only entities added by PlayerSync.
         if (EntitySync.InfoMap.TryGetValue(uid, out Info info))
+            return info;
+
+        // Fallback: global Info dictionary — populated by EntityMachine.Initialize()
+        // on both host and client, so it includes all entities (including static ones
+        // like crafting stations that aren't in EntitySync.InfoMap on the host).
+        if (Info.Dictionary.TryGetValue(uid, out info))
             return info;
 
         // Fallback: players (host server doesn't keep them in EntitySync.InfoMap)

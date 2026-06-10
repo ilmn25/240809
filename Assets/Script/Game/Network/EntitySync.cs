@@ -46,7 +46,9 @@ public static class EntitySync
         }
     }
 
+    private class PendingSpawn { public Info info; }
     private class PendingUnload { public string uid; public int id; public Vector3 pos; }
+    private static readonly List<PendingSpawn> _pendingSpawns = new List<PendingSpawn>();
     private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
 
     /// <summary>Client-side: tracks last received animation hash per uid so we know when to play a new one-shot.</summary>
@@ -203,9 +205,9 @@ public static class EntitySync
             animNormalizedTimes.Add(0f);
         }
 
-        foreach (var em in EntityDynamicLoad.GetActiveEntities())
+        void AddEntityToBatch(EntityMachine em)
         {
-            if (em == null) continue;
+            if (em == null || em.Info == null) return;
             uids.Add(em.Info.uid);
             // For items, send the actual item ID (e.g. ID.Log) instead of the generic ID.ItemPrefab
             // so the client can reconstruct the ItemInfo with a proper ItemSlot.
@@ -218,8 +220,19 @@ public static class EntitySync
                 AddAnimData(dyn);
             else
                 AddZeroAnimData();
-
         }
+
+        foreach (var em in EntityDynamicLoad.GetActiveEntities())
+            AddEntityToBatch(em);
+
+        // Pending spawns: one-shot entities (e.g. newly placed structures) that
+        // only need a single broadcast to appear on clients.
+        foreach (var ps in _pendingSpawns)
+        {
+            if (ps.info?.Machine is EntityMachine em)
+                AddEntityToBatch(em);
+        }
+        _pendingSpawns.Clear();
 
         // append pending unloads (processed BEFORE the empty check so that
         // the last entity's destroy is always broadcast to clients)
@@ -285,6 +298,14 @@ public static class EntitySync
     {
         if (!Helper.IsHost() || !NetworkServer.active || info == null) return;
         _pendingUnloads.Add(new PendingUnload { uid = info.uid, id = (int)info.id, pos = info.position });
+    }
+
+    /// <summary>Queue a one-time spawn broadcast for a newly created entity.
+    /// Used by static-load entities (structures) that aren't in the dynamic batch loop.</summary>
+    public static void BroadcastEntitySpawn(Info info)
+    {
+        if (!Helper.IsHost() || !NetworkServer.active || info == null || info.Machine == null) return;
+        _pendingSpawns.Add(new PendingSpawn { info = info });
     }
 
     // ── Shared coordinate transforms ─────────────────────────────
