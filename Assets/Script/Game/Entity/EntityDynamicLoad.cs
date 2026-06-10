@@ -5,12 +5,8 @@ using UnityEngine;
 public class EntityDynamicLoad 
 {
 
-    private static List<EntityMachine> _activeEntities = new List<EntityMachine>();
-
-    public static List<EntityMachine> GetActiveEntities()
-    {
-        return _activeEntities;
-    }
+    private static readonly List<EntityMachine> _activeEntities = new List<EntityMachine>();
+    public static List<EntityMachine> ActiveEntities => _activeEntities;
 
     public static void ForgetEntity(EntityMachine entity)
     {
@@ -23,6 +19,20 @@ public class EntityDynamicLoad
         if (entity == null) return;
         if (_activeEntities.Contains(entity)) return;
         _activeEntities.Add(entity);
+    }
+
+    private static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
+    {
+        foreach (var player in Save.Inst.players)
+        {
+            if (player.Machine == null || player.ownerId == "-1") continue;
+            Vector3Int playerChunk = World.GetChunkCoordinate(player.Machine.transform.position);
+            if (chunkCoord.x >= playerChunk.x - distance && chunkCoord.x <= playerChunk.x + distance + 1 &&
+                chunkCoord.y >= playerChunk.y - distance && chunkCoord.y <= playerChunk.y + distance + 1 &&
+                chunkCoord.z >= playerChunk.z - distance && chunkCoord.z <= playerChunk.z + distance + 1)
+                return true;
+        }
+        return false;
     }
 
     public static void OnChunkTraverse()
@@ -40,7 +50,7 @@ public class EntityDynamicLoad
         { 
             entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             
-            if (!Scene.InPlayerChunkRange(entityChunkPosition, Scene.LogicDistance))
+            if (!AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
                 if (World.IsInWorldBounds(entityChunkPosition))
                     World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
@@ -56,24 +66,30 @@ public class EntityDynamicLoad
 
     private static void ScanAndLoad()
     {
-        // Collect chunk coordinates within render distance
-        for (int x = -Scene.LogicRange; x <= Scene.LogicRange; x++)
+        HashSet<Vector3Int> loaded = new HashSet<Vector3Int>();
+        foreach (var player in Save.Inst.players)
         {
-            for (int y = -Scene.LogicRange; y <= Scene.LogicRange; y++)
+            if (player.Machine == null || player.ownerId == "-1") continue;
+            Vector3Int center = World.GetChunkCoordinate(player.Machine.transform.position);
+            for (int x = -Scene.LogicRange; x <= Scene.LogicRange; x++)
             {
-                for (int z = -Scene.LogicRange; z <= Scene.LogicRange; z++)
+                for (int y = -Scene.LogicRange; y <= Scene.LogicRange; y++)
                 {
-                    Vector3Int chunkCoordinate = new Vector3Int(
-                        Scene.PlayerChunkPosition.x + x * World.ChunkSize,
-                        Scene.PlayerChunkPosition.y + y * World.ChunkSize,
-                        Scene.PlayerChunkPosition.z + z * World.ChunkSize
-                    );
-                    if (NavMap.SetChunk(chunkCoordinate))
-                        NavMapSync.BroadcastChunk(chunkCoordinate);
-                    LoadEntitiesInChunk(chunkCoordinate); 
+                    for (int z = -Scene.LogicRange; z <= Scene.LogicRange; z++)
+                    {
+                        Vector3Int chunkCoordinate = new Vector3Int(
+                            center.x + x * World.ChunkSize,
+                            center.y + y * World.ChunkSize,
+                            center.z + z * World.ChunkSize
+                        );
+                        if (!loaded.Add(chunkCoordinate)) continue;
+                        if (NavMap.SetChunk(chunkCoordinate))
+                            NavMapSync.BroadcastChunk(chunkCoordinate);
+                        LoadEntitiesInChunk(chunkCoordinate);
+                    }
                 }
             }
-        } 
+        }
     } 
       
     public static void UnloadWorld()
