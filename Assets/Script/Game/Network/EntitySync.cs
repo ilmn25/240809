@@ -27,6 +27,8 @@ public struct BatchEntityInfoMessage : NetworkMessage
 
     // Item stack count (0 = not an item / no stack)
     public int[] itemAmounts;
+    // Item durability (0 = default / not an item)
+    public int[] itemDurabilities;
 }
 
 public static class EntitySync
@@ -91,12 +93,17 @@ public static class EntitySync
                 info.uid = uid;
                 info.position = pos;
                 // Ensure ItemInfo has a valid item slot (batch sends item ID but CreateInfo
-                // may leave item null if the ID is in Entity.Dictionary)
-                if (info is ItemInfo itemInfo && (itemInfo.item == null || itemInfo.item.ID == ID.Null))
+                // may leave item null if the ID is in Entity.Dictionary).
+                // Always apply the stack count from the batch — CreateInfo sets Stack=1 by default,
+                // so without this all stacked items appear as single items on the client.
+                if (info is ItemInfo itemInfo)
                 {
-                    itemInfo.item = new ItemSlot((ID)id);
+                    if (itemInfo.item == null || itemInfo.item.ID == ID.Null)
+                        itemInfo.item = new ItemSlot((ID)id);
                     if (message.itemAmounts != null && i < message.itemAmounts.Length && message.itemAmounts[i] > 1)
                         itemInfo.item.Stack = message.itemAmounts[i];
+                    if (message.itemDurabilities != null && i < message.itemDurabilities.Length && message.itemDurabilities[i] > 0)
+                        itemInfo.item.Durability = message.itemDurabilities[i];
                 }
                 InfoMap[uid] = info;
                 Entity.SpawnFromInfo(info, true);
@@ -170,6 +177,7 @@ public static class EntitySync
         List<int> animTriggers = new List<int>();
         List<float> animNormalizedTimes = new List<float>();
         List<int> itemAmounts = new List<int>();
+        List<int> itemDurabilities = new List<int>();
         void AddAnimData(DynamicInfo dyn)
         {
             animDirs.Add(dyn.Direction);
@@ -215,6 +223,7 @@ public static class EntitySync
             positions.Add(em.Info.position);
             destroyed.Add(em.Info.Destroyed);
             itemAmounts.Add(em.Info is ItemInfo { item: not null } ia ? ia.item.Stack : 0);
+            itemDurabilities.Add(em.Info is ItemInfo { item: not null } ida ? ida.item.Durability : 0);
 
             if (em.Info is DynamicInfo dyn)
                 AddAnimData(dyn);
@@ -243,6 +252,7 @@ public static class EntitySync
             positions.Add(pu.pos);
             destroyed.Add(true);
             itemAmounts.Add(0);
+            itemDurabilities.Add(0);
             AddZeroAnimData();
         }
         _pendingUnloads.Clear();
@@ -263,7 +273,8 @@ public static class EntitySync
             animTargetScreenDirs = animTargetScreens.ToArray(),
             animTriggers = animTriggers.ToArray(),
             animNormalizedTimes = animNormalizedTimes.ToArray(),
-            itemAmounts = itemAmounts.ToArray()
+            itemAmounts = itemAmounts.ToArray(),
+            itemDurabilities = itemDurabilities.ToArray()
         });
 
         // Send initial storage for NEW container entities (StorageSync only sends on modification).
