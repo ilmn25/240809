@@ -37,6 +37,58 @@ public class Gen
         return (float)Random.NextDouble() * 1000f;
     }
 
+    /// <summary>
+    /// Returns a deterministic Perlin-noise offset derived from the world seed and
+    /// a unique salt string.  Unlike GetOffset(), this does NOT consume the shared
+    /// Random state, so it is safe to use in static field initializers without
+    /// introducing non-determinism.
+    /// </summary>
+    public static float GetDeterministicOffset(string salt)
+    {
+        int hash = CombineHashes(Save.Inst.seed, DeterministicStringHash(salt));
+        return (float)(new System.Random(hash).NextDouble()) * 1000f;
+    }
+
+    /// <summary>
+    /// Creates a System.Random seeded from the world seed + salt + chunk coordinate.
+    /// This ensures every chunk+task combination always gets the same random sequence,
+    /// regardless of execution order.
+    /// </summary>
+    public static System.Random CreateChunkRandom(string salt, Vector3Int chunkCoord)
+    {
+        int hash = CombineHashes(Save.Inst.seed, 
+                   CombineHashes(DeterministicStringHash(salt),
+                   CombineHashes(chunkCoord.x, 
+                   CombineHashes(chunkCoord.y, chunkCoord.z))));
+        return new System.Random(hash);
+    }
+
+    private static int CombineHashes(int h1, int h2)
+    {
+        unchecked
+        {
+            int hash = 17;
+            hash = hash * 31 + h1;
+            hash = hash * 31 + h2;
+            return hash;
+        }
+    }
+
+    /// <summary>
+    /// A stable string hash that produces the same value on all .NET
+    /// runtimes and platforms (unlike string.GetHashCode()).
+    /// </summary>
+    private static int DeterministicStringHash(string str)
+    {
+        unchecked
+        {
+            int hash = 5381;
+            for (int i = 0; i < str.Length; i++)
+                hash = hash * 33 + str[i];
+            return hash;
+        }
+    }
+
     public static IEnumerator GenerateNearbyChunks(Vector3Int center, int range)
     {
         Vector3Int position; 

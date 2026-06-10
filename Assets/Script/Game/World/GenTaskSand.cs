@@ -5,7 +5,7 @@ public class GenTaskSand : Gen
     private static float _x, _z, _value;
     private static int _height;
     private const float Scale = 0.03f;
-    private static readonly float Offset = GetOffset();
+    private static readonly float Offset = GetDeterministicOffset("Sand");
     private static int _id;
     private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
     private const int VerticalScale  = World.ChunkSize;

@@ -6,7 +6,7 @@ public class GenTaskGranite : Gen
     private const float Threshold = 0.5f;
     private const float MaxGraniteHeight = 180;
 
-    private static readonly float Offset = GetOffset();
+    private static readonly float Offset = GetDeterministicOffset("Granite");
 
     private static int _idGranite;
     private static int ID => _idGranite == 0 ? Block.ConvertID(global::ID.GraniteBlock) : _idGranite;

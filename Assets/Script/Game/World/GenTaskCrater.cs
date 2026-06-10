@@ -7,7 +7,7 @@ public class GenTaskCrater : Gen
     private static readonly int Radius = 24;
     private const float Scale = 0.1f;
     private static readonly int Steps = 16;
-    private static readonly float Offset = GetOffset();
+    private static readonly float Offset = GetDeterministicOffset("Crater");
     private static int _id;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
 

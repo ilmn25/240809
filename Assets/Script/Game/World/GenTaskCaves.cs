@@ -3,7 +3,7 @@ using UnityEngine;
 public class GenTaskCaves : Gen
 {
     private const float Scale = 0.06f;
-    private static readonly float Offset = GetOffset(); 
+    private static readonly float Offset = GetDeterministicOffset("Caves"); 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)

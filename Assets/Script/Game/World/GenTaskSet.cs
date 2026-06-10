@@ -7,7 +7,8 @@ public class GenTaskThrone : Gen
     private static readonly Chunk Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        if (UnityEngine.Random.Range(0, 10) != 0) return; 
+        System.Random rng = CreateChunkRandom("Throne", currentCoordinate);
+        if (rng.Next(0, 10) != 0) return; 
         for (int x = 0; x < World.ChunkSize - 6; x++)
         {
             for (int y = 0; y < World.ChunkSize - 1; y++)
@@ -33,7 +34,8 @@ public class GenTaskHouse : Gen
     
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        if (UnityEngine.Random.Range(0, 15) != 0) return; 
+        System.Random rng = CreateChunkRandom("House", currentCoordinate);
+        if (rng.Next(0, 15) != 0) return; 
         for (int x = 0; x < World.ChunkSize - 9; x++)
         {
             for (int y = 0; y < World.ChunkSize - 1; y++)
