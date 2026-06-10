@@ -116,15 +116,18 @@ public static class PlayerSync
     public static bool IsClaimedByRemoteClient(string uid)
     {
         if (!Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
-        return _playerControllers.GetValueOrDefault(uid, -1) >= 1;
+        if (Info.Dictionary.TryGetValue(uid, out Info info))
+            return info.ownerId != "0" && info.ownerId != "-1";
+        return false;
     }
 
     /// <summary>Client-side: can WE control this player? (free, or already ours)</summary>
     public static bool CanLocalClientControl(string uid)
     {
         if (Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
-        int controller = _playerControllers.GetValueOrDefault(uid, -1);
-        return controller == -1 || controller == _myConnectionId;
+        if (Info.Dictionary.TryGetValue(uid, out Info info))
+            return info.ownerId == "-1" || info.ownerId == _myConnectionId.ToString();
+        return false;
     }
 
     /// <summary>Host: register the player we're controlling (only if free).</summary>
@@ -135,6 +138,8 @@ public static class PlayerSync
         if (owner == -1 || owner == 0)
         {
             _playerControllers[uid] = 0;
+            if (Info.Dictionary.TryGetValue(uid, out Info info))
+                info.ownerId = "0";
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -146,6 +151,8 @@ public static class PlayerSync
         if (_playerControllers.GetValueOrDefault(uid, -1) == 0)
         {
             _playerControllers.Remove(uid);
+            if (Info.Dictionary.TryGetValue(uid, out Info info))
+                info.ownerId = "0";
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -364,6 +371,8 @@ public static class PlayerSync
         }
 
         _playerControllers[msg.uid] = msg.controllingClientId;
+        if (InfoMap.TryGetValue(msg.uid, out Info syncInfo))
+            syncInfo.ownerId = msg.controllingClientId.ToString();
 
         if (!InfoMap.TryGetValue(msg.uid, out Info existing))
             HandleNewPlayer(msg);
@@ -526,10 +535,13 @@ public static class PlayerSync
             if (oldUid != null)
             {
                 _playerControllers.Remove(oldUid);
+                if (Info.Dictionary.TryGetValue(oldUid, out Info oldInfo))
+                    oldInfo.ownerId = "0";
                 ResetPlayerAnimatorToIdle(oldUid);
             }
 
             _playerControllers[targetPlayer.uid] = conn.connectionId;
+            targetPlayer.ownerId = conn.connectionId.ToString();
         }
         return true;
     }

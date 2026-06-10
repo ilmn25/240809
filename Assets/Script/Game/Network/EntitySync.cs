@@ -12,6 +12,8 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public int[] ids;
     public Vector3[] positions;
     public bool[] destroyed;
+    /// <summary>Owner connection ID for each entity. Empty = host-owned.</summary>
+    public string[] ownerIds;
 
     // Animation/runtime primitive arrays
     public Vector3[] animDirections;
@@ -31,6 +33,20 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public int[] itemDurabilities;
 }
 
+/// <summary>Owner client → Host: updated state for entities this client owns.
+/// Host relays to all other clients.</summary>
+public struct ClientEntityUpdateMessage : NetworkMessage
+{
+    public string[] uids;
+    public Vector3[] positions;
+    public Vector3[] animDirections;
+    public bool[] animIsGrounded;
+    public float[] animSpeedCurrent;
+    public float[] animSpeedTarget;
+    public int[] animTriggers;
+    public float[] animNormalizedTimes;
+}
+
 public static class EntitySync
 {
     public static readonly Dictionary<string, Info> InfoMap = new Dictionary<string, Info>();
@@ -40,6 +56,9 @@ public static class EntitySync
     public static void RegisterHandlers()
     {
         NetworkClient.ReplaceHandler<BatchEntityInfoMessage>(OnBatchEntityInfoMessageReceived, false);
+        NetworkClient.ReplaceHandler<ClientEntityUpdateMessage>(OnClientEntityUpdateReceived, false);
+        // Host relays owner-client updates to other clients
+        NetworkServer.ReplaceHandler<ClientEntityUpdateMessage>(OnRelayClientEntityUpdate, false);
 
         // Start batch loop using CoroutineTask when running in play mode.
         if (Application.isPlaying)
@@ -62,6 +81,7 @@ public static class EntitySync
 
     private static void OnBatchEntityInfoMessageReceived(BatchEntityInfoMessage message)
     {
+        // Host generates entities locally — skip own broadcast to avoid duplicates
         if (Helper.IsHost()) return;
         int n = message.uids.Length;
         for (int i = 0; i < n; i++)
@@ -71,6 +91,7 @@ public static class EntitySync
             int id = message.ids[i];
             Vector3 pos = message.positions[i];
             bool destroyed = message.destroyed[i];
+            string ownerId = (message.ownerIds != null && i < message.ownerIds.Length) ? message.ownerIds[i] : "0";
             Vector3 animDir = message.animDirections[i];
             bool animGrounded = message.animIsGrounded[i];
             float animSpeedCurr = message.animSpeedCurrent[i];
@@ -91,6 +112,7 @@ public static class EntitySync
                 // create the correct typed Info without full spawn serialization
                 Info info = Entity.CreateInfo((ID)id, pos);
                 info.uid = uid;
+                info.ownerId = ownerId;
                 info.position = pos;
                 // Ensure ItemInfo has a valid item slot (batch sends item ID but CreateInfo
                 // may leave item null if the ID is in Entity.Dictionary).
@@ -110,6 +132,11 @@ public static class EntitySync
                 isExist = true;
                 targetInfo = info;
             }
+            else
+            {
+                // Update ownerId even for existing entities (e.g. after ownership transfer)
+                targetInfo.ownerId = ownerId;
+            }
             if (destroyed)
             {
                 if (targetInfo.Machine != null)
@@ -121,6 +148,14 @@ public static class EntitySync
             // Entity might have been destroyed locally (pickup via F/right-click in client-authoritative mode).
             // If Machine was nulled by Unload(), just skip — the server will broadcast the destroy soon.
             if (targetInfo.Machine == null)
+                continue;
+
+            // Skip sync for entities we own — we run them locally
+            if (targetInfo.IsOwner())
+                continue;
+
+            // Skip sync for client-owned entities — owner sends updates via relay
+            if (targetInfo.ownerId != "0" && targetInfo.ownerId != "-1")
                 continue;
 
             // Update minimal authoritative fields
@@ -178,6 +213,7 @@ public static class EntitySync
         List<float> animNormalizedTimes = new List<float>();
         List<int> itemAmounts = new List<int>();
         List<int> itemDurabilities = new List<int>();
+        List<string> ownerIds = new List<string>();
         void AddAnimData(DynamicInfo dyn)
         {
             animDirs.Add(dyn.Direction);
@@ -217,6 +253,7 @@ public static class EntitySync
         {
             if (em == null || em.Info == null) return;
             uids.Add(em.Info.uid);
+            ownerIds.Add(em.Info.ownerId);
             // For items, send the actual item ID (e.g. ID.Log) instead of the generic ID.ItemPrefab
             // so the client can reconstruct the ItemInfo with a proper ItemSlot.
             ids.Add((int)(em.Info is ItemInfo { item: not null } ii ? ii.item.ID : em.Info.id));
@@ -248,6 +285,7 @@ public static class EntitySync
         foreach (var pu in _pendingUnloads)
         {
             uids.Add(pu.uid);
+            ownerIds.Add(""); // host-owned; unload doesn't need owner
             ids.Add(pu.id);
             positions.Add(pu.pos);
             destroyed.Add(true);
@@ -265,6 +303,7 @@ public static class EntitySync
             ids = ids.ToArray(),
             positions = positions.ToArray(),
             destroyed = destroyed.ToArray(),
+            ownerIds = ownerIds.ToArray(),
             animDirections = animDirs.ToArray(),
             animIsGrounded = animGrounded.ToArray(),
             animSpeedCurrent = animSpeedCurr.ToArray(),
@@ -302,7 +341,110 @@ public static class EntitySync
             yield return new WaitForSeconds(BroadcastInterval);
             if (NetworkServer.active)
                 SendBatch();
+            else
+                ClientSendUpdate();
         }
+    }
+
+    private static void ApplyEntityUpdate(string uid, Vector3 pos, Vector3 dir, bool grounded, float speedCurr, float speedTarg)
+    {
+        if (!InfoMap.TryGetValue(uid, out Info info))
+            Info.Dictionary.TryGetValue(uid, out info);
+        if (info == null || info.Machine == null || info.IsOwner()) return;
+        info.position = pos;
+        info.Machine.transform.position = pos;
+        if (info is DynamicInfo dyn)
+        {
+            dyn.Direction = dir;
+            dyn.IsGrounded = grounded;
+            dyn.SpeedCurrent = speedCurr;
+            dyn.SpeedTarget = speedTarg;
+        }
+    }
+
+    /// <summary>Remote client: apply owner's entity updates relayed by host.</summary>
+    private static void OnClientEntityUpdateReceived(ClientEntityUpdateMessage msg)
+    {
+        for (int i = 0; i < msg.uids.Length; i++)
+            ApplyEntityUpdate(msg.uids[i], msg.positions[i],
+                msg.animDirections[i], msg.animIsGrounded[i],
+                msg.animSpeedCurrent[i], msg.animSpeedTarget[i]);
+    }
+
+    /// <summary>Host: apply owner update locally, then relay to remote clients.</summary>
+    private static void OnRelayClientEntityUpdate(NetworkConnection conn, ClientEntityUpdateMessage msg)
+    {
+        if (!NetworkServer.active) return;
+        int senderId = ((Mirror.NetworkConnectionToClient)conn).connectionId;
+        for (int i = 0; i < msg.uids.Length; i++)
+            ApplyEntityUpdate(msg.uids[i], msg.positions[i],
+                msg.animDirections[i], msg.animIsGrounded[i],
+                msg.animSpeedCurrent[i], msg.animSpeedTarget[i]);
+        foreach (var kv in NetworkServer.connections)
+            if (kv.Key != senderId && kv.Key != 0)
+                kv.Value.Send(msg);
+    }
+
+    /// <summary>Client: send updated state for entities this client owns back to the host.</summary>
+    private static void ClientSendUpdate()
+    {
+        if (Helper.IsHost() || !NetworkClient.active) return;
+        List<string> uids = new List<string>();
+        List<Vector3> positions = new List<Vector3>();
+        List<Vector3> animDirs = new List<Vector3>();
+        List<bool> animGrounded = new List<bool>();
+        List<float> animSpeedCurr = new List<float>();
+        List<float> animSpeedTarg = new List<float>();
+        List<int> animTriggers = new List<int>();
+        List<float> animNormalizedTimes = new List<float>();
+
+        foreach (var kv in InfoMap)
+        {
+            Info info = kv.Value;
+            if (info == null || !info.IsOwner() || info.Machine == null) continue;
+            uids.Add(info.uid);
+            positions.Add(info.position);
+            if (info is DynamicInfo dyn)
+            {
+                animDirs.Add(dyn.Direction);
+                animGrounded.Add(dyn.IsGrounded);
+                animSpeedCurr.Add(dyn.SpeedCurrent);
+                animSpeedTarg.Add(dyn.SpeedTarget);
+                if (dyn.Animator != null && dyn.Animator.isActiveAndEnabled)
+                {
+                    AnimatorStateInfo state = dyn.Animator.GetCurrentAnimatorStateInfo(0);
+                    animTriggers.Add(state.shortNameHash);
+                    animNormalizedTimes.Add(state.normalizedTime);
+                }
+                else
+                {
+                    animTriggers.Add(0);
+                    animNormalizedTimes.Add(0f);
+                }
+            }
+            else
+            {
+                animDirs.Add(Vector3.zero);
+                animGrounded.Add(false);
+                animSpeedCurr.Add(0f);
+                animSpeedTarg.Add(0f);
+                animTriggers.Add(0);
+                animNormalizedTimes.Add(0f);
+            }
+        }
+        if (uids.Count == 0) return;
+
+        NetworkClient.Send(new ClientEntityUpdateMessage
+        {
+            uids = uids.ToArray(),
+            positions = positions.ToArray(),
+            animDirections = animDirs.ToArray(),
+            animIsGrounded = animGrounded.ToArray(),
+            animSpeedCurrent = animSpeedCurr.ToArray(),
+            animSpeedTarget = animSpeedTarg.ToArray(),
+            animTriggers = animTriggers.ToArray(),
+            animNormalizedTimes = animNormalizedTimes.ToArray()
+        });
     }
 
     public static void BroadcastEntityUnload(Info info)

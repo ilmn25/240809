@@ -31,8 +31,8 @@ class MobAttackSwing : MobState {
     
     public override void OnUpdateState()
     {
-        // Client: only run for locally-controlled player
-        if (!Helper.IsHost() && Main.PlayerInfo != Info) return;
+        // Only the owner advances the swing animation and fires the attack
+        if (!Info.IsOwner()) return;
 
         AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
         if (stateInfo.normalizedTime >= 1f)
