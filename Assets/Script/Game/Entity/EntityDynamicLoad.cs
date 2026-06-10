@@ -99,7 +99,7 @@ public class EntityDynamicLoad
     {
         List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity; 
         foreach (Info info in chunkEntityList)
-            Entity.SpawnFromInfo(info);
+            Entity.SpawnFromInfo(info, true);
         World.Inst[chunkCoordinate].DynamicEntity.Clear(); 
     } 
 }
