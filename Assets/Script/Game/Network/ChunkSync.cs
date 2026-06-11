@@ -7,6 +7,7 @@ public struct HostToClientSnapshotChunkMessage : NetworkMessage
     public int index;
     public int totalChunks;
     public byte[] chunk;
+    public bool isSave;
 }
 
 public static class ChunkSync
@@ -29,7 +30,29 @@ public static class ChunkSync
 
         for (int i = 0; i < totalChunks; i++)
         {
-            conn.Send(new HostToClientSnapshotChunkMessage { index = i, totalChunks = totalChunks, chunk = chunks[i] });
+            conn.Send(new HostToClientSnapshotChunkMessage { index = i, totalChunks = totalChunks, chunk = chunks[i], isSave = true });
+        }
+    }
+
+    public static void SendChunkBatchToAll(List<Vector3Int> chunkCoords)
+    {
+        if (!NetworkServer.active || chunkCoords == null || chunkCoords.Count == 0) return;
+        var map = new Dictionary<Vector3Int, Chunk>();
+        foreach (var coord in chunkCoords)
+        {
+            Chunk chunk = World.Inst[coord];
+            if (chunk != null && chunk != Chunk.Zero)
+                map[coord] = chunk;
+        }
+        if (map.Count == 0) return;
+        byte[] bytes = Helper.SerializeObject(map);
+        byte[][] split = Helper.SplitBytes(bytes, Server.MaxSnapshotChunkSize);
+        int total = split.Length;
+        foreach (var kv in NetworkServer.connections)
+        {
+            if (!kv.Value.isReady) continue;
+            for (int i = 0; i < total; i++)
+                kv.Value.Send(new HostToClientSnapshotChunkMessage { index = i, totalChunks = total, chunk = split[i], isSave = false });
         }
     }
 
@@ -48,11 +71,27 @@ public static class ChunkSync
         byte[] allBytes = Helper.CombineChunks(receivedSnapshotChunks, expectedSnapshotChunks);
         receivedSnapshotChunks.Clear();
         expectedSnapshotChunks = 0;
-        Save received = Helper.DeserializeObject<Save>(allBytes);
-        received.id = null;
-        // Set Save.Inst immediately so World.Inst is valid during the loading sequence.
-        Save.Inst = received;
-        Scene.SwitchSave(received);
+
+        if (message.isSave)
+        {
+            Save save = Helper.DeserializeObject<Save>(allBytes);
+            if (save == null) return;
+            save.id = null;
+            Save.Inst = save;
+            Scene.SwitchSave(save);
+        }
+        else
+        {
+            // Save must be loaded before we can write chunks into the world
+            if (Save.Inst == null) return;
+            var map = Helper.DeserializeObject<Dictionary<Vector3Int, Chunk>>(allBytes);
+            if (map == null) return;
+            foreach (var kv in map)
+            {
+                World.Inst[kv.Key] = kv.Value;
+                NavMap.SetChunk(kv.Key);
+            }
+        }
     }
 
     public static void Clear()

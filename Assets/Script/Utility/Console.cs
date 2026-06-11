@@ -269,10 +269,10 @@ public class Console : MonoBehaviour
                     ScreenShake.Shake(40f, shakeMagnitude, shakeTime);
                 }
                 break;   
-            case "join":
+            case "j":
                 Server.StartClient(_command.Length > 1 ? _command[1] : null);
                 break;
-            case "host":
+            case "h":
                 Host();
                 break;
             case "unhost":

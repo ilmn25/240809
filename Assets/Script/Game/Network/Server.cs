@@ -10,9 +10,9 @@ public static class Server
     internal const int MaxSnapshotChunkSize = 12000;
     private const int DefaultHostPort = 7777;
     private static bool handlersRegistered;
+    private static bool _disconnecting;
     private static readonly Action<NetworkConnectionToClient> serverConnectedHandler = conn => NetworkManager.singleton.StartCoroutine(OnServerConnected(conn));
     private static GameObject networkPrefab;
-
     static Server()
     {
         networkPrefab = Resources.Load<GameObject>("Prefab/Network");
@@ -35,6 +35,7 @@ public static class Server
         NetworkManager.singleton.StartHost();
         Scene.LoadWorld();
         RegisterHandlers();
+        NetworkManager.singleton.StartCoroutine(ChunkBatchLoop());
         return true;
     }
 
@@ -75,7 +76,11 @@ public static class Server
     private static void RegisterHandlers()
     {
         if (handlersRegistered) return;
+        // Unregister first to prevent double-subscription if called again
+        // (e.g. after a disconnect that didn't run UnregisterHandlers)
+        NetworkClient.OnConnectedEvent -= OnClientConnected;
         NetworkClient.OnConnectedEvent += OnClientConnected;
+        NetworkClient.OnDisconnectedEvent -= OnClientDisconnected;
         NetworkClient.OnDisconnectedEvent += OnClientDisconnected;
         Chat.RegisterHandlers();
         ChunkSync.RegisterHandlers();
@@ -95,6 +100,8 @@ public static class Server
 
     private static void OnClientDisconnected()
     {
+        if (_disconnecting) return;
+        _disconnecting = true;
         Console.Print("Disconnected from host");
 
         // Clear HUD text, then switch to menu — stops game logic updates.
@@ -123,10 +130,18 @@ public static class Server
 
         // Reset environment so a future game doesn't stay black
         Environment.Target = EnvironmentType.Null;
+        _disconnecting = false;
     }
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)
     {
+        // Reject join until the host has finished initial world gen
+        if (Scene.Busy)
+        {
+            conn.Disconnect();
+            yield break;
+        }
+
         while (!conn.isReady)
             yield return null;
  
@@ -135,13 +150,24 @@ public static class Server
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
 
-        // Send authoritative player state to the new client
-        PlayerSync.SendPlayerData(conn);
         PlayerSync.SendConnectionId(conn);
 
         // Notify all clients
         int userId = conn.connectionId + 1;
         NetworkServer.SendToAll(new ServerToClientTextMessage { text = $"User {userId} connected" });
+    }
+
+    private static IEnumerator ChunkBatchLoop()
+    {
+        var wait = new WaitForSeconds(2f);
+        while (NetworkServer.active)
+        {
+            yield return wait;
+            if (Gen.PendingNewChunks.Count == 0) continue;
+            var batch = new List<Vector3Int>(Gen.PendingNewChunks);
+            Gen.PendingNewChunks.Clear();
+            ChunkSync.SendChunkBatchToAll(batch);
+        }
     }
 
     private static bool IsPortInUse(int port)

@@ -89,6 +89,8 @@ public class Gen
         }
     }
 
+    public static readonly List<Vector3Int> PendingNewChunks = new();
+
     public static IEnumerator GenerateNearbyChunks(Vector3Int center, int range)
     {
         Vector3Int position; 
@@ -108,7 +110,10 @@ public class Gen
                         Generate(position);
                         yield return null;  
                     }
-                    NavMap.SetChunk(position);
+                    else
+                    {
+                        NavMap.SetChunk(position);
+                    }
                 }
             }
         }
@@ -119,5 +124,7 @@ public class Gen
         Chunk currentChunk = new Chunk();
         World.Inst[currentCoordinate] = currentChunk;
         _target.GenChunk(currentCoordinate, currentChunk);
+        NavMap.SetChunk(currentCoordinate);
+        PendingNewChunks.Add(currentCoordinate);
     }   
 }

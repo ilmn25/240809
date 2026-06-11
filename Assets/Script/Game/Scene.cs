@@ -15,6 +15,8 @@ public class Scene
 { 
     public static Vector3Int PlayerChunkPosition;
     private static Vector3Int _playerChunkPositionPrevious;
+    private static readonly Dictionary<int, Vector3Int> _playerChunkPositions = new();
+    private static bool _hostFirstGenDone;
 
     public static readonly int RenderRange = 2;
     public static readonly int LogicRange = 3; 
@@ -62,6 +64,8 @@ public class Scene
 
         if (Helper.IsHost())
         {
+            _playerChunkPositions.Clear();
+            _hostFirstGenDone = false;
             foreach (PlayerInfo player in Save.Inst.players)
             {
                 if (player.Machine == null) Entity.SpawnFromInfo(player, false);
@@ -71,16 +75,26 @@ public class Scene
         }
         else
         {
-            // Remote client: PlayerSync creates the player entity.
-            // Start map generation from player 0's position so the scene loads.
+            // Remote client: chunks come from the server.
             PlayerChunkPosition = World.GetChunkCoordinate(Save.Inst.players[0].position);
-            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition, GenRange));
-            mapGenTask.Finished += (bool _) => { Busy = false; };
-            mapGenTask.Finished += (bool _) => { World.LoadWorld(); };
             _playerChunkPositionPrevious = PlayerChunkPosition;
+            World.LoadWorld();
+            Busy = false;
         }
 
         NavMap.Initialize();
+        if (!Helper.IsHost())
+        {
+            // Build NavMap for chunks received from server in starting range.
+            Vector3Int center = World.GetChunkCoordinate(Save.Inst.players[0].position);
+            for (int x = -GenRange; x <= GenRange; x++)
+                for (int y = -GenRange; y <= GenRange; y++)
+                    for (int z = -GenRange; z <= GenRange; z++)
+                        NavMap.SetChunk(new Vector3Int(
+                            center.x + x * World.ChunkSize,
+                            center.y + y * World.ChunkSize,
+                            center.z + z * World.ChunkSize));
+        }
         Control.SetPlayer(0);
         if (Helper.IsHost())
         {
@@ -103,16 +117,42 @@ public class Scene
     {   
         if (!Main.Player) return;
         PlayerChunkPosition = World.GetChunkCoordinate(Main.Player.transform.position);
-        if (PlayerChunkPosition != _playerChunkPositionPrevious)
-        { 
-            CoroutineTask mapGenTask = new CoroutineTask(Gen.GenerateNearbyChunks(PlayerChunkPosition, GenRange));
-            if (_playerChunkPositionPrevious == Vector3Int.down)
-                mapGenTask.Finished += (bool _) => { 
-                    Main.SceneMode = SceneMode.Game;
-                    Environment.Target = EnvironmentType.Null;
-                    Busy = false;
-                }; 
-            mapGenTask.Finished += (bool _) => { World.LoadWorld(); };
+
+        if (Helper.IsHost())
+        {
+            for (int i = 0; i < Save.Inst.players.Count; i++)
+            {
+                PlayerInfo p = Save.Inst.players[i];
+                if (p.Machine == null || p.ownerId == "-1") continue;
+                Vector3Int chunkPos = World.GetChunkCoordinate(p.position);
+                if (_playerChunkPositions.TryGetValue(i, out var prev) && prev == chunkPos) continue;
+                _playerChunkPositions[i] = chunkPos;
+
+                var genTask = new CoroutineTask(Gen.GenerateNearbyChunks(chunkPos, GenRange));
+                if (!_hostFirstGenDone)
+                {
+                    genTask.Finished += (bool _) => {
+                        if (!_hostFirstGenDone)
+                        {
+                            _hostFirstGenDone = true;
+                            Main.SceneMode = SceneMode.Game;
+                            Environment.Target = EnvironmentType.Null;
+                            Busy = false;
+                        }
+                    };
+                }
+                genTask.Finished += (bool _) => { World.LoadWorld(); };
+            }
+            // Update rendering when the controlled player moves or host switches players
+            if (PlayerChunkPosition != _playerChunkPositionPrevious)
+            {
+                World.LoadWorld();
+                _playerChunkPositionPrevious = PlayerChunkPosition;
+            }
+        }
+        else if (PlayerChunkPosition != _playerChunkPositionPrevious)
+        {
+            World.LoadWorld();
             _playerChunkPositionPrevious = PlayerChunkPosition;
         }
     }
