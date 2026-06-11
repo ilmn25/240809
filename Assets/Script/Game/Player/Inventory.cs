@@ -38,6 +38,22 @@ public class Inventory
     }
  
     
+    /// <summary>Shared helper: client-side drop. Deducts from the slot, syncs storage,
+    /// and tells the server to spawn the world entity via ClientDropItemMessage.</summary>
+    public static void ClientDropSlot(ItemSlot slot, int amount, Storage storage, Vector3 position)
+    {
+        ID itemID = slot.ID;
+        slot.Stack -= amount;
+        if (slot.Stack <= 0) slot.clear();
+        storage.NotifyChanged();
+        NetworkClient.Send(new ClientDropItemMessage
+        {
+            itemID = itemID,
+            count = amount,
+            position = position
+        });
+    }
+
     public static void Update()
     {
         // Spectating clients cannot use inventory (drop, hotkeys)
@@ -59,19 +75,8 @@ public class Inventory
             }
             else if (NetworkClient.isConnected)
             {
-                // Client: modify local storage, then tell the server to spawn the world entity.
-                // Storage.OnChanged → StorageSync.Send() broadcasts the storage change.
                 int dropAmount = Input.GetKey(KeyCode.LeftControl) ? CurrentItem.Stack : 1;
-                ID itemID = CurrentItem.ID;
-                CurrentItem.Stack -= dropAmount;
-                if (CurrentItem.Stack <= 0) CurrentItem.clear();
-                Main.PlayerInfo.Storage.NotifyChanged();
-                NetworkClient.Send(new ClientDropItemMessage
-                {
-                    itemID = itemID,
-                    count = dropAmount,
-                    position = Main.PlayerInfo.position
-                });
+                ClientDropSlot(CurrentItem, dropAmount, Main.PlayerInfo.Storage, Main.PlayerInfo.position);
             }
             RefreshInventory();
         }

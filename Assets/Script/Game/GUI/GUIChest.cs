@@ -30,6 +30,11 @@ public class GUIChest : GUIStorage
                 {
                     Entity.SpawnItem(Storage.List[CurrentSlotKey], Main.PlayerInfo.position); 
                 }
+                else if (NetworkClient.isConnected)
+                {
+                    int dropAmount = Storage.List[CurrentSlotKey].Stack;
+                    Inventory.ClientDropSlot(Storage.List[CurrentSlotKey], dropAmount, Storage, Main.PlayerInfo.position);
+                }
                 //doesnt account for full inventory
             }
             else
