@@ -48,9 +48,13 @@ public class Main : MonoBehaviour
     public static GameObject GUICursorSlot;
  
     public static GameObject GUIMainMenu;
-    public static GUIButton GUIMainMenuButtonNew;
-    public static GUIButton GUIMainMenuButtonLoad;
+    public static GUIButton GUIMainMenuButtonHost;
+    public static GUIButton GUIMainMenuButtonJoin;
     public static GUIButton GUIMainMenuButtonExit; 
+    public static GameObject GUIHostMenu;
+    public static GUIButton GUIHostMenuButtonNew;
+    public static GUIButton GUIHostMenuButtonLoad;
+    public static GUIButton GUIHostMenuButtonBack;
     public static GameObject GUILoadMenu;
     public void Awake()
     { 
@@ -67,11 +71,11 @@ public class Main : MonoBehaviour
 
     public void Start()
     {
-        Environment.Set(Environment.Environments[EnvironmentType.Black].AmbientLight,
-            Environment.Environments[EnvironmentType.Black].FogColor,
-            Environment.Environments[EnvironmentType.Black].SpotLight,
-            Environment.Environments[EnvironmentType.Black].DirectionalLight,
-            Environment.Environments[EnvironmentType.Black].BackgroundColor);
+        Environment.Set(Environment.Environments[EnvironmentType.NightBright].AmbientLight,
+            Environment.Environments[EnvironmentType.NightBright].FogColor,
+            Environment.Environments[EnvironmentType.NightBright].SpotLight,
+            Environment.Environments[EnvironmentType.NightBright].DirectionalLight,
+            Environment.Environments[EnvironmentType.NightBright].BackgroundColor);
         
         ViewPort.Initialize(); 
         Audio.Initialize();
@@ -151,9 +155,13 @@ public class Main : MonoBehaviour
         GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
         
         GUIMainMenu = GUIObject.transform.Find("MainMenu").gameObject;
-        GUIMainMenuButtonNew = GUIMainMenu.transform.Find("New").GetComponent<GUIButton>();
-        GUIMainMenuButtonLoad = GUIMainMenu.transform.Find("Load").GetComponent<GUIButton>();
+        GUIMainMenuButtonHost = GUIMainMenu.transform.Find("Host").GetComponent<GUIButton>();
+        GUIMainMenuButtonJoin = GUIMainMenu.transform.Find("Join").GetComponent<GUIButton>();
         GUIMainMenuButtonExit = GUIMainMenu.transform.Find("Exit").GetComponent<GUIButton>();
+        GUIHostMenu = GUIObject.transform.Find("HostMenu").gameObject;
+        GUIHostMenuButtonNew = GUIHostMenu.transform.Find("New").GetComponent<GUIButton>();
+        GUIHostMenuButtonLoad = GUIHostMenu.transform.Find("Load").GetComponent<GUIButton>();
+        GUIHostMenuButtonBack = GUIHostMenu.transform.Find("Back").GetComponent<GUIButton>();
         GUILoadMenu = GUIObject.transform.Find("LoadMenu").gameObject;
     }
     

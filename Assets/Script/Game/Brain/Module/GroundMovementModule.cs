@@ -33,6 +33,7 @@ public class GroundMovementModule : MovementModule
             if (Vector3.Distance(Info.TargetPointPosition, _abstractPos) < 0.2f)
                 Machine.transform.position = Info.TargetPointPosition;
             Info.Velocity = Vector3.zero;
+            Info.position = Machine.transform.position;
             return; 
         }
         NewPosition = Machine.transform.position;
@@ -73,6 +74,7 @@ public class GroundMovementModule : MovementModule
  
         HandleMove();  
         _abstractPos = Machine.transform.position;
+        Info.position = Machine.transform.position;
     } 
 
     protected virtual void HandleJump()

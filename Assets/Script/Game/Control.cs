@@ -152,23 +152,11 @@ public class Control
             if (target == null) return;
             var info = ((EntityMachine)target).Info;
 
-            if (Helper.IsHost())
+            if (Helper.IsHost() || NetworkClient.isConnected)
             {
-                // Host: state machine handles pathfinding + pickup via MobChaseAction
+                // Host/Client: state machine handles pathfinding + pickup via MobChaseAction
                 Main.PlayerInfo.Target = info;
                 Main.PlayerInfo.ActionType = IActionType.PickUp;
-            }
-            else if (NetworkClient.isConnected && info is ItemInfo item)
-            {
-                // Client: pick up immediately (range check inside OnActionSecondary)
-                item.OnActionSecondary(Main.PlayerInfo);
-                PlayerSync.SetPendingDestroyUid(item.uid);
-                // Play equip animation (MobChaseAction → EquipSelectState doesn't run on clients)
-                if (Main.PlayerInfo.Animator != null)
-                {
-                    Main.PlayerInfo.Animator.speed = 1f;
-                    Main.PlayerInfo.Animator.Play("EquipSelect", 0, 0f);
-                }
             }
         }
         // else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
@@ -236,10 +224,11 @@ public class Control
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
                 {
-                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo item)
+                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo)
                     {
-                        item.OnActionSecondary(Main.PlayerInfo);
-                        PlayerSync.SetPendingDestroyUid(item.uid);
+                        // Both host and client: state machine handles pathfinding + pickup
+                        Main.PlayerInfo.Target = ((EntityMachine)action).Info;
+                        Main.PlayerInfo.ActionType = IActionType.PickUp;
                     }
                     else if (action is IActionSecondaryInteract interact)
                         interact.OnActionSecondary(Main.PlayerInfo);

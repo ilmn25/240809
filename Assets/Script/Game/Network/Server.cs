@@ -96,7 +96,13 @@ public static class Server
         handlersRegistered = true;
     }
 
-    private static void OnClientConnected() => Console.Print("Connected to host");
+    private static void OnClientConnected()
+    {
+        Console.Print("Connected to host");
+        GUIMain.GUIMenu.Show(false);
+        GUIMain.GUIHostMenu.Show(false);
+        GUIMain.GUILoad.Show(false);
+    }
 
     private static void OnClientDisconnected()
     {
@@ -131,6 +137,9 @@ public static class Server
         // Reset environment so a future game doesn't stay black
         Environment.Target = EnvironmentType.Null;
         _disconnecting = false;
+
+        // Show main menu after disconnect
+        GUIMain.GUIMenu.Show(true);
     }
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)
