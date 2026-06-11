@@ -108,6 +108,7 @@ public class Gen
                         Generate(position);
                         yield return null;  
                     }
+                    NavMap.SetChunk(position);
                 }
             }
         }

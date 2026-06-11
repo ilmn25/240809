@@ -81,8 +81,6 @@ public class Scene
         }
 
         NavMap.Initialize();
-        if (!Helper.IsHost() && NetworkClient.isConnected)
-            NavMapSync.RequestFullSync();
         Control.SetPlayer(0);
         if (Helper.IsHost())
         {

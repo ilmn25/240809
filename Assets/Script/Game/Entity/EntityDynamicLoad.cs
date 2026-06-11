@@ -83,8 +83,6 @@ public class EntityDynamicLoad
                             center.z + z * World.ChunkSize
                         );
                         if (!loaded.Add(chunkCoordinate)) continue;
-                        if (NavMap.SetChunk(chunkCoordinate))
-                            NavMapSync.BroadcastChunk(chunkCoordinate);
                         LoadEntitiesInChunk(chunkCoordinate);
                     }
                 }
