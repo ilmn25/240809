@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using TMPro;
 using UnityEngine;
 
@@ -12,18 +13,20 @@ public class GUIMenu : GUI
     }
     public void Update()
     {
+        // Don't process menu clicks while connected or hosting
+        if (NetworkClient.isConnected || NetworkServer.active) return;
+
         if (!Control.Inst.ActionPrimary.KeyDown()) return;
-        if (Main.GUIMainMenuButtonNew.IsHovered)
+        if (Main.GUIMainMenuButtonHost.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
-            Save.Inst = new Save(GenType.Abyss);
-            Server.StartHost();
             Show(false);
+            GUIMain.GUIHostMenu.Show(true);
         }
-        else if (Main.GUIMainMenuButtonLoad.IsHovered)
+        else if (Main.GUIMainMenuButtonJoin.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
-            GUIMain.GUILoad.Show(true);
+            Server.StartClient();
             Show(false);
         }
         else if (Main.GUIMainMenuButtonExit.IsHovered)

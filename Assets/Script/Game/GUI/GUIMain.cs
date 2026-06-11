@@ -13,6 +13,7 @@ public static class GUIMain
     public static GUIInfoPanel InfoPanel;
     public static GUICursor Cursor;
     public static GUIMenu GUIMenu;
+    public static GUIHostMenu GUIHostMenu;
     public static GUILoad GUILoad;
 
     public static bool Showing = true;
@@ -21,6 +22,8 @@ public static class GUIMain
     {
         Inventory.SlotUpdate += RefreshStorage;
         GUIMenu = new GUIMenu(); 
+        GUIHostMenu = new GUIHostMenu();
+        GUIHostMenu.Show(false);
         GUILoad = new GUILoad();
         GUILoad.Show(false);
         
@@ -68,6 +71,7 @@ public static class GUIMain
     public static void UpdateMenu()
     {
         GUIMenu.Update();
+        GUIHostMenu.Update();
         GUILoad.Update();
     }
 

@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 class MobChaseAction : MobState {
@@ -32,8 +33,12 @@ class MobChaseAction : MobState {
                 } 
                 else if (Info.ActionType == IActionType.PickUp && !Info.Target.Destroyed)
                 {
+                    string targetUid = Info.Target.uid;
                     (Info.Target as ItemInfo).OnActionSecondary(Info);
                     Info.CancelTarget();
+                    // Client: queue destroy UID so the host removes the item server-side
+                    if (!Helper.IsHost() && NetworkClient.isConnected)
+                        PlayerSync.SetPendingDestroyUid(targetUid);
                     Machine.SetState<EquipSelectState>();
                 }
                 else if (Info.ActionType == IActionType.Hit && !Info.Target.Destroyed)
