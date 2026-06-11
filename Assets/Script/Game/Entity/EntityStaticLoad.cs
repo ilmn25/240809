@@ -8,7 +8,7 @@ public class EntityStaticLoad
     public static void ForgetEntity(EntityMachine entityMachine, Entity entity)
     {
         ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Remove(entityMachine);
-        NavMap.SetEntity(entity, entityMachine.transform.position, false);
+        NavMap.SetEntity(entity, entityMachine.transform.position, true); // mark space walkable after removal
     }
     public static void InviteEntity(EntityMachine entityMachine, Entity entity) {
         Vector3Int chunkCoord = World.GetChunkCoordinate(entityMachine.transform.position);
