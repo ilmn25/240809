@@ -123,7 +123,7 @@ public class Scene
             for (int i = 0; i < Save.Inst.players.Count; i++)
             {
                 PlayerInfo p = Save.Inst.players[i];
-                if (p.Machine == null || p.ownerId == "-1") continue;
+                if (p.Machine == null || p.ownerId == -1) continue;
                 Vector3Int chunkPos = World.GetChunkCoordinate(p.position);
                 if (_playerChunkPositions.TryGetValue(i, out var prev) && prev == chunkPos) continue;
                 _playerChunkPositions[i] = chunkPos;
