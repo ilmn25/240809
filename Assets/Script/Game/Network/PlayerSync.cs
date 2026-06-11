@@ -117,7 +117,7 @@ public static class PlayerSync
     {
         if (!Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
         if (Info.Dictionary.TryGetValue(uid, out Info info))
-            return info.ownerId != "0" && info.ownerId != "-1";
+            return info.ownerId != 0 && info.ownerId != -1;
         return false;
     }
 
@@ -126,7 +126,7 @@ public static class PlayerSync
     {
         if (Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
         if (Info.Dictionary.TryGetValue(uid, out Info info))
-            return info.ownerId == "-1" || info.ownerId == _myConnectionId.ToString();
+            return info.ownerId == -1 || info.ownerId == _myConnectionId;
         return false;
     }
 
@@ -139,7 +139,7 @@ public static class PlayerSync
         {
             _playerControllers[uid] = 0;
             if (Info.Dictionary.TryGetValue(uid, out Info info))
-                info.ownerId = "0";
+                info.ownerId = 0;
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -152,7 +152,7 @@ public static class PlayerSync
         {
             _playerControllers.Remove(uid);
             if (Info.Dictionary.TryGetValue(uid, out Info info))
-                info.ownerId = "0";
+                info.ownerId = 0;
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -372,15 +372,17 @@ public static class PlayerSync
 
         _playerControllers[msg.uid] = msg.controllingClientId;
         if (InfoMap.TryGetValue(msg.uid, out Info syncInfo))
-            syncInfo.ownerId = msg.controllingClientId.ToString();
+            syncInfo.ownerId = msg.controllingClientId;
 
         if (!InfoMap.TryGetValue(msg.uid, out Info existing))
             HandleNewPlayer(msg);
         else if (existing is PlayerInfo pi)
             HandleExistingPlayer(msg, pi);
 
-        // Client handles its own animation — skip host broadcast for locally-controlled player
-        if (!CanLocalClientControl(msg.uid))
+        // Client handles its own animation — skip host broadcast for players we actually own.
+        // Free players (ownerId = "-1") must still receive animation from host broadcast.
+        bool isOwnedByUs = !Helper.IsHost() && syncInfo != null && syncInfo.ownerId == _myConnectionId;
+        if (!isOwnedByUs)
             HandleAnimationTrigger(msg, existing);
         TryInitializeScene(msg);
     }
@@ -419,7 +421,10 @@ public static class PlayerSync
 
     private static void HandleExistingPlayer(PlayerSyncMessage msg, PlayerInfo pi)
     {
-        if (CanLocalClientControl(msg.uid))
+        // Only skip position/animation sync for players we actually own.
+        // Free players (ownerId = "-1") must still receive position/animation from host broadcast.
+        bool isOwnedByUs = !Helper.IsHost() && pi.ownerId == _myConnectionId;
+        if (isOwnedByUs)
         {
             // Local player: only sync server-authoritative fields (stats).
             // Inventory is client-authoritative — don't overwrite with host broadcast.
@@ -432,7 +437,7 @@ public static class PlayerSync
         }
         else
         {
-            // Remote player: full state sync
+            // Remote or free player: full state sync
             pi.position = msg.position;
             CopyAll(pi, msg);
             if (pi.Machine != null) pi.Machine.transform.position = msg.position;
@@ -536,12 +541,12 @@ public static class PlayerSync
             {
                 _playerControllers.Remove(oldUid);
                 if (Info.Dictionary.TryGetValue(oldUid, out Info oldInfo))
-                    oldInfo.ownerId = "0";
+                    oldInfo.ownerId = 0;
                 ResetPlayerAnimatorToIdle(oldUid);
             }
 
             _playerControllers[targetPlayer.uid] = conn.connectionId;
-            targetPlayer.ownerId = conn.connectionId.ToString();
+            targetPlayer.ownerId = conn.connectionId;
         }
         return true;
     }

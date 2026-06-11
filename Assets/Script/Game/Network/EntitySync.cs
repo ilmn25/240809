@@ -10,8 +10,8 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public int[] ids;
     public Vector3[] positions;
     public bool[] destroyed;
-    /// <summary>Owner connection ID per entity: "0"=host, "-1"=free, "1"+=client.</summary>
-    public string[] ownerIds;
+    /// <summary>Owner connection ID per entity: 0=host, -1=free, >0=client.</summary>
+    public int[] ownerIds;
 
     // Animation/runtime primitive arrays
     public Vector3[] animDirections;
@@ -83,7 +83,7 @@ public static class EntitySync
             int id = message.ids[i];
             Vector3 pos = message.positions[i];
             bool destroyed = message.destroyed[i];
-            string ownerId = (message.ownerIds != null && i < message.ownerIds.Length) ? message.ownerIds[i] : "0";
+            int ownerId = (message.ownerIds != null && i < message.ownerIds.Length) ? message.ownerIds[i] : 0;
             Vector3 animDir = message.animDirections[i];
             bool animGrounded = message.animIsGrounded[i];
             float animSpeedCurr = message.animSpeedCurrent[i];
@@ -147,7 +147,7 @@ public static class EntitySync
                 continue;
 
             // Skip sync for client-owned entities — owner sends updates via relay
-            if (targetInfo.ownerId != "0" && targetInfo.ownerId != "-1")
+            if (targetInfo.ownerId != 0 && targetInfo.ownerId != -1)
                 continue;
 
             // Update minimal authoritative fields
@@ -202,7 +202,7 @@ public static class EntitySync
     private static readonly List<float> _batchAnimNormalizedTimes = new List<float>();
     private static readonly List<int> _batchItemAmounts = new List<int>();
     private static readonly List<int> _batchItemDurabilities = new List<int>();
-    private static readonly List<string> _batchOwnerIds = new List<string>();
+    private static readonly List<int> _batchOwnerIds = new List<int>();
 
     public static void SendBatch()
     {
@@ -279,7 +279,7 @@ public static class EntitySync
         foreach (var pu in _pendingUnloads)
         {
             _batchUids.Add(pu.uid);
-            _batchOwnerIds.Add("");
+            _batchOwnerIds.Add(0);
             _batchIds.Add(pu.id);
             _batchPositions.Add(pu.pos);
             _batchDestroyed.Add(true);
@@ -334,9 +334,9 @@ public static class EntitySync
         if (!Helper.IsHost()) return;
         foreach (var em in EntityDynamicLoad.ActiveEntities)
         {
-            if (em.Info == null || em.Info.ownerId == "-1") continue;
+            if (em.Info == null || em.Info.ownerId == -1) continue;
             Vector3 pos = em.transform.position;
-            string currentId = em.Info.ownerId;
+            int currentId = em.Info.ownerId;
 
             string closestRenderUid = null;
             string logicFallbackUid = null;
@@ -356,21 +356,21 @@ public static class EntitySync
             }
 
             // DynamicEntity load/unload is handled by EntityDynamicLoad — ownership only transfers here
-            string newOwnerId = null;
+            int? newOwnerId = null;
             if (closestRenderUid != null)
             {
                 int cId = PlayerSync.PlayerControllers.GetValueOrDefault(closestRenderUid, -1);
-                newOwnerId = cId >= 1 ? cId.ToString() : "0";
+                newOwnerId = cId >= 1 ? cId : 0;
             }
             else
             {
                 // Check if current owner (if it's a client) still has logic range
-                if (currentId != "0")
+                if (currentId != 0)
                 {
                     var currentPlayer = Save.Inst.players.Find(p =>
                     {
                         int cId = PlayerSync.PlayerControllers.GetValueOrDefault(p.uid, -1);
-                        return cId.ToString() == currentId;
+                        return cId == currentId;
                     });
                     if (currentPlayer?.Machine != null &&
                         Vector3.Distance(pos, currentPlayer.Machine.transform.position) <= Scene.LogicDistance)
@@ -380,15 +380,15 @@ public static class EntitySync
                 if (logicFallbackUid != null)
                 {
                     int cId = PlayerSync.PlayerControllers.GetValueOrDefault(logicFallbackUid, -1);
-                    newOwnerId = cId >= 1 ? cId.ToString() : "0";
+                    newOwnerId = cId >= 1 ? cId : 0;
                 }
                 else
                     continue; // host-owned or free — keep as-is
             }
-            if (newOwnerId != null && em.Info.ownerId != newOwnerId)
+            if (newOwnerId.HasValue && em.Info.ownerId != newOwnerId.Value)
             {
-                Console.Print($"Owner {em.Info.ownerId} → {newOwnerId} for {em.Info.id}");
-                em.Info.ownerId = newOwnerId;
+                Console.Print($"Owner {em.Info.ownerId} → {newOwnerId.Value} for {em.Info.id}");
+                em.Info.ownerId = newOwnerId.Value;
             }
         }
     }
