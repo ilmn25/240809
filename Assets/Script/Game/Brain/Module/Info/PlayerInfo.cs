@@ -56,7 +56,7 @@ public class PlayerInfo : MobInfo
         base.OnUpdate();
         if (PlayerStatus == PlayerStatus.Respawn)
         {
-            if (IframesCurrent != 1) return;
+            if (IframesCurrent > 1) return;
 
             Hunger = HungerMax;
             Health = HealthMax;

@@ -84,12 +84,17 @@ public class Control
         if (Inst.SwapChar.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
-            int next;
-            if (CurrentPlayerIndex == global::Save.Inst.players.Count - 1)
-                next = 0;
-            else
-                next = CurrentPlayerIndex + 1;
             int prevIndex = CurrentPlayerIndex;
+            int next = CurrentPlayerIndex;
+            int count = global::Save.Inst.players.Count;
+            for (int i = 0; i < count; i++)
+            {
+                next = (next + 1) % count;
+                if (next == prevIndex) break; // wrapped around
+                var p = global::Save.Inst.players[next];
+                if (p.Machine != null && p.IsInRenderRange) break;
+            }
+            if (next == prevIndex) return; // no other player in range
             SetPlayer(next);
 
             if (!Helper.IsHost())

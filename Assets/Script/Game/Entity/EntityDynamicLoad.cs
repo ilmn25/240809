@@ -25,7 +25,7 @@ public class EntityDynamicLoad
     {
         foreach (var player in Save.Inst.players)
         {
-            if (player.Machine == null || player.ownerId == -1) continue;
+            if (player.Machine == null || player.controllerId == -1) continue;
             Vector3Int playerChunk = World.GetChunkCoordinate(player.Machine.transform.position);
             if (chunkCoord.x >= playerChunk.x - distance && chunkCoord.x <= playerChunk.x + distance + 1 &&
                 chunkCoord.y >= playerChunk.y - distance && chunkCoord.y <= playerChunk.y + distance + 1 &&
@@ -69,7 +69,7 @@ public class EntityDynamicLoad
         HashSet<Vector3Int> loaded = new HashSet<Vector3Int>();
         foreach (var player in Save.Inst.players)
         {
-            if (player.Machine == null || player.ownerId == -1) continue;
+            if (player.Machine == null || player.controllerId == -1) continue;
             Vector3Int center = World.GetChunkCoordinate(player.Machine.transform.position);
             for (int x = -Scene.LogicRange; x <= Scene.LogicRange; x++)
             {

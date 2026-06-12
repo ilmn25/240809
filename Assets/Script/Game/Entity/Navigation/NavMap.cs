@@ -56,18 +56,21 @@ public class NavMap
 
     public static bool Get(Vector3Int worldPosition)
     {
+        if (_bitMap == null) return false;
         if (!World.IsInWorldBounds(worldPosition)) return true;
         return _bitMap[GetIndex(worldPosition)];
     }
 
     public static void Set(Vector3Int worldPosition, bool value, bool isAir = false)
     {
+        if (_bitMap == null) return;
         if (isAir && !World.IsInWorldBounds(worldPosition)) return;
         _bitMap[GetIndex(worldPosition)] = value; 
     }
     
     public static void Set(int x, int y, int z, bool value, bool isAir = false)
     {
+        if (_bitMap == null) return;
         if (isAir && !World.IsInWorldBounds(x, y, z)) return;
         _bitMap[GetIndex(x, y, z)] = value;
     }
@@ -77,7 +80,7 @@ public class NavMap
     /// ChunkSize³ bits → ceil(ChunkSize³ / 8) bytes.
     public static void SetEntity(Entity entity, Vector3 position, bool isAir)
     {
-        if (entity.Collision != Main.IndexCollide) return; 
+        if (_bitMap == null || entity.Collision != Main.IndexCollide) return; 
         int entityX = Mathf.FloorToInt(position.x);
         int entityY = Mathf.FloorToInt(position.y);
         int entityZ = Mathf.FloorToInt(position.z);

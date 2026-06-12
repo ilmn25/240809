@@ -10,7 +10,7 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public int[] ids;
     public Vector3[] positions;
     public bool[] destroyed;
-    /// <summary>Owner connection ID per entity: 0=host, -1=free, >0=client.</summary>
+    /// <summary>Owner connection ID per entity: 0=host, >0=client.</summary>
     public int[] ownerIds;
 
     // Animation/runtime primitive arrays
@@ -146,8 +146,10 @@ public static class EntitySync
             if (targetInfo.IsOwner())
                 continue;
 
-            // Skip sync for client-owned entities — owner sends updates via relay
-            if (targetInfo.ownerId != 0 && targetInfo.ownerId != -1)
+            // Skip sync for client-owned entities — the owner sends updates via relay (ClientEntityUpdateMessage).
+            // IsOwner() catches self-ownership (our locally-run entities).
+            // ownerId != 0 catches other-client-owned entities that IsOwner() wouldn't match.
+            if (targetInfo.ownerId != 0)
                 continue;
 
             // Update minimal authoritative fields
@@ -328,60 +330,67 @@ public static class EntitySync
             foreach (var em in kv.Value.Item2) SendContainerStorageFor(em);
     }
 
-    /// <summary>Host: assign entity ownership based on player proximity.</summary>
+    /// <summary>Find nearest player uid in render range, falling back to logic range.</summary>
+    private static (string renderUid, string logicUid) FindNearestPlayerUids(Vector3 pos, string excludeUid = null)
+    {
+        string closestRenderUid = null;
+        string logicFallbackUid = null;
+        float closestRender = float.MaxValue;
+
+        foreach (var player in Save.Inst.players)
+        {
+            if (player.Machine == null || (excludeUid != null && player.uid == excludeUid)) continue;
+            float dist = Vector3.Distance(pos, player.Machine.transform.position);
+
+            if (dist <= Scene.RenderDistance)
+            {
+                if (dist < closestRender) { closestRender = dist; closestRenderUid = player.uid; }
+            }
+            else if (dist <= Scene.LogicDistance && logicFallbackUid == null)
+                logicFallbackUid = player.uid;
+        }
+        return (closestRenderUid, logicFallbackUid);
+    }
+
+    /// <summary>Get the connection ID that controls a player uid, mapped to ownerId: 0=host, >0=client.</summary>
+    private static int PlayerUidToOwnerId(string uid)
+    {
+        int cId = PlayerSync.PlayerControllers.GetValueOrDefault(uid, -1);
+        return cId >= 1 ? cId : 0;
+    }
+
+    /// <summary>Host: assign entity and player ownership based on player proximity.</summary>
     private static void UpdateOwnership()
     {
         if (!Helper.IsHost()) return;
+
+        // ── Entity ownership ──────────────────────────────────────────
         foreach (var em in EntityDynamicLoad.ActiveEntities)
         {
-            if (em.Info == null || em.Info.ownerId == -1) continue;
+            if (em.Info == null) continue;
             Vector3 pos = em.transform.position;
             int currentId = em.Info.ownerId;
 
-            string closestRenderUid = null;
-            string logicFallbackUid = null;
-            float closestRender = float.MaxValue;
-
-            foreach (var player in Save.Inst.players)
-            {
-                if (player.Machine == null) continue;
-                float dist = Vector3.Distance(pos, player.Machine.transform.position);
-
-                if (dist <= Scene.RenderDistance)
-                {
-                    if (dist < closestRender) { closestRender = dist; closestRenderUid = player.uid; }
-                }
-                else if (dist <= Scene.LogicDistance && logicFallbackUid == null)
-                    logicFallbackUid = player.uid;
-            }
+            var (closestRenderUid, logicFallbackUid) = FindNearestPlayerUids(pos);
 
             // DynamicEntity load/unload is handled by EntityDynamicLoad — ownership only transfers here
             int? newOwnerId = null;
             if (closestRenderUid != null)
-            {
-                int cId = PlayerSync.PlayerControllers.GetValueOrDefault(closestRenderUid, -1);
-                newOwnerId = cId >= 1 ? cId : 0;
-            }
+                newOwnerId = PlayerUidToOwnerId(closestRenderUid);
             else
             {
                 // Check if current owner (if it's a client) still has logic range
                 if (currentId != 0)
                 {
                     var currentPlayer = Save.Inst.players.Find(p =>
-                    {
-                        int cId = PlayerSync.PlayerControllers.GetValueOrDefault(p.uid, -1);
-                        return cId == currentId;
-                    });
+                        PlayerSync.PlayerControllers.GetValueOrDefault(p.uid, -1) == currentId);
                     if (currentPlayer?.Machine != null &&
                         Vector3.Distance(pos, currentPlayer.Machine.transform.position) <= Scene.LogicDistance)
                         continue; // keep current owner
                 }
                 // Try any player in logic range
                 if (logicFallbackUid != null)
-                {
-                    int cId = PlayerSync.PlayerControllers.GetValueOrDefault(logicFallbackUid, -1);
-                    newOwnerId = cId >= 1 ? cId : 0;
-                }
+                    newOwnerId = PlayerUidToOwnerId(logicFallbackUid);
                 else
                     continue; // host-owned or free — keep as-is
             }
@@ -390,6 +399,23 @@ public static class EntitySync
                 // Console.Print($"Owner {em.Info.ownerId} → {newOwnerId.Value} for {em.Info.id}");
                 em.Info.ownerId = newOwnerId.Value;
             }
+        }
+
+        // ── Player ownership: assign free players (no controller) to nearest controlled player ──
+        foreach (var player in Save.Inst.players)
+        {
+            if (player.Machine == null || player.controllerId != -1) continue;
+            Vector3 pos = player.Machine.transform.position;
+
+            var (closestRenderUid, logicFallbackUid) = FindNearestPlayerUids(pos, player.uid);
+
+            int newOwner = player.ownerId; // keep current by default
+            if (closestRenderUid != null)
+                newOwner = PlayerUidToOwnerId(closestRenderUid);
+            else if (logicFallbackUid != null)
+                newOwner = PlayerUidToOwnerId(logicFallbackUid);
+            if (player.ownerId != newOwner)
+                player.ownerId = newOwner;
         }
     }
 
@@ -469,7 +495,8 @@ public static class EntitySync
         foreach (var kv in InfoMap)
         {
             Info info = kv.Value;
-            if (info == null || !info.IsOwner() || info.Machine == null) continue;
+            // Players are synced via PlayerSync — skip them in EntitySync
+            if (info == null || info is PlayerInfo || !info.IsOwner() || info.Machine == null) continue;
             uids.Add(info.uid);
             positions.Add(info.position);
             if (info is DynamicInfo dyn)
