@@ -114,6 +114,7 @@ public static class Server
         // Environment.Update() still runs (called before the SceneMode guard in Main.Update()),
         // so the fade continues.
         if (Main.GUIHudText != null) Main.GUIHudText.text = "";
+        GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
 
         // Fade to black, then clean up players/world after it completes

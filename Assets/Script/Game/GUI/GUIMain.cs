@@ -6,7 +6,8 @@ public static class GUIMain
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
     
-    private static CoroutineTask _showTask; 
+    private static CoroutineTask _showTask;
+    private static bool _gameWasActive;
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
     public static GUICraft GUICraft;
@@ -65,7 +66,7 @@ public static class GUIMain
         InfoPanel.Show(false);
         
         Dialogue.Show(false);
-        Show(true);
+        Show(false);
     }
 
     public static void UpdateMenu()
@@ -75,8 +76,23 @@ public static class GUIMain
         GUILoad.Update();
     }
 
+    /// <summary>Call when leaving game mode to hide the inventory GUI.</summary>
+    public static void OnGameEnd()
+    {
+        _gameWasActive = false;
+        Show(false);
+    }
+
     public static void Update()
-    { 
+    {
+        // Show inventory GUI when entering game mode
+        if (!_gameWasActive)
+        {
+            _gameWasActive = true;
+            if (!Showing)
+                Show(true);
+        }
+
         Dialogue.Update(); 
         Cursor.Update();
         StorageInv.Update();
@@ -162,9 +178,8 @@ public static class GUIMain
                 Showing = false;
 
                 // return any item held on cursor to inventory (or drop if full)
-                if (!GUICursor.Data.isEmpty())
+                if (!GUICursor.Data.isEmpty() && Main.PlayerInfo?.Storage != null)
                 {
-                    // try add to player storage; AddItem will drop leftover automatically
                     Main.PlayerInfo.Storage.AddItem(GUICursor.Data);
                     GUICursor.UpdateCursorSlot();
                 }
