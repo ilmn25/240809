@@ -83,7 +83,6 @@ public static class PlayerSync
     /// <summary>Host: uid → connectionId. Free = no entry / -1, host = 0, remote = ≥1.
     /// Client: same, populated from broadcast.</summary>
     internal static readonly Dictionary<string, int> PlayerControllers = new Dictionary<string, int>();
-    private static Dictionary<string, int> _playerControllers => PlayerControllers;
 
     /// <summary>Client: my own connection ID (set by host on connect). -1 until set.</summary>
     public static int MyConnectionId => _myConnectionId;
@@ -117,7 +116,7 @@ public static class PlayerSync
     {
         if (!Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
         if (Info.Dictionary.TryGetValue(uid, out Info info))
-            return info.ownerId != 0 && info.ownerId != -1;
+            return info.controllerId != 0 && info.controllerId != -1;
         return false;
     }
 
@@ -126,7 +125,7 @@ public static class PlayerSync
     {
         if (Helper.IsHost() || string.IsNullOrEmpty(uid)) return false;
         if (Info.Dictionary.TryGetValue(uid, out Info info))
-            return info.ownerId == -1 || info.ownerId == _myConnectionId;
+            return info.controllerId == -1 || info.controllerId == _myConnectionId;
         return false;
     }
 
@@ -134,12 +133,15 @@ public static class PlayerSync
     public static void HostClaimPlayer(string uid)
     {
         if (!NetworkServer.active || string.IsNullOrEmpty(uid)) return;
-        int owner = _playerControllers.GetValueOrDefault(uid, -1);
-        if (owner == -1 || owner == 0)
+        int ctrl = PlayerControllers.GetValueOrDefault(uid, -1);
+        if (ctrl == -1 || ctrl == 0)
         {
-            _playerControllers[uid] = 0;
+            PlayerControllers[uid] = 0;
             if (Info.Dictionary.TryGetValue(uid, out Info info))
+            {
+                info.controllerId = 0;
                 info.ownerId = 0;
+            }
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -148,11 +150,11 @@ public static class PlayerSync
     public static void HostReleasePlayer(string uid)
     {
         if (!NetworkServer.active || string.IsNullOrEmpty(uid)) return;
-        if (_playerControllers.GetValueOrDefault(uid, -1) == 0)
+        if (PlayerControllers.GetValueOrDefault(uid, -1) == 0)
         {
-            _playerControllers.Remove(uid);
+            PlayerControllers.Remove(uid);
             if (Info.Dictionary.TryGetValue(uid, out Info info))
-                info.ownerId = 0;
+                info.controllerId = -1;
             ResetPlayerAnimatorToIdle(uid);
         }
     }
@@ -184,17 +186,22 @@ public static class PlayerSync
         conn.Send(new YourConnectionIdMessage { connectionId = conn.connectionId });
     }
 
-    /// <summary>Clean up when a remote client disconnects.</summary>
+    /// <summary>Clean up when a remote client disconnects — release ALL players they controlled.</summary>
     public static void OnServerDisconnected(NetworkConnectionToClient conn)
     {
         if (!NetworkServer.active || conn == null) return;
-        string oldUid = null;
-        foreach (var kv in _playerControllers)
-            if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
-        if (oldUid != null)
+        List<string> toRelease = new List<string>();
+        foreach (var kv in PlayerControllers)
+            if (kv.Value == conn.connectionId) toRelease.Add(kv.Key);
+        foreach (var uid in toRelease)
         {
-            _playerControllers.Remove(oldUid);
-            ResetPlayerAnimatorToIdle(oldUid);
+            PlayerControllers.Remove(uid);
+            if (Info.Dictionary.TryGetValue(uid, out Info info))
+            {
+                info.controllerId = -1;
+                info.ownerId = 0;
+            }
+            ResetPlayerAnimatorToIdle(uid);
         }
     }
 
@@ -240,7 +247,7 @@ public static class PlayerSync
         {
             playerIndex = index, uid = player.uid, id = (int)player.id,
             position = player.position, destroyed = destroyed,
-            controllingClientId = _playerControllers.GetValueOrDefault(player.uid, -1),
+            controllingClientId = PlayerControllers.GetValueOrDefault(player.uid, -1),
             health = player.Health, healthMax = player.HealthMax,
             mana = player.Mana, sanity = player.Sanity,
             hunger = player.Hunger, hungerMax = player.HungerMax,
@@ -370,26 +377,26 @@ public static class PlayerSync
             return;
         }
 
-        _playerControllers[msg.uid] = msg.controllingClientId;
+        PlayerControllers[msg.uid] = msg.controllingClientId;
         if (InfoMap.TryGetValue(msg.uid, out Info syncInfo))
-            syncInfo.ownerId = msg.controllingClientId;
+            syncInfo.controllerId = msg.controllingClientId;
 
         if (!InfoMap.TryGetValue(msg.uid, out Info existing))
             HandleNewPlayer(msg);
         else if (existing is PlayerInfo pi)
             HandleExistingPlayer(msg, pi);
 
-        // Client handles its own animation — skip host broadcast for players we actually own.
-        // Free players (ownerId = "-1") must still receive animation from host broadcast.
-        bool isOwnedByUs = !Helper.IsHost() && syncInfo != null && syncInfo.ownerId == _myConnectionId;
-        if (!isOwnedByUs)
+        // Client handles its own animation — skip host broadcast for players we control.
+        // Free players (controllerId = -1) still receive animation from host broadcast.
+        bool isControlledByUs = !Helper.IsHost() && syncInfo != null && syncInfo.controllerId == _myConnectionId;
+        if (!isControlledByUs)
             HandleAnimationTrigger(msg, existing);
         TryInitializeScene(msg);
     }
 
     private static void HandleDestroyedPlayer(PlayerSyncMessage msg)
     {
-        _playerControllers.Remove(msg.uid);
+        PlayerControllers.Remove(msg.uid);
         if (InfoMap.TryGetValue(msg.uid, out Info dead))
         {
             EntitySync.InfoMap.Remove(msg.uid);
@@ -421,10 +428,10 @@ public static class PlayerSync
 
     private static void HandleExistingPlayer(PlayerSyncMessage msg, PlayerInfo pi)
     {
-        // Only skip position/animation sync for players we actually own.
-        // Free players (ownerId = "-1") must still receive position/animation from host broadcast.
-        bool isOwnedByUs = !Helper.IsHost() && pi.ownerId == _myConnectionId;
-        if (isOwnedByUs)
+        // Only skip position/animation sync for players we control (provide input for).
+        // Free/owner-only players (controllerId = -1) still receive full sync from host.
+        bool isControlledByUs = !Helper.IsHost() && pi.controllerId == _myConnectionId;
+        if (isControlledByUs)
         {
             // Local player: only sync server-authoritative fields (stats).
             // Inventory is client-authoritative — don't overwrite with host broadcast.
@@ -519,33 +526,39 @@ public static class PlayerSync
     {
         if (!Helper.IsHost() || Main.PlayerInfo == null) return;
         string currentUid = Main.PlayerInfo.uid;
-        int owner = _playerControllers.GetValueOrDefault(currentUid, -1);
-        if (owner == -1)
+        int ctrl = PlayerControllers.GetValueOrDefault(currentUid, -1);
+        if (ctrl == -1)
             HostClaimPlayer(currentUid);
     }
 
-    /// <summary>Claim the player if free; returns false if another connection already controls it.</summary>
+    /// <summary>Claim the player if free; returns false if another connection already controls it.
+    /// Sets both controller and owner so AI runs on the claiming client.
+    /// Releases any previous claim from this connection (client tab-switched).</summary>
     private static bool TryClaimPlayer(NetworkConnectionToClient conn, PlayerInfo targetPlayer)
     {
-        int currentOwner = _playerControllers.GetValueOrDefault(targetPlayer.uid, -1);
-        if (currentOwner != -1 && currentOwner != conn.connectionId)
+        int currentCtrl = PlayerControllers.GetValueOrDefault(targetPlayer.uid, -1);
+        if (currentCtrl != -1 && currentCtrl != conn.connectionId)
             return false;
 
-        if (currentOwner == -1)
+        if (currentCtrl == -1)
         {
-            // Release any previous claim from this connection
+            // Release any previous claim from this connection (client tab-switched to another player)
             string oldUid = null;
-            foreach (var kv in _playerControllers)
+            foreach (var kv in PlayerControllers)
                 if (kv.Value == conn.connectionId) { oldUid = kv.Key; break; }
             if (oldUid != null)
             {
-                _playerControllers.Remove(oldUid);
+                PlayerControllers.Remove(oldUid);
                 if (Info.Dictionary.TryGetValue(oldUid, out Info oldInfo))
+                {
+                    oldInfo.controllerId = -1;
                     oldInfo.ownerId = 0;
+                }
                 ResetPlayerAnimatorToIdle(oldUid);
             }
 
-            _playerControllers[targetPlayer.uid] = conn.connectionId;
+            PlayerControllers[targetPlayer.uid] = conn.connectionId;
+            targetPlayer.controllerId = conn.connectionId;
             targetPlayer.ownerId = conn.connectionId;
         }
         return true;
@@ -654,7 +667,7 @@ public static class PlayerSync
         }
         InfoMap.Clear();
         _pendingUnloads.Clear();
-        _playerControllers.Clear();
+        PlayerControllers.Clear();
         _myConnectionId = -1;
         _clientSceneInitialized = false;
         _lastPlayerAnimHash.Clear();

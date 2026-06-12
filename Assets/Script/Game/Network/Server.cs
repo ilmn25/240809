@@ -131,6 +131,11 @@ public static class Server
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
 
+        // Reset client sync state immediately so a fast reconnect doesn't
+        // inherit stale state (e.g. _clientSceneInitialized still true from
+        // the previous session, which would block TryInitializeScene).
+        PlayerSync.Clear();
+
         // Fade to black, then clean up players/world after it completes
         _ = new CoroutineTask(DisconnectCleanup());
     }

@@ -13,6 +13,14 @@ class MobChaseAction : MobState {
     }
     
     public override void OnUpdateState() {
+        // Teleport followers to target if out of logic range
+        if (Info.ActionType == IActionType.Follow && Info.Target?.Machine != null &&
+            Vector3.Distance(Machine.transform.position, Info.Target.position) > Scene.LogicDistance)
+        {
+            Machine.transform.position = Info.Target.position;
+            return;
+        }
+
         if (Main.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
         {
             Info.CancelTarget();

@@ -138,18 +138,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                     { Info.Target = si; Info.ActionType = IActionType.Hit; return; }
             }
 
-            // Follow nearest player
-            PlayerInfo nearest = null;
-            float nearestDist = float.MaxValue;
-            foreach (var p in Save.Inst.players)
+            // Follow owner's controlling character
+            if (Info.Target != Main.PlayerInfo && Main.PlayerInfo?.PlayerStatus == PlayerStatus.Active)
             {
-                if (p.Machine == null || p == Info || p.ownerId == -1) continue;
-                float d = Vector3.Distance(transform.position, p.Machine.transform.position);
-                if (d < nearestDist) { nearestDist = d; nearest = p; }
-            }
-            if (nearest != null && Info.Target != nearest)
-            {
-                Info.Target = nearest;
+                Info.Target = Main.PlayerInfo;
                 Info.ActionType = IActionType.Follow;
             }
             

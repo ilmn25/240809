@@ -11,8 +11,10 @@ public class Info : EntityModule
     public string uid = Guid.NewGuid().ToString("N");
     public ID id;
     public Vector3 position;
-    /// <summary>Who owns this entity. 0 = host, -1 = free (host-owned until claimed), >0 = remote client connection ID.</summary>
+    /// <summary>Who owns this entity (runs AI/pathfinding). 0 = host (free, host-managed), >0 = remote client.</summary>
     public int ownerId = 0;
+    /// <summary>Who controls this player (provides input). -1 = free, 0 = host, >0 = remote client.</summary>
+    public int controllerId = -1;
     [NonSerialized] public bool Destroyed = false;
     [NonSerialized] public bool IsInRenderRange;
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
@@ -20,12 +22,12 @@ public class Info : EntityModule
     public void Destroy() {Destroyed = true;}
     
     /// <summary>Does the local context (host or client) have authority over this entity?
-    /// 0 = host, -1 = free (host-owned until claimed), >0 = remote client connection ID.</summary>
+    /// 0 = host, >0 = remote client connection ID.</summary>
     public bool IsOwner()
     {
         if (Helper.IsHost())
-            return ownerId == 0 || ownerId == -1;
-        return ownerId == PlayerSync.MyConnectionId;
+            return ownerId == 0 || controllerId == 0;
+        return ownerId == PlayerSync.MyConnectionId || controllerId == PlayerSync.MyConnectionId;
     }
 
     public override string ToString()
