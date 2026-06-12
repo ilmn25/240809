@@ -139,11 +139,11 @@ public class MapLoad
             {
                 _chunkCoordinate = chunkCoord;
                 _chunk = World.Inst[chunkCoord.x, chunkCoord.y, chunkCoord.z];
-                if (_chunk != Chunk.Zero)
+                if (_chunk != null && _chunk != Chunk.Zero)
                 {
                     await Task.Run(() => LoadMeshMath()); 
                     LoadMeshObject(replace);
-                }  else Helper.Log("Chunk in queue is zero");
+                }
             }
         }
         catch (Exception ex)

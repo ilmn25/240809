@@ -20,7 +20,7 @@ public static class Server
         NetworkManager.singleton.spawnPrefabs.Add(networkPrefab);
     }
 
-    public static bool StartHost()
+    public static IEnumerator StartHost()
     {
         if (NetworkClient.isConnected)
             NetworkManager.singleton.StopClient();
@@ -28,21 +28,35 @@ public static class Server
         if (Save.Inst == null)
             Save.Inst = new Save(GenType.SuperFlat);
 
+        // Fade to black first (Save.Inst must exist so Environment.Update()
+        // actually transitions). The fade back in happens naturally in
+        // Scene.Update() when _hostFirstGenDone sets Environment.Target = Null.
+        Environment.Target = EnvironmentType.Black;
+        yield return new WaitForSeconds(2f);
+
         PortTransport transport = Transport.active as PortTransport;
         int port = transport != null ? transport.Port : DefaultHostPort;
         while (IsPortInUse(port)) port++;
         if (transport != null) transport.Port = (ushort)port;
+
         NetworkManager.singleton.StartHost();
         Scene.LoadWorld();
         RegisterHandlers();
         NetworkManager.singleton.StartCoroutine(ChunkBatchLoop());
-        return true;
     }
 
-    public static void StartClient(string address = null)
+    public static IEnumerator StartClient(string address = null)
     {
         if (NetworkServer.active)
             StopHost();
+
+        // Ensure Save.Inst exists so Environment.Update() actually transitions.
+        if (Save.Inst == null)
+            Save.Inst = new Save(GenType.SuperFlat);
+
+        // Fade to black first, then connect to the server.
+        Environment.Target = EnvironmentType.Black;
+        yield return new WaitForSeconds(2f);
 
         NetworkManager.singleton.networkAddress = string.IsNullOrWhiteSpace(address) ? "127.0.0.1" : address;
         NetworkManager.singleton.StartClient();
@@ -135,8 +149,13 @@ public static class Server
         Scene.Busy = false;
         World.UnloadWorld();
 
-        // Reset environment so a future game doesn't stay black
-        Environment.Target = EnvironmentType.Null;
+        // Reset environment to DaySnow (menu default) so a future game
+        // starts from a clean state — avoids transitioning to whatever
+        // Save.Inst.weather happened to be.
+        // Target must also be reset so Environment.Update() doesn't
+        // immediately transition back to the previous target (e.g. Black).
+        Environment.SetStartEnvironment(EnvironmentType.DaySnow);
+        Environment.Target = EnvironmentType.DaySnow;
         _disconnecting = false;
 
         // Show main menu after disconnect

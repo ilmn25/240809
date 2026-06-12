@@ -91,7 +91,7 @@ public class Environment
     private const float Speed = 0.4f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
-    private static EnvironmentType _previous;
+    private static EnvironmentType _previous = EnvironmentType.Black;
     private static EnvironmentType _current = EnvironmentType.Black; 
     public static EnvironmentType Target = EnvironmentType.Null;
     private static int Time
@@ -103,6 +103,19 @@ public class Environment
     {
         get => Save.Inst.weather;
         set => Save.Inst.weather = value;
+    }
+
+    /// <summary>
+    /// Sets the initial environment state so _current/_previous track the
+    /// actual visual state. Call once at startup (e.g. Main.Start) instead
+    /// of Set() to keep the transition system in sync.
+    /// </summary>
+    public static void SetStartEnvironment(EnvironmentType type)
+    {
+        _previous = type;
+        _current = type;
+        Environment env = Environments[type];
+        Set(env.AmbientLight, env.FogColor, env.SpotLight, env.DirectionalLight, env.BackgroundColor);
     }
 
     private static void SetTarget(EnvironmentType target)

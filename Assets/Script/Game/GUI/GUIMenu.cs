@@ -26,7 +26,7 @@ public class GUIMenu : GUI
         else if (Main.GUIMainMenuButtonJoin.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
-            Server.StartClient();
+            _ = new CoroutineTask(Server.StartClient());
             Show(false);
         }
         else if (Main.GUIMainMenuButtonExit.IsHovered)

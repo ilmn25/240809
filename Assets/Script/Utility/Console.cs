@@ -270,7 +270,7 @@ public class Console : MonoBehaviour
                 }
                 break;   
             case "j":
-                Server.StartClient(_command.Length > 1 ? _command[1] : null);
+                _ = new CoroutineTask(Server.StartClient(_command.Length > 1 ? _command[1] : null));
                 break;
             case "h":
                 Host();
@@ -310,7 +310,7 @@ public class Console : MonoBehaviour
 
     private static void Host()
     {
-        Server.StartHost();
+        _ = new CoroutineTask(Server.StartHost());
         PrintIP();
     }
 

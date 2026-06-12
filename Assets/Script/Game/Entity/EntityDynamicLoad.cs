@@ -112,10 +112,12 @@ public class EntityDynamicLoad
 
     private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
     {
-        List<Info> chunkEntityList = World.Inst[chunkCoordinate].DynamicEntity; 
+        Chunk chunk = World.Inst[chunkCoordinate];
+        if (chunk == null || chunk == Chunk.Zero) return;
+        List<Info> chunkEntityList = chunk.DynamicEntity; 
         foreach (Info info in chunkEntityList)
             Entity.SpawnFromInfo(info, true);
-        World.Inst[chunkCoordinate].DynamicEntity.Clear(); 
+        chunk.DynamicEntity.Clear(); 
     } 
 }
  

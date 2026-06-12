@@ -71,11 +71,7 @@ public class Main : MonoBehaviour
 
     public void Start()
     {
-        Environment.Set(Environment.Environments[EnvironmentType.DaySnow].AmbientLight,
-            Environment.Environments[EnvironmentType.DaySnow].FogColor,
-            Environment.Environments[EnvironmentType.DaySnow].SpotLight,
-            Environment.Environments[EnvironmentType.DaySnow].DirectionalLight,
-            Environment.Environments[EnvironmentType.DaySnow].BackgroundColor);
+        Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         
         ViewPort.Initialize(); 
         Audio.Initialize();
