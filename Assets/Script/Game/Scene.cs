@@ -111,6 +111,7 @@ public class Scene
                 if (player.Machine != null)
                     ObjectPool.ReturnObject(player.Machine.gameObject);
         World.UnloadWorld();
+        GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
     }
     public static void Update()

@@ -71,11 +71,11 @@ public class Main : MonoBehaviour
 
     public void Start()
     {
-        Environment.Set(Environment.Environments[EnvironmentType.NightBright].AmbientLight,
-            Environment.Environments[EnvironmentType.NightBright].FogColor,
-            Environment.Environments[EnvironmentType.NightBright].SpotLight,
-            Environment.Environments[EnvironmentType.NightBright].DirectionalLight,
-            Environment.Environments[EnvironmentType.NightBright].BackgroundColor);
+        Environment.Set(Environment.Environments[EnvironmentType.DaySnow].AmbientLight,
+            Environment.Environments[EnvironmentType.DaySnow].FogColor,
+            Environment.Environments[EnvironmentType.DaySnow].SpotLight,
+            Environment.Environments[EnvironmentType.DaySnow].DirectionalLight,
+            Environment.Environments[EnvironmentType.DaySnow].BackgroundColor);
         
         ViewPort.Initialize(); 
         Audio.Initialize();

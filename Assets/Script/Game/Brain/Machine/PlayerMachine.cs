@@ -130,26 +130,28 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 EnsureCompatibleToolForTarget();
             }
 
-            // If no target or only following player, search pending tasks
-            if ((Info.Target == null || Info.Target == Main.PlayerInfo) && PlayerTask.Pending.Count != 0)
-            {  
-                foreach (StructureInfo structureInfo in PlayerTask.Pending)
-                { 
-                    if (Info.Storage.SetTool(structureInfo.operationType))
-                    {
-                        Info.Target = structureInfo;
-                        Info.ActionType = IActionType.Hit; 
-                        return;
-                    } 
-                } 
+            // Search pending tasks if not working on a structure
+            if (Info.Target is not StructureInfo && PlayerTask.Pending.Count != 0)
+            {
+                foreach (StructureInfo si in PlayerTask.Pending)
+                    if (Info.Storage.SetTool(si.operationType))
+                    { Info.Target = si; Info.ActionType = IActionType.Hit; return; }
             }
-            
-            // If no task found, follow player
-            if (Info.Target == null && Main.PlayerInfo.PlayerStatus == PlayerStatus.Active)
-            {  
-                Info.Target = Main.PlayerInfo;
+
+            // Follow nearest player
+            PlayerInfo nearest = null;
+            float nearestDist = float.MaxValue;
+            foreach (var p in Save.Inst.players)
+            {
+                if (p.Machine == null || p == Info || p.ownerId == -1) continue;
+                float d = Vector3.Distance(transform.position, p.Machine.transform.position);
+                if (d < nearestDist) { nearestDist = d; nearest = p; }
+            }
+            if (nearest != null && Info.Target != nearest)
+            {
+                Info.Target = nearest;
                 Info.ActionType = IActionType.Follow;
-            } 
+            }
             
             SetState<MobChaseAction>();
         } 
