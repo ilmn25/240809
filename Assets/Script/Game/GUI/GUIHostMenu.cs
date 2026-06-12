@@ -28,8 +28,9 @@ public class GUIHostMenu : GUI
         if (Main.GUIHostMenuButtonNew.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
+            Environment.Target = EnvironmentType.Black;
             Save.Inst = new Save(GenType.Abyss);
-            Server.StartHost();
+            _ = new CoroutineTask(Server.StartHost());
             Show(false);
         }
         else if (Main.GUIHostMenuButtonLoad.IsHovered)

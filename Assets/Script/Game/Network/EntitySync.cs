@@ -387,7 +387,7 @@ public static class EntitySync
             }
             if (newOwnerId.HasValue && em.Info.ownerId != newOwnerId.Value)
             {
-                Console.Print($"Owner {em.Info.ownerId} → {newOwnerId.Value} for {em.Info.id}");
+                // Console.Print($"Owner {em.Info.ownerId} → {newOwnerId.Value} for {em.Info.id}");
                 em.Info.ownerId = newOwnerId.Value;
             }
         }

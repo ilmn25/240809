@@ -37,8 +37,9 @@ public class GUILoad : GUI
  
         if (Control.Inst.ActionPrimary.KeyDown() && Target != -1)
         {  
+            Environment.Target = EnvironmentType.Black;
             Saves.LoadSave(Saves.Inst.List[Target]);
-            Server.StartHost();
+            _ = new CoroutineTask(Server.StartHost());
             Show(false); 
         } 
     }
