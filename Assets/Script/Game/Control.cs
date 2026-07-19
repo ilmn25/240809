@@ -92,14 +92,15 @@ public class Control
                 next = (next + 1) % count;
                 if (next == prevIndex) break; // wrapped around
                 var p = global::Save.Inst.players[next];
-                if (p.Machine != null && p.IsInRenderRange) break;
+                if (p.Machine != null) break;
             }
             if (next == prevIndex) return; // no other player in range
             SetPlayer(next);
 
             if (!Helper.IsHost())
             {
-                // Remote client: do nothing — host will see our ClientToServerPlayerMessage
+                // Immediately claim the new player so the host doesn't broadcast stale controllerId.
+                PlayerSync.SendClientPlayerBatch();
             }
             else
             {

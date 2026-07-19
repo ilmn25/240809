@@ -321,7 +321,7 @@ public static class PlayerSync
 
     #region Client Send
 
-    private static void SendClientPlayerBatch()
+    public static void SendClientPlayerBatch()
     {
         if (Helper.IsHost() || !NetworkClient.isConnected || Main.PlayerInfo?.Machine == null) return;
 
