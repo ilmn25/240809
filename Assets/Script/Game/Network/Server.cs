@@ -29,8 +29,8 @@ public static class Server
             Save.Inst = new Save(GenType.SuperFlat);
 
         // Fade to black first (Save.Inst must exist so Environment.Update()
-        // actually transitions). The fade back in happens naturally in
-        // Scene.Update() when _hostFirstGenDone sets Environment.Target = Null.
+        // actually transitions). The fade back in happens in Scene.Start()
+        // after all chunks are generated.
         Environment.Target = EnvironmentType.Black;
         yield return new WaitForSeconds(2f);
 
@@ -42,7 +42,6 @@ public static class Server
         NetworkManager.singleton.StartHost();
         Scene.LoadWorld();
         RegisterHandlers();
-        NetworkManager.singleton.StartCoroutine(ChunkBatchLoop());
     }
 
     public static IEnumerator StartClient(string address = null)
@@ -79,7 +78,8 @@ public static class Server
         NetworkServer.OnDisconnectedEvent -= PlayerSync.OnServerDisconnected;
         NetworkClient.UnregisterHandler<ServerToClientTextMessage>();
         NetworkServer.UnregisterHandler<ClientToServerTextMessage>();
-        NetworkClient.UnregisterHandler<HostToClientSnapshotChunkMessage>();
+        NetworkClient.UnregisterHandler<HostToClientFullSaveMessage>();
+        NetworkClient.UnregisterHandler<HostToClientWorldSwitchMessage>();
         NetworkClient.UnregisterHandler<BatchEntityInfoMessage>();
         NetworkClient.UnregisterHandler<PlayerSyncMessage>();
         DropSync.UnregisterHandlers();
@@ -97,7 +97,7 @@ public static class Server
         NetworkClient.OnDisconnectedEvent -= OnClientDisconnected;
         NetworkClient.OnDisconnectedEvent += OnClientDisconnected;
         Chat.RegisterHandlers();
-        ChunkSync.RegisterHandlers();
+        SaveSync.RegisterHandlers();
         EntitySync.RegisterHandlers();
         PlayerSync.RegisterHandlers();
         StorageSync.RegisterHandlers();
@@ -145,7 +145,7 @@ public static class Server
         Environment.Target = EnvironmentType.Black;
         yield return new WaitForSeconds(2f);
 
-        ChunkSync.Clear();
+        SaveSync.Clear();
         DropSync.Clear();
         EffectSync.Clear();
         PlayerSync.Clear();
@@ -180,7 +180,7 @@ public static class Server
             yield return null;
  
         World.UnloadWorld();
-        ChunkSync.SendSaveChunks(conn, Save.Inst);
+        SaveSync.SendFullSave(conn, Save.Inst);
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
 
@@ -189,19 +189,6 @@ public static class Server
         // Notify all clients
         int userId = conn.connectionId + 1;
         NetworkServer.SendToAll(new ServerToClientTextMessage { text = $"User {userId} connected" });
-    }
-
-    private static IEnumerator ChunkBatchLoop()
-    {
-        var wait = new WaitForSeconds(2f);
-        while (NetworkServer.active)
-        {
-            yield return wait;
-            if (Gen.PendingNewChunks.Count == 0) continue;
-            var batch = new List<Vector3Int>(Gen.PendingNewChunks);
-            Gen.PendingNewChunks.Clear();
-            ChunkSync.SendChunkBatchToAll(batch);
-        }
     }
 
     private static bool IsPortInUse(int port)
