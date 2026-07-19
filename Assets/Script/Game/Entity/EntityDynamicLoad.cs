@@ -1,10 +1,13 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages active dynamic entities (mobs, items) in a single global list.
+/// Entities that leave player logic range are despawned (not saved back to chunks).
+/// New entities are spawned by MobSpawner or player actions — never loaded from world data.
+/// </summary>
 public class EntityDynamicLoad 
 {
-
     private static readonly List<EntityMachine> _activeEntities = new List<EntityMachine>();
     public static List<EntityMachine> ActiveEntities => _activeEntities;
 
@@ -21,6 +24,30 @@ public class EntityDynamicLoad
         _activeEntities.Add(entity);
     }
 
+    public static void OnChunkTraverse()
+    {
+        if (!Helper.IsHost()) return;
+        ScanAndUnload();
+    }
+    
+    private static void ScanAndUnload()
+    {
+        List<EntityMachine> removeList = new List<EntityMachine>();
+        foreach (var entityMachine in _activeEntities)
+        { 
+            Vector3Int entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
+            if (!AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
+            {
+                removeList.Add(entityMachine);
+            }
+        }
+        foreach (var entityMachine in removeList)
+        {
+            EntitySync.BroadcastEntityUnload(entityMachine.Info);
+            entityMachine.Unload();
+        }
+    }
+
     private static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
     {
         foreach (var player in Save.Inst.players)
@@ -35,89 +62,16 @@ public class EntityDynamicLoad
         return false;
     }
 
-    public static void OnChunkTraverse()
-    {
-        if (!Helper.IsHost()) return;
-        ScanAndUnload();
-        ScanAndLoad();
-    }
-    
-    private static void ScanAndUnload()
-    {
-        List<EntityMachine> removeList = new List<EntityMachine>();
-        Vector3Int entityChunkPosition;
-        foreach (var entityMachine in _activeEntities)
-        { 
-            entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
-            
-            if (!AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
-            {
-                if (World.IsInWorldBounds(entityChunkPosition))
-                    World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
-                removeList.Add(entityMachine);
-            }
-        }
-        foreach (var entityMachine in removeList)
-        {
-            EntitySync.BroadcastEntityUnload(entityMachine.Info);
-            entityMachine.Unload();
-        }
-    }
-
-    private static void ScanAndLoad()
-    {
-        HashSet<Vector3Int> loaded = new HashSet<Vector3Int>();
-        foreach (var player in Save.Inst.players)
-        {
-            if (player.Machine == null || player.controllerId == -1) continue;
-            Vector3Int center = World.GetChunkCoordinate(player.Machine.transform.position);
-            for (int x = -Scene.LogicRange; x <= Scene.LogicRange; x++)
-            {
-                for (int y = -Scene.LogicRange; y <= Scene.LogicRange; y++)
-                {
-                    for (int z = -Scene.LogicRange; z <= Scene.LogicRange; z++)
-                    {
-                        Vector3Int chunkCoordinate = new Vector3Int(
-                            center.x + x * World.ChunkSize,
-                            center.y + y * World.ChunkSize,
-                            center.z + z * World.ChunkSize
-                        );
-                        if (!loaded.Add(chunkCoordinate)) continue;
-                        LoadEntitiesInChunk(chunkCoordinate);
-                    }
-                }
-            }
-        }
-    } 
-      
     public static void UnloadWorld()
     {
         if (!Helper.IsHost()) return;
 
-        List<EntityMachine> removeList = new List<EntityMachine>();
-        Vector3Int entityChunkPosition;
-        foreach (EntityMachine entityMachine in _activeEntities)
-        {
-            entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
-            if (World.IsInWorldBounds(entityChunkPosition))
-                World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
-            removeList.Add(entityMachine);
-        }
+        List<EntityMachine> removeList = new List<EntityMachine>(_activeEntities);
         foreach (var entityMachine in removeList)
         {
             EntitySync.BroadcastEntityUnload(entityMachine.Info);
             entityMachine.Unload();
         }
     }
-
-    private static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
-    {
-        Chunk chunk = World.Inst[chunkCoordinate];
-        if (chunk == null || chunk == Chunk.Zero) return;
-        List<Info> chunkEntityList = chunk.DynamicEntity; 
-        foreach (Info info in chunkEntityList)
-            Entity.SpawnFromInfo(info, true);
-        chunk.DynamicEntity.Clear(); 
-    } 
 }
  

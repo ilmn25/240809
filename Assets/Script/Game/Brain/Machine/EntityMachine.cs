@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public abstract class EntityMachine : Machine, IInfoProvider
 { 
@@ -19,7 +17,6 @@ public abstract class EntityMachine : Machine, IInfoProvider
         StatePrevious = State.DefaultState;
         AddModule(info);
         // Track by uid so the server can find and destroy entities (e.g. client pickup relay).
-        // Deserialized Info objects (from chunk saves) may have null uid — assign one.
         if (string.IsNullOrEmpty(info.uid))
             info.uid = Guid.NewGuid().ToString("N");
         Info.Dictionary[info.uid] = info;

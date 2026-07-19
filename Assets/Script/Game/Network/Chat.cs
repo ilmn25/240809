@@ -1,5 +1,4 @@
 using Mirror;
-using UnityEngine;
 
 public struct ClientToServerTextMessage : NetworkMessage { public string text; }
 public struct ServerToClientTextMessage : NetworkMessage { public string text; }
