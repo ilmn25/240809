@@ -1,21 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
-using Mirror;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 
 public class Scene 
 { 
     public static Vector3Int PlayerChunkPosition;
     private static Vector3Int _playerChunkPositionPrevious;
-    private static readonly Dictionary<int, Vector3Int> _playerChunkPositions = new();
 
     public static readonly int RenderRange = 2;
     public static readonly int LogicRange = 3; 
@@ -65,8 +57,6 @@ public class Scene
 
         if (Helper.IsHost())
         {
-            _playerChunkPositions.Clear();
-
             // Generate ALL worlds up-front (Minecraft-style dimensions).
             // Gen.GenerateAllFor skips worlds that already have data.
             foreach (var kv in Save.Inst.worlds)
@@ -131,20 +121,9 @@ public class Scene
 
         if (Helper.IsHost())
         {
-            for (int i = 0; i < Save.Inst.players.Count; i++)
-            {
-                PlayerInfo p = Save.Inst.players[i];
-                if (p.Machine == null || p.controllerId == -1) continue;
-                Vector3Int chunkPos = World.GetChunkCoordinate(p.position);
-                if (_playerChunkPositions.TryGetValue(i, out var prev) && prev == chunkPos) continue;
-                _playerChunkPositions[i] = chunkPos;
-            }
-            // Update rendering when the controlled player moves or host switches players
-            if (PlayerChunkPosition != _playerChunkPositionPrevious)
-            {
-                World.LoadWorld();
-                _playerChunkPositionPrevious = PlayerChunkPosition;
-            }
+            // Always update render & entity state — handles player switches (Tab)
+            // even when both players share the same chunk.
+            World.LoadWorld();
         }
         else if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
