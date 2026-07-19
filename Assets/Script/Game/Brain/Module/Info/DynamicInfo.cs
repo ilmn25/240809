@@ -57,7 +57,18 @@ public class DynamicInfo : Info
         if (Machine)
         {
             position = Machine.transform.position;
-            IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
+            if (Helper.IsHost())
+            {
+                // On the host: entity is in render range if ANY player is close enough.
+                // Remote clients see entities near them, so those entities must use full
+                // physics to avoid teleporting (abstract movement snaps to TargetPointPosition).
+                Vector3Int chunkCoord = World.GetChunkCoordinate(position);
+                IsInRenderRange = EntityDynamicLoad.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
+            }
+            else
+            {
+                IsInRenderRange = SpriteCharRenderer.isVisible && MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(position));
+            }
         }
 
         if (KnockbackCounter != KnockbackInterval)

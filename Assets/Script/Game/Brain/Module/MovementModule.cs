@@ -4,8 +4,6 @@ using UnityEngine;
 [Serializable]
 public abstract class MovementModule : DynamicModule
 {
-    protected static readonly Collider[] ColliderArray = new Collider[1];
-    
     private const float SlideDegree = 0.3f;
     
     protected float DeltaTime;  
@@ -103,23 +101,32 @@ public abstract class MovementModule : DynamicModule
         } 
         
         
-        // if (Info.Direction != Vector3.zero && _previousPosition == Machine.transform.position)
-        // {
-        //     Debug.Log("aaa");
-        //     Vector3 tempPosition = Utility.AddToVector(Machine.transform.position, 0, 0.1f, 0);
-        //     if (IsMovable(tempPosition)) Machine.transform.position = tempPosition; 
-        // }
-        // _previousPosition = Machine.transform.position;
     }
     
-    private readonly Vector3 _colliderSize = new Vector3(0.35f, 0.35f, 0.25f);  
-    private readonly Vector3 _colliderCenter = new Vector3(0, 0.35f, 0);  
     protected bool IsMovable(Vector3 newPosition)
     {
-        // if (!Scene.InPlayerChunkRange(World.GetChunkCoordinate(newPosition), Scene.LogicDistance)) return false;  
-        
-        return !(Physics.OverlapBoxNonAlloc(newPosition + _colliderCenter, 
-            _colliderSize, ColliderArray, Quaternion.identity, 
-            Main.MaskStatic) > 0);
+        // Compute the exact block range the collider box overlaps.
+        // Box half-extents: (0.35, 0.35, 0.25) centered at newPosition + (0, 0.35, 0).
+        // Using precise extents avoids the 1-block padding that a fixed ±1 footprint would create.
+        int minX = Mathf.FloorToInt(newPosition.x - 0.35f);
+        int maxX = Mathf.FloorToInt(newPosition.x + 0.35f);
+        int minZ = Mathf.FloorToInt(newPosition.z - 0.25f);
+        int maxZ = Mathf.FloorToInt(newPosition.z + 0.25f);
+        int minY = Mathf.FloorToInt(newPosition.y);
+        int maxY = Mathf.FloorToInt(newPosition.y + 0.7f);
+
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                for (int z = minZ; z <= maxZ; z++)
+                {
+                    Vector3Int b = new Vector3Int(x, y, z);
+                    if (World.IsInWorldBounds(b) && !NavMap.Get(b))
+                        return false;
+                }
+            }
+        }
+        return true;
     } 
 }

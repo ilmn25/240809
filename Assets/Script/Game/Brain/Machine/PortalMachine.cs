@@ -14,13 +14,13 @@ public class PortalMachine: StructureMachine, IActionSecondaryInteract
         return;
         IEnumerator Portal()
         {
-            Environment.Target = EnvironmentType.Black; 
+            ScreenFade.FadeOut(0.5f); 
             Main.PlayerInfo.SpeedModifier = 0.001f;
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(0.6f);
             Main.Player.transform.position = new Vector3Int(2, 50, 2); 
-            yield return new WaitForSeconds(3);
+            ScreenFade.FadeIn(0.5f);
             Main.PlayerInfo.SpeedModifier = 1;
-            Environment.Target = EnvironmentType.Null; 
+            yield return new WaitForSeconds(0.6f); 
         }
     }
 }

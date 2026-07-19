@@ -20,6 +20,7 @@ public class Scene
     {  
         if (Busy) return;
         Busy = true;
+        ScreenFade.FadeOut(0.3f);
         if (spawnPoint.HasValue)
             Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
         new CoroutineTask(Quit(false)).Finished += _ => {
@@ -99,17 +100,21 @@ public class Scene
             // All chunks already exist — signal game ready immediately.
             Main.SceneMode = SceneMode.Game;
             Environment.Target = EnvironmentType.Null;
+            ScreenFade.FadeIn(1f);
             Busy = false;
         }
     }
     private static IEnumerator Quit(bool includePlayers)
     {     
-        Environment.Target = EnvironmentType.Black; 
-        yield return new WaitForSeconds(2);
+        // Screen is already black from caller's FadeOut — don't fade again.
+        yield return new WaitForSeconds(0.4f);
         if (includePlayers && Save.Inst != null)
             foreach (PlayerInfo player in Save.Inst.players)
                 if (player.Machine != null)
+                {
                     ObjectPool.ReturnObject(player.Machine.gameObject);
+                    player.Machine = null;
+                }
         World.UnloadWorld();
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;

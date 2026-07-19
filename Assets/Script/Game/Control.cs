@@ -165,17 +165,6 @@ public class Control
                 Main.PlayerInfo.ActionType = IActionType.PickUp;
             }
         }
-        // else if (Inst.ActionSecondaryNear.KeyDown() && !GUIDialogue.Showing)
-        // { 
-        //     IActionSecondary target = GetNearestInteractable<IActionSecondary>();
-        //     if (target == null) return;
-        //     Game.PlayerInfo.Target = ((EntityMachine)target).Info;   
-        //     
-        //     if (target is IActionSecondaryPickUp)
-        //         Game.PlayerInfo.ActionType = IActionType.PickUp;
-        //     else
-        //         Game.PlayerInfo.ActionType = IActionType.Interact;
-        // }
     }
 
     private static T GetNearestInteractable<T>() where T : class, IAction

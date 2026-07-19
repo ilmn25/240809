@@ -5,8 +5,6 @@ public class GroundAnimationModule : MobModule
     public GroundAnimationModule() { updateMode = UpdateMode.Everyone; }
     private const float BounceSpeed = 1.35f;
     private const float BounceRange = 0.125f;
-    // private const float BounceSpeed = 1f;
-    // private const float BounceRange = 0.12f;
     private const float TrailFrequency = 0.5f;
     private const float FlipDuration = 0.06f; 
     

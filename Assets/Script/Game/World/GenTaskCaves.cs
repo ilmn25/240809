@@ -21,15 +21,7 @@ public class GenTaskCaves : Gen
                     {
                         currentChunk[x, y, z] = 0; // Empty space for caves
                     }
-                    
-                    // Convert local chunk coordinates to world position
-                    // Vector3 position = new Vector3(CurrentCoordinate.x + x, CurrentCoordinate.y + y, CurrentCoordinate.z + z);
-                    //
-                    // // If density is below threshold, it's a cave (air)
-                    // if (_densityGen.GetDensity(position) < _densityGen.threshold)
-                    // {
-                    //     CurrentChunk[x, y, z] = 0; // Empty space for caves
-                    // }  
+
                 }
             }
         }

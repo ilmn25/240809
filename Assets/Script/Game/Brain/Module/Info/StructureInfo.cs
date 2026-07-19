@@ -33,7 +33,7 @@ public class StructureInfo : Info
             return false;
         }  
         projectile.SourceInfo.Target = this;
-        projectile.SourceInfo.ActionType = IActionType.Hit;;
+        projectile.SourceInfo.ActionType = IActionType.Hit;
         return true;
         // if (!PlayerTask.Pending.Contains(this)) PlayerTask.Pending.Add(this) 
     }

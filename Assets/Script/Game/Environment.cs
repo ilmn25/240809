@@ -143,7 +143,7 @@ public class Environment
             SetTarget(Weather);
         else
             SetTarget(Target);
-         
+
         if (_currentTransitionTime < TransitionLength - 1)
         {
             _currentTransitionTime++;

@@ -27,8 +27,18 @@ public class ItemInfo : Info
         if (Machine)
         {
             position = Machine.transform.position;
-            IsInRenderRange = SpriteRenderer.isVisible &&
-                              MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(Machine.transform.position));
+            if (Helper.IsHost())
+            {
+                // On the host: entity is in render range if ANY player is close enough.
+                // Prevents items from being simulated with abstract movement near remote clients.
+                Vector3Int chunkCoord = World.GetChunkCoordinate(position);
+                IsInRenderRange = EntityDynamicLoad.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
+            }
+            else
+            {
+                IsInRenderRange = SpriteRenderer.isVisible &&
+                                  MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(position));
+            }
         }
     }
 

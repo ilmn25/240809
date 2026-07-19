@@ -28,7 +28,7 @@ public class GUIHostMenu : GUI
         if (Main.GUIHostMenuButtonNew.IsHovered)
         {
             Audio.PlaySFX(SfxID.Text);
-            Environment.Target = EnvironmentType.Black;
+            ScreenFade.FadeOut(0.3f);
             Save.Inst = new Save(GenType.Abyss);
             _ = new CoroutineTask(Server.StartHost());
             Show(false);

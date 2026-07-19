@@ -1,5 +1,4 @@
 using System;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public class ItemSlot
@@ -86,10 +85,7 @@ public class ItemSlot
                             break;
                     }
                 }  
-                // text += " \nattack cooldown: " + Info.Speed;
-                // if (Info.ProjectileInfo is RangedProjectileInfo) text += " \nbullet speed: " + Info.ProjectileInfo.Damage;  
-                // else text += " \nrange: " + Info.ProjectileInfo.Radius;
-                // text += " \ncrit chance: " + Info.ProjectileInfo.CritChance * 100 + "%";  
+
                 if (Info.ProjectileInfo.Ammo != ID.Null) text += " \n \nammo: " + Info.ProjectileInfo.Ammo;
             } 
 

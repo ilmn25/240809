@@ -48,7 +48,7 @@ public class EntityDynamicLoad
         }
     }
 
-    private static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
+    public static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
     {
         foreach (var player in Save.Inst.players)
         {
