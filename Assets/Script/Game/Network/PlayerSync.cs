@@ -476,6 +476,7 @@ public static class PlayerSync
             _clientSceneInitialized = true;
             Main.SceneMode = SceneMode.Game;
             Environment.Target = EnvironmentType.Null;
+            ScreenFade.FadeIn(1f);
         }
     }
 

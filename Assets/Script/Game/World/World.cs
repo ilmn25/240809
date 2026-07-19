@@ -107,16 +107,14 @@ public class World
         }
     }
     
-    public static Boolean IsInWorldBounds(Vector3 worldPosition)
+    public static bool IsInWorldBounds(Vector3 worldPosition)
     {
-        if (worldPosition.x < Inst.Bounds.x && worldPosition.x >= 0 &&
-            worldPosition.y < Inst.Bounds.y && worldPosition.y >= 0 &&
-            worldPosition.z < Inst.Bounds.z && worldPosition.z >= 0)
-            return true;
-        return false;
+        return worldPosition.x < Inst.Bounds.x && worldPosition.x >= 0 &&
+               worldPosition.y < Inst.Bounds.y && worldPosition.y >= 0 &&
+               worldPosition.z < Inst.Bounds.z && worldPosition.z >= 0;
     }
 
-    public static Boolean IsInWorldBounds(int x, int y, int z)
+    public static bool IsInWorldBounds(int x, int y, int z)
     {
         if (x < Inst.Bounds.x && x >= 0 &&
             y < Inst.Bounds.y && y >= 0 &&
@@ -161,7 +159,7 @@ public class World
         NavMap.Set(coordinate, isAir);
         NavMapSync.BroadcastBlockUpdate(coordinate, isAir);
         
-        if (MapUpdated != null) MapUpdated(coordinate);
+        MapUpdated?.Invoke(coordinate);
         
         MapLoad.RefreshExistingChunk(chunkCoordinate); // Refresh on screen
         if (blockCoordinate.x != 0 && blockCoordinate.x != ChunkSize - 1 &&

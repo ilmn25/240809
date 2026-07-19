@@ -47,21 +47,6 @@ public class MapCull
         {
             YThreshold -= 1;
         }
-        // if (Control.Inst.CullUp.KeyDown())
-        // {
-            // switch (_currentCullMode)
-            // {
-            //     case CullMode.On:
-            //         _currentCullMode = CullMode.Off;
-            //         break;
-            //     case CullMode.Off:
-            //         _currentCullMode = CullMode.Auto;
-            //         break;
-            //     case CullMode.Auto:
-            //         _currentCullMode = CullMode.On;
-            //         break;
-            // }
-        // }
     }
 
     private static IEnumerator YCheckRoutine()

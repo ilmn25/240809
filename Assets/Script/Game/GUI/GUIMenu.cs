@@ -35,8 +35,8 @@ public class GUIMenu : GUI
             _ = new CoroutineTask(Quit());
             IEnumerator Quit()
             {
-                Environment.Target = EnvironmentType.Black;
-                yield return new WaitForSeconds(3);
+                ScreenFade.FadeOut(0.5f);
+                yield return new WaitForSeconds(0.6f);
                 Application.Quit();
             }
         }

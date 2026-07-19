@@ -12,8 +12,4 @@ public class PlanterInfo : SpriteStructureInfo
     public bool IsPlanted;
     public bool IsGrown;
 
-    public override void Update()
-    {
-        // Growth is driven by Environment.HourlyTriggered in PlanterMachine.
-    }
 }

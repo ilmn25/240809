@@ -248,6 +248,7 @@ public class Console : MonoBehaviour
                 }
                 break;
             case "flat":
+                ScreenFade.FadeOut(0.3f);
                 Scene.SwitchSave(new Save(GenType.SuperFlat));  
                 GUIMain.GUIMenu.Show(false);
                 break;   

@@ -90,6 +90,7 @@ public class Main : MonoBehaviour
     private void Update()
     {   
         GUIMain.UpdateMenu();
+        ScreenFade.Update();
         Environment.Update();
         if (SceneMode != SceneMode.Game || !Player) return;
         Terraform.Update();
@@ -106,10 +107,14 @@ public class Main : MonoBehaviour
         Scene.Update(); 
     }
 
+    private void OnGUI()
+    {
+        ScreenFade.OnGUI();
+    }
+
     private void OnApplicationQuit()
     {
         Block.Dispose();
-        // PlayerData.Save();
         Control.Save();  
         Saves.Quit();  
         MapLoad.CancellationTokenSourceKillGame.Cancel();

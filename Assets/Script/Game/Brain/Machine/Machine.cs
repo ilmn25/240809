@@ -14,7 +14,7 @@ public abstract class Machine : MonoBehaviour
     public virtual void OnUpdate() {}
     public virtual void OnTerminate() {}
  
-    public void AddState(State state, Boolean current = false)
+    public void AddState(State state, bool current = false)
     {
         state.Machine = this;
         States.Add(state);

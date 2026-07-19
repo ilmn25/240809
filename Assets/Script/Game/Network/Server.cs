@@ -28,11 +28,8 @@ public static class Server
         if (Save.Inst == null)
             Save.Inst = new Save(GenType.SuperFlat);
 
-        // Fade to black first (Save.Inst must exist so Environment.Update()
-        // actually transitions). The fade back in happens in Scene.Start()
-        // after all chunks are generated.
-        Environment.Target = EnvironmentType.Black;
-        yield return new WaitForSeconds(2f);
+        ScreenFade.FadeOut(0.5f);
+        yield return new WaitForSeconds(0.7f);
 
         PortTransport transport = Transport.active as PortTransport;
         int port = transport != null ? transport.Port : DefaultHostPort;
@@ -49,13 +46,11 @@ public static class Server
         if (NetworkServer.active)
             StopHost();
 
-        // Ensure Save.Inst exists so Environment.Update() actually transitions.
         if (Save.Inst == null)
             Save.Inst = new Save(GenType.SuperFlat);
 
-        // Fade to black first, then connect to the server.
-        Environment.Target = EnvironmentType.Black;
-        yield return new WaitForSeconds(2f);
+        ScreenFade.FadeOut(0.5f);
+        yield return new WaitForSeconds(0.7f);
 
         NetworkManager.singleton.networkAddress = string.IsNullOrWhiteSpace(address) ? "127.0.0.1" : address;
         NetworkManager.singleton.StartClient();
@@ -142,8 +137,8 @@ public static class Server
 
     private static IEnumerator DisconnectCleanup()
     {
-        Environment.Target = EnvironmentType.Black;
-        yield return new WaitForSeconds(2f);
+        ScreenFade.FadeOut(0.5f);
+        yield return new WaitForSeconds(0.7f);
 
         SaveSync.Clear();
         DropSync.Clear();

@@ -37,7 +37,7 @@ public class GUILoad : GUI
  
         if (Control.Inst.ActionPrimary.KeyDown() && Target != -1)
         {  
-            Environment.Target = EnvironmentType.Black;
+            ScreenFade.FadeOut(0.3f);
             Saves.LoadSave(Saves.Inst.List[Target]);
             _ = new CoroutineTask(Server.StartHost());
             Show(false); 

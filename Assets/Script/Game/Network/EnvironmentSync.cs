@@ -5,7 +5,9 @@ public class EnvironmentSync : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnDayChanged))] public int day;
     [SyncVar(hook = nameof(OnTimeChanged))] public int time;
-    [SyncVar(hook = nameof(OnWeatherChanged))] public EnvironmentType weather;
+    // Default to Sunrise (not Null) — Null (0) is not in Environments dict
+    // and would crash Environment.Update(), killing the whole Main.Update().
+    [SyncVar(hook = nameof(OnWeatherChanged))] public EnvironmentType weather = EnvironmentType.Sunrise;
 
     private void Update()
     {

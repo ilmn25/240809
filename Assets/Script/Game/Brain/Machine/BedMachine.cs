@@ -16,13 +16,13 @@ public class BedMachine: StructureMachine, IActionSecondaryInteract
 
         IEnumerator Sleep()
         {
-            Environment.Target = EnvironmentType.Black;
+            ScreenFade.FadeOut(0.5f);
             Main.PlayerInfo.SpeedModifier = 0.001f;
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(2.5f);
             Environment.MoveTime(Environment.Length / 2);
-            yield return new WaitForSeconds(3);
+            ScreenFade.FadeIn(0.5f);
+            yield return new WaitForSeconds(0.6f);
             Main.PlayerInfo.SpeedModifier = 1;
-            Environment.Target = EnvironmentType.Null;
         }
     }
 }
