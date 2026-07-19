@@ -313,73 +313,17 @@ public static class EntitySync
             foreach (var em in kv.Value.Item2) SendContainerStorageFor(em);
     }
 
-    /// <summary>Find nearest player uid in render range, falling back to logic range.</summary>
-    private static (string renderUid, string logicUid) FindNearestPlayerUids(Vector3 pos, string excludeUid = null)
-    {
-        string closestRenderUid = null;
-        string logicFallbackUid = null;
-        float closestRender = float.MaxValue;
-
-        foreach (var player in Save.Inst.players)
-        {
-            if (player.Machine == null || (excludeUid != null && player.uid == excludeUid)) continue;
-            float dist = Vector3.Distance(pos, player.Machine.transform.position);
-
-            if (dist <= Scene.RenderDistance)
-            {
-                if (dist < closestRender) { closestRender = dist; closestRenderUid = player.uid; }
-            }
-            else if (dist <= Scene.LogicDistance && logicFallbackUid == null)
-                logicFallbackUid = player.uid;
-        }
-        return (closestRenderUid, logicFallbackUid);
-    }
-
-    /// <summary>Get the connection ID that controls a player uid, mapped to ownerId: 0=host, >0=client.</summary>
-    private static int PlayerUidToOwnerId(string uid)
-    {
-        int cId = PlayerSync.PlayerControllers.GetValueOrDefault(uid, -1);
-        return cId >= 1 ? cId : 0;
-    }
-
-    /// <summary>Host: assign uncontrolled players to the nearest controlled player.
-    /// Non-player entities are always owned by the host (ownerId=0).</summary>
-    private static void UpdateOwnership()
-    {
-        if (!Helper.IsHost()) return;
-
-        // ── Player ownership: assign free players (no controller) to nearest controlled player ──
-        foreach (var player in Save.Inst.players)
-        {
-            if (player.Machine == null || player.controllerId != -1) continue;
-            Vector3 pos = player.Machine.transform.position;
-
-            var (closestRenderUid, logicFallbackUid) = FindNearestPlayerUids(pos, player.uid);
-
-            int newOwner = player.ownerId; // keep current by default
-            if (closestRenderUid != null)
-                newOwner = PlayerUidToOwnerId(closestRenderUid);
-            else if (logicFallbackUid != null)
-                newOwner = PlayerUidToOwnerId(logicFallbackUid);
-            if (player.ownerId != newOwner)
-                player.ownerId = newOwner;
-        }
-    }
+    /// <summary>Non-player entities are always host-owned (ownerId=0).
+    /// Free players (controllerId=-1) also stay host-owned since ownership transfer
+    /// to a remote client causes pathfinding bugs (lost target/action context,
+    /// ownership thrashing at range edges, and other clients skipping position sync).</summary>
 
     private static IEnumerator BatchLoop()
     {
-        float ownershipTimer = 0f;
         while (true)
         {
             yield return new WaitForSeconds(BroadcastInterval);
             if (!NetworkServer.active) continue;
-
-            ownershipTimer += BroadcastInterval;
-            if (ownershipTimer >= 0.5f)
-            {
-                UpdateOwnership();
-                ownershipTimer = 0f;
-            }
             SendBatch();
         }
     }

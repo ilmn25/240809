@@ -52,8 +52,8 @@ public abstract class EntityMachine : Machine, IInfoProvider
 
     public override void Update()
     {
-        // Only the owner runs AI/pathfinding/host-only modules
-        if (Info != null && Info.IsOwner())
+        // Host runs AI/pathfinding for all entities; client only for entities it controls
+        if (Info != null && (Helper.IsHost() || Info.IsOwner()))
         {
             OnUpdate();
             RunForMode(Module.UpdateMode.OwnerOnly);

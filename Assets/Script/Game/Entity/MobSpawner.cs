@@ -12,10 +12,6 @@ public class MobSpawner
     private const int MobCapPerPlayer = 15;      // max active mobs near each player
     private const int SpawnAttemptsPerTick = 5;  // retries per tick
 
-    // Day: 0–660 min   Sunset: 660–840   Night: 840–1380   Sunrise: 1380–1440
-    private const int NightStart = 840;
-    private const int DayStart = 1380;
-
     private static int _timer;
 
     private static readonly List<ID> DayMobs = new() { ID.Sheep, ID.Chicken };
@@ -35,7 +31,7 @@ public class MobSpawner
         int globalCap = Save.Inst.players.Count * MobCapPerPlayer;
         if (totalMobs >= globalCap) return;
 
-        bool isNight = Save.Inst.time >= NightStart || Save.Inst.time < DayStart;
+        bool isNight = Save.Inst.weather == EnvironmentType.NightRainy || Save.Inst.weather == EnvironmentType.NightBright;
 
         foreach (var player in Save.Inst.players)
         {
@@ -77,13 +73,10 @@ public class MobSpawner
 
         ID mobID = pool[Random.Range(0, pool.Count)];
 
-        // Spawn a group of 1–3.
+        // Spawn a group of 1–3 at the exact same position (no spread).
         int groupSize = Random.Range(1, 4);
         for (int i = 0; i < groupSize; i++)
-        {
-            Vector3Int offset = new Vector3Int(Random.Range(-2, 3), 0, Random.Range(-2, 3));
-            Entity.Spawn(mobID, spawnPos + offset);
-        }
+            Entity.Spawn(mobID, spawnPos);
     }
 
     /// <summary>Scan downward from the given position to find the first
