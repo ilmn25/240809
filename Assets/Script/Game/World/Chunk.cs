@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public class Chunk 
@@ -11,7 +9,6 @@ public class Chunk
     protected int[] Map;
     public int size;     
     public readonly List<Info> StaticEntity = new();
-    public readonly List<Info> DynamicEntity = new(); 
      
     public Chunk(int size = 0)
     {

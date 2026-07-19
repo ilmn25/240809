@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Newtonsoft.Json;
-using UnityEditor;
 using UnityEngine.Serialization;
  
 
@@ -72,7 +71,6 @@ public class SetPiece
         {
             Chunk chunk = World.Inst[chunkCoord.x, chunkCoord.y, chunkCoord.z];
             
-            // Check and add static entities
             foreach (Info entity in chunk.StaticEntity)
             {
                 if (IsEntityInRange(Vector3Int.FloorToInt(entity.position) , minX, minY, minZ, maxX, maxY, maxZ))
@@ -80,17 +78,6 @@ public class SetPiece
                     info = (Info)Helper.Clone(entity);
                     info.position = entity.position - new Vector3Int(minX, minY, minZ);
                     setPiece.StaticEntity.Add(info);
-                }
-            }
-
-            // Check and add dynamic entities
-            foreach (Info entity in chunk.DynamicEntity)
-            {
-                if (IsEntityInRange(Vector3Int.FloorToInt(entity.position), minX, minY, minZ, maxX, maxY, maxZ))
-                { 
-                    info = (Info)Helper.Clone(entity);
-                    info.position = entity.position - new Vector3Int(minX, minY, minZ);
-                    setPiece.DynamicEntity.Add(info);
                 }
             }
         }
@@ -119,18 +106,6 @@ public class SetPiece
                 info.position += position;
                 World.Inst[chunkPos].StaticEntity.Add(info);
             } 
-        }
- 
-        foreach (Info entity in setPiece.DynamicEntity)
-        { 
-            worldPos = position + Vector3Int.FloorToInt(entity.position);
-            if (World.IsInWorldBounds(worldPos))
-            { 
-                chunkPos = World.GetChunkCoordinate(worldPos);
-                info = (Info)Helper.Clone(entity);
-                info.position += position;
-                World.Inst[chunkPos].DynamicEntity.Add(info);
-            }  
         }
  
         for (int x = 0; x < setPiece.size; x++)

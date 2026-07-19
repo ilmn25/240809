@@ -1,6 +1,4 @@
  
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
  
 public class PlayerMachine : MobMachine, IActionSecondaryInteract

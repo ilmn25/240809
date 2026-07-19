@@ -31,20 +31,6 @@ public struct BatchEntityInfoMessage : NetworkMessage
     public int[] itemDurabilities;
 }
 
-/// <summary>Owner client → Host: updated state for entities this client owns.
-/// Host relays to all other clients.</summary>
-public struct ClientEntityUpdateMessage : NetworkMessage
-{
-    public string[] uids;
-    public Vector3[] positions;
-    public Vector3[] animDirections;
-    public bool[] animIsGrounded;
-    public float[] animSpeedCurrent;
-    public float[] animSpeedTarget;
-    public int[] animTriggers;
-    public float[] animNormalizedTimes;
-}
-
 public static class EntitySync
 {
     public static readonly Dictionary<string, Info> InfoMap = new Dictionary<string, Info>();
@@ -53,8 +39,6 @@ public static class EntitySync
     public static void RegisterHandlers()
     {
         NetworkClient.ReplaceHandler<BatchEntityInfoMessage>(OnBatchEntityInfoMessageReceived, false);
-        NetworkClient.ReplaceHandler<ClientEntityUpdateMessage>(OnClientEntityUpdateReceived, false);
-        NetworkServer.ReplaceHandler<ClientEntityUpdateMessage>(OnRelayClientEntityUpdate, false);
         if (Application.isPlaying)
             _ = new CoroutineTask(BatchLoop());
     }
@@ -146,9 +130,8 @@ public static class EntitySync
             if (targetInfo.IsOwner())
                 continue;
 
-            // Skip sync for client-owned entities — the owner sends updates via relay (ClientEntityUpdateMessage).
-            // IsOwner() catches self-ownership (our locally-run entities).
-            // ownerId != 0 catches other-client-owned entities that IsOwner() wouldn't match.
+            // Non-player entities are host-owned — skip syncing any that slipped through
+            // (e.g. stale state). Host broadcasts are authoritative for all non-player entities.
             if (targetInfo.ownerId != 0)
                 continue;
 
@@ -359,47 +342,11 @@ public static class EntitySync
         return cId >= 1 ? cId : 0;
     }
 
-    /// <summary>Host: assign entity and player ownership based on player proximity.</summary>
+    /// <summary>Host: assign uncontrolled players to the nearest controlled player.
+    /// Non-player entities are always owned by the host (ownerId=0).</summary>
     private static void UpdateOwnership()
     {
         if (!Helper.IsHost()) return;
-
-        // ── Entity ownership ──────────────────────────────────────────
-        foreach (var em in EntityDynamicLoad.ActiveEntities)
-        {
-            if (em.Info == null) continue;
-            Vector3 pos = em.transform.position;
-            int currentId = em.Info.ownerId;
-
-            var (closestRenderUid, logicFallbackUid) = FindNearestPlayerUids(pos);
-
-            // DynamicEntity load/unload is handled by EntityDynamicLoad — ownership only transfers here
-            int? newOwnerId = null;
-            if (closestRenderUid != null)
-                newOwnerId = PlayerUidToOwnerId(closestRenderUid);
-            else
-            {
-                // Check if current owner (if it's a client) still has logic range
-                if (currentId != 0)
-                {
-                    var currentPlayer = Save.Inst.players.Find(p =>
-                        PlayerSync.PlayerControllers.GetValueOrDefault(p.uid, -1) == currentId);
-                    if (currentPlayer?.Machine != null &&
-                        Vector3.Distance(pos, currentPlayer.Machine.transform.position) <= Scene.LogicDistance)
-                        continue; // keep current owner
-                }
-                // Try any player in logic range
-                if (logicFallbackUid != null)
-                    newOwnerId = PlayerUidToOwnerId(logicFallbackUid);
-                else
-                    continue; // host-owned or free — keep as-is
-            }
-            if (newOwnerId.HasValue && em.Info.ownerId != newOwnerId.Value)
-            {
-                // Console.Print($"Owner {em.Info.ownerId} → {newOwnerId.Value} for {em.Info.id}");
-                em.Info.ownerId = newOwnerId.Value;
-            }
-        }
 
         // ── Player ownership: assign free players (no controller) to nearest controlled player ──
         foreach (var player in Save.Inst.players)
@@ -425,122 +372,20 @@ public static class EntitySync
         while (true)
         {
             yield return new WaitForSeconds(BroadcastInterval);
-            if (NetworkServer.active)
+            if (!NetworkServer.active) continue;
+
+            ownershipTimer += BroadcastInterval;
+            if (ownershipTimer >= 0.5f)
             {
-                ownershipTimer += BroadcastInterval;
-                if (ownershipTimer >= 0.5f)
-                {
-                    UpdateOwnership();
-                    ownershipTimer = 0f;
-                }
-                SendBatch();
+                UpdateOwnership();
+                ownershipTimer = 0f;
             }
-            else
-                ClientSendUpdate();
+            SendBatch();
         }
     }
 
-    private static void ApplyEntityUpdate(string uid, Vector3 pos, Vector3 dir, bool grounded, float speedCurr, float speedTarg)
-    {
-        if (!InfoMap.TryGetValue(uid, out Info info))
-            Info.Dictionary.TryGetValue(uid, out info);
-        if (info == null || info.Machine == null || info.IsOwner()) return;
-        info.position = pos;
-        info.Machine.transform.position = pos;
-        if (info is DynamicInfo dyn)
-        {
-            dyn.Direction = dir;
-            dyn.IsGrounded = grounded;
-            dyn.SpeedCurrent = speedCurr;
-            dyn.SpeedTarget = speedTarg;
-        }
-    }
-
-    /// <summary>Remote client: apply owner's entity updates relayed by host.</summary>
-    private static void OnClientEntityUpdateReceived(ClientEntityUpdateMessage msg)
-    {
-        for (int i = 0; i < msg.uids.Length; i++)
-            ApplyEntityUpdate(msg.uids[i], msg.positions[i],
-                msg.animDirections[i], msg.animIsGrounded[i],
-                msg.animSpeedCurrent[i], msg.animSpeedTarget[i]);
-    }
-
-    /// <summary>Host: apply owner update locally, then relay to remote clients.</summary>
-    private static void OnRelayClientEntityUpdate(NetworkConnection conn, ClientEntityUpdateMessage msg)
-    {
-        if (!NetworkServer.active) return;
-        int senderId = ((Mirror.NetworkConnectionToClient)conn).connectionId;
-        for (int i = 0; i < msg.uids.Length; i++)
-            ApplyEntityUpdate(msg.uids[i], msg.positions[i],
-                msg.animDirections[i], msg.animIsGrounded[i],
-                msg.animSpeedCurrent[i], msg.animSpeedTarget[i]);
-        foreach (var kv in NetworkServer.connections)
-            if (kv.Key != senderId && kv.Key != 0)
-                kv.Value.Send(msg);
-    }
-
-    /// <summary>Client: send updated state for entities this client owns back to the host.</summary>
-    private static void ClientSendUpdate()
-    {
-        if (Helper.IsHost() || !NetworkClient.active) return;
-        List<string> uids = new List<string>();
-        List<Vector3> positions = new List<Vector3>();
-        List<Vector3> animDirs = new List<Vector3>();
-        List<bool> animGrounded = new List<bool>();
-        List<float> animSpeedCurr = new List<float>();
-        List<float> animSpeedTarg = new List<float>();
-        List<int> animTriggers = new List<int>();
-        List<float> animNormalizedTimes = new List<float>();
-
-        foreach (var kv in InfoMap)
-        {
-            Info info = kv.Value;
-            // Players are synced via PlayerSync — skip them in EntitySync
-            if (info == null || info is PlayerInfo || !info.IsOwner() || info.Machine == null) continue;
-            uids.Add(info.uid);
-            positions.Add(info.position);
-            if (info is DynamicInfo dyn)
-            {
-                animDirs.Add(dyn.Direction);
-                animGrounded.Add(dyn.IsGrounded);
-                animSpeedCurr.Add(dyn.SpeedCurrent);
-                animSpeedTarg.Add(dyn.SpeedTarget);
-                if (dyn.Animator != null && dyn.Animator.isActiveAndEnabled)
-                {
-                    AnimatorStateInfo state = dyn.Animator.GetCurrentAnimatorStateInfo(0);
-                    animTriggers.Add(state.shortNameHash);
-                    animNormalizedTimes.Add(state.normalizedTime);
-                }
-                else
-                {
-                    animTriggers.Add(0);
-                    animNormalizedTimes.Add(0f);
-                }
-            }
-            else
-            {
-                animDirs.Add(Vector3.zero);
-                animGrounded.Add(false);
-                animSpeedCurr.Add(0f);
-                animSpeedTarg.Add(0f);
-                animTriggers.Add(0);
-                animNormalizedTimes.Add(0f);
-            }
-        }
-        if (uids.Count == 0) return;
-
-        NetworkClient.Send(new ClientEntityUpdateMessage
-        {
-            uids = uids.ToArray(),
-            positions = positions.ToArray(),
-            animDirections = animDirs.ToArray(),
-            animIsGrounded = animGrounded.ToArray(),
-            animSpeedCurrent = animSpeedCurr.ToArray(),
-            animSpeedTarget = animSpeedTarg.ToArray(),
-            animTriggers = animTriggers.ToArray(),
-            animNormalizedTimes = animNormalizedTimes.ToArray()
-        });
-    }
+    /// <summary>Non-player entities are host-owned — clients never send entity updates.
+    /// Client-side animation/runtime sync is handled entirely via the host's BatchEntityInfoMessage broadcast.</summary>
 
     public static void BroadcastEntityUnload(Info info)
     {
