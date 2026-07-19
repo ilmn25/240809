@@ -115,7 +115,6 @@ public class SetPiece
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos); 
-                if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                 info = (Info)Helper.Clone(entity);
                 info.position += position;
                 World.Inst[chunkPos].StaticEntity.Add(info);
@@ -128,7 +127,6 @@ public class SetPiece
             if (World.IsInWorldBounds(worldPos))
             { 
                 chunkPos = World.GetChunkCoordinate(worldPos);
-                if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                 info = (Info)Helper.Clone(entity);
                 info.position += position;
                 World.Inst[chunkPos].DynamicEntity.Add(info);
@@ -148,7 +146,6 @@ public class SetPiece
                         if (World.IsInWorldBounds(worldPos))
                         {
                             chunkPos = World.GetChunkCoordinate(worldPos);
-                            if (World.Inst[chunkPos] == null) Gen.Generate(chunkPos);
                             World.Inst[chunkPos][World.GetBlockCoordinate(worldPos)] = blockID; 
                         } 
                     }

@@ -1,20 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Random = System.Random;
  
 [Serializable]
 public class World
 {
-    public static Vector3Int GetSize(GenType genType) => Gen.Dictionary[genType].GetSize();
-    public static Vector3Int GetSpawnPoint(GenType genType) => Gen.Dictionary[genType].GetSpawnPoint();
-
     public delegate void Vector3IntEvent(Vector3Int position);
     public static event Vector3IntEvent MapUpdated;  
     public const int ChunkSize = 15; 
@@ -30,10 +20,22 @@ public class World
     public World(GenType genType)
     {
         GenType = genType; 
-        Size = GetSize(genType);
+        Size = Gen.Dictionary[genType].GetSize();
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
-        SpawnPoint = GetSpawnPoint(genType);
+        SpawnPoint = Gen.Dictionary[genType].GetSpawnPoint();
         _chunks = new Chunk[Size.x * Size.y * Size.z];
+    }
+
+    /// <summary>
+    /// Populates NavMap for every chunk in this world.
+    /// NavMap must already be initialized for the correct world bounds.
+    /// </summary>
+    public void PopulateNavMap()
+    {
+        for (int cx = 0; cx < Size.x; cx++)
+            for (int cy = 0; cy < Size.y; cy++)
+                for (int cz = 0; cz < Size.z; cz++)
+                    NavMap.SetChunk(new Vector3Int(cx * ChunkSize, cy * ChunkSize, cz * ChunkSize));
     }
 
     public static void UnloadWorld()

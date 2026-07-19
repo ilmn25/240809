@@ -100,8 +100,6 @@ public class GenTaskWall : Gen
                     Vector3Int blockPos = World.GetBlockCoordinate(worldPos);
 
                     Chunk targetChunk = World.Inst[chunkPos];
-                    if (targetChunk == null) 
-                        Gen.Generate(chunkPos);
 
                     int existingID = World.Inst[chunkPos][blockPos.x, blockPos.y, blockPos.z];
                     if (existingID == 0)

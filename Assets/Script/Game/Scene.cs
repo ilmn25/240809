@@ -16,7 +16,6 @@ public class Scene
     public static Vector3Int PlayerChunkPosition;
     private static Vector3Int _playerChunkPositionPrevious;
     private static readonly Dictionary<int, Vector3Int> _playerChunkPositions = new();
-    private static bool _hostFirstGenDone;
 
     public static readonly int RenderRange = 2;
     public static readonly int LogicRange = 3; 
@@ -56,16 +55,26 @@ public class Scene
     
     private static void Start()
     {
-        Gen.Initialize(Save.Inst.current);
         Vector3 spawnPosition = World.Inst.SpawnPoint;
 
         foreach (PlayerInfo player in Save.Inst.players)
             player.position = spawnPosition;
 
+        // Initialise NavMap before any chunk data is written into it.
+        NavMap.Initialize();
+
         if (Helper.IsHost())
         {
             _playerChunkPositions.Clear();
-            _hostFirstGenDone = false;
+
+            // Generate ALL worlds up-front (Minecraft-style dimensions).
+            // Gen.GenerateAllFor skips worlds that already have data.
+            foreach (var kv in Save.Inst.worlds)
+                Gen.GenerateAllFor(kv.Value);
+
+            // Populate NavMap for the current (active) world.
+            World.Inst.PopulateNavMap();
+
             foreach (PlayerInfo player in Save.Inst.players)
             {
                 if (player.Machine == null) Entity.SpawnFromInfo(player, false);
@@ -80,11 +89,7 @@ public class Scene
             _playerChunkPositionPrevious = PlayerChunkPosition;
             World.LoadWorld();
             Busy = false;
-        }
 
-        NavMap.Initialize();
-        if (!Helper.IsHost())
-        {
             // Build NavMap for chunks received from server in starting range.
             Vector3Int center = World.GetChunkCoordinate(Save.Inst.players[0].position);
             for (int x = -GenRange; x <= GenRange; x++)
@@ -100,6 +105,11 @@ public class Scene
         {
             PlayerInfo firstPlayer = global::Save.Inst.players[0];
             PlayerSync.HostClaimPlayer(firstPlayer.uid);
+
+            // All chunks already exist — signal game ready immediately.
+            Main.SceneMode = SceneMode.Game;
+            Environment.Target = EnvironmentType.Null;
+            Busy = false;
         }
     }
     private static IEnumerator Quit(bool includePlayers)
@@ -128,21 +138,6 @@ public class Scene
                 Vector3Int chunkPos = World.GetChunkCoordinate(p.position);
                 if (_playerChunkPositions.TryGetValue(i, out var prev) && prev == chunkPos) continue;
                 _playerChunkPositions[i] = chunkPos;
-
-                var genTask = new CoroutineTask(Gen.GenerateNearbyChunks(chunkPos, GenRange));
-                if (!_hostFirstGenDone)
-                {
-                    genTask.Finished += (bool _) => {
-                        if (!_hostFirstGenDone)
-                        {
-                            _hostFirstGenDone = true;
-                            Main.SceneMode = SceneMode.Game;
-                            Environment.Target = EnvironmentType.Null;
-                            Busy = false;
-                        }
-                    };
-                }
-                genTask.Finished += (bool _) => { World.LoadWorld(); };
             }
             // Update rendering when the controlled player moves or host switches players
             if (PlayerChunkPosition != _playerChunkPositionPrevious)
