@@ -88,8 +88,10 @@ public class DynamicInfo : Info
             
             if (Main.Player && col.gameObject == Main.Player)
                 KnockBack(col.transform.position, 1, true);
+            else if (Main.Player && Machine.gameObject == Main.Player)
+                KnockBack(col.transform.position, 2, true);
             else
-                KnockBack(col.transform.position, 2 , true);
+                KnockBack(col.transform.position, 1.3f, true);
             break; 
         }
     } 
