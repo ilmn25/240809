@@ -18,8 +18,8 @@ public class GroundMovementModule : MovementModule
     { 
         if (Info.Health <= 0) return;
 
-        // Only the owner runs physics (host for players, client for owned entities)
-        if (!Info.IsOwner()) return;
+        // Host runs physics for all entities; client only for owned entities
+        if (!Helper.IsHost() && !Info.IsOwner()) return;
 
         if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         
