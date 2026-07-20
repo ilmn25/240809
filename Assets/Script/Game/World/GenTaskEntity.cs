@@ -69,9 +69,56 @@ public class GenTaskEntity : Gen
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
                             }
                         }
+
+                        // Surface ground pickups — persistent worldgen items
+                        if (roll >= 0.9)
+                        {
+                            ID groundItem = PickGroundItem(rng, position);
+                            if (groundItem != ID.Null)
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(groundItem, position));
+                        }
                     }
                 }
             }
         }
+    }
+
+    private static ID PickGroundItem(System.Random rng, Vector3Int position)
+    {
+        BiomeType biome = GenHelpBiome.GetBiomeType(position.x, position.z);
+        return biome == BiomeType.Desert
+            ? PickDesertItem(rng)
+            : PickGrassItem(rng);
+    }
+
+    private static ID PickDesertItem(System.Random rng)
+    {
+        double roll = rng.NextDouble();
+        double chance = 0;
+
+        if ((chance += 0.25) > roll) return ID.Flint;
+        if ((chance += 0.20) > roll) return ID.Gravel;
+        if ((chance += 0.15) > roll) return ID.Shell;
+        if ((chance += 0.12) > roll) return ID.Sand;
+        if ((chance += 0.08) > roll) return ID.Sticks;
+        if ((chance += 0.03) > roll) return ID.MetalChunks;
+        if ((chance += 0.02) > roll) return ID.CopperChunks;
+        return ID.Null;
+    }
+
+    private static ID PickGrassItem(System.Random rng)
+    {
+        double roll = rng.NextDouble();
+        double chance = 0;
+
+        if ((chance += 0.22) > roll) return ID.Flint;
+        if ((chance += 0.20) > roll) return ID.Sticks;
+        if ((chance += 0.12) > roll) return ID.Gravel;
+        if ((chance += 0.10) > roll) return ID.Shell;
+        if ((chance += 0.10) > roll) return ID.Acorn;
+        if ((chance += 0.08) > roll) return ID.Mud;
+        if ((chance += 0.03) > roll) return ID.MetalChunks;
+        if ((chance += 0.02) > roll) return ID.CopperChunks;
+        return ID.Null;
     }
 }
