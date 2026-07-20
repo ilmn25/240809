@@ -205,9 +205,9 @@ public class Entity
                         Collision = Main.IndexNoCollide,
                         PrefabName = ID.ItemPrefab,
                         Machine = typeof(ItemMachine),
-                        StaticLoad = false,
-                        SpawnOffset = MidAir
-                });  
+                        StaticLoad = true,
+                        SpawnOffset = Floor
+                });
                  
         }
 
@@ -258,7 +258,7 @@ public class Entity
 
                         EntityMachine currentEntityMachine = 
                                 gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>();
-                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
+                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
 
                         ItemInfo itemInfo = (ItemInfo)CreateInfo(ID.ItemPrefab, worldPosition);
                         itemInfo.item = new ItemSlot();
@@ -346,4 +346,5 @@ public class Entity
                 Debug.Log("error making info");
                 return null;
         }
+
 }
