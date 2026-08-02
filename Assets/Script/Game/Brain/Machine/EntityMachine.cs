@@ -45,7 +45,9 @@ public abstract class EntityMachine : Machine, IInfoProvider
             Info.IsInRenderRange = false;
             EntityStaticLoad.ForgetEntity(this, Entity);
         } 
-        else 
+        else if (Info is ItemInfo)
+            EntityItemLoad.ForgetEntity(this);
+        else
             EntityDynamicLoad.ForgetEntity(this);
         ObjectPool.ReturnObject(gameObject); 
     }

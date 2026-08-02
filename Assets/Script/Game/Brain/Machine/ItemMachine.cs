@@ -15,7 +15,6 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
     private float _deltaTime;
     private const float Gravity = 35;
     private const float BounceFactor = 0.3f;
-    private const float CollisionRange = 0.3f; 
     public override void OnStart()
     {
         if (ItemInfo.StackOnSpawn)
@@ -73,13 +72,22 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             ItemInfo.Velocity = -ItemInfo.Velocity * BounceFactor;
         }
 
-        return;
-
         bool IsMovable(Vector3 pos)
-        {  
-            _collisionCount = Physics.OverlapSphereNonAlloc(pos + new Vector3(0,0.2f,0), CollisionRange, CollisionArray, Main.MaskStatic);
-
-            return !(_collisionCount > 0);
+        {
+            // Equivalent to the old Physics.OverlapSphere(center y+0.2, radius 0.3)
+            // which covered y from (pos.y-0.1) to (pos.y+0.5). Check all blocks in
+            // that vertical range, matching MovementModule's box-footprint pattern.
+            int minY = Mathf.FloorToInt(pos.y - 0.1f);
+            int maxY = Mathf.FloorToInt(pos.y + 0.5f);
+            int cx = Mathf.FloorToInt(pos.x);
+            int cz = Mathf.FloorToInt(pos.z);
+            for (int y = minY; y <= maxY; y++)
+            {
+                Vector3Int b = new Vector3Int(cx, y, cz);
+                if (World.IsInWorldBounds(b) && !NavMap.Get(b))
+                    return false;
+            }
+            return true;
         } 
     }
 }

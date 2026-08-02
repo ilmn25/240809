@@ -16,6 +16,7 @@ public class World
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
 
+
     public World() {}  // for cloning
     public World(GenType genType)
     {
@@ -41,13 +42,15 @@ public class World
     public static void UnloadWorld()
     {   
 
-        EntityDynamicLoad.UnloadWorld(); 
+        EntityDynamicLoad.UnloadWorld();
+        EntityItemLoad.UnloadWorld();
         MapLoad.UnloadMap(); 
     }
 
     public static void LoadWorld()
     { 
         EntityDynamicLoad.OnChunkTraverse();
+        EntityItemLoad.OnChunkTraverse();
         MapLoad.OnChunkTraverse();
     }
  

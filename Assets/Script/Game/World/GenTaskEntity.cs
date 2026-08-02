@@ -12,6 +12,8 @@ public class GenTaskEntity : Gen
     private const double SurfaceChestChance = 0.0004;
     private const double SurfaceSlabChance = 0.0196;
     private const double SurfaceSandStructureChance = 0.0196;
+    /// <summary>Chance per surface block to spawn a ground item (matches original 1%+1%).</summary>
+    private const double GroundItemChance = 0.02;
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -50,6 +52,14 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
                             }
+ 
+                            // Grass biome items on dirt surface
+                            if (rng.NextDouble() < GroundItemChance)
+                            {
+                                ID groundItem = PickGrassItem(rng);
+                                if (groundItem != ID.Null)
+                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                            }
                         }
                         else
                         {
@@ -68,14 +78,14 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
                             }
-                        }
 
-                        // Surface ground pickups — persistent worldgen items
-                        if (roll >= 0.9)
-                        {
-                            ID groundItem = PickGroundItem(rng, position);
-                            if (groundItem != ID.Null)
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(groundItem, position));
+                            // Desert biome items on sand surface
+                            if (currentChunk[x, y, z] == Sand && rng.NextDouble() < GroundItemChance)
+                            {
+                                ID groundItem = PickDesertItem(rng);
+                                if (groundItem != ID.Null)
+                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                            }
                         }
                     }
                 }
@@ -83,42 +93,33 @@ public class GenTaskEntity : Gen
         }
     }
 
-    private static ID PickGroundItem(System.Random rng, Vector3Int position)
-    {
-        BiomeType biome = GenHelpBiome.GetBiomeType(position.x, position.z);
-        return biome == BiomeType.Desert
-            ? PickDesertItem(rng)
-            : PickGrassItem(rng);
-    }
-
+    /// <summary>Desert items — spawn on sand surfaces.</summary>
     private static ID PickDesertItem(System.Random rng)
     {
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.25) > roll) return ID.Flint;
-        if ((chance += 0.20) > roll) return ID.Gravel;
-        if ((chance += 0.15) > roll) return ID.Shell;
+        if ((chance += 0.30) > roll) return ID.Flint;
+        if ((chance += 0.25) > roll) return ID.Gravel;
+        if ((chance += 0.20) > roll) return ID.Shell;
         if ((chance += 0.12) > roll) return ID.Sand;
-        if ((chance += 0.08) > roll) return ID.Sticks;
-        if ((chance += 0.03) > roll) return ID.MetalChunks;
-        if ((chance += 0.02) > roll) return ID.CopperChunks;
+        if ((chance += 0.08) > roll) return ID.CopperChunks;
+        if ((chance += 0.05) > roll) return ID.MetalChunks;
         return ID.Null;
     }
 
+    /// <summary>Grass items — spawn on dirt surfaces.</summary>
     private static ID PickGrassItem(System.Random rng)
     {
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.22) > roll) return ID.Flint;
-        if ((chance += 0.20) > roll) return ID.Sticks;
-        if ((chance += 0.12) > roll) return ID.Gravel;
-        if ((chance += 0.10) > roll) return ID.Shell;
-        if ((chance += 0.10) > roll) return ID.Acorn;
-        if ((chance += 0.08) > roll) return ID.Mud;
-        if ((chance += 0.03) > roll) return ID.MetalChunks;
-        if ((chance += 0.02) > roll) return ID.CopperChunks;
+        if ((chance += 0.30) > roll) return ID.Sticks;
+        if ((chance += 0.25) > roll) return ID.Flint;
+        if ((chance += 0.15) > roll) return ID.Gravel;
+        if ((chance += 0.15) > roll) return ID.Acorn;
+        if ((chance += 0.10) > roll) return ID.Mud;
+        if ((chance += 0.05) > roll) return ID.Shell;
         return ID.Null;
     }
 }

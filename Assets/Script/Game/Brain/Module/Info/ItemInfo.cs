@@ -32,7 +32,7 @@ public class ItemInfo : Info
                 // On the host: entity is in render range if ANY player is close enough.
                 // Prevents items from being simulated with abstract movement near remote clients.
                 Vector3Int chunkCoord = World.GetChunkCoordinate(position);
-                IsInRenderRange = EntityDynamicLoad.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
+                IsInRenderRange = Scene.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
             }
             else
             {
