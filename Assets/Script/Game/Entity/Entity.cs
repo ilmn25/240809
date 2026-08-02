@@ -205,8 +205,8 @@ public class Entity
                         Collision = Main.IndexNoCollide,
                         PrefabName = ID.ItemPrefab,
                         Machine = typeof(ItemMachine),
-                        StaticLoad = true,
-                        SpawnOffset = Floor
+                        StaticLoad = false,
+                        SpawnOffset = MidAir
                 });
                  
         }
@@ -258,7 +258,7 @@ public class Entity
 
                         EntityMachine currentEntityMachine = 
                                 gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>();
-                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
+                        EntityItemLoad.InviteEntity(currentEntityMachine);
 
                         ItemInfo itemInfo = (ItemInfo)CreateInfo(ID.ItemPrefab, worldPosition);
                         itemInfo.item = new ItemSlot();
@@ -268,6 +268,8 @@ public class Entity
                         
                         itemInfo.StackOnSpawn = stackOnSpawn;
                         currentEntityMachine.Initialize(itemInfo);
+                        if (Helper.IsHost())
+                            EntitySync.BroadcastEntitySpawn(itemInfo);
                 }
         }
 
@@ -306,7 +308,18 @@ public class Entity
                 if (entity.StaticLoad)
                         EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
                 else if (invite)
-                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
+                {
+                        if (info is ItemInfo)
+                        {
+                                EntityItemLoad.InviteEntity(currentEntityMachine);
+                                currentEntityMachine.Initialize(info);
+                                if (Helper.IsHost())
+                                    EntitySync.BroadcastEntitySpawn(info);
+                                return currentEntityMachine;
+                        }
+                        else
+                                EntityDynamicLoad.InviteEntity(currentEntityMachine);
+                }
 
                 currentEntityMachine.Initialize(info);
                 return currentEntityMachine;

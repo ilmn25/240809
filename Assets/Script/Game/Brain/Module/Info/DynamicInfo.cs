@@ -63,7 +63,7 @@ public class DynamicInfo : Info
                 // Remote clients see entities near them, so those entities must use full
                 // physics to avoid teleporting (abstract movement snaps to TargetPointPosition).
                 Vector3Int chunkCoord = World.GetChunkCoordinate(position);
-                IsInRenderRange = EntityDynamicLoad.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
+                IsInRenderRange = Scene.AnyPlayerInChunkRange(chunkCoord, Scene.RenderDistance);
             }
             else
             {

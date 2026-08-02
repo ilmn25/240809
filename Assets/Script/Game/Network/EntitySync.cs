@@ -250,7 +250,7 @@ public static class EntitySync
         foreach (var em in EntityDynamicLoad.ActiveEntities)
             AddEntityToBatch(em);
 
-        // Pending spawns: one-shot entities (e.g. newly placed structures) that
+        // Pending spawns: one-shot entities (items, newly placed structures) that
         // only need a single broadcast to appear on clients.
         foreach (var ps in _pendingSpawns)
         {

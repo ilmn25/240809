@@ -137,6 +137,21 @@ public class Scene
         }
     }
     
+    /// <summary>Is any player within <paramref name="distance"/> (world units) of the given chunk coordinate?</summary>
+    public static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
+    {
+        foreach (var player in Save.Inst.players)
+        {
+            if (player.Machine == null || player.controllerId == -1) continue;
+            Vector3Int playerChunk = World.GetChunkCoordinate(player.Machine.transform.position);
+            if (chunkCoord.x >= playerChunk.x - distance && chunkCoord.x <= playerChunk.x + distance + 1 &&
+                chunkCoord.y >= playerChunk.y - distance && chunkCoord.y <= playerChunk.y + distance + 1 &&
+                chunkCoord.z >= playerChunk.z - distance && chunkCoord.z <= playerChunk.z + distance + 1)
+                return true;
+        }
+        return false;
+    }
+
     public static bool InPlayerChunkRange(Vector3 position, float distance)
     {
         return position.x >= PlayerChunkPosition.x - distance &&

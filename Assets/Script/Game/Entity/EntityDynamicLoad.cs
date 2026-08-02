@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Manages active dynamic entities (mobs, items) in a single global list.
-/// Entities that leave player logic range are despawned (not saved back to chunks).
-/// New entities are spawned by MobSpawner or player actions — never loaded from world data.
+/// Manages active mob entities. Mobs are never persisted to chunks — MobSpawner handles
+/// spawning/respawning. Entities out of player logic range are simply discarded.
 /// </summary>
 public class EntityDynamicLoad 
 {
@@ -29,17 +28,16 @@ public class EntityDynamicLoad
         if (!Helper.IsHost()) return;
         ScanAndUnload();
     }
-    
+
+    /// <summary>Discard mobs far from all players (MobSpawner will respawn them).</summary>
     private static void ScanAndUnload()
     {
         List<EntityMachine> removeList = new List<EntityMachine>();
         foreach (var entityMachine in _activeEntities)
         { 
             Vector3Int entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
-            if (!AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
-            {
+            if (!Scene.AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
                 removeList.Add(entityMachine);
-            }
         }
         foreach (var entityMachine in removeList)
         {
@@ -48,20 +46,7 @@ public class EntityDynamicLoad
         }
     }
 
-    public static bool AnyPlayerInChunkRange(Vector3 chunkCoord, float distance)
-    {
-        foreach (var player in Save.Inst.players)
-        {
-            if (player.Machine == null || player.controllerId == -1) continue;
-            Vector3Int playerChunk = World.GetChunkCoordinate(player.Machine.transform.position);
-            if (chunkCoord.x >= playerChunk.x - distance && chunkCoord.x <= playerChunk.x + distance + 1 &&
-                chunkCoord.y >= playerChunk.y - distance && chunkCoord.y <= playerChunk.y + distance + 1 &&
-                chunkCoord.z >= playerChunk.z - distance && chunkCoord.z <= playerChunk.z + distance + 1)
-                return true;
-        }
-        return false;
-    }
-
+    /// <summary>Unload all mobs — no persistence (MobSpawner handles respawns).</summary>
     public static void UnloadWorld()
     {
         if (!Helper.IsHost()) return;
