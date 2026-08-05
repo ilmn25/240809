@@ -8,7 +8,7 @@ public class EntityStaticLoad
     public static void ForgetEntity(EntityMachine entityMachine, Entity entity)
     {
         ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Remove(entityMachine);
-        NavMap.SetEntity(entity, entityMachine.transform.position, true); // mark space walkable after removal
+        NavMap.SetEntity(entity, entityMachine.transform.position, true);
     }
     public static void InviteEntity(EntityMachine entityMachine, Entity entity) {
         Vector3Int chunkCoord = World.GetChunkCoordinate(entityMachine.transform.position);
@@ -32,7 +32,6 @@ public class EntityStaticLoad
     public static void LoadEntitiesInChunk(Vector3Int chunkCoordinate)
     {  
         List<Info> activeEntities = World.Inst[chunkCoordinate].StaticEntity;
-        // Find the key once
         if (!ActiveEntities.ContainsKey(chunkCoordinate))
         {
             ActiveEntities[chunkCoordinate] = (activeEntities, new List<EntityMachine>());
@@ -45,8 +44,7 @@ public class EntityStaticLoad
         activeEntities.Clear();
     } 
 
-    /// <summary>Save active static entities back into their chunk lists and unload their
-    /// machines, so a serialized Save includes them. Doesn't touch map renderers.</summary>
+    /// <summary>Save active static entities back into their chunk lists.</summary>
     public static void SnapshotToChunks()
     {
         foreach (var kv in ActiveEntities)
@@ -59,7 +57,7 @@ public class EntityStaticLoad
         }
     }
 
-    /// <summary>Re-spawn static entities that SnapshotToChunks just unloaded (near players).</summary>
+    /// <summary>Re-spawn static entities from their chunk lists.</summary>
     public static void LoadActiveChunks()
     {
         foreach (var key in new List<Vector3Int>(ActiveEntities.Keys))

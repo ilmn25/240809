@@ -41,7 +41,6 @@ public class EntityItemLoad
             Vector3Int entityChunkPosition = World.GetChunkCoordinate(entityMachine.transform.position);
             if (!Scene.AnyPlayerInChunkRange(entityChunkPosition, Scene.LogicDistance))
             {
-                // Save to whichever chunk the item is currently in
                 if (World.IsInWorldBounds(entityChunkPosition))
                     World.Inst[entityChunkPosition].DynamicEntity.Add(entityMachine.Info);
                 removeList.Add(entityMachine);
