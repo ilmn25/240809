@@ -64,7 +64,10 @@ public abstract class EntityMachine : Machine, IInfoProvider
         {
             // Broadcast destruction to remote clients so they remove the entity too.
             // Covers all destroy paths: ItemMachine merge stacking, BlockMachine, despawn, etc.
-            EntitySync.BroadcastEntityUnload(Info);
+            if (Info is ItemInfo)
+                ItemSync.BroadcastUnload(Info);
+            else
+                EntitySync.BroadcastEntityUnload(Info);
             Unload();
         }
     }
