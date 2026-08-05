@@ -180,7 +180,7 @@ public static class Server
         while (!conn.isReady)
             yield return null;
  
-        EntityStaticLoad.SnapshotToChunks(); // include active structures in the full save
+        EntityStaticLoad.SnapshotToChunks();
         SaveSync.SendFullSave(conn, Save.Inst);
         ItemSync.SendActiveItems(conn);
         EntityStaticLoad.LoadActiveChunks();

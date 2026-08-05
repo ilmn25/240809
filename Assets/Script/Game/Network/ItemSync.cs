@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-/// <summary>
-/// Lean networking for ground items: one-shot spawns, dirty position updates, and destroys.
-/// Items don't animate, so they never touch the animation-laden BatchEntityInfoMessage
-/// (EntitySync). Sent at a low frequency (BroadcastInterval) to avoid overflow with many items.
-/// Items are tracked in EntitySync.InfoMap like other entities.
-/// </summary>
+/// <summary>Networking for ground items: one-shot spawns, position updates, and destroys.</summary>
 public static class ItemSync
 {
     public struct BatchItemInfoMessage : NetworkMessage
@@ -28,7 +23,6 @@ public static class ItemSync
     private static readonly List<PendingSpawn> _pendingSpawns = new List<PendingSpawn>();
     private static readonly List<PendingUnload> _pendingUnloads = new List<PendingUnload>();
 
-    // Reusable batch buffers
     private static readonly List<string> _batchUids = new List<string>();
     private static readonly List<int> _batchIds = new List<int>();
     private static readonly List<Vector3> _batchPositions = new List<Vector3>();
@@ -57,8 +51,7 @@ public static class ItemSync
             _pendingUnloads.Add(new PendingUnload { uid = info.uid, id = (int)itemInfo.item.ID, pos = info.position });
     }
 
-    /// <summary>Send all currently active items to a single connection (joining client).
-    /// Active items aren't in the full save (they were removed from chunk lists when loaded).</summary>
+    /// <summary>Send all currently active items to a single connection.</summary>
     public static void SendActiveItems(NetworkConnectionToClient conn)
     {
         if (!NetworkServer.active || conn == null) return;
@@ -87,8 +80,7 @@ public static class ItemSync
         });
     }
 
-    /// <summary>Client-side cleanup on disconnect: unload synced items and drop their InfoMap
-    /// entries so a rejoin doesn't hit stale (Machine == null) entries.</summary>
+    /// <summary>Client-side cleanup on disconnect: unload synced items and drop their InfoMap entries.</summary>
     public static void Clear()
     {
         if (Helper.IsHost()) return;
@@ -110,8 +102,7 @@ public static class ItemSync
         }
     }
 
-    /// <summary>Flush item spawns, dirty position updates (falling/bouncing), and unloads.
-    /// Resting items are skipped — they were synced on spawn.</summary>
+    /// <summary>Flush item spawns, position updates, and unloads.</summary>
     private static void SendBatch()
     {
         if (!NetworkServer.active) return;
@@ -128,12 +119,12 @@ public static class ItemSync
             _batchAmounts.Add(destroyed ? 0 : itemInfo.item.Stack);
         }
 
-        // One-shot spawns (drop, loot, chunk load)
+        // One-shot spawns
         foreach (var ps in _pendingSpawns)
             if (ps.info?.Machine != null) AddItem(ps.info, false);
         _pendingSpawns.Clear();
 
-        // Dirty position updates for moving items
+        // Dirty position updates
         foreach (var em in EntityItemLoad.ActiveEntities)
         {
             if (em == null || em.Info is not ItemInfo itemInfo) continue;
@@ -142,7 +133,7 @@ public static class ItemSync
             itemInfo.MarkPositionSynced();
         }
 
-        // Unloads (pickup, out of range, world save)
+        // Unloads
         foreach (var pu in _pendingUnloads)
         {
             _batchUids.Add(pu.uid);
@@ -173,7 +164,7 @@ public static class ItemSync
             if (string.IsNullOrEmpty(uid)) continue;
             bool destroyed = message.destroyed[i];
 
-            // New item — spawn it
+            // New item
             if (!EntitySync.InfoMap.TryGetValue(uid, out Info info))
             {
                 int itemId = message.ids[i];
@@ -192,7 +183,7 @@ public static class ItemSync
                 continue;
             }
 
-            // Destroyed (picked up / unloaded)
+            // Destroyed
             if (destroyed)
             {
                 if (info.Machine != null)
