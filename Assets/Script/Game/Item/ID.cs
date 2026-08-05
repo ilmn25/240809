@@ -101,4 +101,5 @@ public enum ID
     Smelter,
     MasonryWorkbench,
     Shell,
+    Lamp,
 }
