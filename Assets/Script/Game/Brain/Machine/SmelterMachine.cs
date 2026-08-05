@@ -1,6 +1,6 @@
 public class SmelterMachine : CraftingMachine
 {
-    protected override bool GlowsAlways => true;
+    protected override bool GlowsWhenCrafting => true;
 
     public static Info CreateInfo()
     {

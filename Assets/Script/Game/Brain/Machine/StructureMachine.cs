@@ -5,9 +5,6 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
     protected SpriteRenderer SpriteRenderer;
     protected Light GlowLight;
 
-    /// <summary>Structures that are permanently lit (furnace, campfire, smelter, ...).</summary>
-    protected virtual bool GlowsAlways => false;
-
     public override void OnSetup()
     {
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
@@ -21,15 +18,7 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
         AddModule(new SpriteOrbitModule()); 
         AddModule(new StructureSpriteCullModule());   
         if (GlowLight == null) return;
-        if (GlowsAlways && Info is StructureInfo litInfo)
-        {
-            litInfo.GlowOn = true; // keep in sync so save/network see it as lit
-            GlowLight.enabled = true;
-        }
-        else
-        {
-            GlowLight.enabled = Info is StructureInfo si && si.GlowOn;
-        }
+        GlowLight.enabled = Info is StructureInfo si && si.GlowOn;
     }
 
     /// <summary>Enable/disable this structure's glow light (furnace, lamp, ...).</summary>

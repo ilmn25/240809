@@ -50,6 +50,11 @@ public class CraftInfo : SpriteStructureInfo
             Entity.SpawnItem(Pending[0], Machine.transform.position + offset, stackOnSpawn: false);
             Pending.RemoveAt(0);
             _counter = 0;
+
+            // Keep clients' pending queue (and crafting-machine glow) in sync
+            // when a craft finishes, not just when a recipe is queued.
+            if (Helper.IsHost())
+                StorageSync.SendCraftUpdate(uid, GetStoragePool(), Pending);
         }
         else
         {
