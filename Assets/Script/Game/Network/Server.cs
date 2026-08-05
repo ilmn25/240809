@@ -84,6 +84,7 @@ public static class Server
         DropSync.UnregisterHandlers();
         NetworkClient.UnregisterHandler<YourConnectionIdMessage>();
         NetworkServer.UnregisterHandler<ClientToServerPlayerMessage>();
+        LampSync.UnregisterHandlers();
     }
 
     private static void RegisterHandlers()
@@ -105,6 +106,7 @@ public static class Server
         EffectSync.RegisterHandlers();
         ProjectileSync.RegisterHandlers();
         NavMapSync.RegisterHandlers();
+        LampSync.RegisterHandlers();
         NetworkServer.OnConnectedEvent += serverConnectedHandler;
         NetworkServer.OnDisconnectedEvent += PlayerSync.OnServerDisconnected;
         handlersRegistered = true;

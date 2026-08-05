@@ -156,6 +156,12 @@ public class Entity
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide); 
+                AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.Lamp);
+                loot.Add(1, 1, ID.Glass);
+                loot.Add(0.5f, 2, ID.Glass);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(0.7f, 1, ID.Stake); 
                  
                 AddMob<PlayerMachine>(ID.Player);
                 

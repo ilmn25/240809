@@ -21,6 +21,8 @@ public class StructureInfo : Info
     public SfxID SfxDestroy;
     public ID Loot;
     public OperationType operationType;
+    /// <summary>Whether this structure's glow light is lit (persists through save/load).</summary>
+    public bool GlowOn;
     [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
     public override bool OnHitInternal(Projectile projectile)
