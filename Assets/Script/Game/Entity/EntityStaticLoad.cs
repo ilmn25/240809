@@ -44,5 +44,26 @@ public class EntityStaticLoad
         }
         activeEntities.Clear();
     } 
+
+    /// <summary>Save active static entities back into their chunk lists and unload their
+    /// machines, so a serialized Save includes them. Doesn't touch map renderers.</summary>
+    public static void SnapshotToChunks()
+    {
+        foreach (var kv in ActiveEntities)
+        {
+            foreach (var entityMachine in new List<EntityMachine>(kv.Value.Item2))
+            {
+                kv.Value.Item1.Add(entityMachine.Info);
+                entityMachine.Unload();
+            }
+        }
+    }
+
+    /// <summary>Re-spawn static entities that SnapshotToChunks just unloaded (near players).</summary>
+    public static void LoadActiveChunks()
+    {
+        foreach (var key in new List<Vector3Int>(ActiveEntities.Keys))
+            LoadEntitiesInChunk(key);
+    }
 }
  

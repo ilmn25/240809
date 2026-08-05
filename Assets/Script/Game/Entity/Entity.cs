@@ -247,7 +247,7 @@ public class Entity
                 SpawnItem(new ItemSlot(id, amount), worldPosition, stackOnSpawn, amount, velocity, despawn);
         }
 
-        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1) // amount to add, add all 999
+        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1)
         {  
                 Entity entity = Dictionary[ID.ItemPrefab];
                 int target = slot.Stack - amount;
@@ -269,7 +269,7 @@ public class Entity
                         itemInfo.StackOnSpawn = stackOnSpawn;
                         currentEntityMachine.Initialize(itemInfo);
                         if (Helper.IsHost())
-                            EntitySync.BroadcastEntitySpawn(itemInfo);
+                            ItemSync.BroadcastSpawn(itemInfo);
                 }
         }
 
@@ -314,7 +314,7 @@ public class Entity
                                 EntityItemLoad.InviteEntity(currentEntityMachine);
                                 currentEntityMachine.Initialize(info);
                                 if (Helper.IsHost())
-                                    EntitySync.BroadcastEntitySpawn(info);
+                                    ItemSync.BroadcastSpawn(info);
                                 return currentEntityMachine;
                         }
                         else

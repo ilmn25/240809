@@ -46,8 +46,12 @@ public static class Server
         if (NetworkServer.active)
             StopHost();
 
-        if (Save.Inst == null)
-            Save.Inst = new Save(GenType.SuperFlat);
+        // Clear any previous save so Save.Inst stays null until the host's full save arrives.
+        // A non-null (placeholder or stale-from-previous-host) save lets PlayerSync process
+        // messages during the transfer and fire TryInitializeScene prematurely, locking the
+        // client out of Game mode (no HUD / control). Matters when leaving one host and
+        // joining another.
+        Save.Inst = null;
 
         ScreenFade.FadeOut(0.5f);
         yield return new WaitForSeconds(0.7f);
@@ -94,6 +98,7 @@ public static class Server
         Chat.RegisterHandlers();
         SaveSync.RegisterHandlers();
         EntitySync.RegisterHandlers();
+        ItemSync.RegisterHandlers();
         PlayerSync.RegisterHandlers();
         StorageSync.RegisterHandlers();
         DropSync.RegisterHandlers();
@@ -145,6 +150,7 @@ public static class Server
         EffectSync.Clear();
         PlayerSync.Clear();
         StorageSync.Clear();
+        ItemSync.Clear();
         handlersRegistered = false;
         Scene.Busy = false;
         World.UnloadWorld();
@@ -174,8 +180,10 @@ public static class Server
         while (!conn.isReady)
             yield return null;
  
-        World.UnloadWorld();
+        EntityStaticLoad.SnapshotToChunks(); // include active structures in the full save
         SaveSync.SendFullSave(conn, Save.Inst);
+        ItemSync.SendActiveItems(conn);
+        EntityStaticLoad.LoadActiveChunks();
         World.LoadWorld();
         NetworkServer.Spawn(UnityEngine.Object.Instantiate(networkPrefab));
 

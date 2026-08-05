@@ -49,7 +49,7 @@ public class EntityItemLoad
         }
         foreach (var entityMachine in removeList)
         {
-            EntitySync.BroadcastEntityUnload(entityMachine.Info);
+            ItemSync.BroadcastUnload(entityMachine.Info);
             entityMachine.Unload();
         }
     }
@@ -99,17 +99,13 @@ public class EntityItemLoad
     {
         if (!Helper.IsHost()) return;
 
-        List<EntityMachine> removeList = new List<EntityMachine>();
-        foreach (EntityMachine entityMachine in _activeEntities)
+        List<EntityMachine> removeList = new List<EntityMachine>(_activeEntities);
+        foreach (EntityMachine entityMachine in removeList)
         {
             Vector3Int chunkPos = World.GetChunkCoordinate(entityMachine.transform.position);
             if (World.IsInWorldBounds(chunkPos))
                 World.Inst[chunkPos].DynamicEntity.Add(entityMachine.Info);
-            removeList.Add(entityMachine);
-        }
-        foreach (var entityMachine in removeList)
-        {
-            EntitySync.BroadcastEntityUnload(entityMachine.Info);
+            ItemSync.BroadcastUnload(entityMachine.Info);
             entityMachine.Unload();
         }
     }
