@@ -3,12 +3,17 @@ using UnityEngine;
 
 public abstract class CraftingMachine: StructureMachine, IActionSecondaryInteract
 { 
+    /// <summary>Machines whose light shines only while they are actively crafting (furnace, campfire, smelter, ...).</summary>
+    protected virtual bool GlowsWhenCrafting => false;
+
     public override void OnStart()
     {
         base.OnStart();
         AddState(new InCraftState());
 
         CraftInfo info = (CraftInfo)Info;
+        if (GlowsWhenCrafting)
+            SetGlow(info.IsConverting());
 
         IEnumerator Enumerator()
         {
@@ -24,7 +29,16 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
         }
 
         StartCoroutine(Enumerator());
-    } 
+    }
+
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+        // Keep the glow in sync with crafting on the host (authoritative) and on
+        // clients (Pending is kept up to date via StorageSync).
+        if (GlowsWhenCrafting && GlowLight != null && Info is StructureInfo)
+            SetGlow(((CraftInfo)Info).IsConverting());
+    }
 
     public void OnActionSecondary(Info info)
     {
