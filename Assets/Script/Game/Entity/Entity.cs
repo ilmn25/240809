@@ -158,6 +158,16 @@ public class Entity
                 AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.OwlStatue);
+                loot.Add(1, 2, ID.StoneBlock);
+                loot.Add(0.5f, 2, ID.StoneBlock);
+
+                AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.OldRadio);
+                loot.Add(1, 2, ID.Steel);
+                loot.Add(0.5f, 1, ID.Steel);
+                loot.Add(1, 2, ID.Slag);
+                loot.Add(0.5f, 1, ID.Glass);
                 loot = new (ID.Lamp);
                 loot.Add(1, 1, ID.Glass);
                 loot.Add(0.5f, 2, ID.Glass);
@@ -202,6 +212,9 @@ public class Entity
 
                 AddMob<GuideMachine>(ID.Guide);
                 loot = new (ID.Guide); // the guide drops nothing
+
+                AddMob<MerchantMachine>(ID.Merchant);
+                loot = new (ID.Merchant); // the merchant drops nothing
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);
