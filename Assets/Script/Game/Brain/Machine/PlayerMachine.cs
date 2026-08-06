@@ -68,6 +68,15 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {
             Storage = Info.Storage
         });
+
+        // Apply the selected inventory slot as the held tool so it renders in hand.
+        // The controlled player gets this via Inventory.RefreshInventory; allies need it here.
+        Storage storage = Info.Storage;
+        if (storage?.List != null && storage.Key >= 0 && storage.Key < storage.List.Count)
+        {
+            ItemSlot selected = storage.List[storage.Key];
+            Info.SetEquipment(selected is { Stack: > 0 } ? selected : null);
+        }
     }
 
     public void OnActionSecondary(Info info)
