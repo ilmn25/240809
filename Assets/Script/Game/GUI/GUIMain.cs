@@ -121,6 +121,10 @@ public static class GUIMain
 
         string BuildTargetHudText(Info target)
         {
+            // Downed player: show status instead of the (cancelled) target.
+            if (Main.PlayerInfo?.PlayerStatus == PlayerStatus.Incapacitated)
+                return "Incapacitated";
+
             if (target == null)
                 return "";
 
