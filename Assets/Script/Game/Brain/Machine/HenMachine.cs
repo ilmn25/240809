@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class HenMachine : MobMachine, IActionSecondaryInteract
 {
-    // Frames between dropped eggs (~40 seconds at 60 fps).
-    private const int EggLayInterval = 2400;
-    private int _eggTimer;
+    // Random wait between eggs, in frames: half a day to a day and a half.
+    private const int MinLayInterval = Environment.Length * 12;
+    private const int MaxLayInterval = Environment.Length * 36;
+    private int _nextLayIn;
 
     public static Info CreateInfo()
     {
@@ -21,6 +22,8 @@ public class HenMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
+        _nextLayIn = Random.Range(MinLayInterval, MaxLayInterval); // first egg after a random wait
+
         AddModule(new GroundMovementModule());
         AddModule(new GroundPathingModule());
         AddModule(new GroundAnimationModule());
@@ -48,12 +51,14 @@ public class HenMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
-        // Hens lay eggs on the ground on a timer (OnUpdate only runs on the host).
-        if (++_eggTimer >= EggLayInterval)
+        // Lay an egg, then wait a random amount of time before the next (host only).
+        if (_nextLayIn <= 0)
         {
-            _eggTimer = 0;
             Entity.SpawnItem(ID.Egg, transform.position);
+            _nextLayIn = Random.Range(MinLayInterval, MaxLayInterval);
         }
+        else
+            _nextLayIn--;
 
         if (!IsCurrentState<DefaultState>()) return;
 
