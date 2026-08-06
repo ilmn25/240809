@@ -26,8 +26,9 @@ class MobChaseAction : MobState {
             Info.CancelTarget();
             return;
         }
+        float engageRange = GetEngageRange();
         if (Info.ActionType != IActionType.PickUp && Info.IsGrounded &&
-            (Info.Target == null || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < Info.DistAttack * Info.DistAttack))
+            (Info.Target == null || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < engageRange * engageRange))
             Info.PathingStatus = PathingStatus.Reached;  
         
         if (Info.PathingStatus == PathingStatus.Reached)
@@ -68,4 +69,13 @@ class MobChaseAction : MobState {
             Info.CancelTarget();
         }
     } 
+
+    // How close the target must be before this action triggers:
+    // followers trail closely, melee hits at arm's reach, ranged weapons fire from range.
+    private float GetEngageRange()
+    {
+        if (Info.ActionType == IActionType.Follow) return Info.DistFollow;
+        if (Info.Equipment != null && Info.Equipment.Info.Gesture == ItemGesture.Shoot) return Info.DistRanged;
+        return Info.DistAttack;
+    }
 }

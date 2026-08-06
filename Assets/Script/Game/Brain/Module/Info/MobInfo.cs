@@ -7,7 +7,9 @@ public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
 public class MobInfo : DynamicInfo
 { 
     public int DistAttack = 2;
-    public int DistAlert = 10;
+    public float DistFollow = 0.65f; // how close allies trail the leader (tight)
+    public int DistRanged = 10;      // preferred firing range for ranged allies
+    public int DistAlert = 5;        // enemy detection radius + how close allies stick to the leader
     public int DistDisengage = 20; 
     
     public int DistEscape = 20;
