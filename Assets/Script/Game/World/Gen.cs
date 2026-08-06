@@ -99,5 +99,49 @@ public class Gen
                 }
             }
         }
+
+        // A freshly generated world gets an owl statue at spawn so the Guide is
+        // always nearby (the statue is saved; the Guide is not).
+        AddSpawnStatue(world);
+    }
+
+    /// <summary>Places an owl statue beside the world's spawn point. Because NPCs
+    /// aren't saved, the statue (a saved static structure) respawns the Guide.</summary>
+    private static void AddSpawnStatue(World world)
+    {
+        Vector3Int spawnPos = world.SpawnPoint;
+        Vector3Int chunkCoord = World.GetChunkCoordinate(spawnPos);
+        Chunk chunk = world[chunkCoord];
+        if (chunk == null || chunk == Chunk.Zero) return;
+
+        // Snap the spot beside spawn down onto the ground so the statue never floats.
+        Vector3Int spot = new Vector3Int(spawnPos.x + 2, spawnPos.y, spawnPos.z);
+        if (FindSurfaceY(chunk, chunkCoord, spot, out int surfaceY))
+        {
+            spot.y = surfaceY;
+            chunk.StaticEntity.Add(Entity.CreateInfo(ID.OwlStatue, spot));
+        }
+    }
+
+    // Snaps a column position down to the ground surface (first air block directly
+    // above a solid block) within the chunk. Returns false if no surface is found.
+    private static bool FindSurfaceY(Chunk chunk, Vector3Int chunkCoord, Vector3Int pos, out int surfaceY)
+    {
+        surfaceY = 0;
+        int localX = pos.x - chunkCoord.x;
+        int localZ = pos.z - chunkCoord.z;
+        if (localX < 0 || localX >= World.ChunkSize || localZ < 0 || localZ >= World.ChunkSize)
+            return false;
+
+        int localY = Mathf.Clamp(pos.y - chunkCoord.y, 1, World.ChunkSize - 1);
+        for (int y = localY; y >= 1; y--)
+        {
+            if (chunk[localX, y, localZ] == 0 && chunk[localX, y - 1, localZ] != 0)
+            {
+                surfaceY = chunkCoord.y + y;
+                return true;
+            }
+        }
+        return false;
     }
 }

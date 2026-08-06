@@ -155,8 +155,9 @@ public class Entity
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
-                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide); 
+                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
+                AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Lamp);
                 loot.Add(1, 1, ID.Glass);
                 loot.Add(0.5f, 2, ID.Glass);
@@ -198,6 +199,9 @@ public class Entity
                 loot = new (ID.Rooster);
                 loot.Add(1, 1, ID.Foul);
                 loot.Add(0.5f, 1, ID.Foul);
+
+                AddMob<GuideMachine>(ID.Guide);
+                loot = new (ID.Guide); // the guide drops nothing
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);

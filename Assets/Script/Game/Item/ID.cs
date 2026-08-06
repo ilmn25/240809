@@ -105,4 +105,6 @@ public enum ID
     Egg,
     Hen,
     Rooster,
+    Guide,
+    OwlStatue,
 }
