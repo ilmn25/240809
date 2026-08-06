@@ -93,7 +93,7 @@ public enum ID
     MulchBlock,
     CopperChunks,
     Copper,
-    Chicken,
+    Chick,
     SandSlab,
     SandDebris,
     Sand,
@@ -102,4 +102,7 @@ public enum ID
     MasonryWorkbench,
     Shell,
     Lamp,
+    Egg,
+    Hen,
+    Rooster,
 }
