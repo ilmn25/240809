@@ -29,6 +29,7 @@ public class OwlStatueMachine : StructureMachine
     public override void OnStart()
     {
         base.OnStart();
+        AddModule(new NightGlowModule());
         _timer = Random.Range(0, CheckInterval); // stagger statues so they don't all fire at once
     }
 
@@ -71,5 +72,19 @@ public class OwlStatueMachine : StructureMachine
             }
         }
         return false;
+    }
+
+    // Glows at night and turns off during the day. Runs in Everyone mode so it
+    // updates on every client too (Save.Inst.weather is synced via EnvironmentSync).
+    private class NightGlowModule : Module
+    {
+        public NightGlowModule() { updateMode = UpdateMode.Everyone; }
+
+        public override void Update()
+        {
+            bool night = Save.Inst.weather == EnvironmentType.NightRainy ||
+                         Save.Inst.weather == EnvironmentType.NightBright;
+            ((StructureMachine)Machine).SetGlow(night);
+        }
     }
 }

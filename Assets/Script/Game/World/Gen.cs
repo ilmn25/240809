@@ -110,38 +110,39 @@ public class Gen
     private static void AddSpawnStatue(World world)
     {
         Vector3Int spawnPos = world.SpawnPoint;
-        Vector3Int chunkCoord = World.GetChunkCoordinate(spawnPos);
-        Chunk chunk = world[chunkCoord];
-        if (chunk == null || chunk == Chunk.Zero) return;
 
         // Snap the spot beside spawn down onto the ground so the statue never floats.
-        Vector3Int spot = new Vector3Int(spawnPos.x + 2, spawnPos.y, spawnPos.z);
-        if (FindSurfaceY(chunk, chunkCoord, spot, out int surfaceY))
-        {
-            spot.y = surfaceY;
-            chunk.StaticEntity.Add(Entity.CreateInfo(ID.OwlStatue, spot));
-        }
+        int x = spawnPos.x + 2;
+        int z = spawnPos.z;
+        int surfaceY = FindSurfaceY(world, x, z);
+        if (surfaceY < 0) return;
+
+        Vector3Int spot = new Vector3Int(x, surfaceY, z);
+        Chunk chunk = world[World.GetChunkCoordinate(spot)];
+        if (chunk == null || chunk == Chunk.Zero) return;
+
+        chunk.StaticEntity.Add(Entity.CreateInfo(ID.OwlStatue, spot));
     }
 
-    // Snaps a column position down to the ground surface (first air block directly
-    // above a solid block) within the chunk. Returns false if no surface is found.
-    private static bool FindSurfaceY(Chunk chunk, Vector3Int chunkCoord, Vector3Int pos, out int surfaceY)
+    // Scans the full column (top to bottom) for the first air block directly above
+    // a solid block — the ground surface. Returns -1 if no surface exists.
+    private static int FindSurfaceY(World world, int x, int z)
     {
-        surfaceY = 0;
-        int localX = pos.x - chunkCoord.x;
-        int localZ = pos.z - chunkCoord.z;
-        if (localX < 0 || localX >= World.ChunkSize || localZ < 0 || localZ >= World.ChunkSize)
-            return false;
-
-        int localY = Mathf.Clamp(pos.y - chunkCoord.y, 1, World.ChunkSize - 1);
-        for (int y = localY; y >= 1; y--)
+        for (int y = world.Bounds.y - 1; y >= 1; y--)
         {
-            if (chunk[localX, y, localZ] == 0 && chunk[localX, y - 1, localZ] != 0)
-            {
-                surfaceY = chunkCoord.y + y;
-                return true;
-            }
+            Vector3Int block = new Vector3Int(x, y, z);
+            Vector3Int chunkCoord = World.GetChunkCoordinate(block);
+            Chunk chunk = world[chunkCoord];
+            if (chunk == null || chunk == Chunk.Zero) continue;
+
+            int localX = block.x - chunkCoord.x;
+            int localY = block.y - chunkCoord.y;
+            int localZ = block.z - chunkCoord.z;
+            if (localY == 0) continue; // bottom block of a chunk — the block below is in the next chunk
+
+            if (chunk[localX, localY, localZ] == 0 && chunk[localX, localY - 1, localZ] != 0)
+                return y;
         }
-        return false;
+        return -1;
     }
 }
