@@ -107,4 +107,6 @@ public enum ID
     Rooster,
     Guide,
     OwlStatue,
+    OldRadio,
+    Merchant,
 }
