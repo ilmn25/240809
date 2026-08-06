@@ -17,7 +17,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     public static Info CreateInfo()
     { 
-        return new PlayerInfo()
+        PlayerInfo player = new PlayerInfo()
         {  
             HitboxType = HitboxType.Friendly,
             targetHitboxType = HitboxType.Passive,
@@ -31,7 +31,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             Sanity = 100,
             Stamina = 100,
             SpeedLogic = 5,
-            SpeedGround = 5,
+            SpeedGround = 6,
             SpeedAir = 6,
             Iframes = 100, 
             PathAmount = 6000,
@@ -44,7 +44,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             DeathSfx = SfxID.DeathPlayer,
             HitSfx = SfxID.HitPlayer, 
             CharSprite = ID.Chito 
-        }; 
+        };
+        // Spawn with a CrudeHatchet in hand (inventory slot 0, selected).
+        player.Storage.List[0] = new ItemSlot(ID.CrudeHatchet);
+        player.Storage.Key = 0;
+        return player;
     }
     public override void OnStart()
     {    
@@ -58,6 +62,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobAttackShoot());
         AddState(new MobChaseAction());
         AddState(new MobHit());
+        AddState(new MobEscape());
         AddState(new EquipSelectState());   
         AddState(new InContainerState()
         {
@@ -120,33 +125,131 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 } 
             } 
         }
-        else if (IsCurrentState<DefaultState>() && !blockedByOther) 
-        { 
-            // Validate current structure target if it exists
-            if (Info.Target is StructureInfo && Info.ActionType is IActionType.Hit or IActionType.Dig)
-            {
-                EnsureCompatibleToolForTarget();
-            }
-
-            // Search pending tasks if not working on a structure
-            if (Info.Target is not StructureInfo && PlayerTask.Pending.Count != 0)
-            {
-                foreach (StructureInfo si in PlayerTask.Pending)
-                    if (Info.Storage.SetTool(si.operationType))
-                    { Info.Target = si; Info.ActionType = IActionType.Hit; return; }
-            }
-
-            // Follow owner's controlling character
-            if (Info.Target != Main.PlayerInfo && Main.PlayerInfo?.PlayerStatus == PlayerStatus.Active)
-            {
-                Info.Target = Main.PlayerInfo;
-                Info.ActionType = IActionType.Follow;
-            }
-            
-            SetState<MobChaseAction>();
+        else if (!blockedByOther)
+        {
+            UpdateAllyBrain();
         } 
     }
      
+    // ---- Ally AI (Death Road to Canada style) ----
+
+    private static readonly Collider[] AllyScanBuffer = new Collider[32];
+
+    // Drives non-controlled party members: fight nearby hostiles, otherwise trail the leader.
+    // SetState is a no-op when already in MobChaseAction, so calling it unconditionally just
+    // retargets via Info.Target while following.
+    private void UpdateAllyBrain()
+    {
+        if (Info.PlayerStatus == PlayerStatus.Incapacitated) return;
+        if (!IsCurrentState<DefaultState>() && !IsCurrentState<MobChaseAction>()) return;
+        if (Info.ActionType is IActionType.PickUp or IActionType.Interact) return;
+
+        bool lowHealth = Info.Health <= Info.HealthMax / 4;
+
+        // Low health: don't fight — flee from nearby hostiles, else keep working/following.
+        if (lowHealth && TryFleeEnemy())
+        {
+            SetState<MobEscape>();
+            return;
+        }
+
+        // Keep working a structure the player assigned instead of chasing zombies.
+        if (Info.Target is StructureInfo && Info.ActionType is IActionType.Hit or IActionType.Dig)
+        {
+            EnsureCompatibleToolForTarget();
+            SetState<MobChaseAction>();
+            return;
+        }
+
+        // Fight nearby hostiles (reacts even while trailing the leader), unless low on health.
+        if (!lowHealth && TryAcquireEnemyTarget())
+        {
+            Info.ActionType = IActionType.Hit;
+            SetState<MobChaseAction>();
+            return;
+        }
+
+        // Idle: take pending tasks, otherwise trail the controlling character.
+        if (!IsCurrentState<DefaultState>()) return;
+
+        if (PlayerTask.Pending.Count != 0)
+        {
+            foreach (StructureInfo si in PlayerTask.Pending)
+                if (Info.Storage.SetTool(si.operationType))
+                { Info.Target = si; Info.ActionType = IActionType.Hit; SetState<MobChaseAction>(); return; }
+        }
+
+        if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
+        {
+            Info.Target = Main.PlayerInfo;
+            Info.ActionType = IActionType.Follow;
+        }
+        SetState<MobChaseAction>();
+    }
+
+    // Anchored to the leader: only fights hostiles that are actively attacking a player, breaks
+    // off and re-follows the leader if the fight drags it away. Unarmed allies just trail.
+    private bool TryAcquireEnemyTarget()
+    {
+        if (Info.Equipment == null) return false;
+        if (Main.PlayerInfo == null) return false; // nothing to defend / follow
+
+        Vector3 leaderPos = Main.PlayerInfo.position;
+
+        // Keep the current target only while it's still attacking a player and the fight stays near.
+        if (Info.Target is MobInfo current && current.HitboxType == HitboxType.Enemy)
+        {
+            if (current.Destroyed ||
+                current.Target is not PlayerInfo ||
+                Vector3.Distance(leaderPos, current.position) > Info.DistDisengage ||
+                Vector3.Distance(leaderPos, transform.position) > Info.DistAlert)
+            {
+                Info.CancelTarget();
+                return false;
+            }
+            return true;
+        }
+
+        // Don't pick new fights while away from the leader — head back first.
+        if (Vector3.Distance(leaderPos, transform.position) > Info.DistAlert) return false;
+
+        // Only engage mobs near the leader that are actively attacking a player.
+        MobInfo enemy = FindNearestEnemy(onlyAggroedOnPlayer: true);
+        if (enemy == null || Vector3.Distance(leaderPos, enemy.position) > Info.DistAlert) return false;
+        Info.Target = enemy;
+        return true;
+    }
+
+    // Flees from the nearest nearby hostile (used when low on health).
+    private bool TryFleeEnemy()
+    {
+        MobInfo threat = FindNearestEnemy(onlyAggroedOnPlayer: false);
+        if (threat == null) return false;
+        Info.Target = threat;
+        return true;
+    }
+
+    // Nearest hostile in the ally's alert radius. When onlyAggroedOnPlayer is true, only mobs
+    // currently attacking a player count; otherwise any hostile counts (for fleeing while low).
+    private MobInfo FindNearestEnemy(bool onlyAggroedOnPlayer)
+    {
+        int count = Physics.OverlapSphereNonAlloc(transform.position, Info.DistAlert, AllyScanBuffer, Main.MaskEntity);
+        MobInfo best = null;
+        float bestSqr = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            if (AllyScanBuffer[i].TryGetComponent(out EntityMachine em) &&
+                em.Info is MobInfo enemy &&
+                enemy.HitboxType == HitboxType.Enemy && !enemy.Destroyed &&
+                (!onlyAggroedOnPlayer || enemy.Target is PlayerInfo))
+            {
+                float sqr = (em.transform.position - transform.position).sqrMagnitude;
+                if (sqr < bestSqr) { bestSqr = sqr; best = enemy; }
+            }
+        }
+        return best;
+    }
+
     public override void Attack()
     {
         if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid) && !EnsureCompatibleToolForTarget())

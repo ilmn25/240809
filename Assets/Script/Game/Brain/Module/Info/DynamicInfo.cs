@@ -120,8 +120,8 @@ public class DynamicInfo : Info
         if (Health <= 0) return false;
         switch (projectile.TargetHitBoxType)
         {
-            case HitboxType.Player:  
-                if (this != Main.PlayerInfo) return false;
+            case HitboxType.Player: // enemy attacks hit any player (controlled or AI ally)
+                if (this is not PlayerInfo) return false;
                 break;
             case HitboxType.Friendly: // enemy kill friendly 
                 if (HitboxType == HitboxType.Enemy) return false;
