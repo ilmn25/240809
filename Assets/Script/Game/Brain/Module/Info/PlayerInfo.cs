@@ -3,7 +3,8 @@ using UnityEngine;
 
 public enum PlayerStatus {
         Active,
-    Respawn
+    Respawn,
+    Incapacitated
 }
 [System.Serializable]
 public class PlayerInfo : MobInfo
@@ -54,27 +55,26 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        if (PlayerStatus == PlayerStatus.Respawn)
-        {
-            if (IframesCurrent > 1) return;
 
-            Hunger = HungerMax;
-            Health = HealthMax;
-            Velocity = Vector2.zero;
-            PlayerStatus = PlayerStatus.Active;
-            GUIBar.Update();
-            Inventory.RefreshInventory();
-            Machine.SetState<DefaultState>();
-        }
-        else if (Health <= 0 && PlayerStatus == PlayerStatus.Active)
+        switch (PlayerStatus)
         {
-            Audio.PlaySFX(SfxID.DeathPlayer);
-            SpriteTool.gameObject.SetActive(false);
-            CancelTarget(); 
-            GUIMain.Show(false);
-            Velocity = Vector2.zero;
-            Machine.SetState<DeadState>();
-        } 
+            case PlayerStatus.Respawn: // spawn protection until Iframes run out
+                if (IframesCurrent > 1) return;
+                Revive();
+                break;
+
+            case PlayerStatus.Incapacitated: // downed: no control, no movement
+                return;
+
+            case PlayerStatus.Active:
+                if (Health <= 0)
+                {
+                    Audio.PlaySFX(SfxID.DeathPlayer);
+                    EnterIncapacitated();
+                    return;
+                }
+                break;
+        }
 
         FaceTarget = Equipment != null || Target != null;
 
@@ -111,6 +111,39 @@ public class PlayerInfo : MobInfo
             }
             AirTime = 0;
         }
+    }
+
+    // Downed: drop control/target and disable movement until revived.
+    private void EnterIncapacitated()
+    {
+        PlayerStatus = PlayerStatus.Incapacitated;
+        Velocity = Vector2.zero;
+        Direction = Vector2.zero;
+        CancelTarget();
+        if (Main.PlayerInfo == this)
+        {
+            if (SpriteTool != null) SpriteTool.gameObject.SetActive(false);
+            GUIMain.Show(false);
+            GUIBar.Update();
+        }
+        Machine.SetState<IncapacitatedState>();
+    }
+
+    // Revive: restore health/control and refresh the local HUD.
+    private void Revive()
+    {
+        Hunger = HungerMax;
+        Health = HealthMax;
+        Velocity = Vector2.zero;
+        PlayerStatus = PlayerStatus.Active;
+        if (Main.PlayerInfo == this)
+        {
+            if (Equipment != null && SpriteTool != null) SpriteTool.gameObject.SetActive(true);
+            GUIMain.Show(true);
+            GUIBar.Update();
+        }
+        Inventory.RefreshInventory();
+        Machine.SetState<DefaultState>();
     }
 
     private void HandleMovement()
@@ -174,11 +207,4 @@ public class PlayerInfo : MobInfo
     {
         return 1 * Inventory.CurrentItemData.Speed;
     } 
-
-    public void Respawn()
-    {
-        if (PlayerStatus == PlayerStatus.Respawn) return;
-        PlayerStatus = PlayerStatus.Respawn;
-        IframesCurrent = 150;
-    }
 }

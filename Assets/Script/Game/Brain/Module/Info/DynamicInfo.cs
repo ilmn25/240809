@@ -116,6 +116,8 @@ public class DynamicInfo : Info
     public override bool OnHitInternal(Projectile projectile)
     { 
         if (IframesCurrent != 0) return false;
+        // Entities at 0 HP are down/dead and cannot be hit.
+        if (Health <= 0) return false;
         switch (projectile.TargetHitBoxType)
         {
             case HitboxType.Player:  

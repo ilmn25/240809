@@ -23,6 +23,7 @@ public class SpriteOrbitModule : EntityModule
  
     private void UpdateOrbit()
     { 
+        if (EntityMachine?.Info is PlayerInfo pi && pi.PlayerStatus == PlayerStatus.Incapacitated) return;
         _sprite.rotation = ViewPort.CurrentRotation;
     }
 }

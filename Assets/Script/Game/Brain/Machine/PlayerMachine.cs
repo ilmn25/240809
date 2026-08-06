@@ -53,7 +53,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddModule(new GroundMovementModule()); 
         AddModule(new GroundPathingModule()); 
         
-        AddState(new DeadState());
+        AddState(new IncapacitatedState());
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
         AddState(new MobChaseAction());
