@@ -13,7 +13,7 @@ public class CraftInfo : SpriteStructureInfo
     private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric);
     private static readonly Storage FurnacePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Furnace), ID.Slag, ID.Steel, ID.Copper);
     private static readonly Storage SmelterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Smelter), ID.Glass);
-    private static readonly Storage MasonryPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.MasonryWorkbench), ID.Anvil, ID.Smelter);
+    private static readonly Storage MasonryPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.MasonryWorkbench), ID.Anvil, ID.Smelter, ID.OwlStatue);
     private static readonly Storage SawmillPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Sawmill), ID.Plank, ID.Stake, ID.Chest);
     private static readonly Storage StonecutterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Stonecutter), ID.Brick, ID.BrickBlock);
     private static readonly Storage WorkbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Workbench), ID.Chalk, ID.Furnace, ID.MasonryWorkbench, ID.WoodenToolbench, ID.CarpenterWorkbench, ID.Sawmill, ID.Stonecutter, ID.FieldStation);

@@ -92,6 +92,7 @@ public partial class Item
         AddStructureDefinition(ID.FieldStation, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.Sticks, 4 } }, 100, description: "A lightweight station specialized for field planting tools.");
         AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Feed it an acorn to grow a log.");
         AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.");
+        AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
 
         // Tools
         AddToolDefinition(
