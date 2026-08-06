@@ -1,7 +1,11 @@
 using UnityEngine;
 
-public class ChickenMachine : MobMachine, IActionSecondaryInteract
+public class HenMachine : MobMachine, IActionSecondaryInteract
 {
+    // Frames between dropped eggs (~40 seconds at 60 fps).
+    private const int EggLayInterval = 2400;
+    private int _eggTimer;
+
     public static Info CreateInfo()
     {
         return new EnemyInfo()
@@ -31,7 +35,7 @@ public class ChickenMachine : MobMachine, IActionSecondaryInteract
 
         Dialogue dialogue = new Dialogue
         {
-            Text = "cluck cluck",
+            Text = "bawk bawk",
         };
         AddState(new DialogueState(dialogue));
     }
@@ -44,47 +48,39 @@ public class ChickenMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
-        if (IsCurrentState<DefaultState>())
+        // Hens lay eggs on the ground on a timer (OnUpdate only runs on the host).
+        if (++_eggTimer >= EggLayInterval)
         {
-            if (Info.Target != null)
+            _eggTimer = 0;
+            Entity.SpawnItem(ID.Egg, transform.position);
+        }
+
+        if (!IsCurrentState<DefaultState>()) return;
+
+        if (Info.Target != null)
+        {
+            if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
             {
-                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-                {
-                    if (Random.value < 0.8f)
-                    {
-                        SetState<MobEscape>();
-                    }
-                    else
-                    {
-                        SetState<MobRoam>();
-                    }
-                }
+                if (Random.value < 0.8f)
+                    SetState<MobEscape>();
                 else
-                {
                     SetState<MobRoam>();
-                }
             }
             else
-            {
-                if (Random.value > 0.5f)
-                {
-                    SetState<MobRoam>();
-                }
-                else
-                {
-                    SetState<MobIdle>();
-                }
-            }
+                SetState<MobRoam>();
+        }
+        else
+        {
+            if (Random.value > 0.5f)
+                SetState<MobRoam>();
+            else
+                SetState<MobIdle>();
         }
     }
 
     public void OnDrawGizmos()
     {
-        if (Camera.current != Camera.main)
-        {
-            return;
-        }
-
-        GetModule<GroundPathingModule>().DrawGizmos();
+        if (Camera.current == Camera.main)
+            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

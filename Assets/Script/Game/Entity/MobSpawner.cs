@@ -14,7 +14,7 @@ public class MobSpawner
 
     private static int _timer;
 
-    private static readonly List<ID> DayMobs = new() { ID.Sheep, ID.Chicken };
+    private static readonly List<ID> DayMobs = new() { ID.Sheep, ID.Hen, ID.Rooster, ID.Chick };
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
 
@@ -37,7 +37,6 @@ public class MobSpawner
         {
             if (player.Machine == null || player.controllerId == -1) continue;
 
-            // Count active mobs near this player
             int nearby = 0;
             Vector3 pPos = player.Machine.transform.position;
             foreach (var em in EntityDynamicLoad.ActiveEntities)
@@ -61,11 +60,9 @@ public class MobSpawner
         Vector3Int spawnPos = Vector3Int.FloorToInt(
             playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * dist);
 
-        // Snap to surface: scan down from sky to find first solid block.
         if (!FindSurfacePosition(ref spawnPos))
             return;
 
-        // Pick mob pool based on biome and time.
         BiomeType biome = GenHelpBiome.GetBiomeType(spawnPos.x, spawnPos.z);
         List<ID> pool = isNight ? NightMobs : DayMobs;
         if (isNight && biome == BiomeType.Desert)
@@ -73,10 +70,22 @@ public class MobSpawner
 
         ID mobID = pool[Random.Range(0, pool.Count)];
 
-        // Spawn a group of 1–3 at the exact same position (no spread).
-        int groupSize = Random.Range(1, 4);
-        for (int i = 0; i < groupSize; i++)
-            Entity.Spawn(mobID, spawnPos);
+        // Sheep graze in large pure flocks.
+        if (mobID == ID.Sheep)
+        {
+            int herd = Random.Range(5, 7);
+            for (int i = 0; i < herd; i++)
+                Entity.Spawn(ID.Sheep, spawnPos);
+            return;
+        }
+
+        // Poultry spawn as a mixed farmyard flock: hens, chicks, and usually a rooster.
+        for (int i = 0, n = Random.Range(1, 3); i < n; i++) // 1–2 hens
+            Entity.Spawn(ID.Hen, spawnPos);
+        for (int i = 0, n = Random.Range(2, 5); i < n; i++) // 2–4 chicks
+            Entity.Spawn(ID.Chick, spawnPos);
+        if (Random.value < 0.6f)
+            Entity.Spawn(ID.Rooster, spawnPos);
     }
 
     /// <summary>Scan downward from the given position to find the first
@@ -86,7 +95,6 @@ public class MobSpawner
         int worldBottom = 0;
         int worldTop = World.Inst.Bounds.y;
 
-        // Clamp to world bounds horizontally.
         pos.x = Mathf.Clamp(pos.x, 0, World.Inst.Bounds.x - 1);
         pos.z = Mathf.Clamp(pos.z, 0, World.Inst.Bounds.z - 1);
 

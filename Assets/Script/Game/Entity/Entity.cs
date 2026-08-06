@@ -183,8 +183,19 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Wool); 
                 loot.Add(0.5f, 1, ID.Wool); 
 
-                AddMob<ChickenMachine>(ID.Chicken);
-                loot = new (ID.Chicken);
+                AddMob<ChickMachine>(ID.Chick);
+                loot = new (ID.Chick);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.5f, 1, ID.Foul);
+
+                AddMob<HenMachine>(ID.Hen);
+                loot = new (ID.Hen);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.5f, 1, ID.Foul);
+                loot.Add(0.4f, 1, ID.Egg);
+
+                AddMob<RoosterMachine>(ID.Rooster);
+                loot = new (ID.Rooster);
                 loot.Add(1, 1, ID.Foul);
                 loot.Add(0.5f, 1, ID.Foul);
                 
