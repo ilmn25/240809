@@ -78,6 +78,31 @@ public class Control
         GUIBar.Update();
         CurrentPlayerIndex = i;
     }
+
+    /// <summary>Switch control to the player at index <paramref name="i"/> and
+    /// update network ownership (host claims/releases, client re-claims).</summary>
+    public static void SwitchToPlayer(int i)
+    {
+        if (i < 0 || i >= global::Save.Inst.players.Count) return;
+        if (i == CurrentPlayerIndex) return;
+
+        int prevIndex = CurrentPlayerIndex;
+        SetPlayer(i);
+
+        if (!Helper.IsHost())
+        {
+            // Immediately claim the new player so the host doesn't broadcast stale controllerId.
+            PlayerSync.SendClientPlayerBatch();
+        }
+        else
+        {
+            // Host: update player ownership so clients see the change
+            string prevUid = global::Save.Inst.players[prevIndex].uid;
+            string newUid = global::Save.Inst.players[i].uid;
+            PlayerSync.HostReleasePlayer(prevUid);
+            PlayerSync.HostClaimPlayer(newUid);
+        }
+    }
     
     public static void Update()
     {
@@ -95,21 +120,7 @@ public class Control
                 if (p.Machine != null) break;
             }
             if (next == prevIndex) return; // no other player in range
-            SetPlayer(next);
-
-            if (!Helper.IsHost())
-            {
-                // Immediately claim the new player so the host doesn't broadcast stale controllerId.
-                PlayerSync.SendClientPlayerBatch();
-            }
-            else
-            {
-                // Host: update player ownership so clients see the change
-                string prevUid = global::Save.Inst.players[prevIndex].uid;
-                string newUid = global::Save.Inst.players[next].uid;
-                PlayerSync.HostReleasePlayer(prevUid);
-                PlayerSync.HostClaimPlayer(newUid);
-            }
+            SwitchToPlayer(next);
         }
         
         if (Inst.FullScreen.KeyDown())

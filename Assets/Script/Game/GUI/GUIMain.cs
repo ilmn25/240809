@@ -12,6 +12,7 @@ public static class GUIMain
     public static GUIStorage Storage; 
     public static GUICraft GUICraft;
     public static GUIInfoPanel InfoPanel;
+    public static GUIPlayerList PlayerList;
     public static GUICursor Cursor;
     public static GUIMenu GUIMenu;
     public static GUIHostMenu GUIHostMenu;
@@ -65,6 +66,9 @@ public static class GUIMain
         InfoPanel.Initialize();
         InfoPanel.Show(false);
         
+        PlayerList = new GUIPlayerList();
+        PlayerList.Initialize();
+        
         Dialogue.Show(false);
         Show(false);
     }
@@ -98,6 +102,7 @@ public static class GUIMain
         StorageInv.Update();
         Storage.Update();
         GUICraft.Update();
+        PlayerList.Update();
         InfoPanel.UpdateDrag();
         UpdateHudText();
 
