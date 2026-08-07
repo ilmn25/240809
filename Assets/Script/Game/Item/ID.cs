@@ -109,4 +109,7 @@ public enum ID
     OwlStatue,
     OldRadio,
     Merchant,
+    ForestBlock,
+    Deathcap,
+    Orchids,
 }

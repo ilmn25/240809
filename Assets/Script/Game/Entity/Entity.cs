@@ -151,7 +151,11 @@ public class Entity
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 
                 AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Main.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Grass, Vector3Int.zero, Main.IndexNoCollide);   
+                // Harvestable plants need a non-zero bounds so a collider is added
+                // for raycast interaction (they stay on NoCollide so they don't block movement).
+                AddStructure<DecorMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);
+                AddStructure<DecorMachine>(ID.Deathcap, Vector3Int.one, Main.IndexNoCollide);
+                AddStructure<DecorMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
