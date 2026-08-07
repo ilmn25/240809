@@ -214,8 +214,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         SetState<MobChaseAction>();
     }
 
-    // Anchored to the leader: only fights hostiles that are actively attacking a player, breaks
-    // off and re-follows the leader if the fight drags it away. Unarmed allies just trail.
+    // Anchored to the leader: fights enemies on sight, and retaliates against a passive mob
+    // that is attacking a player. Breaks off and re-follows the leader if the fight drags it
+    // away. Unarmed allies just trail.
     private bool TryAcquireEnemyTarget()
     {
         if (Info.Equipment == null) return false;
@@ -223,11 +224,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         Vector3 leaderPos = Main.PlayerInfo.position;
 
-        // Keep the current target only while it's still attacking a player and the fight stays near.
-        if (Info.Target is MobInfo current && current.HitboxType == HitboxType.Enemy)
+        // Keep the current target while it's still a threat and the fight stays near.
+        if (Info.Target is MobInfo current && IsThreat(current))
         {
             if (current.Destroyed ||
-                current.Target is not PlayerInfo ||
                 Vector3.Distance(leaderPos, current.position) > Info.DistDisengage ||
                 Vector3.Distance(leaderPos, transform.position) > Info.DistAlert)
             {
@@ -240,8 +240,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         // Don't pick new fights while away from the leader — head back first.
         if (Vector3.Distance(leaderPos, transform.position) > Info.DistAlert) return false;
 
-        // Only engage mobs near the leader that are actively attacking a player.
-        MobInfo enemy = FindNearestEnemy(onlyAggroedOnPlayer: true);
+        // Engage the nearest threat near the leader.
+        MobInfo enemy = FindNearestThreat();
         if (enemy == null || Vector3.Distance(leaderPos, enemy.position) > Info.DistAlert) return false;
         Info.Target = enemy;
         return true;
@@ -250,15 +250,23 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     // Flees from the nearest nearby hostile (used when low on health).
     private bool TryFleeEnemy()
     {
-        MobInfo threat = FindNearestEnemy(onlyAggroedOnPlayer: false);
+        MobInfo threat = FindNearestThreat();
         if (threat == null) return false;
         Info.Target = threat;
         return true;
     }
 
-    // Nearest hostile in the ally's alert radius. When onlyAggroedOnPlayer is true, only mobs
-    // currently attacking a player count; otherwise any hostile counts (for fleeing while low).
-    private MobInfo FindNearestEnemy(bool onlyAggroedOnPlayer)
+    // A threat is any enemy (attacked on sight) or a passive mob currently attacking a player
+    // (retaliate when it damages someone).
+    private bool IsThreat(MobInfo mob)
+    {
+        if (mob == null || mob.Destroyed) return false;
+        if (mob.HitboxType == HitboxType.Enemy) return true;
+        return mob.HitboxType == HitboxType.Passive && mob.Target is PlayerInfo;
+    }
+
+    // Nearest threat in the ally's alert radius.
+    private MobInfo FindNearestThreat()
     {
         int count = Physics.OverlapSphereNonAlloc(transform.position, Info.DistAlert, AllyScanBuffer, Main.MaskEntity);
         MobInfo best = null;
@@ -266,9 +274,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         for (int i = 0; i < count; i++)
         {
             if (AllyScanBuffer[i].TryGetComponent(out EntityMachine em) &&
-                em.Info is MobInfo enemy &&
-                enemy.HitboxType == HitboxType.Enemy && !enemy.Destroyed &&
-                (!onlyAggroedOnPlayer || enemy.Target is PlayerInfo))
+                em.Info is MobInfo enemy && IsThreat(enemy))
             {
                 float sqr = (em.transform.position - transform.position).sqrMagnitude;
                 if (sqr < bestSqr) { bestSqr = sqr; best = enemy; }

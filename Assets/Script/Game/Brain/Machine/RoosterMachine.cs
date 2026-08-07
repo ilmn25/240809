@@ -10,7 +10,7 @@ public class RoosterMachine : MobMachine, IActionSecondaryInteract
 
     public static Info CreateInfo()
     {
-        return new EnemyInfo()
+        return new PassiveInfo()
         {
             HealthMax = 16,
             SpeedGround = 7,
