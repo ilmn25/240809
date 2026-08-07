@@ -140,11 +140,7 @@ public class DynamicInfo : Info
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         // Only a user-controlled player should acquire a target from hitting something;
         // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
-        if (projectile.SourceInfo is PlayerInfo sourcePlayer && sourcePlayer.controllerId != -1)
-        {
-            projectile.SourceInfo.Target = this;
-            projectile.SourceInfo.ActionType = IActionType.Hit;
-        }
+        projectile.SourceInfo.AcquireTarget(this);
         OnHit(projectile);
         return true;
     }

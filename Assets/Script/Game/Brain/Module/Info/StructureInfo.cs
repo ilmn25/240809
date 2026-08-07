@@ -34,8 +34,9 @@ public class StructureInfo : Info
         { 
             return false;
         }  
-        projectile.SourceInfo.Target = this;
-        projectile.SourceInfo.ActionType = IActionType.Hit;
+        // Only a user-controlled player should acquire a target from hitting a structure;
+        // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
+        projectile.SourceInfo.AcquireTarget(this);
         return true;
         // if (!PlayerTask.Pending.Contains(this)) PlayerTask.Pending.Add(this) 
     }
