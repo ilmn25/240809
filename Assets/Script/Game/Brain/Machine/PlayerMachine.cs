@@ -60,6 +60,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new IncapacitatedState());
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
+        AddState(new MobEat());
         AddState(new MobChaseAction());
         AddState(new MobHit());
         AddState(new MobEscape());
@@ -129,6 +130,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                         case ItemType.Tool: 
                             if (Control.Inst.ActionPrimary.Key())
                                 Attack();
+                            break;
+                        case ItemType.Food:
+                            if (Control.Inst.ActionPrimary.KeyDown())
+                                SetState<MobEat>();
                             break;
                     }
                 } 
