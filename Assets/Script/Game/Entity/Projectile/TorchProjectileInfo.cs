@@ -17,21 +17,18 @@ public class TorchProjectileInfo : SwingProjectileInfo
 
         for (int i = 0; i < hitCount; i++)
         {
-            // Ignite any flammable object we touch. FlammableModule is an EntityModule
-            // on the Machine (a MonoBehaviour), so resolve the machine first.
+            // FlammableModule is an EntityModule on the Machine (a MonoBehaviour),
+            // so resolve the machine once and reuse it.
             Machine machine = HitBuffer[i].GetComponent<Machine>();
-            if (machine != null)
-            {
-                FlammableModule flammable = machine.GetModule<FlammableModule>();
-                if (flammable != null && flammable.Ignite())
-                    Audio.PlaySFX(SfxID.Sword);
-            }
+            if (machine == null || machine == projectile.SourceInfo.Machine) continue;
+
+            // Ignite any flammable object we touch.
+            FlammableModule flammable = machine.GetModule<FlammableModule>();
+            if (flammable != null && flammable.Ignite())
+                Audio.PlaySFX(SfxID.Sword);
 
             // Also register the hit so the swing still feels responsive.
-            IActionPrimary target = HitBuffer[i].GetComponent<IActionPrimary>();
-            if (target == null || projectile.SourceInfo.Machine == (Machine)target) continue;
-            Info info = ((Machine)target).GetModule<Info>();
-            info.OnHitInternal(projectile);
+            machine.GetModule<Info>().OnHitInternal(projectile);
         }
         projectile.Delete();
     }
