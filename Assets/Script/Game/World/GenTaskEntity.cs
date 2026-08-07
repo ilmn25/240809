@@ -3,8 +3,10 @@ using UnityEngine;
 public class GenTaskEntity : Gen
 {
     private static int _id;
+    private static int _idForest;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
     private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
+    private static int Forest => _idForest == 0 ? Block.ConvertID(ID.ForestBlock) : _idForest;
 
     private const double DirtTreeChance = 0.02;
     private const double DirtBushChance = 0.02;
@@ -14,6 +16,24 @@ public class GenTaskEntity : Gen
     private const double SurfaceSandStructureChance = 0.0196;
     /// <summary>Chance per surface block to spawn a ground item (matches original 1%+1%).</summary>
     private const double GroundItemChance = 0.02;
+
+    // Dense forest generation
+    private const double ForestTreeChance = 0.5;
+    private const double ForestBushChance = 0.08;
+    private const double ForestGrassChance = 0.12;
+    private const double ForestDeathcapChance = 0.02;
+    private const double GrassOrchidChance = 0.02;
+    private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
+    private const float PathScale = 0.02f;
+    private const float PathWidth = 0.03f;
+
+    /// <summary>Deterministic check for whether a world position lies on a clear path
+    /// (a narrow winding band of Perlin noise) where no trees grow.</summary>
+    private static bool IsOnPath(int x, int z)
+    {
+        float noise = Mathf.PerlinNoise(x * PathScale + PathOffset, z * PathScale + PathOffset);
+        return noise > 0.5f - PathWidth && noise < 0.5f + PathWidth;
+    }
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -32,7 +52,40 @@ public class GenTaskEntity : Gen
                     {
                         Vector3Int position = currentCoordinate + new Vector3Int(x, y + 1, z);
                         double roll = rng.NextDouble();
-                        if (currentChunk[x, y, z] == Dirt)
+                        if (currentChunk[x, y, z] == Forest)
+                        {
+                            // Forest biome: dense trees, but never on the clear paths.
+                            if (IsOnPath(position.x, position.z))
+                                continue;
+
+                            double chance = ForestTreeChance;
+                            if (roll <= chance)
+                            {
+                                ID treeID = rng.NextDouble() <= 0.8 ? ID.PineTree : ID.BirchTree;
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
+                            }
+                            else if (roll <= (chance += ForestBushChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Bush, position));
+                            }
+                            else if (roll <= (chance += ForestGrassChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
+                            }
+                            else if (roll <= (chance += ForestDeathcapChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Deathcap, position));
+                            }
+
+                            // Forest floor ground items.
+                            if (rng.NextDouble() < GroundItemChance)
+                            {
+                                ID groundItem = PickGrassItem(rng);
+                                if (groundItem != ID.Null)
+                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                            }
+                        }
+                        else if (currentChunk[x, y, z] == Dirt)
                         {
                             double chance = DirtTreeChance;
                             if (roll <= chance)
@@ -47,6 +100,10 @@ public class GenTaskEntity : Gen
                             else if (roll <= (chance += DirtGrassChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
+                            }
+                            else if (roll <= (chance += GrassOrchidChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Orchids, position));
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {

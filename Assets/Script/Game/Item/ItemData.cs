@@ -71,6 +71,8 @@ public partial class Item
         AddMaterialDefinition(ID.Slag, "Molten industrial residue used in crafting.", materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
         AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.");
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500);
+        AddMaterialDefinition(ID.Deathcap, "A rare poisonous mushroom found in dark forests.");
+        AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
@@ -83,6 +85,9 @@ public partial class Item
         AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.");
         AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.");
         AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
+        AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.");
+        loot = new (ID.ForestBlock);
+        loot.Add(1, 1, ID.DirtBlock);
         AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 6 }, { ID.Plank, 5 }}, 100, description: "Cuts stone into refined brick parts quickly.");
         AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100, description: "Transforms logs into planks and stakes for building.");
         AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100, description: "Cooks meat and creates charcoal while giving light.");
