@@ -1,12 +1,14 @@
 using UnityEngine;
 
-public class RoosterMachine : MobMachine, IActionSecondaryInteract
+public class RoosterMachine : AnimalMachine
 {
     // A rooster tolerates the player getting close for a little while, then pecks them.
     private const int AggroDelay = 180;   // frames the player must linger (~3s at 60 fps)
     private const int PounceCount = 2;    // peck hops per attack
 
     private int _nearTimer;
+
+    protected override string DialogueText => "cock-a-doodle-doo!";
 
     public static Info CreateInfo()
     {
@@ -24,30 +26,10 @@ public class RoosterMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
-        AddState(new MobIdle());
-        AddState(new MobRoam());
         AddState(new MobChase());
-        AddState(new MobHit());
         AddState(new MobAttackPounce(PounceCount));
-        AddState(new EquipSelectState());
-
-        Dialogue dialogue = new Dialogue
-        {
-            Text = "cock-a-doodle-doo!",
-        };
-        AddState(new DialogueState(dialogue));
-    }
-
-    public void OnActionSecondary(Info info)
-    {
-        if (Info.Target != null) return;
-        SetState<DialogueState>();
     }
 
     public override void OnUpdate()
@@ -58,13 +40,12 @@ public class RoosterMachine : MobMachine, IActionSecondaryInteract
 
         if (playerNear)
         {
-            // Attack if the player lingers too close for too long.
-            if (++_nearTimer >= AggroDelay && Info.Target is not PlayerInfo)
+            // Attack immediately if the player attacked us (target already set by OnHit),
+            // otherwise attack if the player lingers too close for too long.
+            if (Info.Target is PlayerInfo ||
+                (++_nearTimer >= AggroDelay && Info.Target is not PlayerInfo))
             {
-                Info.Target = Main.PlayerInfo;
-                Info.ActionType = IActionType.Hit;
-                Info.PathingStatus = PathingStatus.Pending;
-                SetState<MobChase>();
+                Chase(Main.PlayerInfo);
                 return;
             }
         }
@@ -106,11 +87,5 @@ public class RoosterMachine : MobMachine, IActionSecondaryInteract
             else
                 SetState<MobIdle>();
         }
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

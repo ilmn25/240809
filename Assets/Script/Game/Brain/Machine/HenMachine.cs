@@ -1,11 +1,13 @@
 using UnityEngine;
 
-public class HenMachine : MobMachine, IActionSecondaryInteract
+public class HenMachine : AnimalMachine
 {
     // Random wait between eggs, in frames: half a day to a day and a half.
     private const int MinLayInterval = Environment.Length * 12;
     private const int MaxLayInterval = Environment.Length * 36;
     private int _nextLayIn;
+
+    protected override string DialogueText => "bawk bawk";
 
     public static Info CreateInfo()
     {
@@ -23,30 +25,11 @@ public class HenMachine : MobMachine, IActionSecondaryInteract
     public override void OnStart()
     {
         _nextLayIn = Random.Range(MinLayInterval, MaxLayInterval); // first egg after a random wait
+        base.OnStart();
 
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-
-        AddState(new MobIdle());
-        AddState(new MobRoam());
         AddState(new MobEscape());
-        AddState(new MobHit());
-        AddState(new EquipSelectState());
-
-        Dialogue dialogue = new Dialogue
-        {
-            Text = "bawk bawk",
-        };
-        AddState(new DialogueState(dialogue));
-    }
-
-    public void OnActionSecondary(Info info)
-    {
-        if (Info.Target != null) return;
-        SetState<DialogueState>();
+        AddState(new MobChase());
+        AddState(new MobAttackPounce(1));
     }
 
     public override void OnUpdate()
@@ -64,7 +47,10 @@ public class HenMachine : MobMachine, IActionSecondaryInteract
 
         if (Info.Target != null)
         {
-            if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
+            // Retaliate against the player if they attacked us.
+            if (Info.Target is PlayerInfo)
+                AttackOrChase();
+            else if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
             {
                 if (Random.value < 0.8f)
                     SetState<MobEscape>();
@@ -81,11 +67,5 @@ public class HenMachine : MobMachine, IActionSecondaryInteract
             else
                 SetState<MobIdle>();
         }
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

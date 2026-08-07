@@ -30,7 +30,7 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         gameObject.SetActive(true);
         _image.sprite = Cache.LoadSprite("Sprite/" + player.CharSprite);
         _image.color = Color.white;
-        _text.text = $"{player.Health}HP";
+        _text.text = player.Health.ToString();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
