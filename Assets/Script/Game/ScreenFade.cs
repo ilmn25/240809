@@ -45,6 +45,13 @@ public static class ScreenFade
         _fadeSpeed = duration > 0.001f ? 1f / duration : 10f;
     }
 
+    /// <summary>Start fully black and fade in to transparent (e.g. on app launch).</summary>
+    public static void FadeInFromBlack(float duration = 0.5f)
+    {
+        _alpha = 1f;
+        FadeIn(duration);
+    }
+
     /// <summary>Call every frame from Main.Update() to animate the alpha.</summary>
     public static void Update()
     {
