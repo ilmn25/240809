@@ -7,7 +7,7 @@ public class ChickMachine : MobMachine, IActionSecondaryInteract
 
     public static Info CreateInfo()
     {
-        return new EnemyInfo()
+        return new PassiveInfo()
         {
             HealthMax = 8,     // fragile baby chick
             SpeedGround = 8,   // quick to scurry

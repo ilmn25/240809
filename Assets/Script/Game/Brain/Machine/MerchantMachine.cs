@@ -10,7 +10,7 @@ public class MerchantMachine : MobMachine, IActionSecondaryInteract
 
     public static Info CreateInfo()
     {
-        return new EnemyInfo()
+        return new PassiveInfo()
         {
             HealthMax = 50,
             SpeedGround = 5,
