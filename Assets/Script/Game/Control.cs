@@ -17,6 +17,7 @@ public class Control
     
     public readonly ControlKey Inv = new (KeyCode.I);
     public readonly ControlKey SwapChar = new (KeyCode.Tab);
+    public readonly ControlKey Recall = new (KeyCode.H);
     public readonly ControlKey Pause = new (KeyCode.Escape);
     public readonly ControlKey FullScreen = new (KeyCode.F11);
     public readonly ControlKey ActionPrimary = new (KeyCode.Mouse0);
@@ -129,6 +130,12 @@ public class Control
                 Screen.SetResolution(960, 540, false);
             else
                 Screen.SetResolution(1920, 1080, true);
+        }
+
+        if (Inst.Recall.KeyDown())
+        {
+            Audio.PlaySFX(SfxID.Text);
+            PlayerMachine.RecallAllies();
         }
 
         HandleActionButton();
