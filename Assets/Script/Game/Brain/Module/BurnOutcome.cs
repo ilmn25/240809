@@ -33,6 +33,19 @@ public class DropItemOutcome : BurnOutcome
     }
 }
 
+/// <summary>Drops an item at the burn site with a given chance (0–1).</summary>
+public class ChanceDropItemOutcome : BurnOutcome
+{
+    public ID ItemID;
+    public int Amount = 1;
+    public float Chance = 0.1f;
+    public override void Apply(Vector3 position)
+    {
+        if (UnityEngine.Random.value <= Chance)
+            Entity.SpawnItem(ItemID, position, Amount);
+    }
+}
+
 /// <summary>Runs several outcomes at once (e.g. rubble + ash).</summary>
 public class CompositeOutcome : BurnOutcome
 {

@@ -55,6 +55,10 @@ public class StructureInfo : Info
                 global::Loot.Gettable(Loot).Spawn(position);
             OnDestroy(info);
             PlayerTask.Pending.Remove(this);
+            // Clear the attacker's target so the swing animation isn't reset by
+            // re-targeting this now-destroyed structure.
+            if (info.Target == this)
+                info.CancelTarget();
             Destroy();
         }
         else

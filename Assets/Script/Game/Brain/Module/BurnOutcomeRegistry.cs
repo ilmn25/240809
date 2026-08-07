@@ -9,9 +9,19 @@ public static class BurnOutcomeRegistry
 {
     private static readonly Dictionary<ID, BurnOutcome> Map = new Dictionary<ID, BurnOutcome>
     {
-        // Trees become charred burned trees.
-        [ID.PineTree]  = new SpawnStructureOutcome { StructureID = ID.BurnedTree },
-        [ID.BirchTree] = new SpawnStructureOutcome { StructureID = ID.BurnedTree },
+        // Trees become charred burned trees, with a rare chance to drop charcoal.
+        [ID.PineTree]  = new CompositeOutcome {
+            Outcomes = {
+                new SpawnStructureOutcome { StructureID = ID.BurnedTree },
+                new ChanceDropItemOutcome { ItemID = ID.Charcoal, Amount = 1, Chance = 0.1f },
+            }
+        },
+        [ID.BirchTree] = new CompositeOutcome {
+            Outcomes = {
+                new SpawnStructureOutcome { StructureID = ID.BurnedTree },
+                new ChanceDropItemOutcome { ItemID = ID.Charcoal, Amount = 1, Chance = 0.1f },
+            }
+        },
 
         // Wooden structures collapse into rubble.
         [ID.Workbench]  = new SpawnStructureOutcome { StructureID = ID.Rubble },
