@@ -55,7 +55,10 @@ public class MobInfo : DynamicInfo
         {
             if (Target.Destroyed)
             {
-                CancelTarget();
+                // Just drop the dead target without resetting the state machine,
+                // so the swing animation isn't interrupted on the killing blow.
+                Target = null;
+                PathingStatus = PathingStatus.Stuck;
             }
             else
             {

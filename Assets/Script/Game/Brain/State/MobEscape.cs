@@ -3,6 +3,8 @@ using UnityEngine;
 class MobEscape : MobState {
     public override void OnEnterState()
     {
+        // Face the direction of movement (away from the threat), not the target.
+        Info.FaceTarget = false;
         Module<PathingModule>().SetTarget(PathingTarget.Escape);
     }
     

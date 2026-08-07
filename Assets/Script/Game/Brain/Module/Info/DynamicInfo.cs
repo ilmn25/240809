@@ -138,8 +138,13 @@ public class DynamicInfo : Info
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
-        projectile.SourceInfo.Target = this;
-        projectile.SourceInfo.ActionType = IActionType.Hit;
+        // Only a user-controlled player should acquire a target from hitting something;
+        // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
+        if (projectile.SourceInfo is PlayerInfo sourcePlayer && sourcePlayer.controllerId != -1)
+        {
+            projectile.SourceInfo.Target = this;
+            projectile.SourceInfo.ActionType = IActionType.Hit;
+        }
         OnHit(projectile);
         return true;
     }
