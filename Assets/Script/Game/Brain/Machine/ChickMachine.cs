@@ -1,18 +1,21 @@
 using UnityEngine;
 
-public class ChickMachine : MobMachine, IActionSecondaryInteract
+public class ChickMachine : AnimalMachine
 {
     // Shared scratch buffer for hen scans (results are consumed before the next call).
     private static readonly Collider[] FollowScanBuffer = new Collider[16];
 
+    protected override string DialogueText => "peep peep";
+
     public static Info CreateInfo()
     {
-        return new PassiveInfo()
+        return new ChickInfo()
         {
             HealthMax = 8,     // fragile baby chick
             SpeedGround = 8,   // quick to scurry
             SpeedAir = 9,
             PathAir = 3,
+            DistAlert = 10,    // how far a chick will follow a hen
             DistFollow = 1.5f, // how close chicks huddle to a hen
             DistRoam = 3
         };
@@ -20,29 +23,8 @@ public class ChickMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-
-        AddState(new MobIdle());
-        AddState(new MobRoam());
+        base.OnStart();
         AddState(new MobChaseAction());
-        AddState(new MobHit());
-        AddState(new EquipSelectState());
-
-        Dialogue dialogue = new Dialogue
-        {
-            Text = "peep peep",
-        };
-        AddState(new DialogueState(dialogue));
-    }
-
-    public void OnActionSecondary(Info info)
-    {
-        if (Info.Target != null) return;
-        SetState<DialogueState>();
     }
 
     public override void OnUpdate()
@@ -83,11 +65,5 @@ public class ChickMachine : MobMachine, IActionSecondaryInteract
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobChaseAction>();
         return true;
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }
