@@ -113,4 +113,7 @@ public enum ID
     Deathcap,
     Orchids,
     Torch,
+    BurnedTree,
+    Rubble,
+    Ash,
 }

@@ -73,6 +73,7 @@ public partial class Item
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500);
         AddMaterialDefinition(ID.Deathcap, "A rare poisonous mushroom found in dark forests.");
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
+        AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");

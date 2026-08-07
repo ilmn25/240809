@@ -1,15 +1,5 @@
 using UnityEngine;
-using Random = UnityEngine.Random;
-
-/// <summary>
-/// Makes an entity flammable, Don't Starve style. When ignited, the object
-/// ramps up to full burn, takes damage over time, emits fire particles, and
-/// spreads fire to nearby flammable objects. When it burns out it is destroyed.
-///
-/// Host-authoritative: all burning/spread logic runs on the host. Clients see
-/// the fire via the persisted FireLevel (synced through the entity batch) and
-/// the fire particles broadcast through EffectSync.
-/// </summary>
+ 
 public class FlammableModule : EntityModule
 {
     /// <summary>How long (seconds) the object burns before it is destroyed.</summary>
@@ -52,18 +42,15 @@ public class FlammableModule : EntityModule
 
     public override void Update()
     {
-        // Only the host simulates burning/spread.
         if (!Helper.IsHost()) return;
 
         Info info = Info;
         if (info == null || info.Destroyed) return;
 
-        // Not burning — nothing to do.
         if (info.FireLevel <= 0f) return;
 
         float dt = Helper.GetDeltaTime();
 
-        // Ramp the fire up to full intensity.
         info.FireLevel = Mathf.Min(1f, info.FireLevel + dt * 0.5f);
 
         _burnTime += dt;
@@ -72,35 +59,30 @@ public class FlammableModule : EntityModule
         _smokeTimer += dt;
         _damageTimer += dt;
 
-        // Emit fire particles.
         if (_particleTimer >= ParticleInterval)
         {
             _particleTimer = 0f;
             Particle.Create(info.position + new Vector3(0, 0.5f, 0), Particles.Fire, false);
         }
 
-        // Emit smoke particles while burning.
         if (_smokeTimer >= SmokeInterval)
         {
             _smokeTimer = 0f;
             Particle.Create(info.position + new Vector3(0, 0.8f, 0), Particles.Smoke, false);
         }
 
-        // Spread fire to neighbors.
         if (_spreadTimer >= SpreadInterval)
         {
             _spreadTimer = 0f;
             FireRegistry.SpreadFrom(this);
         }
 
-        // Apply burn damage once per second.
         if (_damageTimer >= 1f)
         {
             _damageTimer = 0f;
             ApplyBurnDamage(info);
         }
 
-        // Burn out once the burn duration has elapsed.
         if (_burnTime >= BurnDuration)
         {
             BurnOut(info);
@@ -124,7 +106,7 @@ public class FlammableModule : EntityModule
     {
         Info info = Info;
         if (info == null || info.Destroyed) return false;
-        if (info.FireLevel > 0f) return false; // already burning
+        if (info.FireLevel > 0f) return false;
 
         info.FireLevel = 0.15f;
         _burnTime = 0f;
@@ -142,11 +124,7 @@ public class FlammableModule : EntityModule
         info.FireLevel = 0f;
         FireRegistry.Unregister(this);
 
-        // Drop the structure's loot (trees drop logs, etc.) like a normal destroy.
-        if (info is StructureInfo structure && structure.Loot != ID.Null)
-        {
-            global::Loot.Gettable(structure.Loot).Spawn(info.position);
-        }
+        BurnOutcomeRegistry.Get(info.id)?.Apply(info.position);
 
         info.Destroy();
     }

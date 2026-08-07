@@ -160,6 +160,9 @@ public class Entity
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
+                // Burn results — spawned when flammable objects burn out.
+                AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
+                AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OwlStatue);
