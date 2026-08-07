@@ -1,7 +1,6 @@
 using UnityEngine;
 
-/// <summary>A placeable old radio. Purely a marker: a nearby bed (with a lamp too) uses it
-/// as part of the requirements to host a travelling merchant. See BedMachine.
+/// <summary>A placeable old radio — one of the key items a travelling merchant looks for.
 /// Interacting with it just makes the radio drowse.</summary>
 public class OldRadioMachine : StructureMachine, IActionSecondaryInteract
 {
