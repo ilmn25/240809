@@ -191,6 +191,7 @@ public class ImprovisedPlanterMachine : PlanterMachine
             SeedID = ID.Acorn,
             HarvestID = ID.Log,
             HarvestAmount = 1,
+            Flammable = true,
         };
     }
 }

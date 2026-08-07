@@ -68,7 +68,7 @@ public class CraftInfo : SpriteStructureInfo
         return Pending.Count > 0;
     }
 
-    public static CraftInfo CreateStructureInfo(ID structureId, float health, SfxID sfxHit, SfxID sfxDestroy)
+    public static CraftInfo CreateStructureInfo(ID structureId, float health, SfxID sfxHit, SfxID sfxDestroy, bool flammable = false)
     {
         return new CraftInfo()
         {
@@ -76,6 +76,7 @@ public class CraftInfo : SpriteStructureInfo
             Loot = structureId,
             SfxHit = sfxHit,
             SfxDestroy = sfxDestroy,
+            Flammable = flammable,
         };
     }
 

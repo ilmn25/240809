@@ -17,6 +17,9 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
     { 
         AddModule(new SpriteOrbitModule()); 
         AddModule(new StructureSpriteCullModule());   
+        // Any flammable structure gets the fire module automatically.
+        if (Info.Flammable)
+            AddModule(new FlammableModule());
         if (GlowLight == null) return;
         GlowLight.enabled = Info is StructureInfo si && si.GlowOn;
     }

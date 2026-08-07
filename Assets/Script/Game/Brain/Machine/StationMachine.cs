@@ -2,7 +2,7 @@ public class WorkbenchMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        return CraftInfo.CreateStructureInfo(ID.Workbench, 500, SfxID.HitStone, SfxID.HitStone);
+        return CraftInfo.CreateStructureInfo(ID.Workbench, 500, SfxID.HitStone, SfxID.HitStone, flammable: true);
     }
 }
 public class AnvilMachine: CraftingMachine
@@ -17,6 +17,6 @@ public class FieldStationMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        return CraftInfo.CreateStructureInfo(ID.FieldStation, 500, SfxID.HitStone, SfxID.HitStone);
+        return CraftInfo.CreateStructureInfo(ID.FieldStation, 500, SfxID.HitStone, SfxID.HitStone, flammable: true);
     }
 }

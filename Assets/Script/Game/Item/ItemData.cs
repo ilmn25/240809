@@ -237,6 +237,24 @@ public partial class Item
         );
 
         AddToolDefinition(
+            id: ID.Torch,
+            gesture: ItemGesture.Swing,
+            speed: 1.2f,
+            range: 4f,
+            projectileInfo: new TorchProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 2,
+                Radius = 2,
+            },
+            durability: 100,
+            description: "A burning torch that sets flammable objects alight.",
+            materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Charcoal, 1 } },
+            holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
             id: ID.Hammer,
             gesture: ItemGesture.Swing,
             speed: 1.8f,

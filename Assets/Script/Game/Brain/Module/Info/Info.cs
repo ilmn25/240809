@@ -15,6 +15,10 @@ public class Info : EntityModule
     public int ownerId = 0;
     /// <summary>Who controls this player (provides input). -1 = free, 0 = host, >0 = remote client.</summary>
     public int controllerId = -1;
+    /// <summary>Whether this entity is flammable (can catch and spread fire).</summary>
+    public bool Flammable;
+    /// <summary>Current fire intensity, 0 = not burning, 1 = fully burning. Persisted for save/load.</summary>
+    public float FireLevel;
     [NonSerialized] public bool Destroyed = false;
     [NonSerialized] public bool IsInRenderRange;
     public virtual bool OnHitInternal(Projectile projectile) { return false; }

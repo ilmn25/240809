@@ -112,4 +112,5 @@ public enum ID
     ForestBlock,
     Deathcap,
     Orchids,
+    Torch,
 }

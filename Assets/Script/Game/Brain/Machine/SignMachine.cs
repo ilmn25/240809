@@ -2,7 +2,7 @@ public class SignMachine: StructureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
-        return new Info();
+        return new Info() { Flammable = true };
     }
 
     public override void OnStart()

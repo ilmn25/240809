@@ -12,6 +12,7 @@ public class LampMachine : StructureMachine, IActionSecondaryInteract
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,
             GlowOn = true,
+            Flammable = true,
         };
     }
 
