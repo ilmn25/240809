@@ -24,6 +24,7 @@ public partial class Item
     public float ProjectileOffset;
     public Vector2 HoldoutOffset;
     public float RotationOffset = 90;
+    public int FoodValue; // hunger restored when eaten (0 = not food)
      
     public string Name => Helper.ToDisplayName(ID, lowercase: true);
     public string Description;
@@ -47,6 +48,36 @@ public partial class Item
             Type = ItemType.Material,
             Gesture = ItemGesture.Swing,
             HoldoutOffset = new Vector2(0.5f, 0),
+
+            Description = description
+        };
+
+        if (materials != null)
+            ItemRecipe.AddRecipe(id, materials, craftStack, time, null);
+
+        Dictionary[id] = itemData;
+    }
+
+    private static void AddFoodDefinition(
+        ID id,
+        int foodValue,
+        string description = "",
+        Dictionary<ID, int> materials = null,
+        int craftStack = 1,
+        int time = 0,
+        int stackSize = 15)
+    {
+        Item itemData = new Item()
+        {
+            ID = id,
+            StackSize = stackSize,
+            Rarity = ItemRarity.Common,
+            Scale = 0.6f,
+
+            Type = ItemType.Food,
+            Gesture = ItemGesture.Swing,
+            HoldoutOffset = new Vector2(0.5f, 0),
+            FoodValue = foodValue,
 
             Description = description
         };
