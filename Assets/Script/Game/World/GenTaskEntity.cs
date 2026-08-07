@@ -18,7 +18,7 @@ public class GenTaskEntity : Gen
     private const double GroundItemChance = 0.02;
 
     // Dense forest generation
-    private const double ForestTreeChance = 0.5;
+    private const double ForestTreeChance = 0.25;
     private const double ForestBushChance = 0.08;
     private const double ForestGrassChance = 0.12;
     private const double ForestDeathcapChance = 0.02;
