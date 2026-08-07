@@ -157,26 +157,19 @@ public class GenTaskEntity : Gen
         double chance = 0;
 
         if ((chance += 0.30) > roll) return ID.Flint;
-        if ((chance += 0.25) > roll) return ID.Gravel;
         if ((chance += 0.20) > roll) return ID.Shell;
         if ((chance += 0.12) > roll) return ID.Sand;
-        if ((chance += 0.08) > roll) return ID.CopperChunks;
-        if ((chance += 0.05) > roll) return ID.MetalChunks;
         return ID.Null;
     }
 
-    /// <summary>Grass items — spawn on dirt surfaces.</summary>
     private static ID PickGrassItem(System.Random rng)
     {
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.30) > roll) return ID.Sticks;
-        if ((chance += 0.25) > roll) return ID.Flint;
-        if ((chance += 0.15) > roll) return ID.Gravel;
-        if ((chance += 0.15) > roll) return ID.Acorn;
-        if ((chance += 0.10) > roll) return ID.Mud;
-        if ((chance += 0.05) > roll) return ID.Shell;
+        if ((chance += 0.45) > roll) return ID.Sticks;
+        if ((chance += 0.45) > roll) return ID.Flint;
+        if ((chance += 0.10) > roll) return ID.StoneBlock;
         return ID.Null;
     }
 }

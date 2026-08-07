@@ -150,16 +150,16 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 
-                AddStructure<DecorMachine>(ID.Bush, Vector3Int.zero, Main.IndexNoCollide);
+                AddStructure<HarvestableMachine>(ID.Bush, Vector3Int.zero, Main.IndexNoCollide);
                 // Harvestable plants need a non-zero bounds so a collider is added
                 // for raycast interaction (they stay on NoCollide so they don't block movement).
-                AddStructure<DecorMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Deathcap, Vector3Int.one, Main.IndexNoCollide);
-                AddStructure<DecorMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
+                AddStructure<HarvestableMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);
+                AddStructure<HarvestableMachine>(ID.Deathcap, Vector3Int.one, Main.IndexNoCollide);
+                AddStructure<HarvestableMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
-                AddStructure<DecorMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
+                AddStructure<HarvestableMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 // Burn results — spawned when flammable objects burn out.
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
                 AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide);
