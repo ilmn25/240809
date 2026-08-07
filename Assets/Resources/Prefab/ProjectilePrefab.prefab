@@ -48,12 +48,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
   LifeSpan: 0
-  LodgeTime: 0
   TargetHitBoxType: 0
   Destination: {x: 0, y: 0, z: 0}
   Direction: {x: 0, y: 0, z: 0}
-  Source: {fileID: 0}
-  Target: {fileID: 0}
+  SourceInfo:
+    updateMode: 1
+    uid: d42ae855d4fc4588825cb42ec9fbd2e0
+    id: 0
+    position: {x: 0, y: 0, z: 0}
+    ownerId: 0
+    controllerId: -1
+    Flammable: 0
+    FireLevel: 0
+    HitboxType: 0
+    CharSprite: 0
+    HitSfx: 6
+    DeathSfx: 7
+    KnockBackResistance: 1
+    SpeedLogic: 5
+    SpeedGround: 5
+    SpeedAir: 10
+    SpeedModifier: 1
+    Gravity: -40
+    JumpVelocity: 10
+    CanFly: 0
+    Health: 0
+    HealthMax: 0
+    Defense: 0
+    Iframes: 5
+    AccelerationTime: 0.3
+    DecelerationTime: 0.08
+    DistAttack: 2
+    DistFollow: 0.65
+    DistRanged: 10
+    DistAlert: 5
+    DistDisengage: 20
+    DistEscape: 20
+    DistRoam: 10
+    DistStrafe: 2
+    PathJump: 1
+    PathHeight: 1
+    PathFall: 15
+    PathAir: 4
+    PathAmount: 3000
+    MaxStuckCount: 250
+    PointLostDistance: 5
+    NormalSkipAmount: 1
+    mustLandFirst: 0
+    targetHitboxType: 0
+  Target:
+    updateMode: 1
+    uid: 822f4aff507a48e2a59d99a8d3fd61ca
+    id: 0
+    position: {x: 0, y: 0, z: 0}
+    ownerId: 0
+    controllerId: -1
+    Flammable: 0
+    FireLevel: 0
+    HitboxType: 0
+    CharSprite: 0
+    HitSfx: 6
+    DeathSfx: 7
+    KnockBackResistance: 1
+    SpeedLogic: 5
+    SpeedGround: 5
+    SpeedAir: 10
+    SpeedModifier: 1
+    Gravity: -40
+    JumpVelocity: 10
+    CanFly: 0
+    Health: 0
+    HealthMax: 0
+    Defense: 0
+    Iframes: 5
+    AccelerationTime: 0.3
+    DecelerationTime: 0.08
+  RelativeRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!212 &7420573449720724083
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -74,7 +144,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d06e4d6d0f777e044b317b5339544449, type: 2}
+  - {fileID: -876546973899608171, guid: 93608cf50593d514a8b0f600368805ef, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -131,7 +131,7 @@ public class GenTaskEntity : Gen
                                 ID spawnID = rng.NextDouble() <= 0.5 ? ID.SandSlab : ID.SandDebris;
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(spawnID, position));
                             }
-                            else if (roll <= (chance += SurfaceSlabChance))
+                            else if (!isDesert && roll <= (chance += SurfaceSlabChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
                             }
