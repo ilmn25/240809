@@ -149,6 +149,19 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     private static readonly Collider[] AllyScanBuffer = new Collider[32];
 
+    /// <summary>Recall all allies: cancel their current target/action. The ally brain
+    /// then auto-follows the leader. Runs on the host (authority over ally AI).</summary>
+    public static void RecallAllies()
+    {
+        if (Save.Inst == null || Main.PlayerInfo == null) return;
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == Main.PlayerInfo || player.Destroyed) continue;
+            if (player.Machine is not PlayerMachine ally) continue;
+            ally.Info.CancelTarget();
+        }
+    }
+
     // Drives non-controlled party members: fight nearby hostiles, otherwise trail the leader.
     // SetState is a no-op when already in MobChaseAction, so calling it unconditionally just
     // retargets via Info.Target while following.
