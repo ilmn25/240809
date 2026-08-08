@@ -197,14 +197,28 @@ public class Environment
             if (Random.value < 0.8f)
                 Weather = EnvironmentType.Sunset;
             else
+            {
                 Weather = EnvironmentType.Rapture;
+                ShowEventDialogue("The sky is red...");
+            }
         else if (Time == 60 * 14)
             if (Random.value < 0.7f)
                 Weather = EnvironmentType.NightRainy;
             else
+            {
                 Weather = EnvironmentType.NightBright;
+                ShowEventDialogue("The full moon rises...");
+            }
         else if (Time == Length * 23/24)
             Weather = EnvironmentType.Sunrise;
+    }
+
+    /// <summary>Shows a one-line event warning when a special night begins.</summary>
+    private static void ShowEventDialogue(string message)
+    {
+        Dialogue.Target = new Dialogue { Text = message };
+        Dialogue.Show(true);
+        Audio.PlaySFX(SfxID.Notification);
     }
 
     public static void Set(Color ambientLight, Color fogColor, Color spotLight, Color directionalLight,
