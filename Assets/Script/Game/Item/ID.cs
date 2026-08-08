@@ -4,7 +4,7 @@ public enum ID
     Null,
     BrickBlock,
     MarbleBlock,
-    DirtBlock,
+    GrassBlock,
     SandBlock,
     BackroomBlock,
     StoneBlock,

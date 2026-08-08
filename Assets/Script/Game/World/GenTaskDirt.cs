@@ -8,7 +8,7 @@ public class GenTaskDirt : Gen
     private static readonly float Offset = GetDeterministicOffset("Dirt");
     private static int _id;
     
-    private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
+    private static int Dirt => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private const int VerticalScale  = World.ChunkSize;
     
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)

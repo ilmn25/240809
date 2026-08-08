@@ -18,13 +18,13 @@ public partial class Item
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
         AddBlockDefinition(ID.MarbleBlock, 200, 1, SfxID.HitMetal, description: "Polished marble block with a pristine look.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.DirtBlock, 80, 1, SfxID.HitStone, description: "Basic dirt block, useful for filling and farming.");
-        loot = new (ID.DirtBlock);
+        AddBlockDefinition(ID.GrassBlock, 80, 1, SfxID.HitStone, description: "Basic dirt block, useful for filling and farming.");
+        loot = new (ID.GrassBlock);
         loot.Add(1, 3, ID.Mud);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, description: "Fine sand block used for glassmaking and terrain.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.BackroomBlock, 200, 2, SfxID.HitStone, description: "Mysterious block from the backroom; fragile to danger.", materials: new Dictionary<ID, int> { { ID.DirtBlock, 1 } }, craftStack: 2);
+        AddBlockDefinition(ID.BackroomBlock, 200, 2, SfxID.HitStone, description: "Mysterious block from the backroom; fragile to danger.", materials: new Dictionary<ID, int> { { ID.GrassBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.StoneBlock, 150, 1, SfxID.HitStone, description: "Common stone block, the foundation of many builds.");
         loot = new (ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
@@ -74,8 +74,6 @@ public partial class Item
         AddMaterialDefinition(ID.Deathcap, "A rare poisonous mushroom found in dark forests.");
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
-        // Cosmetic blood pool left on the ground when something is hit; not pickupable.
-        AddMaterialDefinition(ID.Blood, "A pool of blood left behind.", pickupable: false, despawnTime: 30f);
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
@@ -90,7 +88,9 @@ public partial class Item
         AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
         AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.");
         loot = new (ID.ForestBlock);
-        loot.Add(1, 1, ID.DirtBlock);
+        loot.Add(1, 3, ID.Mud);
+        loot.Add(0.5f, 1, ID.Flint);
+        loot.Add(0.5f, 1, ID.Sticks);
         AddStructureDefinition(ID.Stonecutter, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 6 }, { ID.Plank, 5 }}, 100, description: "Cuts stone into refined brick parts quickly.");
         AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100, description: "Transforms logs into planks and stakes for building.");
         AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100, description: "Cooks meat and creates charcoal while giving light.");

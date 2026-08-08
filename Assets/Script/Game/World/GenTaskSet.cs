@@ -3,7 +3,7 @@ using UnityEngine;
 public class GenTaskThrone : Gen
 {
     private static int _id;
-    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
+    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private static readonly Chunk Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
@@ -29,7 +29,7 @@ public class GenTaskThrone : Gen
 public class GenTaskHouse : Gen
 {
     private static int _id;
-    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id; 
+    private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id; 
     private static readonly Chunk House = SetPiece.LoadSetPieceFile("House");
     
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
