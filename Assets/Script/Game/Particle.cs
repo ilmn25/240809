@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum Particles {Smoke, Dust,
-    HitDust, Fire
+    HitDust, Fire, Blood
 }
 public class Particle
 {
@@ -12,6 +12,7 @@ public class Particle
         [Particles.Smoke] = 2,
         [Particles.HitDust] = 2, 
         [Particles.Fire] = 0,
+        [Particles.Blood] = 0,
     };
 
     private const int PoolSize = 40;

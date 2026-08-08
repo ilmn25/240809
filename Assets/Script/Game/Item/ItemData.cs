@@ -120,13 +120,32 @@ public partial class Item
             materials: new Dictionary<ID, int> { { ID.Flint, 5 }, { ID.Stake, 2 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
+
+        AddToolDefinition(
+            id: ID.Rapier,
+            gesture: ItemGesture.Swing,
+            speed: 1.0f,
+            range: 1,
+            projectileInfo: new SingleTargetSwingProjectileInfo {
+                Damage = 3,
+                Knockback = 8,
+                CritChance = 15,
+                Speed = 1f,
+                Radius = 1.5f,
+                Breaking = 1,
+                OperationType = OperationType.Cutting
+            },
+            description: "A swift rapier that strikes a single target with precision.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 1 } },
+            holdoutOffset: new Vector2(0.6f, 0)
+        );
  
         AddToolDefinition(
             id: ID.StonePickaxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -145,7 +164,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -165,7 +184,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -184,7 +203,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -204,7 +223,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -223,7 +242,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -260,7 +279,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.8f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -279,7 +298,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2.8f,
             range: 4f,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,

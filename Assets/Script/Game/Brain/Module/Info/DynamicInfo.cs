@@ -138,6 +138,7 @@ public class DynamicInfo : Info
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
+        Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), Particles.Blood, false);
         // Only a user-controlled player should acquire a target from hitting something;
         // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
         projectile.SourceInfo.AcquireTarget(this);

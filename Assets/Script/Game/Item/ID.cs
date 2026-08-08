@@ -116,4 +116,5 @@ public enum ID
     BurnedTree,
     Rubble,
     Ash,
+    Rapier,
 }
