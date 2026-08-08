@@ -25,6 +25,12 @@ public partial class Item
     public Vector2 HoldoutOffset;
     public float RotationOffset = 90;
     public int FoodValue; // hunger restored when eaten (0 = not food)
+
+    /// <summary>Whether this item can be picked up by the player. False for
+    /// cosmetic debris (blood) that should just sit on the ground.</summary>
+    public bool Pickupable = true;
+    /// <summary>If &gt; 0, this item despawns after this many seconds on the ground.</summary>
+    public float DespawnTime;
      
     public string Name => Helper.ToDisplayName(ID, lowercase: true);
     public string Description;
@@ -35,7 +41,9 @@ public partial class Item
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int time = 0,
-        int stackSize = 15)
+        int stackSize = 15,
+        bool pickupable = true,
+        float despawnTime = 0f)
     {
 
         Item itemData = new Item()
@@ -48,6 +56,9 @@ public partial class Item
             Type = ItemType.Material,
             Gesture = ItemGesture.Swing,
             HoldoutOffset = new Vector2(0.5f, 0),
+
+            Pickupable = pickupable,
+            DespawnTime = despawnTime,
 
             Description = description
         };

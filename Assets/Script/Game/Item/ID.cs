@@ -117,4 +117,5 @@ public enum ID
     Rubble,
     Ash,
     Rapier,
+    Blood,
 }

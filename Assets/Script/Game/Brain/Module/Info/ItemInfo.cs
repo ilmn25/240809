@@ -14,11 +14,14 @@ public class ItemInfo : Info
     /// item-batch broadcast. Cleared by MarkPositionSynced(). Never set on clients.</summary>
     [NonSerialized] public bool PositionDirty = false;
     [NonSerialized] private Vector3 _lastSyncedPosition;
+    [NonSerialized] private float _despawnTimer;
 
     public override void Initialize()
     { 
         SpriteRenderer = Machine.transform.GetComponent<SpriteRenderer>();
         _lastSyncedPosition = position;
+        // Seed the timed-despawn timer from the item's definition.
+        _despawnTimer = item.Info.DespawnTime;
     }
 
     public override void Update()
@@ -48,6 +51,17 @@ public class ItemInfo : Info
                                   MapLoad.ActiveChunks.ContainsKey(World.GetChunkCoordinate(position));
             }
         }
+
+        // Timed despawn (ash, etc.) — host-authoritative.
+        if (Helper.IsHost() && _despawnTimer > 0f)
+        {
+            _despawnTimer -= Helper.GetDeltaTime();
+            if (_despawnTimer <= 0f)
+            {
+                Destroy();
+                return;
+            }
+        }
     }
 
     /// <summary>Host: mark this item as sent to clients, so it stops being re-broadcast.</summary>
@@ -59,6 +73,8 @@ public class ItemInfo : Info
 
     public void OnActionSecondary(Info info)
     {        
+        // Non-pickupable items (blood) can't be collected.
+        if (!item.Info.Pickupable) return;
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
             Audio.PlaySFX(SfxID.Item);
