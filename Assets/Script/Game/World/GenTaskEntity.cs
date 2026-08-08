@@ -4,7 +4,7 @@ public class GenTaskEntity : Gen
 {
     private static int _id;
     private static int _idForest;
-    private static int Dirt => _id == 0 ? Block.ConvertID(ID.DirtBlock) : _id;
+    private static int Dirt => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
     private static int Forest => _idForest == 0 ? Block.ConvertID(ID.ForestBlock) : _idForest;
 

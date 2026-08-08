@@ -176,6 +176,9 @@ public class Control
             if (target == null) return;
             var info = ((EntityMachine)target).Info;
 
+            // Skip non-pickupable items (e.g. blood pools) — they can't be collected.
+            if (info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable) return;
+
             if (Helper.IsHost() || NetworkClient.isConnected)
             {
                 // Host/Client: state machine handles pathfinding + pickup via MobChaseAction
@@ -237,8 +240,11 @@ public class Control
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)
                 {
-                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo)
+                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo itemInfo)
                     {
+                        // Skip non-pickupable items (e.g. blood pools) — they can't be collected.
+                        if (!itemInfo.item.Info.Pickupable) return;
+
                         // Both host and client: state machine handles pathfinding + pickup
                         Main.PlayerInfo.Target = ((EntityMachine)action).Info;
                         Main.PlayerInfo.ActionType = IActionType.PickUp;

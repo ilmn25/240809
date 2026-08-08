@@ -142,7 +142,8 @@ public class DynamicInfo : Info
         // Leave a non-pickupable blood pool on the ground that despawns offscreen.
         if (Helper.IsHost())
             Entity.SpawnItem(ID.Blood, Machine.transform.position, stackOnSpawn: false);
-        // Acquire the target from landing a hit.
+        // Only a user-controlled player should acquire a target from hitting something;
+        // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
         projectile.SourceInfo.AcquireTarget(this);
         OnHit(projectile);
         return true;
