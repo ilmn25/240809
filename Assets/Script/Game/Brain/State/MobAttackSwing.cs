@@ -45,7 +45,7 @@ class MobAttackSwing : MobState {
             }
             else if (stateInfo.IsName("EquipSwing"))
             {  
-                Info.Animator.speed = Main.BuildMode? 70 : _equipment.Speed;
+                Info.Animator.speed = Main.CreativeMode? 70 : _equipment.Speed;
                 Audio.PlaySFX(_equipment.Sfx); 
                 Info.SpeedModifier = 0.8f;
                 Info.Animator.Play("EquipSwingCooldown", 0, 0f);

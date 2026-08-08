@@ -97,7 +97,7 @@ public static class Terraform
             return;
         }
 
-        if (Main.BuildMode)
+        if (Main.CreativeMode)
         {
             if (Target == ID.Chalk)
                 World.SetBlock(_coordinate);

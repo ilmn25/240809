@@ -29,7 +29,7 @@ public class MobSpawner
     public static void Update()
     {
         if (!Helper.IsHost()) return;
-        if (Main.BuildMode) return;
+        if (Main.CreativeMode) return;
 
         _timer++;
         if (_timer < SpawnInterval) return;

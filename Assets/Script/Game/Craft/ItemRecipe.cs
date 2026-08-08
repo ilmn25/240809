@@ -30,6 +30,9 @@ public partial class ItemRecipe
 
     public static bool IsCraftable (ID stringID)
     {
+        // Creative mode: everything is craftable without resources.
+        if (Main.CreativeMode) return true;
+
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             int needed = ingredient.Value;
@@ -69,6 +72,9 @@ public partial class ItemRecipe
     public static void TakeIngredients(ID stringID)
     {
         Audio.PlaySFX(SfxID.Item);
+        // Creative mode: crafting is free, don't consume any resources.
+        if (Main.CreativeMode) return;
+
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             // Try to remove from player inventory first

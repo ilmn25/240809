@@ -12,7 +12,7 @@ public class Main : MonoBehaviour
     public const float MaxDeltaTime = 0.03f; 
     private const float FixedUpdateMS = 0.30f; 
             
-    public static bool BuildMode = false;
+    public static bool CreativeMode = false;
     public static bool Fly = false;
     public static SceneMode SceneMode = SceneMode.Menu;
     

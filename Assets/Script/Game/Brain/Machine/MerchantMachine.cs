@@ -30,9 +30,13 @@ public class MerchantMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobIdle(600)); // lingers in place longer than the animals
         AddState(new MobRoam());
         AddState(new MobHit());
+        AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
 
         AddState(new ShopState());
+
+        // The merchant carries a sword to defend itself if attacked.
+        Info.SetEquipment(new ItemSlot(ID.SteelSword));
 
         // A CraftInfo whose id resolves to the shared MerchantPool of goods for sale.
         // All goods are instant-craft (Time==0 tools or structures), so the shop never

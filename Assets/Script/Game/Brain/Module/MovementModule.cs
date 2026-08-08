@@ -66,7 +66,7 @@ public abstract class MovementModule : DynamicModule
     
     protected void HandleMove()
     { 
-        if (Main.BuildMode && Info != Main.PlayerInfo) NewPosition = Machine.transform.position;
+        if (Main.CreativeMode && Info != Main.PlayerInfo) NewPosition = Machine.transform.position;
         
         if (Info.Velocity.y > Info.Gravity) //terminal velocity
         {

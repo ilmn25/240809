@@ -174,7 +174,7 @@ public class Console : MonoBehaviour
                 $"X:{pos.x} \nY:{pos.y} \nZ:{pos.z}", GUIStyle);
         }
         
-        if (!Main.BuildMode || !Main.Player) return;
+        if (!Main.CreativeMode || !Main.Player) return;
 
         _lines[12].SetPosition(0, Main.PlayerInfo.position);
         _lines[12].SetPosition(1, Main.PlayerInfo.position + new Vector3(1, 0, 1));
@@ -380,9 +380,9 @@ public class Console : MonoBehaviour
     {
         if (_command.Length < 2)
         {
-            Main.BuildMode = !Main.BuildMode;
-            if (!Main.BuildMode) HideLines();
-            Print("build mode: " + Main.BuildMode);
+            Main.CreativeMode = !Main.CreativeMode;
+            if (!Main.CreativeMode) HideLines();
+            Print("creative mode: " + Main.CreativeMode);
         }
         else if (_command[1] == "1")
         { 
