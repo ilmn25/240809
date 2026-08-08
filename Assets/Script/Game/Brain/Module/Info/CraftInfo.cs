@@ -18,7 +18,7 @@ public class CraftInfo : SpriteStructureInfo
     private static readonly Storage StonecutterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Stonecutter), ID.Brick, ID.BrickBlock);
     private static readonly Storage WorkbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Workbench), ID.Chalk, ID.Furnace, ID.MasonryWorkbench, ID.WoodenToolbench, ID.CarpenterWorkbench, ID.Sawmill, ID.Stonecutter, ID.FieldStation);
     private static readonly Storage FieldStationPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.FieldStation), ID.ImprovisedPlanter);
-    private static readonly Storage AnvilPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Anvil), ID.SteelSword, ID.MetalAxe);
+    private static readonly Storage AnvilPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Anvil), ID.SteelSword, ID.MetalAxe, ID.Rapier);
     private static readonly Storage MerchantPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Merchant), ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp);
 
     public readonly List<ID> Pending = new List<ID>();

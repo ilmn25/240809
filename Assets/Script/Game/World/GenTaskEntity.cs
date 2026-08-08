@@ -156,7 +156,7 @@ public class GenTaskEntity : Gen
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.30) > roll) return ID.Flint;
+        if ((chance += 0.02) > roll) return ID.Flint;
         if ((chance += 0.20) > roll) return ID.Shell;
         if ((chance += 0.12) > roll) return ID.Sand;
         return ID.Null;
