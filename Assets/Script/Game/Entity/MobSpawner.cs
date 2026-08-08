@@ -11,12 +11,20 @@ public class MobSpawner
     private const int SpawnInterval = 200;       // frames between spawn ticks
     private const int MobCapPerPlayer = 15;      // max active mobs near each player
     private const int SpawnAttemptsPerTick = 5;  // retries per tick
+    // During Rapture / full moon, spawn more enemies.
+    private const int EventMobCapPerPlayer = 30;
+    private const int EventSpawnAttemptsPerTick = 10;
 
     private static int _timer;
 
     private static readonly List<ID> DayMobs = new() { ID.Sheep, ID.Hen, ID.Rooster, ID.Chick };
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
+
+    /// <summary>True during Rapture or a full-moon (bright) night — spawns ramp up.</summary>
+    private static bool IsEventActive =>
+        Save.Inst.weather == EnvironmentType.Rapture ||
+        Save.Inst.weather == EnvironmentType.NightBright;
 
     public static void Update()
     {
@@ -27,8 +35,12 @@ public class MobSpawner
         if (_timer < SpawnInterval) return;
         _timer = 0;
 
+        bool eventActive = IsEventActive;
+        int capPerPlayer = eventActive ? EventMobCapPerPlayer : MobCapPerPlayer;
+        int attemptsPerTick = eventActive ? EventSpawnAttemptsPerTick : SpawnAttemptsPerTick;
+
         int totalMobs = EntityDynamicLoad.ActiveEntities.Count;
-        int globalCap = Save.Inst.players.Count * MobCapPerPlayer;
+        int globalCap = Save.Inst.players.Count * capPerPlayer;
         if (totalMobs >= globalCap) return;
 
         bool isNight = Save.Inst.weather == EnvironmentType.NightRainy || Save.Inst.weather == EnvironmentType.NightBright;
@@ -45,9 +57,9 @@ public class MobSpawner
                 if (Vector3.Distance(em.transform.position, pPos) <= Scene.LogicDistance)
                     nearby++;
             }
-            if (nearby >= MobCapPerPlayer) continue;
+            if (nearby >= capPerPlayer) continue;
 
-            for (int i = 0; i < SpawnAttemptsPerTick; i++)
+            for (int i = 0; i < attemptsPerTick; i++)
                 TrySpawnGroup(pPos, isNight);
         }
     }
