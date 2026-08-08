@@ -57,6 +57,7 @@ public partial class Item
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
         AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");
         AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
+        AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
         AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.");
         AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.");
