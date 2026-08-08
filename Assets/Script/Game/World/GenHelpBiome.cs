@@ -4,7 +4,7 @@ public enum BiomeType {Desert, Grass, Forest}
 public class GenHelpBiome : Gen
 {
     private static readonly float DrynessOffset = GetDeterministicOffset("BiomeDryness");
-    private static readonly float Scale = 0.01f;
+    private static readonly float Scale = 0.0025f;
 
     public static BiomeType GetBiomeType(int x, int z)
     {

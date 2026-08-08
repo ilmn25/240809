@@ -81,6 +81,7 @@ public class Main : MonoBehaviour
         Item.Initialize();
         Entity.Initialize(); 
         Block.Initialize();   
+        HarvestableRegistry.Initialize();
         
         Saves.Initialize();    
         GUIMain.Initialize();    

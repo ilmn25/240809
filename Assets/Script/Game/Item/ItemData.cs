@@ -49,6 +49,7 @@ public partial class Item
         AddFoodDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddFoodDefinition(ID.CookedChicken, 8, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
         AddFoodDefinition(ID.Egg, 3, "A fresh egg laid by a hen.");
+        AddFoodDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20);
         AddMaterialDefinition(ID.Sand, "Loose sand collected from desert debris and deposits.");
         AddMaterialDefinition(ID.Glass, "Smelted glass used for windows and light fixtures.", materials: new Dictionary<ID, int> { { ID.Sand, 2 } }, time: 1800);
         AddMaterialDefinition(ID.Shell, "A tiny collection of shells found on the ground.");

@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-    private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Workbench, ID.Campfire, ID.MulchBlock);
+    private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Workbench, ID.Campfire, ID.MulchBlock, ID.Chalk, ID.Torch);
     private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.WoodenToolbench), ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
     private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
     private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign, ID.Lamp);
