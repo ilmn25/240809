@@ -16,6 +16,7 @@ public class Control
     public static int MouseLayer; // -1 means hit void
     
     public readonly ControlKey Inv = new (KeyCode.I);
+    public readonly ControlKey Map = new (KeyCode.M);
     public readonly ControlKey SwapChar = new (KeyCode.Tab);
     public readonly ControlKey Recall = new (KeyCode.H);
     public readonly ControlKey Pause = new (KeyCode.Escape);
@@ -212,7 +213,10 @@ public class Control
     {
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0 || GUIMain.GUILoad.Showing) return;
-        
+
+        // While the map is open, the scroll wheel zooms the map instead of the game.
+        if (GUIMain.Map != null && GUIMain.Map.IsOpen) return;
+
         if (!Input.GetKey(KeyCode.LeftAlt))
         {
             // MapCull.HandleScrollInput(scroll);

@@ -14,6 +14,8 @@ public class Scene
     public static readonly int GenRange = 4; 
     public static readonly int RenderDistance = RenderRange * World.ChunkSize; 
     public static readonly int LogicDistance = LogicRange * World.ChunkSize;
+    /// <summary>Radius (in blocks) revealed on the map around the player each frame.</summary>
+    public static readonly int MapRevealRadius = 12;
     public static bool Busy;
 
     public static void SwitchWorld(GenType genType, Vector3Int? spawnPoint = null)
@@ -123,6 +125,13 @@ public class Scene
     {   
         if (!Main.Player) return;
         PlayerChunkPosition = World.GetChunkCoordinate(Main.Player.transform.position);
+
+        // Reveal the map around the local player (fog of war).
+        if (World.Inst?.Map != null)
+        {
+            Vector3 p = Main.Player.transform.position;
+            World.Inst.Map.Reveal((int)p.x, (int)p.z, MapRevealRadius);
+        }
 
         if (Helper.IsHost())
         {

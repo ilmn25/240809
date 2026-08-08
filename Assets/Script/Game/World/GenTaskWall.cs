@@ -99,11 +99,15 @@ public class GenTaskWall : Gen
                     Vector3Int chunkPos = World.GetChunkCoordinate(worldPos);
                     Vector3Int blockPos = World.GetBlockCoordinate(worldPos);
 
+                    // The chunk may not be generated yet (generation runs bottom-up),
+                    // so skip it rather than crashing on a null chunk.
                     Chunk targetChunk = World.Inst[chunkPos];
+                    if (targetChunk == null || targetChunk == Chunk.Zero)
+                        continue;
 
-                    int existingID = World.Inst[chunkPos][blockPos.x, blockPos.y, blockPos.z];
+                    int existingID = targetChunk[blockPos.x, blockPos.y, blockPos.z];
                     if (existingID == 0)
-                        World.Inst[chunkPos][blockPos.x, blockPos.y, blockPos.z] = Brick;
+                        targetChunk[blockPos.x, blockPos.y, blockPos.z] = Brick;
                 }
                 continue;
             }

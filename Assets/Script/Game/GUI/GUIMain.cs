@@ -17,6 +17,7 @@ public static class GUIMain
     public static GUIMenu GUIMenu;
     public static GUIHostMenu GUIHostMenu;
     public static GUILoad GUILoad;
+    public static GUIMap Map;
 
     public static bool Showing = true;
     public static bool IsHover;
@@ -68,6 +69,9 @@ public static class GUIMain
         
         PlayerList = new GUIPlayerList();
         PlayerList.Initialize();
+
+        Map = new GUIMap();
+        Map.Initialize();
         
         Dialogue.Show(false);
         Show(false);
@@ -104,6 +108,7 @@ public static class GUIMain
         GUICraft.Update();
         PlayerList.Update();
         InfoPanel.UpdateDrag();
+        Map.Update();
         UpdateHudText();
 
         if (Control.Inst.Inv.KeyDown())
@@ -113,6 +118,12 @@ public static class GUIMain
                 Show(false);
             else
                 Show(true);
+        }
+
+        if (Control.Inst.Map.KeyDown())
+        {
+            Audio.PlaySFX(SfxID.Text);
+            Map.Show(!Map.Showing);
         }
     }
 

@@ -15,6 +15,8 @@ public class World
     private Chunk[] _chunks; 
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
+    /// <summary>Per-world 2D map state (explored fog, markers, texture).</summary>
+    public WorldMap Map;
 
 
     public World() {}  // for cloning
@@ -25,6 +27,7 @@ public class World
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
         SpawnPoint = Gen.Dictionary[genType].GetSpawnPoint();
         _chunks = new Chunk[Size.x * Size.y * Size.z];
+        Map = new WorldMap { Explored = new byte[Bounds.x * Bounds.z] };
     }
 
     /// <summary>
