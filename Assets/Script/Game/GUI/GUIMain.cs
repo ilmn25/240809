@@ -123,7 +123,10 @@ public static class GUIMain
         if (Control.Inst.Map.KeyDown())
         {
             Audio.PlaySFX(SfxID.Text);
-            Map.Show(!Map.Showing);
+            bool wasOpen = Map.Showing;
+            Map.Show(!wasOpen);
+            // Refocus the map onto the player when opening it.
+            if (!wasOpen) Map.FocusOnPlayer();
         }
     }
 

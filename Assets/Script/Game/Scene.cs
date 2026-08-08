@@ -63,7 +63,12 @@ public class Scene
             // Generate ALL worlds up-front (Minecraft-style dimensions).
             // Gen.GenerateAllFor skips worlds that already have data.
             foreach (var kv in Save.Inst.worlds)
+            {
                 Gen.GenerateAllFor(kv.Value);
+                // Build map markers right after generation, while all static
+                // entities are still in the chunk lists (before they're loaded out).
+                kv.Value.Map?.BuildMarkers(kv.Value);
+            }
 
             // Populate NavMap for the current (active) world.
             World.Inst.PopulateNavMap();

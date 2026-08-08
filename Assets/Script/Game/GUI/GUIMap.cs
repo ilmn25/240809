@@ -1,30 +1,40 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 /// <summary>
 /// Don't Starve-style 2D map panel. Shows the current world's top-down terrain
-/// texture (with fog of war) plus a player marker. Toggled with the Map key (M).
-/// Full screen, with drag-to-pan and scroll-to-zoom.
+/// texture (with fog of war) plus structure icons and a player marker. Toggled
+/// with the Map key (M). Full screen, with drag-to-pan and scroll-to-zoom.
 /// </summary>
 public class GUIMap : GUI
 {
     private RawImage _mapImage;
     private RectTransform _mapRect;
-    private RectTransform _playerMarker;
     private RectTransform _panelRect;
+    private readonly Dictionary<MapMarker, Image> _icons = new Dictionary<MapMarker, Image>();
+    private readonly List<RectTransform> _playerMarkers = new List<RectTransform>();
+    private readonly Dictionary<ID, Sprite> _spriteCache = new Dictionary<ID, Sprite>();
 
-    private float _zoom = 1f;
+    private float _zoom = 1.5f;
     private const float MinZoom = 0.5f;
     private const float MaxZoom = 6f;
     private const float ZoomSpeed = 0.12f;
+    /// <summary>How many map pixels each sprite pixel occupies, so pixel-art
+    /// sprites keep consistent density relative to each other.</summary>
+    private const float PixelsPerSpritePixel = 0.2f;
 
     private bool _dragging;
     private Vector2 _dragStartMouse;
     private Vector2 _dragStartPan;
+    private bool _needsFocus;
 
     /// <summary>Whether the map is currently open (used to block game input).</summary>
     public bool IsOpen => Showing;
+
+    /// <summary>Centers the map on the player the next time it's updated.</summary>
+    public void FocusOnPlayer() => _needsFocus = true;
 
     // The GUI canvas is a world-space canvas (scale 0.04) with a reference
     // resolution of 800x600. Its root has SizeDelta 0x0, so we give the map
@@ -66,14 +76,6 @@ public class GUIMap : GUI
         _mapRect.anchoredPosition = Vector2.zero;
         _mapImage = mapObj.GetComponent<RawImage>();
 
-        // Player marker (child of the map image so it pans/zooms with it).
-        GameObject marker = new GameObject("PlayerMarker", typeof(RectTransform), typeof(Image));
-        marker.transform.SetParent(mapObj.transform, false);
-        _playerMarker = marker.GetComponent<RectTransform>();
-        _playerMarker.sizeDelta = new Vector2(8, 8);
-        Image markerImage = marker.GetComponent<Image>();
-        markerImage.color = Color.white;
-
         Show(false);
     }
 
@@ -100,20 +102,137 @@ public class GUIMap : GUI
             _mapRect.sizeDelta = new Vector2(baseSize * aspect, baseSize);
         }
 
+        // Smoothly rotate the map to match the camera's orbit (like the camera lerp).
+        Quaternion targetRotation = Quaternion.Euler(0, 0, ViewPort.OrbitRotation);
+        _mapRect.localRotation = Quaternion.Lerp(_mapRect.localRotation, targetRotation, Time.deltaTime * 7f);
+
+        // Refocus the map onto the player when it's opened.
+        if (_needsFocus && Main.Player != null)
+        {
+            Vector3Int bounds = World.Inst.Bounds;
+            Vector2 size = _mapRect.sizeDelta;
+            Vector3 p = Main.Player.transform.position;
+            _mapRect.anchoredPosition = new Vector2(
+                (0.5f - p.x / bounds.x) * size.x,
+                (0.5f - p.z / bounds.z) * size.y);
+            _needsFocus = false;
+        }
+
         HandleInput();
 
-        // Position the player marker on the map (in map image local space).
-        if (Main.Player != null)
+        UpdatePlayerMarkers();
+        UpdateIcons(map);
+    }
+
+    /// <summary>Positions a marker for every player on the map.</summary>
+    private void UpdatePlayerMarkers()
+    {
+        if (Save.Inst == null) return;
+
+        int count = 0;
+        foreach (PlayerInfo player in Save.Inst.players)
         {
-            Vector3 p = Main.Player.transform.position;
-            Vector3Int bounds = World.Inst.Bounds;
-            float u = bounds.x > 0 ? p.x / bounds.x : 0f;
-            float v = bounds.z > 0 ? p.z / bounds.z : 0f;
-            Vector2 size = _mapRect.sizeDelta;
-            _playerMarker.anchoredPosition = new Vector2(
-                (u - 0.5f) * size.x,
-                (v - 0.5f) * size.y);
+            if (player == null || player.Machine == null) continue;
+
+            RectTransform marker;
+            if (count < _playerMarkers.Count)
+            {
+                marker = _playerMarkers[count];
+            }
+            else
+            {
+                GameObject markerObj = new GameObject("PlayerMarker", typeof(RectTransform), typeof(Image));
+                markerObj.transform.SetParent(_mapRect, false);
+                marker = markerObj.GetComponent<RectTransform>();
+                marker.GetComponent<Image>().color = Color.white;
+                _playerMarkers.Add(marker);
+            }
+
+            // Use the player's character sprite so each player is distinct.
+            Image img = marker.GetComponent<Image>();
+            img.sprite = GetSprite(player.CharSprite);
+
+            Vector3 p = player.Machine.transform.position;
+            PlaceAndSize(marker, img.sprite, p.x, p.z);
+            // Render players above structure icons.
+            marker.SetAsLastSibling();
+            marker.gameObject.SetActive(true);
+            count++;
         }
+
+        // Hide any unused player markers.
+        for (int i = count; i < _playerMarkers.Count; i++)
+            _playerMarkers[i].gameObject.SetActive(false);
+    }
+
+    /// <summary>Positions structure icons over the map. One icon is created per
+    /// marker (lazily) and cached, so there is no fixed pool limit.</summary>
+    private void UpdateIcons(WorldMap map)
+    {
+        Vector3Int bounds = World.Inst.Bounds;
+
+        foreach (MapMarker m in map.Markers)
+        {
+            if (m.x < 0 || m.x >= bounds.x || m.z < 0 || m.z >= bounds.z) continue;
+
+            // Only show icons in explored columns.
+            int idx = m.z * bounds.x + m.x;
+            if (map.Explored == null || map.Explored[idx] == 0) continue;
+
+            if (!_icons.TryGetValue(m, out Image icon))
+            {
+                GameObject iconObj = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                iconObj.transform.SetParent(_mapRect, false);
+                icon = iconObj.GetComponent<Image>();
+                icon.color = Color.white;
+                _icons[m] = icon;
+            }
+
+            icon.enabled = true;
+            icon.sprite = GetSprite(m.id);
+            PlaceAndSize(icon.rectTransform, icon.sprite, m.x, m.z);
+        }
+    }
+
+    /// <summary>Positions a marker/icon at a world column and sizes it to the
+    /// sprite's pixel dimensions (consistent pixel density). Also counter-rotates
+    /// it so it stays upright regardless of map rotation.</summary>
+    private void PlaceAndSize(RectTransform rt, Sprite sprite, float worldX, float worldZ)
+    {
+        Vector3Int bounds = World.Inst.Bounds;
+        Vector2 size = _mapRect.sizeDelta;
+        float pixelsPerColumn = size.x / (float)Mathf.Max(1, bounds.x);
+
+        rt.anchoredPosition = new Vector2(
+            ((worldX / bounds.x) - 0.5f) * size.x,
+            ((worldZ / bounds.z) - 0.5f) * size.y);
+
+        // Scale each sprite by a constant pixels-per-sprite-pixel factor, so
+        // pixel-art sprites keep the same pixel density relative to each other
+        // (a 32x32 sprite renders twice as large as a 16x16 one).
+        if (sprite != null && sprite.rect.width > 0 && sprite.rect.height > 0)
+        {
+            float scale = PixelsPerSpritePixel * pixelsPerColumn;
+            rt.sizeDelta = new Vector2(sprite.rect.width * scale, sprite.rect.height * scale);
+        }
+        else
+        {
+            rt.sizeDelta = Vector2.zero;
+        }
+
+        // Counter-rotate so the marker stays upright regardless of map rotation.
+        rt.localRotation = Quaternion.Euler(0, 0, -ViewPort.OrbitRotation);
+    }
+
+    /// <summary>Caches and returns the sprite for an ID.</summary>
+    private Sprite GetSprite(ID id)
+    {
+        if (!_spriteCache.TryGetValue(id, out Sprite sprite))
+        {
+            sprite = Cache.LoadSprite("Sprite/" + id);
+            _spriteCache[id] = sprite;
+        }
+        return sprite;
     }
 
     private void HandleInput()
