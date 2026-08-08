@@ -139,8 +139,10 @@ public class DynamicInfo : Info
         Health -= projectile.Info.GetDamage() - Defense;
         KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), Particles.Blood, false);
-        // Only a user-controlled player should acquire a target from hitting something;
-        // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
+        // Leave a non-pickupable blood pool on the ground that despawns offscreen.
+        if (Helper.IsHost())
+            Entity.SpawnItem(ID.Blood, Machine.transform.position, stackOnSpawn: false);
+        // Acquire the target from landing a hit.
         projectile.SourceInfo.AcquireTarget(this);
         OnHit(projectile);
         return true;

@@ -46,12 +46,9 @@ public class MobInfo : DynamicInfo
         Machine.SetState<DefaultState>();
     }
 
-    /// <summary>Acquire a target from landing a hit. Only user-controlled players
-    /// (controllerId != -1) lock onto what they hit; AI allies (controllerId == -1)
-    /// shouldn't retarget onto whatever they accidentally swing at.</summary>
+    /// <summary>Acquire a target from landing a hit.</summary>
     public void AcquireTarget(Info target)
     {
-        if (controllerId == -1) return;
         Target = target;
         ActionType = IActionType.Hit;
     }
