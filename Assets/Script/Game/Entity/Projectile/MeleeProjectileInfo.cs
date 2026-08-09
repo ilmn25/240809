@@ -36,7 +36,13 @@ public class ContactDamageProjectileInfo : ProjectileInfo
             IActionPrimary target = _hitBuffer[i].GetComponent<IActionPrimary>();
             if (target == null || projectile.SourceInfo.Machine == (Machine)target) continue;
 
-            ((Machine)target).GetModule<Info>().OnHitInternal(projectile);
+            Info info = ((Machine)target).GetModule<Info>();
+            info.OnHitInternal(projectile);
+            // Route the swing damage through AbstractHit when this is the attacker's
+            // current target, so contact attackers (slimes, bugs) can also bash
+            // structures (doors, barricades) the same way swing attackers do.
+            if (info == projectile.SourceInfo.Target)
+                projectile.SourceInfo.Target.AbstractHit(projectile.SourceInfo);
         }
 
         projectile.Delete();

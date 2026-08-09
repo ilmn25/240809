@@ -25,6 +25,7 @@ public class HarpyMachine : MobMachine
         AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());
         AddModule(new SpriteOrbitModule());
+        AddModule(new DoorBashModule());
 
         AddState(new MobIdle());
         AddState(new MobChase());

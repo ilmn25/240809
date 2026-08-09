@@ -119,4 +119,5 @@ public enum ID
     Rapier,
     Blood,
     Berries,
+    Door,
 }

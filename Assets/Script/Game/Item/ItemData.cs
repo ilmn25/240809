@@ -104,6 +104,7 @@ public partial class Item
         AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
         AddStructureDefinition(ID.OldRadio, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 3 }, { ID.Glass, 1 } }, 100, description: "An old radio — one of the key items a travelling merchant looks for.");
+        AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
 
         // Tools
         AddToolDefinition(

@@ -39,6 +39,7 @@ public class SlimeMachine : MobMachine
         AddModule(new GroundPathingModule());
         AddModule(new MobSpriteCullModule());
         AddModule(new SpriteOrbitModule());
+        AddModule(new DoorBashModule());
 
         AddState(new MobIdle());
         AddState(new MobChase());

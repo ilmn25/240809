@@ -85,6 +85,7 @@ public class Entity
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
+                AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide);
 
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);
@@ -175,6 +176,9 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Steel);
                 loot.Add(1, 2, ID.Slag);
                 loot.Add(0.5f, 1, ID.Glass);
+                loot = new (ID.Door);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(0.5f, 1, ID.Plank);
                 loot = new (ID.Lamp);
                 loot.Add(1, 1, ID.Glass);
                 loot.Add(0.5f, 2, ID.Glass);
