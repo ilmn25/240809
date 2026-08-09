@@ -154,6 +154,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     public static void RecallAllies()
     {
         if (Save.Inst == null || Main.PlayerInfo == null) return;
+        // Un-mark any structure the leader had allies work, so the handoff can't
+        // re-assign it the moment the ally's target is cancelled.
+        if (Main.PlayerInfo.Target is StructureInfo)
+            Main.PlayerInfo.Target = null;
         foreach (PlayerInfo player in Save.Inst.players)
         {
             if (player == Main.PlayerInfo || player.Destroyed) continue;
@@ -196,11 +200,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                  Main.PlayerInfo.Target is StructureInfo leaderTask && !leaderTask.Destroyed)
             work = leaderTask;
 
-        if (work != null)
+        // No compatible tool — don't lock onto it, follow the leader instead.
+        if (work != null && Info.Storage.SetTool(work.operationType))
         {
             Info.Target = work;
             Info.ActionType = IActionType.Hit;
-            EnsureCompatibleToolForTarget();
             SetState<MobChaseAction>();
             return;
         }
