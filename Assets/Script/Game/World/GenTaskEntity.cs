@@ -12,7 +12,7 @@ public class GenTaskEntity : Gen
     private const double DirtBushChance = 0.00125;
     private const double DirtGrassChance = 0.08;
     private const double SurfaceChestChance = 0.0002;
-    private const double SurfaceFossilChance = 0.0001;
+    private const double SurfaceSkeletonChance = 0.0001;
     private const double SurfaceSlabChance = 0.0098;
     private const double SurfaceSandStructureChance = 0.0098;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
@@ -54,10 +54,10 @@ public class GenTaskEntity : Gen
                         Vector3Int position = currentCoordinate + new Vector3Int(x, y + 1, z);
 
                         double roll = rng.NextDouble();
-                        if (rng.NextDouble() < SurfaceFossilChance)
+                        if (rng.NextDouble() < SurfaceSkeletonChance)
                         {
-                            currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Fossil, position));
-                            SpawnFossilLoot(currentCoordinate, currentChunk, position, rng);
+                            currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Skeleton, position));
+                            SpawnSkeletonLoot(currentCoordinate, currentChunk, position, rng);
                         }
                         if (currentChunk[x, y, z] == Forest)
                         {
@@ -183,7 +183,7 @@ public class GenTaskEntity : Gen
     }
 
     // Scatters low-tier starter loot (crude tools, flint) around a skeleton.
-    private static void SpawnFossilLoot(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int position, System.Random rng)
+    private static void SpawnSkeletonLoot(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int position, System.Random rng)
     {
         int count = rng.Next(1, 3);
         for (int i = 0; i < count; i++)
@@ -193,13 +193,13 @@ public class GenTaskEntity : Gen
             int localX = lx - currentCoordinate.x;
             int localZ = lz - currentCoordinate.z;
             if (localX < 0 || localX >= World.ChunkSize || localZ < 0 || localZ >= World.ChunkSize) continue;
-            ID item = PickFossilLoot(rng);
+            ID item = PickSkeletonLoot(rng);
             if (item != ID.Null)
                 currentChunk.DynamicEntity.Add(Entity.CreateInfo(item, new Vector3Int(lx, position.y, lz)));
         }
     }
 
-    private static ID PickFossilLoot(System.Random rng)
+    private static ID PickSkeletonLoot(System.Random rng)
     {
         double roll = rng.NextDouble();
         double chance = 0;

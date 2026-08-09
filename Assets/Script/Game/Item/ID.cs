@@ -121,5 +121,5 @@ public enum ID
     Berries,
     Door,
     Generator,
-    Fossil,
+    Skeleton,
 }

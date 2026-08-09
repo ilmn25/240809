@@ -155,8 +155,8 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
 
-                AddStructure<FossilMachine>(ID.Fossil, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.Fossil);
+                AddStructure<SkeletonMachine>(ID.Skeleton, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.Skeleton);
                 loot.Add(1, 1, ID.Cytoplasm);
                 loot.Add(0.5f, 2, ID.Cytoplasm);
                 loot.Add(0.4f, 1, ID.Flint);
