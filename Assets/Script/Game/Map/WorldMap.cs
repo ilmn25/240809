@@ -267,16 +267,16 @@ public class WorldMap
         if (blockID == 0) return VoidColor;
         switch (Block.ConvertID(blockID))
         {
-            case ID.GrassBlock: return new Color(0.55f, 0.42f, 0.28f); // dirt terrain + roads
-            case ID.ForestBlock: return new Color(0.20f, 0.50f, 0.20f);
-            case ID.SandBlock: return new Color(0.85f, 0.80f, 0.50f);
+            case ID.GrassBlock: return new Color(0.678f, 0.882f, 0.322f);
+            case ID.ForestBlock: return new Color(0.44f, 0.56f, 0.19f);
+            case ID.SandBlock: return new Color(0.80f, 0.77f, 0.59f);
             case ID.StoneBlock: return new Color(0.50f, 0.50f, 0.50f);
-            case ID.GraniteBlock: return new Color(0.62f, 0.52f, 0.52f);
-            case ID.MarbleBlock: return new Color(0.85f, 0.85f, 0.85f);
-            case ID.BrickBlock: return new Color(0.60f, 0.30f, 0.20f);
-            case ID.WoodBlock: return new Color(0.50f, 0.35f, 0.20f);
-            case ID.BackroomBlock: return new Color(0.80f, 0.80f, 0.20f);
-            case ID.MulchBlock: return new Color(0.40f, 0.30f, 0.20f);
+            case ID.GraniteBlock: return new Color(0.59f, 0.53f, 0.53f);
+            case ID.MarbleBlock: return new Color(0.65f, 0.78f, 0.90f);
+            case ID.BrickBlock: return new Color(0.72f, 0.84f, 0.86f);
+            case ID.WoodBlock: return new Color(0.44f, 0.35f, 0.26f);
+            case ID.BackroomBlock: return new Color(0.72f, 0.72f, 0.36f);
+            case ID.MulchBlock: return new Color(0.36f, 0.30f, 0.24f);
             default: return new Color(0.40f, 0.40f, 0.40f);
         }
     }
