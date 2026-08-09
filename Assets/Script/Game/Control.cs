@@ -184,9 +184,6 @@ public class Control
             if (target == null) return;
             var info = ((EntityMachine)target).Info;
 
-            // Skip non-pickupable items (e.g. blood pools) — they can't be collected.
-            if (info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable) return;
-
             if (Helper.IsHost() || NetworkClient.isConnected)
             {
                 // Host/Client: state machine handles pathfinding + pickup via MobChaseAction
@@ -206,6 +203,10 @@ public class Control
             if (collider.gameObject == Main.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
+            // Skip non-pickupable items (blood pools) so they don't block picking
+            // up a real item that's slightly farther away.
+            if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable)
+                continue;
             distance = Helper.SquaredDistance(collider.transform.position, Main.Player.transform.position);
             if (distance < nearestDistance)
             {
