@@ -61,6 +61,15 @@ public class ItemSlot
 
             text += "\n \n" + Info.Description;
         }
+        else if (Info.Type == ItemType.Food)
+        {
+            text += Stack + "x";
+
+            if (Info.FoodValue > 0)
+                text += "\n \nrestores " + Info.FoodValue + " hunger";
+
+            text += "\n \n" + Info.Description;
+        }
         else if (Info.Type == ItemType.Tool)
         { 
             if (Durability != -1) text += Durability + "x\n";

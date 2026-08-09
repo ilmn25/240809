@@ -148,7 +148,7 @@ public partial class Item
             id: ID.StonePickaxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
-            range: 4f,
+            range: 1,
             projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
@@ -167,7 +167,7 @@ public partial class Item
             id: ID.CrudePickaxe,
             gesture: ItemGesture.Swing,
             speed: 2.4f,
-            range: 4f,
+            range: 1,
             projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
@@ -187,8 +187,8 @@ public partial class Item
             id: ID.StoneHatchet,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
-            range: 4f,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -206,8 +206,8 @@ public partial class Item
             id: ID.CrudeHatchet,
             gesture: ItemGesture.Swing,
             speed: 2.4f,
-            range: 4f,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -226,8 +226,8 @@ public partial class Item
             id: ID.MetalAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
-            range: 4f,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -245,8 +245,8 @@ public partial class Item
             id: ID.DiamondAxe,
             gesture: ItemGesture.Swing,
             speed: 1.4f,
-            range: 4f,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -264,7 +264,7 @@ public partial class Item
             id: ID.Torch,
             gesture: ItemGesture.Swing,
             speed: 1.2f,
-            range: 4f,
+            range: 1,
             projectileInfo: new TorchProjectileInfo {
                 Damage = 0,
                 Knockback = 0,
@@ -282,7 +282,7 @@ public partial class Item
             id: ID.Hammer,
             gesture: ItemGesture.Swing,
             speed: 1.8f,
-            range: 4f,
+            range: 1,
             projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
@@ -301,7 +301,7 @@ public partial class Item
             id: ID.CrudeMallet,
             gesture: ItemGesture.Swing,
             speed: 2.8f,
-            range: 4f,
+            range: 1,
             projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,

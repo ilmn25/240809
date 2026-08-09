@@ -150,7 +150,7 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 
-                AddStructure<HarvestableMachine>(ID.Bush, Vector3Int.zero, Main.IndexNoCollide);
+                AddStructure<HarvestableMachine>(ID.Bush, Vector3Int.one, Main.IndexNoCollide);
                 // Harvestable plants need a non-zero bounds so a collider is added
                 // for raycast interaction (they stay on NoCollide so they don't block movement).
                 AddStructure<HarvestableMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);

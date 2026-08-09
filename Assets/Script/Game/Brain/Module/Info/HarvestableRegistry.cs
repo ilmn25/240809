@@ -46,7 +46,8 @@ public static class HarvestableRegistry
         // stays so it can be harvested again.
         Loot bush = new Loot(ID.Bush);
         bush.Add(1f, 1, ID.Sticks);
-        bush.Add(0.2f, 1, ID.Berries);
+        bush.Add(1f, 1, ID.Berries);
+        bush.Add(0.5f, 1, ID.Berries);
         Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, flammable: true));
 
         // Grass: flammable, drops nothing when harvested (just decor).

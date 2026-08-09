@@ -11,13 +11,17 @@ public class MobSpawner
     private const int SpawnInterval = 200;       // frames between spawn ticks
     private const int MobCapPerPlayer = 15;      // max active mobs near each player
     private const int SpawnAttemptsPerTick = 5;  // retries per tick
+    /// <summary>Chance a passive farm-animal group (sheep/poultry) actually
+    /// spawns — 0.5 makes them 2x rarer.</summary>
+    private const float PassiveMobRarity = 0.5f;
     // During Rapture / full moon, spawn more enemies.
     private const int EventMobCapPerPlayer = 30;
     private const int EventSpawnAttemptsPerTick = 10;
 
     private static int _timer;
 
-    private static readonly List<ID> DayMobs = new() { ID.Sheep, ID.Hen, ID.Rooster, ID.Chick };
+    private static readonly List<ID> GrassMobs = new() { ID.Sheep };              // sheep graze only on grassland
+    private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick }; // poultry only in forest
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
 
@@ -76,27 +80,42 @@ public class MobSpawner
             return;
 
         BiomeType biome = GenHelpBiome.GetBiomeType(spawnPos.x, spawnPos.z);
-        List<ID> pool = isNight ? NightMobs : DayMobs;
-        if (isNight && biome == BiomeType.Desert)
-            pool = DesertNightMobs;
+        List<ID> pool;
+        if (isNight)
+            pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
+        else
+            pool = biome switch
+            {
+                BiomeType.Grass => GrassMobs,   // sheep graze only on grassland
+                BiomeType.Forest => ForestMobs, // poultry live only in forest
+                _ => null,                      // no passive mobs in other biomes
+            };
+
+        if (pool == null || pool.Count == 0) return;
 
         ID mobID = pool[Random.Range(0, pool.Count)];
 
-        // Sheep graze in large pure flocks.
+        // Passive farm animals (sheep & poultry) are 2x rarer — only 50% of
+        // the time does a day group actually spawn.
+        if (!isNight && Random.value < PassiveMobRarity)
+            return;
+
+        // Sheep graze in small flocks (half of the previous 5–6).
         if (mobID == ID.Sheep)
         {
-            int herd = Random.Range(5, 7);
+            int herd = Random.Range(2, 4);
             for (int i = 0; i < herd; i++)
                 Entity.Spawn(ID.Sheep, spawnPos);
             return;
         }
 
-        // Poultry spawn as a mixed farmyard flock: hens, chicks, and usually a rooster.
-        for (int i = 0, n = Random.Range(1, 3); i < n; i++) // 1–2 hens
+        // Poultry spawn as a small farmyard flock: a hen, a couple of chicks,
+        // and sometimes a rooster (amounts halved).
+        for (int i = 0, n = Random.Range(1, 2); i < n; i++) // 1 hen
             Entity.Spawn(ID.Hen, spawnPos);
-        for (int i = 0, n = Random.Range(2, 5); i < n; i++) // 2–4 chicks
+        for (int i = 0, n = Random.Range(1, 3); i < n; i++) // 1–2 chicks
             Entity.Spawn(ID.Chick, spawnPos);
-        if (Random.value < 0.6f)
+        if (Random.value < 0.3f)
             Entity.Spawn(ID.Rooster, spawnPos);
     }
 
