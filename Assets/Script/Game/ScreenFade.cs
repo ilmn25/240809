@@ -13,6 +13,7 @@ public static class ScreenFade
     private static float _alpha = 0f;        // 0 = transparent, 1 = fully black
     private static float _targetAlpha = 0f;
     private static float _fadeSpeed = 0f;    // alpha units per second
+    private static float _fadeDelay = 0f;    // seconds to hold the current alpha before animating
     private static Texture2D _blackTexture;
 
     /// <summary>Current overlay alpha (0 = transparent, 1 = black).</summary>
@@ -36,13 +37,16 @@ public static class ScreenFade
     {
         _targetAlpha = 1f;
         _fadeSpeed = duration > 0.001f ? 1f / duration : 10f;
+        _fadeDelay = 0f;
     }
 
-    /// <summary>Fade from current alpha to 0 (fully transparent).</summary>
-    public static void FadeIn(float duration = 0.5f)
+    /// <summary>Fade from current alpha to 0 (fully transparent), optionally holding the
+    /// current alpha (e.g. black) for `delay` seconds first.</summary>
+    public static void FadeIn(float duration = 0.5f, float delay = 0f)
     {
         _targetAlpha = 0f;
         _fadeSpeed = duration > 0.001f ? 1f / duration : 10f;
+        _fadeDelay = Mathf.Max(0f, delay);
     }
 
     /// <summary>Start fully black and fade in to transparent (e.g. on app launch).</summary>
@@ -55,6 +59,11 @@ public static class ScreenFade
     /// <summary>Call every frame from Main.Update() to animate the alpha.</summary>
     public static void Update()
     {
+        if (_fadeDelay > 0f)
+        {
+            _fadeDelay -= Time.deltaTime;
+            return;
+        }
         if (_alpha == _targetAlpha) return;
 
         float step = _fadeSpeed * Time.deltaTime;

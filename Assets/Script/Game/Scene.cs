@@ -107,7 +107,7 @@ public class Scene
             // All chunks already exist — signal game ready immediately.
             Main.SceneMode = SceneMode.Game;
             Environment.Target = EnvironmentType.Null;
-            ScreenFade.FadeIn(1f);
+            ScreenFade.FadeIn(1f, 2f);
             Busy = false;
         }
     }
