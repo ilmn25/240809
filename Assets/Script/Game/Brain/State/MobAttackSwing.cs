@@ -9,7 +9,7 @@ class MobAttackSwing : MobState {
 
     public void Attack()
     {
-        if (_equipment.ProjectileInfo != null)
+        if (_equipment?.ProjectileInfo != null && Info.Equipment != null)
         {
             Vector3 direction = Info.GetDirection();
             ProjectileSync.SpawnProjectile(Info,

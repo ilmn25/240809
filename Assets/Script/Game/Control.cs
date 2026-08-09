@@ -90,6 +90,14 @@ public class Control
         if (i == CurrentPlayerIndex) return;
 
         int prevIndex = CurrentPlayerIndex;
+        // Drop the outgoing character's stale input direction so it doesn't keep
+        // walking (e.g. when it was mid-jump with a key held on swap).
+        PlayerInfo prev = global::Save.Inst.players[prevIndex];
+        if (prev != null)
+        {
+            prev.Direction = Vector3.zero;
+            prev.Velocity = new Vector3(0f, prev.Velocity.y, 0f);
+        }
         SetPlayer(i);
 
         if (!Helper.IsHost())
