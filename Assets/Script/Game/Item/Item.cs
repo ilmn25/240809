@@ -25,6 +25,7 @@ public partial class Item
     public Vector2 HoldoutOffset;
     public float RotationOffset = 90;
     public int FoodValue; // hunger restored when eaten (0 = not food)
+    public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
     /// <summary>Whether this item can be picked up by the player. False for
     /// cosmetic debris (blood) that should just sit on the ground.</summary>
@@ -158,7 +159,8 @@ public partial class Item
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int time = 0,
-        string[] modifiers = null
+        string[] modifiers = null,
+        bool glow = false
     )
     {
 
@@ -182,6 +184,7 @@ public partial class Item
             ProjectileOffset = projectileOffset,
             HoldoutOffset = holdoutOffset,
             RotationOffset = rotationOffset,
+            Glow = glow,
 
             Description = description
         };

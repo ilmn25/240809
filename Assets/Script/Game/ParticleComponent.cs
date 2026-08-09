@@ -5,6 +5,7 @@ public class ParticleComponent : MonoBehaviour
 {
     private Animator _animator;
     private AnimatorStateInfo _stateInfo;
+    private Light _glow;
 
     void Awake()
     {
@@ -15,6 +16,10 @@ public class ParticleComponent : MonoBehaviour
     {
         transform.position = position;
         transform.rotation = ViewPort.CurrentRotation;
+        if (_glow == null)
+            _glow = transform.Find("Sprite/Glow")?.GetComponent<Light>();
+        if (_glow != null)
+            _glow.enabled = id == Particles.Fire;
         string variation = max > 0 ? UnityEngine.Random.Range(1, max+1).ToString() : "";
         _animator.Play("Particle" + id + variation, 0, 0f);
         CheckFinish();

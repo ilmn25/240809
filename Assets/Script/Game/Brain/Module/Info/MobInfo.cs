@@ -28,6 +28,7 @@ public class MobInfo : DynamicInfo
     public HitboxType targetHitboxType;
  
     [NonSerialized] public ItemSlot Equipment;
+    [NonSerialized] private Light _toolGlow;
     
     [NonSerialized] public Info Target;
     [NonSerialized] public IActionType ActionType;
@@ -99,6 +100,7 @@ public class MobInfo : DynamicInfo
         if (target == null)
         {
             Equipment = null;
+            SetToolGlow(false);
             SpriteTool.gameObject.SetActive(false);
             return;
         }
@@ -115,8 +117,17 @@ public class MobInfo : DynamicInfo
         
         SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + spriteName);
         SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
+        SetToolGlow(Equipment.Info.Glow);
         // Host processes state machine for all entities; client only for owned entities.
         if (Machine != null && Machine.IsCurrentState<DefaultState>() && (Helper.IsHost() || IsOwner()))
             Machine.SetState<EquipSelectState>();
+    }
+
+    private void SetToolGlow(bool on)
+    {
+        if (_toolGlow == null && SpriteTool != null)
+            _toolGlow = SpriteTool.Find("Glow")?.GetComponent<Light>();
+        if (_toolGlow != null)
+            _toolGlow.enabled = on;
     }
 }

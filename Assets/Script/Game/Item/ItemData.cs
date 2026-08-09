@@ -276,7 +276,8 @@ public partial class Item
             durability: 100,
             description: "A burning torch that sets flammable objects alight.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Charcoal, 1 } },
-            holdoutOffset: new Vector2(0.65f, 0)
+            holdoutOffset: new Vector2(0.65f, 0),
+            glow: true
         );
 
         AddToolDefinition(
