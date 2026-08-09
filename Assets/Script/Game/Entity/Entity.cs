@@ -202,9 +202,7 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Wool); 
 
                 AddMob<ChickMachine>(ID.Chick);
-                loot = new (ID.Chick);
-                loot.Add(1, 1, ID.Foul);
-                loot.Add(0.5f, 1, ID.Foul);
+                loot = new (ID.Chick); // chicks drop nothing
 
                 AddMob<HenMachine>(ID.Hen);
                 loot = new (ID.Hen);

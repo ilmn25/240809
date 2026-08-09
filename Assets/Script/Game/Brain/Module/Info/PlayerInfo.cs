@@ -120,6 +120,7 @@ public class PlayerInfo : MobInfo
         Velocity = Vector2.zero;
         Direction = Vector2.zero;
         CancelTarget();
+        DeaggroMobs(); // downed players are ignored — mobs drop this player
         if (Main.PlayerInfo == this)
         {
             if (SpriteTool != null) SpriteTool.gameObject.SetActive(false);
@@ -127,6 +128,18 @@ public class PlayerInfo : MobInfo
             GUIBar.Update();
         }
         Machine.SetState<IncapacitatedState>();
+    }
+
+    // When a player goes down, every mob targeting them loses interest.
+    private void DeaggroMobs()
+    {
+        if (!Helper.IsHost()) return;
+        foreach (var em in EntityDynamicLoad.ActiveEntities)
+        {
+            if (em == null || em.Info is not MobInfo mob) continue;
+            if (mob.Target == this)
+                mob.CancelTarget();
+        }
     }
 
     // Revive: restore health/control and refresh the local HUD.

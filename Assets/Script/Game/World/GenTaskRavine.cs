@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// Carves bottomless chasms along the ridges where two different biome regions
-/// meet (the voronoi boundaries between biome nodes in GenTopology). Roads and
-/// open sky are left intact, so the dirt roads become bridges spanning chasms.
+/// meet (the voronoi boundaries between biome nodes in GenTopology). Land
+/// bridges and open sky are left intact, so the bridges span the chasms.
 /// </summary>
 public class GenTaskRavine : Gen
 {

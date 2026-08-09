@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A Don't Starve-style world topology generator.
+/// A branch-and-loop world topology generator.
 ///
-/// Procedural passes (mirroring DST's world generator):
+/// Procedural passes:
 ///   Pass 1 — BuildGraph: place biome "room" nodes with a physics repulsion
 ///            simulation so they spread organically with a natural minimum
 ///            spacing, tethered inside the map; then link them into a minimum
@@ -16,7 +16,7 @@ using UnityEngine;
 ///
 /// Land is the Voronoi diagram of the room nodes (biome islands), with narrow
 /// land bridges along the branch/loop network connecting the islands together,
-/// and ocean filling the gaps between branches (DST "connectivity").
+/// and ocean filling the gaps between branches.
 /// </summary>
 public static class GenTopology
 {
@@ -54,8 +54,8 @@ public static class GenTopology
     /// <summary>Biome border wobble in blocks — organic voronoi seams.</summary>
     private const float VoronoiNoise = 24f;
     private const float VoronoiScale = 0.045f;
-    /// <summary>DST "Land Loops" dial: how often to close a circuit between
-    /// nearby rooms. 0 = never (pure tree), ~0.35 = default, higher = always.</summary>
+    /// <summary>How often to close a circuit between nearby rooms. 0 = never
+    /// (pure tree), ~0.35 = default, higher = always.</summary>
     private const double LoopChance = 0.35;
     /// <summary>Max distance (blocks) for a loop link between unlinked rooms.</summary>
     private const float LoopLinkRadius = 110f;
@@ -111,9 +111,8 @@ public static class GenTopology
         }
 
         // Land = the island blob around a room, OR a land bridge along the
-        // branch/loop network. The bridges connect the biome islands together
-        // naturally (DST "connectivity / land bridges"). Island size varies per
-        // room, so big biomes are large and small ones are pockets.
+        // branch/loop network, so the biome islands stay connected. Island size
+        // varies per room — big biomes are large, small ones are pockets.
         float coast = LandNoise * (Mathf.PerlinNoise(x * CoastScale + _coastOffset, z * CoastScale + _coastOffset) - 0.5f);
         float islandRadius = LandRadius * _nodes[best].Size;
         if (bestD > islandRadius + coast && DistanceToNetwork(x, z) > BridgeWidth)
@@ -149,7 +148,7 @@ public static class GenTopology
         _nodes[0].Z = cz;
 
         // Repulsion / collision resolution: push rooms apart to a natural minimum
-        // spacing while tethering them inside the map (DST "node physics" step).
+        // spacing while tethering them inside the map.
         float tether = TetherRadius * Mathf.Min(bounds.x, bounds.z);
         for (int iter = 0; iter < 140; iter++)
         {
@@ -186,11 +185,9 @@ public static class GenTopology
             }
         }
 
-        // Connectivity — build a minimum spanning tree over the room cloud
-        // (DST's graph network): every room is reachable, and the tree's leaf
-        // nodes form the dead-end "branches" that stretch out from the main
-        // path into the map (DST "Land Branching" — a tree with no loops means
-        // lots of backtracking).
+        // Connectivity — build a minimum spanning tree over the room cloud:
+        // every room is reachable, and the tree's leaf nodes form the dead-end
+        // "branches" that stretch out from the main path into the map.
         bool[] inMst = new bool[_nodes.Count];
         float[] minDist = new float[_nodes.Count];
         int[] minEdge = new int[_nodes.Count];
@@ -220,9 +217,9 @@ public static class GenTopology
             }
         }
 
-        // Loops (DST "Land Loops"): close circuits between nearby rooms so the
-        // map has rings instead of a pure tree — you can walk in a full circle
-        // instead of always hitting a dead-end.
+        // Loops: close circuits between nearby rooms so the map has rings
+        // instead of a pure tree — you can walk in a full circle instead of
+        // always hitting a dead-end.
         for (int i = 0; i < _nodes.Count; i++)
         {
             for (int j = i + 1; j < _nodes.Count; j++)
@@ -237,8 +234,8 @@ public static class GenTopology
             }
         }
 
-        // Branching (DST "Land Branching"): stretch every dead-end leaf room
-        // outward from its parent so branches become long, winding peninsulas.
+        // Branching: stretch every dead-end leaf room outward from its parent
+        // so branches become long, winding peninsulas.
         // The land bridge along each link connects the branch island back to
         // the mainland, so branches read as walkable dead-end fingers.
         float branchTether = BranchTether * Mathf.Min(bounds.x, bounds.z);

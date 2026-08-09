@@ -48,8 +48,8 @@ public class OwlStatueMachine : StructureMachine
             return;
         }
 
-        // Spawn a new guide next to the statue.
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(2, 0, 2);
+        // Spawn a new guide above the statue so it drops down and stands on top.
+        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(0, 2, 0);
         _guideInfo = Entity.Spawn(ID.Guide, spawnPos);
         _respawnTimer = RespawnDelay;
     }

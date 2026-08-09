@@ -8,20 +8,18 @@ using UnityEngine;
 /// </summary>
 public class MobSpawner
 {
-    private const int SpawnInterval = 200;       // frames between spawn ticks
-    private const int MobCapPerPlayer = 15;      // max active mobs near each player
-    private const int SpawnAttemptsPerTick = 5;  // retries per tick
-    /// <summary>Chance a passive farm-animal group (sheep/poultry) actually
-    /// spawns — 0.5 makes them 2x rarer.</summary>
-    private const float PassiveMobRarity = 0.5f;
-    // During Rapture / full moon, spawn more enemies.
+    private const int SpawnInterval = 200;
+    private const int MobCapPerPlayer = 15;
+    private const int SpawnAttemptsPerTick = 5;
+    private const float PassiveMobRarity = 0.1f;
+    private const int PassiveMobCap = 12;
     private const int EventMobCapPerPlayer = 30;
     private const int EventSpawnAttemptsPerTick = 10;
 
     private static int _timer;
 
-    private static readonly List<ID> GrassMobs = new() { ID.Sheep };              // sheep graze only on grassland
-    private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick }; // poultry only in forest
+    private static readonly List<ID> GrassMobs = new() { ID.Sheep };
+    private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
 
@@ -70,7 +68,6 @@ public class MobSpawner
 
     private static void TrySpawnGroup(Vector3 playerPos, bool isNight)
     {
-        // Pick a random position within logic range (outside render range).
         float angle = Random.Range(0f, Mathf.PI * 2f);
         float dist = Random.Range(Scene.RenderDistance + 2, Scene.LogicDistance - 2);
         Vector3Int spawnPos = Vector3Int.FloorToInt(
@@ -86,37 +83,45 @@ public class MobSpawner
         else
             pool = biome switch
             {
-                BiomeType.Grass => GrassMobs,   // sheep graze only on grassland
-                BiomeType.Forest => ForestMobs, // poultry live only in forest
-                _ => null,                      // no passive mobs in other biomes
+                BiomeType.Grass => GrassMobs,
+                BiomeType.Forest => ForestMobs,
+                _ => null,
             };
 
         if (pool == null || pool.Count == 0) return;
 
         ID mobID = pool[Random.Range(0, pool.Count)];
 
-        // Passive farm animals (sheep & poultry) are 2x rarer — only 50% of
-        // the time does a day group actually spawn.
-        if (!isNight && Random.value < PassiveMobRarity)
-            return;
+        if (!isNight)
+        {
+            if (Random.value < PassiveMobRarity) return;
+            if (CountPassiveMobs() >= PassiveMobCap) return;
+        }
 
-        // Sheep graze in small flocks (half of the previous 5–6).
         if (mobID == ID.Sheep)
         {
-            int herd = Random.Range(2, 4);
+            int herd = Random.Range(1, 3);
             for (int i = 0; i < herd; i++)
                 Entity.Spawn(ID.Sheep, spawnPos);
             return;
         }
 
-        // Poultry spawn as a small farmyard flock: a hen, a couple of chicks,
-        // and sometimes a rooster (amounts halved).
-        for (int i = 0, n = Random.Range(1, 2); i < n; i++) // 1 hen
-            Entity.Spawn(ID.Hen, spawnPos);
-        for (int i = 0, n = Random.Range(1, 3); i < n; i++) // 1–2 chicks
-            Entity.Spawn(ID.Chick, spawnPos);
-        if (Random.value < 0.3f)
+        Entity.Spawn(ID.Hen, spawnPos);
+        Entity.Spawn(ID.Chick, spawnPos);
+        if (Random.value < 0.15f)
             Entity.Spawn(ID.Rooster, spawnPos);
+    }
+
+    /// <summary>Counts currently-active passive farm animals (sheep/poultry).</summary>
+    private static int CountPassiveMobs()
+    {
+        int count = 0;
+        foreach (var em in EntityDynamicLoad.ActiveEntities)
+        {
+            if (em == null || em.Info is not MobInfo mob) continue;
+            if (mob.id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick) count++;
+        }
+        return count;
     }
 
     /// <summary>Scan downward from the given position to find the first
