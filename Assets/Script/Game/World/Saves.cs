@@ -86,11 +86,6 @@ public class Save
         PlayerInfo third = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
         third.CharSprite = ID.Yuuri;
         players.Add(third);
-
-        if (gen != GenType.Abyss) return;
-        PlayerInfo second = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        second.CharSprite = ID.Sheep;
-        players.Add(second);
     }
 }
 

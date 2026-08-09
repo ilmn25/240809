@@ -81,7 +81,6 @@ public class ItemSlot
             {
                 text += Info.ProjectileInfo.Damage + " damage";
                 text += " \n" + Info.ProjectileInfo.Knockback + " knockback\n";
-                // if (Info.MiningPower != 0) text += " \nmining power: " + Info.MiningPower;  
                 if (Info.ProjectileInfo.Breaking != 0)
                 {
                     switch (Info.ProjectileInfo.OperationType)

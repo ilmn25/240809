@@ -39,7 +39,6 @@ public class GroundMovementModule : MovementModule
         {  
             //! speeding up to start
             Info.SpeedCurrent = Mathf.Lerp(Info.SpeedCurrent, Info.SpeedTarget, DeltaTime / Info.AccelerationTime); 
-            // if (Info.IsPlayer)Utility.Log(Info.SpeedTarget, Info.Direction);
             if (Info.Direction.x != 0 && Info.Direction.z != 0)
             {
                 _speedAdjust = 1 / Mathf.Sqrt(2); // This is equivalent to 1 / 1.41421
@@ -75,7 +74,6 @@ public class GroundMovementModule : MovementModule
 
     protected virtual void HandleJump()
     { 
-        // if (_isGrounded && _direction.y > 0 && _npcPathFindInst._nextPointDistance < 2f)
         if ((Info.IsGrounded || Info.CanFly) && Info.Direction.y > 0)
         {
             Info.Velocity.y = Info.JumpVelocity; 

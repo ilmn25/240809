@@ -110,6 +110,7 @@ public static class Terraform
             return;
         }
         
+        Tutorial.OnBlockPlaced();
         Entity.Spawn(Target, _coordinate);
     }
      

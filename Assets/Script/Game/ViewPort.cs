@@ -47,6 +47,7 @@ public partial class ViewPort
 
         if (Control.Inst.OrbitLeft.KeyDown())
         { 
+            Tutorial.OnControl(Tutorial.TutorialControl.Orbit);
             OrbitRotation += 45;
             if (OrbitRotation >= 180) OrbitRotation = -180;
             UpdateOrbit();
@@ -55,6 +56,7 @@ public partial class ViewPort
         }
         else if (Control.Inst.OrbitRight.KeyDown())
         {
+            Tutorial.OnControl(Tutorial.TutorialControl.Orbit);
             OrbitRotation -= 45;
             if (OrbitRotation <= -180) OrbitRotation = 180;
             UpdateOrbit();

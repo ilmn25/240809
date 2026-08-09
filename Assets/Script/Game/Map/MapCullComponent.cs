@@ -137,15 +137,6 @@ public class MapCullComponent : MonoBehaviour
                     await Task.Run(() => HandleCullMath());
                     HandleCullMesh();
                 }
-                // else
-                // {
-                //     if ((int)Game.Player.transform.position.y < HIDE_ALL_Y) // cull but out of range and player is low ???? 
-                //     {
-                //         Lib.Log();
-                //         _meshRenderer.enabled = false;
-                //         _meshFilter.mesh = _meshData;
-                //     }
-                // } 
             }
             else // no cull, revert to normal
             {
@@ -187,7 +178,6 @@ public class MapCullComponent : MonoBehaviour
     bool zCheck; 
     bool HandleRangeCheck()
     {
-        // return true;
         try
         { 
             //TODO y

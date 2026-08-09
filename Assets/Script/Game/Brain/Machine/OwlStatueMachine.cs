@@ -1,13 +1,16 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 /// <summary>A placeable owl statue that acts as the Guide's home, like a pig house.
-/// NPCs aren't saved, so the statue respawns the Guide whenever it dies or despawns.</summary>
-public class OwlStatueMachine : StructureMachine
+/// NPCs aren't saved, so the statue respawns the Guide whenever it dies or despawns.
+/// Right-clicking it shows the controls.</summary>
+public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
 {
     private const int CheckInterval = 200;  // frames between checks (~3.3s at 60 fps)
     private const int RespawnDelay = 900;   // frames before a lost guide respawns (~15s)
     private const float GuideSearchRadius = 40f;
+    private const float TetherRadius = 8f;  // snap the guide back if it wanders this far
 
     private static readonly Collider[] GuideScanBuffer = new Collider[8];
 
@@ -40,6 +43,11 @@ public class OwlStatueMachine : StructureMachine
         if (++_timer < CheckInterval) return;
         _timer = 0;
 
+        // Tether the guide back to the statue so it stays home.
+        if (_guideInfo != null && _guideInfo.Machine != null &&
+            Vector3.Distance(_guideInfo.Machine.transform.position, transform.position) > TetherRadius)
+            _guideInfo.Machine.transform.position = transform.position + Vector3.up * 2;
+
         if (GuideAlive()) return;
 
         if (_respawnTimer > 0)
@@ -52,6 +60,32 @@ public class OwlStatueMachine : StructureMachine
         Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(0, 2, 0);
         _guideInfo = Entity.Spawn(ID.Guide, spawnPos);
         _respawnTimer = RespawnDelay;
+    }
+
+    public void OnActionSecondary(Info info)
+    {
+        Tutorial.OnOwlStatueInteracted();
+        Dialogue.Target = BuildControlsDialogue();
+        Dialogue.Show(true);
+        Audio.PlaySFX(SfxID.Text);
+    }
+
+    private static Dialogue BuildControlsDialogue()
+    {
+        return box("Movement: WASD, Jump Space, Sprint Shift, Orbit Q/E",
+            box("Combat: Left Click attack, Right Click interact/place, F pick up, G use near",
+                box("Items: R drop, 1-9 hotbar, I inventory",
+                    box("Party: Tab swap characters, H recall allies",
+                        box("Map: M open, F7 reveal", null)))));
+
+        Dialogue box(string text, Dialogue next)
+        {
+            return new Dialogue
+            {
+                Text = text,
+                Next = next == null ? null : new Dictionary<string, Dialogue> { [""] = next },
+            };
+        }
     }
 
     // True while this statue's guide is still alive. Falls back to adopting any

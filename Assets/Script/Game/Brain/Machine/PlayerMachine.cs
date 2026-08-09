@@ -45,8 +45,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             HitSfx = SfxID.HitPlayer, 
             CharSprite = ID.Chito 
         };
-        // Spawn with a CrudeHatchet in hand (inventory slot 0, selected).
-        player.Storage.List[0] = new ItemSlot(ID.CrudeHatchet);
         player.Storage.Key = 0;
         return player;
     }

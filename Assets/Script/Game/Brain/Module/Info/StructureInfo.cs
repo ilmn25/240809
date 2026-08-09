@@ -71,13 +71,13 @@ public class StructureInfo : Info
     {
         if (Destroyed) return;
         Health -= damage;
+        Tutorial.OnTreeHit(this, info);
         if (Health <= 0)
         { 
             Audio.PlaySFX(SfxDestroy);  
             if (Loot != ID.Null)
                 global::Loot.Gettable(Loot).Spawn(position);
             OnDestroy(info);
-            Tutorial.OnStructureDestroyed(this, info);
             // Clear the attacker's target so the swing animation isn't reset by
             // re-targeting this now-destroyed structure (null attacker = no target).
             if (info != null && info.Target == this)

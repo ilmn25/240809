@@ -7,7 +7,6 @@ public static class GUIMain
     private const float HideDuration = 0.2f;
     
     private static CoroutineTask _showTask;
-    private static bool _gameWasActive;
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
     public static GUICraft GUICraft;
@@ -19,7 +18,7 @@ public static class GUIMain
     public static GUILoad GUILoad;
     public static GUIMap Map;
 
-    public static bool Showing = true;
+    public static bool Showing = false;
     public static bool IsHover;
     public static void Initialize()
     {
@@ -87,19 +86,11 @@ public static class GUIMain
     /// <summary>Call when leaving game mode to hide the inventory GUI.</summary>
     public static void OnGameEnd()
     {
-        _gameWasActive = false;
         Show(false);
     }
 
     public static void Update()
     {
-        // Show inventory GUI when entering game mode
-        if (!_gameWasActive)
-        {
-            _gameWasActive = true;
-            if (!Showing)
-                Show(true);
-        }
 
         Dialogue.Update(); 
         Cursor.Update();
@@ -114,6 +105,7 @@ public static class GUIMain
         if (Control.Inst.Inv.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
+            Tutorial.OnControl(Tutorial.TutorialControl.Inventory);
             if (Showing)
                 Show(false);
             else
@@ -123,6 +115,7 @@ public static class GUIMain
         if (Control.Inst.Map.KeyDown())
         {
             Audio.PlaySFX(SfxID.Text);
+            Tutorial.OnControl(Tutorial.TutorialControl.Map);
             bool wasOpen = Map.Showing;
             Map.Show(!wasOpen);
             // Refocus the map onto the player when opening it.
@@ -240,7 +233,6 @@ public static class GUIMain
             float t = elapsedTime / duration;
             if (show)
             {
-                // if (target.transform.localScale.x > 0.5f) _isInputBlocked = false;
                 t = Mathf.SmoothStep(0f, 1f, Mathf.Pow(t, easeSpeed)); // Apply adjustable ease-out effect
             }
             else

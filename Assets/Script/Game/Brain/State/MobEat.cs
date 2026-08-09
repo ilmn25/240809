@@ -52,6 +52,8 @@ class MobEat : MobState
         if (_food == null || _food.FoodValue <= 0) return;
         if (Info is not PlayerInfo player) return;
 
+        Tutorial.OnEat();
+
         // Restore hunger first; overflow goes to health.
         int hungerGain = Mathf.Min(_food.FoodValue, player.HungerMax - player.Hunger);
         player.Hunger += hungerGain;

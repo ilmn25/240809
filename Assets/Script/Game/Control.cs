@@ -131,6 +131,7 @@ public class Control
                 if (p.Machine != null) break;
             }
             if (next == prevIndex) return; // no other player in range
+            Tutorial.OnSwap();
             SwitchToPlayer(next);
         }
         
@@ -151,6 +152,7 @@ public class Control
         if (Inst.Recall.KeyDown())
         {
             Audio.PlaySFX(SfxID.Text);
+            Tutorial.OnRecall();
             PlayerMachine.RecallAllies();
         }
 
