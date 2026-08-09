@@ -12,6 +12,7 @@ public class GenTaskEntity : Gen
     private const double DirtBushChance = 0.00125;
     private const double DirtGrassChance = 0.08;
     private const double SurfaceChestChance = 0.0002;
+    private const double SurfaceFossilChance = 0.0001;
     private const double SurfaceSlabChance = 0.0098;
     private const double SurfaceSandStructureChance = 0.0098;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
@@ -53,6 +54,11 @@ public class GenTaskEntity : Gen
                         Vector3Int position = currentCoordinate + new Vector3Int(x, y + 1, z);
 
                         double roll = rng.NextDouble();
+                        if (rng.NextDouble() < SurfaceFossilChance)
+                        {
+                            currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Fossil, position));
+                            SpawnFossilLoot(currentCoordinate, currentChunk, position, rng);
+                        }
                         if (currentChunk[x, y, z] == Forest)
                         {
                             // Forest biome: dense trees, but never on the clear paths.
@@ -125,7 +131,9 @@ public class GenTaskEntity : Gen
                             bool isDesert = GenHelpBiome.GetBiomeType(position.x, position.z) == BiomeType.Desert;
                             if (roll <= chance)
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Chest, position));
+                                ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, position);
+                                Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
+                                currentChunk.StaticEntity.Add(chest);
                             } 
                             else if (isDesert && roll <= (chance += SurfaceSandStructureChance))
                             {
@@ -172,5 +180,33 @@ public class GenTaskEntity : Gen
         if ((chance += 0.45) > roll) return ID.Flint;
         if ((chance += 0.10) > roll) return ID.StoneBlock;
         return ID.Null;
+    }
+
+    // Scatters low-tier starter loot (crude tools, flint) around a skeleton.
+    private static void SpawnFossilLoot(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int position, System.Random rng)
+    {
+        int count = rng.Next(1, 3);
+        for (int i = 0; i < count; i++)
+        {
+            int lx = position.x + rng.Next(-1, 2);
+            int lz = position.z + rng.Next(-1, 2);
+            int localX = lx - currentCoordinate.x;
+            int localZ = lz - currentCoordinate.z;
+            if (localX < 0 || localX >= World.ChunkSize || localZ < 0 || localZ >= World.ChunkSize) continue;
+            ID item = PickFossilLoot(rng);
+            if (item != ID.Null)
+                currentChunk.DynamicEntity.Add(Entity.CreateInfo(item, new Vector3Int(lx, position.y, lz)));
+        }
+    }
+
+    private static ID PickFossilLoot(System.Random rng)
+    {
+        double roll = rng.NextDouble();
+        double chance = 0;
+        if ((chance += 0.25) > roll) return ID.CrudeHatchet;
+        if ((chance += 0.25) > roll) return ID.CrudePickaxe;
+        if ((chance += 0.2) > roll) return ID.CrudeMallet;
+        if ((chance += 0.2) > roll) return ID.Flint;
+        return ID.Sticks;
     }
 }
