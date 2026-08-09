@@ -50,7 +50,7 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Sticks);
                 loot.Add(0.5f, 1, ID.Sticks);
                 
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.Slab);
                 loot.Add(1, 2, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Gravel);
@@ -58,14 +58,14 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
 
-                AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandSlab);
                 loot.Add(1, 2, ID.Sand);
                 loot.Add(0.7f, 1, ID.Sand);
                 loot.Add(0.5f, 1, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Flint);
 
-                AddStructure<SandDebrisMachine>(ID.SandDebris, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<SandDebrisMachine>(ID.SandDebris, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandDebris);
                 loot.Add(1, 2, ID.Sand);
                 loot.Add(0.7f, 1, ID.Sand);
@@ -84,8 +84,8 @@ public class Entity
                 AddStructure<MasonryWorkbenchMachine>(ID.MasonryWorkbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FieldStationMachine>(ID.FieldStation, Vector3Int.one, Main.IndexCollide);
-                AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
-                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
 
@@ -159,13 +159,13 @@ public class Entity
                 AddStructure<HarvestableMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<HarvestableMachine>(ID.Deathcap, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<HarvestableMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
-                AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide);
-                AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide);
-                AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<HarvestableMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 // Burn results — spawned when flammable objects burn out.
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
-                AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide);
+                AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OwlStatue);

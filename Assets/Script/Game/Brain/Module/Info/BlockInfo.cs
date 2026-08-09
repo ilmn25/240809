@@ -9,7 +9,6 @@ public class BlockInfo : StructureInfo
     public override void Initialize()
     {
         Terraform.PendingBlocks.Add(Coordinate);
-        PlayerTask.Pending.Add(this);
         Block block;
         if (id == ID.Chalk)
         {

@@ -4,14 +4,15 @@ using UnityEngine;
 
 /// <summary>
 /// Occupancy map used by pathfinding and movement. Each cell holds a value:
-/// Air (0.0, byte 0) = empty, Door (0.5, byte 1) = blocks movement but is still
-/// navigable by pathfinding, Block (1.0, byte 2) = fully solid.
+/// Air (0) = empty, Door (1) / Semi (3) = blocks movement but pathfinding can
+/// route through (with a cost penalty), Block (2) = fully solid.
 /// </summary>
 public class NavMap
 {
-    public const byte Air = 0;   // 0.0 — empty, walkable
-    public const byte Door = 1;  // 0.5 — blocks movement, pathfinding can route through
-    public const byte Block = 2; // 1.0 — fully solid
+    public const byte Air = 0;   // empty, walkable
+    public const byte Door = 1;  // closed door — blocks movement, pathfinding can route through
+    public const byte Block = 2; // fully solid
+    public const byte Semi = 3;  // semi-collidable structure (slab, sign, bed, ...) — same as Door
 
     private static byte[] _map;
     private static readonly List<Vector3Int> LoadedChunks = new ();
@@ -74,8 +75,11 @@ public class NavMap
     /// <summary>True if the cell is fully empty (walkable, no door).</summary>
     public static bool IsAir(Vector3Int worldPosition) => Get(worldPosition) == Air;
 
-    /// <summary>True if the cell is navigable for pathfinding (air or door).</summary>
+    /// <summary>True if the cell is navigable for pathfinding (air, door, or semi).</summary>
     public static bool IsNavigable(Vector3Int worldPosition) => Get(worldPosition) != Block;
+
+    /// <summary>True if a cell is passable but pathfinding should avoid it when possible.</summary>
+    public static bool IsSemiBlocking(byte value) => value == Door || value == Semi;
 
     public static void Set(Vector3Int worldPosition, byte value)
     {
@@ -95,7 +99,7 @@ public class NavMap
     /// </summary>
     public static void SetEntity(Entity entity, Vector3 position, byte value)
     {
-        if (_map == null || entity.Collision != Main.IndexCollide) return;
+        if (_map == null || (entity.Collision != Main.IndexCollide && entity.Collision != Main.IndexSemiCollide)) return;
         int entityX = Mathf.FloorToInt(position.x);
         int entityY = Mathf.FloorToInt(position.y);
         int entityZ = Mathf.FloorToInt(position.z);

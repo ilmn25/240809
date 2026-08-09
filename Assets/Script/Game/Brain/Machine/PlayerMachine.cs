@@ -180,31 +180,33 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Keep working a structure the player assigned instead of chasing zombies.
-        if (Info.Target is StructureInfo && Info.ActionType is IActionType.Hit or IActionType.Dig)
-        {
-            EnsureCompatibleToolForTarget();
-            SetState<MobChaseAction>();
-            return;
-        }
-
-        // Fight nearby hostiles (reacts even while trailing the leader), unless low on health.
-        if (!lowHealth && TryAcquireEnemyTarget())
+        // A threat takes priority over cutting — don't let a sheep you clipped kill you.
+        if (TryAcquireEnemyTarget())
         {
             Info.ActionType = IActionType.Hit;
             SetState<MobChaseAction>();
             return;
         }
 
-        // Idle: take pending tasks, otherwise trail the controlling character.
-        if (!IsCurrentState<DefaultState>()) return;
+        // Work a structure: the assigned one, or whatever the leader marked.
+        StructureInfo work = null;
+        if (Info.Target is StructureInfo assigned && Info.ActionType is IActionType.Hit or IActionType.Dig)
+            work = assigned;
+        else if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed &&
+                 Main.PlayerInfo.Target is StructureInfo leaderTask && !leaderTask.Destroyed)
+            work = leaderTask;
 
-        if (PlayerTask.Pending.Count != 0)
+        if (work != null)
         {
-            foreach (StructureInfo si in PlayerTask.Pending)
-                if (Info.Storage.SetTool(si.operationType))
-                { Info.Target = si; Info.ActionType = IActionType.Hit; SetState<MobChaseAction>(); return; }
+            Info.Target = work;
+            Info.ActionType = IActionType.Hit;
+            EnsureCompatibleToolForTarget();
+            SetState<MobChaseAction>();
+            return;
         }
+
+        // Idle: trail the controlling character.
+        if (!IsCurrentState<DefaultState>()) return;
 
         if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
         {

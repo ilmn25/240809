@@ -9,6 +9,7 @@ public class PathFind
 
     private static readonly int MaxTaskCount = 10;
     private static SemaphoreSlim _semaphore;
+    private const float ObstaclePenalty = 10f; // cost per door/semi cell, so A* prefers paths around them
     static PathFind(){
         _semaphore = new SemaphoreSlim(MaxTaskCount, MaxTaskCount);
     } 
@@ -57,10 +58,10 @@ public class PathFind
         openList.Add(new Node(startPosition, null, 0, Helper.SquaredDistance(startPosition, endPosition), false, new Vector3Int(0, 0, 0)));
         while (openList.Count > 0 && closedList.Count < scanCount)
         { 
-            openList.Sort((A, B) => A.F.CompareTo(B.F)); // sort lowest f to [0] 
-            currentNode = openList[0]; //set lowest f to current
-            openList.RemoveAt(0); //remove current from open list
-            closedList.Add(currentNode.Position); //add to closed list
+            openList.Sort((A, B) => A.F.CompareTo(B.F)); 
+            currentNode = openList[0];
+            openList.RemoveAt(0);
+            closedList.Add(currentNode.Position);
             
             delta = endPosition - currentNode.Position;
 
@@ -72,16 +73,16 @@ public class PathFind
                 return currentNode.GetPathList(agent.Info.CanFly);
             }
             
-            foreach (var direction in Node.Directions) //scan each direction
+            foreach (var direction in Node.Directions)
             {  
                 dirPosition = Vector3Int.FloorToInt(currentNode.Position + direction);
                 if (closedList.Contains(dirPosition)) continue;
                  
-                isFloat = Node.IsAir(dirPosition + Vector3Int.down); // set true if midair
+                isFloat = Node.IsAir(dirPosition + Vector3Int.down); // midair when the cell below is air
                 gCost = currentNode.G + Helper.SquaredDistance(currentNode.Position, dirPosition);
-                if (direction.x != 0 && direction.z != 0 && isFloat) gCost++;  
+                if (direction.x != 0 && direction.z != 0 && isFloat) gCost++;
+                if (NavMap.IsSemiBlocking(NavMap.Get(dirPosition))) gCost += ObstaclePenalty;
                   
-                //don't add if not the lowest node compared to others
                 if (openList.Exists(node => node.Position == dirPosition && node.G <= gCost) || 
                     !agent.IsValidPosition(dirPosition, direction, currentNode)) continue;   
 
@@ -98,6 +99,6 @@ public class PathFind
             }
         }
 
-        return closestNode?.GetPathList(agent.Info.CanFly); // Return the path to the closest node 
+        return closestNode?.GetPathList(agent.Info.CanFly);
     }
 }

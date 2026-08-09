@@ -43,10 +43,11 @@ public class StructureInfo : Info
         { 
             return false;
         }  
-        // Acquire the target from hitting a structure.
-        projectile.SourceInfo.AcquireTarget(this);
+        // User-controlled players acquire the target from hitting a structure; AI
+        // allies (controllerId == -1) keep the target their brain assigned.
+        if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.controllerId != -1)
+            projectile.SourceInfo.AcquireTarget(this);
         return true;
-        // if (!PlayerTask.Pending.Contains(this)) PlayerTask.Pending.Add(this) 
     }
 
     public override void AbstractHit(MobInfo info)
@@ -76,7 +77,6 @@ public class StructureInfo : Info
             if (Loot != ID.Null)
                 global::Loot.Gettable(Loot).Spawn(position);
             OnDestroy(info);
-            PlayerTask.Pending.Remove(this);
             // Clear the attacker's target so the swing animation isn't reset by
             // re-targeting this now-destroyed structure (null attacker = no target).
             if (info != null && info.Target == this)
