@@ -55,8 +55,11 @@ public static class HarvestableRegistry
         bush.Add(0.5f, 1, ID.Berries);
         Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, flammable: true, regrowTime: 20f));
 
-        // Grass: flammable, drops nothing when harvested (just decor).
-        Register(ID.Grass, new HarvestableDefinition(flammable: true));
+        // Grass: flammable decor that rarely yields sticks/flint (1/25) or a bullet casing (1/100).
+        Loot grass = new Loot(ID.Grass);
+        grass.Add(0.04f, 1, ID.Sticks, ID.Flint);
+        grass.Add(0.01f, 1, ID.Casing);
+        Register(ID.Grass, new HarvestableDefinition(grass, flammable: true));
 
         // Flowers: drop themselves and are consumed.
         Loot deathcap = new Loot(ID.Deathcap);
