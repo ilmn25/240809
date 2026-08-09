@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// Don't Starve-style 2D map panel. Shows the current world's top-down terrain
+/// 2D top-down map panel. Shows the current world's top-down terrain
 /// texture (with fog of war) plus structure icons and a player marker. Toggled
 /// with the Map key (M). Full screen, with drag-to-pan and scroll-to-zoom.
 /// </summary>
@@ -23,7 +23,7 @@ public class GUIMap : GUI
     private const float ZoomSpeed = 0.12f;
     /// <summary>How many map pixels each sprite pixel occupies, so pixel-art
     /// sprites keep consistent density relative to each other.</summary>
-    private const float PixelsPerSpritePixel = 0.2f;
+    private const float PixelsPerSpritePixel = 0.15f;
 
     private bool _dragging;
     private Vector2 _dragStartMouse;

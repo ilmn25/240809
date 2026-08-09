@@ -1,17 +1,13 @@
 using UnityEngine;
 
-public enum BiomeType {Desert, Grass, Forest}
+public enum BiomeType {Desert, Grass, Forest, Ocean}
 public class GenHelpBiome : Gen
 {
-    private static readonly float DrynessOffset = GetDeterministicOffset("BiomeDryness");
-    private static readonly float Scale = 0.0025f;
-
+    /// <summary>
+    /// Procedural biome layout driven by the branch/loop network and its
+    /// Voronoi regions (see GenTopology). Ocean marks the empty sky where
+    /// there is no ground.
+    /// </summary>
     public static BiomeType GetBiomeType(int x, int z)
-    {
-        float value = Mathf.PerlinNoise(x * Scale + DrynessOffset, 
-            z * Scale + DrynessOffset);
-        if (value > 0.6f) return BiomeType.Forest;
-        if (value > 0.5f) return BiomeType.Grass;
-        return BiomeType.Desert;
-    }
+        => GenTopology.GetBiome(x, z);
 }

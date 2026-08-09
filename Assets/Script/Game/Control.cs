@@ -21,6 +21,7 @@ public class Control
     public readonly ControlKey Recall = new (KeyCode.H);
     public readonly ControlKey Pause = new (KeyCode.Escape);
     public readonly ControlKey FullScreen = new (KeyCode.F11);
+    public readonly ControlKey RevealMap = new (KeyCode.F7);
     public readonly ControlKey ActionPrimary = new (KeyCode.Mouse0);
     public readonly ControlKey ActionSecondary = new (KeyCode.Mouse1);
     public readonly ControlKey ActionPrimaryNear = new (KeyCode.G);
@@ -131,6 +132,12 @@ public class Control
                 Screen.SetResolution(960, 540, false);
             else
                 Screen.SetResolution(1920, 1080, true);
+        }
+
+        if (Inst.RevealMap.KeyDown() && World.Inst?.Map != null)
+        {
+            Audio.PlaySFX(SfxID.Text);
+            World.Inst.Map.ToggleFullReveal();
         }
 
         if (Inst.Recall.KeyDown())

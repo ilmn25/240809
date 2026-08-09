@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// DST / Terraria-style mob spawning.
+/// Terraria-style mob spawning.
 /// Mobs spawn in groups within logic range of each player, up to a per-player cap.
 /// Spawn pools are biome-aware and respect day/night cycles.
 /// </summary>

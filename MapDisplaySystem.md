@@ -1,4 +1,4 @@
-# Map Display System — Don't Starve Style
+# Map Display System
 
 A per-world 2D map showing an aerial view of the terrain plus structure markers,
 revealed gradually as the player explores (fog of war).

@@ -8,21 +8,21 @@ public class GenTaskEntity : Gen
     private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
     private static int Forest => _idForest == 0 ? Block.ConvertID(ID.ForestBlock) : _idForest;
 
-    private const double DirtTreeChance = 0.02;
-    private const double DirtBushChance = 0.02;
-    private const double DirtGrassChance = 0.16;
-    private const double SurfaceChestChance = 0.0004;
-    private const double SurfaceSlabChance = 0.0196;
-    private const double SurfaceSandStructureChance = 0.0196;
+    private const double DirtTreeChance = 0.005;
+    private const double DirtBushChance = 0.01;
+    private const double DirtGrassChance = 0.08;
+    private const double SurfaceChestChance = 0.0002;
+    private const double SurfaceSlabChance = 0.0098;
+    private const double SurfaceSandStructureChance = 0.0098;
     /// <summary>Chance per surface block to spawn a ground item (matches original 1%+1%).</summary>
-    private const double GroundItemChance = 0.02;
+    private const double GroundItemChance = 0.01;
 
     // Dense forest generation
-    private const double ForestTreeChance = 0.25;
-    private const double ForestBushChance = 0.08;
-    private const double ForestGrassChance = 0.12;
-    private const double ForestDeathcapChance = 0.02;
-    private const double GrassOrchidChance = 0.02;
+    private const double ForestTreeChance = 0.0625;
+    private const double ForestBushChance = 0.04;
+    private const double ForestGrassChance = 0.06;
+    private const double ForestDeathcapChance = 0.01;
+    private const double GrassOrchidChance = 0.01;
     private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
@@ -51,6 +51,7 @@ public class GenTaskEntity : Gen
                         currentChunk[x, y + 1, z] == 0)
                     {
                         Vector3Int position = currentCoordinate + new Vector3Int(x, y + 1, z);
+
                         double roll = rng.NextDouble();
                         if (currentChunk[x, y, z] == Forest)
                         {

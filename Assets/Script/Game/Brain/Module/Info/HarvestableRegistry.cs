@@ -42,8 +42,8 @@ public static class HarvestableRegistry
     /// <summary>Register all harvestable definitions. Called once at startup.</summary>
     public static void Initialize()
     {
-        // Berry bush (Don't Starve style): hit to knock off sticks and rarely
-        // berries, but the bush stays so it can be harvested again.
+        // Berry bush: hit to knock off sticks and rarely berries, but the bush
+        // stays so it can be harvested again.
         Loot bush = new Loot(ID.Bush);
         bush.Add(1f, 1, ID.Sticks);
         bush.Add(0.2f, 1, ID.Berries);

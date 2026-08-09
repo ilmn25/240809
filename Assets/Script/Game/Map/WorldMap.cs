@@ -12,7 +12,7 @@ public class MapMarker
 }
 
 /// <summary>
-/// Per-world 2D map state (Don't Starve style). Stores which columns have been
+/// Per-world 2D map state. Stores which columns have been
 /// explored (fog of war), caches structure markers, and generates a top-down
 /// terrain texture. Persisted with the World via BinaryFormatter, so the
 /// runtime-only fields (Texture, Dirty) are marked [NonSerialized].
@@ -28,6 +28,11 @@ public class WorldMap
     [NonSerialized] public Texture2D Texture;
     [NonSerialized] public bool Dirty = true;
     [NonSerialized] private bool _markersBuilt;
+    /// <summary>Whether the whole map is currently revealed (F7 toggle).</summary>
+    [NonSerialized] public bool FullReveal;
+    /// <summary>Backup of the explored mask taken before a full reveal, so the
+    /// toggle can restore the fog of war.</summary>
+    [NonSerialized] private byte[] _savedExplored;
 
     private static readonly Color FogColor = new Color(0.08f, 0.08f, 0.10f, 1f);
     private static readonly Color VoidColor = new Color(0.15f, 0.25f, 0.45f, 1f);
@@ -56,6 +61,29 @@ public class WorldMap
                 }
             }
         }
+    }
+
+    /// <summary>Reveals or hides the whole map (fog of war toggle).</summary>
+    public void ToggleFullReveal()
+    {
+        World world = World.Inst;
+        int width = world.Bounds.x;
+        int height = world.Bounds.z;
+        if (Explored == null || Explored.Length != width * height) return;
+
+        if (!FullReveal)
+        {
+            _savedExplored = (byte[])Explored.Clone();
+            for (int i = 0; i < Explored.Length; i++) Explored[i] = 1;
+            FullReveal = true;
+        }
+        else
+        {
+            if (_savedExplored != null)
+                _savedExplored.CopyTo(Explored, 0);
+            FullReveal = false;
+        }
+        Dirty = true;
     }
 
     /// <summary>How far (in blocks) above or below the surface a structure must be
@@ -239,7 +267,7 @@ public class WorldMap
         if (blockID == 0) return VoidColor;
         switch (Block.ConvertID(blockID))
         {
-            case ID.GrassBlock: return new Color(0.55f, 0.42f, 0.28f);
+            case ID.GrassBlock: return new Color(0.55f, 0.42f, 0.28f); // dirt terrain + roads
             case ID.ForestBlock: return new Color(0.20f, 0.50f, 0.20f);
             case ID.SandBlock: return new Color(0.85f, 0.80f, 0.50f);
             case ID.StoneBlock: return new Color(0.50f, 0.50f, 0.50f);

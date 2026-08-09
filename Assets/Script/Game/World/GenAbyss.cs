@@ -2,19 +2,22 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    public override Vector3Int GetSize() => new Vector3Int(25, 4, 25);
+    public override Vector3Int GetSize() => new Vector3Int(50, 3, 50);
     public override Vector3Int GetSpawnPoint() => new Vector3Int(GetSize().x / 2, GetSize().y - 2, GetSize().z / 2) * World.ChunkSize;
     
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
-    { 
+    {
+        // Procedural order: base land → biome surfaces → roads → void edge → features.
         GenTaskStone.Run(currentCoordinate, currentChunk);
         GenTaskGranite.Run(currentCoordinate, currentChunk);  
         GenTaskMarble.Run(currentCoordinate, currentChunk);
         GenTaskDirt.Run(currentCoordinate, currentChunk);
         GenTaskSand.Run(currentCoordinate, currentChunk);
         GenTaskForest.Run(currentCoordinate, currentChunk);
+        GenTaskVoid.Run(currentCoordinate, currentChunk);
+        GenTaskRavine.Run(currentCoordinate, currentChunk);
+        // GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);
-        GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskEntity.Run(currentCoordinate, currentChunk);
     }
     
