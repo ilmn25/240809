@@ -29,44 +29,39 @@ class MobChaseAction : MobState {
         float engageRange = GetEngageRange();
         if (Info.ActionType != IActionType.PickUp && Info.IsGrounded &&
             (Info.Target == null || Helper.SquaredDistance(Machine.transform.position, Info.Target.position) < engageRange * engageRange))
-            Info.PathingStatus = PathingStatus.Reached;  
-        
-        if (Info.PathingStatus == PathingStatus.Reached)
-        {
-            if (Info.Target != null)
-            { 
-                if (Info.ActionType == IActionType.Interact && Info.Target.Machine.gameObject.activeSelf)
-                {
-                    (Info.Target.Machine as IActionSecondaryInteract).OnActionSecondary(Info);
-                    Info.CancelTarget(); 
-                } 
-                else if (Info.ActionType == IActionType.PickUp && !Info.Target.Destroyed)
-                {
-                    string targetUid = Info.Target.uid;
-                    (Info.Target as ItemInfo).OnActionSecondary(Info);
-                    Info.CancelTarget();
-                    // Client: queue destroy UID so the host removes the item server-side
-                    if (!Helper.IsHost() && NetworkClient.isConnected)
-                        PlayerSync.SetPendingDestroyUid(targetUid);
-                    Machine.SetState<EquipSelectState>();
-                }
-                else if (Info.ActionType == IActionType.Hit && !Info.Target.Destroyed)
-                {
-                    ((EntityMachine)Machine).Attack();
-                }
-                else if (Info.ActionType == IActionType.Dig && !Info.Target.Destroyed)
-                {
-                    ((EntityMachine)Machine).Attack();
-                }
-                else
-                {
-                    Info.CancelTarget();
-                } 
-            }  
-        }
-        else if (Info.PathingStatus == PathingStatus.Stuck)
+            Info.PathingStatus = PathingStatus.Reached;
+
+        // Target died/cleared or we're stuck — drop it and let the brain pick the next action.
+        if (Info.Target == null || Info.PathingStatus == PathingStatus.Stuck)
         {
             Info.CancelTarget();
+            return;
+        }
+        if (Info.PathingStatus != PathingStatus.Reached) return;
+
+        switch (Info.ActionType)
+        {
+            case IActionType.Interact when Info.Target.Machine.gameObject.activeSelf:
+                (Info.Target.Machine as IActionSecondaryInteract).OnActionSecondary(Info);
+                Info.CancelTarget();
+                break;
+            case IActionType.PickUp when !Info.Target.Destroyed:
+            {
+                string targetUid = Info.Target.uid;
+                (Info.Target as ItemInfo).OnActionSecondary(Info);
+                Info.CancelTarget();
+                // Client: queue destroy UID so the host removes the item server-side
+                if (!Helper.IsHost() && NetworkClient.isConnected)
+                    PlayerSync.SetPendingDestroyUid(targetUid);
+                Machine.SetState<EquipSelectState>();
+                break;
+            }
+            case IActionType.Hit or IActionType.Dig when !Info.Target.Destroyed:
+                ((EntityMachine)Machine).Attack();
+                break;
+            default:
+                Info.CancelTarget();
+                break;
         }
     } 
 
