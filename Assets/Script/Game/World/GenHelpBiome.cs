@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum BiomeType {Desert, Grass, Forest, Ocean}
+public enum BiomeType {Desert, Grass, Forest, Ocean, Mountain}
 public class GenHelpBiome : Gen
 {
     /// <summary>

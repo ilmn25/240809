@@ -33,6 +33,7 @@ public class LampMachine : StructureMachine, IActionSecondaryInteract
         if (!Powered)
         {
             Dialogue.Target = new Dialogue { Text = "Needs an electric source." };
+            Dialogue.Show(true);
             return;
         }
 

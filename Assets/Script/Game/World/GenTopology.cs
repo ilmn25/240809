@@ -65,7 +65,7 @@ public static class GenTopology
     {
         BiomeType.Forest, BiomeType.Forest, BiomeType.Desert, BiomeType.Desert,
         BiomeType.Grass, BiomeType.Grass, BiomeType.Forest, BiomeType.Desert,
-        BiomeType.Grass, BiomeType.Forest, BiomeType.Desert, BiomeType.Grass,
+        BiomeType.Grass, BiomeType.Mountain, BiomeType.Forest, BiomeType.Mountain,
     };
 
     // --- Pass results -------------------------------------------------------
@@ -318,6 +318,20 @@ public static class GenTopology
             _nodeWorld[i] = new Vector3Int((int)_nodes[i].X, 0, (int)_nodes[i].Z);
     }
 
+    /// <summary>World positions of all Mountain-biome nodes (the mountain peaks).</summary>
+    public static Vector3Int[] GetMountainCenters()
+    {
+        EnsureGenerated();
+        int count = 0;
+        for (int i = 0; i < _nodeWorld.Length; i++)
+            if (_nodes[i].Biome == BiomeType.Mountain) count++;
+        var centers = new Vector3Int[count];
+        int c = 0;
+        for (int i = 0; i < _nodeWorld.Length; i++)
+            if (_nodes[i].Biome == BiomeType.Mountain) centers[c++] = _nodeWorld[i];
+        return centers;
+    }
+
     /// <summary>Distance from (x,z) to the nearest link or room centre — the
     /// branch/loop network that the land bridges are built along.</summary>
     private static float DistanceToNetwork(int x, int z)
@@ -343,14 +357,13 @@ public static class GenTopology
         return _links != null && _links.Count > 0 && DistanceToNetwork(x, z) <= BridgeWidth;
     }
 
-    /// <summary>
-    /// True when (x,z) sits on the voronoi ridge between two nodes that have
-    /// different biomes, within <paramref name="maxGap"/> blocks of the ridge.
-    /// Ravines carve along these ridges to separate biomes.
-    /// </summary>
-    public static bool IsBiomeBoundary(int x, int z, float maxGap)
+    /// <summary>Distance from the voronoi ridge between two different biomes
+    /// (0 = dead centre of the boundary). False when (x,z) isn't on a real
+    /// boundary (same biomes on both sides, or not enough nodes).</summary>
+    public static bool TryGetBiomeBoundaryGap(int x, int z, out float gap)
     {
         EnsureGenerated();
+        gap = float.MaxValue;
         if (_nodeWorld == null || _nodeWorld.Length < 2) return false;
 
         int bestA = -1, bestB = -1;
@@ -363,7 +376,8 @@ public static class GenTopology
         }
         if (bestA < 0 || bestB < 0) return false;
         if (_nodes[bestA].Biome == _nodes[bestB].Biome) return false;
-        return (dB - dA) < maxGap;
+        gap = dB - dA;
+        return true;
     }
 
     /// <summary>Per-node jittered distance used for both biome assignment and

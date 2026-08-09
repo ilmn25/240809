@@ -7,13 +7,14 @@ public class GenAbyss : Gen
     
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        // Procedural order: base land → biome surfaces → void edge → ravines → features.
+        // Procedural order: base land → biome surfaces → mountains → void edge → ravines → features.
         GenTaskStone.Run(currentCoordinate, currentChunk);
         GenTaskGranite.Run(currentCoordinate, currentChunk);  
         GenTaskMarble.Run(currentCoordinate, currentChunk);
         GenTaskDirt.Run(currentCoordinate, currentChunk);
         GenTaskSand.Run(currentCoordinate, currentChunk);
         GenTaskForest.Run(currentCoordinate, currentChunk);
+        GenTaskMountain.Run(currentCoordinate, currentChunk);
         GenTaskVoid.Run(currentCoordinate, currentChunk);
         GenTaskRavine.Run(currentCoordinate, currentChunk);
         // GenTaskWall.Run(currentCoordinate, currentChunk);
