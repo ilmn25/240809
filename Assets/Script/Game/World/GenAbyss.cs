@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    public override Vector3Int GetSize() => new Vector3Int(50, 3, 50);
+    public override Vector3Int GetSize() => new Vector3Int(35, 3, 35);
     public override Vector3Int GetSpawnPoint() => new Vector3Int(GetSize().x / 2, GetSize().y - 2, GetSize().z / 2) * World.ChunkSize;
     
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
