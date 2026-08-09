@@ -4,6 +4,19 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
 {
     protected SpriteRenderer SpriteRenderer;
     protected Light GlowLight;
+    private bool _powered;
+
+    /// <summary>Whether a nearby generator is powering this structure.</summary>
+    public bool Powered => _powered;
+
+    public void SetPowered(bool powered)
+    {
+        if (_powered == powered) return;
+        _powered = powered;
+        OnPoweredChanged(powered);
+    }
+
+    public virtual void OnPoweredChanged(bool powered) { }
 
     public override void OnSetup()
     {

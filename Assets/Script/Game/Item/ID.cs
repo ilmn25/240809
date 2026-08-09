@@ -120,4 +120,5 @@ public enum ID
     Blood,
     Berries,
     Door,
+    Generator,
 }

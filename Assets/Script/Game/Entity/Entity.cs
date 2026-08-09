@@ -167,6 +167,7 @@ public class Entity
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
                 AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
+                AddStructure<GeneratorMachine>(ID.Generator, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OwlStatue);
                 loot.Add(1, 2, ID.StoneBlock);
@@ -186,6 +187,10 @@ public class Entity
                 loot.Add(0.5f, 2, ID.Glass);
                 loot.Add(1, 2, ID.Plank);
                 loot.Add(0.7f, 1, ID.Stake); 
+                loot = new (ID.Generator);
+                loot.Add(1, 1, ID.Copper);
+                loot.Add(1, 1, ID.Glass);
+                loot.Add(0.5f, 2, ID.Stake); 
                  
                 AddMob<PlayerMachine>(ID.Player);
                 
