@@ -276,7 +276,7 @@ public class Control
             float yThreshold = MapCull.YThreshold + 0.05f;
             Vector3 thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
             
-            if (!NavMap.Get(Vector3Int.FloorToInt(thresholdPoint) + Vector3Int.down))
+            if (NavMap.Get(Vector3Int.FloorToInt(thresholdPoint) + Vector3Int.down) != NavMap.Air)
             { 
                 MouseLayer = Main.MaskMap;
                 MousePosition = Vector3Int.FloorToInt(thresholdPoint); ;

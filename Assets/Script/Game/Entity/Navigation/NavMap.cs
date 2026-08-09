@@ -1,20 +1,28 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
- 
+
+/// <summary>
+/// Occupancy map used by pathfinding and movement. Each cell holds a value:
+/// Air (0.0, byte 0) = empty, Door (0.5, byte 1) = blocks movement but is still
+/// navigable by pathfinding, Block (1.0, byte 2) = fully solid.
+/// </summary>
 public class NavMap
 {
-    private static BitArray _bitMap;
+    public const byte Air = 0;   // 0.0 — empty, walkable
+    public const byte Door = 1;  // 0.5 — blocks movement, pathfinding can route through
+    public const byte Block = 2; // 1.0 — fully solid
+
+    private static byte[] _map;
     private static readonly List<Vector3Int> LoadedChunks = new ();
 
     public static void Initialize()
     {
-        _bitMap = new (
-            World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z);
+        _map = new byte[
+            World.Inst.Bounds.x * World.Inst.Bounds.y * World.Inst.Bounds.z];
         LoadedChunks.Clear();
     }
-    
+
     private static int GetIndex(int x, int y, int z)
     {
         return x + World.Inst.Bounds.x * (y + World.Inst.Bounds.y * z);
@@ -22,28 +30,29 @@ public class NavMap
     private static int GetIndex(Vector3Int coordinate)
     {
         return coordinate.x + World.Inst.Bounds.x * (coordinate.y + World.Inst.Bounds.y * coordinate.z);
-    } 
+    }
+
     /// <summary>Process a chunk into NavMap. Returns true if new data was loaded (false if already done).</summary>
     public static bool SetChunk(Vector3Int coordinate)
-    { 
+    {
         if (!World.IsInWorldBounds(coordinate) || LoadedChunks.Contains(coordinate)) return false;
         LoadedChunks.Add(coordinate);
-        Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z]; 
+        Chunk chunk = World.Inst[coordinate.x, coordinate.y, coordinate.z];
         if (chunk != null)
-        { 
+        {
             for (int x = 0; x < World.ChunkSize; x++)
             {
                 for (int y = 0; y < World.ChunkSize; y++)
                 {
                     for (int z = 0; z < World.ChunkSize; z++)
                     {
-                        Set(coordinate.x + x, coordinate.y + y, coordinate.z + z, chunk[x, y, z] == 0);
+                        Set(coordinate.x + x, coordinate.y + y, coordinate.z + z, chunk[x, y, z] == 0 ? Air : Block);
                     }
                 }
             }
             foreach (var entity in chunk.StaticEntity)
             {
-                SetEntity(Entity.Dictionary[entity.id], entity.position, false);
+                SetEntity(Entity.Dictionary[entity.id], entity.position, Entity.Dictionary[entity.id].NavValue);
             }
         }
         return true;
@@ -54,33 +63,39 @@ public class NavMap
         return coordinate;
     }
 
-    public static bool Get(Vector3Int worldPosition)
+    /// <summary>The NavMap value at a cell: Air (0), Door (1), or Block (2).</summary>
+    public static byte Get(Vector3Int worldPosition)
     {
-        if (_bitMap == null) return false;
-        if (!World.IsInWorldBounds(worldPosition)) return true;
-        return _bitMap[GetIndex(worldPosition)];
+        if (_map == null) return Block;
+        if (!World.IsInWorldBounds(worldPosition)) return Air;
+        return _map[GetIndex(worldPosition)];
     }
 
-    public static void Set(Vector3Int worldPosition, bool value, bool isAir = false)
+    /// <summary>True if the cell is fully empty (walkable, no door).</summary>
+    public static bool IsAir(Vector3Int worldPosition) => Get(worldPosition) == Air;
+
+    /// <summary>True if the cell is navigable for pathfinding (air or door).</summary>
+    public static bool IsNavigable(Vector3Int worldPosition) => Get(worldPosition) != Block;
+
+    public static void Set(Vector3Int worldPosition, byte value)
     {
-        if (_bitMap == null) return;
-        if (isAir && !World.IsInWorldBounds(worldPosition)) return;
-        _bitMap[GetIndex(worldPosition)] = value; 
+        if (_map == null || !World.IsInWorldBounds(worldPosition)) return;
+        _map[GetIndex(worldPosition)] = value;
     }
-    
-    public static void Set(int x, int y, int z, bool value, bool isAir = false)
+
+    public static void Set(int x, int y, int z, byte value)
     {
-        if (_bitMap == null) return;
-        if (isAir && !World.IsInWorldBounds(x, y, z)) return;
-        _bitMap[GetIndex(x, y, z)] = value;
+        if (_map == null || !World.IsInWorldBounds(x, y, z)) return;
+        _map[GetIndex(x, y, z)] = value;
     }
 
     /// <summary>
-    /// Pack a chunk's NavMap bits (air=true) into a byte array for network transfer.
-    /// ChunkSize³ bits → ceil(ChunkSize³ / 8) bytes.
-    public static void SetEntity(Entity entity, Vector3 position, bool isAir)
+    /// Marks every cell a static entity occupies with the given NavMap value.
+    /// Pass Air to clear (entity removed), or the entity's own NavValue to block.
+    /// </summary>
+    public static void SetEntity(Entity entity, Vector3 position, byte value)
     {
-        if (_bitMap == null || entity.Collision != Main.IndexCollide) return; 
+        if (_map == null || entity.Collision != Main.IndexCollide) return;
         int entityX = Mathf.FloorToInt(position.x);
         int entityY = Mathf.FloorToInt(position.y);
         int entityZ = Mathf.FloorToInt(position.z);
@@ -96,10 +111,9 @@ public class NavMap
             {
                 for (int z = entityZ; z < entityEndZ; z++)
                 {
-                    NavMap.Set(x, y, z, isAir);
+                    NavMap.Set(x, y, z, value);
                 }
             }
         }
     }
-
-} 
+}

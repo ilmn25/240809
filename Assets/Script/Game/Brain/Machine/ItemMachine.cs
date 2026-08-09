@@ -84,7 +84,7 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
             for (int y = minY; y <= maxY; y++)
             {
                 Vector3Int b = new Vector3Int(cx, y, cz);
-                if (World.IsInWorldBounds(b) && !NavMap.Get(b))
+                if (World.IsInWorldBounds(b) && NavMap.Get(b) != NavMap.Air)
                     return false;
             }
             return true;

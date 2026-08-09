@@ -5,7 +5,7 @@ using UnityEngine;
 public struct NavMapBlockUpdateMessage : NetworkMessage
 {
     public Vector3Int blockCoord;
-    public bool isAir;
+    public byte value; // NavMap.Air / NavMap.Door / NavMap.Block
 }
 
 public static class NavMapSync
@@ -16,18 +16,18 @@ public static class NavMapSync
     }
 
     /// <summary>Host: broadcast incremental single-block NavMap update to all clients.</summary>
-    public static void BroadcastBlockUpdate(Vector3Int blockCoord, bool isAir)
+    public static void BroadcastBlockUpdate(Vector3Int blockCoord, byte value)
     {
         if (!NetworkServer.active) return;
         NetworkServer.SendToAll(new NavMapBlockUpdateMessage
         {
             blockCoord = blockCoord,
-            isAir = isAir
+            value = value
         });
     }
 
     private static void OnNavMapBlockUpdate(NavMapBlockUpdateMessage msg)
     {
-        NavMap.Set(msg.blockCoord, msg.isAir);
+        NavMap.Set(msg.blockCoord, msg.value);
     }
 }

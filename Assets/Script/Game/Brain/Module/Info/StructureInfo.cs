@@ -65,9 +65,10 @@ public class StructureInfo : Info
         Damage(info.Equipment.Info.ProjectileInfo.Breaking, info);
     }
 
-    // Shared damage path for both players (tool Breaking) and enemies (bash damage).
+    // Shared damage path for players (tool Breaking) and enemies bashing via AbstractHit.
     private void Damage(int damage, MobInfo info)
     {
+        if (Destroyed) return;
         Health -= damage;
         if (Health <= 0)
         { 
@@ -77,8 +78,8 @@ public class StructureInfo : Info
             OnDestroy(info);
             PlayerTask.Pending.Remove(this);
             // Clear the attacker's target so the swing animation isn't reset by
-            // re-targeting this now-destroyed structure.
-            if (info.Target == this)
+            // re-targeting this now-destroyed structure (null attacker = no target).
+            if (info != null && info.Target == this)
                 info.CancelTarget();
             Destroy();
         }

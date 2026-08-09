@@ -138,9 +138,9 @@ public class MobSpawner
         pos.y = worldTop - 1;
         while (pos.y > worldBottom)
         {
-            bool currentAir = NavMap.Get(pos);
+            bool currentAir = NavMap.Get(pos) == NavMap.Air;
             pos.y--;
-            bool belowSolid = !NavMap.Get(pos);
+            bool belowSolid = NavMap.Get(pos) != NavMap.Air;
 
             if (currentAir && belowSolid)
             {

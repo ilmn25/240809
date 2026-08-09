@@ -28,8 +28,8 @@ public class SpotLightModule : MonoBehaviour
             _offset.Normalize();
 
             bool shouldEnable = 
-                NavMap.Get(Vector3Int.FloorToInt(transform.position)) &&
-                NavMap.Get(Vector3Int.FloorToInt(transform.position + _offset + Vector3Int.down));
+                NavMap.Get(Vector3Int.FloorToInt(transform.position)) == NavMap.Air &&
+                NavMap.Get(Vector3Int.FloorToInt(transform.position + _offset + Vector3Int.down)) == NavMap.Air;
 
             if (shouldEnable) // on
             {

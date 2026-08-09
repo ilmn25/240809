@@ -231,7 +231,7 @@ public class Console : MonoBehaviour
                 SetPieceCommands();
                 break; 
             case "air":
-                Print(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position))? "is air" : "not air");
+                Print(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position)) == NavMap.Air ? "is air" : "not air");
                 break;  
             case "fly":
                 Main.Fly = !Main.Fly;

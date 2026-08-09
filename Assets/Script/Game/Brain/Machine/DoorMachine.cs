@@ -14,7 +14,7 @@ public class DoorMachine : StructureMachine, IActionSecondaryInteract
         {
             Health = DoorHealth,
             threshold = 1,
-            operationType = OperationType.Building,
+            operationType = OperationType.Cutting, // hit it with an axe, like other wooden structures
             Loot = ID.Door,
             EnemyBreakable = true,
             SfxHit = SfxID.HitStone,
@@ -35,15 +35,17 @@ public class DoorMachine : StructureMachine, IActionSecondaryInteract
         SpriteRenderer.sprite = Cache.LoadSprite(open ? "Sprite/DoorOpen" : "Sprite/Door");
     }
 
-    // Toggle the door's NavMap bit so enemies can (or can't) path through it.
+    // Toggle the door's NavMap value: closed = Door (blocks movement, pathfinding
+    // can still route through), open = Air (fully passable).
     private void SetBlocked(bool blocked)
     {
-        NavMap.SetEntity(Entity, transform.position, !blocked);
+        byte value = blocked ? NavMap.Door : NavMap.Air;
+        NavMap.SetEntity(Entity, transform.position, value);
         Vector3Int start = Vector3Int.FloorToInt(transform.position);
         Vector3Int size = Vector3Int.FloorToInt(Entity.Bounds);
         for (int x = 0; x < size.x; x++)
             for (int y = 0; y < size.y; y++)
                 for (int z = 0; z < size.z; z++)
-                    NavMapSync.BroadcastBlockUpdate(start + new Vector3Int(x, y, z), !blocked);
+                    NavMapSync.BroadcastBlockUpdate(start + new Vector3Int(x, y, z), value);
     }
 }

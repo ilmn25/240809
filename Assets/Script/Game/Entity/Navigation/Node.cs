@@ -32,8 +32,8 @@ public class Node
         if (pos.y >= World.Inst.Bounds.y)
             return true;
 
-        // Check air or block
-        return NavMap.Get(pos);
+        // Navigable = air or door (pathfinding can route through doors).
+        return NavMap.IsNavigable(pos);
     }
     
  

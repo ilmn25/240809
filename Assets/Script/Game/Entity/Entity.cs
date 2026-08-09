@@ -12,6 +12,8 @@ public class Entity
         public int Collision;
         public bool StaticLoad;
         public Vector3 SpawnOffset;
+        /// <summary>NavMap value this static entity writes when placed (Block for most structures, Door for doors).</summary>
+        public byte NavValue = NavMap.Block;
         
         public static Vector3 MidAir = new Vector3(0.5f, 0.3f, 0.5f);
         public static Vector3 Floor = new Vector3(0.5f, 0f, 0.5f);
@@ -85,7 +87,7 @@ public class Entity
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
-                AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide);
+                AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
 
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);
@@ -267,7 +269,7 @@ public class Entity
                 });
         }
 
-        private static void AddStructure<T>(ID id, Vector3Int bounds, int collision) where T : EntityMachine
+        private static void AddStructure<T>(ID id, Vector3Int bounds, int collision, byte navValue = NavMap.Block) where T : EntityMachine
         {
                 Dictionary.Add(id, new Entity
                 {
@@ -277,6 +279,7 @@ public class Entity
                         Machine = typeof(T),
                         StaticLoad = true,
                         SpawnOffset = Floor,
+                        NavValue = navValue,
                 });
         }
  

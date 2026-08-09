@@ -122,7 +122,7 @@ public abstract class MovementModule : DynamicModule
                 for (int z = minZ; z <= maxZ; z++)
                 {
                     Vector3Int b = new Vector3Int(x, y, z);
-                    if (World.IsInWorldBounds(b) && !NavMap.Get(b))
+                    if (World.IsInWorldBounds(b) && NavMap.Get(b) != NavMap.Air)
                         return false;
                 }
             }

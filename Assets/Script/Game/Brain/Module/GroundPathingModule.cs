@@ -32,11 +32,12 @@ public class GroundPathingModule : PathingModule
     {
         if (PathingTarget == PathingTarget.Target)
         {   
-            // !Info.IsGrounded cant because grounded only lasts a frame || 
+            // Wait for the target to land: only pause when the cell below is fully
+            // empty air (a door counts as solid ground, so it doesn't block landing).
             if (!Info.CanFly)
             {
-                while (Node.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down) ||
-                       (!Info.IsGrounded && Node.IsAir(Vector3Int.FloorToInt(Info.position) + Vector3Int.down)))
+                while (NavMap.IsAir(Vector3Int.FloorToInt(Info.Target.position) + Vector3Int.down) ||
+                       (!Info.IsGrounded && NavMap.IsAir(Vector3Int.FloorToInt(Info.position) + Vector3Int.down)))
                 {
                     await Task.Delay(100); 
                 } 

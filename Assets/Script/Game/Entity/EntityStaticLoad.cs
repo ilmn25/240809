@@ -8,14 +8,14 @@ public class EntityStaticLoad
     public static void ForgetEntity(EntityMachine entityMachine, Entity entity)
     {
         ActiveEntities[World.GetChunkCoordinate(entityMachine.transform.position)].Item2.Remove(entityMachine);
-        NavMap.SetEntity(entity, entityMachine.transform.position, true);
+        NavMap.SetEntity(entity, entityMachine.transform.position, NavMap.Air);
     }
     public static void InviteEntity(EntityMachine entityMachine, Entity entity) {
         Vector3Int chunkCoord = World.GetChunkCoordinate(entityMachine.transform.position);
         if (!ActiveEntities.ContainsKey(chunkCoord))
             ActiveEntities[chunkCoord] = (new List<Info>(), new List<EntityMachine>());
         ActiveEntities[chunkCoord].Item2.Add(entityMachine);
-        NavMap.SetEntity(entity, entityMachine.transform.position, false);
+        NavMap.SetEntity(entity, entityMachine.transform.position, entity.NavValue);
     } 
       
     public static void UnloadEntitiesInChunk(Vector3Int key)
