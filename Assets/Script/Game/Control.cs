@@ -146,6 +146,9 @@ public class Control
             PlayerMachine.RecallAllies();
         }
 
+        // The map handles its own input (drag/zoom) — no world interaction while open.
+        if (GUIMain.Map is { IsOpen: true }) return;
+
         HandleActionButton();
         
         HandleScroll();
@@ -221,9 +224,6 @@ public class Control
     {
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0 || GUIMain.GUILoad.Showing) return;
-
-        // While the map is open, the scroll wheel zooms the map instead of the game.
-        if (GUIMain.Map != null && GUIMain.Map.IsOpen) return;
 
         if (!Input.GetKey(KeyCode.LeftAlt))
         {

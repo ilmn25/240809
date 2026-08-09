@@ -240,10 +240,9 @@ public class WorldMap
 
                 if (dist < EdgeWidth)
                 {
-                    // Closer to fog = darker; fade out over the edge width.
+                    // Blend the explored edge toward the fog color instead of black.
                     float t = 1f - (dist / (float)EdgeWidth);
-                    float darken = Mathf.Lerp(1f, 0.05f, t);
-                    pixels[idx] *= darken;
+                    pixels[idx] = Color.Lerp(pixels[idx], FogColor, t);
                 }
             }
         }
@@ -269,7 +268,7 @@ public class WorldMap
         {
             case ID.GrassBlock: return new Color(0.678f, 0.882f, 0.322f);
             case ID.ForestBlock: return new Color(0.44f, 0.56f, 0.19f);
-            case ID.SandBlock: return new Color(0.80f, 0.77f, 0.59f);
+            case ID.SandBlock: return new Color(0.92f, 0.90f, 0.75f);
             case ID.StoneBlock: return new Color(0.50f, 0.50f, 0.50f);
             case ID.GraniteBlock: return new Color(0.59f, 0.53f, 0.53f);
             case ID.MarbleBlock: return new Color(0.65f, 0.78f, 0.90f);
