@@ -49,11 +49,12 @@ public static class ScreenFade
         _fadeDelay = Mathf.Max(0f, delay);
     }
 
-    /// <summary>Start fully black and fade in to transparent (e.g. on app launch).</summary>
-    public static void FadeInFromBlack(float duration = 0.5f)
+    /// <summary>Start fully black and fade in to transparent (e.g. on app launch),
+    /// optionally holding black for `delay` seconds first.</summary>
+    public static void FadeInFromBlack(float duration = 0.5f, float delay = 0f)
     {
         _alpha = 1f;
-        FadeIn(duration);
+        FadeIn(duration, delay);
     }
 
     /// <summary>Call every frame from Main.Update() to animate the alpha.</summary>

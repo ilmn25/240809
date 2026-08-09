@@ -16,6 +16,7 @@ public class GUIMap : GUI
     private readonly Dictionary<MapMarker, Image> _icons = new Dictionary<MapMarker, Image>();
     private readonly List<RectTransform> _playerMarkers = new List<RectTransform>();
     private readonly Dictionary<ID, Sprite> _spriteCache = new Dictionary<ID, Sprite>();
+    private Material _spriteMaterial;
 
     private float _zoom = 1.5f;
     private const float MinZoom = 0.5f;
@@ -75,6 +76,8 @@ public class GUIMap : GUI
         _mapRect = mapObj.GetComponent<RectTransform>();
         _mapRect.anchoredPosition = Vector2.zero;
         _mapImage = mapObj.GetComponent<RawImage>();
+        _spriteMaterial = Resources.Load<Material>("Shader/Material/CustomSprite");
+        if (_spriteMaterial != null) _mapImage.material = _spriteMaterial;
 
         Show(false);
     }
@@ -145,6 +148,7 @@ public class GUIMap : GUI
                 markerObj.transform.SetParent(_mapRect, false);
                 marker = markerObj.GetComponent<RectTransform>();
                 marker.GetComponent<Image>().color = Color.white;
+                if (_spriteMaterial != null) marker.GetComponent<Image>().material = _spriteMaterial;
                 _playerMarkers.Add(marker);
             }
 
@@ -185,6 +189,7 @@ public class GUIMap : GUI
                 iconObj.transform.SetParent(_mapRect, false);
                 icon = iconObj.GetComponent<Image>();
                 icon.color = Color.white;
+                if (_spriteMaterial != null) icon.material = _spriteMaterial;
                 _icons[m] = icon;
             }
 

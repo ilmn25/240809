@@ -71,7 +71,7 @@ public class Main : MonoBehaviour
 
     public void Start()
     {
-        ScreenFade.FadeInFromBlack(1f);
+        ScreenFade.FadeInFromBlack(1f, 1f);
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         
         ViewPort.Initialize(); 
