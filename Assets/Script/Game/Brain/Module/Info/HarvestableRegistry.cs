@@ -14,19 +14,24 @@ public class HarvestableDefinition
     public bool DestroyOnHarvest = true;
     /// <summary>If true, this harvestable can catch and spread fire.</summary>
     public bool Flammable = false;
+    /// <summary>Seconds before a non-destroyed harvestable regrows and can be
+    /// harvested again (0 = always harvestable). Prevents infinite farming.</summary>
+    public float RegrowTime = 0f;
 
-    public HarvestableDefinition(bool destroyOnHarvest = true, bool flammable = false)
+    public HarvestableDefinition(bool destroyOnHarvest = true, bool flammable = false, float regrowTime = 0f)
     {
         DestroyOnHarvest = destroyOnHarvest;
         Flammable = flammable;
+        RegrowTime = regrowTime;
     }
 
     /// <summary>Convenience: create a definition with a drop table.</summary>
-    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, bool flammable = false)
+    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, bool flammable = false, float regrowTime = 0f)
     {
         Drops = drops;
         DestroyOnHarvest = destroyOnHarvest;
         Flammable = flammable;
+        RegrowTime = regrowTime;
     }
 }
 
@@ -48,7 +53,7 @@ public static class HarvestableRegistry
         bush.Add(1f, 1, ID.Sticks);
         bush.Add(1f, 1, ID.Berries);
         bush.Add(0.5f, 1, ID.Berries);
-        Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, flammable: true));
+        Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, flammable: true, regrowTime: 20f));
 
         // Grass: flammable, drops nothing when harvested (just decor).
         Register(ID.Grass, new HarvestableDefinition(flammable: true));

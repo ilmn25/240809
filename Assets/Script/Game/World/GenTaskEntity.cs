@@ -9,7 +9,7 @@ public class GenTaskEntity : Gen
     private static int Forest => _idForest == 0 ? Block.ConvertID(ID.ForestBlock) : _idForest;
 
     private const double DirtTreeChance = 0.0025;
-    private const double DirtBushChance = 0.0025;
+    private const double DirtBushChance = 0.00125;
     private const double DirtGrassChance = 0.08;
     private const double SurfaceChestChance = 0.0002;
     private const double SurfaceSlabChance = 0.0098;
@@ -19,10 +19,10 @@ public class GenTaskEntity : Gen
 
     // Dense forest generation
     private const double ForestTreeChance = 0.0625;
-    private const double ForestBushChance = 0.01;
+    private const double ForestBushChance = 0.005;
     private const double ForestGrassChance = 0.06;
-    private const double ForestDeathcapChance = 0.0025;
-    private const double GrassOrchidChance = 0.01;
+    private const double ForestDeathcapChance = 0.00125;
+    private const double GrassOrchidChance = 0.005;
     private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
