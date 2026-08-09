@@ -13,5 +13,6 @@ public class ConstructionInfo : SpriteStructureInfo
     public override void OnDestroy(MobInfo info)
     { 
         Entity.Spawn(structureID, Vector3Int.FloorToInt(Machine.transform.position));
+        Tutorial.OnAssembled(structureID);
     }
 }

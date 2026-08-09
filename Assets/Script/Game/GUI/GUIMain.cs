@@ -132,6 +132,8 @@ public static class GUIMain
 
     private static void UpdateHudText()
     {
+        Tutorial.Update();
+
         string BuildTimeHudText()
         {
             if (Save.Inst == null) return "Day ?, ??:??";
@@ -176,10 +178,12 @@ public static class GUIMain
             ? $"Spectating Player {playerIndex}"
             : $"Controlling Player {playerIndex}";
 
+        string tutorial = Tutorial.BuildHudText();
         Main.GUIHudText.text =
             $"{BuildTimeHudText()}\n" +
             $"{controlStatus} | Slot {slotId}\n" +
-            BuildTargetHudText(Main.PlayerInfo?.Target);
+            BuildTargetHudText(Main.PlayerInfo?.Target) +
+            (tutorial.Length > 0 ? "\n" + tutorial : "");
     }
 
     public static void Show(bool isShow)

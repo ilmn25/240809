@@ -50,6 +50,8 @@ public class Scene
     
     private static void Start()
     {
+        Tutorial.Reset();
+
         Vector3 spawnPosition = World.Inst.SpawnPoint;
 
         foreach (PlayerInfo player in Save.Inst.players)

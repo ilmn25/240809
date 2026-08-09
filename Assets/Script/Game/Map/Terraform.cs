@@ -93,6 +93,7 @@ public static class Terraform
             info.operationType = OperationType.Building;
             info.SfxHit = SfxID.HitMetal;
             info.SfxDestroy = SfxID.HitMetal;
+            Tutorial.OnPlaced(Target);
             Main.PlayerInfo.Storage.RemoveItem(Target, 1, Main.PlayerInfo.Storage.Key);
             return;
         }

@@ -49,6 +49,7 @@ public class CraftInfo : SpriteStructureInfo
                 Random.value > 0.5f ? 0.65f : -0.65f);
 
             Entity.SpawnItem(Pending[0], Machine.transform.position + offset, stackOnSpawn: false);
+            Tutorial.OnCraft(Pending[0]);
             Pending.RemoveAt(0);
             _counter = 0;
 

@@ -51,6 +51,7 @@ public partial class ItemRecipe
     
     public static void CraftItem(ID stringID, bool isCursor = true)
     {
+        Tutorial.OnCraft(stringID);
         TakeIngredients(stringID);
         
         ItemSlot craftedItem = new ItemSlot(stringID, Dictionary[stringID].Stack);

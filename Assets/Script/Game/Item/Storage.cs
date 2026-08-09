@@ -126,6 +126,16 @@ public class Storage
                 AddItem(new ItemSlot(stringID, count));
         }
 
+        public int Count(ID itemID)
+        {
+                int count = 0;
+                if (List == null) return 0;
+                foreach (ItemSlot slot in List)
+                        if (slot.ID == itemID)
+                                count += slot.Stack;
+                return count;
+        }
+
         public virtual void AddItem(ItemSlot newItemSlot, int priority = 0)
         {
                 if (List[priority].isSame(newItemSlot))

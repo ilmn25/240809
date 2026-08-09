@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class ItemSlot
@@ -26,6 +27,12 @@ public class ItemSlot
         Durability = Item.GetItem(id).Durability;
     }
     
+    private string IngredientText(KeyValuePair<ID, int> ingredient)
+    {
+        int have = Main.PlayerInfo?.Storage?.GetAmount(ingredient.Key) ?? 0;
+        return $"{Item.GetItem(ingredient.Key).Name} ({have}/{ingredient.Value})";
+    }
+
     public string ToString(bool ingredients)
     {
         string text = "";
@@ -36,9 +43,7 @@ public class ItemSlot
             text += " \ningredients: ";
             if (recipe != null)
                 foreach (var ingredient in recipe.Ingredients)
-                {
-                    text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
-                }
+                    text += "\n" + IngredientText(ingredient);
             text += "\n \n" + Info.Description;
         }
         else 
@@ -53,9 +58,7 @@ public class ItemSlot
                 {
                     text += " \n \ningredients: ";
                     foreach (var ingredient in recipe.Ingredients)
-                    {
-                        text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
-                    }
+                        text += "\n" + IngredientText(ingredient);
                 }
             }
 
@@ -102,13 +105,11 @@ public class ItemSlot
             if (ingredients)
             {
                 text += " \n \ningredients: ";
-                ItemRecipe recipe = ItemRecipe.Dictionary[ID];
+                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
                 if (recipe != null)
                 {
                     foreach (var ingredient in recipe.Ingredients)
-                    {
-                        text += "\n" + Item.GetItem(ingredient.Key).Name + " x " + ingredient.Value;
-                    }
+                        text += "\n" + IngredientText(ingredient);
                 }
             }
 

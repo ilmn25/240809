@@ -77,6 +77,7 @@ public class StructureInfo : Info
             if (Loot != ID.Null)
                 global::Loot.Gettable(Loot).Spawn(position);
             OnDestroy(info);
+            Tutorial.OnStructureDestroyed(this, info);
             // Clear the attacker's target so the swing animation isn't reset by
             // re-targeting this now-destroyed structure (null attacker = no target).
             if (info != null && info.Target == this)
