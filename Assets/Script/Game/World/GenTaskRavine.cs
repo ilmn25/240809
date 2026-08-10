@@ -14,13 +14,13 @@ public class GenTaskRavine : Gen
     private static readonly float ErodeOffset = GetDeterministicOffset("RavineErode");
     private static readonly float StepOffset = GetDeterministicOffset("RavineSteps");
     /// <summary>Half-width (blocks) of the ridge band that becomes a chasm.</summary>
-    private const float ChasmHalfWidth = 10.5f;
+    private const float ChasmHalfWidth = 50f;
     /// <summary>Number of terrace bands down each wall.</summary>
-    private const int RidgeSteps = 5;
+    private const int RidgeSteps = 6;
     /// <summary>How much narrower the chasm gets at the bottom (fraction of the top).</summary>
-    private const float BottomWidthFactor = 0.3f;
+    private const float BottomWidthFactor = 0.25f;
     /// <summary>Noise that jitters each wall band so the ridges are jagged.</summary>
-    private const float WallNoiseStrength = 2.5f;
+    private const float WallNoiseStrength = 3.5f;
     private const float WallNoiseScale = 0.08f;
 
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
@@ -37,10 +37,11 @@ public class GenTaskRavine : Gen
                 int worldZ = currentCoordinate.z + z;
 
                 // Leave open sky intact.
-                if (GenHelpBiome.GetBiomeType(worldX, worldZ) == BiomeType.Ocean) continue;
+                if (GenHelpBiome.GetBiomeType(worldX, worldZ) == BiomeType.Void) continue;
 
-                // Never cut the land bridges — they keep the biome islands connected.
-                if (GenTopology.IsBridge(worldX, worldZ)) continue;
+                // Never cut the outer loop or central hub — they keep the biome
+                // plates connected into a walkable ring.
+                if (GenTopology.IsLandConnection(worldX, worldZ)) continue;
 
                 // Distance from the ridge line (0 = dead centre, grows outward).
                 if (!GenTopology.TryGetBiomeBoundaryGap(worldX, worldZ, out float gap)) continue;

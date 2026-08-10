@@ -12,7 +12,7 @@ public class GenTaskVoid : Gen
         {
             for (int z = 0; z < World.ChunkSize; z++)
             {
-                if (GenHelpBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Ocean)
+                if (GenHelpBiome.GetBiomeType(currentCoordinate.x + x, currentCoordinate.z + z) != BiomeType.Void)
                     continue;
 
                 // Clear the whole column — each chunk clears its own slice.
