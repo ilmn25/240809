@@ -6,7 +6,7 @@ public class Settings
 {
     public static Settings Inst;
     public bool Fullscreen = true;
-    public int ResolutionIndex = 2;
+    public int ResolutionIndex = 3;
     public float BgmVolume = 1f;
     public float SfxVolume = 0.5f;
     public int ScrollSpeedIndex = 1;

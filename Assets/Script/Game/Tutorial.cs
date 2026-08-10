@@ -34,16 +34,15 @@ public static class Tutorial
         switch (_progress)
         {
             case 2: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 3; break;
-            case 7: if (storage.Count(ID.Log) >= 15) _progress = 8; break;
-            case 8: if (_workbenchCrafted) _progress = 9; break;
-            case 9: if (_workbenchPlaced) _progress = 10; break;
-            case 10: if (_malletCrafted && _workbenchAssembled) _progress = 11; break;
+            case 7: if (_workbenchCrafted) _progress = 8; break;
+            case 8: if (_workbenchPlaced) _progress = 9; break;
+            case 9: if (_malletCrafted && _workbenchAssembled) _progress = 10; break;
         }
     }
 
     public static void OnWorkbenchInteracted()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
+        if (Settings.Inst.TutorialEnabled && _progress == 10) _progress = 11;
     }
 
     public static void OnCraft(ID id)
@@ -52,19 +51,19 @@ public static class Tutorial
         switch (_progress)
         {
             case 3: if (IsHatchet(id)) _progress = 4; break;
-            case 8: if (id == ID.Workbench) _workbenchCrafted = true; break;
-            case 10: if (id == ID.CrudeMallet) _malletCrafted = true; break;
+            case 7: if (id == ID.Workbench) _workbenchCrafted = true; break;
+            case 9: if (id == ID.CrudeMallet) _malletCrafted = true; break;
         }
     }
 
     public static void OnPlaced(ID structure)
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 9 && structure == ID.Workbench) _workbenchPlaced = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 8 && structure == ID.Workbench) _workbenchPlaced = true;
     }
 
     public static void OnAssembled(ID structure)
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 10 && structure == ID.Workbench) _workbenchAssembled = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 9 && structure == ID.Workbench) _workbenchAssembled = true;
     }
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
@@ -87,12 +86,12 @@ public static class Tutorial
 
     public static void OnBlockPlaced()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 12) _progress = 13;
+        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
     }
 
     public static void OnEat()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 13) _progress = 14;
+        if (Settings.Inst.TutorialEnabled && _progress == 12) _progress = 13;
     }
 
     private static bool IsHatchet(ID id) =>
@@ -105,7 +104,7 @@ public static class Tutorial
         return "\u2192 " + BuildLabel(_progress) + ProgressSuffix();
     }
 
-    private static int LabelCount => 14;
+    private static int LabelCount => 13;
 
     private static string Key(ControlKey key) => key.Primary.ToString();
 
@@ -118,13 +117,12 @@ public static class Tutorial
         4 => "hit a tree",
         5 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
         6 => "right click on a teammate to access their inventory",
-        7 => "collect 15 logs",
-        8 => "craft a workbench",
-        9 => "place the workbench",
-        10 => "craft a crude mallet and assemble the workbench",
-        11 => "interact with the workbench with right click",
-        12 => "craft and place a mulch block",
-        13 => "eat some food",
+        7 => "craft a workbench",
+        8 => "place the workbench",
+        9 => "craft a crude mallet and assemble the workbench",
+        10 => "interact with the workbench with right click",
+        11 => "craft and place a mulch block",
+        12 => "eat some food",
         _ => "",
     };
 
@@ -134,8 +132,8 @@ public static class Tutorial
         return _progress switch
         {
             2 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
-            7 => $" (logs {storage?.Count(ID.Log) ?? 0}/15)",
-            8 => $" (logs {storage?.Count(ID.Log) ?? 0}/15, flint {storage?.Count(ID.Flint) ?? 0}/5)",
+            3 => $" (sticks {storage?.Count(ID.Sticks) ?? 0}/2, flint {storage?.Count(ID.Flint) ?? 0}/2)",
+            7 => $" (logs {storage?.Count(ID.Log) ?? 0}/15, flint {storage?.Count(ID.Flint) ?? 0}/5)",
             _ => "",
         };
     }

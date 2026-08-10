@@ -193,7 +193,7 @@ public class Environment
             else
                 Weather = EnvironmentType.DaySnow;
         } 
-        else if (Time == 60 * 11)
+        else if (Time == 60 * 18)
             if (Random.value < 0.8f)
                 Weather = EnvironmentType.Sunset;
             else
@@ -201,7 +201,7 @@ public class Environment
                 Weather = EnvironmentType.Rapture;
                 ShowEventDialogue("The sky is red...");
             }
-        else if (Time == 60 * 14)
+        else if (Time == 60 * 19)
             if (Random.value < 0.7f)
                 Weather = EnvironmentType.NightRainy;
             else
@@ -209,7 +209,7 @@ public class Environment
                 Weather = EnvironmentType.NightBright;
                 ShowEventDialogue("The full moon rises...");
             }
-        else if (Time == Length * 23/24)
+        else if (Time == 60 * 23)
             Weather = EnvironmentType.Sunrise;
     }
 

@@ -151,7 +151,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.4f,
             range: 1,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -170,7 +170,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2.4f,
             range: 1,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -286,7 +286,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 1.8f,
             range: 1,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
@@ -305,7 +305,7 @@ public partial class Item
             gesture: ItemGesture.Swing,
             speed: 2.8f,
             range: 1,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
+            projectileInfo: new SwingProjectileInfo {
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,

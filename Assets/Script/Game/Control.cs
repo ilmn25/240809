@@ -97,6 +97,14 @@ public class Control
         {
             prev.Direction = Vector3.zero;
             prev.Velocity = new Vector3(0f, prev.Velocity.y, 0f);
+            // Clear a stale pickup/interact action before releasing control. The ally
+            // brain (UpdateAllyBrain) bails out on PickUp/Interact, so a leftover action
+            // would freeze this player in place once it becomes an ally after the swap.
+            if (prev.ActionType is IActionType.PickUp or IActionType.Interact)
+            {
+                prev.CancelTarget();
+                prev.ActionType = IActionType.Follow;
+            }
         }
         SetPlayer(i);
 
