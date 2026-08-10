@@ -257,7 +257,7 @@ public class Control
         if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
         { 
     
-            if (Inst.ActionSecondary.KeyDown() && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+            if (Inst.ActionSecondary.KeyDown() && !Dialogue.Showing && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)

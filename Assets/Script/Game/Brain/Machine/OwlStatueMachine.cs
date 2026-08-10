@@ -72,11 +72,15 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
 
     private static Dialogue BuildControlsDialogue()
     {
-        return box("Movement: WASD, Jump Space, Sprint Shift, Orbit Q/E",
-            box("Combat: Left Click attack, Right Click interact/place, F pick up, G use near",
-                box("Items: R drop, 1-9 hotbar, I inventory",
-                    box("Party: Tab swap characters, H recall allies",
-                        box("Map: M open, F7 reveal", null)))));
+        return box(
+            "movement - W A S D\n\njump - space\n\nsprint - shift\n\norbit - Q/E",
+            box(
+                "combat - left click\n\ninteract/place - right click\n\npick up - F\n\nuse near - G",
+                box(
+                    "drop - R\n\nhotbar - 1-9\n\ninventory - I\n\nswap characters - Tab",
+                    box(
+                        "recall allies - H\n\nmap - M",
+                        null))));
 
         Dialogue box(string text, Dialogue next)
         {

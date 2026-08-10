@@ -18,7 +18,7 @@ public static class GUIMain
     public static GUILoad GUILoad;
     public static GUIMap Map;
 
-    public static bool Showing = false;
+    public static bool Showing = true;
     public static bool IsHover;
     public static void Initialize()
     {
