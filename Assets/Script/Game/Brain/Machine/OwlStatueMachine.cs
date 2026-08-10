@@ -72,24 +72,7 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
 
     private static Dialogue BuildControlsDialogue()
     {
-        return box(
-            "movement - W A S D\njump - space\nsprint - shift",
-            box(
-                "orbit - Q/E\ncombat - left click\ninteract/place - right click\npick up - F",
-                box(
-                    "use near - G\ndrop - R\nhotbar - 1-9\nswap characters - Tab",
-                    box(
-                        "recall allies - H\nmap - M\nhide inventory - F3",
-                        null))));
-
-        Dialogue box(string text, Dialogue next)
-        {
-            return new Dialogue
-            {
-                Text = text,
-                Next = next == null ? null : new Dictionary<string, Dialogue> { [""] = next },
-            };
-        }
+        return new Dialogue { Text = "this is the center of the map" };
     }
 
     // True while this statue's guide is still alive. Falls back to adopting any

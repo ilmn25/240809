@@ -10,6 +10,7 @@ public class Settings
     public float BgmVolume = 1f;
     public float SfxVolume = 0.5f;
     public int ScrollSpeedIndex = 1;
+    public bool TutorialEnabled = true;
 
     public static readonly float[] ScrollSpeeds = { 0.5f, 1f, 2f, 4f };
 

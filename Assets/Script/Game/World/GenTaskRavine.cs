@@ -15,6 +15,9 @@ public class GenTaskRavine : Gen
     private static readonly float StepOffset = GetDeterministicOffset("RavineSteps");
     /// <summary>Half-width (blocks) of the ridge band that becomes a chasm.</summary>
     private const float ChasmHalfWidth = 50f;
+    /// <summary>Radius (blocks) around the spawn hub that is never carved, so
+    /// the player always spawns on solid ground.</summary>
+    private const float SpawnClearRadius = 12f;
     /// <summary>Number of terrace bands down each wall.</summary>
     private const int RidgeSteps = 6;
     /// <summary>How much narrower the chasm gets at the bottom (fraction of the top).</summary>
@@ -38,6 +41,11 @@ public class GenTaskRavine : Gen
 
                 // Leave open sky intact.
                 if (GenHelpBiome.GetBiomeType(worldX, worldZ) == BiomeType.Void) continue;
+
+                // Never cut the spawn hub — the player must always land on solid ground.
+                float spawnDx = worldX - World.Inst.SpawnPoint.x;
+                float spawnDz = worldZ - World.Inst.SpawnPoint.z;
+                if (spawnDx * spawnDx + spawnDz * spawnDz < SpawnClearRadius * SpawnClearRadius) continue;
 
                 // Never cut the outer loop or central hub — they keep the biome
                 // plates connected into a walkable ring.

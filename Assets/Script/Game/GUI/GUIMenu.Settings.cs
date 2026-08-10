@@ -12,7 +12,8 @@ public partial class GUIMenu
             "3 > BGM Volume: " + Mathf.RoundToInt(s.BgmVolume * 100) + "\n" +
             "4 > SFX Volume: " + Mathf.RoundToInt(s.SfxVolume * 100) + "\n" +
             "5 > Text Speed: " + (Settings.ScrollSpeeds[s.ScrollSpeedIndex] * 100) + "%" + "\n" +
-            "6 > Keybinds";
+            "6 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
+            "7 > Keybinds";
     }
 
     private void CycleSetting(int index)
@@ -34,6 +35,9 @@ public partial class GUIMenu
                 break;
             case 4: // text speed
                 s.ScrollSpeedIndex = (s.ScrollSpeedIndex + 1) % Settings.ScrollSpeeds.Length;
+                break;
+            case 5: // tutorial
+                s.TutorialEnabled = !s.TutorialEnabled;
                 break;
         }
         Settings.Apply();

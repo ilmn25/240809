@@ -88,7 +88,7 @@ public partial class GUIMenu
 
         if (_screen == MenuScreen.Settings)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha6)) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); return; }
+            if (Input.GetKeyDown(KeyCode.Alpha7)) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); return; }
         }
         else if (_screen == MenuScreen.Keybind)
         {
@@ -180,7 +180,7 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Settings:
-                if (n >= 1 && n <= 5) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
+                if (n >= 1 && n <= 6) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
                 break;
 
             case MenuScreen.Keybinds:

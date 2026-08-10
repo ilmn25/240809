@@ -3,30 +3,13 @@
 /// the player's storage is read each frame for the "collect" objectives.</summary>
 public static class Tutorial
 {
-    private static readonly string[] Labels =
-    {
-        "press M to open the map",
-        "press Q/E to orbit the camera",
-        "right click on the owl statue",
-        "press F to pick up flint and sticks",
-        "craft a hatchet",
-        "hit a tree",
-        "press Tab to swap character",
-        "collect 15 logs",
-        "press H to recall your allies",
-        "craft and place a workbench",
-        "craft a crude mallet and assemble the workbench",
-        "place a block",
-        "eat some food",
-    };
-
     private const int ControlBase = 0;  // index of the first control objective
 
-    public enum TutorialControl { Map, Orbit }
+    public enum TutorialControl { Orbit, Map }
 
     public static void OnControl(TutorialControl control)
     {
-        if (_progress == ControlBase + (int)control) _progress++;
+        if (Settings.Inst.TutorialEnabled && _progress == ControlBase + (int)control) _progress++;
     }
 
     private static int _progress;   // index of the current objective
@@ -44,6 +27,7 @@ public static class Tutorial
     /// <summary>Advance objectives satisfied by inventory state or combined flags.</summary>
     public static void Update()
     {
+        if (!Settings.Inst.TutorialEnabled) return;
         Storage storage = Main.PlayerInfo?.Storage;
         if (storage == null) return;
 
@@ -58,11 +42,12 @@ public static class Tutorial
 
     public static void OnOwlStatueInteracted()
     {
-        if (_progress == 2) _progress = 3;
+        if (Settings.Inst.TutorialEnabled && _progress == 2) _progress = 3;
     }
 
     public static void OnCraft(ID id)
     {
+        if (!Settings.Inst.TutorialEnabled) return;
         switch (_progress)
         {
             case 4: if (IsHatchet(id)) _progress = 5; break;
@@ -73,51 +58,73 @@ public static class Tutorial
 
     public static void OnPlaced(ID structure)
     {
-        if (_progress == 9 && structure == ID.Workbench) _workbenchPlaced = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 9 && structure == ID.Workbench) _workbenchPlaced = true;
     }
 
     public static void OnAssembled(ID structure)
     {
-        if (_progress == 10 && structure == ID.Workbench) _workbenchAssembled = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 10 && structure == ID.Workbench) _workbenchAssembled = true;
     }
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
     {
-        if (_progress == 5 &&
+        if (Settings.Inst.TutorialEnabled && _progress == 5 &&
             structure.id is ID.PineTree or ID.BirchTree &&
             attacker is PlayerInfo)
-            _progress = 7;
+            _progress = 6;
     }
 
     public static void OnSwap()
     {
-        if (_progress == 6) _progress = 7;
+        if (Settings.Inst.TutorialEnabled && _progress == 6) _progress = 7;
     }
 
     public static void OnRecall()
     {
-        if (_progress == 8) _progress = 9;
+        if (Settings.Inst.TutorialEnabled && _progress == 8) _progress = 9;
     }
 
     public static void OnBlockPlaced()
     {
-        if (_progress == 11) _progress = 12;
+        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
     }
 
     public static void OnEat()
     {
-        if (_progress == 12) _progress = 13;
+        if (Settings.Inst.TutorialEnabled && _progress == 12) _progress = 13;
     }
 
     private static bool IsHatchet(ID id) =>
         id is ID.CrudeHatchet or ID.StoneHatchet or ID.MetalAxe or ID.DiamondAxe;
 
-    /// <summary>Current objective text for the HUD, or "" once the tutorial is complete.</summary>
+    /// <summary>Current objective text for the HUD, or "" once the tutorial is complete or disabled.</summary>
     public static string BuildHudText()
     {
-        if (_progress >= Labels.Length) return "";
-        return "\u2192 " + Labels[_progress] + ProgressSuffix();
+        if (!Settings.Inst.TutorialEnabled || _progress >= LabelCount) return "";
+        return "\u2192 " + BuildLabel(_progress) + ProgressSuffix();
     }
+
+    private static int LabelCount => 13;
+
+    private static string Key(ControlKey key) => key.Primary.ToString();
+
+    private static string BuildLabel(int i) => i switch
+    {
+        0 => "press " + Key(Control.Inst.OrbitLeft) + "/" + Key(Control.Inst.OrbitRight) + " to orbit the camera",
+        1 => "press " + Key(Control.Inst.Map) + " to open the map",
+        2 => "right click on the owl statue",
+        3 => "press " + Key(Control.Inst.ActionSecondaryNear) + " to pick up flint and sticks",
+        4 => "craft a hatchet",
+        5 => "hit a tree",
+        6 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
+        7 => "collect 15 logs",
+        8 => "press " + Key(Control.Inst.Recall) + " to recall your teammates",
+        9 => "craft and place a workbench",
+        10 => "craft a crude mallet and assemble the workbench",
+        11 => "place a block",
+        12 => "eat some food",
+        _ => "",
+    };
 
     private static string ProgressSuffix()
     {
