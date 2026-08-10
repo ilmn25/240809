@@ -5,12 +5,13 @@ using UnityEngine;
 public partial class GUIMenu
 {
     private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm }
-    private enum ConfirmAction { None, Save, Load }
+    private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
     private bool _transitioning;
     private ConfirmAction _confirmAction;
     private int _confirmIndex;
+    private KeyCode _pendingKeybind;
     private MenuScreen _returnScreen;
     private MenuScreen _loadReturn = MenuScreen.Main;
     private MenuScreen _settingsReturn = MenuScreen.Pause;
@@ -96,9 +97,20 @@ public partial class GUIMenu
             if (TryGetPressedKey(out KeyCode key))
             {
                 Audio.PlaySFX(SfxID.Text);
-                ApplyKeybind(key);
-                _rebinding = false;
-                ShowKeybinds();
+                _pendingKeybind = key;
+                string conflict = FindKeybindConflict(key);
+                if (conflict != null)
+                {
+                    _confirmAction = ConfirmAction.Keybind;
+                    _returnScreen = MenuScreen.Keybind;
+                    TransitionTo(MenuScreen.Confirm);
+                }
+                else
+                {
+                    ApplyKeybind(key);
+                    _rebinding = false;
+                    ShowKeybinds();
+                }
             }
             return;
         }
@@ -226,6 +238,12 @@ public partial class GUIMenu
                 Show(false);
             }));
         }
+        else if (_confirmAction == ConfirmAction.Keybind)
+        {
+            ApplyKeybind(_pendingKeybind);
+            _rebinding = false;
+            ShowKeybinds();
+        }
     }
 
     private void Render()
@@ -322,6 +340,8 @@ public partial class GUIMenu
     }
     private string RenderLoad()
     {
+        if (Saves.Inst.List.Count == 0)
+            return "No saves found";
         var sb = new StringBuilder();
         int start = _loadPage * 8;
         for (int i = 0; i < 8; i++)
@@ -343,6 +363,12 @@ public partial class GUIMenu
             Save save = Saves.Inst.List[_confirmIndex];
             return $"Load Day {save.day}, {Helper.FormatTime(save.time)}?\n1 > Yes\n2 > No";
         }
+        if (_confirmAction == ConfirmAction.Keybind)
+        {
+            var (label, _) = KeybindList[_keybindIndex];
+            string conflict = FindKeybindConflict(_pendingKeybind);
+            return $"\"{_pendingKeybind}\" is already bound to {conflict}.\nOverwrite {label}? \n1 > Yes\n2 > No";
+        }
         return "";
     }
 
@@ -360,6 +386,10 @@ public partial class GUIMenu
         Server.StopHost();
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
+        World.UnloadWorld();
+        // Reset environment to the bright menu default so the screen isn't black.
+        Environment.SetStartEnvironment(EnvironmentType.DaySnow);
+        Environment.Target = EnvironmentType.DaySnow;
         ShowMain();
         ScreenFade.FadeIn(1f, 0f);
     }

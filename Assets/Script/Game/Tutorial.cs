@@ -123,7 +123,7 @@ public static class Tutorial
         9 => "place the workbench",
         10 => "craft a crude mallet and assemble the workbench",
         11 => "interact with the workbench with right click",
-        12 => "place a block",
+        12 => "craft and place a mulch block",
         13 => "eat some food",
         _ => "",
     };

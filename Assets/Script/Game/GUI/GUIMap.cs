@@ -18,7 +18,7 @@ public class GUIMap : GUI
     private readonly Dictionary<ID, Sprite> _spriteCache = new Dictionary<ID, Sprite>();
     private Material _spriteMaterial;
 
-    private float _zoom = 1.5f;
+    private float _zoom = 3f;
     private const float MinZoom = 0.5f;
     private const float MaxZoom = 6f;
     private const float ZoomSpeed = 0.12f;

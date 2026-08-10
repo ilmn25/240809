@@ -91,6 +91,20 @@ public partial class GUIMenu
         }
     }
 
+    /// <summary>Returns the label of another action already bound to <paramref name="key"/>,
+    /// or null if the key is free.</summary>
+    private string FindKeybindConflict(KeyCode key)
+    {
+        if (_keybindIndex < 0 || _keybindIndex >= KeybindList.Length) return null;
+        for (int i = 0; i < KeybindList.Length; i++)
+        {
+            if (i == _keybindIndex) continue;
+            if (KeybindList[i].GetKey().Primary == key)
+                return KeybindList[i].Label;
+        }
+        return null;
+    }
+
     private static bool TryGetPressedKey(out KeyCode key)
     {
         foreach (KeyCode k in Enum.GetValues(typeof(KeyCode)))
