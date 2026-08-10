@@ -18,3 +18,7 @@
 /Temp
 /.vscode
 report.md
+
+# TMP default fallback font asset (unused generated artifact — never commit)
+/Assets/Resources/font/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+/Assets/Resources/font/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset.meta
