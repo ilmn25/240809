@@ -66,6 +66,7 @@ public class Main : MonoBehaviour
         ScreenFade.FadeInFromBlack(1f, 1f);
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         
+        Settings.Initialize();
         ViewPort.Initialize(); 
         Audio.Initialize();
         Control.Initialize();  

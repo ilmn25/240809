@@ -6,8 +6,6 @@ public class Audio
     private static List<AudioSource> _audioSources;
     private static AudioSource _bgmSource;
 
-    private static readonly float BgmVolume = 1f;
-    private static readonly float SfxVolume = 0.5f;
     private static readonly int PoolSize = 12;
 
     private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>();
@@ -41,7 +39,7 @@ public class Audio
         if (clip == null) return;
 
         _bgmSource.clip = clip;
-        _bgmSource.volume = volume * BgmVolume;
+        _bgmSource.volume = volume * Settings.Inst.BgmVolume;
         _bgmSource.loop = loop;
         _bgmSource.Play();
     }
@@ -56,7 +54,7 @@ public class Audio
         if (availableSource)
         {
             availableSource.clip = clip;
-            availableSource.volume = volume * SfxVolume;
+            availableSource.volume = volume * Settings.Inst.SfxVolume;
             availableSource.loop = loop;
             availableSource.Play();
         }

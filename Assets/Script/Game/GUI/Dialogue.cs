@@ -63,7 +63,11 @@ public class Dialogue
             { 
                 Audio.PlaySFX(SfxID.Text); 
                 
-                if (_scrollTask.Running) _scrollTask.Stop(); 
+                if (_scrollTask.Running)
+                {
+                    _scrollTask.Stop();
+                    Main.GUIDialogueText.text = Target.Text;
+                }
                 else
                 {
                     if (Target.Next != null)
@@ -83,7 +87,8 @@ public class Dialogue
     {
         SetSprite(Target.Sprite);
         Main.GUIDialogueText.text = Target.Text;
-        _scrollTask = TextScroller.HandleScroll(Main.GUIDialogueText, sound: SfxID.Text);
+        float mult = Settings.ScrollSpeeds[Settings.Inst.ScrollSpeedIndex];
+        _scrollTask = TextScroller.HandleScroll(Main.GUIDialogueText, speed: Mathf.RoundToInt(213 * mult), sound: SfxID.Text);
     }
 
     private static void SetSprite(Sprite sprite = null)

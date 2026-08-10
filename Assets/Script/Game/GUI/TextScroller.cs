@@ -11,10 +11,13 @@
             AudioSource audioSource = sound != SfxID.Null? Audio.PlaySFX(sound, true) : null;
             
             CoroutineTask scrollTask =  new CoroutineTask(ScrollText(text, textBox, speed));
-            scrollTask.Finished += _ => 
+            scrollTask.Finished += (bool manual) => 
             { 
                 Audio.StopSFX(audioSource);
-                textBox.text = text;
+                // Only restore the full text on natural completion. On a manual
+                // stop a new scroll is replacing this one, so writing the stale
+                // text back would double up characters.
+                if (!manual) textBox.text = text;
             }; 
             return scrollTask;
             

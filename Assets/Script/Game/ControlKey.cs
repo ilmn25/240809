@@ -15,6 +15,12 @@ public class ControlKey
         _modifier = modifier ?? Array.Empty<KeyCode>();
     }
 
+    public KeyCode Primary
+    {
+        get => _primary;
+        set => _primary = value;
+    }
+
     public bool KeyDown()
     {
         return ModifierActive() && !Console.IsTyping &&

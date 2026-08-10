@@ -2,9 +2,9 @@ using System.Collections;
 using System.Text;
 using UnityEngine;
 
-public class GUIMenu
+public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, Pause, Settings, Load, Confirm }
+    private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm }
     private enum ConfirmAction { None, Save, Load }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -13,7 +13,10 @@ public class GUIMenu
     private int _confirmIndex;
     private MenuScreen _returnScreen;
     private MenuScreen _loadReturn = MenuScreen.Main;
+    private MenuScreen _settingsReturn = MenuScreen.Pause;
     private CoroutineTask _scrollTask;
+    private string _toast;
+    private CoroutineTask _toastTask;
     public bool Showing { get; private set; }
 
     public void Show(bool isShow)
@@ -27,14 +30,46 @@ public class GUIMenu
 
     public void ShowMain()
     {
+        Showing = true;
+        _transitioning = true;
+        _scrollTask?.Stop();
+        if (Main.GUIMenu != null)
+            Main.GUIMenu.gameObject.SetActive(true);
+        _ = new CoroutineTask(LoadingBeforeMain());
+    }
+
+    private IEnumerator LoadingBeforeMain()
+    {
+        string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
+        float end = Time.time + 0.75f;
+        int i = 0;
+        while (Time.time < end)
+        {
+            Main.GUIMenu.text = frames[i % frames.Length];
+            i++;
+            yield return new WaitForSeconds(0.025f);
+        }
+        _transitioning = false;
         _screen = MenuScreen.Main;
-        Show(true);
+        Render();
     }
 
     public void ShowPause()
     {
         _screen = MenuScreen.Pause;
         Show(true);
+    }
+
+    private void ShowSettings()
+    {
+        _screen = MenuScreen.Settings;
+        Render();
+    }
+
+    private void ShowKeybinds()
+    {
+        _screen = MenuScreen.Keybinds;
+        RenderNoScroll();
     }
 
     public void Update()
@@ -51,6 +86,35 @@ public class GUIMenu
 
         if (!Showing) return;
 
+        if (_screen == MenuScreen.Settings)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha6)) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); return; }
+        }
+        else if (_screen == MenuScreen.Keybind)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)) { Audio.PlaySFX(SfxID.Text); _rebinding = false; ShowKeybinds(); return; }
+            if (TryGetPressedKey(out KeyCode key))
+            {
+                Audio.PlaySFX(SfxID.Text);
+                ApplyKeybind(key);
+                _rebinding = false;
+                ShowKeybinds();
+            }
+            return;
+        }
+        else if (_screen == MenuScreen.Keybinds && _rebinding)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)) { Audio.PlaySFX(SfxID.Text); _rebinding = false; Render(); return; }
+            if (TryGetPressedKey(out KeyCode key))
+            {
+                Audio.PlaySFX(SfxID.Text);
+                ApplyKeybind(key);
+                _rebinding = false;
+                Render();
+            }
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha1)) Select(1);
         else if (Input.GetKeyDown(KeyCode.Alpha2)) Select(2);
         else if (Input.GetKeyDown(KeyCode.Alpha3)) Select(3);
@@ -60,6 +124,7 @@ public class GUIMenu
         else if (Input.GetKeyDown(KeyCode.Alpha7)) Select(7);
         else if (Input.GetKeyDown(KeyCode.Alpha8)) Select(8);
         else if (Input.GetKeyDown(KeyCode.Alpha9)) Select(9);
+        else if (Input.GetKeyDown(KeyCode.Alpha0)) Select(0);
     }
 
     private void Back()
@@ -76,7 +141,14 @@ public class GUIMenu
                 Show(false);
                 break;
             case MenuScreen.Settings:
-                TransitionTo(MenuScreen.Pause);
+                TransitionTo(_settingsReturn);
+                break;
+            case MenuScreen.Keybinds:
+                TransitionTo(MenuScreen.Settings);
+                break;
+            case MenuScreen.Keybind:
+                _rebinding = false;
+                ShowKeybinds();
                 break;
             case MenuScreen.Confirm:
                 TransitionTo(_returnScreen);
@@ -91,7 +163,8 @@ public class GUIMenu
             case MenuScreen.Main:
                 if (n == 1) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Host); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(Server.StartClient()); Show(false); }
-                else if (n == 3) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(Quit()); }
+                else if (n == 3) { Audio.PlaySFX(SfxID.Text); _settingsReturn = MenuScreen.Main; ShowSettings(); }
+                else if (n == 4) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(Quit()); }
                 break;
 
             case MenuScreen.Host:
@@ -102,12 +175,16 @@ public class GUIMenu
             case MenuScreen.Pause:
                 if (n == 1) { Audio.PlaySFX(SfxID.Text); _confirmAction = ConfirmAction.Save; _returnScreen = MenuScreen.Pause; TransitionTo(MenuScreen.Confirm); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Pause; _loadPage = 0; TransitionTo(MenuScreen.Load); }
-                else if (n == 3) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Settings); }
+                else if (n == 3) { Audio.PlaySFX(SfxID.Text); _settingsReturn = MenuScreen.Pause; ShowSettings(); }
                 else if (n == 4) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(QuitToMenu()); }
                 break;
 
             case MenuScreen.Settings:
-                if (n == 1) { Audio.PlaySFX(SfxID.Text); ToggleFullscreen(); Render(); }
+                if (n >= 1 && n <= 5) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
+                break;
+
+            case MenuScreen.Keybinds:
+                HandleKeybindSelect(n);
                 break;
 
             case MenuScreen.Load:
@@ -137,7 +214,7 @@ public class GUIMenu
         Audio.PlaySFX(SfxID.Text);
         if (_confirmAction == ConfirmAction.Save)
         {
-            _ = new CoroutineTask(LoadingThen(() => { Saves.SaveGame(); Show(false); }));
+            _ = new CoroutineTask(LoadingThen(() => { Saves.SaveGame(); _screen = MenuScreen.Pause; ShowToast("Game saved!"); }));
         }
         else if (_confirmAction == ConfirmAction.Load)
         {
@@ -153,22 +230,62 @@ public class GUIMenu
 
     private void Render()
     {
-        string text = _screen switch
+        Main.GUIMenu.text = BuildText() + (HasBack() ? "\n\nESC > Back" : "") + (_toast != null ? "\n\n" + _toast : "");
+        _scrollTask?.Stop();
+        float mult = Settings.ScrollSpeeds[Settings.Inst.ScrollSpeedIndex];
+        int speed = Mathf.RoundToInt(1150 * mult);
+        _scrollTask = TextScroller.HandleScroll(Main.GUIMenu, speed: speed);
+    }
+
+    private void RenderNoScroll()
+    {
+        _scrollTask?.Stop();
+        Main.GUIMenu.text = BuildText() + (HasBack() ? "\n\nESC > Back" : "") + (_toast != null ? "\n\n" + _toast : "");
+    }
+
+    private bool HasBack()
+    {
+        return _screen switch
         {
-            MenuScreen.Main => Header("Main Menu") + "1 > Host\n2 > Join\n3 > Exit",
+            MenuScreen.Main => false,
+            MenuScreen.Pause => false,
+            _ => true,
+        };
+    }
+
+    private string BuildText()
+    {
+        return _screen switch
+        {
+            MenuScreen.Main => Header("Main Menu") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
-            MenuScreen.Settings => Header("Settings") + "1 > Fullscreen: " + (Screen.fullScreen ? "On" : "Off"),
+            MenuScreen.Settings => Header("Settings") + RenderSettings(),
+            MenuScreen.Keybinds => Header("Keybinds") + RenderKeybinds(),
+            MenuScreen.Keybind => Header(KeybindList[_keybindIndex].Label) + RenderKeybind(),
             MenuScreen.Load => Header("Load") + RenderLoad(),
             MenuScreen.Confirm => Header("Confirm") + RenderConfirm(),
             _ => ""
         };
-        Main.GUIMenu.text = text + "\n\nESC > Back";
-        _scrollTask?.Stop();
-        _scrollTask = TextScroller.HandleScroll(Main.GUIMenu, speed: 230);
     }
 
     private static string Header(string name) => $"+-= ═.·:·. {name} .·:·.═ =-+\n";
+
+    private void ShowToast(string message)
+    {
+        _toastTask?.Stop();
+        _toast = message;
+        _toastTask = new CoroutineTask(ClearToast());
+        RenderNoScroll();
+    }
+
+    private IEnumerator ClearToast()
+    {
+        yield return new WaitForSeconds(1.5f);
+        _toast = null;
+        _toastTask = null;
+        if (Showing) RenderNoScroll();
+    }
 
     private void TransitionTo(MenuScreen target)
     {
@@ -181,7 +298,7 @@ public class GUIMenu
     private IEnumerator Transition(MenuScreen target)
     {
         string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
             foreach (string frame in frames)
             {
                 Main.GUIMenu.text = frame;
@@ -229,12 +346,6 @@ public class GUIMenu
         return "";
     }
 
-    private static void ToggleFullscreen()
-    {
-        if (Screen.fullScreen) Screen.SetResolution(960, 540, false);
-        else Screen.SetResolution(1920, 1080, true);
-    }
-
     private static IEnumerator Quit()
     {
         ScreenFade.FadeOut(0.5f);
@@ -249,8 +360,7 @@ public class GUIMenu
         Server.StopHost();
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
-        _screen = MenuScreen.Main;
-        Show(true);
-        ScreenFade.FadeIn(1f, 1f);
+        ShowMain();
+        ScreenFade.FadeIn(1f, 0f);
     }
 }
