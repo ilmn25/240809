@@ -105,11 +105,7 @@ public static class GUIMain
         if (Control.Inst.Inv.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
-            Tutorial.OnControl(Tutorial.TutorialControl.Inventory);
-            if (Showing)
-                Show(false);
-            else
-                Show(true);
+            Show(false);
         }
 
         if (Control.Inst.Map.KeyDown())

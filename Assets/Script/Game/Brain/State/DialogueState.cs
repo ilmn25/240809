@@ -21,7 +21,6 @@ public class DialogueState : MobState {
         Info.Direction = Vector3.zero; 
         Dialogue.Target = Dialogue;
         Dialogue.Show(true);
-        GUIMain.Show(false);
     }
     
     public override void OnUpdateState()
@@ -55,7 +54,6 @@ public class MessageState : MobState {
         }
         Dialogue.Target = Dialogue;
         Dialogue.Show(true);
-        GUIMain.Show(false);
     }
     
     public override void OnUpdateState()

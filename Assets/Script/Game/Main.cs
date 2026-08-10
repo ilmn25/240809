@@ -143,14 +143,14 @@ public class Main : MonoBehaviour
         GUICamera = GameObject.Find("HudCamera").GetComponent<Camera>();
         
         GUIObject = GameObject.Find("GUI");
-        GUIHudText = GUIObject.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
+        GUIInv = GUIObject.transform.Find("Inventory").gameObject;
+        GUIHudText = GUIInv.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
         GUIHudText.enableWordWrapping = false;
         GUIHudText.overflowMode = TextOverflowModes.Overflow;
         GUIDialogue = GUIObject.transform.Find("Dialogue").gameObject;
         GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GUIImage = GUIObject.transform.Find("Image").gameObject;
-        GUIImageRenderer = GUIImage.GetComponent<Image>();
-        GUIInv = GUIObject.transform.Find("Inventory").gameObject;
+        GUIImageRenderer = GUIImage.GetComponent<Image>(); 
         GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;
         
         GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;

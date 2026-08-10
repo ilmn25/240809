@@ -5,7 +5,6 @@ public static class Tutorial
 {
     private static readonly string[] Labels =
     {
-        "press I to open inventory",
         "press M to open the map",
         "press Q/E to orbit the camera",
         "right click on the owl statue",
@@ -23,7 +22,7 @@ public static class Tutorial
 
     private const int ControlBase = 0;  // index of the first control objective
 
-    public enum TutorialControl { Inventory, Map, Orbit }
+    public enum TutorialControl { Map, Orbit }
 
     public static void OnControl(TutorialControl control)
     {
@@ -50,41 +49,41 @@ public static class Tutorial
 
         switch (_progress)
         {
-            case 4: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 5; break;
-            case 8: if (storage.Count(ID.Log) >= 15) _progress = 9; break;
-            case 10: if (_workbenchCrafted && _workbenchPlaced) _progress = 11; break;
-            case 11: if (_malletCrafted && _workbenchAssembled) _progress = 12; break;
+            case 3: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 4; break;
+            case 7: if (storage.Count(ID.Log) >= 15) _progress = 8; break;
+            case 9: if (_workbenchCrafted && _workbenchPlaced) _progress = 10; break;
+            case 10: if (_malletCrafted && _workbenchAssembled) _progress = 11; break;
         }
     }
 
     public static void OnOwlStatueInteracted()
     {
-        if (_progress == 3) _progress = 4;
+        if (_progress == 2) _progress = 3;
     }
 
     public static void OnCraft(ID id)
     {
         switch (_progress)
         {
-            case 5: if (IsHatchet(id)) _progress = 6; break;
-            case 10: if (id == ID.Workbench) _workbenchCrafted = true; break;
-            case 11: if (id == ID.CrudeMallet) _malletCrafted = true; break;
+            case 4: if (IsHatchet(id)) _progress = 5; break;
+            case 9: if (id == ID.Workbench) _workbenchCrafted = true; break;
+            case 10: if (id == ID.CrudeMallet) _malletCrafted = true; break;
         }
     }
 
     public static void OnPlaced(ID structure)
     {
-        if (_progress == 10 && structure == ID.Workbench) _workbenchPlaced = true;
+        if (_progress == 9 && structure == ID.Workbench) _workbenchPlaced = true;
     }
 
     public static void OnAssembled(ID structure)
     {
-        if (_progress == 11 && structure == ID.Workbench) _workbenchAssembled = true;
+        if (_progress == 10 && structure == ID.Workbench) _workbenchAssembled = true;
     }
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
     {
-        if (_progress == 6 &&
+        if (_progress == 5 &&
             structure.id is ID.PineTree or ID.BirchTree &&
             attacker is PlayerInfo)
             _progress = 7;
@@ -92,22 +91,22 @@ public static class Tutorial
 
     public static void OnSwap()
     {
-        if (_progress == 7) _progress = 8;
+        if (_progress == 6) _progress = 7;
     }
 
     public static void OnRecall()
     {
-        if (_progress == 9) _progress = 10;
+        if (_progress == 8) _progress = 9;
     }
 
     public static void OnBlockPlaced()
     {
-        if (_progress == 12) _progress = 13;
+        if (_progress == 11) _progress = 12;
     }
 
     public static void OnEat()
     {
-        if (_progress == 13) _progress = 14;
+        if (_progress == 12) _progress = 13;
     }
 
     private static bool IsHatchet(ID id) =>
@@ -125,8 +124,8 @@ public static class Tutorial
         Storage storage = Main.PlayerInfo?.Storage;
         return _progress switch
         {
-            4 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
-            8 => $" (logs {storage?.Count(ID.Log) ?? 0}/15)",
+            3 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
+            7 => $" (logs {storage?.Count(ID.Log) ?? 0}/15)",
             _ => "",
         };
     }

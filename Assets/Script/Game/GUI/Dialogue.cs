@@ -28,6 +28,7 @@ public class Dialogue
             if (!Showing)
             {
                 Showing = true;
+                GUIMain.Show(false);
                 SetDialogue();  
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(true, ShowDuration, Main.GUIDialogue, 
@@ -41,6 +42,7 @@ public class Dialogue
             { 
                 Showing = false;
                 _frameClosedAt = Time.frameCount;
+                GUIMain.Show(true);
                 SetSprite();
                 _scaleTask?.Stop();
                 _scaleTask = new CoroutineTask(GUIMain.Scale(false, HideDuration, Main.GUIDialogue, 

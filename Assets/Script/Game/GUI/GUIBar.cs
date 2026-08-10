@@ -6,17 +6,18 @@ using UnityEngine.UI;
 public class GUIBar
 {
         protected readonly List<Image> Bar = new List<Image>();
-        private static readonly GUIBar HealthBar = new GUIHealthBar(new Vector3Int(-326, 178, 203));
-        private static readonly GUIBar HungerBar = new GUIHungerBar(new Vector3Int(-326, 162, 203));
+        private static readonly GUIBar HealthBar = new GUIHealthBar(new Vector3Int(-455, 250, 0));
+        private static readonly GUIBar HungerBar = new GUIHungerBar(new Vector3Int(-455, 225, 0));
 
         protected GUIBar(Vector3Int position)
         {
                 GameObject obj = new GameObject("Bar", typeof(RectTransform));
                 RectTransform rectTransform = obj.GetComponent<RectTransform>();
 
-                rectTransform.SetParent(Main.GUIObject.transform, false);
+                rectTransform.SetParent(Main.GUIInv.transform, false);
                 rectTransform.localPosition = position;
-                rectTransform.localScale = Vector3.one * 0.6f;
+                rectTransform.localRotation = Quaternion.Euler(-15, 0, 0);
+                // rectTransform.localScale = Vector3.one * 0.9f;
 
                 GameObject iconObj;
                 RectTransform iconRect;

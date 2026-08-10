@@ -15,7 +15,7 @@ public class Control
     public static Transform MouseTarget;
     public static int MouseLayer; // -1 means hit void
     
-    public readonly ControlKey Inv = new (KeyCode.I);
+    public readonly ControlKey Inv = new (KeyCode.F3);
     public readonly ControlKey Map = new (KeyCode.M);
     public readonly ControlKey SwapChar = new (KeyCode.Tab);
     public readonly ControlKey Recall = new (KeyCode.H);

@@ -152,7 +152,7 @@ public class PlayerInfo : MobInfo
         if (Main.PlayerInfo == this)
         {
             if (Equipment != null && SpriteTool != null) SpriteTool.gameObject.SetActive(true);
-            // GUIMain.Show(true);
+            GUIMain.Show(true);
             GUIBar.Update();
         }
         Inventory.RefreshInventory();
