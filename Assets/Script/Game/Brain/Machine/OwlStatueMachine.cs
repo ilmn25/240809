@@ -64,7 +64,6 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        Tutorial.OnOwlStatueInteracted();
         Dialogue.Target = BuildControlsDialogue();
         Dialogue.Show(true);
         Audio.PlaySFX(SfxID.Text);

@@ -33,16 +33,17 @@ public static class Tutorial
 
         switch (_progress)
         {
-            case 3: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 4; break;
+            case 2: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 3; break;
             case 7: if (storage.Count(ID.Log) >= 15) _progress = 8; break;
-            case 9: if (_workbenchCrafted && _workbenchPlaced) _progress = 10; break;
+            case 8: if (_workbenchCrafted) _progress = 9; break;
+            case 9: if (_workbenchPlaced) _progress = 10; break;
             case 10: if (_malletCrafted && _workbenchAssembled) _progress = 11; break;
         }
     }
 
-    public static void OnOwlStatueInteracted()
+    public static void OnWorkbenchInteracted()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 2) _progress = 3;
+        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
     }
 
     public static void OnCraft(ID id)
@@ -50,8 +51,8 @@ public static class Tutorial
         if (!Settings.Inst.TutorialEnabled) return;
         switch (_progress)
         {
-            case 4: if (IsHatchet(id)) _progress = 5; break;
-            case 9: if (id == ID.Workbench) _workbenchCrafted = true; break;
+            case 3: if (IsHatchet(id)) _progress = 4; break;
+            case 8: if (id == ID.Workbench) _workbenchCrafted = true; break;
             case 10: if (id == ID.CrudeMallet) _malletCrafted = true; break;
         }
     }
@@ -68,30 +69,30 @@ public static class Tutorial
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 5 &&
+        if (Settings.Inst.TutorialEnabled && _progress == 4 &&
             structure.id is ID.PineTree or ID.BirchTree &&
             attacker is PlayerInfo)
-            _progress = 6;
+            _progress = 5;
     }
 
     public static void OnSwap()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 6) _progress = 7;
+        if (Settings.Inst.TutorialEnabled && _progress == 5) _progress = 6;
     }
 
     public static void OnRecall()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 8) _progress = 9;
+        if (Settings.Inst.TutorialEnabled && _progress == 6) _progress = 7;
     }
 
     public static void OnBlockPlaced()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
+        if (Settings.Inst.TutorialEnabled && _progress == 12) _progress = 13;
     }
 
     public static void OnEat()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 12) _progress = 13;
+        if (Settings.Inst.TutorialEnabled && _progress == 13) _progress = 14;
     }
 
     private static bool IsHatchet(ID id) =>
@@ -104,7 +105,7 @@ public static class Tutorial
         return "\u2192 " + BuildLabel(_progress) + ProgressSuffix();
     }
 
-    private static int LabelCount => 13;
+    private static int LabelCount => 14;
 
     private static string Key(ControlKey key) => key.Primary.ToString();
 
@@ -112,17 +113,18 @@ public static class Tutorial
     {
         0 => "press " + Key(Control.Inst.OrbitLeft) + "/" + Key(Control.Inst.OrbitRight) + " to orbit the camera",
         1 => "press " + Key(Control.Inst.Map) + " to open the map",
-        2 => "right click on the owl statue",
-        3 => "press " + Key(Control.Inst.ActionSecondaryNear) + " to pick up flint and sticks",
-        4 => "craft a hatchet",
-        5 => "hit a tree",
-        6 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
+        2 => "press " + Key(Control.Inst.ActionSecondaryNear) + " to pick up flint and sticks",
+        3 => "craft a hatchet",
+        4 => "hit a tree",
+        5 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
+        6 => "press " + Key(Control.Inst.Recall) + " to recall your teammates",
         7 => "collect 15 logs",
-        8 => "press " + Key(Control.Inst.Recall) + " to recall your teammates",
-        9 => "craft and place a workbench",
+        8 => "craft a workbench",
+        9 => "place the workbench",
         10 => "craft a crude mallet and assemble the workbench",
-        11 => "place a block",
-        12 => "eat some food",
+        11 => "interact with the workbench with right click",
+        12 => "place a block",
+        13 => "eat some food",
         _ => "",
     };
 
@@ -131,8 +133,9 @@ public static class Tutorial
         Storage storage = Main.PlayerInfo?.Storage;
         return _progress switch
         {
-            3 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
+            2 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
             7 => $" (logs {storage?.Count(ID.Log) ?? 0}/15)",
+            8 => $" (logs {storage?.Count(ID.Log) ?? 0}/15, flint {storage?.Count(ID.Flint) ?? 0}/5)",
             _ => "",
         };
     }
