@@ -13,7 +13,9 @@ public partial class GUIMenu
             "4 > SFX Volume: " + Mathf.RoundToInt(s.SfxVolume * 100) + "\n" +
             "5 > Text Speed: " + (Settings.ScrollSpeeds[s.ScrollSpeedIndex] * 100) + "%" + "\n" +
             "6 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
-            "7 > Keybinds";
+            "7 > Max FPS: " + Settings.FpsLimits[s.FpsIndex] + "\n" +
+            "8 > Max Zoom: " + Settings.MaxZooms[s.MaxZoomIndex] + "x" + "\n" +
+            "9 > Keybinds";
     }
 
     private void CycleSetting(int index)
@@ -38,6 +40,12 @@ public partial class GUIMenu
                 break;
             case 5: // tutorial
                 s.TutorialEnabled = !s.TutorialEnabled;
+                break;
+            case 6: // max fps
+                s.FpsIndex = (s.FpsIndex + 1) % Settings.FpsLimits.Length;
+                break;
+            case 7: // max zoom
+                s.MaxZoomIndex = (s.MaxZoomIndex + 1) % Settings.MaxZooms.Length;
                 break;
         }
         Settings.Apply();

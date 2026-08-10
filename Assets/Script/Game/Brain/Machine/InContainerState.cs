@@ -6,6 +6,8 @@ public class InContainerState : State
     {
         Audio.PlaySFX(SfxID.Text);
         _playerIndex = Control.CurrentPlayerIndex;
+        if (Storage != Main.PlayerInfo.Storage)
+            Tutorial.OnTeammateInventory();
         GUIMain.Storage.Storage = Storage;
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);

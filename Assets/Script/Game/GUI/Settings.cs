@@ -11,8 +11,12 @@ public class Settings
     public float SfxVolume = 0.5f;
     public int ScrollSpeedIndex = 1;
     public bool TutorialEnabled = true;
+    public int FpsIndex = 2;
+    public int MaxZoomIndex = 2;
 
     public static readonly float[] ScrollSpeeds = { 0.5f, 1f, 2f, 4f };
+    public static readonly int[] FpsLimits = { 30, 60, 100, 144, 240 };
+    public static readonly float[] MaxZooms = { 4f, 6f, 8f, 10f };
 
     public static readonly Vector2Int[] Resolutions =
     {
@@ -32,6 +36,7 @@ public class Settings
     {
         Vector2Int res = Resolutions[Mathf.Clamp(Inst.ResolutionIndex, 0, Resolutions.Length - 1)];
         Screen.SetResolution(res.x, res.y, Inst.Fullscreen);
+        Application.targetFrameRate = FpsLimits[Mathf.Clamp(Inst.FpsIndex, 0, FpsLimits.Length - 1)];
     }
 
     public static void Save()

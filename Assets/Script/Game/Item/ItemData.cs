@@ -218,7 +218,7 @@ public partial class Item
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
-            durability: 100,
+            durability: 200,
             description: "A rough hatchet for early woodcutting.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
@@ -314,7 +314,7 @@ public partial class Item
                 Breaking = 3,
                 OperationType = OperationType.Building
             },
-            durability: 100,
+            durability: 200,
             description: "A rough mallet for basic building work.",
             materials: new Dictionary<ID, int> { { ID.Flint, 1 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)

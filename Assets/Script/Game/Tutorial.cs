@@ -80,7 +80,7 @@ public static class Tutorial
         if (Settings.Inst.TutorialEnabled && _progress == 5) _progress = 6;
     }
 
-    public static void OnRecall()
+    public static void OnTeammateInventory()
     {
         if (Settings.Inst.TutorialEnabled && _progress == 6) _progress = 7;
     }
@@ -117,7 +117,7 @@ public static class Tutorial
         3 => "craft a hatchet",
         4 => "hit a tree",
         5 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
-        6 => "press " + Key(Control.Inst.Recall) + " to recall your teammates",
+        6 => "right click on a teammate to access their inventory",
         7 => "collect 15 logs",
         8 => "craft a workbench",
         9 => "place the workbench",

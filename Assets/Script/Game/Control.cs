@@ -152,7 +152,6 @@ public class Control
         if (Inst.Recall.KeyDown())
         {
             Audio.PlaySFX(SfxID.Text);
-            Tutorial.OnRecall();
             PlayerMachine.RecallAllies();
         }
 
