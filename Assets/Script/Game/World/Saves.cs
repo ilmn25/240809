@@ -37,7 +37,6 @@ public class Saves
             Inst.List.Add(data);
             Helper.FileSave(data, data.Path + SaveDataFile);
             Helper.SaveScreenShot(data.Path + "Preview");
-            GUILoad.AddToList(Inst.List.Count - 1); 
             World.LoadWorld(); 
         }
     }

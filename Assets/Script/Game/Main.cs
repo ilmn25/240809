@@ -47,15 +47,7 @@ public class Main : MonoBehaviour
     public static GameObject GUICursorInfo;
     public static GameObject GUICursorSlot;
  
-    public static GameObject GUIMainMenu;
-    public static GUIButton GUIMainMenuButtonHost;
-    public static GUIButton GUIMainMenuButtonJoin;
-    public static GUIButton GUIMainMenuButtonExit; 
-    public static GameObject GUIHostMenu;
-    public static GUIButton GUIHostMenuButtonNew;
-    public static GUIButton GUIHostMenuButtonLoad;
-    public static GUIButton GUIHostMenuButtonBack;
-    public static GameObject GUILoadMenu;
+    public static TextMeshProUGUI GUIMenu;
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
@@ -143,6 +135,7 @@ public class Main : MonoBehaviour
         GUICamera = GameObject.Find("HudCamera").GetComponent<Camera>();
         
         GUIObject = GameObject.Find("GUI");
+        GUIMenu = GUIObject.transform.Find("Menu").GetComponent<TextMeshProUGUI>();
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
         GUIHudText = GUIInv.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
         GUIHudText.enableWordWrapping = false;
@@ -156,16 +149,6 @@ public class Main : MonoBehaviour
         GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;
         GUICursorInfo = GUICursor.transform.Find("Info").gameObject;    
         GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
-        
-        GUIMainMenu = GUIObject.transform.Find("MainMenu").gameObject;
-        GUIMainMenuButtonHost = GUIMainMenu.transform.Find("Host").GetComponent<GUIButton>();
-        GUIMainMenuButtonJoin = GUIMainMenu.transform.Find("Join").GetComponent<GUIButton>();
-        GUIMainMenuButtonExit = GUIMainMenu.transform.Find("Exit").GetComponent<GUIButton>();
-        GUIHostMenu = GUIObject.transform.Find("HostMenu").gameObject;
-        GUIHostMenuButtonNew = GUIHostMenu.transform.Find("New").GetComponent<GUIButton>();
-        GUIHostMenuButtonLoad = GUIHostMenu.transform.Find("Load").GetComponent<GUIButton>();
-        GUIHostMenuButtonBack = GUIHostMenu.transform.Find("Back").GetComponent<GUIButton>();
-        GUILoadMenu = GUIObject.transform.Find("LoadMenu").gameObject;
     }
     
  

@@ -14,8 +14,6 @@ public static class GUIMain
     public static GUIPlayerList PlayerList;
     public static GUICursor Cursor;
     public static GUIMenu GUIMenu;
-    public static GUIHostMenu GUIHostMenu;
-    public static GUILoad GUILoad;
     public static GUIMap Map;
 
     public static bool Showing = true;
@@ -23,11 +21,8 @@ public static class GUIMain
     public static void Initialize()
     {
         Inventory.SlotUpdate += RefreshStorage;
-        GUIMenu = new GUIMenu(); 
-        GUIHostMenu = new GUIHostMenu();
-        GUIHostMenu.Show(false);
-        GUILoad = new GUILoad();
-        GUILoad.Show(false);
+        GUIMenu = new GUIMenu();
+        GUIMenu.ShowMain();
         
         Cursor = new GUICursor();
         Cursor.Initialize();
@@ -79,8 +74,6 @@ public static class GUIMain
     public static void UpdateMenu()
     {
         GUIMenu.Update();
-        GUIHostMenu.Update();
-        GUILoad.Update();
     }
 
     /// <summary>Call when leaving game mode to hide the inventory GUI.</summary>

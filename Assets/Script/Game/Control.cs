@@ -233,7 +233,7 @@ public class Control
     private static void HandleScroll()
     {
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
-        if (scroll == 0 || GUIMain.GUILoad.Showing) return;
+        if (scroll == 0) return;
 
         if (!Input.GetKey(KeyCode.LeftAlt))
         {
