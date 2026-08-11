@@ -281,6 +281,9 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Foul);
                 loot.Add(0.3f, 1, ID.Cytoplasm);   
 
+                AddMob<LichMachine>(ID.Lich);
+                loot = new (ID.Lich); // immortal — never actually drops   
+
                 AddMob<TreeMimicMachine>(ID.TreeMimic);
                 loot = new (ID.TreeMimic);
                 loot.Add(1, 2, ID.Log);

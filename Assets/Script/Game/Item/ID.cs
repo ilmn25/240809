@@ -130,4 +130,5 @@ public enum ID
     SpiderNest,
     SpiderWeb,
     TreeMimic,
+    Lich,
 }

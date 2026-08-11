@@ -22,6 +22,7 @@ public class MobSpawner
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime, ID.Bear, ID.TreeMimic };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
+    private static readonly List<ID> RaptureMobs = new() { ID.Lich };
 
     /// <summary>True during Rapture or a full-moon (bright) night — spawns ramp up.</summary>
     private static bool IsEventActive =>
@@ -78,7 +79,9 @@ public class MobSpawner
 
         BiomeType biome = GenHelpBiome.GetBiomeType(spawnPos.x, spawnPos.z);
         List<ID> pool;
-        if (isNight)
+        if (Save.Inst.weather == EnvironmentType.Rapture)
+            pool = RaptureMobs;
+        else if (isNight)
             pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
         else
             pool = biome switch
