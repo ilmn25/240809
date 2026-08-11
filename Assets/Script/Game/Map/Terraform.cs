@@ -27,7 +27,7 @@ public static class Terraform
             return;
         }
 
-        if (Inventory.CurrentItemData.ID == ID.Chalk)
+        if (Inventory.CurrentItemData.ID == ID.ChalkPowder)
         {
             _blockObj.SetActive(true); 
             if (_blockObj.name != "overlay")
@@ -102,7 +102,7 @@ public static class Terraform
 
         if (Main.CreativeMode)
         {
-            if (Target == ID.Chalk)
+            if (Target == ID.ChalkPowder)
                 World.SetBlock(_coordinate);
             else
             {
@@ -129,7 +129,7 @@ public static class Terraform
     private static bool HandleCoord()
     {
         Vector3Int adjustedPoint;
-        if (Target == ID.Chalk)
+        if (Target == ID.ChalkPowder)
             adjustedPoint =  Vector3Int.FloorToInt(Control.MousePosition + Control.MouseDirection * 0.02f);
         else
             adjustedPoint =  Vector3Int.FloorToInt(Control.MousePosition - Control.MouseDirection * 0.02f);

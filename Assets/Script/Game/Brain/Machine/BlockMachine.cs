@@ -10,7 +10,7 @@ public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecond
 
     public override void OnSetup()
     {
-        if (Info.id == ID.Chalk)
+        if (Info.id == ID.ChalkPowder)
         {
             transform.localScale = Vector3.one * 1.04f; 
             BlockPreview.Set(gameObject, ID.OverlayBlock); 
@@ -24,7 +24,7 @@ public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecond
     
     public void OnActionSecondary(Info info)
     {
-        if (Info.id != ID.Chalk) Entity.SpawnItem(Info.id, transform.position);
+        if (Info.id != ID.ChalkPowder) Entity.SpawnItem(Info.id, transform.position);
         Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(transform.position));
         Audio.PlaySFX(SfxID.Item);
         Info.Destroy();

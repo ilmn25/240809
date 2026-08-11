@@ -10,7 +10,7 @@ public class BlockInfo : StructureInfo
     {
         Terraform.PendingBlocks.Add(Coordinate);
         Block block;
-        if (id == ID.Chalk)
+        if (id == ID.ChalkPowder)
         {
             block = Block.GetBlock(World.GetBlock(Coordinate));
             operationType = OperationType.Mining;
@@ -30,7 +30,7 @@ public class BlockInfo : StructureInfo
 
     public override void OnDestroy(MobInfo info)
     { 
-        if (id == ID.Chalk)
+        if (id == ID.ChalkPowder)
             World.SetBlock(Vector3Int.FloorToInt(position));
         else
             World.SetBlock(Vector3Int.FloorToInt(position), Block.ConvertID(id));
@@ -40,7 +40,7 @@ public class BlockInfo : StructureInfo
     public override string ToString()
     {
         string name;
-        if (id != ID.Chalk)
+        if (id != ID.ChalkPowder)
         {
             name = Helper.ToDisplayName(id);
         }

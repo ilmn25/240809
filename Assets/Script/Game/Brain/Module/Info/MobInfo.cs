@@ -110,9 +110,9 @@ public class MobInfo : DynamicInfo
         SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
         SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
         
-        // Display Blueprint sprite for structures and chalk
+        // Display Blueprint sprite for structures and chalk powder
         string spriteName = Equipment.Info.ID.ToString();
-        if (Equipment.ID == ID.Chalk || Equipment.Info.Type == ItemType.Structure)
+        if (Equipment.ID == ID.ChalkPowder || Equipment.Info.Type == ItemType.Structure)
             spriteName = "Blueprint";
         
         SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + spriteName);

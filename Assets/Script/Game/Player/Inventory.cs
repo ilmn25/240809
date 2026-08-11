@@ -29,7 +29,7 @@ public class Inventory
 
             Main.PlayerInfo.SetEquipment(held);
 
-            if (CurrentItemData.ID == ID.Chalk || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
+            if (CurrentItemData.ID == ID.ChalkPowder || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
                 Terraform.BlockUpdate(CurrentItem.ID);
             else
                 Terraform.BlockUpdate();

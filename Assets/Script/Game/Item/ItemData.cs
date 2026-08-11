@@ -35,8 +35,8 @@ public partial class Item
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.");
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         AddBlockDefinition(
-            ID.Chalk,
-            description: "Blueprint used to learn new crafting recipes.",
+            ID.ChalkPowder,
+            description: "Used to mark surfaces for mining",
             materials: new Dictionary<ID, int> { { ID.Log, 2 }, { ID.Charcoal, 1 } }
         );
 
