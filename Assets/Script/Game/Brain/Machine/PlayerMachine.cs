@@ -121,7 +121,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 { 
                     SetState<MobChaseAction>();
                 }
-                else if (!GUIMain.IsHover && GUIMain.Map is not { IsOpen: true })
+                else if (!GUIStorage.HoveringSlot && GUIMain.Map is not { IsOpen: true })
                 {
                     switch (Info.Equipment?.Info.Type)
                     {

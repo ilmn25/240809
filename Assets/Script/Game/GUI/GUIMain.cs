@@ -108,7 +108,6 @@ public static class GUIMain
         if (Control.Inst.Map.KeyDown())
         {
             Audio.PlaySFX(SfxID.Text);
-            Tutorial.OnControl(Tutorial.TutorialControl.Map);
             bool wasOpen = Map.Showing;
             Map.Show(!wasOpen);
             // Refocus the map onto the player when opening it.
@@ -146,6 +145,32 @@ public static class GUIMain
 
             return text;
         }
+
+        // Mouse/inventory shortcuts, matching the actual slot/cursor behavior.
+        string BuildShortcutsText()
+        {
+            if (GUIStorage.HoveringSlot)
+            {
+                // Crafting slots use left/right-click to craft/queue.
+                if (GUIStorage.Hovered == GUIMain.GUICraft)
+                    return "LMB/RMB: craft";
+
+                // Shift+LMB moves to the chest when hovering the player inventory with
+                // the chest open; otherwise it drops the stack.
+                string shiftLmb = GUIStorage.Hovered == GUIMain.StorageInv && GUIMain.Storage.Showing
+                    ? "move"
+                    : "drop";
+                return $"Shift+LMB: {shiftLmb} | RMB: take one | Shift+RMB: split";
+            }
+            if (!GUICursor.Data.isEmpty())
+            {
+                string action = Inventory.CurrentItem?.Info.ActionLabel ?? "";
+                return action.Length > 0
+                    ? $"LMB: {action} | RMB: drop"
+                    : "RMB: drop";
+            }
+            return "";
+        }
     
         if (Scene.Busy)
         {
@@ -169,7 +194,8 @@ public static class GUIMain
             $"{BuildTimeHudText()}\n" +
             $"{controlStatus} | Slot {slotId}\n" +
             BuildTargetHudText(Main.PlayerInfo?.Target) +
-            (tutorial.Length > 0 ? "\n" + tutorial : "");
+            (tutorial.Length > 0 ? "\n" + tutorial : "") +
+            "\n" + BuildShortcutsText();
     }
 
     public static void Show(bool isShow)

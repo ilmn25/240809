@@ -61,9 +61,13 @@ class MobEat : MobState
         if (overflow > 0)
             player.Health = Mathf.Min(player.HealthMax, player.Health + overflow);
 
-        // Consume one food item from the selected slot.
-        if (player.Storage != null)
-            player.Storage.RemoveItem(_food.ID, 1);
+        // Consume one food item from the held slot (cursor when non-empty, else hotbar).
+        if (Inventory.CurrentItem != null && Inventory.CurrentItem.Stack > 0)
+        {
+            Inventory.CurrentItem.Stack--;
+            if (Inventory.CurrentItem.Stack <= 0) Inventory.CurrentItem.clear();
+            Inventory.RefreshInventory();
+        }
 
         GUIBar.Update();
     }

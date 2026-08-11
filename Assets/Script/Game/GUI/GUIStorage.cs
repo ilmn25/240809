@@ -19,7 +19,9 @@ public class  GUIStorage : GUI
     protected int CurrentSlotKey = -1;
     /// <summary>True while the mouse is over any storage slot (inventory management
     /// takes priority over cursor quick-actions).</summary>
-    public static bool HoveringSlot;  
+    public static bool HoveringSlot;
+    /// <summary>The storage currently hovered (null when not hovering a slot).</summary>
+    public static GUIStorage Hovered;
 
     private void OnRefresh(object sender, EventArgs e)
     {
@@ -108,6 +110,7 @@ public class  GUIStorage : GUI
     { 
         CurrentSlotKey = currentSlotKey;
         HoveringSlot = currentSlotKey != -1;
+        Hovered = currentSlotKey != -1 ? this : null;
         
         if (currentSlotKey == -1)
         {

@@ -71,17 +71,24 @@ public class GUIChest : GUIStorage
     
     protected override void ActionSecondaryDown()
     {
-        if (!Input.GetKey(KeyCode.LeftShift)) return;
         ItemSlot itemSlot = Storage.List[CurrentSlotKey];
-        if (!itemSlot.isEmpty())
+        if (itemSlot.isEmpty()) return;
+
+        // Shift+right-click splits half; plain right-click takes one onto the cursor.
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
             {
-                GUICursor.Data.Add(itemSlot, itemSlot.Stack/2); 
+                GUICursor.Data.Add(itemSlot, itemSlot.Stack / 2);
                 Audio.PlaySFX(SfxID.Item);
                 Storage.NotifyChanged();
-                // Sync is handled by Storage.OnChanged hook
             }
+        }
+        else if (GUICursor.Data.isEmpty() || itemSlot.isSame(GUICursor.Data))
+        {
+            GUICursor.Data.Add(itemSlot, 1);
+            Audio.PlaySFX(SfxID.Item);
+            Storage.NotifyChanged();
         }
     }
     protected override void SetInfoPanel(ItemSlot itemSlot)

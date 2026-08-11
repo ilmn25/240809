@@ -36,6 +36,16 @@ public partial class Item
     public string Name => Helper.ToDisplayName(ID, lowercase: true);
     public string Description;
 
+    /// <summary>Short action shown in the HUD for the held item (e.g. "place", "eat").
+    /// Empty when the item has no quick action.</summary>
+    public string ActionLabel => Type switch
+    {
+        ItemType.Block or ItemType.Structure => "place",
+        ItemType.Food => "consume",
+        ItemType.Tool => "use",
+        _ => "",
+    };
+
     private static void AddMaterialDefinition(
         ID id,
         string description = "",
