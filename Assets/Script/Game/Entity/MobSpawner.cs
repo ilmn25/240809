@@ -8,19 +8,20 @@ using UnityEngine;
 /// </summary>
 public class MobSpawner
 {
-    private const int SpawnInterval = 200;
-    private const int MobCapPerPlayer = 15;
-    private const int SpawnAttemptsPerTick = 5;
+    private const int SpawnInterval = 320;
+    private const int MobCapPerPlayer = 9;
+    private const int SpawnAttemptsPerTick = 3;
     private const float PassiveMobRarity = 0.1f;
     private const int PassiveMobCap = 12;
-    private const int EventMobCapPerPlayer = 30;
-    private const int EventSpawnAttemptsPerTick = 10;
+    private const int EventMobCapPerPlayer = 16;
+    private const int EventSpawnAttemptsPerTick = 6;
 
     private static int _timer;
 
     private static readonly List<ID> GrassMobs = new() { ID.Sheep };
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
-    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime, ID.Bear, ID.TreeMimic, ID.Mannequin };
+    private static readonly List<ID> DayMobs = new() { ID.Slime };
+    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Bear, ID.TreeMimic, ID.Mannequin };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
     private static readonly List<ID> RaptureMobs = new() { ID.Lich };
 
@@ -83,6 +84,8 @@ public class MobSpawner
             pool = RaptureMobs;
         else if (isNight)
             pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
+        else if (Random.value < 0.35f)
+            pool = DayMobs;   // slimes drift across the world during the day
         else
             pool = biome switch
             {

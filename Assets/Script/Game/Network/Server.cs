@@ -164,8 +164,10 @@ public static class Server
         Environment.Target = EnvironmentType.DaySnow;
         _disconnecting = false;
 
-        // Show main menu after disconnect
+        // Show main menu after disconnect — fade back in so the screen isn't
+        // left black (QuitToMenu's FadeIn is overridden by this coroutine's FadeOut).
         GUIMain.GUIMenu.Show(true);
+        ScreenFade.FadeIn(1f, 0f);
     }
 
     private static IEnumerator OnServerConnected(NetworkConnectionToClient conn)

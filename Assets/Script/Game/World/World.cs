@@ -166,6 +166,7 @@ public class World
         NavMapSync.BroadcastBlockUpdate(coordinate, navValue);
         
         MapUpdated?.Invoke(coordinate);
+        if (Inst.Map != null) Inst.Map.Dirty = true;
         
         MapLoad.RefreshExistingChunk(chunkCoordinate); // Refresh on screen
         if (blockCoordinate.x != 0 && blockCoordinate.x != ChunkSize - 1 &&

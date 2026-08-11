@@ -16,7 +16,7 @@ public class GenTaskEntity : Gen
     private const double SurfaceSlabChance = 0.0098;
     private const double SurfaceSandStructureChance = 0.0098;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
-    private const double GroundItemChance = 0.011;
+    private const double GroundItemChance = 0.016;
 
     // Dense forest generation
     private const double ForestTreeChance = 0.0625;
@@ -182,8 +182,9 @@ public class GenTaskEntity : Gen
         double chance = 0;
 
         if ((chance += 0.45) > roll) return ID.Sticks;
+        if ((chance += 0.45) > roll) return ID.Mud;
         if ((chance += 0.45) > roll) return ID.Flint;
-        if ((chance += 0.10) > roll) return ID.StoneBlock;
+        if ((chance += 0.10) > roll) return ID.Gravel;
         return ID.Null;
     }
 

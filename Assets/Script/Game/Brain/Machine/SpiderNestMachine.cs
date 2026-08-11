@@ -24,6 +24,8 @@ public class SpiderNestMachine : StructureMachine
             Loot = ID.SpiderNest,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
+            operationType = OperationType.Cutting, // axe, like trees
+            threshold = 1,
         };
     }
 

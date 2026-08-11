@@ -75,6 +75,10 @@ public class WorldMap
 
     private const int SurfaceBand = 8;
 
+    /// <summary>Force markers to rebuild on the next map update (called when a
+    /// structure is placed or removed).</summary>
+    public void ResetMarkers() => _markersBuilt = false;
+
     public void BuildMarkers(World world)
     {
         if (_markersBuilt) return;

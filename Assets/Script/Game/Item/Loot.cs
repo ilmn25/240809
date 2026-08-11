@@ -46,7 +46,7 @@ public class Loot
                 if (Random.value <= entry.Chance)
                 {
                     ID itemID = items[Random.Range(0, items.Count)];
-                    Entity.SpawnItem(itemID, worldPosition);
+                    Entity.SpawnItem(itemID, worldPosition, stackOnSpawn: false);
                 }
             }
         }
@@ -59,7 +59,7 @@ public class Loot
         Vector3Int worldPosition = Vector3Int.FloorToInt(position);
         var entry = _table[Random.Range(0, _table.Count)];
         ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
-        Entity.SpawnItem(itemID, worldPosition);
+        Entity.SpawnItem(itemID, worldPosition, stackOnSpawn: false);
     }
     
     public void AddToContainer(Storage storage)

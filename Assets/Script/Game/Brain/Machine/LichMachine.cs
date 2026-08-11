@@ -1,8 +1,8 @@
 using UnityEngine;
 
-/// <summary>Lich enemy: agonizingly slow but hits like a truck and literally
-/// cannot be killed. Relentlessly closing on the player is its whole threat —
-/// get away or get crushed. Only stalks during the Rapture and vanishes when it ends.</summary>
+/// <summary>Lich enemy: agonizingly slow but hits hard and is very tanky.
+/// Relentlessly closes on the player — get away or get crushed. Only stalks
+/// during the Rapture and vanishes when it ends.</summary>
 public class LichMachine : MobMachine
 {
     private static readonly ProjectileInfo CrushProjectile = new ContactDamageProjectileInfo {
@@ -14,19 +14,18 @@ public class LichMachine : MobMachine
 
     public static Info CreateInfo()
     {
-        return new LichInfo()
+        return new EnemyInfo()
         {
             HealthMax = 200,
             DistAttack = 2,
             DistAlert = 30,
-            DistDisengage = 60,
+            DistDisengage = 30,
             DistRoam = 5,
             SpeedGround = 0.8f,
             SpeedAir = 1.0f,
             SpeedLogic = 0.8f,
             PathJump = 1,
             PathAir = 3,
-            KnockBackResistance = 1,
         };
     }
 

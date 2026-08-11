@@ -10,7 +10,7 @@ public class MobInfo : DynamicInfo
     public float DistFollow = 0.65f; // how close allies trail the leader (tight)
     public int DistRanged = 10;      // preferred firing range for ranged allies
     public int DistAlert = 5;        // enemy detection radius + how close allies stick to the leader
-    public int DistDisengage = 20; 
+    public int DistDisengage = 14;   // how far an enemy pursues before giving up 
     
     public int DistEscape = 20;
     public int DistRoam = 10;

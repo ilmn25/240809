@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>Melee attack that stops all movement while telegraphing and swinging,
 /// then resumes chasing. Mirrors the hound's "freeze in place to swing" behavior.
-/// Shared by the bear and spider.</summary>
+/// Shared by the bear, spider, harpy, lich, and mannequin.</summary>
 public class MobAttackStopSwing : MobState
 {
     private readonly ProjectileInfo _projectileInfo;

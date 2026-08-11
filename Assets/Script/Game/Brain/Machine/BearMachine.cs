@@ -18,7 +18,7 @@ public class BearMachine : MobMachine
             HealthMax = 42,
             DistAttack = 2,
             DistAlert = 16,
-            DistDisengage = 26,
+            DistDisengage = 18,
             DistRoam = 6,
             SpeedGround = 4,
             SpeedAir = 6,

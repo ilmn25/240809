@@ -23,7 +23,7 @@ public class MannequinMachine : MobMachine
             HealthMax = 22,
             DistAttack = 2,
             DistAlert = 20,
-            DistDisengage = 30,
+            DistDisengage = 20,
             DistRoam = 4,
             SpeedGround = FastSpeed,
             SpeedAir = FastSpeed,

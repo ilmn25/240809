@@ -72,6 +72,11 @@ public static class HarvestableRegistry
 
         // Wooden table: flammable decor, drops nothing.
         Register(ID.Table, new HarvestableDefinition(flammable: true));
+
+        // Spider web: cut down for sticky silk, consumed on harvest.
+        Loot web = new Loot(ID.SpiderWeb);
+        web.Add(1f, 1, ID.SpiderWeb);
+        Register(ID.SpiderWeb, new HarvestableDefinition(web));
     }
 
     /// <summary>Register (or override) a harvestable definition.</summary>

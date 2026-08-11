@@ -41,15 +41,7 @@ public partial class GUIMenu
 
     private IEnumerator LoadingBeforeMain()
     {
-        string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
-        float end = Time.time + 0.75f;
-        int i = 0;
-        while (Time.time < end)
-        {
-            Main.GUIMenu.text = frames[i % frames.Length];
-            i++;
-            yield return new WaitForSeconds(0.025f);
-        }
+        yield return PlayLoading(0.75f);
         _transitioning = false;
         _screen = MenuScreen.Main;
         Render();
@@ -65,6 +57,15 @@ public partial class GUIMenu
     {
         _screen = MenuScreen.Death;
         Show(true);
+    }
+
+    /// <summary>Return the menu to its neutral state and hide it. Called when a
+    /// new or loaded game starts so a stale death/pause screen can't stick around.</summary>
+    public void ResetToNeutral()
+    {
+        _transitioning = false;
+        _screen = MenuScreen.Main;
+        Show(false);
     }
 
     private void ShowSettings()
@@ -190,7 +191,7 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Host:
-                if (n == 1) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(LoadingThen(() => { ScreenFade.FadeOut(0.3f); Save.Inst = new Save(GenType.Abyss); _ = new CoroutineTask(Server.StartHost()); Show(false); })); }
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(LoadingThen(() => { ScreenFade.FadeOut(0.3f); Save.Inst = new Save(GenType.Abyss); _ = new CoroutineTask(Server.StartHost()); ResetToNeutral(); })); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Host; _loadPage = 0; TransitionTo(MenuScreen.Load); }
                 break;
 
@@ -251,7 +252,7 @@ public partial class GUIMenu
                 ScreenFade.FadeOut(0.3f);
                 Saves.LoadSave(Saves.Inst.List[_confirmIndex]);
                 _ = new CoroutineTask(Server.StartHost());
-                Show(false);
+                ResetToNeutral();
             }));
         }
         else if (_confirmAction == ConfirmAction.Keybind)
@@ -282,7 +283,6 @@ public partial class GUIMenu
         return _screen switch
         {
             MenuScreen.Main => false,
-            MenuScreen.Pause => false,
             MenuScreen.Death => false,
             _ => true,
         };
@@ -292,7 +292,7 @@ public partial class GUIMenu
     {
         return _screen switch
         {
-            MenuScreen.Main => Header("Main Menu") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
+            MenuScreen.Main => Header("ANIMAL WELL") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
@@ -328,33 +328,36 @@ public partial class GUIMenu
         if (_transitioning) return;
         _transitioning = true;
         _scrollTask?.Stop();
-        _ = new CoroutineTask(Transition(target));
+        _ = new CoroutineTask(PlayLoading(0.3f, () =>
+        {
+            _screen = target;
+            _transitioning = false;
+            Render();
+        }));
     }
 
-    private IEnumerator Transition(MenuScreen target)
-    {
-        string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
-        for (int i = 0; i < 2; i++)
-            foreach (string frame in frames)
-            {
-                Main.GUIMenu.text = frame;
-                yield return new WaitForSeconds(0.03f);
-            }
-        _screen = target;
-        _transitioning = false;
-        Render();
-    }
+    private const float LoadingFrameRate = 0.03f; // fixed animation speed
 
     private IEnumerator LoadingThen(System.Action done)
     {
-        string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
-        for (int i = 0; i < 3; i++)
-            foreach (string frame in frames)
-            {
-                Main.GUIMenu.text = frame;
-                yield return new WaitForSeconds(0.03f);
-            }
+        yield return PlayLoading(0.45f);
         done();
+    }
+
+    /// <summary>Plays the loading animation for a fixed duration at a constant
+    /// frame rate, then invokes <paramref name="done"/> (if provided).</summary>
+    private IEnumerator PlayLoading(float duration, System.Action done = null)
+    {
+        string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
+        int i = 0;
+        float end = Time.time + duration;
+        while (Time.time < end)
+        {
+            Main.GUIMenu.text = frames[i % frames.Length];
+            i++;
+            yield return new WaitForSeconds(LoadingFrameRate);
+        }
+        done?.Invoke();
     }
     private string RenderLoad()
     {

@@ -14,7 +14,7 @@ public class PortalMachine: StructureMachine, IActionSecondaryInteract
         return;
         IEnumerator Portal()
         {
-            ScreenFade.FadeOut(0.5f); 
+            ScreenFade.FadeOut(0.5f);
             Main.PlayerInfo.SpeedModifier = 0.001f;
             yield return new WaitForSeconds(0.6f);
             Main.Player.transform.position = new Vector3Int(2, 50, 2); 

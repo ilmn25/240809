@@ -8,17 +8,26 @@ public class HarpyMachine : MobMachine
     private const int GroupAttackCount = 3; // harpies needed before they dive in
     private const float GroupRadius = 8f;   // how close harpies must be to count as grouped
 
+    private bool _committed;               // latched once grouped — keeps them attacking
+
     private static readonly Collider[] HarpyScanBuffer = new Collider[16];
+    private static readonly ProjectileInfo TalonProjectile = new ContactDamageProjectileInfo {
+        Damage = 3,
+        Knockback = 9,
+        CritChance = 0.1f,
+        Radius = 0.8f,
+    };
 
     public static Info CreateInfo()
     {
         return new EnemyInfo()
         {
             HealthMax = 16,
-            DistAttack = 1,
+            DistAttack = 2,
             DistRoam = 7,
             PathJump = 10,
             PathAir = -1,
+            SpeedGround = 6,
             SpeedAir = 7,
             JumpVelocity = 7,
             CanFly = true,
@@ -40,48 +49,38 @@ public class HarpyMachine : MobMachine
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobHit());
-        AddState(new MobAttackSwing());
+        AddState(new MobAttackStopSwing(TalonProjectile));
         AddState(new EquipSelectState());
-        Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
     public override void OnUpdate()
     {
-        HandleInput();
-
         if (IsCurrentState<DefaultState>())
         {
-            if (Info.Target != null)
+            if (Info.Target == null)
             {
-                float dist = Vector3.Distance(Info.Target.position, transform.position);
+                _committed = false;
+                if (Random.value > 0.5f)
+                    SetState<MobRoam>();
+                else
+                    SetState<MobIdle>();
+                return;
+            }
 
-                // Not enough harpies grouped up yet — stalk from a distance.
-                if (GroupedHarpies() < GroupAttackCount)
+            float dist = Vector3.Distance(Info.Target.position, transform.position);
+
+            // Latch onto the attack once enough harpies group up, so a few of them
+            // spreading out mid-dive doesn't make the group re-stalk.
+            if (!_committed && GroupedHarpies() >= GroupAttackCount)
+                _committed = true;
+
+            // Not committed yet — stalk from a distance.
+            if (!_committed)
+            {
+                if (dist < StalkDistance)
                 {
-                    if (dist < StalkDistance)
-                    {
-                        // Too close while stalking: back off to keep the stalk distance.
-                        SetState<MobEvade>();
-                    }
-                    else if (Info.PathingStatus == PathingStatus.Stuck)
-                    {
-                        SetState<MobRoam>();
-                    }
-                    else
-                    {
-                        SetState<MobStalk>();
-                    }
-                }
-                // Enough harpies grouped — dive in and attack.
-                else if (dist < Info.DistAttack)
-                {
-                    if (Random.value < 0.7f)
-                    {
-                        Info.AimPosition = Info.Target.position;
-                        Attack();
-                    }
-                    else
-                        SetState<MobEvade>();
+                    // Too close while stalking: back off to keep the stalk distance.
+                    SetState<MobEvade>();
                 }
                 else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
@@ -89,15 +88,24 @@ public class HarpyMachine : MobMachine
                 }
                 else
                 {
-                    SetState<MobChase>();
+                    SetState<MobStalk>();
                 }
+                return;
+            }
+
+            // Committed — dive in and attack.
+            if (dist < Info.DistAttack)
+            {
+                Info.AimPosition = Info.Target.position;
+                SetState<MobAttackStopSwing>();
+            }
+            else if (Info.PathingStatus == PathingStatus.Stuck)
+            {
+                SetState<MobRoam>();
             }
             else
             {
-                if (Random.value > 0.5f)
-                    SetState<MobRoam>();
-                else
-                    SetState<MobIdle>();
+                SetState<MobChase>();
             }
         }
     }
@@ -113,20 +121,6 @@ public class HarpyMachine : MobMachine
                 count++;
         }
         return count;
-    }
-
-    void HandleInput()
-    {
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Reached;
-            SetState<DefaultState>();
-        }
-        else if (Input.GetKeyDown(KeyCode.T))
-            Info.Target = null;
-        else if (Input.GetKeyDown(KeyCode.U))
-            transform.position = Main.Player.transform.position;
     }
 
     public void OnDrawGizmos()

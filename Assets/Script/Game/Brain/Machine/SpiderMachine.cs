@@ -14,6 +14,8 @@ public class SpiderMachine : MobMachine
 
     private int _strafeTimer;
     private int _webTimer;
+    private int _websLaid;                 // how many webs this spider has laid
+    private const int MaxWebs = 3;         // hard cap per spider
 
     public static Info CreateInfo()
     {
@@ -22,11 +24,11 @@ public class SpiderMachine : MobMachine
             HealthMax = 18,
             DistAttack = 2,
             DistAlert = 14,
-            DistDisengage = 24,
+            DistDisengage = 18,
             DistRoam = 5,
             DistStrafe = 3,
-            SpeedGround = 8,
-            SpeedAir = 10,
+            SpeedGround = 5.5f,
+            SpeedAir = 7,
             PathJump = 2,
             PathAir = 4,
         };
@@ -62,13 +64,18 @@ public class SpiderMachine : MobMachine
 
     public override void OnUpdate()
     {
-        // Lay a web behind us occasionally while active.
-        if (Helper.IsHost() && ++_webTimer >= 900 && Random.value < 0.4f)
+        // Lay a web behind us occasionally while active, up to a per-spider cap.
+        // Lay a web in the morning only (first 8 hours of the day), up to a per-spider cap.
+        bool isMorning = Save.Inst.time < 60 * 8;
+        if (Helper.IsHost() && isMorning && _websLaid < MaxWebs && ++_webTimer >= 900 && Random.value < 0.4f)
         {
             _webTimer = 0;
             Vector3Int webPos = Vector3Int.FloorToInt(transform.position);
             if (World.GetBlock(webPos) == 0)
+            {
                 Entity.Spawn(ID.SpiderWeb, webPos);
+                _websLaid++;
+            }
         }
 
         bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;

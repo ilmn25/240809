@@ -59,6 +59,7 @@ public partial class Item
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
         AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");
         AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
+        AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.");
         AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
         AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.");
@@ -81,7 +82,7 @@ public partial class Item
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
-        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 }, { ID.Flint, 5 } }, 100, description: "A workbench to build other machines.");
+        AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Flint, 3 } , { ID.Sticks, 3 } }, 100, description: "A workbench to build other machines.");
         AddStructureDefinition(ID.Smelter, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.StoneBlock, 6 } }, 100, description: "A dedicated smelter used to turn sand into glass.");
         AddStructureDefinition(ID.MasonryWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.StoneBlock, 8 } }, 100, description: "A masonry bench for building advanced stonework and powering anvils.");
         AddStructureDefinition(ID.WoodenToolbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");

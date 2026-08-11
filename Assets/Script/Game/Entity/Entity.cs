@@ -187,9 +187,6 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Cytoplasm);
 
                 AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
-                loot = new (ID.SpiderWeb);
-                loot.Add(1, 1, ID.Foul);
-
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OldRadio);
                 loot.Add(1, 2, ID.Steel);
@@ -277,12 +274,14 @@ public class Entity
 
                 AddMob<SpiderMachine>(ID.Spider);
                 loot = new (ID.Spider);
-                loot.Add(1, 1, ID.Foul);
-                loot.Add(0.5f, 1, ID.Foul);
+                loot.Add(1, 2, ID.SpiderWeb);
                 loot.Add(0.3f, 1, ID.Cytoplasm);   
 
                 AddMob<LichMachine>(ID.Lich);
-                loot = new (ID.Lich); // immortal — never actually drops   
+                loot = new (ID.Lich);
+                loot.Add(1, 3, ID.DiamondAxe);
+                loot.Add(0.5f, 2, ID.Meat);
+                loot.Add(0.3f, 1, ID.OldRadio);   
 
                 AddMob<TreeMimicMachine>(ID.TreeMimic);
                 loot = new (ID.TreeMimic);
@@ -384,7 +383,17 @@ public class Entity
 
                 Info info = CreateInfo(id, worldPosition);
                 if (entity.StaticLoad)
+                {
                         EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
+                        // Persist the placed structure into its chunk so it survives
+                        // reloads and shows up on the map (markers read chunk.StaticEntity).
+                        World.Inst[World.GetChunkCoordinate(worldPosition)].StaticEntity.Add(info);
+                        if (World.Inst.Map != null)
+                        {
+                                World.Inst.Map.Dirty = true;
+                                World.Inst.Map.ResetMarkers();
+                        }
+                }
                 else
                         EntityDynamicLoad.InviteEntity(currentEntityMachine);
                 currentEntityMachine.Initialize(info);

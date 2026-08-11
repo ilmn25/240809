@@ -132,7 +132,7 @@ public static class Tutorial
         {
             1 => $" (flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/2)",
             2 => $" (sticks {storage?.Count(ID.Sticks) ?? 0}/2, flint {storage?.Count(ID.Flint) ?? 0}/2)",
-            6 => $" (logs {storage?.Count(ID.Log) ?? 0}/15, flint {storage?.Count(ID.Flint) ?? 0}/5)",
+            6 => $" (logs {storage?.Count(ID.Log) ?? 0}/5, flint {storage?.Count(ID.Flint) ?? 0}/3, sticks {storage?.Count(ID.Sticks) ?? 0}/3)",
             _ => "",
         };
     }

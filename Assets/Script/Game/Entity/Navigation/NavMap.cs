@@ -1,18 +1,18 @@
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
 /// Occupancy map used by pathfinding and movement. Each cell holds a value:
-/// Air (0) = empty, Door (1) / Semi (3) = blocks movement but pathfinding can
-/// route through (with a cost penalty), Block (2) = fully solid.
+/// Air (0) = empty, Door (1) = blocks movement but pathfinding can route
+/// through (with a cost penalty), Block (2) = fully solid, Semi (3) = fully
+/// solid like Block (slab, sign, bed, ...) — cannot be walked on or passed through.
 /// </summary>
 public class NavMap
 {
     public const byte Air = 0;   // empty, walkable
     public const byte Door = 1;  // closed door — blocks movement, pathfinding can route through
     public const byte Block = 2; // fully solid
-    public const byte Semi = 3;  // semi-collidable structure (slab, sign, bed, ...) — same as Door
+    public const byte Semi = 3;  // fully solid (slab, sign, bed, ...) — same as Block
 
     private static byte[] _map;
     private static readonly List<Vector3Int> LoadedChunks = new ();
@@ -75,11 +75,15 @@ public class NavMap
     /// <summary>True if the cell is fully empty (walkable, no door).</summary>
     public static bool IsAir(Vector3Int worldPosition) => Get(worldPosition) == Air;
 
-    /// <summary>True if the cell is navigable for pathfinding (air, door, or semi).</summary>
-    public static bool IsNavigable(Vector3Int worldPosition) => Get(worldPosition) != Block;
+    /// <summary>True if the cell is navigable for pathfinding (air or door).</summary>
+    public static bool IsNavigable(Vector3Int worldPosition)
+    {
+        byte value = Get(worldPosition);
+        return value == Air || value == Door;
+    }
 
     /// <summary>True if a cell is passable but pathfinding should avoid it when possible.</summary>
-    public static bool IsSemiBlocking(byte value) => value == Door || value == Semi;
+    public static bool IsSemiBlocking(byte value) => value == Door;
 
     public static void Set(Vector3Int worldPosition, byte value)
     {

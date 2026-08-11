@@ -1,8 +1,8 @@
 using UnityEngine;
 
-/// <summary>A spider web structure. When the player steps on it, nearby spiders
-/// are alerted and come to investigate the disturbance.</summary>
-public class SpiderWebMachine : StructureMachine
+/// <summary>A spider web — a harvestable that any tool can cut down. When the
+/// player steps on it, nearby spiders are alerted and come to investigate.</summary>
+public class SpiderWebMachine : HarvestableMachine
 {
     private const float WebRadius = 1.2f;      // how close the player must be to "step on" the web
     private const float AlertRadius = 20f;     // how far away spiders get alerted
@@ -15,10 +15,9 @@ public class SpiderWebMachine : StructureMachine
 
     public static Info CreateInfo()
     {
-        return new StructureInfo
+        return new HarvestableInfo
         {
-            Health = 20,
-            Loot = ID.SpiderWeb,
+            Health = 8,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
         };

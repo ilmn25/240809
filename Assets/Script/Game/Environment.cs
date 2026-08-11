@@ -88,7 +88,7 @@ public class Environment
     }       
      
     public const int Length = 60 * 24;
-    private const float Speed = 0.4f;
+    private const float Speed = 0.48f; // seconds per in-game minute — 20% longer days
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous = EnvironmentType.Black;
@@ -191,19 +191,19 @@ public class Environment
     {
         if (Time == 0)
         { 
-            if (Random.value < 0.5f)
+            // Rapture is a rare day-long event (15% chance); otherwise a normal day.
+            if (Random.value < 0.15f)
+            {
+                Weather = EnvironmentType.Rapture;
+                ShowEventDialogue("The sky is red...");
+            }
+            else if (Random.value < 0.5f)
                 Weather = EnvironmentType.Day;
             else
                 Weather = EnvironmentType.DaySnow;
         } 
         else if (Time == 60 * 18)
-            if (Random.value < 0.8f)
-                Weather = EnvironmentType.Sunset;
-            else
-            {
-                Weather = EnvironmentType.Rapture;
-                ShowEventDialogue("The sky is red...");
-            }
+            Weather = EnvironmentType.Sunset;
         else if (Time == 60 * 19)
             if (Random.value < 0.7f)
                 Weather = EnvironmentType.NightRainy;
