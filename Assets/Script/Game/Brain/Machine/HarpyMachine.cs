@@ -24,6 +24,8 @@ public class HarpyMachine : MobMachine
         {
             HealthMax = 16,
             DistAttack = 2,
+            DistAlert = 16,
+            DistDisengage = 26,
             DistRoam = 7,
             PathJump = 10,
             PathAir = -1,
@@ -57,6 +59,21 @@ public class HarpyMachine : MobMachine
     {
         if (IsCurrentState<DefaultState>())
         {
+            // Aggressive: lock onto the player on sight, drop them once they flee.
+            bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
+            bool playerInRange = playerAlive &&
+                Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
+            if (playerInRange && Info.Target != Main.PlayerInfo)
+            {
+                Info.Target = Main.PlayerInfo;
+                Info.PathingStatus = PathingStatus.Pending;
+            }
+            else if (!playerInRange && Info.Target == Main.PlayerInfo &&
+                     Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage)
+            {
+                Info.CancelTarget();
+            }
+
             if (Info.Target == null)
             {
                 _committed = false;

@@ -260,17 +260,17 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return true;
     }
 
-    // A threat is any enemy (attacked on sight) or a passive mob that is actively
-    // attacking a player (retaliate when it damages someone). A docile sheep/chicken
-    // that is merely fleeing is not a threat — its flee anchor is a player but its
-    // ActionType isn't Hit, so the ally won't attack innocent farm animals.
+    // A threat is any enemy (attacked on sight) or a passive mob that is actually
+    // attacking a player. A docile sheep/chicken merely fleeing is not a threat —
+    // PassiveInfo defaults ActionType to Hit for all passives, so we rely on the
+    // sheep's Retaliating flag (set only when it's hit and fights back) instead of
+    // ActionType, which would wrongly flag innocent farm animals.
     private bool IsThreat(MobInfo mob)
     {
         if (mob == null || mob.Destroyed) return false;
         if (mob.HitboxType == HitboxType.Enemy) return true;
-        return mob.HitboxType == HitboxType.Passive &&
-               mob.Target is PlayerInfo &&
-               mob.ActionType == IActionType.Hit;
+        if (mob.HitboxType != HitboxType.Passive) return false;
+        return mob is SheepInfo sheep && sheep.Retaliating;
     }
 
     // Nearest threat in the ally's alert radius.

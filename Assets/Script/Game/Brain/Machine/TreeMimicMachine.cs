@@ -16,7 +16,7 @@ public class TreeMimicMachine : MobMachine
         {
             HealthMax = 30,
             DistAttack = 2,
-            DistAlert = FollowDistance,
+            DistAlert = 16,            // how far away it notices and starts following
             DistDisengage = FleeDistance,
             DistEscape = FleeDistance,
             DistRoam = 4,

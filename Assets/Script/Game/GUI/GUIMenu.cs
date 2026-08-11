@@ -404,10 +404,21 @@ public partial class GUIMenu
     {
         ScreenFade.FadeOut(0.5f);
         yield return new WaitForSeconds(0.6f);
-        Server.StopHost();
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
+        // Return players to the pool while still hosting (they aren't tracked by
+        // EntityDynamicLoad, so UnloadWorld alone won't despawn them).
+        if (Save.Inst != null)
+            foreach (PlayerInfo player in Save.Inst.players)
+                if (player.Machine != null)
+                {
+                    ObjectPool.ReturnObject(player.Machine.gameObject);
+                    player.Machine = null;
+                }
+        // Unload the world while still hosting so mobs/entities actually despawn
+        // (EntityDynamicLoad.UnloadWorld bails if IsHost() is false).
         World.UnloadWorld();
+        Server.StopHost();
         // Reset environment to the bright menu default so the screen isn't black.
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         Environment.Target = EnvironmentType.DaySnow;
