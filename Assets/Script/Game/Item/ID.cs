@@ -132,4 +132,5 @@ public enum ID
     TreeMimic,
     Lich,
     Mannequin,
+    Headstone,
 }

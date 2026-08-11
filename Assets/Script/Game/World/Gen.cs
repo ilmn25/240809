@@ -103,6 +103,9 @@ public class Gen
         // A freshly generated world gets an owl statue at spawn so the Guide is
         // always nearby (the statue is saved; the Guide is not).
         AddSpawnStatue(world);
+
+        // Scatter a graveyard cluster in the grass biome.
+        GenTaskGraveyard.Run(world);
     }
 
     /// <summary>Places an owl statue beside the world's spawn point. Because NPCs

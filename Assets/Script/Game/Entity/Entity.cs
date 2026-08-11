@@ -181,6 +181,10 @@ public class Entity
                 loot.Add(1, 2, ID.StoneBlock);
                 loot.Add(0.5f, 2, ID.StoneBlock);
 
+                AddStructure<HeadstoneMachine>(ID.Headstone, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.Headstone);
+                loot.Add(1, 1, ID.StoneBlock);
+
                 AddStructure<SpiderNestMachine>(ID.SpiderNest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
