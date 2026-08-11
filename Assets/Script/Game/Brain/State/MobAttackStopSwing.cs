@@ -5,12 +5,11 @@ using UnityEngine;
 /// Shared by the bear and spider.</summary>
 public class MobAttackStopSwing : MobState
 {
-    public MobAttackStopSwing() { updateMode = global::Module.UpdateMode.Everyone; }
-
     private readonly ProjectileInfo _projectileInfo;
 
     public MobAttackStopSwing(ProjectileInfo projectileInfo)
     {
+        updateMode = global::Module.UpdateMode.Everyone;
         _projectileInfo = projectileInfo;
     }
 
