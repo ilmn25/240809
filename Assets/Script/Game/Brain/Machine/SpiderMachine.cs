@@ -1,27 +1,32 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-/// <summary>Bear enemy: aggressively chases its target down, then freezes in place
-/// to swing when it closes to melee range (hound-in-Dont-Starve behavior).</summary>
-public class BearMachine : MobMachine
+/// <summary>Spider enemy: fast, erratic hunter that periodically strafes while
+/// closing in, then freezes to swing when in melee range. Spawned by SpiderNestMachine.</summary>
+public class SpiderMachine : MobMachine
 {
-    private static readonly ProjectileInfo ClawProjectile = new ContactDamageProjectileInfo {
-        Damage = 3,
-        Knockback = 14,
+    private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
+        Damage = 2,
+        Knockback = 8,
         CritChance = 0.1f,
-        Radius = 0.9f,
+        Radius = 0.7f,
     };
+
+    private int _strafeTimer;
+    private int _webTimer;
 
     public static Info CreateInfo()
     {
         return new EnemyInfo()
         {
-            HealthMax = 42,
+            HealthMax = 18,
             DistAttack = 2,
-            DistAlert = 16,
-            DistDisengage = 26,
-            DistRoam = 6,
-            SpeedGround = 4,
-            SpeedAir = 6,
+            DistAlert = 14,
+            DistDisengage = 24,
+            DistRoam = 5,
+            DistStrafe = 3,
+            SpeedGround = 8,
+            SpeedAir = 10,
             PathJump = 2,
             PathAir = 4,
         };
@@ -38,21 +43,39 @@ public class BearMachine : MobMachine
 
         AddState(new MobIdle());
         AddState(new MobChase());
+        AddState(new MobStrafe());
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(ClawProjectile));
+        AddState(new MobAttackStopSwing(BiteProjectile));
         AddState(new EquipSelectState());
+    }
+
+    /// <summary>Alerted by a web: head toward the player who stepped on it.</summary>
+    public void Investigate(Info target)
+    {
+        if (Info.Target != null) return; // already hunting something
+        Info.Target = target;
+        Info.PathingStatus = PathingStatus.Pending;
+        SetState<MobChase>();
     }
 
     public override void OnUpdate()
     {
+        // Lay a web behind us every so often while active.
+        if (Helper.IsHost() && ++_webTimer >= 300)
+        {
+            _webTimer = 0;
+            Vector3Int webPos = Vector3Int.FloorToInt(transform.position);
+            if (World.GetBlock(webPos) == 0)
+                Entity.Spawn(ID.SpiderWeb, webPos);
+        }
+
         bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
         bool playerInRange = playerAlive &&
             Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
 
-        // Aggressive predator: mark the player as a target the moment they wander
-        // into alert range, and let go once they retreat well out of reach.
+        // Aggressive: mark the player as a target on sight, drop it once they flee.
         if (playerInRange && Info.Target != Main.PlayerInfo)
         {
             Info.Target = Main.PlayerInfo;
@@ -76,6 +99,12 @@ public class BearMachine : MobMachine
                 else if (Info.PathingStatus == PathingStatus.Stuck)
                 {
                     SetState<MobRoam>();
+                }
+                // Erratic: dart sideways every so often while closing in.
+                else if (++_strafeTimer > 90 && Random.value < 0.5f)
+                {
+                    _strafeTimer = 0;
+                    SetState<MobStrafe>();
                 }
                 else
                 {

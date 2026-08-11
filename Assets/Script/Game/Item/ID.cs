@@ -126,4 +126,7 @@ public enum ID
     CookedDeathcap,
     BoundNPC,
     Bear,
+    Spider,
+    SpiderNest,
+    SpiderWeb,
 }

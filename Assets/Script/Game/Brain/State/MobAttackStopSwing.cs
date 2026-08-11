@@ -1,22 +1,23 @@
 using UnityEngine;
 
-/// <summary>Bear melee attack: stops all movement while telegraphing and swinging,
-/// then resumes chasing. Mirrors the hound's "freeze in place to swing" behavior.</summary>
-public class MobAttackBearSwing : MobState
+/// <summary>Melee attack that stops all movement while telegraphing and swinging,
+/// then resumes chasing. Mirrors the hound's "freeze in place to swing" behavior.
+/// Shared by the bear and spider.</summary>
+public class MobAttackStopSwing : MobState
 {
-    public MobAttackBearSwing() { updateMode = global::Module.UpdateMode.Everyone; }
+    public MobAttackStopSwing() { updateMode = global::Module.UpdateMode.Everyone; }
 
-    private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
-        Damage = 3,
-        Knockback = 14,
-        CritChance = 0.1f,
-        Radius = 0.9f,
-    };
+    private readonly ProjectileInfo _projectileInfo;
+
+    public MobAttackStopSwing(ProjectileInfo projectileInfo)
+    {
+        _projectileInfo = projectileInfo;
+    }
 
     public override void OnEnterState()
     {
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
-        Info.SpeedModifier = 0f; // hound-style: freeze in place while winding up
+        Info.SpeedModifier = 0f; // freeze in place while winding up
         Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
     }
 

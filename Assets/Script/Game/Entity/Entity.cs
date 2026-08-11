@@ -181,6 +181,15 @@ public class Entity
                 loot.Add(1, 2, ID.StoneBlock);
                 loot.Add(0.5f, 2, ID.StoneBlock);
 
+                AddStructure<SpiderNestMachine>(ID.SpiderNest, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.SpiderNest);
+                loot.Add(1, 2, ID.Foul);
+                loot.Add(0.5f, 1, ID.Cytoplasm);
+
+                AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
+                loot = new (ID.SpiderWeb);
+                loot.Add(1, 1, ID.Foul);
+
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OldRadio);
                 loot.Add(1, 2, ID.Steel);
@@ -264,7 +273,13 @@ public class Entity
                 loot = new (ID.Bear);
                 loot.Add(1, 2, ID.Meat);
                 loot.Add(0.5f, 1, ID.Meat);
-                loot.Add(0.4f, 1, ID.Foul);   
+                loot.Add(0.4f, 1, ID.Foul);
+
+                AddMob<SpiderMachine>(ID.Spider);
+                loot = new (ID.Spider);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.5f, 1, ID.Foul);
+                loot.Add(0.3f, 1, ID.Cytoplasm);   
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

@@ -23,6 +23,7 @@ public class GenTaskEntity : Gen
     private const double ForestBushChance = 0.005;
     private const double ForestGrassChance = 0.06;
     private const double ForestDeathcapChance = 0.00125;
+    private const double ForestSpiderNestChance = 0.0008;
     private const double GrassOrchidChance = 0.005;
     private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
@@ -82,6 +83,10 @@ public class GenTaskEntity : Gen
                             else if (roll <= (chance += ForestDeathcapChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Deathcap, position));
+                            }
+                            else if (roll <= (chance += ForestSpiderNestChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
                             }
 
                             // Forest floor ground items.
