@@ -170,6 +170,9 @@ public class Environment
             {
                 Time = 0;
                 Save.Inst.day++;
+                // Auto-save at the start of each new day when enabled.
+                if (Settings.Inst != null && Settings.Inst.AutoSaveIndex == 1)
+                    Saves.SaveGame();
             }
 
             if (Time % 60 == 0)

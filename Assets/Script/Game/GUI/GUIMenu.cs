@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm }
+    private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
     private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -61,6 +61,12 @@ public partial class GUIMenu
         Show(true);
     }
 
+    public void ShowDeath()
+    {
+        _screen = MenuScreen.Death;
+        Show(true);
+    }
+
     private void ShowSettings()
     {
         _screen = MenuScreen.Settings;
@@ -80,6 +86,7 @@ public partial class GUIMenu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Audio.PlaySFX(SfxID.Text);
+            if (Showing && _screen == MenuScreen.Death) return; // death menu can't be dismissed
             if (Showing) Back();
             else ShowPause();
             return;
@@ -152,6 +159,9 @@ public partial class GUIMenu
             case MenuScreen.Pause:
                 Show(false);
                 break;
+            case MenuScreen.Death:
+                Show(false);
+                break;
             case MenuScreen.Settings:
                 TransitionTo(_settingsReturn);
                 break;
@@ -191,8 +201,14 @@ public partial class GUIMenu
                 else if (n == 4) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(QuitToMenu()); }
                 break;
 
+            case MenuScreen.Death:
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Death; _loadPage = 0; TransitionTo(MenuScreen.Load); }
+                else if (n == 2) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(QuitToMenu()); }
+                break;
+
             case MenuScreen.Settings:
-                if (n >= 1 && n <= 8) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
+                if (n >= 1 && n <= 9) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
+                else if (n == 0) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); }
                 break;
 
             case MenuScreen.Keybinds:
@@ -267,6 +283,7 @@ public partial class GUIMenu
         {
             MenuScreen.Main => false,
             MenuScreen.Pause => false,
+            MenuScreen.Death => false,
             _ => true,
         };
     }
@@ -278,6 +295,7 @@ public partial class GUIMenu
             MenuScreen.Main => Header("Main Menu") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
+            MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
             MenuScreen.Settings => Header("Settings") + RenderSettings(),
             MenuScreen.Keybinds => Header("Keybinds") + RenderKeybinds(),
             MenuScreen.Keybind => Header(KeybindList[_keybindIndex].Label) + RenderKeybind(),

@@ -98,6 +98,7 @@ public static class GUIMain
         InfoPanel.UpdateDrag();
         Map.Update();
         UpdateHudText();
+        CheckAllDowned();
 
         if (Control.Inst.Inv.KeyDown())
         { 
@@ -113,6 +114,21 @@ public static class GUIMain
             // Refocus the map onto the player when opening it.
             if (!wasOpen) Map.FocusOnPlayer();
         }
+    }
+
+    // Shows the death menu when every player is downed (incapacitated).
+    private static void CheckAllDowned()
+    {
+        if (Save.Inst == null || Save.Inst.players.Count == 0) return;
+        if (GUIMenu.Showing) return;
+
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == null || player.PlayerStatus != PlayerStatus.Incapacitated)
+                return;
+        }
+
+        GUIMenu.ShowDeath();
     }
 
     private static void UpdateHudText()

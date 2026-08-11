@@ -15,7 +15,8 @@ public partial class GUIMenu
             "6 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
             "7 > Max FPS: " + Settings.FpsLimits[s.FpsIndex] + "\n" +
             "8 > Max Zoom: " + Settings.MaxZooms[s.MaxZoomIndex] + "x" + "\n" +
-            "9 > Keybinds";
+            "9 > Auto Save: " + AutoSaveLabel(s.AutoSaveIndex) + "\n" +
+            "0 > Keybinds";
     }
 
     private void CycleSetting(int index)
@@ -47,10 +48,22 @@ public partial class GUIMenu
             case 7: // max zoom
                 s.MaxZoomIndex = (s.MaxZoomIndex + 1) % Settings.MaxZooms.Length;
                 break;
+            case 8: // auto save
+                s.AutoSaveIndex = (s.AutoSaveIndex + 1) % 2;
+                break;
         }
         Settings.Apply();
         Settings.Save();
         RenderSettingsText();
+    }
+
+    private static string AutoSaveLabel(int index)
+    {
+        return index switch
+        {
+            0 => "Off",
+            _ => "Every Day",
+        };
     }
 
     private void RenderSettingsText()

@@ -13,6 +13,7 @@ public class Settings
     public bool TutorialEnabled = true;
     public int FpsIndex = 2;
     public int MaxZoomIndex = 2;
+    public int AutoSaveIndex = 1; // 0 = off, 1 = every day (default)
 
     public static readonly float[] ScrollSpeeds = { 0.5f, 1f, 2f, 4f };
     public static readonly int[] FpsLimits = { 30, 60, 100, 144, 240 };
