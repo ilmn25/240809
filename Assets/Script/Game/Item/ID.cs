@@ -131,4 +131,5 @@ public enum ID
     SpiderWeb,
     TreeMimic,
     Lich,
+    Mannequin,
 }

@@ -62,8 +62,8 @@ public class SpiderMachine : MobMachine
 
     public override void OnUpdate()
     {
-        // Lay a web behind us every so often while active.
-        if (Helper.IsHost() && ++_webTimer >= 300)
+        // Lay a web behind us occasionally while active.
+        if (Helper.IsHost() && ++_webTimer >= 900 && Random.value < 0.4f)
         {
             _webTimer = 0;
             Vector3Int webPos = Vector3Int.FloorToInt(transform.position);

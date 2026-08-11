@@ -73,6 +73,17 @@ public class ItemSlot
             if (Info.HungerValue > 0)
                 text += "\n \nrestores " + Info.HungerValue + " hunger";
 
+            if (ingredients)
+            {
+                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
+                if (recipe != null)
+                {
+                    text += " \n \ningredients: ";
+                    foreach (var ingredient in recipe.Ingredients)
+                        text += "\n" + IngredientText(ingredient);
+                }
+            }
+
             text += "\n \n" + Info.Description;
         }
         else if (Info.Type == ItemType.Tool)

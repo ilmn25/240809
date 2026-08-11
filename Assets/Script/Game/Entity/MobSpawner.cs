@@ -20,7 +20,7 @@ public class MobSpawner
 
     private static readonly List<ID> GrassMobs = new() { ID.Sheep };
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
-    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime, ID.Bear, ID.TreeMimic };
+    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime, ID.Bear, ID.TreeMimic, ID.Mannequin };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
     private static readonly List<ID> RaptureMobs = new() { ID.Lich };
 

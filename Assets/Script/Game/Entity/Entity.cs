@@ -290,6 +290,12 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.4f, 1, ID.Acorn);
                 loot.Add(0.3f, 1, ID.Sticks);
+
+                AddMob<MannequinMachine>(ID.Mannequin);
+                loot = new (ID.Mannequin);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.5f, 1, ID.Foul);
+                loot.Add(0.3f, 1, ID.Fabric);
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {
