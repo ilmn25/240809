@@ -62,6 +62,10 @@ public static class Terraform
     public static void Update()
     {
         if (Target == ID.Null) return;
+        // The cursor item is the held item whenever it isn't empty, so the same place
+        // path works from the cursor. Placing is skipped while hovering a slot so
+        // inventory management (pick up/swap) takes priority.
+        if (GUIStorage.HoveringSlot) return;
         Item currentItemData = Inventory.CurrentItemData;
 
         if (Helper.isLayer(Control.MouseLayer, Main.IndexMap) && 
@@ -69,14 +73,12 @@ public static class Terraform
         { 
             HandleCoord(); 
  
-            if (Control.Inst.ActionSecondary.Key())
+            if (Control.Inst.ActionPrimary.Key())
             {
                 bool isStructure = currentItemData.Type == ItemType.Structure;
                 Main.PlayerInfo.Machine.SetState<MobAttackSwing>();
                 Audio.PlaySFX(currentItemData.Sfx);
                 SpawnBlock(isStructure);
-                if (currentItemData.Type == ItemType.Block)
-                    Main.PlayerInfo.Storage.RemoveItem(Target, 1, Main.PlayerInfo.Storage.Key);
             }
         }
         _blockObj.transform.position = Vector3.Lerp(_blockObj.transform.position, _coordinate + 
@@ -94,7 +96,7 @@ public static class Terraform
             info.SfxHit = SfxID.HitMetal;
             info.SfxDestroy = SfxID.HitMetal;
             Tutorial.OnPlaced(Target);
-            Main.PlayerInfo.Storage.RemoveItem(Target, 1, Main.PlayerInfo.Storage.Key);
+            RemoveHeldItem();
             return;
         }
 
@@ -112,10 +114,19 @@ public static class Terraform
         
         Tutorial.OnBlockPlaced();
         Entity.Spawn(Target, _coordinate);
+        RemoveHeldItem();
+    }
+
+    /// <summary>Consume one placed item from the held slot (cursor or hotbar).</summary>
+    private static void RemoveHeldItem()
+    {
+        Inventory.CurrentItem.Stack--;
+        if (Inventory.CurrentItem.Stack <= 0) Inventory.CurrentItem.clear();
+        Inventory.RefreshInventory();
     }
      
     
-    private static void HandleCoord()
+    private static bool HandleCoord()
     {
         Vector3Int adjustedPoint;
         if (Target == ID.Chalk)
@@ -125,8 +136,9 @@ public static class Terraform
   
         
         if (PendingBlocks.Contains(adjustedPoint) || !Scene.InPlayerBlockRange(adjustedPoint, 4) ||
-            !World.IsInWorldBounds(adjustedPoint)) return; 
+            !World.IsInWorldBounds(adjustedPoint)) return false; 
         _coordinate = adjustedPoint;
+        return true;
     } 
 }
     

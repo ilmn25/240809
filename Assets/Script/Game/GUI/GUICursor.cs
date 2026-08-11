@@ -32,6 +32,24 @@ public class GUICursor : GUI
         Rect.anchoredPosition = mousePosition;
     }
 
+    /// <summary>Quick-actions while the inventory is open. The cursor item is the held
+    /// item (see Inventory.SyncCurrentItemState), so the normal place/use paths already
+    /// work from the cursor; here we only handle dropping the held item.</summary>
+    public void HandleInteraction()
+    {
+        if (Data.isEmpty()) return;
+
+        if (Control.Inst.ActionSecondary.KeyDown() && !Input.GetKey(KeyCode.LeftShift))
+            DropToWorld();
+    }
+
+    private static void DropToWorld()
+    {
+        Inventory.DropToWorld(Data, Data.Stack, Main.PlayerInfo.Storage, Main.Player.transform.position);
+        Audio.PlaySFX(SfxID.Item);
+        UpdateCursorSlot();
+    }
+
     public void SetItemSlotInfo(ItemSlot item = null, bool ingredient = false)
     {
         if (item == null)

@@ -17,12 +17,17 @@ public class Inventory
 
     private static void SyncCurrentItemState()
     {  
-        CurrentItem = Main.PlayerInfo.Storage.List[Main.PlayerInfo.Storage.Key];
-        if (CurrentItem is { Stack: > 0 })
-        {
-            CurrentItemData = Item.GetItem(CurrentItem.ID); 
+        // The cursor item is the held item whenever it isn't empty (inventory open).
+        // This single rule lets every place/use path work from the cursor with no
+        // separate handling — the cursor item simply becomes the held item.
+        ItemSlot held = !GUICursor.Data.isEmpty() ? GUICursor.Data : Main.PlayerInfo.Storage.List[Main.PlayerInfo.Storage.Key];
 
-            Main.PlayerInfo.SetEquipment(CurrentItem);
+        if (held is { Stack: > 0 })
+        {
+            CurrentItem = held;
+            CurrentItemData = Item.GetItem(held.ID); 
+
+            Main.PlayerInfo.SetEquipment(held);
 
             if (CurrentItemData.ID == ID.Chalk || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
                 Terraform.BlockUpdate(CurrentItem.ID);
@@ -54,6 +59,21 @@ public class Inventory
         });
     }
 
+    /// <summary>Drop <paramref name="amount"/> of <paramref name="slot"/> to the world at
+    /// <paramref name="position"/>. Host spawns locally; client sends a drop message.</summary>
+    public static void DropToWorld(ItemSlot slot, int amount, Storage storage, Vector3 position)
+    {
+        if (Helper.IsHost())
+        {
+            Entity.SpawnItem(slot, position, amount: amount);
+            storage.NotifyChanged();
+        }
+        else if (NetworkClient.isConnected)
+        {
+            ClientDropSlot(slot, amount, storage, position);
+        }
+    }
+
     public static void Update()
     {
         // Spectating clients cannot use inventory (drop, hotkeys)
@@ -64,20 +84,8 @@ public class Inventory
 
         if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
         {
-            if (Helper.IsHost())
-            {
-                // Host: spawn locally + sync storage
-                if (Input.GetKey(KeyCode.LeftControl))
-                    Entity.SpawnItem(CurrentItem, Main.Player.transform.position);
-                else
-                    Entity.SpawnItem(CurrentItem, Main.Player.transform.position, amount: 1);
-                Main.PlayerInfo.Storage.NotifyChanged();
-            }
-            else if (NetworkClient.isConnected)
-            {
-                int dropAmount = Input.GetKey(KeyCode.LeftControl) ? CurrentItem.Stack : 1;
-                ClientDropSlot(CurrentItem, dropAmount, Main.PlayerInfo.Storage, Main.PlayerInfo.position);
-            }
+            int dropAmount = Input.GetKey(KeyCode.LeftControl) ? CurrentItem.Stack : 1;
+            DropToWorld(CurrentItem, dropAmount, Main.PlayerInfo.Storage, Main.Player.transform.position);
             RefreshInventory();
         }
 

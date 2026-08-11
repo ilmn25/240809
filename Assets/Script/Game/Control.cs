@@ -174,7 +174,7 @@ public class Control
         
         HandleInput();
 
-        if (Inst.ActionPrimary.KeyDown() && !GUIMain.IsHover &&
+        if (Inst.ActionPrimary.KeyDown() && !GUIMain.IsHover && !GUIMain.CursorActive &&
             Main.PlayerInfo?.Equipment?.Info.Type == ItemType.Tool &&
             Main.PlayerInfo.Machine is EntityMachine em &&
             (Helper.IsHost() || PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid)))
@@ -186,6 +186,7 @@ public class Control
     private static void HandleActionButton()
     {
         // Spectating clients cannot interact
+        if (GUIMain.CursorActive) return;
         if (!Helper.IsHost() && NetworkClient.isConnected &&
             Main.PlayerInfo != null &&
             !PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid))
@@ -255,6 +256,7 @@ public class Control
     
     private static void HandleInput()
     {
+        if (GUIMain.CursorActive) return;
         if (MouseLayer != -1 && MouseLayer != Main.MaskMap)
         {
             MouseTarget = _mouseRaycastInfo.collider.transform;

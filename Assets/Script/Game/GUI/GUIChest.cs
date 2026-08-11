@@ -1,4 +1,3 @@
-using Mirror;
 using UnityEngine;
 
 public class GUIChest : GUIStorage
@@ -26,14 +25,9 @@ public class GUIChest : GUIStorage
                         Storage.info.uid, Storage,
                         GUIMain.Storage.Storage.info.uid, GUIMain.Storage.Storage);
                 }
-                else if (Helper.IsHost())
+                else
                 {
-                    Entity.SpawnItem(Storage.List[CurrentSlotKey], Main.PlayerInfo.position); 
-                }
-                else if (NetworkClient.isConnected)
-                {
-                    int dropAmount = Storage.List[CurrentSlotKey].Stack;
-                    Inventory.ClientDropSlot(Storage.List[CurrentSlotKey], dropAmount, Storage, Main.PlayerInfo.position);
+                    Inventory.DropToWorld(Storage.List[CurrentSlotKey], Storage.List[CurrentSlotKey].Stack, Storage, Main.PlayerInfo.position);
                 }
                 //doesnt account for full inventory
             }

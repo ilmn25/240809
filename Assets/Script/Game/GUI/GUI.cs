@@ -30,7 +30,8 @@ public class GUI
     {
         if (IsHover || IsDrag)
         { 
-            if (Control.Inst.ActionPrimary.KeyDown())
+            // While an item is on the cursor, left-click is a quick-action, not a window drag.
+            if (Control.Inst.ActionPrimary.KeyDown() && GUICursor.Data.isEmpty())
             {
                 Position = Rect.anchoredPosition;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(

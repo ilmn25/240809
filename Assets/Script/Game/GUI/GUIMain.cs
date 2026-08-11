@@ -18,6 +18,9 @@ public static class GUIMain
 
     public static bool Showing = true;
     public static bool IsHover;
+    /// <summary>True while the inventory is open and an item is held on the cursor;
+    /// cursor quick-actions take over from world input.</summary>
+    public static bool CursorActive => Showing && !GUICursor.Data.isEmpty();
     public static void Initialize()
     {
         Inventory.SlotUpdate += RefreshStorage;
@@ -87,6 +90,7 @@ public static class GUIMain
 
         Dialogue.Update(); 
         Cursor.Update();
+        if (Showing) Cursor.HandleInteraction();
         StorageInv.Update();
         Storage.Update();
         GUICraft.Update();
