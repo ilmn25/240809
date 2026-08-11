@@ -129,4 +129,5 @@ public enum ID
     Spider,
     SpiderNest,
     SpiderWeb,
+    TreeMimic,
 }

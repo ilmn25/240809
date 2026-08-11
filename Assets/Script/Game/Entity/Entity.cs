@@ -280,6 +280,13 @@ public class Entity
                 loot.Add(1, 1, ID.Foul);
                 loot.Add(0.5f, 1, ID.Foul);
                 loot.Add(0.3f, 1, ID.Cytoplasm);   
+
+                AddMob<TreeMimicMachine>(ID.TreeMimic);
+                loot = new (ID.TreeMimic);
+                loot.Add(1, 2, ID.Log);
+                loot.Add(0.5f, 1, ID.Log);
+                loot.Add(0.4f, 1, ID.Acorn);
+                loot.Add(0.3f, 1, ID.Sticks);
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {
