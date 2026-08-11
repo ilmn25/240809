@@ -153,7 +153,7 @@ public static class GUIMain
             {
                 // Crafting slots use left/right-click to craft/queue.
                 if (GUIStorage.Hovered == GUIMain.GUICraft)
-                    return "LMB/RMB: craft";
+                    return "LMB/hold RMB: craft";
 
                 // Shift+LMB moves to the chest when hovering the player inventory with
                 // the chest open; otherwise it drops the stack.

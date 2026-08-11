@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>A single structure marker on the map (a static entity's world column).</summary>
 [Serializable]
 public class MapMarker
 {
@@ -11,33 +10,22 @@ public class MapMarker
     public int y;
 }
 
-/// <summary>
-/// Per-world 2D map state. Stores which columns have been
-/// explored (fog of war), caches structure markers, and generates a top-down
-/// terrain texture. Persisted with the World via BinaryFormatter, so the
-/// runtime-only fields (Texture, Dirty) are marked [NonSerialized].
-/// </summary>
 [Serializable]
 public class WorldMap
 {
     /// <summary>Per-column explored flag, indexed z * width + x. 0 = fog, 1 = revealed.</summary>
     public byte[] Explored;
-    /// <summary>Cached structure markers (built once per world).</summary>
     public List<MapMarker> Markers = new List<MapMarker>();
 
     [NonSerialized] public Texture2D Texture;
     [NonSerialized] public bool Dirty = true;
     [NonSerialized] private bool _markersBuilt;
-    /// <summary>Whether the whole map is currently revealed (F7 toggle).</summary>
     [NonSerialized] public bool FullReveal;
-    /// <summary>Backup of the explored mask taken before a full reveal, so the
-    /// toggle can restore the fog of war.</summary>
     [NonSerialized] private byte[] _savedExplored;
 
     private static readonly Color FogColor = new Color(0.08f, 0.08f, 0.10f, 1f);
-    private static readonly Color VoidColor = new Color(0.15f, 0.25f, 0.45f, 1f);
+    private static readonly Color VoidColor = new Color(0.75f, 0.75f, 0.85f, 1f);
 
-    /// <summary>Marks all columns within <paramref name="radius"/> of (x, z) as explored.</summary>
     public void Reveal(int x, int z, int radius)
     {
         World world = World.Inst;
@@ -63,7 +51,6 @@ public class WorldMap
         }
     }
 
-    /// <summary>Reveals or hides the whole map (fog of war toggle).</summary>
     public void ToggleFullReveal()
     {
         World world = World.Inst;
@@ -86,14 +73,8 @@ public class WorldMap
         Dirty = true;
     }
 
-    /// <summary>How far (in blocks) above or below the surface a structure must be
-    /// to appear on the map. Deeper structures are hidden.</summary>
     private const int SurfaceBand = 8;
 
-    /// <summary>Scans every chunk's static entities and caches their map markers.
-    /// Only structures near the surface are kept, so underground content stays hidden.
-    /// Must be called right after world generation, while all static entities are
-    /// still stored in the chunk lists (before any are loaded into the world).</summary>
     public void BuildMarkers(World world)
     {
         if (_markersBuilt) return;
@@ -116,7 +97,6 @@ public class WorldMap
         _markersBuilt = true;
     }
 
-    /// <summary>Adds a marker for a static entity if it's near the surface.</summary>
     private void AddMarker(World world, Info info)
     {
         if (info == null) return;
@@ -124,15 +104,12 @@ public class WorldMap
         int z = (int)info.position.z;
         int y = (int)info.position.y;
 
-        // Only keep structures near the surface.
         int surfaceY = FindSurfaceY(world, x, z);
         if (surfaceY < 0 || Mathf.Abs(y - surfaceY) > SurfaceBand) return;
 
         Markers.Add(new MapMarker { id = info.id, x = x, z = z, y = y });
     }
 
-    /// <summary>Scans a column top-to-bottom for the first air block above a solid
-    /// block — the ground surface. Returns -1 if no surface exists.</summary>
     private static int FindSurfaceY(World world, int x, int z)
     {
         for (int y = world.Bounds.y - 1; y >= 1; y--)
@@ -153,8 +130,6 @@ public class WorldMap
         return -1;
     }
 
-    /// <summary>Rebuilds the map texture from explored state, terrain, and markers.
-    /// Unexplored columns render as fog.</summary>
     public void RegenerateTexture(World world)
     {
         int width = world.Bounds.x;
@@ -171,8 +146,8 @@ public class WorldMap
         }
 
         Color[] pixels = new Color[width * height];
+        int[] surfaceHeights = new int[width * height];
 
-        // Terrain + fog
         for (int wz = 0; wz < height; wz++)
         {
             int cz = wz / World.ChunkSize;
@@ -205,15 +180,38 @@ public class WorldMap
                     }
                 }
 
-                Color color = block != 0 ? GetBlockColor(block) : VoidColor;
-                // Elevation → brightness: higher ground is brighter, lower is darker.
-                color *= GetElevationBrightness(surfaceY, world.Bounds.y);
-                pixels[idx] = color;
+                surfaceHeights[idx] = surfaceY;
+                pixels[idx] = block != 0 ? GetBlockColor(block) : VoidColor;
             }
         }
 
-        // Black cover at the explored edge: darken explored columns near the fog
-        // boundary with a gradient, so the edge reads as a visible black fade.
+        const int ShadowHeight = 12;
+        const float ShadowStrength = 0.45f;
+        for (int wz = 0; wz < height; wz++)
+        {
+            for (int wx = 0; wx < width; wx++)
+            {
+                int idx = wz * width + wx;
+                if (Explored[idx] == 0) continue;
+
+                float shadow = 0f;
+                for (int d = 1; d <= 2; d++)
+                {
+                    int hx = wx + d;
+                    int hz = wz + d;
+                    if (hx >= width || hz >= height) break;
+                    int hidx = hz * width + hx;
+                    if (Explored[hidx] == 0) continue;
+                    int diff = surfaceHeights[hidx] - surfaceHeights[idx];
+                    if (diff > 0)
+                        shadow = Mathf.Max(shadow, Mathf.Clamp01(diff / (float)ShadowHeight));
+                }
+
+                if (shadow > 0f)
+                    pixels[idx] = Color.Lerp(pixels[idx], Color.black, shadow * ShadowStrength);
+            }
+        }
+
         const int EdgeWidth = 4;
         for (int wz = 0; wz < height; wz++)
         {
@@ -222,7 +220,6 @@ public class WorldMap
                 int idx = wz * width + wx;
                 if (Explored[idx] == 0) continue;
 
-                // Distance to the nearest unexplored column (0 = adjacent).
                 int dist = EdgeWidth;
                 for (int d = 1; d <= EdgeWidth; d++)
                 {
@@ -240,7 +237,6 @@ public class WorldMap
 
                 if (dist < EdgeWidth)
                 {
-                    // Blend the explored edge toward the fog color instead of black.
                     float t = 1f - (dist / (float)EdgeWidth);
                     pixels[idx] = Color.Lerp(pixels[idx], FogColor, t);
                 }
@@ -252,31 +248,22 @@ public class WorldMap
         Dirty = false;
     }
 
-    /// <summary>Maps a surface height to a brightness multiplier (0.5–1.5) so
-    /// elevation is visible on the map. Higher ground is brighter.</summary>
-    private static float GetElevationBrightness(int surfaceY, int worldHeight)
-    {
-        if (worldHeight <= 0) return 1f;
-        float t = Mathf.Clamp01((float)surfaceY / worldHeight);
-        return Mathf.Lerp(0.5f, 1.5f, t);
-    }
-
     private static Color GetBlockColor(int blockID)
     {
         if (blockID == 0) return VoidColor;
         switch (Block.ConvertID(blockID))
         {
-            case ID.GrassBlock: return new Color(0.678f, 0.882f, 0.322f);
-            case ID.ForestBlock: return new Color(0.44f, 0.56f, 0.19f);
-            case ID.SandBlock: return new Color(0.92f, 0.90f, 0.75f);
-            case ID.StoneBlock: return new Color(0.50f, 0.50f, 0.50f);
-            case ID.GraniteBlock: return new Color(0.59f, 0.53f, 0.53f);
-            case ID.MarbleBlock: return new Color(0.65f, 0.78f, 0.90f);
-            case ID.BrickBlock: return new Color(0.72f, 0.84f, 0.86f);
-            case ID.WoodBlock: return new Color(0.44f, 0.35f, 0.26f);
-            case ID.BackroomBlock: return new Color(0.72f, 0.72f, 0.36f);
-            case ID.MulchBlock: return new Color(0.36f, 0.30f, 0.24f);
-            default: return new Color(0.40f, 0.40f, 0.40f);
+            case ID.GrassBlock: return new Color(0.60f, 0.64f, 0.42f);
+            case ID.ForestBlock: return new Color(0.30f, 0.40f, 0.22f);
+            case ID.SandBlock: return new Color(0.80f, 0.76f, 0.60f);
+            case ID.StoneBlock: return new Color(0.55f, 0.55f, 0.55f);
+            case ID.GraniteBlock: return new Color(0.62f, 0.58f, 0.58f);
+            case ID.MarbleBlock: return new Color(0.72f, 0.76f, 0.82f);
+            case ID.BrickBlock: return new Color(0.62f, 0.55f, 0.50f);
+            case ID.WoodBlock: return new Color(0.48f, 0.40f, 0.30f);
+            case ID.BackroomBlock: return new Color(0.62f, 0.60f, 0.42f);
+            case ID.MulchBlock: return new Color(0.38f, 0.32f, 0.26f);
+            default: return new Color(0.45f, 0.45f, 0.45f);
         }
     }
 }

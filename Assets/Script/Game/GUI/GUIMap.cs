@@ -114,9 +114,15 @@ public class GUIMap : GUI
             Vector3Int bounds = World.Inst.Bounds;
             Vector2 size = _mapRect.sizeDelta;
             Vector3 p = Main.Player.transform.position;
-            _mapRect.anchoredPosition = new Vector2(
+            Vector2 offset = new Vector2(
                 (0.5f - p.x / bounds.x) * size.x,
                 (0.5f - p.z / bounds.z) * size.y);
+            // The map is rotated to match the camera orbit, so rotate the
+            // offset into the panel space before centering on the player.
+            Vector3 rotated = _mapRect.localRotation * new Vector3(offset.x, offset.y, 0f);
+            // The map is also zoomed, so scale the offset to match how the
+            // player's position is displaced on screen.
+            _mapRect.anchoredPosition = new Vector2(rotated.x, rotated.y) * _zoom;
             _needsFocus = false;
         }
 
@@ -143,11 +149,7 @@ public class GUIMap : GUI
             }
             else
             {
-                GameObject markerObj = new GameObject("PlayerMarker", typeof(RectTransform), typeof(Image));
-                markerObj.transform.SetParent(_mapRect, false);
-                marker = markerObj.GetComponent<RectTransform>();
-                marker.GetComponent<Image>().color = Color.white;
-                if (_spriteMaterial != null) marker.GetComponent<Image>().material = _spriteMaterial;
+                marker = CreateMapImage("PlayerMarker").rectTransform;
                 _playerMarkers.Add(marker);
             }
 
@@ -184,11 +186,7 @@ public class GUIMap : GUI
 
             if (!_icons.TryGetValue(m, out Image icon))
             {
-                GameObject iconObj = new GameObject("Icon", typeof(RectTransform), typeof(Image));
-                iconObj.transform.SetParent(_mapRect, false);
-                icon = iconObj.GetComponent<Image>();
-                icon.color = Color.white;
-                if (_spriteMaterial != null) icon.material = _spriteMaterial;
+                icon = CreateMapImage("Icon");
                 _icons[m] = icon;
             }
 
@@ -196,6 +194,17 @@ public class GUIMap : GUI
             icon.sprite = GetSprite(m.id);
             PlaceAndSize(icon.rectTransform, icon.sprite, m.x, m.z);
         }
+    }
+
+    /// <summary>Creates an Image under the map rect with the shared sprite material.</summary>
+    private Image CreateMapImage(string name)
+    {
+        GameObject obj = new GameObject(name, typeof(RectTransform), typeof(Image));
+        obj.transform.SetParent(_mapRect, false);
+        Image img = obj.GetComponent<Image>();
+        img.color = Color.white;
+        if (_spriteMaterial != null) img.material = _spriteMaterial;
+        return img;
     }
 
     /// <summary>Positions a marker/icon at a world column and sizes it to the
@@ -246,8 +255,12 @@ public class GUIMap : GUI
         if (Mathf.Abs(scroll) > 0.01f)
         {
             float maxZoom = Settings.MaxZooms[Settings.Inst.MaxZoomIndex];
+            float oldZoom = _zoom;
             _zoom = Mathf.Clamp(_zoom + scroll * ZoomSpeed, MinZoom, maxZoom);
             _mapRect.localScale = Vector3.one * _zoom;
+            // Scale the pan by the zoom ratio so the point under the screen
+            // center stays anchored while zooming.
+            _mapRect.anchoredPosition *= _zoom / oldZoom;
         }
 
         // Drag to pan.
