@@ -89,7 +89,7 @@ public static class Tutorial
         if (Settings.Inst.TutorialEnabled && _progress == 10) _progress = 11;
     }
 
-    public static void OnEat()
+    public static void OnConsume()
     {
         if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
     }

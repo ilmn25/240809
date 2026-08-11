@@ -64,12 +64,14 @@ public class ItemSlot
 
             text += "\n \n" + Info.Description;
         }
-        else if (Info.Type == ItemType.Food)
+        else if (Info.Type == ItemType.Consumable)
         {
             text += Stack + "x";
 
-            if (Info.FoodValue > 0)
-                text += "\n \nrestores " + Info.FoodValue + " hunger";
+            if (Info.HealValue > 0)
+                text += "\n \nrestores " + Info.HealValue + " health";
+            if (Info.HungerValue > 0)
+                text += "\n \nrestores " + Info.HungerValue + " hunger";
 
             text += "\n \n" + Info.Description;
         }

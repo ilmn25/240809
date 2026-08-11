@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum ItemRarity { Common, Rare, Epic, Legendary }
-public enum ItemType { Tool, Armor, Accessory, Block, Structure, Material, Food}
+public enum ItemType { Tool, Armor, Accessory, Block, Structure, Material, Consumable}
 public enum ItemGesture { Swing, Poke, Cast, Shoot} 
 
 public partial class Item
@@ -44,12 +44,14 @@ public partial class Item
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.");
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.");
-        AddFoodDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
-        AddFoodDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
-        AddFoodDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
-        AddFoodDefinition(ID.CookedChicken, 8, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
-        AddFoodDefinition(ID.Egg, 3, "A fresh egg laid by a hen.");
-        AddFoodDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20);
+        AddConsumableDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
+        AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
+        AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
+        AddConsumableDefinition(ID.CookedChicken, 8, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
+        AddConsumableDefinition(ID.Egg, 3, "A fresh egg laid by a hen.");
+        AddConsumableDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20);
+        AddConsumableDefinition(ID.CookedDeathcap, 0, "A cooked mushroom that restores health.", materials: new Dictionary<ID, int> { { ID.Deathcap, 1 } }, time: 2000, healValue: 6);
+        AddConsumableDefinition(ID.Bandages, 0, "Clean bandages that patch up wounds.", materials: new Dictionary<ID, int> { { ID.Fabric, 1 } }, healValue: 6);
         AddMaterialDefinition(ID.Sand, "Loose sand collected from desert debris and deposits.");
         AddMaterialDefinition(ID.Glass, "Smelted glass used for windows and light fixtures.", materials: new Dictionary<ID, int> { { ID.Sand, 2 } }, time: 1800);
         AddMaterialDefinition(ID.Shell, "A tiny collection of shells found on the ground.");

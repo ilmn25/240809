@@ -122,4 +122,6 @@ public enum ID
     Door,
     Generator,
     Skeleton,
+    Bandages,
+    CookedDeathcap,
 }

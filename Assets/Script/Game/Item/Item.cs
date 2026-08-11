@@ -24,7 +24,8 @@ public partial class Item
     public float ProjectileOffset;
     public Vector2 HoldoutOffset;
     public float RotationOffset = 90;
-    public int FoodValue; // hunger restored when eaten (0 = not food)
+    public int HungerValue; // hunger restored when eaten (0 = not food)
+    public int HealValue; // health restored when consumed (0 = no direct heal)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
     /// <summary>Whether this item can be picked up by the player. False for
@@ -41,7 +42,7 @@ public partial class Item
     public string ActionLabel => Type switch
     {
         ItemType.Block or ItemType.Structure => "place",
-        ItemType.Food => "consume",
+        ItemType.Consumable => "consume",
         ItemType.Tool => "use",
         _ => "",
     };
@@ -80,14 +81,15 @@ public partial class Item
         Dictionary[id] = itemData;
     }
 
-    private static void AddFoodDefinition(
+    private static void AddConsumableDefinition(
         ID id,
-        int foodValue,
+        int hungerValue,
         string description = "",
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int time = 0,
-        int stackSize = 15)
+        int stackSize = 15,
+        int healValue = 0)
     {
         Item itemData = new Item()
         {
@@ -96,10 +98,11 @@ public partial class Item
             Rarity = ItemRarity.Common,
             Scale = 0.6f,
 
-            Type = ItemType.Food,
+            Type = ItemType.Consumable,
             Gesture = ItemGesture.Swing,
             HoldoutOffset = new Vector2(0.5f, 0),
-            FoodValue = foodValue,
+            HungerValue = hungerValue,
+            HealValue = healValue,
 
             Description = description
         };

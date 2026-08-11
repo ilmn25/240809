@@ -1,25 +1,25 @@
 using UnityEngine;
 
-/// <summary>Eating state: plays the swing animation, then on impact restores
-/// hunger (and health if full) and consumes one food item.</summary>
-class MobEat : MobState
+/// <summary>Consuming state: plays the swing animation, then on impact restores
+/// hunger (and health if full) and consumes one consumable item.</summary>
+class MobConsume : MobState
 {
-    public MobEat() { updateMode = global::Module.UpdateMode.Everyone; }
+    public MobConsume() { updateMode = global::Module.UpdateMode.Everyone; }
 
-    private Item _food;
+    private Item _consumable;
 
     public override void OnEnterState()
     {
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
         Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
-        _food = Info.Equipment?.Info;
+        _consumable = Info.Equipment?.Info;
         Info.SpeedModifier = 0.25f;
         Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
     }
 
     public override void OnUpdateState()
     {
-        // Host processes eating for all entities; client only for owned entities.
+        // Host processes consuming for all entities; client only for owned entities.
         if (!Helper.IsHost() && !Info.IsOwner()) return;
 
         AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
@@ -29,7 +29,7 @@ class MobEat : MobState
             {
                 Info.Animator.speed = 1;
                 Info.Animator.Play("EquipSwing", 0, 0f);
-                Eat();
+                Consume();
             }
             else if (stateInfo.IsName("EquipSwing"))
             {
@@ -47,25 +47,25 @@ class MobEat : MobState
         }
     }
 
-    private void Eat()
+    private void Consume()
     {
-        if (_food == null || (_food.HungerValue <= 0 && _food.HealValue <= 0)) return;
+        if (_consumable == null || (_consumable.HungerValue <= 0 && _consumable.HealValue <= 0)) return;
         if (Info is not PlayerInfo player) return;
 
-        Tutorial.OnEat();
+        Tutorial.OnConsume();
 
         // Direct heal (bandages, cooked mushroom) applies first.
-        if (_food.HealValue > 0)
-            player.Health = Mathf.Min(player.HealthMax, player.Health + _food.HealValue);
+        if (_consumable.HealValue > 0)
+            player.Health = Mathf.Min(player.HealthMax, player.Health + _consumable.HealValue);
 
         // Restore hunger first; overflow goes to health.
-        int hungerGain = Mathf.Min(_food.HungerValue, player.HungerMax - player.Hunger);
+        int hungerGain = Mathf.Min(_consumable.HungerValue, player.HungerMax - player.Hunger);
         player.Hunger += hungerGain;
-        int overflow = _food.HungerValue - hungerGain;
+        int overflow = _consumable.HungerValue - hungerGain;
         if (overflow > 0)
             player.Health = Mathf.Min(player.HealthMax, player.Health + overflow);
 
-        // Consume one food item from the held slot (cursor when non-empty, else hotbar).
+        // Consume one consumable item from the held slot (cursor when non-empty, else hotbar).
         if (Inventory.CurrentItem != null && Inventory.CurrentItem.Stack > 0)
         {
             Inventory.CurrentItem.Stack--;

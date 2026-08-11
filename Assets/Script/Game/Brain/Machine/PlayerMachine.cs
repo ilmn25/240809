@@ -25,7 +25,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             {
                 Name = "Inventory"
             },
-            HealthMax = 12,
+            HealthMax = 18,
             Defense = 0,
             Mana = 100,
             Sanity = 100,
@@ -58,7 +58,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new IncapacitatedState());
         AddState(new MobAttackSwing());
         AddState(new MobAttackShoot());
-        AddState(new MobEat());
+        AddState(new MobConsume());
         AddState(new MobChaseAction());
         AddState(new MobHit());
         AddState(new MobEscape());
@@ -129,9 +129,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                             if (Control.Inst.ActionPrimary.Key())
                                 Attack();
                             break;
-                        case ItemType.Food:
+                        case ItemType.Consumable:
                             if (Control.Inst.ActionPrimary.KeyDown())
-                                SetState<MobEat>();
+                                SetState<MobConsume>();
                             break;
                     }
                 } 

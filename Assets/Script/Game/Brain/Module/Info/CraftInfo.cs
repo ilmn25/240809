@@ -8,9 +8,9 @@ public class CraftInfo : SpriteStructureInfo
 {
     private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Workbench, ID.Campfire, ID.MulchBlock, ID.ChalkPowder, ID.Torch, ID.Generator);
     private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.WoodenToolbench), ID.Spear, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer);
-    private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken);
+    private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap);
     private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign, ID.Lamp);
-    private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric);
+    private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric, ID.Bandages);
     private static readonly Storage FurnacePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Furnace), ID.Slag, ID.Steel, ID.Copper);
     private static readonly Storage SmelterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Smelter), ID.Glass);
     private static readonly Storage MasonryPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.MasonryWorkbench), ID.Anvil, ID.Smelter, ID.OwlStatue, ID.OldRadio);
