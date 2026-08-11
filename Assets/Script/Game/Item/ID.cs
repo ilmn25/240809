@@ -124,4 +124,5 @@ public enum ID
     Skeleton,
     Bandages,
     CookedDeathcap,
+    BoundNPC,
 }

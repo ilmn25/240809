@@ -237,6 +237,9 @@ public class Entity
                 AddMob<GuideMachine>(ID.Guide);
                 loot = new (ID.Guide); // the guide drops nothing
 
+                AddMob<BoundNPCMachine>(ID.BoundNPC);
+                loot = new (ID.BoundNPC); // the bound NPC drops nothing
+
                 AddMob<MerchantMachine>(ID.Merchant);
                 loot = new (ID.Merchant); // the merchant drops nothing
                 
