@@ -258,7 +258,13 @@ public class Entity
                 AddMob<HarpyMachine>(ID.Harpy);
                 loot = new (ID.Harpy);
                 loot.Add(1, 2, ID.Foul);  
-                loot.Add(0.5f, 1, ID.Wool);   
+                loot.Add(0.5f, 1, ID.Wool);  
+
+                AddMob<BearMachine>(ID.Bear);
+                loot = new (ID.Bear);
+                loot.Add(1, 2, ID.Meat);
+                loot.Add(0.5f, 1, ID.Meat);
+                loot.Add(0.4f, 1, ID.Foul);   
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

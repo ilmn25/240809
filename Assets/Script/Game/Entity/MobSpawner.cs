@@ -20,7 +20,7 @@ public class MobSpawner
 
     private static readonly List<ID> GrassMobs = new() { ID.Sheep };
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
-    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime };
+    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Megumin, ID.Slime, ID.Bear };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
 
     /// <summary>True during Rapture or a full-moon (bright) night — spawns ramp up.</summary>
@@ -106,10 +106,7 @@ public class MobSpawner
             return;
         }
 
-        Entity.Spawn(ID.Hen, spawnPos);
-        Entity.Spawn(ID.Chick, spawnPos);
-        if (Random.value < 0.15f)
-            Entity.Spawn(ID.Rooster, spawnPos);
+        Entity.Spawn(mobID, spawnPos);
     }
 
     /// <summary>Counts currently-active passive farm animals (sheep/poultry).</summary>

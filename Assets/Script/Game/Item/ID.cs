@@ -125,4 +125,5 @@ public enum ID
     Bandages,
     CookedDeathcap,
     BoundNPC,
+    Bear,
 }
