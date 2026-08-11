@@ -8,7 +8,7 @@ public class SpiderNestMachine : StructureMachine
     private const int CheckInterval = 200;   // frames between checks (~3.3s at 60 fps)
     private const int RespawnDelay = 1200;   // frames before a lost spider respawns (~20s)
     private const float SpiderSearchRadius = 30f;
-    private const int MaxSpiders = 3;
+    private const int MaxSpiders = 6;
 
     private static readonly Collider[] SpiderScanBuffer = new Collider[16];
 

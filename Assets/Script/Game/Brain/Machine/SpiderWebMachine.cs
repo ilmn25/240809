@@ -15,7 +15,7 @@ public class SpiderWebMachine : HarvestableMachine
 
     public static Info CreateInfo()
     {
-        return new HarvestableInfo
+        return new SpiderWebInfo
         {
             Health = 8,
             SfxHit = SfxID.HitStone,
@@ -43,7 +43,7 @@ public class SpiderWebMachine : HarvestableMachine
         return Vector3.Distance(Main.PlayerInfo.position, transform.position) < WebRadius;
     }
 
-    private void AlertSpiders()
+    public void AlertSpiders()
     {
         int hits = Physics.OverlapSphereNonAlloc(transform.position, AlertRadius, ScanBuffer, Main.MaskEntity);
         for (int i = 0; i < hits; i++)

@@ -78,22 +78,9 @@ public class SpiderMachine : MobMachine
             }
         }
 
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        bool playerInRange = playerAlive &&
-            Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
-
-        // Aggressive: mark the player as a target on sight, drop it once they flee.
-        if (playerInRange && Info.Target != Main.PlayerInfo)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (!playerInRange && Info.Target == Main.PlayerInfo &&
-                 Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage)
-        {
-            Info.CancelTarget();
-        }
-
+        // Spiders only hunt when alerted — stepping on/breaking a web calls
+        // Investigate(), or being hit sets a target (EnemyInfo.OnHit). They do
+        // NOT aggro on sight, so they stay docile until provoked.
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)
