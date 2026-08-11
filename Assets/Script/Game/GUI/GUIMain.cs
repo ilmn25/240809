@@ -87,6 +87,7 @@ public static class GUIMain
 
     public static void Update()
     {
+        SyncHudVisibility();
 
         Dialogue.Update(); 
         Cursor.Update();
@@ -256,7 +257,17 @@ public static class GUIMain
         Storage.OnRefreshSlot?.Invoke(Storage, null);
         GUICraft.OnRefreshSlot?.Invoke(GUICraft, null);
         GUICursor.UpdateCursorSlot();
-    } 
+    }
+
+    /// <summary>Keeps the HUD visible only while the controlled player is alive.
+    /// Central source of truth: covers death, revival, and swapping between
+    /// alive/dead characters from one place.</summary>
+    public static void SyncHudVisibility()
+    {
+        bool alive = Main.PlayerInfo != null &&
+                     Main.PlayerInfo.PlayerStatus != PlayerStatus.Incapacitated;
+        Show(alive);
+    }
     public static IEnumerator Scale(bool show, float duration, GameObject target, float scale, float easeSpeed = 0.5f)
     { 
         Vector3 initialScale = target.transform.localScale;

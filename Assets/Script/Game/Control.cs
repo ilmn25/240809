@@ -79,6 +79,9 @@ public class Control
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
         Inventory.RefreshInventory();
         GUIBar.Update();
+        // Immediate HUD sync so a swap to an alive/dead character shows/hides
+        // the inventory correctly (also enforced every frame in GUIMain.Update).
+        GUIMain.SyncHudVisibility();
         CurrentPlayerIndex = i;
     }
 
