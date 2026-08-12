@@ -76,6 +76,9 @@ public static class GUIMain
 
     public static void UpdateMenu()
     {
+        // The cursor only follows in game mode, so hide it in the menu to avoid
+        // a stuck, non-moving cursor.
+        if (Main.GUICursor != null) Main.GUICursor.SetActive(false);
         GUIMenu.Update();
     }
 
@@ -89,6 +92,8 @@ public static class GUIMain
     {
         SyncHudVisibility();
 
+        // Re-show the cursor now that we're in game mode (hidden while in menu).
+        if (Main.GUICursor != null) Main.GUICursor.SetActive(true);
         Dialogue.Update(); 
         Cursor.Update();
         if (Showing) Cursor.HandleInteraction();

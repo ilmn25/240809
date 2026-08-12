@@ -10,7 +10,8 @@ public class GUICursor : GUI
     private static TextMeshProUGUI _infoSlotText;
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
-    
+    private static Sprite _cursorIcon;   // the default cursor icon, shown when no item is held
+
     public new void Initialize()
     {
         ShowSpeed = 0.25f;
@@ -23,6 +24,7 @@ public class GUICursor : GUI
         Text = Main.GUICursorInfo.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
         _cursorSlotText = Main.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         _cursorSlotImage = Main.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
+        _cursorIcon = _cursorSlotImage.sprite; // the slot's default image is the cursor icon
     }
 
     public void Update()
@@ -76,13 +78,15 @@ public class GUICursor : GUI
     
     public static void UpdateCursorSlot()
     { 
+        // Always show the cursor. Swap its icon to the held item when there is one.
+        Main.GUICursorSlot.SetActive(true);
         if (Data.Stack == 0)
         {
-            Main.GUICursorSlot.SetActive(false);
+            _cursorSlotImage.sprite = _cursorIcon;
+            _cursorSlotText.text = "";
         }
         else
         {
-            Main.GUICursorSlot.SetActive(true);
             _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.ID}");
             _cursorSlotText.text = Data.Stack.ToString();
         } 
