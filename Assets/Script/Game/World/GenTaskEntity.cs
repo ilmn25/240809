@@ -59,6 +59,7 @@ public class GenTaskEntity : Gen
                         {
                             currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Skeleton, position));
                             SpawnSkeletonLoot(currentCoordinate, currentChunk, position, rng);
+                            continue; // one structure per cell — skip the biome spawn
                         }
                         if (currentChunk[x, y, z] == Forest)
                         {
