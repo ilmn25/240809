@@ -73,6 +73,11 @@ public class GUIMap : GUI
         GameObject mapObj = new GameObject("MapImage", typeof(RectTransform), typeof(RawImage));
         mapObj.transform.SetParent(panel.transform, false);
         _mapRect = mapObj.GetComponent<RectTransform>();
+        // Pin to center anchors + center pivot so rotation spins around the view
+        // area's center (not a runtime-default corner).
+        _mapRect.anchorMin = new Vector2(0.5f, 0.5f);
+        _mapRect.anchorMax = new Vector2(0.5f, 0.5f);
+        _mapRect.pivot = new Vector2(0.5f, 0.5f);
         _mapRect.anchoredPosition = Vector2.zero;
         _mapImage = mapObj.GetComponent<RawImage>();
         _spriteMaterial = Resources.Load<Material>("Shader/Material/CustomSprite");
