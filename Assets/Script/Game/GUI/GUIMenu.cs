@@ -59,12 +59,12 @@ public partial class GUIMenu
         Show(true);
     }
 
-    /// <summary>Return the menu to its neutral state and hide it. Called when a
-    /// new or loaded game starts so a stale death/pause screen can't stick around.</summary>
+    /// <summary>Hide the menu and clear any transition so a fresh new/loaded game
+    /// starts with no menu on screen. Does NOT switch to the Main screen — the
+    /// player is already entering a game.</summary>
     public void ResetToNeutral()
     {
         _transitioning = false;
-        _screen = MenuScreen.Main;
         Show(false);
     }
 
@@ -292,7 +292,7 @@ public partial class GUIMenu
     {
         return _screen switch
         {
-            MenuScreen.Main => Header("ANIMAL WELL") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
+            MenuScreen.Main => Header("MORIMORI") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
