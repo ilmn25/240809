@@ -9,8 +9,6 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
 {
     private const int CheckInterval = 200;  // frames between checks (~3.3s at 60 fps)
     private const int RespawnDelay = 900;   // frames before a lost guide respawns (~15s)
-    private const float GuideSearchRadius = 40f;
-    private const float TetherRadius = 8f;  // snap the guide back if it wanders this far
 
     private Info _guideInfo;
     private int _timer;
@@ -41,11 +39,6 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
         if (++_timer < CheckInterval) return;
         _timer = 0;
 
-        // Tether the guide back to the statue so it stays home.
-        if (_guideInfo != null && _guideInfo.Machine != null &&
-            Vector3.Distance(_guideInfo.Machine.transform.position, transform.position) > TetherRadius)
-            _guideInfo.Machine.transform.position = transform.position + Vector3.up * 2;
-
         if (GuideAlive()) return;
 
         if (_respawnTimer > 0)
@@ -72,21 +65,11 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
         return new Dialogue { Text = "this is the center of the map" };
     }
 
-    // True while this statue's guide is still alive. Falls back to adopting any
-    // guide already standing nearby (e.g. after a world reload or when placed
-    // beside another statue), so one statue never stacks extra guides.
+    // True while this statue's guide is still alive. We just track the guide we
+    // spawned — no scanning the world to adopt random nearby guides.
     private bool GuideAlive()
     {
-        if (_guideInfo != null && !_guideInfo.Destroyed && _guideInfo.Machine != null)
-            return true;
-
-        Info guide = EntityScan.FindNearest(transform.position, GuideSearchRadius, i => i.Machine is GuideMachine g && !g.Info.Destroyed);
-        if (guide != null)
-        {
-            _guideInfo = guide;
-            return true;
-        }
-        return false;
+        return _guideInfo != null && !_guideInfo.Destroyed && _guideInfo.Machine != null;
     }
 
     // Glows at night and turns off during the day. Runs in Everyone mode so it

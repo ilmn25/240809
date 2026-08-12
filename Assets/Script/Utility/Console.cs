@@ -352,7 +352,12 @@ public class Console : MonoBehaviour
         {
             for (int i = 0; i < count; i++)
             {
-                Info info = Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
+                // Items (Spear, logs, ...) aren't registered as world entities, so
+                // spawn them as dropped items instead of crashing on a missing key.
+                if (!Entity.Dictionary.ContainsKey(id))
+                    Entity.SpawnItem(id, Main.PlayerInfo.position);
+                else
+                    Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
             } 
         }
     }

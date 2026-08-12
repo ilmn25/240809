@@ -325,7 +325,7 @@ public partial class Item
 
         AddToolDefinition(
             id: ID.Spear,
-            gesture: ItemGesture.Swing,
+            gesture: ItemGesture.Shoot,
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = ID.Spear,
