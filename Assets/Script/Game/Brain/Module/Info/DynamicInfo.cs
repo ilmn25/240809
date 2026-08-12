@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 [System.Serializable]
 public class DynamicInfo : Info
 {
-    public DynamicInfo() { updateMode = UpdateMode.Everyone; }
+    public DynamicInfo() { updateMode = UpdateMode.Everyone; Flammable = true; }
     private const int KnockbackInterval = 3;
     public HitboxType HitboxType;
     public ID CharSprite = ID.Null;

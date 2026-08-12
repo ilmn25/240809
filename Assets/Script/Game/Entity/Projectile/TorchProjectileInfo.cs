@@ -1,9 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// A melee swing that, instead of dealing damage, ignites flammable objects
-/// it touches (like a torch). Any structure with a FlammableModule catches
-/// fire when struck.
+/// A melee swing that, instead of dealing damage, ignites flammable entities
+/// it touches (like a torch). Any flammable entity (structure, mob, player)
+/// catches fire when struck.
 /// </summary>
 public class TorchProjectileInfo : SwingProjectileInfo
 {

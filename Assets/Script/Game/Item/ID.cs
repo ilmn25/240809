@@ -133,4 +133,5 @@ public enum ID
     Lich,
     Mannequin,
     Headstone,
+    Burn,
 }

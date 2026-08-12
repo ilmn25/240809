@@ -1,14 +1,17 @@
 using UnityEngine;
- 
+
+/// <summary>Makes an entity flammable. Igniting applies a Burn status effect that
+/// deals damage over time and shows "Burning" in the HUD. Fire spreads to nearby
+/// flammable entities via FireRegistry and, for structures, consumes them.</summary>
 public class FlammableModule : EntityModule
 {
-    /// <summary>How long (seconds) the object burns before it is destroyed.</summary>
+    /// <summary>How long (seconds) a structure burns before it is destroyed.</summary>
     public float BurnDuration = 25f;
-    /// <summary>Damage dealt to the structure per second while burning.</summary>
+    /// <summary>Damage dealt per second while burning.</summary>
     public float BurnDamagePerSecond = 4f;
-    /// <summary>Radius within which this fire can ignite other flammable objects.</summary>
+    /// <summary>Radius within which this fire can ignite other flammable entities.</summary>
     public float SpreadRadius = 2.5f;
-    /// <summary>Chance per spread tick to ignite a nearby flammable object.</summary>
+    /// <summary>Chance per spread tick to ignite a nearby flammable entity.</summary>
     public float SpreadChance = 0.12f;
     /// <summary>Seconds between spread attempts.</summary>
     public float SpreadInterval = 2.5f;
@@ -18,7 +21,6 @@ public class FlammableModule : EntityModule
     public float SmokeInterval = 1.2f;
 
     private float _burnTime;
-    private float _damageTimer;
     private float _spreadTimer;
     private float _particleTimer;
     private float _smokeTimer;
@@ -37,7 +39,8 @@ public class FlammableModule : EntityModule
     public override void Initialize()
     {
         base.Initialize();
-        FireRegistry.Register(this);
+        if (Info.Flammable)
+            FireRegistry.Register(this);
     }
 
     public override void Update()
@@ -46,7 +49,6 @@ public class FlammableModule : EntityModule
 
         Info info = Info;
         if (info == null || info.Destroyed) return;
-
         if (info.FireLevel <= 0f) return;
 
         float dt = Helper.GetDeltaTime();
@@ -57,7 +59,6 @@ public class FlammableModule : EntityModule
         _spreadTimer += dt;
         _particleTimer += dt;
         _smokeTimer += dt;
-        _damageTimer += dt;
 
         if (_particleTimer >= ParticleInterval)
         {
@@ -77,55 +78,42 @@ public class FlammableModule : EntityModule
             FireRegistry.SpreadFrom(this);
         }
 
-        if (_damageTimer >= 1f)
-        {
-            _damageTimer = 0f;
-            ApplyBurnDamage(info);
-        }
-
-        if (_burnTime >= BurnDuration)
-        {
+        // Structures are consumed by fire; living entities just burn until the
+        // Burn status effect expires (or they die from the damage).
+        if (info is StructureInfo && _burnTime >= BurnDuration)
             BurnOut(info);
-        }
     }
 
-    private void ApplyBurnDamage(Info info)
-    {
-        if (info is StructureInfo structure)
-        {
-            structure.Health -= BurnDamagePerSecond;
-            if (structure.Health <= 0f)
-            {
-                BurnOut(info);
-            }
-        }
-    }
-
-    /// <summary>Ignite this object. Returns true if it started burning.</summary>
+    /// <summary>Ignite this entity. Returns true if it started burning.</summary>
     public bool Ignite()
     {
         Info info = Info;
         if (info == null || info.Destroyed) return false;
+        if (!info.Flammable) return false;
         if (info.FireLevel > 0f) return false;
 
         info.FireLevel = 0.15f;
         _burnTime = 0f;
-        _damageTimer = 0f;
         _spreadTimer = 0f;
         _particleTimer = 0f;
         _smokeTimer = 0f;
+
+        // Route the burn damage through the status effect system so it ticks
+        // uniformly (structures and living entities) and shows as "Burning".
+        GetModule<StatusEffectModule>()?.Apply(new StatusEffect(
+            ID.Burn, EffectType.Damage, BurnDuration, 1f, (int)BurnDamagePerSecond, name: "Burning"));
+
         Particle.Create(info.position + new Vector3(0, 0.5f, 0), Particles.Fire, false);
         return true;
     }
 
-    /// <summary>Destroy the object once it has burned out.</summary>
+    /// <summary>Destroy a structure once it has burned out.</summary>
     private void BurnOut(Info info)
     {
         info.FireLevel = 0f;
         FireRegistry.Unregister(this);
-
+        GetModule<StatusEffectModule>()?.Remove(ID.Burn);
         BurnOutcomeRegistry.Get(info.id)?.Apply(info.position);
-
         info.Destroy();
     }
 }

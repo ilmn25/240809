@@ -17,6 +17,7 @@ public abstract class EntityMachine : Machine, IInfoProvider
         StatePrevious = State.DefaultState;
         AddModule(info);
         AddModule(new StatusEffectModule());
+        AddModule(new FlammableModule());
         // Track by uid so the server can find and destroy entities (e.g. client pickup relay).
         if (string.IsNullOrEmpty(info.uid))
             info.uid = Guid.NewGuid().ToString("N");

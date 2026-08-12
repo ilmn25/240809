@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Host-side registry of all active flammable objects. Used by FlammableModule
-/// to spread fire from a burning object to nearby flammable neighbors.
+/// Host-side registry of all active flammable entities. Used by FlammableModule
+/// to spread fire from a burning entity to nearby flammable neighbors.
 /// </summary>
 public static class FireRegistry
 {
