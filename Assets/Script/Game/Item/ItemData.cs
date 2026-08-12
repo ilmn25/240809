@@ -76,7 +76,7 @@ public partial class Item
         AddMaterialDefinition(ID.Slag, "Molten industrial residue used in crafting.", materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
         AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.");
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500);
-        AddMaterialDefinition(ID.Deathcap, "A rare poisonous mushroom found in dark forests.");
+        AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
 

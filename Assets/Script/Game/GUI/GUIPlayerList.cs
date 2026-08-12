@@ -78,9 +78,11 @@ public class GUIPlayerList : GUI
             HideInfo();
             return;
         }
+        string effects = player.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
         GUIMain.Cursor.Set(
             $"HP {player.Health}/{player.HealthMax}",
             $"Controlled by: {ControlStatus(player)}\n" +
+            (effects.Length > 0 ? "Effects: " + effects + "\n" : "") +
             (IsControlling(player) ? "(controlling)" : "Click to select"));
     }
 

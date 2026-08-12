@@ -14,10 +14,13 @@ public class StatusEffect
     public float TickInterval;
     public int AmountPerTick;
     public float SlowAmount;
+    /// <summary>Optional display name shown in the HUD/info panel. Falls back to
+    /// the EffectID's display name when empty.</summary>
+    public string Name;
 
     public StatusEffect() { }
 
-    public StatusEffect(ID effectID, EffectType type, float duration, float tickInterval, int amountPerTick = 0, float slowAmount = 0)
+    public StatusEffect(ID effectID, EffectType type, float duration, float tickInterval, int amountPerTick = 0, float slowAmount = 0, string name = null)
     {
         EffectID = effectID;
         Type = type;
@@ -25,5 +28,6 @@ public class StatusEffect
         TickInterval = tickInterval;
         AmountPerTick = amountPerTick;
         SlowAmount = slowAmount;
+        Name = name;
     }
 }

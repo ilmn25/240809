@@ -56,7 +56,6 @@ public class StatusEffectModule : EntityModule
             {
                 effect.Definition = definition;
                 effect.Remaining = definition.Duration;
-                effect.TickTimer = 0f;
                 return;
             }
         }
@@ -84,6 +83,23 @@ public class StatusEffectModule : EntityModule
             if (effect.Definition.EffectID == effectID)
                 return true;
         return false;
+    }
+
+    /// <summary>Comma-separated names of the currently active effects, or empty
+    /// when none are active. Used for HUD / info-panel display.</summary>
+    public string ActiveEffectsText()
+    {
+        if (_effects.Count == 0) return "";
+
+        var names = new List<string>(_effects.Count);
+        foreach (ActiveEffect effect in _effects)
+        {
+            string name = effect.Definition.Name;
+            if (string.IsNullOrEmpty(name))
+                name = Helper.ToDisplayName(effect.Definition.EffectID);
+            names.Add(name);
+        }
+        return string.Join(", ", names);
     }
 
     private void ApplyTick(StatusEffect definition)

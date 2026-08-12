@@ -207,10 +207,12 @@ public static class GUIMain
             : $"Controlling Player {playerIndex}";
 
         string tutorial = Tutorial.BuildHudText();
+        string effects = Main.PlayerInfo?.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
         Main.GUIHudText.text =
             $"{BuildTimeHudText()}\n" +
             $"{controlStatus} | Slot {slotId}\n" +
             BuildTargetHudText(Main.PlayerInfo?.Target) +
+            (effects.Length > 0 ? "\nEffects: " + effects : "") +
             (tutorial.Length > 0 ? "\n" + tutorial : "") +
             "\n" + BuildShortcutsText();
     }

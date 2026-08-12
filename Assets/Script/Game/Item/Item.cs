@@ -26,6 +26,7 @@ public partial class Item
     public float RotationOffset = 90;
     public int HungerValue; // hunger restored when eaten (0 = not food)
     public int HealValue; // health restored when consumed (0 = no direct heal)
+    public int DamageValue; // damage dealt to the eater when consumed (0 = safe)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
     /// <summary>Whether this item can be picked up by the player. False for
@@ -89,7 +90,8 @@ public partial class Item
         int craftStack = 1,
         int time = 0,
         int stackSize = 15,
-        int healValue = 0)
+        int healValue = 0,
+        int damageValue = 0)
     {
         Item itemData = new Item()
         {
@@ -103,6 +105,7 @@ public partial class Item
             HoldoutOffset = new Vector2(0.5f, 0),
             HungerValue = hungerValue,
             HealValue = healValue,
+            DamageValue = damageValue,
 
             Description = description
         };

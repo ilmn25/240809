@@ -49,7 +49,8 @@ class MobConsume : MobState
 
     private void Consume()
     {
-        if (_consumable == null || (_consumable.HungerValue <= 0 && _consumable.HealValue <= 0)) return;
+        if (_consumable == null ||
+            (_consumable.HungerValue <= 0 && _consumable.HealValue <= 0 && _consumable.DamageValue <= 0)) return;
         if (Info is not PlayerInfo player) return;
 
         Tutorial.OnConsume();
@@ -57,6 +58,13 @@ class MobConsume : MobState
         // Direct heal (bandages, cooked mushroom) applies first.
         if (_consumable.HealValue > 0)
             player.Health = Mathf.Min(player.HealthMax, player.Health + _consumable.HealValue);
+
+        // Poisonous food (raw deathcap) hurts the eater.
+        if (_consumable.DamageValue > 0)
+        {
+            player.Health -= _consumable.DamageValue;
+            Audio.PlaySFX(SfxID.HitPlayer);
+        }
 
         // Restore hunger first; overflow goes to health.
         int hungerGain = Mathf.Min(_consumable.HungerValue, player.HungerMax - player.Hunger);

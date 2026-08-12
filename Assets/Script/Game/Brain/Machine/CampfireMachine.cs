@@ -9,8 +9,8 @@ public class CampfireMachine: CraftingMachine
     private const float HealInterval = 1f;
     private static readonly Collider[] HealBuffer = new Collider[32];
 
-    private static readonly StatusEffect Regeneration = new StatusEffect(
-        ID.Campfire, EffectType.Heal, duration: 3f, tickInterval: 1f, amountPerTick: 1);
+    private static readonly StatusEffect Cozy = new StatusEffect(
+        ID.Campfire, EffectType.Heal, duration: 3f, tickInterval: 12f, amountPerTick: 1, name: "Cozy");
 
     public static Info CreateInfo()
     {
@@ -37,9 +37,8 @@ public class CampfireMachine: CraftingMachine
                 if (!HealBuffer[i].TryGetComponent(out EntityMachine em)) continue;
                 if (em.Info is not DynamicInfo dynamicInfo) continue;
                 if (dynamicInfo.HitboxType == HitboxType.Enemy) continue;
-                if (dynamicInfo.Health >= dynamicInfo.HealthMax) continue;
 
-                em.GetModule<StatusEffectModule>()?.Apply(Regeneration);
+                em.GetModule<StatusEffectModule>()?.Apply(Cozy);
             }
         }
     }
