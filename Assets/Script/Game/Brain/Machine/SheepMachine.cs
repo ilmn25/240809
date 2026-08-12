@@ -100,21 +100,11 @@ public class SheepMachine : AnimalMachine
     // Keeps the flock together: follows the nearest sheep that has strayed past herd spacing.
     private bool HerdUp()
     {
-        int count = Physics.OverlapSphereNonAlloc(transform.position, Info.DistAlert, SheepScanBuffer, Main.MaskEntity);
-        SheepMachine flockmate = null;
-        float bestSqr = float.MaxValue;
-        for (int i = 0; i < count; i++)
-        {
-            if (SheepScanBuffer[i].TryGetComponent(out SheepMachine other) && other != this)
-            {
-                float sqr = (other.transform.position - transform.position).sqrMagnitude;
-                if (sqr < bestSqr) { bestSqr = sqr; flockmate = other; }
-            }
-        }
+        Info flockmate = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i.Machine is SheepMachine s && s != this);
         if (flockmate == null) return false;
-        if (bestSqr < Info.DistFollow * Info.DistFollow) return false; // already huddled
+        if ((flockmate.position - transform.position).sqrMagnitude < Info.DistFollow * Info.DistFollow) return false; // already huddled
 
-        Info.Target = flockmate.Info;
+        Info.Target = flockmate;
         Info.ActionType = IActionType.Follow;
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobChaseAction>();

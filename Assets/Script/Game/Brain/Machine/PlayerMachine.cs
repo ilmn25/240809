@@ -145,8 +145,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     // ---- Ally AI (Death Road to Canada style) ----
 
-    private static readonly Collider[] AllyScanBuffer = new Collider[32];
-
     /// <summary>Recall all allies: cancel their current target/action. The ally brain
     /// then auto-follows the leader. Runs on the host (authority over ally AI).</summary>
     public static void RecallAllies()
@@ -276,19 +274,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     // Nearest threat in the ally's alert radius.
     private MobInfo FindNearestThreat()
     {
-        int count = Physics.OverlapSphereNonAlloc(transform.position, Info.DistAlert, AllyScanBuffer, Main.MaskEntity);
-        MobInfo best = null;
-        float bestSqr = float.MaxValue;
-        for (int i = 0; i < count; i++)
-        {
-            if (AllyScanBuffer[i].TryGetComponent(out EntityMachine em) &&
-                em.Info is MobInfo enemy && IsThreat(enemy))
-            {
-                float sqr = (em.transform.position - transform.position).sqrMagnitude;
-                if (sqr < bestSqr) { bestSqr = sqr; best = enemy; }
-            }
-        }
-        return best;
+        return EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is MobInfo m && IsThreat(m)) as MobInfo;
     }
 
     public override void Attack()

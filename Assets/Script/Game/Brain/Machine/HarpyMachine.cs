@@ -12,7 +12,6 @@ public class HarpyMachine : GroundMobMachine
 
     private bool _committed;               // latched once grouped — keeps them attacking
 
-    private static readonly Collider[] HarpyScanBuffer = new Collider[16];
     private static readonly ProjectileInfo TalonProjectile = new ContactDamageProjectileInfo {
         Damage = 3,
         Knockback = 9,
@@ -127,14 +126,7 @@ public class HarpyMachine : GroundMobMachine
     /// <summary>Counts how many harpies are grouped near this one (including itself).</summary>
     private int GroupedHarpies()
     {
-        int count = 1;
-        int hits = Physics.OverlapSphereNonAlloc(transform.position, GroupRadius, HarpyScanBuffer, Main.MaskEntity);
-        for (int i = 0; i < hits; i++)
-        {
-            if (HarpyScanBuffer[i].TryGetComponent(out HarpyMachine other) && other != this)
-                count++;
-        }
-        return count;
+        return 1 + EntityScan.Count(transform.position, GroupRadius, i => i.Machine is HarpyMachine h && h != this);
     }
 
 } 

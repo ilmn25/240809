@@ -11,6 +11,7 @@ public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
             SpeedGround = 5,
             SpeedAir = 6,
             DistRoam = 3,
+            IsNPC = true,
         };
     }
 
@@ -21,6 +22,7 @@ public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
         AddState(new MobIdle(600)); // lingers in place longer than the animals
         AddState(new MobRoam());
         AddState(new MobHit());
+        AddState(new MobEscape());
         AddState(new EquipSelectState());
 
         AddState(new DialogueState(CreateGuideDialogue()));
@@ -36,14 +38,18 @@ public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
     {
         if (!IsCurrentState<DefaultState>()) return;
 
-        // The guide is approachable — it never flees or fights, just stays put.
+        // The guide is approachable — it never fights, just flees from anything
+        // that attacks it, otherwise stays put.
         if (Info.Target != null)
-            Info.CancelTarget();
+        {
+            if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
+                Info.CancelTarget(); // the threat got away — calm down
+            else
+                SetState<MobEscape>(); // run from the attacker
+            return;
+        }
 
-        if (Random.value > 0.5f)
-            SetState<MobRoam>();
-        else
-            SetState<MobIdle>(); // registered with a long idle time in OnStart
+        SetState<MobIdle>(); // lingers in place (long idle from OnStart)
     }
 
     // Steps the player through the early-game progression. Pressing the interact

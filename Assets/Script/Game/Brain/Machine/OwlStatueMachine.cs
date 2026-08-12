@@ -12,8 +12,6 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
     private const float GuideSearchRadius = 40f;
     private const float TetherRadius = 8f;  // snap the guide back if it wanders this far
 
-    private static readonly Collider[] GuideScanBuffer = new Collider[8];
-
     private Info _guideInfo;
     private int _timer;
     private int _respawnTimer;
@@ -82,14 +80,11 @@ public class OwlStatueMachine : StructureMachine, IActionSecondaryInteract
         if (_guideInfo != null && !_guideInfo.Destroyed && _guideInfo.Machine != null)
             return true;
 
-        int count = Physics.OverlapSphereNonAlloc(transform.position, GuideSearchRadius, GuideScanBuffer, Main.MaskEntity);
-        for (int i = 0; i < count; i++)
+        Info guide = EntityScan.FindNearest(transform.position, GuideSearchRadius, i => i.Machine is GuideMachine g && !g.Info.Destroyed);
+        if (guide != null)
         {
-            if (GuideScanBuffer[i].TryGetComponent(out GuideMachine guide) && !guide.Info.Destroyed)
-            {
-                _guideInfo = guide.Info;
-                return true;
-            }
+            _guideInfo = guide;
+            return true;
         }
         return false;
     }

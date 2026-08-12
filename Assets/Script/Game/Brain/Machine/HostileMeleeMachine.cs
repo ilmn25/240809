@@ -48,23 +48,36 @@ public abstract class HostileMeleeMachine : GroundMobMachine
             SetState<MobIdle>();
     }
 
-    /// <summary>Lock onto the player on sight; release them once they retreat well
-    /// out of disengage range.</summary>
+    /// <summary>Lock onto the nearest player or friendly NPC on sight; release it
+    /// once it retreats well out of disengage range.</summary>
     protected void UpdateAggro()
     {
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        bool playerInRange = playerAlive &&
-            Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
+        Info nearest = FindNearestAggroTarget();
+        if (nearest != null)
+        {
+            if (Info.Target != nearest)
+            {
+                Info.Target = nearest;
+                Info.PathingStatus = PathingStatus.Pending;
+            }
+            return;
+        }
 
-        if (playerInRange && Info.Target != Main.PlayerInfo)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (!playerInRange && Info.Target == Main.PlayerInfo &&
-                 Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage)
-        {
+        // Nothing in range — release any current target that has wandered off.
+        if (Info.Target != null &&
+            Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
             Info.CancelTarget();
-        }
+    }
+
+    private Info FindNearestAggroTarget()
+    {
+        // The player is always a candidate (relentless); friendly NPCs only within
+        // alert range.
+        Info best = (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed) ? Main.PlayerInfo : null;
+        Info npc = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is DynamicInfo d && d.IsNPC);
+        if (npc != null && (best == null ||
+            (npc.position - transform.position).sqrMagnitude < (best.position - transform.position).sqrMagnitude))
+            best = npc;
+        return best;
     }
 }

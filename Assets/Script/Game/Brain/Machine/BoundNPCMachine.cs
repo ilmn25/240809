@@ -13,6 +13,7 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
             SpeedAir = 6,
             DistRoam = 3,
             CharSprite = ID.Chito,
+            IsNPC = true,
         };
     }
 
@@ -20,8 +21,7 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
     {
         base.OnStart();
 
-        AddState(new MobIdle(600));
-        AddState(new MobRoam());
+        AddState(new MobIdle());
         AddState(new MobHit());
         AddState(new EquipSelectState());
     }
@@ -36,13 +36,11 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
     {
         if (!IsCurrentState<DefaultState>()) return;
 
+        // Bound NPC stays put — it can't move until rescued.
         if (Info.Target != null)
             Info.CancelTarget();
 
-        if (Random.value > 0.5f)
-            SetState<MobRoam>();
-        else
-            SetState<MobIdle>();
+        SetState<MobIdle>();
     }
 
     // Converts this bound NPC into a controllable player added to the save.

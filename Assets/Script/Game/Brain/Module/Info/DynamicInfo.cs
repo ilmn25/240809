@@ -8,6 +8,9 @@ public class DynamicInfo : Info
     public DynamicInfo() { updateMode = UpdateMode.Everyone; Flammable = true; }
     private const int KnockbackInterval = 3;
     public HitboxType HitboxType;
+    /// <summary>True for friendly NPCs (merchant, guide, bound NPC). Enemies will
+    /// target and damage them, and they flee when attacked.</summary>
+    public bool IsNPC;
     public ID CharSprite = ID.Null;
     public SfxID HitSfx = SfxID.HitMob;
     public SfxID DeathSfx = SfxID.DeathPlayer; 
@@ -120,8 +123,8 @@ public class DynamicInfo : Info
         if (Health <= 0) return false;
         switch (projectile.TargetHitBoxType)
         {
-            case HitboxType.Player: // enemy attacks hit any player (controlled or AI ally)
-                if (this is not PlayerInfo) return false;
+            case HitboxType.Player: // enemy attacks hit any player (controlled or AI ally) or friendly NPC
+                if (this is not PlayerInfo && !IsNPC) return false;
                 break;
             case HitboxType.Friendly: // enemy kill friendly 
                 if (HitboxType == HitboxType.Enemy) return false;

@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class ChickMachine : AnimalMachine
 {
-    // Shared scratch buffer for hen scans (results are consumed before the next call).
-    private static readonly Collider[] FollowScanBuffer = new Collider[16];
-
     protected override string DialogueText => "peep peep";
 
     public static Info CreateInfo()
@@ -46,21 +43,11 @@ public class ChickMachine : AnimalMachine
     // Baby chicks trail the nearest hen when nothing is spooking them.
     private bool FollowHen()
     {
-        int count = Physics.OverlapSphereNonAlloc(transform.position, Info.DistAlert, FollowScanBuffer, Main.MaskEntity);
-        HenMachine hen = null;
-        float bestSqr = float.MaxValue;
-        for (int i = 0; i < count; i++)
-        {
-            if (FollowScanBuffer[i].TryGetComponent(out HenMachine other))
-            {
-                float sqr = (other.transform.position - transform.position).sqrMagnitude;
-                if (sqr < bestSqr) { bestSqr = sqr; hen = other; }
-            }
-        }
+        Info hen = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i.Machine is HenMachine);
         if (hen == null) return false;
-        if (bestSqr < Info.DistFollow * Info.DistFollow) return false; // already huddled by the hen
+        if ((hen.position - transform.position).sqrMagnitude < Info.DistFollow * Info.DistFollow) return false; // already huddled by the hen
 
-        Info.Target = hen.Info;
+        Info.Target = hen;
         Info.ActionType = IActionType.Follow;
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobChaseAction>();
