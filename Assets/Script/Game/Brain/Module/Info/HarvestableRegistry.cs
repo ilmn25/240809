@@ -77,6 +77,12 @@ public static class HarvestableRegistry
         Loot web = new Loot(ID.SpiderWeb);
         web.Add(1f, 1, ID.SpiderWeb);
         Register(ID.SpiderWeb, new HarvestableDefinition(web));
+
+        // Skeleton: break apart for bone loot, including the femur weapon.
+        Loot skeleton = new Loot(ID.Skeleton);
+        skeleton.Add(0.4f, 1, ID.Flint);
+        skeleton.Add(0.35f, 1, ID.Femur);
+        Register(ID.Skeleton, new HarvestableDefinition(skeleton));
     }
 
     /// <summary>Register (or override) a harvestable definition.</summary>

@@ -156,10 +156,6 @@ public class Entity
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
 
                 AddStructure<SkeletonMachine>(ID.Skeleton, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.Skeleton);
-                loot.Add(1, 1, ID.Cytoplasm);
-                loot.Add(0.5f, 2, ID.Cytoplasm);
-                loot.Add(0.4f, 1, ID.Flint);
                 
                 AddStructure<HarvestableMachine>(ID.Bush, Vector3Int.one, Main.IndexNoCollide);
                 // Harvestable plants need a non-zero bounds so a collider is added
@@ -188,7 +184,6 @@ public class Entity
                 AddStructure<SpiderNestMachine>(ID.SpiderNest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
-                loot.Add(0.5f, 1, ID.Cytoplasm);
 
                 AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
@@ -278,8 +273,7 @@ public class Entity
 
                 AddMob<SpiderMachine>(ID.Spider);
                 loot = new (ID.Spider);
-                loot.Add(1, 2, ID.SpiderWeb);
-                loot.Add(0.3f, 1, ID.Cytoplasm);   
+                loot.Add(1, 2, ID.SpiderWeb);   
 
                 AddMob<LichMachine>(ID.Lich);
                 loot = new (ID.Lich);

@@ -113,6 +113,12 @@ public static class Terraform
         }
         
         Tutorial.OnBlockPlaced();
+
+        // Chalk powder is an overlay on an existing block — refuse to place it on
+        // empty/unregistered ground so BlockInfo.Initialize doesn't crash.
+        if (Target == ID.ChalkPowder && Block.GetBlock(World.GetBlock(_coordinate)) == null)
+            return;
+
         Entity.Spawn(Target, _coordinate);
         RemoveHeldItem();
     }

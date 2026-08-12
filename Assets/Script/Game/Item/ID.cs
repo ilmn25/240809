@@ -134,4 +134,5 @@ public enum ID
     Mannequin,
     Headstone,
     Burn,
+    Femur,
 }

@@ -148,6 +148,25 @@ public partial class Item
             materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 1 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
+
+        AddToolDefinition(
+            id: ID.Femur,
+            gesture: ItemGesture.Swing,
+            speed: 1.0f,
+            range: 1,
+            projectileInfo: new SingleTargetSwingProjectileInfo {
+                Damage = 3,
+                Knockback = 10,
+                CritChance = 10,
+                Speed = 1f,
+                Radius = 1.5f,
+                Breaking = 1,
+                OperationType = OperationType.Cutting
+            },
+            description: "A crude bone club carved from a skeleton's femur.",
+            materials: new Dictionary<ID, int> { { ID.Stake, 1 } },
+            holdoutOffset: new Vector2(0.6f, 0)
+        );
  
         AddToolDefinition(
             id: ID.StonePickaxe,
