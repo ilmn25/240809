@@ -3,8 +3,10 @@ using Random = UnityEngine.Random;
 
 /// <summary>Spider enemy: fast, erratic hunter that periodically strafes while
 /// closing in, then freezes to swing when in melee range. Spawned by SpiderNestMachine.</summary>
-public class SpiderMachine : MobMachine
+public class SpiderMachine : GroundMobMachine
 {
+    protected override bool UsesDoorBash => true;
+
     private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
         Damage = 2,
         Knockback = 8,
@@ -36,12 +38,7 @@ public class SpiderMachine : MobMachine
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobChase());
@@ -113,13 +110,5 @@ public class SpiderMachine : MobMachine
                     SetState<MobIdle>();
             }
         }
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A travelling merchant that lives at the Old Radio. It never fights or flees;
 /// interact with it to open its shop (the craft UI with a fixed inventory of goods).</summary>
-public class MerchantMachine : MobMachine, IActionSecondaryInteract
+public class MerchantMachine : GroundMobMachine, IActionSecondaryInteract
 {
     /// <summary>The merchant's shop inventory, shown through the craft UI. Created fresh
     /// per merchant so Pending/crafting state never bleeds between instances.</summary>
@@ -21,11 +21,7 @@ public class MerchantMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
         AddState(new MobIdle(600)); // lingers in place longer than the animals
         AddState(new MobRoam());

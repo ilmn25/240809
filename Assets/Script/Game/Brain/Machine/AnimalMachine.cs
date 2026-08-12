@@ -3,15 +3,11 @@ using UnityEngine;
 /// <summary>Shared base for docile farm animals (hen, rooster, sheep, chick).
 /// Handles common module setup, dialogue interaction, and gizmos. Subclasses
 /// add their own states and retaliation behavior.</summary>
-public abstract class AnimalMachine : MobMachine, IActionSecondaryInteract
+public abstract class AnimalMachine : GroundMobMachine, IActionSecondaryInteract
 {
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobRoam());
@@ -49,11 +45,5 @@ public abstract class AnimalMachine : MobMachine, IActionSecondaryInteract
         }
         else
             SetState<MobChase>();
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

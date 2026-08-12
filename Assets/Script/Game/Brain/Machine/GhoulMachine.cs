@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GhoulMachine : MobMachine, IActionSecondaryInteract
-{   
+public class GhoulMachine : GroundMobMachine, IActionSecondaryInteract
+{
+    protected override bool UsesDoorBash => true;
+
     public static Info CreateInfo()
     { 
         return new EnemyInfo()
@@ -15,12 +17,7 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
     }
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobChase());
@@ -95,12 +92,4 @@ public class GhoulMachine : MobMachine, IActionSecondaryInteract
         }
     }
      
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
-    }
- 
 } 

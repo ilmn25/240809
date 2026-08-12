@@ -3,8 +3,10 @@ using UnityEngine;
 
  
 
-public class BugMachine : MobMachine
-{   
+public class BugMachine : GroundMobMachine
+{
+    protected override bool UsesDoorBash => true;
+
     public static Info CreateInfo()
     {
         return new EnemyInfo()
@@ -20,12 +22,7 @@ public class BugMachine : MobMachine
     }
     public override void OnStart()
     { 
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobChase());
@@ -79,11 +76,4 @@ public class BugMachine : MobMachine
             }
         }
     } 
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
-    }
 }

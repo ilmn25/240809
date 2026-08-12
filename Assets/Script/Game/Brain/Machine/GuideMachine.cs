@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GuideMachine : MobMachine, IActionSecondaryInteract
+public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
@@ -16,11 +16,7 @@ public class GuideMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
         AddState(new MobIdle(600)); // lingers in place longer than the animals
         AddState(new MobRoam());

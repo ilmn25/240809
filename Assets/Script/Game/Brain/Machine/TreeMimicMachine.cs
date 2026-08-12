@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 /// follows from a distance. If the player attacks it, it drops a little loot and
 /// flees, despawning once it gets away. It also flees and despawns at dawn.
 /// Killing it outright drops more loot.</summary>
-public class TreeMimicMachine : MobMachine
+public class TreeMimicMachine : GroundMobMachine
 {
     private const int FollowDistance = 6;   // how close it creeps before stopping
     private const int FleeDistance = 30;     // how far it flees before despawning
@@ -29,11 +29,7 @@ public class TreeMimicMachine : MobMachine
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobStalk(FollowDistance));
@@ -92,13 +88,5 @@ public class TreeMimicMachine : MobMachine
         Info.Target = Main.PlayerInfo;
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobFleeDespawn>();
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

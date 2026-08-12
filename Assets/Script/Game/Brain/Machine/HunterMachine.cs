@@ -1,7 +1,7 @@
  
 using UnityEngine; 
 
-public class HunterMachine : MobMachine
+public class HunterMachine : GroundMobMachine
 {   
     public static Info CreateInfo()
     {
@@ -18,11 +18,7 @@ public class HunterMachine : MobMachine
     public override void OnStart()
     {
         _ammo = AmmoMax;  
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule()); 
-        AddModule(new MobSpriteCullModule()); 
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
         
         AddState(new MobIdle());
         AddState(new MobChaseAim());
@@ -90,13 +86,5 @@ public class HunterMachine : MobMachine
                 return true;
             }
         }
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
     }
 } 

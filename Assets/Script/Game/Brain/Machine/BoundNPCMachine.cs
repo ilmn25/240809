@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A bound NPC that can be rescued by right-clicking. On rescue it is
 /// converted into a player and added to the save's player list.</summary>
-public class BoundNPCMachine : MobMachine, IActionSecondaryInteract
+public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
@@ -18,11 +18,7 @@ public class BoundNPCMachine : MobMachine, IActionSecondaryInteract
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
+        base.OnStart();
 
         AddState(new MobIdle(600));
         AddState(new MobRoam());

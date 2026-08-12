@@ -2,8 +2,10 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class HarpyMachine : MobMachine
+public class HarpyMachine : GroundMobMachine
 {
+    protected override bool UsesDoorBash => true;
+
     private const int StalkDistance = 6;   // how close a lone harpy creeps before stopping
     private const int GroupAttackCount = 3; // harpies needed before they dive in
     private const float GroupRadius = 8f;   // how close harpies must be to count as grouped
@@ -38,12 +40,7 @@ public class HarpyMachine : MobMachine
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobChase());
@@ -140,11 +137,4 @@ public class HarpyMachine : MobMachine
         return count;
     }
 
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
-    }
 } 

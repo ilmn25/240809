@@ -4,8 +4,10 @@ using UnityEngine;
 /// player at high speed while unobserved, but freezes in place the instant the
 /// player is looking at it. Once the player looks away, it resumes its rush.
 /// Its attack is a stop-swing that deals 3 damage.</summary>
-public class MannequinMachine : MobMachine
+public class MannequinMachine : GroundMobMachine
 {
+    protected override bool UsesDoorBash => true;
+
     private const float FaceThreshold = 0.35f;   // dot product that counts as "being faced"
     private const float FastSpeed = 13f;          // rapid approach while unobserved
 
@@ -35,12 +37,7 @@ public class MannequinMachine : MobMachine
 
     public override void OnStart()
     {
-        AddModule(new GroundMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new GroundAnimationModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
+        base.OnStart();
 
         AddState(new MobIdle());
         AddState(new MobChase());
@@ -120,14 +117,6 @@ public class MannequinMachine : MobMachine
         Vector2 toMe = screenDir.normalized;
         Vector2 facing = player.TargetScreenDir;
         return Vector2.Dot(facing, toMe) > FaceThreshold;
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current != Camera.main)
-            return;
-
-        GetModule<GroundPathingModule>().DrawGizmos();
     }
 
     /// <summary>Stops all movement and pathing. Used while the player is looking
