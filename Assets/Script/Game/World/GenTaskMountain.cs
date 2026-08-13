@@ -9,7 +9,7 @@ using UnityEngine;
 public class GenTaskMountain : Gen
 {
     private const int Steps = 5;               // cliff ledges up each mountain
-    private const float PeakScale = 2f;        // max peak height as a multiple of chunk size
+    private const float PeakScale = 1f;        // max peak height as a multiple of chunk size
     private const float RadiusScale = 3f;      // footprint radius as a multiple of chunk size
     private const int DirtCap = 2;             // grassy top thickness in blocks
     private const float NoiseStrength = 4f;

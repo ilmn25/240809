@@ -299,6 +299,28 @@ public static class GenTopology
         return true;
     }
 
+    /// <summary>
+    /// True when (x,z) sits on the boundary between a land plate and a void
+    /// plate, within <paramref name="maxGap"/> blocks of the seam. Used to build
+    /// barrier mountains along the coastline instead of leaving empty void.
+    /// </summary>
+    public static bool TryGetVoidBoundaryGap(int x, int z, out float gap)
+    {
+        EnsureGenerated();
+        gap = float.MaxValue;
+        if (_nodeWorld == null || _nodeWorld.Length < 2) return false;
+
+        if (!TryGetNearestTwo(x, z, out int bestA, out int bestB)) return false;
+        bool aVoid = _nodes[bestA].Kind == PlateKind.Void;
+        bool bVoid = _nodes[bestB].Kind == PlateKind.Void;
+        if (aVoid == bVoid) return false; // both land or both void — not a coastline
+
+        float dA = JitteredDistance(x, z, bestA);
+        float dB = JitteredDistance(x, z, bestB);
+        gap = dB - dA;
+        return true;
+    }
+
     private static bool TryGetNearestTwo(int x, int z, out int a, out int b)
     {
         a = -1; b = -1;

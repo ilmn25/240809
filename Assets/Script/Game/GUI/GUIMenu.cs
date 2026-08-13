@@ -336,7 +336,7 @@ public partial class GUIMenu
         }));
     }
 
-    private const float LoadingFrameRate = 0.03f; // fixed animation speed
+    private const float LoadingFrameRate = 0.06f; // fixed animation speed
 
     private IEnumerator LoadingThen(System.Action done)
     {

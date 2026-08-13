@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    public override Vector3Int GetSize() => new Vector3Int(25, 3, 25);
+    public override Vector3Int GetSize() => new Vector3Int(25, 4, 25);
     public override Vector3Int GetSpawnPoint() => new Vector3Int(GetSize().x / 2, GetSize().y - 2, GetSize().z / 2) * World.ChunkSize;
     
     protected override void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
@@ -15,8 +15,9 @@ public class GenAbyss : Gen
         GenTaskSand.Run(currentCoordinate, currentChunk);
         GenTaskForest.Run(currentCoordinate, currentChunk);
         GenTaskMountain.Run(currentCoordinate, currentChunk);
-        GenTaskVoid.Run(currentCoordinate, currentChunk);
-        GenTaskRavine.Run(currentCoordinate, currentChunk);
+        GenTaskVoid.Run(currentCoordinate, currentChunk); // void replaced by plateau
+        GenTaskRavine.Run(currentCoordinate, currentChunk); // temporarily disabled — replaced by plateaus
+        // GenTaskPlateau.Run(currentCoordinate, currentChunk);
         // GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);
         GenTaskEntity.Run(currentCoordinate, currentChunk);

@@ -191,26 +191,31 @@ public class Environment
     {
         if (Time == 0)
         { 
-            // Rapture is a rare day-long event (15% chance); otherwise a normal day.
-            if (Random.value < 0.15f)
+            // Rapture is a rare day-long event (15% chance), but never before
+            // day 10 — the early game stays calm.
+            if (Save.Inst.day >= 10 && Random.value < 0.15f)
             {
                 Weather = EnvironmentType.Rapture;
                 ShowEventDialogue("The sky is red...");
             }
-            else if (Random.value < 0.5f)
-                Weather = EnvironmentType.Day;
-            else
+            // Winter (snowy days) only begins after day 15; before that it's a
+            // normal day.
+            else if (Save.Inst.day >= 15)
                 Weather = EnvironmentType.DaySnow;
+            else
+                Weather = EnvironmentType.Day;
         } 
         else if (Time == 60 * 18)
             Weather = EnvironmentType.Sunset;
         else if (Time == 60 * 19)
-            if (Random.value < 0.7f)
-                Weather = EnvironmentType.NightRainy;
+            // The full moon (bright night) only rises after day 10.
+            if (Save.Inst.day >= 10 && Random.value < 0.7f)
+                Weather = EnvironmentType.NightBright;
             else
             {
-                Weather = EnvironmentType.NightBright;
-                ShowEventDialogue("The full moon rises...");
+                Weather = EnvironmentType.NightRainy;
+                if (Save.Inst.day >= 10 && Random.value < 0.3f)
+                    ShowEventDialogue("The full moon rises...");
             }
         else if (Time == 60 * 23)
             Weather = EnvironmentType.Sunrise;
