@@ -9,7 +9,6 @@ public class GenTaskGraveyard : Gen
     private const int MinHeadstones = 7;
     private const int MaxHeadstones = 10;
     private const int ScatterRadius = 5;
-    private const int GraveDepth = 3; // blocks below the surface to dig out
 
     /// <summary>Places the graveyard, if any, for this world.</summary>
     public static void Run(World world)
@@ -32,25 +31,36 @@ public class GenTaskGraveyard : Gen
         }
     }
 
-    /// <summary>Places a headstone and the buried grave beneath it (pit, skeleton,
-    /// and loot) at the given surface position.</summary>
+    /// <summary>Places a headstone on top of a solid grass block, with a skeleton
+    /// buried beneath that block and loot in an empty air block to the side.</summary>
     private static void PlaceGrave(World world, Vector3Int surface, System.Random rng)
     {
         Chunk chunk = world[World.GetChunkCoordinate(surface)];
         if (chunk == null || chunk == Chunk.Zero) return;
+
+        // Headstone sits on the surface.
         chunk.StaticEntity.Add(Entity.CreateInfo(ID.Headstone, surface));
 
-        // Dig out the grave pit below the surface.
-        for (int depth = 1; depth <= GraveDepth; depth++)
-        {
-            Vector3Int cell = new Vector3Int(surface.x, surface.y - depth, surface.z);
-            CarveCell(world, cell);
-        }
+        // Solid grass block directly below the headstone.
+        SetBlock(world, surface + Vector3Int.down, ID.GrassBlock);
 
-        // Skeleton lies at the bottom of the pit, loot stacked one block above.
-        Vector3Int skeleton = new Vector3Int(surface.x, surface.y - GraveDepth, surface.z);
-        PlaceEntity(world, skeleton, ID.Skeleton);
-        PlaceEntity(world, skeleton + Vector3Int.up, PickGraveLoot(rng));
+        // Skeleton and loot in empty air blocks to the side (at surface level).
+        PlaceEntity(world, surface + new Vector3Int(1, 0, 0), ID.Skeleton);
+        PlaceEntity(world, surface + new Vector3Int(2, 0, 0), PickGraveLoot(rng));
+    }
+
+    /// <summary>Sets a solid block at <paramref name="cell"/>.</summary>
+    private static void SetBlock(World world, Vector3Int cell, ID id)
+    {
+        if (!World.IsInWorldBounds(cell)) return;
+
+        Vector3Int chunkCoord = World.GetChunkCoordinate(cell);
+        Chunk chunk = world[chunkCoord];
+        if (chunk == null || chunk == Chunk.Zero) return;
+
+        int localY = cell.y - chunkCoord.y;
+        if (localY <= 0) return;
+        chunk[cell.x - chunkCoord.x, localY, cell.z - chunkCoord.z] = Block.ConvertID(id);
     }
 
     /// <summary>Adds a static entity to the chunk containing <paramref name="cell"/>.</summary>
@@ -60,20 +70,6 @@ public class GenTaskGraveyard : Gen
         Chunk chunk = world[World.GetChunkCoordinate(cell)];
         if (chunk == null || chunk == Chunk.Zero) return;
         chunk.StaticEntity.Add(Entity.CreateInfo(id, cell));
-    }
-
-    /// <summary>Removes the block at <paramref name="cell"/> to carve out a hole.</summary>
-    private static void CarveCell(World world, Vector3Int cell)
-    {
-        if (!World.IsInWorldBounds(cell)) return;
-
-        Vector3Int chunkCoord = World.GetChunkCoordinate(cell);
-        Chunk chunk = world[chunkCoord];
-        if (chunk == null || chunk == Chunk.Zero) return;
-
-        int localY = cell.y - chunkCoord.y;
-        if (localY <= 0) return; // don't carve through the chunk bottom
-        chunk[cell.x - chunkCoord.x, localY, cell.z - chunkCoord.z] = 0;
     }
 
     private static ID PickGraveLoot(System.Random rng)

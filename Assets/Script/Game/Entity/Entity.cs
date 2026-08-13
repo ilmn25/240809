@@ -313,6 +313,9 @@ public class Entity
                 loot.Add(1, 1, ID.Foul);
                 loot.Add(0.5f, 1, ID.Foul);
                 loot.Add(0.3f, 1, ID.Fabric);
+
+                AddMob<VisitorMachine>(ID.Visitor);
+                loot = new (ID.Visitor); // the visitor drops nothing
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

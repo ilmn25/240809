@@ -139,4 +139,5 @@ public enum ID
     Watchdog,
     RaiderGuard,
     ScoutGuard,
+    Visitor,
 }

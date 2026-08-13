@@ -11,6 +11,7 @@ public static class Event
         RaidEvent.Subscribe();
         RainEvent.Subscribe();
         LeafEvent.Subscribe();
+        VisitorSpawner.Subscribe();
     }
 
     public static void TriggerUpdate()
