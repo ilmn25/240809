@@ -45,6 +45,9 @@ public class GuardModule : MobModule
             {
                 Info.Target = nearest;
                 Info.PathingStatus = PathingStatus.Pending;
+                // Snap back to DefaultState so the mob's own OnUpdate (which only
+                // acts in DefaultState) picks up the new target and starts chasing.
+                Machine.SetState<DefaultState>();
             }
         }
     }

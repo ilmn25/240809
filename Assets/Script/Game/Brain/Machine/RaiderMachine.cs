@@ -29,17 +29,17 @@ public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
         
         var dialogue = new Dialogue
         {
-            Text = "awdasaaksjdlkasjdklasjdasd dawdajdkjdsa",
+            Text = "You shouldn't be here.",
             Sprite = Cache.LoadSprite("Sprite/Illu"),
             Next = new Dictionary<string, Dialogue>
             {
                 [""] = new() {
-                    Text = "......",
+                    Text = "This is our turf. Turn around and leave.",
                     Sprite = Cache.LoadSprite("Sprite/Illu"),
                     Next = new Dictionary<string, Dialogue>
                     {
                         [""] = new() { 
-                            Text = "awdasdadaskjdasfkajdkjdsa",
+                            Text = "Or don't. I could use the exercise.",
                             Sprite = Cache.LoadSprite("Sprite/Illu"),
                         }
                     }

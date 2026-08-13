@@ -40,9 +40,7 @@ public enum ID
     Slab,
     PineTree, 
     Raider,
-    RaiderGuard,
     Chito,
-    ScoutGuard,
     SnareFlea,
     Yuuri,
     BreakBlock,
@@ -139,4 +137,6 @@ public enum ID
     Femur,
     DirtyTent,
     Watchdog,
+    RaiderGuard,
+    ScoutGuard,
 }
