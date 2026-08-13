@@ -21,6 +21,7 @@ public class RaiderGuardMachine : RaiderMachine
             DistAlert = 10,   // notices intruders a bit sooner than a raider
             DistDisengage = 20,
             DistRoam = 6,
+            CharSprite = ID.Raider, // no dedicated sprite — reuse the raider
         };
     }
 

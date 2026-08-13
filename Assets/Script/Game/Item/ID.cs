@@ -138,4 +138,5 @@ public enum ID
     Burn,
     Femur,
     DirtyTent,
+    Watchdog,
 }

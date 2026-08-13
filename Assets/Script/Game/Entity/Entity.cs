@@ -285,6 +285,12 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Meat);
                 loot.Add(0.4f, 1, ID.Foul);
 
+                AddMob<WatchdogMachine>(ID.Watchdog);
+                loot = new (ID.Watchdog);
+                loot.Add(1, 2, ID.Meat);
+                loot.Add(0.5f, 1, ID.Meat);
+                loot.Add(0.4f, 1, ID.Foul);
+
                 AddMob<SpiderMachine>(ID.Spider);
                 loot = new (ID.Spider);
                 loot.Add(1, 2, ID.SpiderWeb);   
