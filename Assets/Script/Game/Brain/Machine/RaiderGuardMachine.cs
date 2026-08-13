@@ -1,8 +1,9 @@
 using UnityEngine;
 
-/// <summary>A raider variant that guards its outpost (dirty tent) instead of
-/// roaming the world. Uses the shared <see cref="GuardModule"/> for territorial
-/// behavior (patrol near home, aggro on tent intruders, leash + return home).</summary>
+/// <summary>A raider variant that guards its outpost (dirty tent). It watches
+/// (faces) anyone who approaches the tent, and only chases/attacks once an
+/// intruder gets close to the guard itself. Uses the shared <see cref="GuardModule"/>
+/// for tent-alert detection and leash/return-home logic.</summary>
 public class RaiderGuardMachine : RaiderMachine
 {
     /// <summary>World position of the outpost this guard protects.</summary>

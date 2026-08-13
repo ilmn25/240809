@@ -106,6 +106,9 @@ public class Gen
 
         // Scatter a graveyard cluster in the grass biome.
         GenTaskGraveyard.Run(world);
+
+        // Place raider camps (loot chest + tents + lamp).
+        GenTaskRaiderCamp.Run(world);
     }
 
     /// <summary>Places an owl statue beside the world's spawn point. Because NPCs
