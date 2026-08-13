@@ -25,6 +25,7 @@ public class GenTaskEntity : Gen
     private const double ForestDeathcapChance = 0.00125;
     private const double ForestSpiderNestChance = 0.0008;
     private const double GrassOrchidChance = 0.005;
+    private const double DirtTentChance = 0.0004;
     private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
@@ -117,6 +118,10 @@ public class GenTaskEntity : Gen
                             else if (roll <= (chance += GrassOrchidChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Orchids, position));
+                            }
+                            else if (roll <= (chance += DirtTentChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.DirtyTent, position));
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {

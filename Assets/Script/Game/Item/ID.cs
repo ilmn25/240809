@@ -39,8 +39,10 @@ public enum ID
     Pistol,
     Slab,
     PineTree, 
-    Megumin,
+    Raider,
+    RaiderGuard,
     Chito,
+    ScoutGuard,
     SnareFlea,
     Yuuri,
     BreakBlock,
@@ -135,4 +137,5 @@ public enum ID
     Headstone,
     Burn,
     Femur,
+    DirtyTent,
 }

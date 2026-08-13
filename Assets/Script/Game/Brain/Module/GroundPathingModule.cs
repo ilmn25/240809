@@ -9,7 +9,7 @@ public class GroundPathingModule : PathingModule
 
     public override void OnStuck()
     {
-        if (PathingTarget == PathingTarget.Target || PathingTarget == PathingTarget.Escape)
+        if (PathingTarget == PathingTarget.Target || PathingTarget == PathingTarget.Escape || PathingTarget == PathingTarget.Home)
         {
             RepathCount++;
             if (RepathCount == MaxRepathCount)
@@ -45,6 +45,8 @@ public class GroundPathingModule : PathingModule
 
             return await PathFind.FindPath(this, Info.PathAmount);
         }
+        if (PathingTarget == PathingTarget.Home)
+            return await PathFind.FindPath(this, Info.PathAmount);
         return PathRandom.FindPath(this);
     } 
     

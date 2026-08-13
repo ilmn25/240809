@@ -185,6 +185,11 @@ public class Entity
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
 
+                AddStructure<DirtyTentMachine>(ID.DirtyTent, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.DirtyTent);
+                loot.Add(1, 2, ID.Fabric);
+                loot.Add(0.5f, 1, ID.Fabric);
+
                 AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OldRadio);
@@ -207,15 +212,20 @@ public class Entity
                  
                 AddMob<PlayerMachine>(ID.Player);
                 
-                AddMob<HunterMachine>(ID.Chito); 
+                AddMob<ScoutMachine>(ID.Chito); 
                 loot = new (ID.Chito);
                 loot.Add(0.7f, 5, ID.Bullet); 
                 loot.Add(0.1f, 1, ID.Pistol); 
                 
-                AddMob<HunterMachine>(ID.Yuuri);
+                AddMob<ScoutMachine>(ID.Yuuri);
                 loot = new (ID.Yuuri);
                 loot.Add(0.7f, 5, ID.Bullet);  
                 loot.Add(0.1f, 1, ID.Pistol);  
+
+                AddMob<ScoutGuardMachine>(ID.ScoutGuard);
+                loot = new (ID.ScoutGuard);
+                loot.Add(0.7f, 5, ID.Bullet);
+                loot.Add(0.1f, 1, ID.Pistol);
                 
                 AddMob<SheepMachine>(ID.Sheep);
                 loot = new (ID.Sheep);
@@ -252,8 +262,12 @@ public class Entity
                 loot = new (ID.SnareFlea);
                 loot.Add(0.5f, 6, ID.Sticks); 
                 
-                AddMob<GhoulMachine>(ID.Megumin);
-                loot = new (ID.Megumin);
+                AddMob<RaiderMachine>(ID.Raider);
+                loot = new (ID.Raider);
+                loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
+
+                AddMob<RaiderGuardMachine>(ID.RaiderGuard);
+                loot = new (ID.RaiderGuard);
                 loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
                 
                 AddMob<SlimeMachine>(ID.Slime);

@@ -5,10 +5,13 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public enum PathingStatus {Pending, Reached, Stuck}
-public enum PathingTarget {None, Target, Strafe, Evade, Escape, Roam}
+public enum PathingTarget {None, Target, Strafe, Evade, Escape, Roam, Home}
 public abstract class PathingModule : MobModule
 { 
     public PathingTarget PathingTarget = PathingTarget.None;  
+    
+    /// <summary>Fixed world position to path to when PathingTarget == Home.</summary>
+    public Vector3 HomePosition;
     
     protected const float PointReachDistance = 0.45f; 
     protected const float RepathInterval = 0.5f;
@@ -80,6 +83,8 @@ public abstract class PathingModule : MobModule
     {
         if (PathingTarget == PathingTarget.Target)
             return Info.Target.position;
+        if (PathingTarget == PathingTarget.Home)
+            return HomePosition;
         
         return Path == null? Vector3.down : Path[^1].Position;
     }

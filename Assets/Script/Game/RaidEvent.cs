@@ -34,8 +34,8 @@ public static class RaidEvent
         new(ID.Harpy, "Wings beat overhead...", 2, 2),
         new(ID.SnareFlea, "The swarm is coming...", 3, 4),
         new(ID.Harpy, "Something is circling above...", 4, 6),
-        new(ID.Megumin, "A terrible presence gathers...", 5, 7),
-        new(ID.Megumin, "A great dread is nearly here...", 7, 10),
+        new(ID.Raider, "A terrible presence gathers...", 5, 7),
+        new(ID.Raider, "A great dread is nearly here...", 7, 10),
     };
 
     public static void Subscribe() => Environment.HourlyTriggered += OnHour;

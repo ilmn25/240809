@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GhoulMachine : GroundMobMachine, IActionSecondaryInteract
+public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
 {
     protected override bool UsesDoorBash => true;
 

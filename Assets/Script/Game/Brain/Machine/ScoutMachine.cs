@@ -1,7 +1,7 @@
  
 using UnityEngine; 
 
-public class HunterMachine : GroundMobMachine
+public class ScoutMachine : GroundMobMachine
 {   
     public static Info CreateInfo()
     {
