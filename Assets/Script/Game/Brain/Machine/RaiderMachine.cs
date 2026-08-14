@@ -94,8 +94,9 @@ public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
     }
 
     /// <summary>Lock onto the nearest player or friendly NPC on sight; release it
-    /// once it retreats well out of disengage range.</summary>
-    private void UpdateAggro()
+    /// once it retreats well out of disengage range. Guards override this to rely
+    /// on their camp-based targeting instead.</summary>
+    protected virtual void UpdateAggro()
     {
         Info nearest = FindNearestAggroTarget();
         if (nearest != null)

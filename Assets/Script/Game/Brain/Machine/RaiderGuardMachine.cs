@@ -31,4 +31,8 @@ public class RaiderGuardMachine : RaiderMachine
         AddModule(new GuardModule());
         AddState(new MobReturnHome());
     }
+
+    /// <summary>Guards don't aggro on sight — they only engage intruders who get
+    /// close to the camp (handled by GuardModule).</summary>
+    protected override void UpdateAggro() { }
 }
