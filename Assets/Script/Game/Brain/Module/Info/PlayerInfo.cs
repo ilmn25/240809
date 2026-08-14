@@ -50,7 +50,21 @@ public class PlayerInfo : MobInfo
     {
         GUIBar.Update(); 
         Machine.SetState<MobHit>();
-    } 
+
+        // If a bug is latched onto us and we get hit by something else, it lets go.
+        ReleaseLatchedBug(projectile);
+    }
+
+    /// <summary>Release any bug latched onto this player when hit by another source.</summary>
+    private void ReleaseLatchedBug(Projectile projectile)
+    {
+        // Only a non-bug hit can knock a bug off — the bug's own damage doesn't.
+        if (projectile.SourceInfo is BugInfo) return;
+
+        Info bug = EntityScan.FindNearest(position, 3f, i => i is BugInfo b && b.LatchedPlayer == this);
+        if (bug is BugInfo bugInfo)
+            bugInfo.OnLatchedPlayerHit();
+    }
 
     protected override void OnUpdate()
     {
