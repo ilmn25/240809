@@ -140,4 +140,5 @@ public enum ID
     RaiderGuard,
     ScoutGuard,
     Visitor,
+    Vampire,
 }

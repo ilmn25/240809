@@ -35,7 +35,6 @@ public class VisitorMachine : GroundMobMachine
             DistDisengage = 40,
             DistRoam = 6,
             IsNPC = true,
-            CharSprite = ID.Chito, // reuse the player's sprite
         };
     }
 

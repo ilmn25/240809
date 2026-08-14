@@ -316,6 +316,11 @@ public class Entity
 
                 AddMob<VisitorMachine>(ID.Visitor);
                 loot = new (ID.Visitor); // the visitor drops nothing
+
+                AddMob<VampireMachine>(ID.Vampire);
+                loot = new (ID.Vampire);
+                loot.Add(0.3f, 1, ID.Blood);
+                loot.Add(0.1f, 1, ID.Foul);
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

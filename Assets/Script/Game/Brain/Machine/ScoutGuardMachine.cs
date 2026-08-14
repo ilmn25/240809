@@ -22,7 +22,6 @@ public class ScoutGuardMachine : ScoutMachine
             DistAlert = 10,   // notices intruders a bit sooner than a scout
             DistDisengage = 20,
             DistRoam = 6,
-            CharSprite = ID.Chito, // no dedicated sprite — reuse the scout
         };
     }
 
