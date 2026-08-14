@@ -335,6 +335,11 @@ public class Entity
                 loot = new (ID.Congregant);
                 loot.Add(0.5f, 1, ID.CrudeHatchet);
                 loot.Add(0.3f, 1, ID.Foul);
+
+                AddMob<AcolyteMachine>(ID.Acolyte);
+                loot = new (ID.Acolyte);
+                loot.Add(0.5f, 1, ID.Torch);
+                loot.Add(0.3f, 1, ID.Foul);
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

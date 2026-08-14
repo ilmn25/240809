@@ -146,4 +146,5 @@ public enum ID
     Gnome,
     Rat,
     Congregant,
+    Acolyte,
 }
