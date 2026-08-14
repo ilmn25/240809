@@ -141,4 +141,6 @@ public enum ID
     ScoutGuard,
     Visitor,
     Vampire,
+    Pigeon,
+    BirdShit,
 }

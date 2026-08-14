@@ -321,6 +321,9 @@ public class Entity
                 loot = new (ID.Vampire);
                 loot.Add(0.3f, 1, ID.Blood);
                 loot.Add(0.1f, 1, ID.Foul);
+
+                AddMob<PigeonMachine>(ID.Pigeon);
+                loot = new (ID.Pigeon); // the pigeon drops nothing
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

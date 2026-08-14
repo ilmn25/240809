@@ -1,0 +1,41 @@
+using UnityEngine;
+
+/// <summary>A falling bird-shit projectile dropped by a pigeon. It falls straight
+/// down and damages whatever it lands on, then disappears.</summary>
+public class PoopProjectileInfo : ProjectileInfo
+{
+    public int LifeSpan = 120; // frames before it despawns if it never lands
+
+    public override void AI(Projectile projectile)
+    {
+        if (projectile.LifeSpan > LifeSpan)
+        {
+            projectile.Delete();
+            return;
+        }
+
+        // Fall straight down.
+        projectile.transform.position += Vector3.down * (Speed * Time.deltaTime);
+
+        int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
+        for (int i = 0; i < hitCount; i++)
+        {
+            // Land on the ground.
+            if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Main.MaskMap))
+            {
+                Audio.PlaySFX(SfxID.HitStone);
+                projectile.Delete();
+                return;
+            }
+
+            // Hit an entity.
+            IActionPrimary target = HitBuffer[i].GetComponent<IActionPrimary>();
+            if (target == null || projectile.SourceInfo.Machine == (Machine)target) continue;
+            if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
+            {
+                projectile.Delete();
+                return;
+            }
+        }
+    }
+}
