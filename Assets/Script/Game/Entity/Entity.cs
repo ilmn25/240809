@@ -330,6 +330,11 @@ public class Entity
 
                 AddMob<RatMachine>(ID.Rat);
                 loot = new (ID.Rat); // the rat drops nothing
+
+                AddMob<CongregantMachine>(ID.Congregant);
+                loot = new (ID.Congregant);
+                loot.Add(0.5f, 1, ID.CrudeHatchet);
+                loot.Add(0.3f, 1, ID.Foul);
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

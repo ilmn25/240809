@@ -125,21 +125,4 @@ public class BugMachine : GroundMobMachine
         if (Info is BugInfo bugInfo) bugInfo.Release();
         SetState<MobStrafe>();
     }
-
-    /// <summary>Lock onto the nearest player on sight; release once they retreat.</summary>
-    private void UpdateAggro()
-    {
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
-
-        float dist = Vector3.Distance(Main.PlayerInfo.position, transform.position);
-        if (dist < Info.DistAlert && Info.Target != Main.PlayerInfo)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (dist > Info.DistDisengage && Info.Target == Main.PlayerInfo)
-        {
-            Info.CancelTarget();
-        }
-    }
 }

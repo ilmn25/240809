@@ -145,4 +145,5 @@ public enum ID
     BirdShit,
     Gnome,
     Rat,
+    Congregant,
 }

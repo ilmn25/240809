@@ -47,37 +47,4 @@ public abstract class HostileMeleeMachine : GroundMobMachine
         else
             SetState<MobIdle>();
     }
-
-    /// <summary>Lock onto the nearest player or friendly NPC on sight; release it
-    /// once it retreats well out of disengage range.</summary>
-    protected void UpdateAggro()
-    {
-        Info nearest = FindNearestAggroTarget();
-        if (nearest != null)
-        {
-            if (Info.Target != nearest)
-            {
-                Info.Target = nearest;
-                Info.PathingStatus = PathingStatus.Pending;
-            }
-            return;
-        }
-
-        // Nothing in range — release any current target that has wandered off.
-        if (Info.Target != null &&
-            Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-            Info.CancelTarget();
-    }
-
-    private Info FindNearestAggroTarget()
-    {
-        // The player is always a candidate (relentless); friendly NPCs only within
-        // alert range.
-        Info best = (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed) ? Main.PlayerInfo : null;
-        Info npc = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is DynamicInfo d && d.IsNPC);
-        if (npc != null && (best == null ||
-            (npc.position - transform.position).sqrMagnitude < (best.position - transform.position).sqrMagnitude))
-            best = npc;
-        return best;
-    }
 }
