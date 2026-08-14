@@ -1,16 +1,18 @@
 using UnityEngine;
 
-/// <summary>Keeps a flying mob airborne at a fixed height and flies it in toward
-/// the target anchor (defaults to the player), then hovers once overhead. Runs in
-/// LateUpdate (after ground movement) so gravity can't pull it down. Altitude is
-/// maintained even while fleeing so it never touches the floor.</summary>
+/// <summary>Keeps a flying mob airborne at a fixed height above a target anchor
+/// (defaults to the player) and flies it in toward it, then hovers once overhead.
+/// Altitude is maintained with the same jump logic the pathfinder uses: when the
+/// mob is below the hover height it sets Direction.y > 0 so GroundMovement gives
+/// it a jump — keeping it airborne without pinning or zeroing its velocity.</summary>
 public class HoverFlightModule : MobModule
 {
     public HoverFlightModule() { updateMode = UpdateMode.Everyone; }
 
     public float HoverHeight = 10f;
-    public float ApproachSpeed = 8f;
     public float ApproachDistance = 1.5f;
+
+    private const float HoverTolerance = 0.5f;
 
     /// <summary>True once the mob has flown in and is hovering over the anchor.</summary>
     public bool IsOverhead { get; private set; }
@@ -24,31 +26,32 @@ public class HoverFlightModule : MobModule
             ? target.position
             : (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed ? Main.PlayerInfo.position : Machine.transform.position);
 
-        Vector3 pos = Machine.transform.position;
         float desiredY = anchor.y + HoverHeight;
+        Vector3 pos = Machine.transform.position;
 
-        // Fleeing — let flee logic handle horizontal movement; only hold altitude.
+        // Fleeing — flee pathing drives horizontal; just climb to hover height so it
+        // stays airborne while it flies away.
         if (Machine.IsCurrentState<MobFleeDespawn>())
         {
-            pos.y = Mathf.MoveTowards(pos.y, desiredY, 20f * Time.deltaTime);
-            Machine.transform.position = pos;
+            Info.Direction.y = pos.y < desiredY - HoverTolerance ? 1f : 0f;
             return;
         }
 
-        // Fly in horizontally toward the anchor, then hover once overhead.
+        // Fly in toward the anchor horizontally, then hover once overhead.
         Vector3 here = new Vector3(pos.x, 0, pos.z);
         Vector3 there = new Vector3(anchor.x, 0, anchor.z);
         float flatDist = Vector3.Distance(here, there);
         IsOverhead = flatDist <= ApproachDistance;
-        if (!IsOverhead)
-        {
-            Vector3 dir = (there - here).normalized;
-            pos.x += dir.x * ApproachSpeed * Time.deltaTime;
-            pos.z += dir.z * ApproachSpeed * Time.deltaTime;
-        }
 
-        pos.y = Mathf.MoveTowards(pos.y, desiredY, 20f * Time.deltaTime);
-        Machine.transform.position = pos;
-        Info.Direction = Vector3.zero;
+        Vector3 dir = Vector3.zero;
+        if (!IsOverhead)
+            dir = new Vector3(there.x - here.x, 0, there.z - here.z).normalized;
+
+        // Jump to hover height when below it, exactly like pathfinding triggers a
+        // jump (Direction.y > 0 → GroundMovement.HandleJump sets JumpVelocity).
+        if (pos.y < desiredY - HoverTolerance)
+            dir.y = 1f;
+
+        Info.Direction = dir;
     }
 }

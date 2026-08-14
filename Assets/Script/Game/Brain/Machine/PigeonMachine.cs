@@ -18,7 +18,6 @@ public class PigeonMachine : GroundMobMachine
     private const float HoverHeight = 10f;   // how high above the player it hovers
     private const int PoopDelay = 120;       // frames overhead before it poops (~2s)
     private const int FleeDistance = 30;     // how far it flees before despawning
-    private const float ApproachSpeed = 9f;  // how fast it flies in toward the player
 
     private HoverFlightModule _hover;
     private int _timer;
@@ -43,7 +42,6 @@ public class PigeonMachine : GroundMobMachine
 
         _hover = AddModule(new HoverFlightModule {
             HoverHeight = HoverHeight,
-            ApproachSpeed = ApproachSpeed,
         });
 
         AddState(new MobFleeDespawn(FleeDistance));
