@@ -12,12 +12,12 @@ public class Settings
     public int ScrollSpeedIndex = 1;
     public bool TutorialEnabled = true;
     public int FpsIndex = 2;
-    public int MaxZoomIndex = 2;
+    public int MaxFOVIndex = 2;
     public int AutoSaveIndex = 1; // 0 = off, 1 = every day (default)
 
     public static readonly float[] ScrollSpeeds = { 0.5f, 1f, 2f, 4f };
     public static readonly int[] FpsLimits = { 30, 60, 100, 144, 240 };
-    public static readonly float[] MaxZooms = { 4f, 6f, 8f, 10f };
+    public static readonly float[] MaxFOVs = { 30f, 40f, 50f, 60f };
 
     public static readonly Vector2Int[] Resolutions =
     {

@@ -345,6 +345,14 @@ public class Entity
                 loot = new (ID.Heretic);
                 loot.Add(0.5f, 1, ID.Dagger);
                 loot.Add(0.3f, 1, ID.Foul);
+
+                AddMob<CultistMachine>(ID.Cultist);
+                loot = new (ID.Cultist);
+                loot.Add(0.5f, 1, ID.Foul);
+                loot.Add(0.3f, 1, ID.Blood);
+
+                AddMob<ThrallMachine>(ID.Thrall);
+                loot = new (ID.Thrall); // the thrall drops nothing
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {

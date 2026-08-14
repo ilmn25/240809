@@ -149,4 +149,6 @@ public enum ID
     Acolyte,
     Heretic,
     Dagger,
+    Cultist,
+    Thrall,
 }

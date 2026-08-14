@@ -14,7 +14,7 @@ public partial class GUIMenu
             "5 > Text Speed: " + (Settings.ScrollSpeeds[s.ScrollSpeedIndex] * 100) + "%" + "\n" +
             "6 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
             "7 > Max FPS: " + Settings.FpsLimits[s.FpsIndex] + "\n" +
-            "8 > Max Zoom: " + Settings.MaxZooms[s.MaxZoomIndex] + "x" + "\n" +
+            "8 > Max FOV: " + Settings.MaxFOVs[s.MaxFOVIndex] + "\n" +
             "9 > Auto Save: " + AutoSaveLabel(s.AutoSaveIndex) + "\n" +
             "0 > Keybinds";
     }
@@ -45,8 +45,8 @@ public partial class GUIMenu
             case 6: // max fps
                 s.FpsIndex = (s.FpsIndex + 1) % Settings.FpsLimits.Length;
                 break;
-            case 7: // max zoom
-                s.MaxZoomIndex = (s.MaxZoomIndex + 1) % Settings.MaxZooms.Length;
+            case 7: // max fov
+                s.MaxFOVIndex = (s.MaxFOVIndex + 1) % Settings.MaxFOVs.Length;
                 break;
             case 8: // auto save
                 s.AutoSaveIndex = (s.AutoSaveIndex + 1) % 2;

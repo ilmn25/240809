@@ -20,6 +20,7 @@ public class GUIMap : GUI
 
     private float _zoom = 3f;
     private const float MinZoom = 0.5f;
+    private const float MaxZoom = 8f;
     private const float ZoomSpeed = 0.12f;
     /// <summary>How many map pixels each sprite pixel occupies, so pixel-art
     /// sprites keep consistent density relative to each other.</summary>
@@ -259,9 +260,8 @@ public class GUIMap : GUI
         float scroll = Input.mouseScrollDelta.y;
         if (Mathf.Abs(scroll) > 0.01f)
         {
-            float maxZoom = Settings.MaxZooms[Settings.Inst.MaxZoomIndex];
             float oldZoom = _zoom;
-            _zoom = Mathf.Clamp(_zoom + scroll * ZoomSpeed, MinZoom, maxZoom);
+            _zoom = Mathf.Clamp(_zoom + scroll * ZoomSpeed, MinZoom, MaxZoom);
             _mapRect.localScale = Vector3.one * _zoom;
             // Scale the pan by the zoom ratio so the point under the screen
             // center stays anchored while zooming.
