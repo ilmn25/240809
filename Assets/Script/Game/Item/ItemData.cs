@@ -410,5 +410,25 @@ public partial class Item
             projectileOffset: 1.016f,
             holdoutOffset: new Vector2(0.4f, -0.25f)
         );
+
+        AddToolDefinition(
+            id: ID.Dagger,
+            gesture: ItemGesture.Swing,
+            speed: 0.5f,          // fast
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 2,
+                Knockback = 6,
+                CritChance = 15,
+                Speed = 2,
+                Radius = 1.2f,     // low range
+                Breaking = 1,
+                OperationType = OperationType.Cutting
+            },
+            durability: 150,
+            description: "A quick, short-bladed dagger for fast close-quarters strikes.",
+            materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 1 } },
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
     }
 }

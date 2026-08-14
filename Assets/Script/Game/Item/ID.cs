@@ -147,4 +147,6 @@ public enum ID
     Rat,
     Congregant,
     Acolyte,
+    Heretic,
+    Dagger,
 }
