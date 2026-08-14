@@ -143,4 +143,6 @@ public enum ID
     Vampire,
     Pigeon,
     BirdShit,
+    Gnome,
+    Rat,
 }

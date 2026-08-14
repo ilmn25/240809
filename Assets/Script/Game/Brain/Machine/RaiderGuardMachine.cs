@@ -18,7 +18,6 @@ public class RaiderGuardMachine : RaiderMachine
         return new EnemyInfo()
         {
             HealthMax = 16,
-            DistAttack = 2,
             DistAlert = 10,   // notices intruders a bit sooner than a raider
             DistDisengage = 20,
             DistRoam = 6,

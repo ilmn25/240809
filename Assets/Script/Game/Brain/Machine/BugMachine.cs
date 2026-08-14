@@ -14,7 +14,6 @@ public class BugMachine : GroundMobMachine
             HealthMax = 15,
             DistAttack = 8,
             DistAlert = 10,
-            DistDisengage = 14,
             PathJump = 2,
             PathAir = 6,
             SpeedGround = 14,

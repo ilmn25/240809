@@ -11,7 +11,6 @@ public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
         return new EnemyInfo()
         {
             HealthMax = 16,
-            DistAttack = 2,
             DistRoam = 7 
         };  
     }

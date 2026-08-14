@@ -29,7 +29,6 @@ public class VampireMachine : GroundMobMachine
         return new VampireInfo()
         {
             HealthMax = 40,
-            DistAttack = 2,
             DistAlert = 18,
             DistDisengage = 26,
             DistRoam = 7,

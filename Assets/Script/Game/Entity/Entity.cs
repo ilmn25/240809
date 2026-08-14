@@ -324,6 +324,12 @@ public class Entity
 
                 AddMob<PigeonMachine>(ID.Pigeon);
                 loot = new (ID.Pigeon); // the pigeon drops nothing
+
+                AddMob<GnomeMachine>(ID.Gnome);
+                loot = new (ID.Gnome); // the gnome drops its stolen items on death
+
+                AddMob<RatMachine>(ID.Rat);
+                loot = new (ID.Rat); // the rat drops nothing
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {
