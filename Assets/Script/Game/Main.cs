@@ -48,6 +48,7 @@ public class Main : MonoBehaviour
     public static GameObject GUICursorSlot;
  
     public static TextMeshProUGUI GUIMenu;
+    public static TextMeshProUGUI GUIConsole;
     public void Awake()
     { 
         Time.fixedDeltaTime = FixedUpdateMS;
@@ -137,6 +138,7 @@ public class Main : MonoBehaviour
         
         GUIObject = GameObject.Find("GUI");
         GUIMenu = GUIObject.transform.Find("Menu").GetComponent<TextMeshProUGUI>();
+        GUIConsole = GUIObject.transform.Find("Console").GetComponent<TextMeshProUGUI>();
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
         GUIHudText = GUIInv.transform.Find("HUD").GetComponent<TextMeshProUGUI>();
         GUIHudText.enableWordWrapping = false;

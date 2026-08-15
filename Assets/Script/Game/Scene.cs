@@ -140,13 +140,7 @@ public class Scene
             World.Inst.Map.Reveal((int)p.x, (int)p.z, MapRevealRadius);
         }
 
-        if (Helper.IsHost())
-        {
-            // Always update render & entity state — handles player switches (Tab)
-            // even when both players share the same chunk.
-            World.LoadWorld();
-        }
-        else if (PlayerChunkPosition != _playerChunkPositionPrevious)
+        if (PlayerChunkPosition != _playerChunkPositionPrevious)
         {
             World.LoadWorld();
             _playerChunkPositionPrevious = PlayerChunkPosition;

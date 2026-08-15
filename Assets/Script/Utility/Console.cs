@@ -7,7 +7,6 @@ using Mirror;
 public class Console : MonoBehaviour
 {
     private static readonly LineRenderer[] _lines = new LineRenderer[13];
-    public static GUIStyle GUIStyle; 
     public static bool IsTyping = false;
     private static string _input = "";
     private static int _cursorPos = 0;
@@ -15,7 +14,7 @@ public class Console : MonoBehaviour
     private static bool _showInfo = false;
     public static int OutputTimer = 0;
     private static string[] _command;  
-
+    private static bool _menuTextActive;
     private static readonly List<string> _history = new ();
     private static int _historyIndex = -1;
     
@@ -36,10 +35,6 @@ public class Console : MonoBehaviour
     }
     void Start()
     {
-        GUIStyle = new GUIStyle();
-        GUIStyle.fontSize = 24;
-        GUIStyle.font = Resources.Load<Font>("Font/OrangeKid/OrangeKid");
-        GUIStyle.normal.textColor = Color.white;
         for (int i = 0; i < _lines.Length; i++)
         {
             GameObject edgeObj = new GameObject("WireEdge" + i);
@@ -141,7 +136,19 @@ public class Console : MonoBehaviour
                 _cursorPos = 0;
                 _historyIndex = -1;
             }
+
+            ShowConsoleText(BuildConsoleText(_input.Insert(_cursorPos, "|")));
         }
+        else if (OutputTimer > 0 || _showInfo)
+        {
+            if (OutputTimer > 0) OutputTimer--;
+            ShowConsoleText(BuildConsoleText(null));
+        }
+        else
+        {
+            HideConsoleText();
+        }
+
         if (Input.GetKeyDown(KeyCode.Slash))
         {
             IsTyping = true;
@@ -150,30 +157,23 @@ public class Console : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.F1)) _showInfo = !_showInfo;
+
+        UpdateSetPieceLines();
     }
 
-    void OnGUI()
+    private static string BuildConsoleText(string inputLine)
     {
-        if (IsTyping)
-        {
-            // show cursor in the input string
-            string displayInput = _input.Insert(_cursorPos, "|");
-            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), displayInput + "\n" + Output, GUIStyle);
-        }
-        else if (OutputTimer != 0)
-        {
-            OutputTimer--;
-            UnityEngine.GUI.Label(new Rect(10, 900, 1000, 30), Output, GUIStyle);
-        }
-
-        if (_showInfo)
+        string info = "";
+        if (_showInfo && Main.PlayerInfo != null)
         {
             Vector3Int pos = Vector3Int.FloorToInt(Main.PlayerInfo.position);
-            UnityEngine.GUI.Label(new Rect(10, 10, 100, 20), 
-                "FPS: " + Mathf.Ceil(_fps) + "\n" +
-                $"X:{pos.x} \nY:{pos.y} \nZ:{pos.z}", GUIStyle);
+            info = $"FPS: {Mathf.Ceil(_fps)}\nX:{pos.x} Y:{pos.y} Z:{pos.z}\n";
         }
-        
+        return info + (inputLine != null ? "> " + inputLine + "\n" : "") + Output;
+    }
+
+    private static void UpdateSetPieceLines()
+    {
         if (!Main.CreativeMode || !Main.Player) return;
 
         _lines[12].SetPosition(0, Main.PlayerInfo.position);
@@ -333,6 +333,24 @@ public class Console : MonoBehaviour
     {
         Output = output + "\n" + Output;
         OutputTimer = 600;
+    }
+
+    // Renders the console's input/output through the shared menu text object
+    // instead of drawing its own OnGUI text.
+    private static void ShowConsoleText(string text)
+    {
+        if (Main.GUIConsole == null) return;
+        _menuTextActive = true;
+        if (!Main.GUIConsole.gameObject.activeSelf)
+            Main.GUIConsole.gameObject.SetActive(true);
+        Main.GUIConsole.text = text;
+    }
+
+    private static void HideConsoleText()
+    {
+        if (Main.GUIConsole == null || !_menuTextActive) return;
+        _menuTextActive = false;
+        Main.GUIConsole.gameObject.SetActive(false);
     }
     
     private static void SpawnEntityOrItem()
