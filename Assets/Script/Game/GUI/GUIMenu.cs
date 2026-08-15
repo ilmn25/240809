@@ -340,7 +340,9 @@ public partial class GUIMenu
 
     private IEnumerator LoadingThen(System.Action done)
     {
+        _transitioning = true;
         yield return PlayLoading(0.45f);
+        _transitioning = false;
         done();
     }
 
@@ -348,6 +350,7 @@ public partial class GUIMenu
     /// frame rate, then invokes <paramref name="done"/> (if provided).</summary>
     private IEnumerator PlayLoading(float duration, System.Action done = null)
     {
+        _scrollTask?.Stop(); // stop any stale scroll so old menu text isn't appended over the loading dots
         string[] frames = { ".", ". ·", ". · .", ". · . ·", ". · . · ." };
         int i = 0;
         float end = Time.time + duration;

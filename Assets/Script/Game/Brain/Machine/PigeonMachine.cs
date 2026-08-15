@@ -16,16 +16,17 @@ public class PigeonMachine : GroundMobMachine
     };
 
     private const float HoverHeight = 10f;   // how high above the player it hovers
-    private const int PoopDelay = 120;       // frames overhead before it poops (~2s)
     private const int FleeDistance = 30;     // how far it flees before despawning
 
     private HoverFlightModule _hover;
-    private int _timer;
     private bool _leaving;
+
+    /// <summary>True once the pigeon has started flying away.</summary>
+    public bool Leaving => _leaving;
 
     public static Info CreateInfo()
     {
-        return new EnemyInfo()
+        return new PigeonInfo()
         {
             HealthMax = 8,
             DistAlert = 20,
@@ -56,19 +57,18 @@ public class PigeonMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
-        // Fleeing — let MobFleeDespawn fly us away and despawn off-screen.
         if (_leaving)
             return;
 
-        // Hover over the player (the module flies us in and holds altitude).
+        // Hover over the player (the module flies us in and holds altitude), then
+        // poop the moment we're overhead and leave immediately.
         if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
         {
             Info.Target = Main.PlayerInfo;
-            // Only start the countdown once we're overhead so we poop on the player.
-            if (_hover.IsOverhead && ++_timer >= PoopDelay)
+            if (_hover.IsOverhead)
                 DropPoop();
         }
-        else if (++_timer >= PoopDelay)
+        else
         {
             // No player — just leave.
             StartFlee();
@@ -85,8 +85,9 @@ public class PigeonMachine : GroundMobMachine
         StartFlee();
     }
 
-    /// <summary>Begin fleeing away from the player; despawns once far enough.</summary>
-    private void StartFlee()
+    /// <summary>Begin fleeing away from the player; despawns once far enough. Also
+    /// called by PigeonInfo when the pigeon is hit mid-escape so it stays leaving.</summary>
+    public void StartFlee()
     {
         _leaving = true;
         SetState<MobFleeDespawn>();

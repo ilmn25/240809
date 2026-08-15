@@ -79,6 +79,7 @@ public partial class Item
         AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
+        AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");

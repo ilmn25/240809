@@ -10,7 +10,7 @@ public class HoverFlightModule : MobModule
     public HoverFlightModule() { updateMode = UpdateMode.Everyone; }
 
     public float HoverHeight = 10f;
-    public float ApproachDistance = 1.5f;
+    public float ApproachDistance = 2.5f;
 
     private const float HoverTolerance = 0.5f;
 
@@ -29,9 +29,9 @@ public class HoverFlightModule : MobModule
         float desiredY = anchor.y + HoverHeight;
         Vector3 pos = Machine.transform.position;
 
-        // Fleeing — flee pathing drives horizontal; just climb to hover height so it
-        // stays airborne while it flies away.
-        if (Machine.IsCurrentState<MobFleeDespawn>())
+        // Fleeing (or leaving) — flee drives horizontal; just keep it airborne so it
+        // stays at hover height while it flies away.
+        if (Machine.IsCurrentState<MobFleeDespawn>() || (Machine is PigeonMachine p && p.Leaving))
         {
             Info.Direction.y = pos.y < desiredY - HoverTolerance ? 1f : 0f;
             return;

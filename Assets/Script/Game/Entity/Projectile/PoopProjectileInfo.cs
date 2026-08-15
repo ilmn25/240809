@@ -20,10 +20,11 @@ public class PoopProjectileInfo : ProjectileInfo
         int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, HitBuffer);
         for (int i = 0; i < hitCount; i++)
         {
-            // Land on the ground.
+            // Land on the ground — leave a pickupable pile of droppings behind.
             if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Main.MaskMap))
             {
                 Audio.PlaySFX(SfxID.HitStone);
+                Entity.SpawnItem(ID.BirdShit, projectile.transform.position);
                 projectile.Delete();
                 return;
             }

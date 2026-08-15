@@ -51,7 +51,9 @@ public abstract class GroundMobMachine : MobMachine
     /// <summary>Nearest player or friendly NPC within alert range.</summary>
     private Info FindNearestAggroTarget()
     {
-        Info best = (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed) ? Main.PlayerInfo : null;
+        Info best = (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed &&
+                     Vector3.Distance(Main.PlayerInfo.position, transform.position) <= Info.DistAlert)
+            ? Main.PlayerInfo : null;
         Info npc = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is DynamicInfo d && d.IsNPC);
         if (npc != null && (best == null ||
             (npc.position - transform.position).sqrMagnitude < (best.position - transform.position).sqrMagnitude))
