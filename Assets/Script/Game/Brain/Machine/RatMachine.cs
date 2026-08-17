@@ -7,6 +7,10 @@ public class RatMachine : GroundMobMachine, IItemThief
 {
     private const int FleeDistance = 30;
 
+    /// <summary>The gnome this rat follows when it has no player target, and
+    /// escapes with when the gnome flees.</summary>
+    public GnomeMachine Gnome;
+
     private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
         Damage = 4,
         Knockback = 6,
@@ -37,7 +41,6 @@ public class RatMachine : GroundMobMachine, IItemThief
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
-        AddState(new MobFleeDespawn(FleeDistance));
         AddState(new MobHit());
         AddState(new MobAttackStopSwing(BiteProjectile));
         AddState(new EquipSelectState());
@@ -45,16 +48,28 @@ public class RatMachine : GroundMobMachine, IItemThief
 
     public override void OnUpdate()
     {
-        if (IsCurrentState<MobFleeDespawn>())
+        // The gnome vanished, so this rat leaves too.
+        if (Gnome == null || Gnome.Info == null || Gnome.Info.Destroyed)
+        {
+            Info.Destroy();
             return;
+        }
 
         if (!IsCurrentState<DefaultState>())
             return;
 
+        // While the gnome is fleeing, the whole pack escapes with it regardless of
+        // the player's position — no explicit "call each rat to leave" is needed.
+        if (Gnome.IsCurrentState<MobFleeDespawn>())
+        {
+            FollowGnome();
+            return;
+        }
+
         PlayerInfo player = Main.PlayerInfo;
         if (player == null || !player.CanBeRobbed)
         {
-            SetState<MobRoam>();
+            FollowGnome();
             return;
         }
 
@@ -73,14 +88,17 @@ public class RatMachine : GroundMobMachine, IItemThief
             Info.PathingStatus = PathingStatus.Pending;
             SetState<MobChase>();
         }
-        else 
-            SetState<MobRoam>();
+        else
+            FollowGnome();
     }
 
-    public void StartFlee()
+    /// <summary>Chase the gnome and hover near it.</summary>
+    private void FollowGnome()
     {
-        Info.Target = Main.PlayerInfo;
+        if (Vector3.Distance(Gnome.transform.position, transform.position) <= Info.DistAttack)
+            return;
+        Info.Target = Gnome.Info;
         Info.PathingStatus = PathingStatus.Pending;
-        SetState<MobFleeDespawn>();
+        SetState<MobChase>();
     }
 }

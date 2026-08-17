@@ -73,7 +73,7 @@ public class Entity
                 loot.Add(0.3f, 1, ID.Flint);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
-                AddStructure<WoodenToolbenchMachine>(ID.WoodenToolbench, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ToolbenchMachine>(ID.Toolbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<CarpenterWorkbenchMachine>(ID.CarpenterWorkbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<LoomMachine>(ID.Loom, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FurnaceMachine>(ID.Furnace, Vector3Int.one, Main.IndexCollide);
@@ -97,7 +97,7 @@ public class Entity
                 loot.Add(1, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
 
-                loot = new (ID.WoodenToolbench);
+                loot = new (ID.Toolbench);
                 loot.Add(1, 3, ID.Log);
                 loot.Add(0.5f, 4, ID.Log);
 

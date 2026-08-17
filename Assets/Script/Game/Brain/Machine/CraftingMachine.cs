@@ -51,11 +51,11 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
             SetState<DefaultState>();
     }
 }
-public class WoodenToolbenchMachine: CraftingMachine
+public class ToolbenchMachine: CraftingMachine
 {
     public static Info CreateInfo()
     {
-        return CraftInfo.CreateStructureInfo(ID.WoodenToolbench, 500, SfxID.HitStone, SfxID.HitStone);
+        return CraftInfo.CreateStructureInfo(ID.Toolbench, 500, SfxID.HitStone, SfxID.HitStone);
     }
 }
 

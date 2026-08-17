@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>A mischievous gnome that stalks the player from a distance. It sneaks
@@ -8,11 +7,8 @@ public class GnomeMachine : GroundMobMachine
 {
     private const int FollowDistance = 6;
     private const int FleeDistance = 30;
-    private const float PickupRadius = 1.2f;
     private const int RatCount = 1;
 
-    private readonly List<RatMachine> _rats = new();
-    private ItemInfo _targetItem;
     private bool _fleeing;
 
     public static Info CreateInfo()
@@ -34,13 +30,11 @@ public class GnomeMachine : GroundMobMachine
     public override void OnStart()
     {
         base.OnStart();
-        _rats.Clear();
-        _targetItem = null;
         _fleeing = false;
 
         AddState(new MobIdle());
         AddState(new MobStalk(FollowDistance));
-        AddState(new MobChase());
+        AddState(new MobStealItem());
         AddState(new MobRoam());
         AddState(new MobFleeDespawn(FleeDistance));
         AddState(new MobHit());
@@ -51,7 +45,7 @@ public class GnomeMachine : GroundMobMachine
             Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(i + 1, 1, 0);
             Info ratInfo = Entity.Spawn(ID.Rat, spawnPos);
             if (ratInfo?.Machine is RatMachine rat)
-                _rats.Add(rat);
+                rat.Gnome = this;
         }
     }
 
@@ -60,30 +54,16 @@ public class GnomeMachine : GroundMobMachine
         if (IsCurrentState<MobFleeDespawn>())
             return;
 
-        if (_targetItem == null && Main.PlayerInfo != null)
-            _targetItem = Main.PlayerInfo.DroppedItem;
-
-        if (_targetItem != null)
+        // DroppedItem always points at the latest item the player dropped; it's only
+        // ever stale once that item is gone, so reading it fresh each frame avoids
+        // caching (and chasing) a destroyed reference forever.
+        ItemInfo dropped = Main.PlayerInfo?.DroppedItem;
+        if (dropped != null && !dropped.Destroyed)
         {
-            if (_targetItem.Destroyed)
-            {
-                _targetItem = null;
-                Info.CancelTarget();
-            }
-            else if (Vector3.Distance(_targetItem.position, transform.position) <= PickupRadius)
-            {
-                Steal(_targetItem);
-                _targetItem = null;
-                StartFlee();
-                return;
-            }
-            else
-            {
-                Info.Target = _targetItem;
-                Info.PathingStatus = PathingStatus.Pending;
-                SetState<MobChase>();
-                return;
-            }
+            Info.Target = dropped;
+            Info.PathingStatus = PathingStatus.Pending;
+            SetState<MobStealItem>();
+            return;
         }
 
         if (!IsCurrentState<DefaultState>())
@@ -113,13 +93,19 @@ public class GnomeMachine : GroundMobMachine
         item.Destroy();
     }
 
+    /// <summary>Steal the currently targeted dropped item and flee. Called by
+    /// MobStealItem once the gnome reaches the item.</summary>
+    public void GrabAndFlee()
+    {
+        if (Info.Target is not ItemInfo item || item.Destroyed) return;
+        Steal(item);
+        StartFlee();
+    }
+
     public void StartFlee()
     {
         if (_fleeing) return;
         _fleeing = true;
-
-        foreach (RatMachine rat in _rats)
-            rat.StartFlee();
 
         Info.Target = Main.PlayerInfo;
         Info.PathingStatus = PathingStatus.Pending;

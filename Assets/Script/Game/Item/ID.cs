@@ -23,7 +23,7 @@ public enum ID
     Brick,
     Chest,
     Workbench,
-    WoodenToolbench,
+    Toolbench,
     Stonecutter,
     Furnace, 
     BlueprintStation,

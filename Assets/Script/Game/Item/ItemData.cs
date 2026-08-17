@@ -86,7 +86,7 @@ public partial class Item
         AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Flint, 3 } , { ID.Sticks, 3 } }, 100, description: "A workbench to build other machines.");
         AddStructureDefinition(ID.Smelter, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.StoneBlock, 6 } }, 100, description: "A dedicated smelter used to turn sand into glass.");
         AddStructureDefinition(ID.MasonryWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.StoneBlock, 8 } }, 100, description: "A masonry bench for building advanced stonework and powering anvils.");
-        AddStructureDefinition(ID.WoodenToolbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");
+        AddStructureDefinition(ID.Toolbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");
         AddStructureDefinition(ID.CarpenterWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.Plank, 5 } }, 100, description: "Crafts beds, looms and signs.");
         AddStructureDefinition(ID.Loom, new Dictionary<ID, int> { { ID.Plank, 6 }, { ID.Sticks, 2 } }, 100, description: "Weaves wool into fabric.");
         AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.");

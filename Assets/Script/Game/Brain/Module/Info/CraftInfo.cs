@@ -6,8 +6,8 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.ChalkPowder, ID.Torch);
-    private static readonly Storage WoodenToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.WoodenToolbench), ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer);
+private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.ChalkPowder, ID.Torch, ID.Toolbench);
+    private static readonly Storage ToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Toolbench), ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer);
     private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap);
     private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.Sawmill, ID.FieldStation);
     private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric, ID.Bandages);
@@ -96,7 +96,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
     {
         return structureId switch
         {
-            ID.WoodenToolbench => WoodenToolbenchPool,
+            ID.Toolbench => ToolbenchPool,
             ID.CarpenterWorkbench => CarpenterPool,
             ID.Loom => LoomPool,
             ID.Campfire => CampfirePool,

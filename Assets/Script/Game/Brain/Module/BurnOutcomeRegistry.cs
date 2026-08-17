@@ -25,7 +25,7 @@ public static class BurnOutcomeRegistry
 
         // Wooden structures collapse into rubble.
         [ID.Workbench]  = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.WoodenToolbench] = new SpawnStructureOutcome { StructureID = ID.Rubble },
+        [ID.Toolbench] = new SpawnStructureOutcome { StructureID = ID.Rubble },
         [ID.CarpenterWorkbench] = new SpawnStructureOutcome { StructureID = ID.Rubble },
         [ID.Loom]       = new SpawnStructureOutcome { StructureID = ID.Rubble },
         [ID.Sawmill]    = new SpawnStructureOutcome { StructureID = ID.Rubble },

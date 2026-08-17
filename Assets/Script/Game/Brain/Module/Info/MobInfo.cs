@@ -39,6 +39,20 @@ public class MobInfo : DynamicInfo
 
     // Animation inputs are serialized by EntitySync for remote clients.
 
+    public override void Initialize()
+    {
+        base.Initialize();
+        // A pooled GameObject can be reused for a new entity while still showing the
+        // previous owner's held item (SpriteTool). Clear it so the new entity doesn't
+        // appear to be holding an item it doesn't have.
+        Equipment = null;
+        if (SpriteTool != null)
+        {
+            SetToolGlow(false);
+            SpriteTool.gameObject.SetActive(false);
+        }
+    }
+
     public void CancelTarget()
     {
         Target = null; 
