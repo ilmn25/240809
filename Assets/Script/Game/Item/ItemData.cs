@@ -352,17 +352,17 @@ public partial class Item
             sfx: SfxID.HitMetal,
             speed: 1.6f,
             range: 1,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new WaterSplashProjectileInfo {
                 Damage = 0,
                 Knockback = 0,
                 CritChance = 0,
                 Speed = 4,
-                Radius = 2,
+                Radius = 3,
                 Breaking = 0,
                 OperationType = OperationType.None
             },
             durability: -1,
-            description: "A bucket of fresh water. Swing it at a planter to water it.",
+            description: "A bucket of fresh water. Swing it to water all nearby planters.",
             holdoutOffset: new Vector2(0.5f, 0)
         );
         AddToolDefinition(

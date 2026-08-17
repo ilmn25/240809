@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>Periodically waters nearby planters so crops grow without a bucket.</summary>
+/// <summary>Periodically sprays water on nearby planters so crops grow without a bucket.</summary>
 public class SprinklerMachine : StructureMachine
 {
     private const float WaterRadius = 4f;
     private const float WaterInterval = 1f;
-    private static readonly Collider[] Buffer = new Collider[32];
+    private static readonly WaterSplashProjectileInfo Water = new() { Radius = WaterRadius };
 
     public static Info CreateInfo()
     {
@@ -34,14 +34,7 @@ public class SprinklerMachine : StructureMachine
             yield return new WaitForSeconds(WaterInterval);
             if (!Helper.IsHost()) continue;
             if (Info.Destroyed) yield break;
-
-            int count = Physics.OverlapSphereNonAlloc(transform.position, WaterRadius, Buffer, Main.MaskEntity);
-            for (int i = 0; i < count; i++)
-            {
-                if (!Buffer[i].TryGetComponent(out EntityMachine em)) continue;
-                if (em is PlanterMachine planter)
-                    planter.Water();
-            }
+            Projectile.Spawn(transform.position, transform.position + Vector3.up, Water, HitboxType.Passive, null);
         }
     }
 }

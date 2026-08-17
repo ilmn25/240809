@@ -69,14 +69,15 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         return Info.IsPlanted && !Info.IsGrown && !Info.IsWatered;
     }
 
-    /// <summary>Water this planter, scheduling growth one day out. No-op unless it can be watered.</summary>
-    public void Water()
+    /// <summary>Water this planter, scheduling growth one day out. True if it was watered.</summary>
+    public bool Water()
     {
-        if (!CanWater()) return;
+        if (!CanWater()) return false;
         Info.IsWatered = true;
         Info.GrowAtDay = Save.Inst.day + 1;
         Info.GrowAtHour = Save.Inst.time / 60;
         RefreshSprite(force: true);
+        return true;
     }
 
     private int GetHoursLeftToGrow()

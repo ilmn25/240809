@@ -109,6 +109,9 @@ public class Gen
 
         // Place raider camps (loot chest + tents + lamp).
         GenTaskRaiderCamp.Run(world);
+
+        // Scatter a few ponds (each ringed with bushes).
+        GenTaskPond.Run(world);
     }
 
     /// <summary>Places an owl statue beside the world's spawn point. Because NPCs

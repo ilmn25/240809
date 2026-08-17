@@ -13,7 +13,6 @@ public class GenTaskEntity : Gen
     private static int Granite => _idGranite == 0 ? Block.ConvertID(ID.GraniteBlock) : _idGranite;
 
     private const double DirtTreeChance = 0.0025;
-    private const double DirtBushChance = 0.00125;
     private const double DirtGrassChance = 0.08;
     private const double SurfaceChestChance = 0.0002;
     private const double SurfaceSkeletonChance = 0.0001;
@@ -25,7 +24,6 @@ public class GenTaskEntity : Gen
 
     // Dense forest generation
     private const double ForestTreeChance = 0.0625;
-    private const double ForestBushChance = 0.005;
     private const double ForestGrassChance = 0.06;
     private const double ForestDeathcapChance = 0.00125;
     private const double ForestSpiderNestChance = 0.0008;
@@ -79,10 +77,6 @@ public class GenTaskEntity : Gen
                                 ID treeID = rng.NextDouble() <= 0.8 ? ID.PineTree : ID.BirchTree;
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
                             }
-                            else if (roll <= (chance += ForestBushChance))
-                            {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Bush, position));
-                            }
                             else if (roll <= (chance += ForestGrassChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
@@ -111,10 +105,6 @@ public class GenTaskEntity : Gen
                             {
                                 ID treeID = rng.NextDouble() <= 0.8 ? ID.PineTree : ID.BirchTree;
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
-                            }
-                            else if (roll <= (chance += DirtBushChance))
-                            {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Bush, position));
                             }
                             else if (roll <= (chance += DirtGrassChance))
                             {
