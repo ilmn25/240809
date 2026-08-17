@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>A mischievous gnome that stalks the player from a distance. It sneaks
@@ -5,11 +6,13 @@ using UnityEngine;
 /// you kill it, you get your items back; if it flees and despawns, they're gone.</summary>
 public class GnomeMachine : GroundMobMachine
 {
-    private const int FollowDistance = 6;   // how close it creeps before stopping
-    private const int FleeDistance = 30;    // how far it flees before despawning
-    private const float PickupRadius = 1f;  // how close an item must be to steal
-    private const int RatCount = 1;         // how many rats accompany the gnome
+    private const int FollowDistance = 6;
+    private const int FleeDistance = 30;
+    private const float PickupRadius = 1.2f;
+    private const int RatCount = 1;
 
+    private readonly List<RatMachine> _rats = new();
+    private ItemInfo _targetItem;
     private bool _fleeing;
 
     public static Info CreateInfo()
@@ -17,6 +20,7 @@ public class GnomeMachine : GroundMobMachine
         return new GnomeInfo()
         {
             HealthMax = 20,
+            DistAttack = 1,
             DistAlert = 16,
             DistDisengage = FleeDistance,
             DistEscape = FleeDistance,
@@ -30,6 +34,9 @@ public class GnomeMachine : GroundMobMachine
     public override void OnStart()
     {
         base.OnStart();
+        _rats.Clear();
+        _targetItem = null;
+        _fleeing = false;
 
         AddState(new MobIdle());
         AddState(new MobStalk(FollowDistance));
@@ -39,11 +46,12 @@ public class GnomeMachine : GroundMobMachine
         AddState(new MobHit());
         AddState(new EquipSelectState());
 
-        // Spawn a small pack of rats to work with the gnome.
         for (int i = 0; i < RatCount; i++)
         {
             Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(i + 1, 1, 0);
-            Entity.Spawn(ID.Rat, spawnPos);
+            Info ratInfo = Entity.Spawn(ID.Rat, spawnPos);
+            if (ratInfo?.Machine is RatMachine rat)
+                _rats.Add(rat);
         }
     }
 
@@ -52,27 +60,26 @@ public class GnomeMachine : GroundMobMachine
         if (IsCurrentState<MobFleeDespawn>())
             return;
 
-        // The player dropped an item (from a rat bite) — go pick it up and run.
-        if (Main.PlayerInfo is { Destroyed: false } && Main.PlayerInfo.DroppedItem != null)
+        if (_targetItem == null && Main.PlayerInfo != null)
+            _targetItem = Main.PlayerInfo.DroppedItem;
+
+        if (_targetItem != null)
         {
-            ItemInfo item = Main.PlayerInfo.DroppedItem;
-            if (item.Destroyed)
+            if (_targetItem.Destroyed)
             {
-                // It was picked back up or vanished — forget it and stop chasing.
-                Main.PlayerInfo.DroppedItem = null;
+                _targetItem = null;
                 Info.CancelTarget();
             }
-            else if (Vector3.Distance(item.position, transform.position) <= PickupRadius)
+            else if (Vector3.Distance(_targetItem.position, transform.position) <= PickupRadius)
             {
-                Steal(item);
-                Main.PlayerInfo.DroppedItem = null;
+                Steal(_targetItem);
+                _targetItem = null;
                 StartFlee();
                 return;
             }
             else
             {
-                // Not close enough yet — chase the item directly.
-                Info.Target = item;
+                Info.Target = _targetItem;
                 Info.PathingStatus = PathingStatus.Pending;
                 SetState<MobChase>();
                 return;
@@ -98,7 +105,6 @@ public class GnomeMachine : GroundMobMachine
             SetState<MobRoam>();
     }
 
-    /// <summary>Take the item — hold it in hand, stash it, and remove it from the ground.</summary>
     private void Steal(ItemInfo item)
     {
         if (Info is not GnomeInfo gnome || gnome.Stolen == null) return;
@@ -107,22 +113,13 @@ public class GnomeMachine : GroundMobMachine
         item.Destroy();
     }
 
-    /// <summary>Begin fleeing away from the player; the whole group (gnome + rats)
-    /// escapes, and the gnome despawns once far enough.</summary>
     public void StartFlee()
     {
         if (_fleeing) return;
         _fleeing = true;
 
-        // Tell nearby rats to flee too.
-        foreach (var em in EntityDynamicLoad.ActiveEntities)
-        {
-            if (em != null && em is RatMachine rat)
-            {
-                rat.StartFlee();
-                return;
-            } 
-        }
+        foreach (RatMachine rat in _rats)
+            rat.StartFlee();
 
         Info.Target = Main.PlayerInfo;
         Info.PathingStatus = PathingStatus.Pending;

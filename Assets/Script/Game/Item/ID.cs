@@ -151,4 +151,10 @@ public enum ID
     Dagger,
     Cultist,
     Thrall,
+    Pond,
+    Bucket,
+    BucketOfWater,
+    BucketOfLava,
+    BucketOfHoney,
+    Sprinkler,
 }

@@ -4,9 +4,13 @@ public class GenTaskEntity : Gen
 {
     private static int _id;
     private static int _idForest;
+    private static int _idStone;
+    private static int _idGranite;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private static int Sand => _id == 0 ? Block.ConvertID(ID.SandBlock) : _id;
     private static int Forest => _idForest == 0 ? Block.ConvertID(ID.ForestBlock) : _idForest;
+    private static int Stone => _idStone == 0 ? Block.ConvertID(ID.StoneBlock) : _idStone;
+    private static int Granite => _idGranite == 0 ? Block.ConvertID(ID.GraniteBlock) : _idGranite;
 
     private const double DirtTreeChance = 0.0025;
     private const double DirtBushChance = 0.00125;
@@ -17,6 +21,7 @@ public class GenTaskEntity : Gen
     private const double SurfaceSandStructureChance = 0.0098;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
     private const double GroundItemChance = 0.016;
+    private const double StoneGroundItemChance = 0.03;
 
     // Dense forest generation
     private const double ForestTreeChance = 0.0625;
@@ -163,6 +168,15 @@ public class GenTaskEntity : Gen
                                 if (groundItem != ID.Null)
                                     currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
                             }
+
+                            // Flint on stone and granite surfaces
+                            if ((currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite)
+                                && rng.NextDouble() < StoneGroundItemChance)
+                            {
+                                ID groundItem = PickStoneItem(rng);
+                                if (groundItem != ID.Null)
+                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                            }
                         }
                     }
                 }
@@ -176,9 +190,21 @@ public class GenTaskEntity : Gen
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.02) > roll) return ID.Flint;
+        if ((chance += 0.10) > roll) return ID.Flint;
         if ((chance += 0.20) > roll) return ID.Shell;
         if ((chance += 0.12) > roll) return ID.Sand;
+        return ID.Null;
+    }
+
+    /// <summary>Stone/granite items — flint-heavy.</summary>
+    private static ID PickStoneItem(System.Random rng)
+    {
+        double roll = rng.NextDouble();
+        double chance = 0;
+
+        if ((chance += 0.75) > roll) return ID.Flint;
+        if ((chance += 0.15) > roll) return ID.Gravel;
+        if ((chance += 0.05) > roll) return ID.Sticks;
         return ID.Null;
     }
 
@@ -187,9 +213,9 @@ public class GenTaskEntity : Gen
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.45) > roll) return ID.Sticks;
-        if ((chance += 0.45) > roll) return ID.Mud;
-        if ((chance += 0.45) > roll) return ID.Flint;
+        if ((chance += 0.40) > roll) return ID.Sticks;
+        if ((chance += 0.40) > roll) return ID.Mud;
+        if ((chance += 0.55) > roll) return ID.Flint;
         if ((chance += 0.10) > roll) return ID.Gravel;
         return ID.Null;
     }

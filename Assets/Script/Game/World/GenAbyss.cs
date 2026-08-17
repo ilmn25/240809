@@ -16,7 +16,7 @@ public class GenAbyss : Gen
         GenTaskForest.Run(currentCoordinate, currentChunk);
         GenTaskMountain.Run(currentCoordinate, currentChunk);
         GenTaskVoid.Run(currentCoordinate, currentChunk); // void replaced by plateau
-        GenTaskRavine.Run(currentCoordinate, currentChunk); // temporarily disabled — replaced by plateaus
+        // GenTaskRavine.Run(currentCoordinate, currentChunk); // temporarily disabled — replaced by plateaus
         // GenTaskPlateau.Run(currentCoordinate, currentChunk);
         // GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);

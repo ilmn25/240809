@@ -110,6 +110,8 @@ public partial class Item
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
         AddStructureDefinition(ID.OldRadio, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 3 }, { ID.Glass, 1 } }, 100, description: "An old radio — one of the key items a travelling merchant looks for.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
+        AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
+        AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
 
         // Tools
         AddToolDefinition(
@@ -321,6 +323,85 @@ public partial class Item
             description: "Hammer used for building and weapon crafting.",
             materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.Bucket,
+            gesture: ItemGesture.Swing,
+            sfx: SfxID.HitMetal,
+            speed: 1.6f,
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 4,
+                Radius = 2,
+                Breaking = 0,
+                OperationType = OperationType.None
+            },
+            durability: -1,
+            description: "An empty bucket. Swing it at a pond to fill it.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 2 } },
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.BucketOfWater,
+            gesture: ItemGesture.Swing,
+            sfx: SfxID.HitMetal,
+            speed: 1.6f,
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 4,
+                Radius = 2,
+                Breaking = 0,
+                OperationType = OperationType.None
+            },
+            durability: -1,
+            description: "A bucket of fresh water. Swing it at a planter to water it.",
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
+        AddToolDefinition(
+            id: ID.BucketOfLava,
+            gesture: ItemGesture.Swing,
+            sfx: SfxID.HitMetal,
+            speed: 1.6f,
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 4,
+                Radius = 2,
+                Breaking = 0,
+                OperationType = OperationType.None
+            },
+            durability: -1,
+            description: "A bucket filled with molten lava.",
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
+        AddToolDefinition(
+            id: ID.BucketOfHoney,
+            gesture: ItemGesture.Swing,
+            sfx: SfxID.HitMetal,
+            speed: 1.6f,
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 4,
+                Radius = 2,
+                Breaking = 0,
+                OperationType = OperationType.None
+            },
+            durability: -1,
+            description: "A bucket filled with honey.",
+            holdoutOffset: new Vector2(0.5f, 0)
         );
 
         AddToolDefinition(

@@ -38,4 +38,16 @@ public static class EntityScan
         }
         return matches;
     }
+
+    /// <summary>Runs the action for every entity within radius whose Info matches
+    /// the predicate.</summary>
+    public static void ForEach(Vector3 origin, float radius, Func<Info, bool> predicate, Action<Info> action)
+    {
+        int count = Physics.OverlapSphereNonAlloc(origin, radius, Buffer, Main.MaskEntity);
+        for (int i = 0; i < count; i++)
+        {
+            if (!Buffer[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
+            if (predicate(em.Info)) action(em.Info);
+        }
+    }
 }

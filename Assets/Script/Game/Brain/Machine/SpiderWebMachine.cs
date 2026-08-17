@@ -8,8 +8,6 @@ public class SpiderWebMachine : HarvestableMachine
     private const float AlertRadius = 20f;     // how far away spiders get alerted
     private const int CheckInterval = 20;      // frames between checks
 
-    private static readonly Collider[] ScanBuffer = new Collider[32];
-
     private int _timer;
     private bool _playerOnWeb;
 
@@ -33,7 +31,7 @@ public class SpiderWebMachine : HarvestableMachine
 
         bool playerOnWeb = PlayerOnWeb();
         if (playerOnWeb && !_playerOnWeb)
-            AlertSpiders();
+            AlertSpiders(Main.PlayerInfo);
         _playerOnWeb = playerOnWeb;
     }
 
@@ -43,13 +41,11 @@ public class SpiderWebMachine : HarvestableMachine
         return Vector3.Distance(Main.PlayerInfo.position, transform.position) < WebRadius;
     }
 
-    public void AlertSpiders()
+    public void AlertSpiders(Info target)
     {
-        int hits = Physics.OverlapSphereNonAlloc(transform.position, AlertRadius, ScanBuffer, Main.MaskEntity);
-        for (int i = 0; i < hits; i++)
-        {
-            if (ScanBuffer[i].TryGetComponent(out SpiderMachine spider) && !spider.Info.Destroyed)
-                spider.Investigate(Main.PlayerInfo);
-        }
+        if (target == null || target.Destroyed) return;
+        EntityScan.ForEach(transform.position, AlertRadius,
+            i => i.Machine is SpiderMachine s && !s.Info.Destroyed,
+            i => ((SpiderMachine)i.Machine).Investigate(target));
     }
 }

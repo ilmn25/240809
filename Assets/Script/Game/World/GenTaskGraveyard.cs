@@ -41,16 +41,15 @@ public class GenTaskGraveyard : Gen
         // Headstone sits on the surface.
         chunk.StaticEntity.Add(Entity.CreateInfo(ID.Headstone, surface));
 
-        // Solid grass block directly below the headstone.
-        SetBlock(world, surface + Vector3Int.down, ID.GrassBlock);
-
-        // Skeleton and loot in empty air blocks to the side (at surface level).
-        PlaceEntity(world, surface + new Vector3Int(1, 0, 0), ID.Skeleton);
-        PlaceEntity(world, surface + new Vector3Int(2, 0, 0), PickGraveLoot(rng));
+        // Skeleton and loot buried beneath the headstone (loot stacked above).
+        SetAir(world, surface + new Vector3Int(0, -2, 0));
+        SetAir(world, surface + new Vector3Int(0, -3, 0));
+        PlaceEntity(world, surface + new Vector3Int(0, -3, 0), ID.Skeleton);
+        PlaceEntity(world, surface + new Vector3Int(0, -2, 0), PickGraveLoot(rng));
     }
 
-    /// <summary>Sets a solid block at <paramref name="cell"/>.</summary>
-    private static void SetBlock(World world, Vector3Int cell, ID id)
+    /// <summary>Clears the block at <paramref name="cell"/> to air.</summary>
+    private static void SetAir(World world, Vector3Int cell)
     {
         if (!World.IsInWorldBounds(cell)) return;
 
@@ -60,7 +59,7 @@ public class GenTaskGraveyard : Gen
 
         int localY = cell.y - chunkCoord.y;
         if (localY <= 0) return;
-        chunk[cell.x - chunkCoord.x, localY, cell.z - chunkCoord.z] = Block.ConvertID(id);
+        chunk[cell.x - chunkCoord.x, localY, cell.z - chunkCoord.z] = 0;
     }
 
     /// <summary>Adds a static entity to the chunk containing <paramref name="cell"/>.</summary>

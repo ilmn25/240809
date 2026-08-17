@@ -64,6 +64,7 @@ public class Main : MonoBehaviour
 
     public void Start()
     {
+        Cursor.visible = false;
         ScreenFade.FadeInFromBlack(1f, 1f);
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         

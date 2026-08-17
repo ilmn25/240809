@@ -55,14 +55,10 @@ public class PlayerInfo : MobInfo
         // If a bug is latched onto us and we get hit by something else, it lets go.
         ReleaseLatchedBug(projectile);
 
-        // A rat's bite knocks the held item out of the player's hand. The rat keeps
-        // biting so the gnome has an item to grab — it doesn't run off here.
-        if (projectile.SourceInfo?.Machine is RatMachine)
+        if (projectile.SourceInfo?.Machine is IItemThief)
             DropHeldItem();
     }
 
-    /// <summary>The item the player most recently dropped from a rat bite, for a
-    /// nearby gnome to steal. Cleared once the gnome grabs it.</summary>
     [NonSerialized] public ItemInfo DroppedItem;
 
     /// <summary>True if the player is alive, active, and holding an item a thief
@@ -71,28 +67,14 @@ public class PlayerInfo : MobInfo
         !Destroyed && Health > 0 && PlayerStatus != PlayerStatus.Incapacitated &&
         Equipment != null && !Equipment.isEmpty();
 
-    /// <summary>Drop the currently held item onto the ground (used when a rat bites
-    /// the player). Reuses the standard inventory drop path so it syncs correctly.
-    /// Returns true if an item was dropped.</summary>
     public bool DropHeldItem()
     {
         if (Storage?.List == null || Storage.Key < 0 || Storage.Key >= Storage.List.Count) return false;
         ItemSlot held = Storage.List[Storage.Key];
         if (held == null || held.isEmpty()) return false;
 
-        Vector3 dropPos = position;
-        ID droppedID = held.ID;
-        Inventory.DropToWorld(held, held.Stack, Storage, dropPos);
-        DroppedItem = FindItemAt(dropPos, droppedID);
+        DroppedItem = Inventory.DropToWorld(held, held.Stack, Storage, position);
         return true;
-    }
-
-    /// <summary>Find the dropped item of the given ID nearest the position. Filters by
-    /// ID so incidental ground items (like blood spawned on hit) aren't mistaken for
-    /// the item the player actually dropped.</summary>
-    private ItemInfo FindItemAt(Vector3 pos, ID id)
-    {
-        return EntityScan.FindNearest(pos, 5f, i => i is ItemInfo item && !item.Destroyed && item.item.ID == id) as ItemInfo;
     }
 
     /// <summary>Release any bug latched onto this player when hit by another source.</summary>

@@ -42,7 +42,10 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
         if (Info.IsPlanted)
         {
-            ShowPlanterMessage($"I should come back in {GetHoursLeftToGrow()} hours");
+            if (!Info.IsWatered)
+                ShowPlanterMessage("This needs water to grow");
+            else
+                ShowPlanterMessage($"I should come back in {GetHoursLeftToGrow()} hours");
             return;
         }
 
@@ -54,6 +57,23 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
         Info.IsPlanted = true;
         Info.IsGrown = false;
+        Info.IsWatered = false;
+        Info.GrowAtDay = -1;
+        Info.GrowAtHour = -1;
+        RefreshSprite(force: true);
+    }
+
+    /// <summary>Whether this planter can currently be watered (planted, not grown, dry).</summary>
+    public bool CanWater()
+    {
+        return Info.IsPlanted && !Info.IsGrown && !Info.IsWatered;
+    }
+
+    /// <summary>Water this planter, scheduling growth one day out. No-op unless it can be watered.</summary>
+    public void Water()
+    {
+        if (!CanWater()) return;
+        Info.IsWatered = true;
         Info.GrowAtDay = Save.Inst.day + 1;
         Info.GrowAtHour = Save.Inst.time / 60;
         RefreshSprite(force: true);
@@ -105,6 +125,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
         Info.IsPlanted = false;
         Info.IsGrown = false;
+        Info.IsWatered = false;
         Info.GrowAtDay = -1;
         Info.GrowAtHour = -1;
         RefreshSprite(force: true);
@@ -117,7 +138,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
     private void EnsureGrowthSchedule()
     {
-        if (!Info.IsPlanted || Info.IsGrown)
+        if (!Info.IsPlanted || Info.IsGrown || !Info.IsWatered)
             return;
 
         if (Info.GrowAtDay > 0 && Info.GrowAtHour >= 0)
@@ -129,7 +150,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
     private void TryGrowForTime(int hour, int day)
     {
-        if (!Info.IsPlanted || Info.IsGrown)
+        if (!Info.IsPlanted || Info.IsGrown || !Info.IsWatered)
             return;
 
         if (Info.GrowAtDay <= 0 || Info.GrowAtHour < 0)

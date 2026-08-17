@@ -5,9 +5,12 @@ using UnityEngine;
 [System.Serializable]
 public class SpiderWebInfo : HarvestableInfo
 {
-    public override void OnDestroy(MobInfo info)
+    // Cutting the web down alerts spiders with the specific player who broke it,
+    // so they hunt the breaker rather than just whoever is nearest.
+    public override bool OnHitInternal(Projectile projectile)
     {
         if (Machine is SpiderWebMachine web)
-            web.AlertSpiders();
+            web.AlertSpiders(projectile.SourceInfo);
+        return base.OnHitInternal(projectile);
     }
 }

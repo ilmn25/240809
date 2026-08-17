@@ -25,6 +25,7 @@ public class PoopProjectileInfo : ProjectileInfo
             {
                 Audio.PlaySFX(SfxID.HitStone);
                 Entity.SpawnItem(ID.BirdShit, projectile.transform.position);
+                Particle.Create(projectile.transform.position, Particles.HitDust, false);
                 projectile.Delete();
                 return;
             }

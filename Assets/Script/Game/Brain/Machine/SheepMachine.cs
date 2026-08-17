@@ -13,8 +13,8 @@ public class SheepMachine : AnimalMachine
         return new SheepInfo()
         {
             HealthMax = 16,
-            SpeedGround = 7,
-            SpeedAir = 8,
+            SpeedGround = 6,
+            SpeedAir = 6,
             PathAir = 3,
             DistAttack = 5,    // how close the player must be before the flock flees
             DistAlert = 14,    // how far a sheep will follow its flockmates

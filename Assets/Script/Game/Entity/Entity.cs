@@ -85,6 +85,8 @@ public class Entity
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FieldStationMachine>(ID.FieldStation, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<PondMachine>(ID.Pond, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<SprinklerMachine>(ID.Sprinkler, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
@@ -403,10 +405,11 @@ public class Entity
                 SpawnItem(new ItemSlot(id, amount), worldPosition, stackOnSpawn, amount, velocity, despawn);
         }
 
-        public static void SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1)
+        public static ItemInfo SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1)
         {  
                 Entity entity = Dictionary[ID.ItemPrefab];
                 int target = slot.Stack - amount;
+                ItemInfo spawned = null;
                 while (slot.Stack != target && !slot.isEmpty())
                 {
                         GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
@@ -426,7 +429,9 @@ public class Entity
                         currentEntityMachine.Initialize(itemInfo);
                         if (Helper.IsHost())
                             ItemSync.BroadcastSpawn(itemInfo);
+                        spawned = itemInfo;
                 }
+                return spawned;
         }
 
         

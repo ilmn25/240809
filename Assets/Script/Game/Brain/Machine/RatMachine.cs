@@ -3,9 +3,9 @@ using UnityEngine;
 /// <summary>A rat that works with the gnome. It bites the player to damage them
 /// (which knocks their held item to the ground), then the gnome grabs the dropped
 /// item and both escape.</summary>
-public class RatMachine : GroundMobMachine
+public class RatMachine : GroundMobMachine, IItemThief
 {
-    private const int FleeDistance = 30;    // how far it flees before despawning
+    private const int FleeDistance = 30;
 
     private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
         Damage = 4,
@@ -51,17 +51,15 @@ public class RatMachine : GroundMobMachine
         if (!IsCurrentState<DefaultState>())
             return;
 
-        // Only engage the player if they're alive and holding an item to steal.
         PlayerInfo player = Main.PlayerInfo;
         if (player == null || !player.CanBeRobbed)
-        { 
+        {
             SetState<MobRoam>();
             return;
         }
 
         float dist = Vector3.Distance(player.position, transform.position);
 
-        // Bite the player — dealing damage knocks their held item to the ground.
         if (dist < Info.DistAttack)
         {
             Info.AimPosition = Main.PlayerInfo.position;
@@ -79,7 +77,6 @@ public class RatMachine : GroundMobMachine
             SetState<MobRoam>();
     }
 
-    /// <summary>Begin fleeing away from the player; despawns once far enough.</summary>
     public void StartFlee()
     {
         Info.Target = Main.PlayerInfo;

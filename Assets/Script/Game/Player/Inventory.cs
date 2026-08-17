@@ -61,17 +61,19 @@ public class Inventory
 
     /// <summary>Drop <paramref name="amount"/> of <paramref name="slot"/> to the world at
     /// <paramref name="position"/>. Host spawns locally; client sends a drop message.</summary>
-    public static void DropToWorld(ItemSlot slot, int amount, Storage storage, Vector3 position)
+    public static ItemInfo DropToWorld(ItemSlot slot, int amount, Storage storage, Vector3 position)
     {
         if (Helper.IsHost())
         {
-            Entity.SpawnItem(slot, position, amount: amount);
+            ItemInfo spawned = Entity.SpawnItem(slot, position, amount: amount);
             storage.NotifyChanged();
+            return spawned;
         }
-        else if (NetworkClient.isConnected)
+        if (NetworkClient.isConnected)
         {
             ClientDropSlot(slot, amount, storage, position);
         }
+        return null;
     }
 
     public static void Update()
