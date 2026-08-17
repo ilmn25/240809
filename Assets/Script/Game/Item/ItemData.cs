@@ -105,10 +105,10 @@ public partial class Item
         AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 100, description: "Unlocks blueprint-based crafting options.");
         AddStructureDefinition(ID.FieldStation, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.Sticks, 4 } }, 100, description: "A lightweight station specialized for field planting tools.");
         AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Feed it an acorn to grow a log.");
-        AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.");
+        AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
         AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
-        AddStructureDefinition(ID.OldRadio, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Slag, 3 }, { ID.Glass, 1 } }, 100, description: "An old radio — one of the key items a travelling merchant looks for.");
+        AddStructureDefinition(ID.OldRadio, null, 100, furniture: true, description: "An old radio — one of the key items a travelling merchant looks for. Found in chests.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");

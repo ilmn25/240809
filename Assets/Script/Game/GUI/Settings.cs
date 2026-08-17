@@ -8,6 +8,7 @@ public class Settings
     public bool Fullscreen = true;
     public int ResolutionIndex = 3;
     public float BgmVolume = 1f;
+    public float AmbienceVolume = 1f;
     public float SfxVolume = 0.5f;
     public int ScrollSpeedIndex = 1;
     public bool TutorialEnabled = true;

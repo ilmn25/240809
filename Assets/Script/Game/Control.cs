@@ -109,6 +109,13 @@ public class Control
                 prev.ActionType = IActionType.Follow;
             }
         }
+        // Return any cursor-held item to the outgoing player's inventory before
+        // switching control; AddItem drops it to the world if the inventory is full.
+        if (!GUICursor.Data.isEmpty() && prev?.Storage != null)
+        {
+            prev.Storage.AddItem(GUICursor.Data);
+            GUICursor.UpdateCursorSlot();
+        }
         SetPlayer(i);
 
         if (!Helper.IsHost())

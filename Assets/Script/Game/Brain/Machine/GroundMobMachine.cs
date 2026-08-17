@@ -29,7 +29,7 @@ public abstract class GroundMobMachine : MobMachine
 
     /// <summary>Lock onto the nearest player or friendly NPC on sight; release it
     /// once it retreats well out of disengage range. Hostile mobs call this from
-    /// their OnUpdate. Guards override it to rely on their camp-based targeting.</summary>
+    /// their OnUpdate. Guards use this too; their extra camp leash is in GuardModule.</summary>
     protected virtual void UpdateAggro()
     {
         Info nearest = FindNearestAggroTarget();

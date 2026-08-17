@@ -29,6 +29,10 @@ public partial class Item
     public int DamageValue; // damage dealt to the eater when consumed (0 = safe)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
+    /// <summary>Whether this structure places directly as furniture: no build phase,
+    /// can't be broken, and a hammer picks it back up into the player's inventory.</summary>
+    public bool Furniture;
+
     /// <summary>Whether this item can be picked up by the player. False for
     /// cosmetic debris (blood) that should just sit on the ground.</summary>
     public bool Pickupable = true;
@@ -216,7 +220,8 @@ public partial class Item
         Dictionary<ID, int> materials,
         int time = 200,
         SfxID sfx = SfxID.HitSand,
-        string description = "")
+        string description = "",
+        bool furniture = false)
     {
         Item itemData = new Item()
         {
@@ -227,6 +232,7 @@ public partial class Item
             Sfx = sfx,
 
             Type = ItemType.Structure,
+            Furniture = furniture,
             Gesture = ItemGesture.Swing,
 
             Speed = 1,

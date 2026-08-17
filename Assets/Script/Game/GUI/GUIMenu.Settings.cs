@@ -10,12 +10,12 @@ public partial class GUIMenu
             "1 > Fullscreen: " + (s.Fullscreen ? "On" : "Off") + "\n" +
             "2 > Resolution: " + res.x + "x" + res.y + "\n" +
             "3 > BGM Volume: " + Mathf.RoundToInt(s.BgmVolume * 100) + "\n" +
-            "4 > SFX Volume: " + Mathf.RoundToInt(s.SfxVolume * 100) + "\n" +
-            "5 > Text Speed: " + (Settings.ScrollSpeeds[s.ScrollSpeedIndex] * 100) + "%" + "\n" +
-            "6 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
-            "7 > Max FPS: " + Settings.FpsLimits[s.FpsIndex] + "\n" +
-            "8 > Max FOV: " + Settings.MaxFOVs[s.MaxFOVIndex] + "\n" +
-            "9 > Auto Save: " + AutoSaveLabel(s.AutoSaveIndex) + "\n" +
+            "4 > Ambience Volume: " + Mathf.RoundToInt(s.AmbienceVolume * 100) + "\n" +
+            "5 > SFX Volume: " + Mathf.RoundToInt(s.SfxVolume * 100) + "\n" +
+            "6 > Text Speed: " + (Settings.ScrollSpeeds[s.ScrollSpeedIndex] * 100) + "%" + "\n" +
+            "7 > Tutorial: " + (s.TutorialEnabled ? "On" : "Off") + "\n" +
+            "8 > Max FPS: " + Settings.FpsLimits[s.FpsIndex] + "\n" +
+            "9 > Max FOV: " + Settings.MaxFOVs[s.MaxFOVIndex] + "\n" +
             "0 > Keybinds";
     }
 
@@ -33,37 +33,28 @@ public partial class GUIMenu
             case 2: // bgm volume
                 s.BgmVolume = CycleVolume(s.BgmVolume);
                 break;
-            case 3: // sfx volume
+            case 3: // ambience volume
+                s.AmbienceVolume = CycleVolume(s.AmbienceVolume);
+                break;
+            case 4: // sfx volume
                 s.SfxVolume = CycleVolume(s.SfxVolume);
                 break;
-            case 4: // text speed
+            case 5: // text speed
                 s.ScrollSpeedIndex = (s.ScrollSpeedIndex + 1) % Settings.ScrollSpeeds.Length;
                 break;
-            case 5: // tutorial
+            case 6: // tutorial
                 s.TutorialEnabled = !s.TutorialEnabled;
                 break;
-            case 6: // max fps
+            case 7: // max fps
                 s.FpsIndex = (s.FpsIndex + 1) % Settings.FpsLimits.Length;
                 break;
-            case 7: // max fov
+            case 8: // max fov
                 s.MaxFOVIndex = (s.MaxFOVIndex + 1) % Settings.MaxFOVs.Length;
-                break;
-            case 8: // auto save
-                s.AutoSaveIndex = (s.AutoSaveIndex + 1) % 2;
                 break;
         }
         Settings.Apply();
         Settings.Save();
         RenderSettingsText();
-    }
-
-    private static string AutoSaveLabel(int index)
-    {
-        return index switch
-        {
-            0 => "Off",
-            _ => "Every Day",
-        };
     }
 
     private void RenderSettingsText()

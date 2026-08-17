@@ -1,9 +1,8 @@
 using UnityEngine;
 
-/// <summary>A raider variant that guards its outpost (dirty tent). It watches
-/// (faces) anyone who approaches the tent, and only chases/attacks once an
-/// intruder gets close to the guard itself. Uses the shared <see cref="GuardModule"/>
-/// for tent-alert detection and leash/return-home logic.</summary>
+/// <summary>A raider variant that guards its outpost (dirty tent). Guards aggro
+/// like a normal raider (near the guard itself), but deaggro and return home
+/// once dragged too far from the tent via the shared <see cref="GuardModule"/>.</summary>
 public class RaiderGuardMachine : RaiderMachine
 {
     /// <summary>World position of the outpost this guard protects.</summary>
@@ -30,8 +29,4 @@ public class RaiderGuardMachine : RaiderMachine
         AddModule(new GuardModule());
         AddState(new MobReturnHome());
     }
-
-    /// <summary>Guards don't aggro on sight — they only engage intruders who get
-    /// close to the camp (handled by GuardModule).</summary>
-    protected override void UpdateAggro() { }
 }

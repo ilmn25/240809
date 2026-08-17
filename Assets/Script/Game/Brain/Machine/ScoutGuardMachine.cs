@@ -1,8 +1,9 @@
 using UnityEngine;
 
 /// <summary>A scout variant that guards its outpost (dirty tent) instead of
-/// roaming the world. Uses the shared <see cref="GuardModule"/> for territorial
-/// behavior, and keeps the scout's ranged pistol combat.</summary>
+/// roaming the world. Guards aggro like a normal scout (near the guard itself),
+/// but deaggro and return home once dragged too far from the tent via the shared
+/// <see cref="GuardModule"/>.</summary>
 public class ScoutGuardMachine : ScoutMachine
 {
     /// <summary>World position of the outpost this guard protects.</summary>
@@ -31,8 +32,4 @@ public class ScoutGuardMachine : ScoutMachine
         AddModule(new GuardModule());
         AddState(new MobReturnHome());
     }
-
-    /// <summary>Guards don't aggro on sight — they only engage intruders who get
-    /// close to the camp (handled by GuardModule).</summary>
-    protected override void UpdateAggro() { }
 }

@@ -1,18 +1,13 @@
 using UnityEngine;
 
 /// <summary>A placeable old radio — one of the key items a travelling merchant looks for.
-/// Interacting with it just makes the radio drowse.</summary>
-public class OldRadioMachine : StructureMachine, IActionSecondaryInteract
+/// Furniture: placed directly, can't be broken, hammer picks it back up. Interacting
+/// with it just makes the radio drowse.</summary>
+public class OldRadioMachine : FurnitureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
-        return new StructureInfo
-        {
-            Health = 100,
-            Loot = ID.OldRadio,
-            SfxHit = SfxID.HitStone,
-            SfxDestroy = SfxID.HitStone,
-        };
+        return CreateFurnitureInfo(ID.OldRadio);
     }
 
     public void OnActionSecondary(Info info)

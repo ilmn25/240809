@@ -1,19 +1,11 @@
 /// <summary>A placeable lamp. Needs a nearby generator to light: right-click toggles
-/// its switch while powered, otherwise it explains it needs power.</summary>
-public class LampMachine : StructureMachine, IActionSecondaryInteract
+/// its switch while powered, otherwise it explains it needs power. Furniture: placed
+/// directly, can't be broken, hammer picks it back up.</summary>
+public class LampMachine : FurnitureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
-        return new StructureInfo
-        {
-            Health = 100,
-            Loot = ID.Lamp,
-            SfxHit = SfxID.HitStone,
-            SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Cutting,
-            GlowOn = true,
-            Flammable = true,
-        };
+        return CreateFurnitureInfo(ID.Lamp, glowOn: true);
     }
 
     public override void OnStart()

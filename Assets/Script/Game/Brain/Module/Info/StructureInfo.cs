@@ -105,6 +105,19 @@ public class StructureInfo : Info
     public virtual void OnHit(MobInfo info) { }
     public virtual void OnDestroy(MobInfo info) { }
 
+    /// <summary>Drop a placed structure from its chunk so it doesn't persist or leave
+    /// a stale map marker (used when a structure is removed, e.g. broken or picked up).</summary>
+    protected void RemoveFromChunk()
+    {
+        Vector3Int chunkCoord = World.GetChunkCoordinate(Machine.transform.position);
+        World.Inst[chunkCoord].StaticEntity.Remove(this);
+        if (World.Inst.Map != null)
+        {
+            World.Inst.Map.Dirty = true;
+            World.Inst.Map.ResetMarkers();
+        }
+    }
+
     public override string ToString()
     {
         string action = operationType switch

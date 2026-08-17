@@ -156,6 +156,7 @@ public class Entity
                 loot.Add(1, 3, ID.Brick); 
                 loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
+                loot.Add(0.35f, 1, ID.OldRadio); 
 
                 AddStructure<SkeletonMachine>(ID.Skeleton, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 

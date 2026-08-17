@@ -5,8 +5,10 @@ public class Audio
 {
     private static List<AudioSource> _audioSources;
     private static AudioSource _bgmSource;
+    private static List<AudioSource> _ambienceSources;
 
     private static readonly int PoolSize = 12;
+    private static readonly int AmbiencePoolSize = 4;
 
     private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>();
     public static void Initialize()
@@ -21,6 +23,12 @@ public class Audio
         GameObject audioManager = new GameObject("Audio");
         _bgmSource = audioManager.AddComponent<AudioSource>();
 
+        _ambienceSources = new List<AudioSource>();
+        for (int i = 0; i < AmbiencePoolSize; i++)
+        {
+            _ambienceSources.Add(audioManager.AddComponent<AudioSource>());
+        }
+
         _audioSources = new List<AudioSource>();
         for (int i = 0; i < PoolSize; i++)
         {
@@ -28,9 +36,9 @@ public class Audio
             _audioSources.Add(newSource);
         }
 
-        // PlayBGM("FairyFountain", 0.2f);
-        PlaySFX(SfxID.Wind, true);
-        PlaySFX(SfxID.Noise, true);
+        PlayBGM("FairyFountain", 0.2f);
+        PlayAmbience(SfxID.Wind);
+        PlayAmbience(SfxID.Noise);
     }
 
     public static void PlayBGM(string id, float volume = 1f, bool loop = true)
@@ -42,6 +50,22 @@ public class Audio
         _bgmSource.volume = volume * Settings.Inst.BgmVolume;
         _bgmSource.loop = loop;
         _bgmSource.Play();
+    }
+
+    public static void PlayAmbience(SfxID id, bool loop = true)
+    {
+        AudioClip clip = Cache.LoadAudioClip($"SFX/{id}");
+        if (!clip) return;
+
+        float volume = Volume.ContainsKey(id) ? Volume[id] : 1;
+        AudioSource availableSource = GetAvailableAmbienceSource();
+        if (availableSource)
+        {
+            availableSource.clip = clip;
+            availableSource.volume = volume * Settings.Inst.AmbienceVolume;
+            availableSource.loop = loop;
+            availableSource.Play();
+        }
     }
 
     public static AudioSource PlaySFX(SfxID id, bool loop = false)
@@ -68,6 +92,18 @@ public class Audio
             audioSource.Stop();
             audioSource.loop = false;
         }
+    }
+
+    private static AudioSource GetAvailableAmbienceSource()
+    {
+        foreach (AudioSource source in _ambienceSources)
+        {
+            if (!source.isPlaying)
+            {
+                return source;
+            }
+        }
+        return null;
     }
 
     private static AudioSource GetAvailableAudioSource()

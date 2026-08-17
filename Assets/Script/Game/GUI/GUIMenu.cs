@@ -95,11 +95,7 @@ public partial class GUIMenu
 
         if (!Showing) return;
 
-        if (_screen == MenuScreen.Settings)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha9)) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); return; }
-        }
-        else if (_screen == MenuScreen.Keybind)
+        if (_screen == MenuScreen.Keybind)
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { Audio.PlaySFX(SfxID.Text); _rebinding = false; ShowKeybinds(); return; }
             if (TryGetPressedKey(out KeyCode key))
