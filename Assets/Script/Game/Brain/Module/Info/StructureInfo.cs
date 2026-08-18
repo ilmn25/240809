@@ -98,6 +98,10 @@ public class StructureInfo : Info
     public virtual void OnHit(MobInfo info) { }
     public virtual void OnDestroy(MobInfo info) { }
 
+    /// <summary>Environmental damage (e.g. lightning) with no attacker, so no
+    /// target acquisition. Breaks and drops loot like normal structure damage.</summary>
+    public void ApplyEnvironmentalDamage(int damage) => Damage(damage, null);
+
     /// <summary>Drop a placed structure from its chunk so it doesn't persist or leave
     /// a stale map marker (used when a structure is removed, e.g. broken or picked up).</summary>
     protected void RemoveFromChunk()

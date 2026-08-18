@@ -97,6 +97,7 @@ public class Main : MonoBehaviour
         MapCull.Update();
         ViewPort.Update();  
         MobSpawner.Update(); 
+        Lightning.Update();
     } 
     
     private void FixedUpdate()

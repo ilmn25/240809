@@ -157,4 +157,5 @@ public enum ID
     BucketOfLava,
     BucketOfHoney,
     Sprinkler,
+    LightningRod,
 }

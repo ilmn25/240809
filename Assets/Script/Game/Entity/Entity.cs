@@ -87,6 +87,7 @@ public class Entity
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<PondMachine>(ID.Pond, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SprinklerMachine>(ID.Sprinkler, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<LightningRodMachine>(ID.LightningRod, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);

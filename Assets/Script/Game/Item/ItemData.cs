@@ -112,6 +112,7 @@ public partial class Item
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
+        AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
 
         // Tools
         AddToolDefinition(

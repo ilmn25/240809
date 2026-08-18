@@ -17,5 +17,6 @@ public enum SfxID
     Footsteps2,
     Pistol,
     Minigun,
-    Sword
+    Sword,
+    Thunder
 }
