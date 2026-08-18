@@ -16,7 +16,6 @@ public class DoorMachine : StructureMachine, IActionSecondaryInteract
             threshold = 1,
             operationType = OperationType.Cutting, // hit it with an axe, like other wooden structures
             Loot = ID.Door,
-            EnemyBreakable = true,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
         };
@@ -25,6 +24,25 @@ public class DoorMachine : StructureMachine, IActionSecondaryInteract
     public void OnActionSecondary(Info info)
     {
         if (info is not PlayerInfo) return; // only players can open/close the door
+        if (Info is not StructureInfo structureInfo) return;
+
+        // A locked door consumes the matching key from the player's inventory and
+        // unlocks itself (KeyId -> ID.Null); without the key it just explains what's needed.
+        if (structureInfo.KeyId != ID.Null)
+        {
+            if (Main.PlayerInfo.Storage.Count(structureInfo.KeyId) > 0)
+            {
+                Main.PlayerInfo.Storage.RemoveItem(structureInfo.KeyId, 1);
+                structureInfo.KeyId = ID.Null;
+            }
+            else
+            {
+                Dialogue.Target = new Dialogue { Text = "Need " + Helper.ToDisplayName(structureInfo.KeyId) };
+                Dialogue.Show(true);
+                return;
+            }
+        }
+
         SetOpen(!_open);
     }
 

@@ -19,8 +19,9 @@ public class FurnitureInfo : StructureInfo
         return true;
     }
 
-    public override void AbstractHit(MobInfo info)
+    public override void AbstractHit(Projectile projectile)
     {
+        MobInfo info = projectile.SourceInfo;
         // Enemies and non-hammer tools do nothing to furniture.
         if (info.HitboxType == HitboxType.Enemy) return;
         if (info.Equipment == null ||

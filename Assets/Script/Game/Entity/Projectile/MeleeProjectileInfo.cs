@@ -17,7 +17,7 @@ public class SwingProjectileInfo : ProjectileInfo
             info = ((Machine)target).GetModule<Info>();
             info.OnHitInternal(projectile);
             if (info == projectile.SourceInfo.Target)
-                projectile.SourceInfo.Target.AbstractHit(projectile.SourceInfo);
+                projectile.SourceInfo.Target.AbstractHit(projectile);
         }
         projectile.Delete();
     }
@@ -42,7 +42,7 @@ public class ContactDamageProjectileInfo : ProjectileInfo
             // current target, so contact attackers (slimes, bugs) can also bash
             // structures (doors, barricades) the same way swing attackers do.
             if (info == projectile.SourceInfo.Target)
-                projectile.SourceInfo.Target.AbstractHit(projectile.SourceInfo);
+                projectile.SourceInfo.Target.AbstractHit(projectile);
         }
 
         projectile.Delete();

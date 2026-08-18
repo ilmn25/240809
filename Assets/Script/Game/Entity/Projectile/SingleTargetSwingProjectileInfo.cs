@@ -36,7 +36,7 @@ public class SingleTargetSwingProjectileInfo : ProjectileInfo
             Info info = closest.GetModule<Info>();
             info.OnHitInternal(projectile);
             if (info == projectile.SourceInfo.Target)
-                projectile.SourceInfo.Target.AbstractHit(projectile.SourceInfo);
+                projectile.SourceInfo.Target.AbstractHit(projectile);
         }
 
         projectile.Delete();

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Makes an enemy bash down EnemyBreakable structures (doors, barricades) that
+/// Makes an enemy bash down structures (doors, barricades) that
 /// block its path, routing all damage through the normal hit system.
 ///
 /// While a NavMap.Door cell sits between the enemy and its chase target, the enemy
@@ -119,7 +119,7 @@ public class DoorBashModule : MobModule
         for (int i = 0; i < count; i++)
         {
             if (BashBuffer[i].TryGetComponent(out EntityMachine em) &&
-                em.Info is StructureInfo si && si.EnemyBreakable && !si.Destroyed)
+                em.Info is StructureInfo si && !si.Destroyed)
                 return si;
         }
         return null;

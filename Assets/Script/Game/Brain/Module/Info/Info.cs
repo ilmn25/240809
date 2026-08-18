@@ -22,7 +22,7 @@ public class Info : EntityModule
     [NonSerialized] public bool Destroyed = false;
     [NonSerialized] public bool IsInRenderRange;
     public virtual bool OnHitInternal(Projectile projectile) { return false; }
-    public virtual void AbstractHit(MobInfo info) { }
+    public virtual void AbstractHit(Projectile projectile) { }
     public void Destroy() {Destroyed = true;}
     
     /// <summary>Does the local context (host or client) have authority over this entity?

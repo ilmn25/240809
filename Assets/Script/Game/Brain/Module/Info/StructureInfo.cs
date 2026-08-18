@@ -23,50 +23,43 @@ public class StructureInfo : Info
     public OperationType operationType;
     /// <summary>Whether this structure's glow light is lit (persists through save/load).</summary>
     public bool GlowOn;
-    /// <summary>Melee damage an enemy deals to this structure per hit (doors, barricades, ...).</summary>
-    public int EnemyBashDamage = 8;
-    /// <summary>If true, enemies will proactively bash this structure when it blocks their path.</summary>
-    public bool EnemyBreakable;
+    /// <summary>Item ID of the key needed to unlock this structure. ID.Null means no key required.</summary>
+    public ID KeyId = ID.Null;
     [NonSerialized] public SpriteRenderer SpriteRenderer; 
+
+    // Unified breaking rule for any attacker: hostiles bash any structure outright;
+    // everyone else needs a matching tool with enough Breaking.
+    private bool CanBreak(MobInfo attacker)
+    {
+        if (attacker.HitboxType == HitboxType.Enemy) return true;
+        if (attacker.targetHitboxType == HitboxType.Player || attacker.Equipment == null) return false;
+        ProjectileInfo tool = attacker.Equipment.Info.ProjectileInfo;
+        return tool.OperationType == operationType && tool.Breaking >= threshold;
+    }
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        // Enemies can bash any structure down with their melee — no tool required.
-        // (Actual damage is applied in AbstractHit, which contact projectiles now
-        // also route through — this just validates the hit.)
-        if (projectile.SourceInfo.HitboxType == HitboxType.Enemy)
-            return true;
-        if (projectile.SourceInfo.Equipment == null ||
-            projectile.SourceInfo.targetHitboxType == HitboxType.Player ||
-            projectile.SourceInfo.Equipment.Info.ProjectileInfo.OperationType != operationType ||
-            projectile.SourceInfo.Equipment.Info.ProjectileInfo.Breaking < threshold)
-        { 
-            return false;
-        }  
+        MobInfo attacker = projectile.SourceInfo;
+        if (!CanBreak(attacker)) return false;
         // User-controlled players acquire the target from hitting a structure; AI
         // allies (controllerId == -1) keep the target their brain assigned.
-        if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.controllerId != -1)
-            projectile.SourceInfo.AcquireTarget(this);
+        if (attacker is not PlayerInfo || attacker.controllerId != -1)
+            attacker.AcquireTarget(this);
         return true;
     }
 
-    public override void AbstractHit(MobInfo info)
+    public override void AbstractHit(Projectile projectile)
     {
-        // Enemies bash the structure down with their melee — no tool requirement.
-        if (info.HitboxType == HitboxType.Enemy)
-        {
-            Damage(EnemyBashDamage, info);
-            return;
-        }
-        if ( info.targetHitboxType == HitboxType.Player ||
-             info.Equipment == null ||
-             info.Equipment.Info.ProjectileInfo.OperationType != operationType || 
-             info.Equipment.Info.ProjectileInfo.Breaking < threshold) return;
-        
-        Damage(info.Equipment.Info.ProjectileInfo.Breaking, info);
+        MobInfo attacker = projectile.SourceInfo;
+        if (!CanBreak(attacker)) return;
+        // Hostiles bash with their own attack damage; tool-users break with Breaking.
+        int damage = attacker.HitboxType == HitboxType.Enemy
+            ? projectile.Info.GetDamage()
+            : attacker.Equipment.Info.ProjectileInfo.Breaking;
+        Damage(damage, attacker);
     }
 
-    // Shared damage path for players (tool Breaking) and enemies bashing via AbstractHit.
+    // Shared damage path for any attacker (tool breaking or enemy bashing).
     private void Damage(int damage, MobInfo info)
     {
         if (Destroyed) return;
