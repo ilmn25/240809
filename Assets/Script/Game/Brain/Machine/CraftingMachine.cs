@@ -44,7 +44,7 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
     {
         if (IsCurrentState<DefaultState>())
         {
-            if (Info.id == ID.Workbench) Tutorial.OnWorkbenchInteracted();
+            if (Info.id == ID.Toolbench) Tutorial.OnWorkbenchInteracted();
             SetState<InCraftState>();
         }
         else 

@@ -13,15 +13,15 @@ public static class Tutorial
     }
 
     private static int _progress;   // index of the current objective
-    private static bool _workbenchCrafted;
-    private static bool _workbenchPlaced;
+    private static bool _toolbenchCrafted;
+    private static bool _toolbenchPlaced;
     private static bool _malletCrafted;
-    private static bool _workbenchAssembled;
+    private static bool _toolbenchAssembled;
 
     public static void Reset()
     {
         _progress = 0;
-        _workbenchCrafted = _workbenchPlaced = _malletCrafted = _workbenchAssembled = false;
+        _toolbenchCrafted = _toolbenchPlaced = _malletCrafted = _toolbenchAssembled = false;
     }
 
     /// <summary>Advance objectives satisfied by inventory state or combined flags.</summary>
@@ -34,9 +34,9 @@ public static class Tutorial
         switch (_progress)
         {
             case 1: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 2; break;
-            case 6: if (_workbenchCrafted) _progress = 7; break;
-            case 7: if (_workbenchPlaced) _progress = 8; break;
-            case 8: if (_malletCrafted && _workbenchAssembled) _progress = 9; break;
+            case 6: if (_toolbenchCrafted) _progress = 7; break;
+            case 7: if (_toolbenchPlaced) _progress = 8; break;
+            case 8: if (_malletCrafted && _toolbenchAssembled) _progress = 9; break;
         }
     }
 
@@ -51,19 +51,19 @@ public static class Tutorial
         switch (_progress)
         {
             case 2: if (IsHatchet(id)) _progress = 3; break;
-            case 6: if (id == ID.Workbench) _workbenchCrafted = true; break;
+            case 6: if (id == ID.Toolbench) _toolbenchCrafted = true; break;
             case 8: if (id == ID.CrudeMallet) _malletCrafted = true; break;
         }
     }
 
     public static void OnPlaced(ID structure)
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 7 && structure == ID.Workbench) _workbenchPlaced = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 7 && structure == ID.Toolbench) _toolbenchPlaced = true;
     }
 
     public static void OnAssembled(ID structure)
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 8 && structure == ID.Workbench) _workbenchAssembled = true;
+        if (Settings.Inst.TutorialEnabled && _progress == 8 && structure == ID.Toolbench) _toolbenchAssembled = true;
     }
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
@@ -116,10 +116,10 @@ public static class Tutorial
         3 => "hit a tree",
         4 => "press " + Key(Control.Inst.SwapChar) + " to swap character",
         5 => "right click on a teammate to access their inventory",
-        6 => "craft a workbench",
-        7 => "place the workbench",
-        8 => "craft a crude mallet and assemble the workbench",
-        9 => "interact with the workbench with right click",
+        6 => "craft a toolbench",
+        7 => "place the toolbench",
+        8 => "craft a crude mallet and assemble the toolbench",
+        9 => "interact with the toolbench with right click",
         10 => "craft and place a mulch block",
         11 => "eat some food",
         _ => "",
