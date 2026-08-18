@@ -45,6 +45,7 @@ public class World
     public static void UnloadWorld()
     {   
 
+        Questmaster.Reset(); // drop the active quest so kill quests stop listening
         EntityDynamicLoad.UnloadWorld();
         EntityItemLoad.UnloadWorld();
         MapLoad.UnloadMap(); 

@@ -59,6 +59,7 @@ public class Save
     public EnvironmentType weather = EnvironmentType.Sunrise;
     public GenType current;
     public int seed;
+    public QuestState quest = new();
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
 

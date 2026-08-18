@@ -266,6 +266,9 @@ public class Entity
                 AddMob<MerchantMachine>(ID.Merchant);
                 loot = new (ID.Merchant); // the merchant drops nothing
 
+                AddMob<QuestmasterMachine>(ID.Questmaster);
+                loot = new (ID.Questmaster); // the questmaster drops nothing
+
                 AddMob<NomadMachine>(ID.Nomad);
                 loot = new (ID.Nomad); // the nomads drop nothing
                 

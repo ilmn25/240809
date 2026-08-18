@@ -3,6 +3,9 @@ using System;
 [System.Serializable]
 public class EnemyInfo : MobInfo
 {
+    /// <summary>Raised when an enemy dies, with the killed enemy's id.</summary>
+    public static event System.Action<ID> Killed;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -20,6 +23,7 @@ public class EnemyInfo : MobInfo
         SpeedTarget *= SpeedModifier;
         if (Health <= 0)
         { 
+            Killed?.Invoke(((EntityMachine)Machine).Info.id);
             Loot.Gettable(((EntityMachine)Machine).Info.id).Spawn(Machine.transform.position);
             Destroy();
             Audio.PlaySFX(DeathSfx);

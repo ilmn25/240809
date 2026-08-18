@@ -162,4 +162,5 @@ public enum ID
     WellFed,
     Corpse,
     Scarecrow,
+    Questmaster,
 }
