@@ -158,4 +158,5 @@ public enum ID
     BucketOfHoney,
     Sprinkler,
     LightningRod,
+    Nomad,
 }

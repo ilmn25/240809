@@ -10,7 +10,7 @@ public class ShopState : State
     {
         Audio.PlaySFX(SfxID.Text);
 
-        _shop = ((MerchantMachine)Machine).Shop;
+        _shop = ((IShopkeeper)Machine).Shop;
         Storage storage = _shop.GetStoragePool();
         EnsureSlotCount(storage, GUIMain.GUICraft.SlotAmount);
 

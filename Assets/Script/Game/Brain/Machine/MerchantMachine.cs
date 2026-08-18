@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A travelling merchant that lives at the Old Radio. It never fights or flees;
 /// interact with it to open its shop (the craft UI with a fixed inventory of goods).</summary>
-public class MerchantMachine : GroundMobMachine, IActionSecondaryInteract
+public class MerchantMachine : GroundMobMachine, IActionSecondaryInteract, IShopkeeper
 {
     /// <summary>The merchant's shop inventory, shown through the craft UI. Created fresh
     /// per merchant so Pending/crafting state never bleeds between instances.</summary>

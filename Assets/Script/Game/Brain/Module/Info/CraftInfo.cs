@@ -20,6 +20,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
     private static readonly Storage FieldStationPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.FieldStation), ID.ImprovisedPlanter);
     private static readonly Storage AnvilPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Anvil), ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator);
     private static readonly Storage MerchantPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Merchant), ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp);
+    private static readonly Storage NomadPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Nomad), ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper);
     
     public readonly List<ID> Pending = new List<ID>();
     public int Max = 10;
@@ -109,6 +110,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
             ID.FieldStation => FieldStationPool,
             ID.Anvil => AnvilPool,
             ID.Merchant => MerchantPool,
+            ID.Nomad => NomadPool,
             _ => null,
         };
     }

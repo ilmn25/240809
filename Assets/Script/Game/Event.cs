@@ -12,6 +12,7 @@ public static class Event
         RainEvent.Subscribe();
         LeafEvent.Subscribe();
         VisitorSpawner.Subscribe();
+        BandwagonSpawner.Subscribe();
     }
 
     public static void TriggerUpdate()

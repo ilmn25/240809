@@ -261,6 +261,9 @@ public class Entity
 
                 AddMob<MerchantMachine>(ID.Merchant);
                 loot = new (ID.Merchant); // the merchant drops nothing
+
+                AddMob<NomadMachine>(ID.Nomad);
+                loot = new (ID.Nomad); // the nomads drop nothing
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);

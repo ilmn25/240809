@@ -42,8 +42,8 @@ public partial class Item
 
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
-        AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.");
-        AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.");
+        AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });
+        AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.", materials: new Dictionary<ID, int> { { ID.Slag, 3 }, { ID.Charcoal, 1 } });
         AddConsumableDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
         AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
         AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
@@ -62,7 +62,7 @@ public partial class Item
         AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.");
         AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
-        AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.");
+        AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.", materials: new Dictionary<ID, int> { { ID.Plank, 1 }, { ID.Charcoal, 1 } });
         AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.");
         AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500);
         AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
