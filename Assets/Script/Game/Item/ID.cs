@@ -163,4 +163,5 @@ public enum ID
     Corpse,
     Scarecrow,
     Questmaster,
+    BabySlime,
 }

@@ -6,6 +6,8 @@ public class BugMachine : GroundMobMachine
     protected override bool UsesDoorBash => true;
 
     private const float LatchRange = 1.5f; // how close to the player before latching
+    private const int LatchCooldownTicks = 180; // ~3s after release before it can latch again
+    private int _latchCooldown;
 
     public static Info CreateInfo()
     {
@@ -31,63 +33,67 @@ public class BugMachine : GroundMobMachine
         AddState(new MobRoam());
         AddState(new MobHit());
         AddState(new MobAttackPounce(5));
+        AddState(new MobEscape());
     }
 
     public override void OnUpdate()
     { 
-        // While latched, hug the player's face and don't act on our own.
+        if (_latchCooldown > 0) _latchCooldown--;
+
         if (Info is BugInfo bugInfo && bugInfo.LatchedPlayer != null)
         {
             LatchedUpdate(bugInfo);
             return;
         }
 
-        // Aggro on sight so the bug attacks without needing to be hit first.
         UpdateAggro();
 
-        if (IsCurrentState<DefaultState>())
+        if (!IsCurrentState<DefaultState>()) return;
+
+        // Keep fleeing after a latch breaks until the cooldown clears.
+        if (_latchCooldown > 0)
         {
-            if (Info.Target != null)
+            SetState<MobEscape>();
+            return;
+        }
+
+        if (Info.Target == null)
+        {
+            switch (Random.Range(1, 6))
             {
-                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-                {
-                    // Try to latch onto the player when close enough.
-                    if (Info.Target is PlayerInfo player && TryLatch(player))
-                        return;
-                    if (Random.value < 0.2f)
-                        SetState<MobStrafe>();
-                    else
-                    {
-                        Info.AimPosition = Info.Target.position;
-                        SetState<MobAttackPounce>();
-                    } 
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
+                case 1:
                     SetState<MobRoam>();
-                }
-                else
-                {
-                    SetState<MobChase>();
-                }
+                    break;
+                case 2:
+                case 3:
+                    SetState<MobStrafe>();
+                    break;
+                default:
+                    SetState<MobIdle>();
+                    break;
             }
+            return;
+        }
+
+        if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
+        {
+            if (Info.Target is PlayerInfo player && TryLatch(player)) return;
+
+            if (Random.value < 0.2f)
+                SetState<MobStrafe>();
             else
             {
-                switch (Random.Range(1,6))
-                {
-                    case 1:
-                        SetState<MobRoam>();
-                        break;
-                    case 2:
-                    case 3:
-                        SetState<MobStrafe>();
-                        break;
-                    case 4:
-                    case 5: 
-                        SetState<MobIdle>();
-                        break;
-                } 
+                Info.AimPosition = Info.Target.position;
+                SetState<MobAttackPounce>();
             }
+        }
+        else if (Info.PathingStatus == PathingStatus.Stuck)
+        {
+            SetState<MobRoam>();
+        }
+        else
+        {
+            SetState<MobChase>();
         }
     }
 
@@ -95,12 +101,9 @@ public class BugMachine : GroundMobMachine
     private bool TryLatch(PlayerInfo player)
     {
         if (Vector3.Distance(player.position, transform.position) > LatchRange) return false;
-        if (Info is BugInfo bugInfo)
-        {
-            bugInfo.Latch(player);
-            return true;
-        }
-        return false;
+        if (Info is not BugInfo bugInfo) return false;
+        bugInfo.Latch(player);
+        return true;
     }
 
     /// <summary>While latched, stick to the player's face.</summary>
@@ -119,10 +122,11 @@ public class BugMachine : GroundMobMachine
         Info.PathingStatus = PathingStatus.Reached;
     }
 
-    /// <summary>Called when the bug is released — go into a strafe panic.</summary>
+    /// <summary>Called when the bug is released — flee away before it can relatch.</summary>
     public void Panic()
     {
         if (Info is BugInfo bugInfo) bugInfo.Release();
-        SetState<MobStrafe>();
+        _latchCooldown = LatchCooldownTicks;
+        SetState<MobEscape>();
     }
 }

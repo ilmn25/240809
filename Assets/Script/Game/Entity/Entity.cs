@@ -287,6 +287,10 @@ public class Entity
                 AddMob<SlimeMachine>(ID.Slime);
                 loot =  new (ID.Slime);
                 loot.Add(1, 2, ID.Cytoplasm); 
+
+                AddMob<BabySlimeMachine>(ID.BabySlime);
+                loot = new (ID.BabySlime);
+                loot.Add(1, 1, ID.Cytoplasm);
                 
                 AddMob<HarpyMachine>(ID.Harpy);
                 loot = new (ID.Harpy);

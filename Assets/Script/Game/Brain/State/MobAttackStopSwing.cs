@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>Melee attack that stops all movement while telegraphing and swinging,
@@ -6,6 +7,11 @@ using UnityEngine;
 public class MobAttackStopSwing : MobState
 {
     private readonly ProjectileInfo _projectileInfo;
+    private CoroutineTask _task;
+
+    private const float TelegraphTime = 0.1f;
+    private const float SwingTime = 0.167f;
+    private const float CooldownTime = 1f;
 
     public MobAttackStopSwing(ProjectileInfo projectileInfo)
     {
@@ -15,37 +21,31 @@ public class MobAttackStopSwing : MobState
 
     public override void OnEnterState()
     {
+        _task?.Stop();
+        _task = null;
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
         Info.SpeedModifier = 0f; // freeze in place while winding up
         Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
+        if (Helper.IsHost() || Info.IsOwner())
+            _task = new CoroutineTask(SwingRoutine());
     }
 
-    public override void OnUpdateState()
+    private IEnumerator SwingRoutine()
     {
-        if (!Helper.IsHost() && !Info.IsOwner()) return;
+        yield return new WaitForSeconds(TelegraphTime / Info.Animator.speed);
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipSwing", 0, 0f);
+        Attack();
 
-        AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
-        if (stateInfo.normalizedTime >= 1f)
-        {
-            if (stateInfo.IsName("EquipSwingTelegraph"))
-            {
-                Info.Animator.speed = 1;
-                Info.Animator.Play("EquipSwing", 0, 0f);
-                Attack();
-            }
-            else if (stateInfo.IsName("EquipSwing"))
-            {
-                Info.Animator.speed = 1;
-                Audio.PlaySFX(SfxID.HitMob);
-                Info.Animator.Play("EquipSwingCooldown", 0, 0f);
-            }
-            else if (stateInfo.IsName("EquipSwingCooldown"))
-            {
-                Info.Animator.speed = 1f;
-                Info.Animator.Play("EquipIdle", 0, 0f);
-                Machine.SetState<DefaultState>();
-            }
-        }
+        yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
+        Info.Animator.speed = 1f;
+        Audio.PlaySFX(SfxID.HitMob);
+        Info.Animator.Play("EquipSwingCooldown", 0, 0f);
+
+        yield return new WaitForSeconds(CooldownTime / Info.Animator.speed);
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipIdle", 0, 0f);
+        Machine.SetState<DefaultState>();
     }
 
     private void Attack()
@@ -56,6 +56,8 @@ public class MobAttackStopSwing : MobState
 
     public override void OnExitState()
     {
+        _task?.Stop();
+        _task = null;
         Info.Animator.speed = 1f;
         Info.Animator.Play("EquipIdle", 0, 0f);
         Info.SpeedModifier = 1f;

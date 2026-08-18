@@ -32,7 +32,7 @@ public class QuestmasterMachine : GroundMobMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
+        Info.CancelTarget();
         SetState<QuestmasterState>();
     }
 

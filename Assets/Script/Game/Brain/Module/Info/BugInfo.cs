@@ -1,8 +1,8 @@
 using System;
 
 /// <summary>Info for the bug. When it latches onto a player it applies a Slow
-/// status effect. The bug only releases when the player is hit by something else
-/// (a non-bug projectile), at which point it goes into a strafe panic.</summary>
+/// status effect. The bug releases when it's hit or when the latched player is
+/// hit by something else (a non-bug projectile).</summary>
 [System.Serializable]
 public class BugInfo : EnemyInfo
 {
@@ -27,6 +27,13 @@ public class BugInfo : EnemyInfo
         if (LatchedPlayer != null)
             LatchedPlayer.Machine?.GetModule<StatusEffectModule>()?.Remove(ID.SnareFlea);
         LatchedPlayer = null;
+    }
+
+    protected override void OnHit(Projectile projectile)
+    {
+        base.OnHit(projectile);
+        if (LatchedPlayer != null)
+            OnLatchedPlayerHit();
     }
 
     /// <summary>Called when the player this bug is latched onto gets hit by

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -6,6 +7,11 @@ class MobAttackSwing : MobState {
     public MobAttackSwing() { updateMode = global::Module.UpdateMode.Everyone; }
 
     private Item _equipment;
+    private CoroutineTask _task;
+
+    private const float TelegraphTime = 0.1f;
+    private const float SwingTime = 0.167f;
+    private const float CooldownTime = 1f;
 
     public void Attack()
     {
@@ -22,45 +28,40 @@ class MobAttackSwing : MobState {
     
     public override void OnEnterState()
     { 
+        _task?.Stop();
+        _task = null;
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
         Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0); 
         _equipment = Info.Equipment.Info; 
         Info.SpeedModifier = 0.25f;
-        Info.Animator.Play("EquipSwingTelegraph", 0, 0f);  
+        Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
+        if (Helper.IsHost() || Info.IsOwner())
+            _task = new CoroutineTask(SwingRoutine());
     }
     
-    public override void OnUpdateState()
+    private IEnumerator SwingRoutine()
     {
-        // Host processes attack for all entities; client only for owned entities
-        if (!Helper.IsHost() && !Info.IsOwner()) return;
+        yield return new WaitForSeconds(TelegraphTime / Info.Animator.speed);
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipSwing", 0, 0f);
+        Attack();
 
-        AnimatorStateInfo stateInfo = Info.Animator.GetCurrentAnimatorStateInfo(0);
-        if (stateInfo.normalizedTime >= 1f)
-        {
-            if (stateInfo.IsName("EquipSwingTelegraph"))
-            {  
-                Info.Animator.speed = 1;
-                Info.Animator.Play("EquipSwing", 0, 0f);
-                Attack();
-            }
-            else if (stateInfo.IsName("EquipSwing"))
-            {  
-                Info.Animator.speed = Main.CreativeMode? 70 : _equipment.Speed;
-                Audio.PlaySFX(_equipment.Sfx); 
-                Info.SpeedModifier = 0.8f;
-                Info.Animator.Play("EquipSwingCooldown", 0, 0f);
-            }
-            else if (stateInfo.IsName("EquipSwingCooldown"))
-            {
-                Info.Animator.speed = 1f;
-                Info.Animator.Play("EquipIdle", 0, 0f);
-                Machine.SetState<DefaultState>(); 
-            }
-        } 
+        yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
+        Info.Animator.speed = Main.CreativeMode ? 70 : _equipment.Speed;
+        Audio.PlaySFX(_equipment.Sfx);
+        Info.SpeedModifier = 0.8f;
+        Info.Animator.Play("EquipSwingCooldown", 0, 0f);
+
+        yield return new WaitForSeconds(CooldownTime / Info.Animator.speed);
+        Info.Animator.speed = 1f;
+        Info.Animator.Play("EquipIdle", 0, 0f);
+        Machine.SetState<DefaultState>();
     }
 
     public override void OnExitState()
     {
+        _task?.Stop();
+        _task = null;
         Info.Animator.speed = 1f;
         Info.Animator.Play("EquipIdle", 0, 0f);  
         Info.SpeedModifier = 1f;

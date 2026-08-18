@@ -86,6 +86,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             SetState<InContainerState>();
     }
     
+    /// <summary>True while a snare flea is latched on (its Bugged slow is active).</summary>
+    private bool IsBugged() => GetModule<StatusEffectModule>()?.Has(ID.SnareFlea) ?? false;
+    
     private void HandleInput()
     {
         if (transform.position.y < -50)
@@ -126,7 +129,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                     switch (Info.Equipment?.Info.Type)
                     {
                         case ItemType.Tool: 
-                            if (Control.Inst.ActionPrimary.Key())
+                            if (Control.Inst.ActionPrimary.Key() && !IsBugged())
                                 Attack();
                             break;
                         case ItemType.Consumable:
