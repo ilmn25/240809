@@ -127,8 +127,7 @@ public class PlayerInfo : MobInfo
             case PlayerStatus.Active:
                 if (Health <= 0)
                 {
-                    Audio.PlaySFX(SfxID.DeathPlayer);
-                    EnterIncapacitated();
+                    if (Helper.IsHost()) Die();
                     return;
                 }
                 break;
@@ -174,32 +173,27 @@ public class PlayerInfo : MobInfo
         }
     }
 
-    // Downed: drop control/target and disable movement until revived.
-    private void EnterIncapacitated()
+    private void Die()
     {
-        PlayerStatus = PlayerStatus.Incapacitated;
-        Velocity = Vector2.zero;
-        Direction = Vector2.zero;
-        CancelTarget();
-        DeaggroMobs(); // downed players are ignored — mobs drop this player
-        if (Main.PlayerInfo == this)
-        {
-            if (SpriteTool != null) SpriteTool.gameObject.SetActive(false);
-            GUIBar.Update();
-        }
-        Machine.SetState<IncapacitatedState>();
-    }
+        Audio.PlaySFX(DeathSfx);
+        bool wasControlled = Main.PlayerInfo == this;
 
-    // When a player goes down, every mob targeting them loses interest.
-    private void DeaggroMobs()
-    {
-        if (!Helper.IsHost()) return;
-        foreach (var em in EntityDynamicLoad.ActiveEntities)
+        CorpseMachine.SpawnCorpse(position, CharSprite, Storage);
+
+        PlayerSync.BroadcastPlayerUnload(this);
+        EntityMachine?.Unload();
+        Save.Inst.players.Remove(this);
+
+        if (wasControlled)
         {
-            if (em == null || em.Info is not MobInfo mob) continue;
-            if (mob.Target == this)
-                mob.CancelTarget();
+            if (Save.Inst.players.Count == 0)
+                GUIMain.GUIMenu?.ShowDeath();
+            else
+                Control.SetPlayer(0);
         }
+
+        GUIBar.Update();
+        GUIMain.SyncHudVisibility();
     }
 
     // Revive: restore health/control and refresh the local HUD.

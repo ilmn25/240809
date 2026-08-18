@@ -215,7 +215,9 @@ public class Entity
                 loot.Add(0.5f, 2, ID.Stake); 
                  
                 AddMob<PlayerMachine>(ID.Player);
-                
+
+                AddMob<CorpseMachine>(ID.Corpse);
+
                 AddMob<ScoutMachine>(ID.Chito); 
                 loot = new (ID.Chito);
                 loot.Add(0.7f, 5, ID.Bullet); 

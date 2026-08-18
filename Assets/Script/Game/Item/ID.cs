@@ -160,4 +160,5 @@ public enum ID
     LightningRod,
     Nomad,
     WellFed,
+    Corpse,
 }
