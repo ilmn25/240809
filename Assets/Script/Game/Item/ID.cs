@@ -161,4 +161,5 @@ public enum ID
     Nomad,
     WellFed,
     Corpse,
+    Scarecrow,
 }

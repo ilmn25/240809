@@ -15,11 +15,17 @@ public class PigeonMachine : GroundMobMachine
         Scale = 0.6f,
     };
 
-    private const float HoverHeight = 10f;   // how high above the player it hovers
+    private const float HoverHeight = 6f;   // how high above the player it hovers
     private const int FleeDistance = 30;     // how far it flees before despawning
+    private const float ScarecrowRadius = 12f; // radius around a scarecrow pigeons avoid
+    private const int DepartDelay = 30;      // frames (~0.5s) before flying off after the drop
+
+    private static readonly Collider[] ScarecrowScan = new Collider[16];
 
     private HoverFlightModule _hover;
     private bool _leaving;
+    private Vector3 _approachDir; // horizontal direction flown in — keeps moving during the linger
+    private int _departTimer;
 
     /// <summary>True once the pigeon has started flying away.</summary>
     public bool Leaving => _leaving;
@@ -57,32 +63,55 @@ public class PigeonMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
+        // Linger: glide forward a moment after the drop, then leave.
+        if (_departTimer > 0)
+        {
+            Info.Direction.x = _approachDir.x;
+            Info.Direction.z = _approachDir.z;
+            if (--_departTimer == 0)
+                StartFlee();
+            return;
+        }
+
         if (_leaving)
             return;
 
-        // Hover over the player (the module flies us in and holds altitude), then
-        // poop the moment we're overhead and leave immediately.
-        if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
+        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed || ScarecrowNear(Main.PlayerInfo.position))
         {
-            Info.Target = Main.PlayerInfo;
-            if (_hover.IsOverhead)
-                DropPoop();
-        }
-        else
-        {
-            // No player — just leave.
             StartFlee();
+            return;
         }
+
+        // Keep the direction we're flying so we glide forward during the linger.
+        if (Info.Direction.sqrMagnitude > 0.001f)
+            _approachDir = Info.Direction;
+
+        Info.Target = Main.PlayerInfo;
+        if (_hover.IsOverhead)
+            DropPoop();
     }
 
-    /// <summary>Drop a poop projectile straight down, then fly away.</summary>
+    private static bool ScarecrowNear(Vector3 pos)
+    {
+        int count = Physics.OverlapSphereNonAlloc(pos, ScarecrowRadius, ScarecrowScan, Main.MaskEntity);
+        for (int i = 0; i < count; i++)
+            if (ScarecrowScan[i].TryGetComponent<ScarecrowMachine>(out _))
+                return true;
+        return false;
+    }
+
+    /// <summary>Drop a poop projectile straight down, then keep flying forward for a
+    /// beat before flying off.</summary>
     private void DropPoop()
     {
         Vector3 origin = transform.position;
         Vector3 dest = origin + Vector3.down * HoverHeight;
         Projectile.Spawn(origin, dest, PoopProjectile, HitboxType.Player, Info);
         Audio.PlaySFX(SfxID.HitStone);
-        StartFlee();
+        // Mark leaving so HoverFlightModule keeps it airborne (only controls Y) and
+        // doesn't pull it back toward the player while it lingers.
+        _leaving = true;
+        _departTimer = DepartDelay;
     }
 
     /// <summary>Begin fleeing away from the player; despawns once far enough. Also

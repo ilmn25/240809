@@ -9,7 +9,7 @@ public class CraftInfo : SpriteStructureInfo
 private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.ChalkPowder, ID.Torch, ID.Toolbench);
     private static readonly Storage ToolbenchPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Toolbench), ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer);
     private static readonly Storage CampfirePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Campfire), ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap);
-    private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.Sawmill, ID.FieldStation);
+    private static readonly Storage CarpenterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.CarpenterWorkbench), ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.Sawmill, ID.FieldStation, ID.Scarecrow);
     private static readonly Storage LoomPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Loom), ID.Fabric, ID.Bandages);
     private static readonly Storage FurnacePool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Furnace), ID.Slag, ID.Steel, ID.Copper);
     private static readonly Storage SmelterPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Smelter), ID.Glass);

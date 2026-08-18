@@ -197,6 +197,8 @@ public class Entity
                 AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OldRadio);
+                AddStructure<ScarecrowMachine>(ID.Scarecrow, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.Scarecrow);
                 loot.Add(1, 2, ID.Steel);
                 loot.Add(0.5f, 1, ID.Steel);
                 loot.Add(1, 2, ID.Slag);
