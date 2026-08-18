@@ -17,6 +17,27 @@ public class PlayerInfo : MobInfo
     public int HungerMax = 20;
     public float Stamina; 
 
+    private const float WellFedThreshold = 0.85f;
+    private static readonly StatusEffect WellFed = new StatusEffect(
+        ID.WellFed, EffectType.Heal, duration: 120f, tickInterval: 60f, amountPerTick: 1, name: "Well Fed");
+
+    public int BaseHealthMax;
+    private enum HungerStage { None, I, II, III, IV, V }
+
+    private HungerStage CurrentHungerStage
+    {
+        get
+        {
+            if (Hunger <= 0) return HungerStage.V;
+            float fraction = (float)Hunger / HungerMax;
+            if (fraction < 0.2f) return HungerStage.IV;
+            if (fraction < 0.35f) return HungerStage.III;
+            if (fraction < 0.5f) return HungerStage.II;
+            if (fraction < 0.75f) return HungerStage.I;
+            return HungerStage.None;
+        }
+    }
+
     private const float JumpGraceTime = 0.1f; 
     private const float CoyoteTime = 0.1f; 
     public float AirTime;
@@ -29,6 +50,7 @@ public class PlayerInfo : MobInfo
         base.Initialize(); 
         IframesCurrent = 150;
         Storage.info = this;  
+        if (BaseHealthMax <= 0) BaseHealthMax = HealthMax;
 
         IEnumerator HungerClock()
         {
@@ -112,6 +134,9 @@ public class PlayerInfo : MobInfo
                 break;
         }
 
+        UpdateWellFed();
+        UpdateHungerStage();
+
         FaceTarget = Equipment != null || Target != null;
 
         bool isSelected = Main.PlayerInfo == this;
@@ -125,8 +150,8 @@ public class PlayerInfo : MobInfo
                 Control.MouseTarget.transform.position + Vector3.up * 0.55f :
                 Control.MousePosition + Vector3.up * 0.15f;
             if (!IsInRenderRange) return;
-            SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround;
-            HandleMovement();
+            if (CurrentHungerStage == HungerStage.IV) { SpeedTarget = 0f; }
+            else { SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround; HandleMovement(); }
         }
         else if (!isSelected && !blockedByOther)
         {
@@ -191,6 +216,41 @@ public class PlayerInfo : MobInfo
         }
         Inventory.RefreshInventory();
         Machine.SetState<DefaultState>();
+    }
+
+    private void UpdateWellFed()
+    {
+        if (!Helper.IsHost()) return;
+        StatusEffectModule module = Machine?.GetModule<StatusEffectModule>();
+        if (module == null) return;
+
+        bool wellFed = HungerMax > 0 && Hunger >= HungerMax * WellFedThreshold;
+        if (wellFed) module.Apply(WellFed);
+        else module.Remove(ID.WellFed);
+    }
+
+    private void UpdateHungerStage()
+    {
+        if (!Helper.IsHost()) return;
+
+        HungerStage stage = CurrentHungerStage;
+        if (stage == HungerStage.V)
+        {
+            Health = 0;
+            return;
+        }
+
+        float multiplier = stage switch
+        {
+            HungerStage.I => 0.9f,
+            HungerStage.II => 0.8f,
+            HungerStage.III => 0.7f,
+            HungerStage.IV => 0.5f,
+            _ => 1f,
+        };
+
+        HealthMax = Mathf.Max(1, (int)(BaseHealthMax * multiplier));
+        if (Health > HealthMax) Health = HealthMax;
     }
 
     private void HandleMovement()
