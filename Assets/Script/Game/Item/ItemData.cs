@@ -80,6 +80,8 @@ public partial class Item
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
         AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
+        AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.", materials: new Dictionary<ID, int> { { ID.Geode, 1 } }, time: 90);
+        AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.");
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
@@ -114,6 +116,7 @@ public partial class Item
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
+        AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
 
         // Tools
         AddToolDefinition(

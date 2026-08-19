@@ -57,6 +57,7 @@ public class Entity
                 loot.Add(1, 1, ID.Flint);
                 loot.Add(0.7f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
+                loot.Add(0.15f, 1, ID.Geode);
 
                 AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandSlab);
@@ -64,6 +65,7 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Sand);
                 loot.Add(0.5f, 1, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Flint);
+                loot.Add(0.1f, 1, ID.Geode);
 
                 AddStructure<SandDebrisMachine>(ID.SandDebris, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandDebris);
@@ -71,6 +73,7 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Sand);
                 loot.Add(0.5f, 1, ID.Mud);
                 loot.Add(0.3f, 1, ID.Flint);
+                loot.Add(0.1f, 1, ID.Geode);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ToolbenchMachine>(ID.Toolbench, Vector3Int.one, Main.IndexCollide);
@@ -84,6 +87,7 @@ public class Entity
                 AddStructure<MasonryWorkbenchMachine>(ID.MasonryWorkbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<AnvilMachine>(ID.Anvil, Vector3Int.one, Main.IndexCollide);
                 AddStructure<FieldStationMachine>(ID.FieldStation, Vector3Int.one, Main.IndexCollide);
+                AddStructure<PulverizerMachine>(ID.Pulverizer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<PondMachine>(ID.Pond, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SprinklerMachine>(ID.Sprinkler, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
@@ -147,6 +151,11 @@ public class Entity
                 loot = new (ID.FieldStation);
                 loot.Add(1, 2, ID.Log);
                 loot.Add(0.5f, 2, ID.Sticks);
+
+                loot = new (ID.Pulverizer);
+                loot.Add(1, 2, ID.Steel);
+                loot.Add(0.5f, 2, ID.Steel);
+                loot.Add(1, 2, ID.StoneBlock);
                 
                 AddStructure<BasicChestMachine>(ID.Chest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Chest);

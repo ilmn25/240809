@@ -165,4 +165,7 @@ public enum ID
     Questmaster,
     BabySlime,
     CharredRubble,
+    Geode,
+    Fossil,
+    Pulverizer,
 }
