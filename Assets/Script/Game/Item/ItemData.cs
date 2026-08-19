@@ -84,6 +84,8 @@ public partial class Item
         AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.");
         AddMaterialDefinition(ID.Gold, "A gleaming bar of refined gold, minted from a refinery.");
         AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.");
+        AddConsumableDefinition(ID.CradleOfBlood, 0, "A dark cradle brimming with vital blood. Consuming it permanently increases your max health.", stackSize: 5, maxHpBonus: 2);
+        AddConsumableDefinition(ID.HornOfPlenty, 0, "An ever-brimming horn of abundance. Consuming it permanently increases your max hunger.", stackSize: 5, maxHungerBonus: 4);
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");

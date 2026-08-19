@@ -72,6 +72,11 @@ public class ItemSlot
                 text += "\n \nrestores " + Info.HealValue + " health";
             if (Info.HungerValue > 0)
                 text += "\n \nrestores " + Info.HungerValue + " hunger";
+            if (Info.MaxHpBonus > 0)
+                text += "\n \npermanently increases max health by " + Info.MaxHpBonus;
+            if (Info.MaxHungerBonus > 0)
+                text += "\n \npermanently increases max hunger by " + Info.MaxHungerBonus;
+
 
             if (ingredients)
             {

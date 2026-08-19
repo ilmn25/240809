@@ -171,4 +171,6 @@ public enum ID
     Gold,
     Refinery,
     PetrifiedDelver,
+    CradleOfBlood,
+    HornOfPlenty,
 }

@@ -27,6 +27,8 @@ public partial class Item
     public int HungerValue; // hunger restored when eaten (0 = not food)
     public int HealValue; // health restored when consumed (0 = no direct heal)
     public int DamageValue; // damage dealt to the eater when consumed (0 = safe)
+    public int MaxHpBonus; // permanent max-health increase when consumed (0 = none)
+    public int MaxHungerBonus; // permanent max-hunger increase when consumed (0 = none)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
     /// <summary>Whether this structure places directly as furniture: no build phase,
@@ -95,7 +97,9 @@ public partial class Item
         int time = 0,
         int stackSize = 15,
         int healValue = 0,
-        int damageValue = 0)
+        int damageValue = 0,
+        int maxHpBonus = 0,
+        int maxHungerBonus = 0)
     {
         Item itemData = new Item()
         {
@@ -110,6 +114,8 @@ public partial class Item
             HungerValue = hungerValue,
             HealValue = healValue,
             DamageValue = damageValue,
+            MaxHpBonus = maxHpBonus,
+            MaxHungerBonus = maxHungerBonus,
 
             Description = description
         };

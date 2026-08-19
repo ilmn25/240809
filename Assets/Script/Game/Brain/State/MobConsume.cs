@@ -50,10 +50,25 @@ class MobConsume : MobState
     private void Consume()
     {
         if (_consumable == null ||
-            (_consumable.HungerValue <= 0 && _consumable.HealValue <= 0 && _consumable.DamageValue <= 0)) return;
+            (_consumable.HungerValue <= 0 && _consumable.HealValue <= 0 && _consumable.DamageValue <= 0 && _consumable.MaxHpBonus <= 0 && _consumable.MaxHungerBonus <= 0)) return;
         if (Info is not PlayerInfo player) return;
 
         Tutorial.OnConsume();
+
+        // Permanent max-health boost (cradle of blood) — also heals for the same amount.
+        if (_consumable.MaxHpBonus > 0)
+        {
+            player.BaseHealthMax += _consumable.MaxHpBonus;
+            player.HealthMax += _consumable.MaxHpBonus;
+            player.Health += _consumable.MaxHpBonus;
+        }
+
+        // Permanent max-hunger boost (horn of plenty) — also fills hunger for the same amount.
+        if (_consumable.MaxHungerBonus > 0)
+        {
+            player.HungerMax += _consumable.MaxHungerBonus;
+            player.Hunger += _consumable.MaxHungerBonus;
+        }
 
         // Direct heal (bandages, cooked mushroom) applies first.
         if (_consumable.HealValue > 0)
