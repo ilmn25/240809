@@ -21,7 +21,6 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
     private static readonly Storage AnvilPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Anvil), ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator);
     private static readonly Storage MerchantPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Merchant), ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp);
     private static readonly Storage NomadPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Nomad), ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper);
-    private static readonly Storage PulverizerPool = CreateNoRefreshPool(Helper.ToDisplayName(ID.Pulverizer), ID.Geode);
     
     public readonly List<ID> Pending = new List<ID>();
     public int Max = 10;
@@ -45,12 +44,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
 
         if (_counter == ItemRecipe.Dictionary[Pending[0]].Time)
         {
-            Vector3 offset = new Vector3(
-                Random.value > 0.5f ? 0.65f : -0.65f,
-                1.8f,
-                Random.value > 0.5f ? 0.65f : -0.65f);
-
-            Entity.SpawnItem(Pending[0], Machine.transform.position + offset, stackOnSpawn: false);
+            Entity.SpawnItem(Pending[0], Machine.transform.position + OutputOffset(), stackOnSpawn: false);
             Tutorial.OnCraft(Pending[0]);
             Pending.RemoveAt(0);
             _counter = 0;
@@ -112,7 +106,6 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
             ID.Anvil => AnvilPool,
             ID.Merchant => MerchantPool,
             ID.Nomad => NomadPool,
-            ID.Pulverizer => PulverizerPool,
             _ => null,
         };
     }

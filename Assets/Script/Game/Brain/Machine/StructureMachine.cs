@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class StructureMachine : EntityMachine, IActionPrimaryResource
@@ -39,5 +41,23 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
     {
         if (GlowLight != null)
             GlowLight.enabled = on;
+    }
+
+    /// <summary>While <paramref name="isConverting"/> is true, periodically emit smoke + fire particles (host only).</summary>
+    protected void StartEmitConvertParticles(Func<bool> isConverting)
+    {
+        IEnumerator Enumerator()
+        {
+            while (gameObject.activeSelf)
+            {
+                yield return new WaitForSeconds(3);
+                if (isConverting() && Helper.IsHost())
+                {
+                    Particle.Create(transform.position, Particles.Smoke, false);
+                    Particle.Create(transform.position, Particles.Fire, false);
+                }
+            }
+        }
+        StartCoroutine(Enumerator());
     }
 } 

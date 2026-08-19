@@ -80,8 +80,10 @@ public partial class Item
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
         AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
-        AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.", materials: new Dictionary<ID, int> { { ID.Geode, 1 } }, time: 90);
+        AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.");
         AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.");
+        AddMaterialDefinition(ID.Gold, "A gleaming bar of refined gold, minted from a refinery.");
+        AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.");
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
@@ -117,6 +119,7 @@ public partial class Item
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
         AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
+        AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into gold.");
 
         // Tools
         AddToolDefinition(

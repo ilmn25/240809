@@ -30,6 +30,14 @@ public class StructureInfo : Info
     public ID KeyId = ID.Null;
     [NonSerialized] public SpriteRenderer SpriteRenderer; 
 
+    protected Vector3 OutputOffset()
+    {
+        return new Vector3(
+            UnityEngine.Random.value > 0.5f ? 0.65f : -0.65f,
+            1.8f,
+            UnityEngine.Random.value > 0.5f ? 0.65f : -0.65f);
+    }
+
     // Unified breaking rule for any attacker: hostiles bash any structure outright;
     // everyone else needs a matching tool with enough Breaking.
     private bool CanBreak(MobInfo attacker)

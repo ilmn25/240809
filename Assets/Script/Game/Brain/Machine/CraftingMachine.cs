@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public abstract class CraftingMachine: StructureMachine, IActionSecondaryInteract
@@ -15,20 +14,7 @@ public abstract class CraftingMachine: StructureMachine, IActionSecondaryInterac
         if (GlowsWhenCrafting)
             SetGlow(info.IsConverting());
 
-        IEnumerator Enumerator()
-        {
-            while (gameObject.activeSelf)
-            {
-                yield return new WaitForSeconds(3);
-                if (info.IsConverting() && Helper.IsHost())
-                {
-                    Particle.Create(transform.position, Particles.Smoke, false);
-                    Particle.Create(transform.position, Particles.Fire, false);
-                }
-            }
-        }
-
-        StartCoroutine(Enumerator());
+        StartEmitConvertParticles(info.IsConverting);
     }
 
     public override void LateUpdate()

@@ -55,8 +55,7 @@ public class GUICraft : GUIStorage
         SyncCraftStorage();
     }
 
-    /// <summary>Sync crafting station pool + pending queue to host (immediate).</summary>
-    private void SyncCraftStorage()
+    protected void SyncCraftStorage()
     {
         if (ActiveCraftInfo == null) return;
         StorageSync.SendCraftUpdate(ActiveCraftInfo.uid, Storage, ActiveCraftInfo.Pending);
@@ -64,6 +63,11 @@ public class GUICraft : GUIStorage
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.SetItemSlotInfo(itemSlot, true);
+        GUIMain.Cursor.SetItemSlotInfo(itemSlot, ShowIngredients(itemSlot.ID));
+    }
+
+    private static bool ShowIngredients(ID id)
+    {
+        return ItemRecipe.GetRecipe(id) != null;
     }
 }

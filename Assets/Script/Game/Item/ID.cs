@@ -168,4 +168,7 @@ public enum ID
     Geode,
     Fossil,
     Pulverizer,
+    Gold,
+    Refinery,
+    PetrifiedDelver,
 }
