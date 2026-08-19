@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
+public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
@@ -19,12 +19,6 @@ public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
     {
         base.OnStart();
 
-        AddState(new MobIdle(600)); // lingers in place longer than the animals
-        AddState(new MobRoam());
-        AddState(new MobHit());
-        AddState(new MobEscape());
-        AddState(new EquipSelectState());
-
         AddState(new DialogueState(CreateGuideDialogue()));
     }
 
@@ -36,20 +30,7 @@ public class GuideMachine : GroundMobMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
-        if (!IsCurrentState<DefaultState>()) return;
-
-        // The guide is approachable — it never fights, just flees from anything
-        // that attacks it, otherwise stays put.
-        if (Info.Target != null)
-        {
-            if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-                Info.CancelTarget(); // the threat got away — calm down
-            else
-                SetState<MobEscape>(); // run from the attacker
-            return;
-        }
-
-        SetState<MobIdle>(); // lingers in place (long idle from OnStart)
+        UpdateFlee();
     }
 
     // Steps the player through the early-game progression. Pressing the interact

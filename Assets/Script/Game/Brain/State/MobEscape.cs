@@ -8,13 +8,25 @@ class MobEscape : MobState {
         Module<PathingModule>().SetTarget(PathingTarget.Escape);
     }
     
-    public override void OnUpdateState() {
+    public override void OnUpdateState()
+    {
+        TryEndEscape();
+    }
+
+    /// <summary>Shared escape exit: stops fleeing when the path is done or the
+    /// threat has backed off. Returns true when the escape ended this frame.</summary>
+    protected bool TryEndEscape()
+    {
         if (Info.PathingStatus != PathingStatus.Pending)
         {
             Machine.SetState<DefaultState>();
-            return;
+            return true;
         }
         if (Info.Target == null || Vector3.Distance(Machine.transform.position, Info.Target.position) > Info.DistAttack + 1)
-            Info.PathingStatus = PathingStatus.Reached;  
+        {
+            Info.PathingStatus = PathingStatus.Reached;
+            return true;
+        }
+        return false;
     }
 }

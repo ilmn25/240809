@@ -2,9 +2,9 @@ using UnityEngine;
 
 /// <summary>A friendly nomad of the travelling bandwagon. The bandwagon leader
 /// (IsLeader) opens a shop that sells goods for specific resources; the rest just
-/// roam the camp and trade a line of dialogue. Like the merchant, nomads never
-/// fight — they flee when attacked.</summary>
-public class NomadMachine : GroundMobMachine, IActionSecondaryInteract, IShopkeeper
+/// roam the camp and trade a line of dialogue. Like the merchant, nomads flee
+/// when attacked but fight back if cornered.</summary>
+public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopkeeper
 {
     /// <summary>True for the single shopkeeper of a visiting bandwagon.</summary>
     public bool IsLeader;
@@ -34,16 +34,7 @@ public class NomadMachine : GroundMobMachine, IActionSecondaryInteract, IShopkee
     {
         base.OnStart();
 
-        AddState(new MobIdle(600));
-        AddState(new MobRoam());
-        AddState(new MobHit());
-        AddState(new MobChase());
-        AddState(new MobAttackSwing());
-        AddState(new EquipSelectState());
         AddState(new ShopState());
-
-        // The nomad carries a sword to defend itself if attacked.
-        Info.SetEquipment(new ItemSlot(ID.SteelSword));
 
         // A CraftInfo whose id resolves to the shared NomadPool of goods for sale.
         Shop = new CraftInfo { id = ID.Nomad };
@@ -77,27 +68,7 @@ public class NomadMachine : GroundMobMachine, IActionSecondaryInteract, IShopkee
             return;
         }
 
-        if (!IsCurrentState<DefaultState>()) return;
-
-        // Retaliate against whoever attacked us (PassiveInfo.OnHit set the target).
-        if (Info.Target != null)
-        {
-            if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-            {
-                Info.AimPosition = Info.Target.position;
-                SetState<MobAttackSwing>();
-            }
-            else if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-            {
-                Info.CancelTarget(); // the threat got away — calm down
-                SetState<MobIdle>();
-            }
-            else
-                SetState<MobChase>();
-            return;
-        }
-
-        SetState<MobIdle>(); // lingers in place
+        UpdateFlee();
     }
 
     private void Leave()

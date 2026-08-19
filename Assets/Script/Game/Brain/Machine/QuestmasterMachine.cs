@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A quest-giver NPC. Interact to hear the current quest; when the task
 /// is done it accepts the hand-in, drops the reward, and offers the next quest.</summary>
-public class QuestmasterMachine : GroundMobMachine, IActionSecondaryInteract
+public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
@@ -21,12 +21,6 @@ public class QuestmasterMachine : GroundMobMachine, IActionSecondaryInteract
     {
         base.OnStart();
 
-        AddState(new MobIdle(600)); // lingers in place longer than the animals
-        AddState(new MobRoam());
-        AddState(new MobHit());
-        AddState(new MobEscape());
-        AddState(new EquipSelectState());
-
         AddState(new QuestmasterState());
     }
 
@@ -38,18 +32,7 @@ public class QuestmasterMachine : GroundMobMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
-        if (!IsCurrentState<DefaultState>()) return;
-
-        if (Info.Target != null)
-        {
-            if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-                Info.CancelTarget(); // the threat got away — calm down
-            else
-                SetState<MobEscape>(); // run from the attacker
-            return;
-        }
-
-        SetState<MobIdle>();
+        UpdateFlee();
     }
 
     public void OnDrawGizmos()

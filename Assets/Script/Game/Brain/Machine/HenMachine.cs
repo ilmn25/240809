@@ -27,7 +27,7 @@ public class HenMachine : AnimalMachine
         _nextLayIn = Random.Range(MinLayInterval, MaxLayInterval); // first egg after a random wait
         base.OnStart();
 
-        AddState(new MobEscape());
+        AddState(new MobEscapeFight<MobAttackPounce>());
         AddState(new MobChase());
         AddState(new MobAttackPounce(1));
     }
@@ -53,7 +53,7 @@ public class HenMachine : AnimalMachine
             else if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
             {
                 if (Random.value < 0.8f)
-                    SetState<MobEscape>();
+                    SetState<MobEscapeFight<MobAttackPounce>>();
                 else
                     SetState<MobRoam>();
             }
