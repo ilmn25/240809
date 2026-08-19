@@ -88,7 +88,7 @@ Files: `Assets/Script/Game/Player/Inventory.cs`, `Assets/Script/Game/Craft/ItemR
 - Add remote inventory state refresh triggers on the client.
 
 ### 7. Block/terrain manipulation and map updates
-Files: `Assets/Script/Game/Map/Terraform.cs`, `Assets/Script/Game/Brain/Module/Info/ConstructionInfo.cs`, `Assets/Script/Game/World/GenTaskEntity.cs`, `Assets/Script/Game/World/Gen.cs`
+Files: `Assets/Script/Game/Map/Terraform.cs`, `Assets/Script/Game/Brain/Module/Info/StructureInfo.cs`, `Assets/Script/Game/World/GenTaskEntity.cs`, `Assets/Script/Game/World/Gen.cs`
 
 - All block placement/destruction commands must be sent to the host.
 - Host applies changes to world data and broadcasts block updates/deltas.

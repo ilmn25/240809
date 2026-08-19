@@ -1,5 +1,5 @@
-/// <summary>Rubble left behind when a structure is broken. Can be mined for gravel.</summary>
-public class RubbleMachine : StructureMachine
+/// <summary>Charred rubble left behind when a wooden structure burns out. Can be mined for gravel.</summary>
+public class CharredRubbleMachine : StructureMachine
 {
     public static Info CreateInfo()
     {

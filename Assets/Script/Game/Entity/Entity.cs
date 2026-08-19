@@ -88,7 +88,6 @@ public class Entity
                 AddStructure<PondMachine>(ID.Pond, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SprinklerMachine>(ID.Sprinkler, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LightningRodMachine>(ID.LightningRod, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                AddStructure<ConstructionMachine>(ID.Construction, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
 
@@ -174,6 +173,7 @@ public class Entity
                 // Burn results — spawned when flammable objects burn out.
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
                 AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<CharredRubbleMachine>(ID.CharredRubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
                 AddStructure<GeneratorMachine>(ID.Generator, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);

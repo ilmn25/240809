@@ -164,4 +164,5 @@ public enum ID
     Scarecrow,
     Questmaster,
     BabySlime,
+    CharredRubble,
 }

@@ -23,15 +23,15 @@ public static class BurnOutcomeRegistry
             }
         },
 
-        // Wooden structures collapse into rubble.
-        [ID.Workbench]  = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Toolbench] = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.CarpenterWorkbench] = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Loom]       = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Sawmill]    = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Campfire]   = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Furnace]    = new SpawnStructureOutcome { StructureID = ID.Rubble },
-        [ID.Table]      = new SpawnStructureOutcome { StructureID = ID.Rubble },
+        // Wooden structures collapse into charred rubble.
+        [ID.Workbench]  = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Toolbench] = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.CarpenterWorkbench] = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Loom]       = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Sawmill]    = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Campfire]   = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Furnace]    = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
+        [ID.Table]      = new SpawnStructureOutcome { StructureID = ID.CharredRubble },
 
         // Decor and plants turn to ash.
         [ID.Bush]    = new DropItemOutcome { ItemID = ID.Ash },

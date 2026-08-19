@@ -21,6 +21,9 @@ public class StructureInfo : Info
     public SfxID SfxDestroy;
     public ID Loot;
     public OperationType operationType;
+    /// <summary>Whether breaking this structure leaves a charred rubble pile. Off for
+    /// natural resources (trees, ores) that already yield their loot directly.</summary>
+    public bool SpawnsRubble = true;
     /// <summary>Whether this structure's glow light is lit (persists through save/load).</summary>
     public bool GlowOn;
     /// <summary>Item ID of the key needed to unlock this structure. ID.Null means no key required.</summary>
@@ -70,6 +73,8 @@ public class StructureInfo : Info
             Audio.PlaySFX(SfxDestroy);  
             if (Loot != ID.Null)
                 global::Loot.Gettable(Loot).Spawn(position);
+            if (SpawnsRubble)
+                Entity.Spawn(ID.Rubble, Vector3Int.FloorToInt(position));
             OnDestroy(info);
             // Clear the attacker's target so the swing animation isn't reset by
             // re-targeting this now-destroyed structure (null attacker = no target).

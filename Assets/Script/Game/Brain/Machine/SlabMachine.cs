@@ -8,6 +8,7 @@ public class SlabMachine : StructureMachine
             SfxHit = SfxID.HitMetal,
             SfxDestroy = SfxID.HitMetal,
             operationType = OperationType.Mining,
+            SpawnsRubble = false,
         }; 
     }
 }

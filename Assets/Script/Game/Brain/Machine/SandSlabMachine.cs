@@ -9,6 +9,7 @@ public class SandSlabMachine : StructureMachine
             SfxHit = SfxID.HitSand,
             SfxDestroy = SfxID.HitSand,
             operationType = OperationType.Mining,
+            SpawnsRubble = false,
         };
     }
 }

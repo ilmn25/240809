@@ -1,8 +1,7 @@
  
-using System.Collections.Generic;
 using UnityEngine;
 
-public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
+public class RaiderMachine : GroundMobMachine
 {
     protected override bool UsesDoorBash => true;
 
@@ -11,7 +10,9 @@ public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
         return new EnemyInfo()
         {
             HealthMax = 16,
-            DistRoam = 7 
+            DistRoam = 7,
+            DistAlert = 12,
+            DistDisengage = 18
         };  
     }
     public override void OnStart()
@@ -25,36 +26,10 @@ public class RaiderMachine : GroundMobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
-        
-        var dialogue = new Dialogue
-        {
-            Text = "You shouldn't be here.",
-            Sprite = Cache.LoadSprite("Sprite/Illu"),
-            Next = new Dictionary<string, Dialogue>
-            {
-                [""] = new() {
-                    Text = "This is our turf. Turn around and leave.",
-                    Sprite = Cache.LoadSprite("Sprite/Illu"),
-                    Next = new Dictionary<string, Dialogue>
-                    {
-                        [""] = new() { 
-                            Text = "Or don't. I could use the exercise.",
-                            Sprite = Cache.LoadSprite("Sprite/Illu"),
-                        }
-                    }
-                }
-            }
-        };
-        AddState(new DialogueState(dialogue)); 
-        
+
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
-    public void OnActionSecondary(Info info)
-    {
-        if (Info.Target != null) return;
-        SetState<DialogueState>();
-    }
     public override void OnUpdate()
     { 
         UpdateAggro();

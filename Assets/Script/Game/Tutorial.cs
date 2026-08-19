@@ -1,5 +1,5 @@
 /// <summary>Linear early-game tutorial shown in the HUD. Progresses through a fixed
-/// checklist; game systems report events (craft, place, assemble, hit, swap) and
+/// checklist; game systems report events (craft, place, hit, swap) and
 /// the player's storage is read each frame for the "collect" objectives.</summary>
 public static class Tutorial
 {
@@ -15,13 +15,11 @@ public static class Tutorial
     private static int _progress;   // index of the current objective
     private static bool _toolbenchCrafted;
     private static bool _toolbenchPlaced;
-    private static bool _malletCrafted;
-    private static bool _toolbenchAssembled;
 
     public static void Reset()
     {
         _progress = 0;
-        _toolbenchCrafted = _toolbenchPlaced = _malletCrafted = _toolbenchAssembled = false;
+        _toolbenchCrafted = _toolbenchPlaced = false;
     }
 
     /// <summary>Advance objectives satisfied by inventory state or combined flags.</summary>
@@ -36,13 +34,12 @@ public static class Tutorial
             case 1: if (storage.Count(ID.Flint) >= 3 && storage.Count(ID.Sticks) >= 2) _progress = 2; break;
             case 6: if (_toolbenchCrafted) _progress = 7; break;
             case 7: if (_toolbenchPlaced) _progress = 8; break;
-            case 8: if (_malletCrafted && _toolbenchAssembled) _progress = 9; break;
         }
     }
 
     public static void OnWorkbenchInteracted()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 9) _progress = 10;
+        if (Settings.Inst.TutorialEnabled && _progress == 8) _progress = 9;
     }
 
     public static void OnCraft(ID id)
@@ -52,18 +49,12 @@ public static class Tutorial
         {
             case 2: if (IsHatchet(id)) _progress = 3; break;
             case 6: if (id == ID.Toolbench) _toolbenchCrafted = true; break;
-            case 8: if (id == ID.CrudeMallet) _malletCrafted = true; break;
         }
     }
 
     public static void OnPlaced(ID structure)
     {
         if (Settings.Inst.TutorialEnabled && _progress == 7 && structure == ID.Toolbench) _toolbenchPlaced = true;
-    }
-
-    public static void OnAssembled(ID structure)
-    {
-        if (Settings.Inst.TutorialEnabled && _progress == 8 && structure == ID.Toolbench) _toolbenchAssembled = true;
     }
 
     public static void OnTreeHit(StructureInfo structure, MobInfo attacker)
@@ -86,12 +77,12 @@ public static class Tutorial
 
     public static void OnBlockPlaced()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 10) _progress = 11;
+        if (Settings.Inst.TutorialEnabled && _progress == 9) _progress = 10;
     }
 
     public static void OnConsume()
     {
-        if (Settings.Inst.TutorialEnabled && _progress == 11) _progress = 12;
+        if (Settings.Inst.TutorialEnabled && _progress == 10) _progress = 11;
     }
 
     private static bool IsHatchet(ID id) =>
@@ -104,7 +95,7 @@ public static class Tutorial
         return "\u2192 " + BuildLabel(_progress) + ProgressSuffix();
     }
 
-    private static int LabelCount => 12;
+    private static int LabelCount => 11;
 
     private static string Key(ControlKey key) => key.Primary.ToString();
 
@@ -118,10 +109,9 @@ public static class Tutorial
         5 => "right click on a teammate to access their inventory",
         6 => "craft a toolbench",
         7 => "place the toolbench",
-        8 => "craft a crude mallet and assemble the toolbench",
-        9 => "interact with the toolbench with right click",
-        10 => "craft and place a mulch block",
-        11 => "eat some food",
+        8 => "interact with the toolbench with right click",
+        9 => "craft and place a mulch block",
+        10 => "eat some food",
         _ => "",
     };
 

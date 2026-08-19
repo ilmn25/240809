@@ -89,20 +89,8 @@ public static class Terraform
     {
         if (isStructure)
         {
-            // Furniture places directly — no build phase, it spawns as the real structure.
-            if (Item.GetItem(Target)?.Furniture == true)
-            {
-                Entity.Spawn(Target, _coordinate);
-                Tutorial.OnPlaced(Target);
-                RemoveHeldItem();
-                return;
-            }
-            ConstructionInfo info = (ConstructionInfo)Entity.Spawn(ID.Construction, _coordinate);
-            info.structureID = Target;
-            info.Health = ItemRecipe.GetRecipe(Target).Time;
-            info.operationType = OperationType.Building;
-            info.SfxHit = SfxID.HitMetal;
-            info.SfxDestroy = SfxID.HitMetal;
+            // Structures place directly — no build phase.
+            Entity.Spawn(Target, _coordinate);
             Tutorial.OnPlaced(Target);
             RemoveHeldItem();
             return;
