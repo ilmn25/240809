@@ -192,4 +192,5 @@ public enum ID
     StarBun,
     AbyssDelicacy,
     CrimsonSoup,
+    DemonEye,
 }

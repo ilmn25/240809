@@ -368,6 +368,11 @@ public class Entity
                 loot.Add(0.3f, 1, ID.Blood);
                 loot.Add(0.1f, 1, ID.Foul);
 
+                AddMob<DemonEyeMachine>(ID.DemonEye);
+                loot = new (ID.DemonEye);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.3f, 1, ID.Cytoplasm);
+
                 AddMob<PigeonMachine>(ID.Pigeon);
                 loot = new (ID.Pigeon); // the pigeon drops nothing
 
