@@ -204,13 +204,13 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         switch (stage)
         {
             case 2:
-                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.HarvestID);
+                SetAttachment(Cache.LoadSprite("Sprite/" + Info.HarvestID));
                 break;
             case 1:
-                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/Seedling");
+                SetAttachment(Cache.LoadSprite("Sprite/Seedling"));
                 break;
             default:
-                SpriteRenderer.sprite = null;
+                SetAttachment(null, false);
                 break;
         }
     }

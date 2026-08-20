@@ -6,9 +6,9 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
 {
     protected SpriteRenderer SpriteRenderer;
     protected Light GlowLight;
+    protected SpriteRenderer AttachmentRenderer;
     private bool _powered;
 
-    /// <summary>Whether a nearby generator is powering this structure.</summary>
     public bool Powered => _powered;
 
     public void SetPowered(bool powered)
@@ -24,26 +24,34 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
     {
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id);
-        GlowLight = transform.Find("Sprite/Glow").GetComponent<Light>();
-        GlowLight.enabled = false; // default off; OnStart decides
+        GlowLight = transform.Find("Sprite/Glow")?.GetComponent<Light>();
+        AttachmentRenderer = transform.Find("Sprite/Attachment")?.GetComponent<SpriteRenderer>();
+        SetGlow(false);
     }
 
     public override void OnStart()
     { 
         AddModule(new SpriteOrbitModule()); 
         AddModule(new StructureSpriteCullModule());   
-        if (GlowLight == null) return;
-        GlowLight.enabled = Info is StructureInfo si && si.GlowOn;
+        // Pooled GameObjects are reused: reset glow/attachment left by the previous occupant.
+        SetGlow(false);
+        SetAttachment(null, false);
+        SetGlow(Info is StructureInfo si && si.GlowOn);
     }
 
-    /// <summary>Enable/disable this structure's glow light (furnace, lamp, ...).</summary>
     public void SetGlow(bool on)
     {
         if (GlowLight != null)
             GlowLight.enabled = on;
     }
 
-    /// <summary>While <paramref name="isConverting"/> is true, periodically emit smoke + fire particles (host only).</summary>
+    protected void SetAttachment(Sprite sprite, bool shown = true)
+    {
+        if (AttachmentRenderer == null) return;
+        AttachmentRenderer.sprite = sprite;
+        AttachmentRenderer.gameObject.SetActive(shown);
+    }
+
     protected void StartEmitConvertParticles(Func<bool> isConverting)
     {
         IEnumerator Enumerator()

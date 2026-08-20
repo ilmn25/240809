@@ -3,6 +3,7 @@ using UnityEngine;
 /// <summary>Info for furniture: a static structure that can't be damaged or broken,
 /// placed directly (no build phase). Hitting it with a hammer (Building) drops it
 /// back to the ground as an item.</summary>
+[System.Serializable]
 public class FurnitureInfo : StructureInfo
 {
     public override bool OnHitInternal(Projectile projectile)
