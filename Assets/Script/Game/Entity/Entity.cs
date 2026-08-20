@@ -90,6 +90,7 @@ public class Entity
                 AddStructure<PulverizerMachine>(ID.Pulverizer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<RefineryMachine>(ID.Refinery, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ImprovisedPlanterMachine>(ID.ImprovisedPlanter, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<CrockPotMachine>(ID.CrockPot, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<PondMachine>(ID.Pond, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SprinklerMachine>(ID.Sprinkler, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LightningRodMachine>(ID.LightningRod, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
@@ -150,6 +151,10 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Acorn);
                 loot.Add(0.25f, 1, ID.CornSeed);
                 loot.Add(0.25f, 1, ID.PumpkinSeed);
+
+                loot = new (ID.CrockPot);
+                loot.Add(1, 2, ID.Steel);
+                loot.Add(1, 3, ID.StoneBlock);
 
                 loot = new (ID.FieldStation);
                 loot.Add(1, 2, ID.Log);

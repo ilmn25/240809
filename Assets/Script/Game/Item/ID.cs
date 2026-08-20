@@ -184,4 +184,12 @@ public enum ID
     Corn,
     PumpkinSeed,
     Pumpkin,
+    CrockPot,
+    CookedEgg,
+    CookedBerries,
+    CookedCorn,
+    CookedPumpkin,
+    StarBun,
+    AbyssDelicacy,
+    CrimsonSoup,
 }

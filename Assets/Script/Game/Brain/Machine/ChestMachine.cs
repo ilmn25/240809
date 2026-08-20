@@ -5,6 +5,11 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
     public override void OnStart()
     { 
         base.OnStart();
+        AddContainerState();
+    }
+
+    protected virtual void AddContainerState()
+    {
         AddState(new InContainerState()
         {
             Storage = ((ContainerInfo)Info).Storage
@@ -12,7 +17,7 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
     }
     
 
-    public void OnActionSecondary(Info info)
+    public virtual void OnActionSecondary(Info info)
     {
         if (IsCurrentState<DefaultState>())
             SetState<InContainerState>();
