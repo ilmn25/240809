@@ -85,6 +85,11 @@ public partial class Item
         AddMaterialDefinition(ID.Gold, "A gleaming bar of refined gold, minted from a refinery.");
         AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.");
         AddConsumableDefinition(ID.CradleOfBlood, 0, "A dark cradle brimming with vital blood. Consuming it permanently increases your max health.", stackSize: 5, maxHpBonus: 2);
+        AddRelicDefinition(ID.StarCompass, "A relic of the Abyss that always points the way to the deepest treasures, no matter how far the descent.", ItemRarity.Epic);
+        AddRelicDefinition(ID.UnheardBell, "A relic of the Abyss that rings only in silence, its tone said to reveal what lies hidden in the dark.", ItemRarity.Epic);
+        AddRelicDefinition(ID.BlazeReap, "A relic of the Abyss that draws the fire of the deep, ready to rain destruction from on high.", ItemRarity.Legendary);
+        AddRelicDefinition(ID.ThousandMenWedge, "A relic of the Abyss, a vast spike driven into the stone where countless Delvers once gathered.", ItemRarity.Rare);
+        AddRelicDefinition(ID.SunSphere, "A relic of the Abyss that holds a sliver of the sun, faintly warm to the touch.", ItemRarity.Epic);
         AddConsumableDefinition(ID.HornOfPlenty, 0, "An ever-brimming horn of abundance. Consuming it permanently increases your max hunger.", stackSize: 5, maxHungerBonus: 4);
 
         // Structures

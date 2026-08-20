@@ -88,6 +88,25 @@ public partial class Item
         Dictionary[id] = itemData;
     }
 
+    private static void AddRelicDefinition(ID id, string description, ItemRarity rarity = ItemRarity.Rare)
+    {
+        Item itemData = new Item()
+        {
+            ID = id,
+            StackSize = 1,
+            Rarity = rarity,
+            Scale = 0.6f,
+
+            Type = ItemType.Material,
+            Gesture = ItemGesture.Swing,
+            HoldoutOffset = new Vector2(0.5f, 0),
+
+            Description = description
+        };
+
+        Dictionary[id] = itemData;
+    }
+
     private static void AddConsumableDefinition(
         ID id,
         int hungerValue,

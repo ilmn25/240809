@@ -173,4 +173,9 @@ public enum ID
     PetrifiedDelver,
     CradleOfBlood,
     HornOfPlenty,
+    StarCompass,
+    UnheardBell,
+    BlazeReap,
+    ThousandMenWedge,
+    SunSphere,
 }
