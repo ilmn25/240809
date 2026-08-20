@@ -179,4 +179,5 @@ public enum ID
     ThousandMenWedge,
     SunSphere,
     Collector,
+    Caravan,
 }

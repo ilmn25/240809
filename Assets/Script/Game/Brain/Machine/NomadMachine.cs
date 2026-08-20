@@ -2,14 +2,13 @@ using UnityEngine;
 
 /// <summary>A friendly nomad of the travelling bandwagon. The bandwagon leader
 /// (IsLeader) opens a shop that sells goods for specific resources; the rest just
-/// roam the camp and trade a line of dialogue. Like the merchant, nomads flee
-/// when attacked but fight back if cornered.</summary>
+/// cluster around the wagon and trade a line of dialogue. When spawned by a
+/// caravan the nomad follows the wagon and leaves with it (see
+/// PassiveNPCMachine.UpdateCaravanFollow).</summary>
 public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopkeeper
 {
     /// <summary>True for the single shopkeeper of a visiting bandwagon.</summary>
     public bool IsLeader;
-
-    private const int LeaveHour = 19; // sunset — the bandwagon travels on
 
     /// <summary>The leader's shop inventory, shown through the craft UI. Created
     /// fresh per nomad so Pending/crafting state never bleeds between instances.</summary>
@@ -61,19 +60,16 @@ public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopke
 
     public override void OnUpdate()
     {
-        // The bandwagon leaves at sunset; each nomad despawns on its own.
-        if (Save.Inst.time / 60 >= LeaveHour)
+        // A caravan nomad follows the wagon and leaves when it's gone.
+        if (Caravan != null)
         {
-            Leave();
+            // Don't interrupt an open shop or a hit reaction.
+            if (IsCurrentState<ShopState>() || IsCurrentState<MobHit>())
+                return;
+            UpdateCaravanFollow();
             return;
         }
 
         UpdateFlee();
-    }
-
-    private void Leave()
-    {
-        Info.Destroy();
-        Unload();
     }
 }

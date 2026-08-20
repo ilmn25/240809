@@ -46,6 +46,20 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
+        // A caravan collector follows the wagon and leaves when it's gone.
+        if (Caravan != null)
+        {
+            // Don't interrupt an open converter or a hit reaction.
+            if (IsCurrentState<InContainerState>() || IsCurrentState<MobHit>())
+            {
+                Converter.Update();
+                return;
+            }
+            UpdateCaravanFollow();
+            Converter.Update();
+            return;
+        }
+
         UpdateFlee();
         Converter.Update();
     }

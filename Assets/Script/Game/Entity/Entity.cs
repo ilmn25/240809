@@ -289,6 +289,9 @@ public class Entity
 
                 AddMob<NomadMachine>(ID.Nomad);
                 loot = new (ID.Nomad); // the nomads drop nothing
+
+                AddMob<CaravanMachine>(ID.Caravan);
+                loot = new (ID.Caravan); // the caravan drops nothing
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);

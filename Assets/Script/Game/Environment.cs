@@ -196,7 +196,7 @@ public class Environment
             if (Save.Inst.day >= 10 && Random.value < 0.15f)
             {
                 Weather = EnvironmentType.Rapture;
-                ShowEventDialogue("The sky is red...");
+                Dialogue.ShowEvent("The sky is red...");
             }
             // Winter (snowy days) only begins after day 15; before that it's a
             // normal day.
@@ -215,18 +215,10 @@ public class Environment
             {
                 Weather = EnvironmentType.NightRainy;
                 if (Save.Inst.day >= 10 && Random.value < 0.3f)
-                    ShowEventDialogue("The full moon rises...");
+                    Dialogue.ShowEvent("The full moon rises...");
             }
         else if (Time == 60 * 23)
             Weather = EnvironmentType.Sunrise;
-    }
-
-    /// <summary>Shows a one-line event warning when a special night begins.</summary>
-    private static void ShowEventDialogue(string message)
-    {
-        Dialogue.Target = new Dialogue { Text = message };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
     }
 
     public static void Set(Color ambientLight, Color fogColor, Color spotLight, Color directionalLight,

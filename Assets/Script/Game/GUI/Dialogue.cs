@@ -55,6 +55,15 @@ public class Dialogue
             }
         }
     }
+    /// <summary>Shows a one-line event notice (e.g. the full moon rising, a
+    /// bandwagon arriving) with a notification sound.</summary>
+    public static void ShowEvent(string message)
+    {
+        Target = new Dialogue { Text = message };
+        Show(true);
+        Audio.PlaySFX(SfxID.Notification);
+    }
+
     public static void Update()
     { 
         if (Showing){  

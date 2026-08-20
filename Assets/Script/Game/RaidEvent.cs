@@ -74,15 +74,7 @@ public static class RaidEvent
     {
         if (Main.PlayerInfo == null || Save.Inst.players.Count == 0) return;
 
-        Vector3Int playerPos = Vector3Int.FloorToInt(Main.PlayerInfo.position);
-        float angle = Random.Range(0f, Mathf.PI * 2f);
-        Vector3 offset = new Vector3(
-            Mathf.Cos(angle) * SpawnDistance,
-            5f,
-            Mathf.Sin(angle) * SpawnDistance
-        );
-
-        Vector3Int spawnPos = playerPos + Vector3Int.FloorToInt(offset);
+        Vector3Int spawnPos = Event.SpawnPointAroundPlayer(SpawnDistance);
         var spawnedEntity = Entity.Spawn(enemyID, spawnPos);
 
         if (spawnedEntity is MobInfo mobInfo && Save.Inst.players.Count > 0)
