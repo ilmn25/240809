@@ -178,4 +178,5 @@ public enum ID
     BlazeReap,
     ThousandMenWedge,
     SunSphere,
+    Collector,
 }
