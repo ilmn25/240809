@@ -35,17 +35,13 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
     public void OnActionSecondary(Info info)
     {
         if (Info.Target != null) return;
-        if (IsCurrentState<DefaultState>())
-        {
-            Dialogue.Target = new Dialogue { Text = "Hand me your relics — I'll melt them down to gold." };
-            Dialogue.Show(true);
-            Audio.PlaySFX(SfxID.Notification);
-            SetState<InContainerState>();
-        }
-        else
-        {
+        Audio.PlaySFX(SfxID.Notification);
+        // The collector idles in MobIdle (not DefaultState), so toggle on
+        // InContainerState instead of the chest's DefaultState pattern.
+        if (IsCurrentState<InContainerState>())
             SetState<DefaultState>();
-        }
+        else
+            SetState<InContainerState>();
     }
 
     public override void OnUpdate()
