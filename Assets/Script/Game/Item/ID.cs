@@ -180,4 +180,8 @@ public enum ID
     SunSphere,
     Collector,
     Caravan,
+    CornSeed,
+    Corn,
+    PumpkinSeed,
+    Pumpkin,
 }

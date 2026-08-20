@@ -148,6 +148,8 @@ public class Entity
                 loot = new (ID.ImprovisedPlanter);
                 loot.Add(1, 2, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
+                loot.Add(0.25f, 1, ID.CornSeed);
+                loot.Add(0.25f, 1, ID.PumpkinSeed);
 
                 loot = new (ID.FieldStation);
                 loot.Add(1, 2, ID.Log);

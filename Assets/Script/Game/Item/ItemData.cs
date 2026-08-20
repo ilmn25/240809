@@ -49,6 +49,8 @@ public partial class Item
         AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddConsumableDefinition(ID.CookedChicken, 8, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
         AddConsumableDefinition(ID.Egg, 3, "A fresh egg laid by a hen.");
+        AddConsumableDefinition(ID.Corn, 4, "A fresh ear of corn, hearty and filling.", stackSize: 20);
+        AddConsumableDefinition(ID.Pumpkin, 5, "A plump pumpkin, substantial and filling.", stackSize: 10);
         AddConsumableDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20);
         AddConsumableDefinition(ID.CookedDeathcap, 0, "A cooked mushroom that restores health.", materials: new Dictionary<ID, int> { { ID.Deathcap, 1 } }, time: 2000, healValue: 6);
         AddConsumableDefinition(ID.Bandages, 0, "Clean bandages that patch up wounds.", materials: new Dictionary<ID, int> { { ID.Fabric, 1 } }, healValue: 6);
@@ -62,6 +64,8 @@ public partial class Item
         AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.");
         AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
+        AddMaterialDefinition(ID.CornSeed, "A kernel of dried corn, ready to plant.", materials: new Dictionary<ID, int> { { ID.Corn, 1 } }, craftStack: 2);
+        AddMaterialDefinition(ID.PumpkinSeed, "A seed saved from a pumpkin, ready to plant.", materials: new Dictionary<ID, int> { { ID.Pumpkin, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.", materials: new Dictionary<ID, int> { { ID.Plank, 1 }, { ID.Charcoal, 1 } });
         AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.");
         AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500);
@@ -115,7 +119,7 @@ public partial class Item
         AddStructureDefinition(ID.Anvil, new Dictionary<ID, int> { { ID.Steel, 8 }, { ID.Hammer, 1}}, 100, description: "Forges steel weapons and tools at higher quality.");
         AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 100, description: "Unlocks blueprint-based crafting options.");
         AddStructureDefinition(ID.FieldStation, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.Sticks, 4 } }, 100, description: "A lightweight station specialized for field planting tools.");
-        AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Feed it an acorn to grow a log.");
+        AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Plant any seed in it to grow a crop.");
         AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
         AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");

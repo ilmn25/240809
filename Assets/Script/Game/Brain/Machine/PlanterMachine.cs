@@ -1,9 +1,31 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public abstract class PlanterMachine : StructureMachine, IActionSecondaryInteract
 {
     protected new PlanterInfo Info => GetModule<PlanterInfo>();
+
+    private readonly struct Crop
+    {
+        public readonly ID Harvest;
+        public readonly int Min;
+        public readonly int Max;
+
+        public Crop(ID harvest, int min, int max)
+        {
+            Harvest = harvest;
+            Min = min;
+            Max = max;
+        }
+    }
+
+    private static readonly Dictionary<ID, Crop> Crops = new()
+    {
+        { ID.Acorn, new Crop(ID.Log, 1, 1) },
+        { ID.CornSeed, new Crop(ID.Corn, 2, 4) },
+        { ID.PumpkinSeed, new Crop(ID.Pumpkin, 1, 1) },
+    };
 
     private int _visualStage = -1;
     private readonly Dialogue _messageDialogue = new();
@@ -51,7 +73,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
 
         if (!TryConsumeSelectedSeed(playerInfo))
         {
-            ShowPlanterMessage("I can plant acorns in this");
+            ShowPlanterMessage("I can plant a seed in this");
             return;
         }
 
@@ -104,12 +126,16 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         int key = Mathf.Clamp(actor.Storage.Key, 0, actor.Storage.List.Count - 1);
         ItemSlot selectedSlot = actor.Storage.List[key];
 
-        if (selectedSlot.Stack <= 0 || selectedSlot.ID != Info.SeedID)
+        if (selectedSlot.Stack <= 0 || !Crops.TryGetValue(selectedSlot.ID, out Crop crop))
             return false;
 
         selectedSlot.Stack--;
         if (selectedSlot.Stack <= 0)
             selectedSlot.clear();
+
+        Info.HarvestID = crop.Harvest;
+        Info.HarvestMin = crop.Min;
+        Info.HarvestMax = crop.Max;
 
         actor.Storage.NotifyChanged();
         return true;
@@ -122,7 +148,8 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
             1.8f,
             Random.value > 0.5f ? 0.65f : -0.65f);
 
-        Entity.SpawnItem(Info.HarvestID, transform.position + offset, amount: Info.HarvestAmount, stackOnSpawn: false);
+        int amount = Random.Range(Info.HarvestMin, Info.HarvestMax + 1);
+        Entity.SpawnItem(Info.HarvestID, transform.position + offset, amount: amount, stackOnSpawn: false);
 
         Info.IsPlanted = false;
         Info.IsGrown = false;
@@ -177,13 +204,13 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         switch (stage)
         {
             case 2:
-                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id + "2");
+                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.HarvestID);
                 break;
             case 1:
-                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id + "1");
+                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/Seedling");
                 break;
             default:
-                SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id);
+                SpriteRenderer.sprite = null;
                 break;
         }
     }
@@ -210,9 +237,6 @@ public class ImprovisedPlanterMachine : PlanterMachine
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,
             threshold = 1,
-            SeedID = ID.Acorn,
-            HarvestID = ID.Log,
-            HarvestAmount = 1,
             Flammable = true,
         };
     }
