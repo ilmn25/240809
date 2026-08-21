@@ -190,6 +190,12 @@ public class Entity
                 AddStructure<HarvestableMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.Bed);
+                loot.Add(1, 3, ID.Fabric);
+                loot.Add(1, 3, ID.Plank);
+                loot = new (ID.Sign);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(1, 2, ID.Sticks);
                 AddStructure<PortalMachine>(ID.Portal, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<HarvestableMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 // Burn results — spawned when flammable objects burn out.

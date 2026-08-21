@@ -32,7 +32,7 @@ public partial class Item
         loot.Add(0.5f, 1, ID.MetalChunks);
         loot.Add(0.5f, 1, ID.CopperChunks);
         loot.Add(0.5f, 1, ID.CopperChunks);
-        AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.");
+        AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.", burnResult: ID.Charcoal);
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         AddBlockDefinition(
             ID.ChalkPowder,
@@ -66,16 +66,16 @@ public partial class Item
         AddMaterialDefinition(ID.Shell, "A tiny collection of shells found on the ground.");
         AddMaterialDefinition(ID.Mud, "Wet earth used for mulch and ground work.");
         AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
-        AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.");
+        AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.", burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
         AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.");
         AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
         AddMaterialDefinition(ID.CornSeed, "A kernel of dried corn, ready to plant.", materials: new Dictionary<ID, int> { { ID.Corn, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.PumpkinSeed, "A seed saved from a pumpkin, ready to plant.", materials: new Dictionary<ID, int> { { ID.Pumpkin, 1 } }, craftStack: 2);
-        AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.", materials: new Dictionary<ID, int> { { ID.Plank, 1 }, { ID.Charcoal, 1 } });
-        AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.");
-        AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500);
+        AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.", materials: new Dictionary<ID, int> { { ID.Plank, 1 }, { ID.Charcoal, 1 } }, burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.", burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500, burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
         AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.");
         AddMaterialDefinition(ID.CopperChunks, "Chunks of copper ore for smelting.");
@@ -83,10 +83,10 @@ public partial class Item
         AddMaterialDefinition(ID.Charcoal, "Burned wood fuel for smelting.", materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
         AddMaterialDefinition(ID.Steel, "Strong forged metal for high-tier items.", materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 }, {ID.Charcoal, 2} }, time:2000);
         AddMaterialDefinition(ID.Brick, "Refined brick piece for sturdy construction.", materials: new Dictionary<ID, int> { { ID.Slag, 3 } }, time:1500);
-        AddMaterialDefinition(ID.Stake, "Wooden stake for defense and traps.", materials: new Dictionary<ID, int> { { ID.Log, 3 } });
+        AddMaterialDefinition(ID.Stake, "Wooden stake for defense and traps.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Slag, "Molten industrial residue used in crafting.", materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
-        AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.");
-        AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500);
+        AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.", burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500, burnResult: ID.Charcoal);
         AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
@@ -111,8 +111,8 @@ public partial class Item
         AddStructureDefinition(ID.Toolbench, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Flint, 3 } , { ID.Sticks, 3 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");
         AddStructureDefinition(ID.CarpenterWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.Plank, 5 } }, 100, description: "Crafts beds, looms and signs.");
         AddStructureDefinition(ID.Loom, new Dictionary<ID, int> { { ID.Plank, 6 }, { ID.Sticks, 2 } }, 100, description: "Weaves wool into fabric.");
-        AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.");
-        AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.");
+        AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.", burnResult: ID.Charcoal);
+        AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.", burnResult: ID.Charcoal);
         AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
         AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.");
         loot = new (ID.ForestBlock);

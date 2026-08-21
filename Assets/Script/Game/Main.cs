@@ -77,6 +77,7 @@ public class Main : MonoBehaviour
         Entity.Initialize(); 
         Block.Initialize();   
         HarvestableRegistry.Initialize();
+        CombustionRegistry.Initialize();
         
         Saves.Initialize();    
         GUIMain.Initialize();    

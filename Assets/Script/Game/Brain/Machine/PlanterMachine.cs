@@ -237,7 +237,6 @@ public class ImprovisedPlanterMachine : PlanterMachine
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,
             threshold = 1,
-            Flammable = true,
         };
     }
 }

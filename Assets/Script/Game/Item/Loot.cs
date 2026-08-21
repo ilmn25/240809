@@ -27,6 +27,11 @@ public class Loot
     {
         return Dictionary[id];
     }
+
+    public static bool TryGet(ID id, out Loot loot)
+    {
+        return Dictionary.TryGetValue(id, out loot);
+    }
      
     public void Add(float chance, int amount, params ID[] itemIDs)
     {
@@ -60,6 +65,25 @@ public class Loot
         var entry = _table[Random.Range(0, _table.Count)];
         ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
         Entity.SpawnItem(itemID, worldPosition, stackOnSpawn: false);
+    }
+
+    /// <summary>Roll the loot table at the burn site, converting any burnable
+    /// item (wood, plants) to its burn result (e.g. charcoal).</summary>
+    public void SpawnBurned(Vector3 position)
+    {
+        Vector3Int worldPosition = Vector3Int.FloorToInt(position);
+
+        foreach (LootEntry entry in _table)
+        {
+            for (int i = 0; i < entry.Amount; i++)
+            {
+                if (Random.value <= entry.Chance)
+                {
+                    ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
+                    Entity.SpawnItem(BurnUtil.BurnResultOf(itemID), worldPosition, stackOnSpawn: false);
+                }
+            }
+        }
     }
     
     public void AddToContainer(Storage storage)

@@ -8,7 +8,6 @@ public abstract class TreeMachine : StructureMachine
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,
-            Flammable = true,
             SpawnsRubble = false,
         }; 
     }

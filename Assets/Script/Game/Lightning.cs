@@ -9,7 +9,7 @@ public static class Lightning
     private const float MinInterval = 20f;   // seconds between bolts
     private const float MaxInterval = 45f;
     private const float StrikeRange = 30f;   // max distance a bolt lands from the player
-    private const float RodRadius = 6f;      // how close a rod must be to catch a bolt
+    private const float RodRadius = 10f;      // how close a rod must be to catch a bolt
     private const float DamageRadius = 3f;   // AoE radius around the impact
     private const int Damage = 25;
 

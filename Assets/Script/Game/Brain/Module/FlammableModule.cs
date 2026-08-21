@@ -39,6 +39,11 @@ public class FlammableModule : EntityModule
     public override void Initialize()
     {
         base.Initialize();
+        // Flammability comes from the combustion registry (single source of truth).
+        // Entities without a profile (e.g. mobs) keep their own default.
+        CombustionProfile profile = CombustionRegistry.Get(Info.id);
+        if (profile != null)
+            Info.Flammable = profile.Flammable;
         if (Info.Flammable)
             FireRegistry.Register(this);
     }
@@ -113,7 +118,29 @@ public class FlammableModule : EntityModule
         info.FireLevel = 0f;
         FireRegistry.Unregister(this);
         GetModule<StatusEffectModule>()?.Remove(ID.Burn);
-        BurnOutcomeRegistry.Get(info.id)?.Apply(info.position);
+
+        // Registered entities burn to their profile output; anything else falls
+        // back to dropping its loot, converting burnable materials to charcoal.
+        CombustionProfile profile = CombustionRegistry.Get(info.id);
+        if (profile != null)
+            ApplyProfile(profile, info.position);
+        else
+            BurnUtil.DropBurnedLoot(info);
+
         info.Destroy();
+    }
+
+    /// <summary>Apply a profile's burn output: leave a structure, roll its loot
+    /// table (converting burnable drops), and drop any fixed items.</summary>
+    private static void ApplyProfile(CombustionProfile profile, Vector3 position)
+    {
+        if (profile.Spawns != ID.Null)
+            Entity.Spawn(profile.Spawns, Vector3Int.FloorToInt(position));
+
+        if (profile.DropsLoot != ID.Null && Loot.TryGet(profile.DropsLoot, out Loot table))
+            table.SpawnBurned(position);
+
+        foreach (BurnDrop drop in profile.Drops)
+            Entity.SpawnItem(drop.ItemID, position, drop.Amount);
     }
 }

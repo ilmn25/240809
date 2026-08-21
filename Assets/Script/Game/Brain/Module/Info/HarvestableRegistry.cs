@@ -12,25 +12,21 @@ public class HarvestableDefinition
     /// <summary>If true, the harvestable is destroyed after being harvested.
     /// If false, it stays so it can be harvested repeatedly.</summary>
     public bool DestroyOnHarvest = true;
-    /// <summary>If true, this harvestable can catch and spread fire.</summary>
-    public bool Flammable = false;
     /// <summary>Seconds before a non-destroyed harvestable regrows and can be
     /// harvested again (0 = always harvestable). Prevents infinite farming.</summary>
     public float RegrowTime = 0f;
 
-    public HarvestableDefinition(bool destroyOnHarvest = true, bool flammable = false, float regrowTime = 0f)
+    public HarvestableDefinition(bool destroyOnHarvest = true, float regrowTime = 0f)
     {
         DestroyOnHarvest = destroyOnHarvest;
-        Flammable = flammable;
         RegrowTime = regrowTime;
     }
 
     /// <summary>Convenience: create a definition with a drop table.</summary>
-    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, bool flammable = false, float regrowTime = 0f)
+    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, float regrowTime = 0f)
     {
         Drops = drops;
         DestroyOnHarvest = destroyOnHarvest;
-        Flammable = flammable;
         RegrowTime = regrowTime;
     }
 }
@@ -53,13 +49,13 @@ public static class HarvestableRegistry
         bush.Add(1f, 1, ID.Sticks);
         bush.Add(1f, 1, ID.Berries);
         bush.Add(0.5f, 1, ID.Berries);
-        Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, flammable: true, regrowTime: 20f));
+        Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, regrowTime: 20f));
 
         // Grass: flammable decor that rarely yields sticks/flint (1/25) or a bullet casing (1/100).
         Loot grass = new Loot(ID.Grass);
         grass.Add(0.04f, 1, ID.Sticks, ID.Flint);
         grass.Add(0.01f, 1, ID.Casing);
-        Register(ID.Grass, new HarvestableDefinition(grass, flammable: true));
+        Register(ID.Grass, new HarvestableDefinition(grass));
 
         // Flowers: drop themselves and are consumed.
         Loot deathcap = new Loot(ID.Deathcap);
@@ -70,8 +66,11 @@ public static class HarvestableRegistry
         orchids.Add(1f, 1, ID.Orchids);
         Register(ID.Orchids, new HarvestableDefinition(orchids));
 
-        // Wooden table: flammable decor, drops nothing.
-        Register(ID.Table, new HarvestableDefinition(flammable: true));
+        // Wooden table: flammable decor that burns down to its wooden materials.
+        Loot table = new Loot(ID.Table);
+        table.Add(1f, 2, ID.Plank);
+        table.Add(0.5f, 2, ID.Sticks);
+        Register(ID.Table, new HarvestableDefinition(table));
 
         // Spider web: cut down for sticky silk, consumed on harvest.
         Loot web = new Loot(ID.SpiderWeb);

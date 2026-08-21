@@ -12,12 +12,6 @@ public class HarvestableMachine : StructureMachine
 
     public override void OnStart()
     {
-        // Mark flammable BEFORE base.OnStart() so StructureMachine adds the
-        // FlammableModule. Flammability comes from the harvestable definition.
-        HarvestableDefinition definition = HarvestableRegistry.Get(Info.id);
-        if (definition != null && definition.Flammable)
-            Info.Flammable = true;
-
         base.OnStart();
         AddState(new StaticIdle(), true);
     }

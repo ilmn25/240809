@@ -31,6 +31,10 @@ public partial class Item
     public int MaxHungerBonus; // permanent max-hunger increase when consumed (0 = none)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
+    /// <summary>What a burnable item turns into when burned. Null = not burnable
+    /// (single source of truth: no separate Burnable flag).</summary>
+    public ID BurnResult = ID.Null;
+
     /// <summary>Whether this structure places directly as furniture: no build phase,
     /// can't be broken, and a hammer picks it back up into the player's inventory.</summary>
     public bool Furniture;
@@ -62,7 +66,8 @@ public partial class Item
         int time = 0,
         int stackSize = 15,
         bool pickupable = true,
-        float despawnTime = 0f)
+        float despawnTime = 0f,
+        ID burnResult = ID.Null)
     {
 
         Item itemData = new Item()
@@ -78,6 +83,8 @@ public partial class Item
 
             Pickupable = pickupable,
             DespawnTime = despawnTime,
+
+            BurnResult = burnResult,
 
             Description = description
         };
@@ -154,7 +161,8 @@ public partial class Item
         Dictionary<ID, int> materials = null,
         int craftStack = 1,
         int time = 0,
-        int stackSize = 100)
+        int stackSize = 100,
+        ID burnResult = ID.Null)
     {
         Entity.AddBlock(id);
         Block.AddBlockDefinition(id, breakThreshold, breakCost);
@@ -174,6 +182,8 @@ public partial class Item
             Speed = 4,
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
+
+            BurnResult = burnResult,
 
             Description = description
         };
@@ -246,7 +256,8 @@ public partial class Item
         int time = 200,
         SfxID sfx = SfxID.HitSand,
         string description = "",
-        bool furniture = false)
+        bool furniture = false,
+        ID burnResult = ID.Null)
     {
         Item itemData = new Item()
         {
@@ -263,6 +274,8 @@ public partial class Item
             Speed = 1,
             Range = 5,
             HoldoutOffset = new Vector2(0.5f, 0),
+
+            BurnResult = burnResult,
 
             Description = description
         };
