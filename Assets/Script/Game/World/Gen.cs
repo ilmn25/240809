@@ -112,6 +112,9 @@ public class Gen
 
         // Scatter a few ponds (each ringed with bushes).
         GenTaskPond.Run(world);
+
+        // Place a fortified outpost watchtower.
+        GenOutpost.Run(world);
     }
 
     /// <summary>Places an owl statue beside the world's spawn point. Because NPCs
