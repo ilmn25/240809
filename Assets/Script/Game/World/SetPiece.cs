@@ -117,16 +117,16 @@ public class SetPiece
             {
                 for (int z = 0; z < setPiece.size; z++)
                 {
+                    // 0 = fillable air (clear to air), -1 = non-fillable (leave existing
+                    // terrain as-is), positive = place that block.
                     int blockID = setPiece[x, y, z];
-                    if (blockID != 0)
-                    {
-                        worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
-                        if (!IsInBounds(world, worldPos)) continue;
-                        chunkPos = World.GetChunkCoordinate(worldPos);
-                        Chunk chunk = world[chunkPos];
-                        if (chunk == null || chunk == Chunk.Zero) continue;
-                        chunk[World.GetBlockCoordinate(worldPos)] = blockID;
-                    }
+                    if (blockID == -1) continue;
+                    worldPos = new Vector3Int(position.x + x, position.y + y, position.z + z);
+                    if (!IsInBounds(world, worldPos)) continue;
+                    chunkPos = World.GetChunkCoordinate(worldPos);
+                    Chunk chunk = world[chunkPos];
+                    if (chunk == null || chunk == Chunk.Zero) continue;
+                    chunk[World.GetBlockCoordinate(worldPos)] = blockID;
                 }
             }
         }
@@ -149,6 +149,7 @@ public class SetPiece
 
     // JSON format:
     //   { "size": N, "blocks": [N^3 ints, x-fastest then y then z], "entities": [{ "id": "PineTree", "x":0, "y":0, "z":0 }] }
+    //   block value: 0 = fillable air (cleared to air), -1 = non-fillable air (left as-is), positive = block id.
     private static string ToJson(Chunk setPiece)
     {
         int size = setPiece.size;

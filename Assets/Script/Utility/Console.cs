@@ -244,7 +244,7 @@ public class Console : MonoBehaviour
                 }
                 else
                 {
-                    Print("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms");
+                    Print("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms|Dungeon");
                 }
                 break;
             case "flat":

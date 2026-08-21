@@ -118,6 +118,7 @@ public class Entity
                 AddStructure<LightningRodMachine>(ID.LightningRod, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
+                AddStructure<DungeonDoorMachine>(ID.DungeonDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
 
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);

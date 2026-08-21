@@ -136,6 +136,7 @@ public partial class Item
         AddStructureDefinition(ID.OldRadio, null, 100, furniture: true, description: "An old radio — one of the key items a travelling merchant looks for. Found in chests.");
         AddStructureDefinition(ID.Scarecrow, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Stake, 2 } }, 100, furniture: true, description: "A scarecrow that keeps pigeons away from the surrounding area.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
+        AddStructureDefinition(ID.DungeonDoor, null, 200, furniture: true, description: "A heavy brick door that descends into the dungeon depths.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");

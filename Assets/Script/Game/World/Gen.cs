@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public enum GenType
 {
-    Abyss, SkyBlock, SuperFlat, Backrooms
+    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon
 }
 public class Gen
 {
@@ -19,6 +19,7 @@ public class Gen
         {GenType.SkyBlock, new GenSkyBlock()},
         {GenType.SuperFlat, new GenSuperFlat()},
         {GenType.Backrooms, new GenBackrooms()},
+        {GenType.Dungeon, new GenDungeon()},
     };
 
     /// <summary>
@@ -115,6 +116,9 @@ public class Gen
 
         // Place a fortified outpost watchtower.
         GenOutpost.Run(world);
+
+        // Place a brick stairwell entrance to the dungeon.
+        GenDungeonEntrance.Run(world);
     }
 
     /// <summary>Places an owl statue beside the world's spawn point. Because NPCs
