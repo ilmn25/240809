@@ -41,6 +41,7 @@ public static class CombustionRegistry
         // Trees: catch fire and collapse to a charred tree you can chop for charcoal.
         Register(ID.PineTree,  new CombustionProfile(true) { Spawns = ID.BurnedTree });
         Register(ID.BirchTree, new CombustionProfile(true) { Spawns = ID.BurnedTree });
+        Register(ID.OakTree,   new CombustionProfile(true) { Spawns = ID.BurnedTree });
 
         // Wooden structures: collapse into charred rubble and drop their loot,
         // burnable wood converting to charcoal.

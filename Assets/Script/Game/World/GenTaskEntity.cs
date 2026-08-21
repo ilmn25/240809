@@ -18,6 +18,7 @@ public class GenTaskEntity : Gen
     private const double SurfaceSkeletonChance = 0.0001;
     private const double SurfaceSlabChance = 0.0098;
     private const double SurfaceSandStructureChance = 0.0098;
+    private const double SurfaceMeteorChance = 0.0004;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
     private const double GroundItemChance = 0.016;
     private const double StoneGroundItemChance = 0.03;
@@ -74,7 +75,8 @@ public class GenTaskEntity : Gen
                             double chance = ForestTreeChance;
                             if (roll <= chance)
                             {
-                                ID treeID = rng.NextDouble() <= 0.8 ? ID.PineTree : ID.BirchTree;
+                                double treeRoll = rng.NextDouble();
+                                ID treeID = treeRoll <= 0.7 ? ID.PineTree : treeRoll <= 0.95 ? ID.BirchTree : ID.OakTree;
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
                             }
                             else if (roll <= (chance += ForestGrassChance))
@@ -120,7 +122,12 @@ public class GenTaskEntity : Gen
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
+                                ID boulder = rng.NextDouble() < 0.15 ? ID.IronDeposit : ID.StoneBoulder;
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(boulder, position));
+                            }
+                            else if (roll <= (chance += SurfaceMeteorChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Meteor, position));
                             }
  
                             // Grass biome items on dirt surface
@@ -148,7 +155,7 @@ public class GenTaskEntity : Gen
                             }
                             else if (!isDesert && roll <= (chance += SurfaceSlabChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Slab, position));
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
                             }
 
                             // Desert biome items on sand surface

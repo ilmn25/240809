@@ -48,10 +48,28 @@ public class StructureInfo : Info
         return tool.OperationType == operationType && tool.Breaking >= threshold;
     }
 
+    private static float _lastToolWarnTime = -999f;
+
+    // Tell the local player when their tool is too weak for this structure, so a
+    // swing with an under-powered tool gives clear feedback instead of doing nothing.
+    private void WarnToolTooWeak(MobInfo attacker)
+    {
+        if (attacker != Main.PlayerInfo || attacker.Equipment?.Info?.ProjectileInfo == null) return;
+        ProjectileInfo tool = attacker.Equipment.Info.ProjectileInfo;
+        if (tool.OperationType != operationType || tool.Breaking >= threshold) return;
+        if (Time.time - _lastToolWarnTime < 2f) return;
+        _lastToolWarnTime = Time.time;
+        Dialogue.ShowEvent("I need a better tool...");
+    }
+
     public override bool OnHitInternal(Projectile projectile)
     {
         MobInfo attacker = projectile.SourceInfo;
-        if (!CanBreak(attacker)) return false;
+        if (!CanBreak(attacker))
+        {
+            WarnToolTooWeak(attacker);
+            return false;
+        }
         // User-controlled players acquire the target from hitting a structure; AI
         // allies (controllerId == -1) keep the target their brain assigned.
         if (attacker is not PlayerInfo || attacker.controllerId != -1)

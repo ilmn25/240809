@@ -50,14 +50,36 @@ public class Entity
                 loot.Add(0.7f, 1, ID.Sticks);
                 loot.Add(0.5f, 1, ID.Sticks);
                 
-                AddStructure<SlabMachine>(ID.Slab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.Slab);
+                AddStructure<OakTreeMachine>(ID.OakTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
+                loot = new (ID.OakTree);
+                loot.Add(1, 8, ID.Log);
+                loot.Add(0.8f, 3, ID.Log);
+                loot.Add(0.6f, 1, ID.Acorn);
+                loot.Add(1, 1, ID.Sticks);
+                loot.Add(0.7f, 2, ID.Sticks);
+                
+                AddStructure<StoneBoulderMachine>(ID.StoneBoulder, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.StoneBoulder);
                 loot.Add(1, 2, ID.Gravel);
                 loot.Add(0.5f, 1, ID.Gravel);
                 loot.Add(1, 1, ID.Flint);
                 loot.Add(0.7f, 1, ID.Flint);
                 loot.Add(0.5f, 1, ID.Flint);
                 loot.Add(0.15f, 1, ID.Geode);
+
+                AddStructure<IronDepositMachine>(ID.IronDeposit, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.IronDeposit);
+                loot.Add(1, 2, ID.MetalChunks);
+                loot.Add(0.6f, 2, ID.MetalChunks);
+                loot.Add(0.5f, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Flint);
+
+                AddStructure<MeteorMachine>(ID.Meteor, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.Meteor);
+                loot.Add(1, 3, ID.Meteorite);
+                loot.Add(0.7f, 2, ID.Meteorite);
+                loot.Add(0.5f, 1, ID.MetalChunks);
+                loot.Add(0.5f, 1, ID.CopperChunks);
 
                 AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandSlab);
@@ -359,6 +381,7 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.4f, 1, ID.Acorn);
                 loot.Add(0.3f, 1, ID.Sticks);
+                loot.Add(0.5f, 1, ID.MourningWood);
 
                 AddMob<MannequinMachine>(ID.Mannequin);
                 loot = new (ID.Mannequin);

@@ -78,6 +78,7 @@ public partial class Item
         AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500, burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
         AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.");
+        AddMaterialDefinition(ID.Meteorite, "Rare meteoric ore from a fallen meteor.");
         AddMaterialDefinition(ID.CopperChunks, "Chunks of copper ore for smelting.");
         AddMaterialDefinition(ID.Copper, "Strong forged copper for crafting and building.", materials: new Dictionary<ID, int> { { ID.CopperChunks, 3 }, { ID.Charcoal, 2 } }, time:2000);
         AddMaterialDefinition(ID.Charcoal, "Burned wood fuel for smelting.", materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
@@ -86,6 +87,7 @@ public partial class Item
         AddMaterialDefinition(ID.Stake, "Wooden stake for defense and traps.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Slag, "Molten industrial residue used in crafting.", materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
         AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.", burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.MourningWood, "Eerie wood harvested from a tree mimic.", burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500, burnResult: ID.Charcoal);
         AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");

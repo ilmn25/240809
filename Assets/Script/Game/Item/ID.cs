@@ -37,7 +37,7 @@ public enum ID
     Spear,
     Minigun,
     Pistol,
-    Slab,
+    StoneBoulder,
     PineTree, 
     Raider,
     Chito,
@@ -193,4 +193,9 @@ public enum ID
     AbyssDelicacy,
     CrimsonSoup,
     DemonEye,
+    OakTree,
+    IronDeposit,
+    Meteor,
+    Meteorite,
+    MourningWood,
 }
