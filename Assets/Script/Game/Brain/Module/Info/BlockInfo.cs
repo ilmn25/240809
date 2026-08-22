@@ -9,19 +9,10 @@ public class BlockInfo : StructureInfo
     public override void Initialize()
     {
         Terraform.PendingBlocks.Add(Coordinate);
-        Block block;
-        if (id == ID.ChalkPowder)
-        {
-            block = Block.GetBlock(World.GetBlock(Coordinate));
-            operationType = OperationType.Mining;
-            Loot = block.StringID; 
-        }
-        else
-        { 
-            block = Block.GetBlock(id);
-            operationType = OperationType.Building;  
-        }
-        
+        bool miningBox = id == ID.MiningBox;
+        Block block = miningBox ? Block.GetBlock(World.GetBlock(Coordinate)) : Block.GetBlock(id);
+        operationType = miningBox ? OperationType.Mining : OperationType.Building;
+        if (miningBox) Loot = block.StringID;
         Health = block.BreakCost;
         threshold = block.BreakThreshold;
         SfxHit = SfxID.HitMetal;
@@ -29,40 +20,18 @@ public class BlockInfo : StructureInfo
     }
 
     public override void OnDestroy(MobInfo info)
-    { 
-        if (id == ID.ChalkPowder)
-            World.SetBlock(Vector3Int.FloorToInt(position));
-        else
-            World.SetBlock(Vector3Int.FloorToInt(position), Block.ConvertID(id));
-        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(Machine.transform.position)); 
+    {
+        World.SetBlock(Coordinate, id == ID.MiningBox ? 0 : Block.ConvertID(id));
+        Terraform.PendingBlocks.Remove(Coordinate);
     }
 
     public override string ToString()
     {
-        string name;
-        if (id != ID.ChalkPowder)
-        {
-            name = Helper.ToDisplayName(id);
-        }
-        else
-        {
-            Block block = Block.GetBlock(World.GetBlock(Coordinate));
-            name = block != null ? Helper.ToDisplayName(block.StringID) : Helper.ToDisplayName(id);
-        }
-
-        if (operationType != OperationType.Building)
-        {
-            string action = operationType switch
-            {
-                OperationType.Mining => "Mining",
-                OperationType.Building => "Building",
-                OperationType.Cutting => "Cutting",
-                _ => "Destroying",
-            };
-            return $"{action} {name} | HP {Health}";
-        }
-
-        return $"Building: {name} | {Health:0.#} Left";
+        Block underlying = id == ID.MiningBox ? Block.GetBlock(World.GetBlock(Coordinate)) : null;
+        string name = underlying != null ? Helper.ToDisplayName(underlying.StringID) : Helper.ToDisplayName(id);
+        return operationType != OperationType.Building
+            ? $"Mining {name} | HP {Health}"
+            : $"Building: {name} | {Health:0.#} Left";
     }
 }
  

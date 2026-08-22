@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.ChalkPowder, ID.Torch, ID.Toolbench);
+private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Toolbench, ID.Torch, ID.MulchBlock);
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
         { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer) },
@@ -18,7 +18,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         { ID.MasonryWorkbench, new PoolDef(0, true, ID.Anvil, ID.Smelter, ID.Furnace, ID.Stonecutter, ID.OwlStatue) },
         { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest) },
         { ID.Stonecutter, new PoolDef(0, true, ID.Brick, ID.BrickBlock) },
-        { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MulchBlock, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
+        { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator) },
         { ID.Merchant, new PoolDef(0, false, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },

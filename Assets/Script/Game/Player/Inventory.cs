@@ -29,7 +29,10 @@ public class Inventory
 
             Main.PlayerInfo.SetEquipment(held);
 
-            if (CurrentItemData.ID == ID.ChalkPowder || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
+            bool isMiningTool = CurrentItemData.Type == ItemType.Tool &&
+                CurrentItemData.ProjectileInfo != null &&
+                CurrentItemData.ProjectileInfo.OperationType == OperationType.Mining;
+            if (isMiningTool || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
                 Terraform.BlockUpdate(CurrentItem.ID);
             else
                 Terraform.BlockUpdate();

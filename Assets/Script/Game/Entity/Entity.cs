@@ -28,6 +28,17 @@ public class Entity
                 StaticLoad = true,
                 SpawnOffset = Floor,
         }; 
+        // The mining box is a non-solid overlay on an existing block — it owns no
+        // collision or nav of its own, so the block underneath keeps its nav intact.
+        private static readonly Entity MiningBoxEntity = new Entity
+        {
+                Bounds = Vector3Int.one,
+                Collision = Main.IndexNoCollide,
+                PrefabName = ID.BlockPrefab,
+                Machine = typeof(BlockMachine),
+                StaticLoad = true,
+                SpawnOffset = Floor,
+        }; 
         public static void Initialize()
         {
                 Loot loot;
@@ -476,7 +487,7 @@ public class Entity
  
         public static void AddBlock(ID id)
         {
-                Dictionary.Add(id, Block); 
+                Dictionary.Add(id, id == ID.MiningBox ? MiningBoxEntity : Block); 
         }
 
         public static void SpawnItem(ID id, Vector3 worldPosition, int amount = 1, bool stackOnSpawn = true, Vector3 velocity = default, int despawn = -1)

@@ -3,29 +3,21 @@ using UnityEngine;
 public class BlockMachine : EntityMachine, IActionPrimaryResource, IActionSecondaryInteract
 {
     public new BlockInfo Info => GetModule<BlockInfo>();
-    public static Info CreateInfo()
-    {
-        return new BlockInfo();
-    }
+    public static Info CreateInfo() => new BlockInfo();
 
     public override void OnSetup()
     {
-        if (Info.id == ID.ChalkPowder)
-        {
-            transform.localScale = Vector3.one * 1.04f; 
-            BlockPreview.Set(gameObject, ID.OverlayBlock); 
-        }
-        else
-        {
-            transform.localScale = Vector3.one; 
-            BlockPreview.Set(gameObject, Info.id);
-        }
+        bool miningBox = Info.id == ID.MiningBox;
+        transform.localScale = Vector3.one * (miningBox ? 1.04f : 1f);
+        BlockPreview.Set(gameObject, miningBox ? ID.OverlayBlock : Info.id);
     }
     
     public void OnActionSecondary(Info info)
     {
-        if (Info.id != ID.ChalkPowder) Entity.SpawnItem(Info.id, transform.position);
-        Terraform.PendingBlocks.Remove(Vector3Int.FloorToInt(transform.position));
+        bool isMiningBox = Info.id == ID.MiningBox;
+        if (!isMiningBox) Entity.SpawnItem(Info.id, transform.position);
+        Vector3Int coord = Vector3Int.FloorToInt(transform.position);
+        Terraform.PendingBlocks.Remove(coord);
         Audio.PlaySFX(SfxID.Item);
         Info.Destroy();
     }

@@ -56,6 +56,24 @@ public class BlockPreview
         sprite.GetComponent<MeshFilter>().mesh = cached.mesh;
         sprite.GetComponent<MeshRenderer>().material = cached.material;
     }
+
+    /// <summary>Create a pooled preview object with a block's generated mesh/material
+    /// display at the given scale.</summary>
+    public static GameObject CreateObject(ID blockID, float scale)
+    {
+        GameObject obj = ObjectPool.GetObject(ID.BlockPrefab);
+        obj.SetActive(false);
+        Apply(obj, blockID, scale);
+        return obj;
+    }
+
+    /// <summary>Apply a block's generated mesh/material display and scale. Shared by the
+    /// placement preview and the cursor aim overlay so both render identically.</summary>
+    public static void Apply(GameObject obj, ID blockID, float scale)
+    {
+        Set(obj, blockID);
+        obj.transform.localScale = Vector3.one * scale;
+    }
    
     private static void GenerateMesh()
     {

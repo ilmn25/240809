@@ -34,12 +34,8 @@ public partial class Item
         loot.Add(0.5f, 1, ID.CopperChunks);
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.", burnResult: ID.Charcoal);
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
-        AddBlockDefinition(
-            ID.ChalkPowder,
-            description: "Used to mark surfaces for mining",
-            materials: new Dictionary<ID, int> { { ID.Log, 2 }, { ID.Charcoal, 1 } }
-        );
-
+        // Internal mining-box entity — placed by mining tools, never crafted by the player.
+        AddBlockDefinition(ID.MiningBox);
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });

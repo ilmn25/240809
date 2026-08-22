@@ -82,7 +82,7 @@ public class Main : MonoBehaviour
         Saves.Initialize();    
         GUIMain.Initialize();    
         EnvParticle.Initialize();    
-        Terraform.Initialize();  
+        Terraform.Initialize();
         MapCull.Initialize();
     } 
     private void Update()

@@ -28,7 +28,7 @@ public enum ID
     Furnace, 
     BlueprintStation,
     SteelSword,
-    ChalkPowder,
+    MiningBox,
     StonePickaxe,
     StoneHatchet,
     MetalAxe,
