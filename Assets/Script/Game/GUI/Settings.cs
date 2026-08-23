@@ -39,6 +39,7 @@ public class Settings
         Vector2Int res = Resolutions[Mathf.Clamp(Inst.ResolutionIndex, 0, Resolutions.Length - 1)];
         Screen.SetResolution(res.x, res.y, Inst.Fullscreen);
         Application.targetFrameRate = FpsLimits[Mathf.Clamp(Inst.FpsIndex, 0, FpsLimits.Length - 1)];
+        Audio.ApplyVolumeSettings();
     }
 
     public static void Save()

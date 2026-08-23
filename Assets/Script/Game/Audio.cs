@@ -3,37 +3,37 @@ using UnityEngine;
 
 public class Audio
 {
-    private static List<AudioSource> _audioSources;
-    private static AudioSource _bgmSource;
-    private static List<AudioSource> _ambienceSources;
+    private static readonly Dictionary<AudioSource, float> BgmBase = new Dictionary<AudioSource, float>();
+    private static readonly Dictionary<AudioSource, float> AmbienceBase = new Dictionary<AudioSource, float>();
+    private static readonly Dictionary<AudioSource, float> SfxBase = new Dictionary<AudioSource, float>();
 
     private static readonly int PoolSize = 12;
     private static readonly int AmbiencePoolSize = 4;
 
-    private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>();
+    private static readonly Dictionary<SfxID, float> Volume = new Dictionary<SfxID, float>
+    {
+        { SfxID.HitMetal, 0.3f },
+        { SfxID.HitStone, 4f },
+        { SfxID.Footsteps1, 0.4f },
+        { SfxID.Footsteps2, 0.4f },
+        { SfxID.Text, 0.3f },
+        { SfxID.Sword, 0.2f },
+        { SfxID.Wind, 0.7f },
+    };
+
     public static void Initialize()
     {
-        Volume.Add(SfxID.HitMetal, 0.3f);
-        Volume.Add(SfxID.HitStone, 4f);
-        Volume.Add(SfxID.Footsteps1, 0.4f);
-        Volume.Add(SfxID.Footsteps2, 0.4f);
-        Volume.Add(SfxID.Text, 0.3f);
-        Volume.Add(SfxID.Sword, 0.2f);
-        Volume.Add(SfxID.Wind, 0.7f);
         GameObject audioManager = new GameObject("Audio");
-        _bgmSource = audioManager.AddComponent<AudioSource>();
+        BgmBase[audioManager.AddComponent<AudioSource>()] = 1f;
 
-        _ambienceSources = new List<AudioSource>();
         for (int i = 0; i < AmbiencePoolSize; i++)
         {
-            _ambienceSources.Add(audioManager.AddComponent<AudioSource>());
+            AmbienceBase.Add(audioManager.AddComponent<AudioSource>(), 1f);
         }
 
-        _audioSources = new List<AudioSource>();
         for (int i = 0; i < PoolSize; i++)
         {
-            AudioSource newSource = audioManager.AddComponent<AudioSource>();
-            _audioSources.Add(newSource);
+            SfxBase.Add(audioManager.AddComponent<AudioSource>(), 1f);
         }
 
         PlayBGM("FairyFountain", 0.2f);
@@ -46,10 +46,13 @@ public class Audio
         AudioClip clip = Cache.LoadAudioClip($"BGM/{id}");
         if (clip == null) return;
 
-        _bgmSource.clip = clip;
-        _bgmSource.volume = volume * Settings.Inst.BgmVolume;
-        _bgmSource.loop = loop;
-        _bgmSource.Play();
+        AudioSource source = GetBgmSource();
+        if (source == null) return;
+        BgmBase[source] = volume;
+        source.clip = clip;
+        source.volume = volume * Settings.Inst.BgmVolume;
+        source.loop = loop;
+        source.Play();
     }
 
     public static void PlayAmbience(SfxID id, bool loop = true)
@@ -57,10 +60,11 @@ public class Audio
         AudioClip clip = Cache.LoadAudioClip($"SFX/{id}");
         if (!clip) return;
 
-        float volume = Volume.ContainsKey(id) ? Volume[id] : 1;
-        AudioSource availableSource = GetAvailableAmbienceSource();
+        float volume = BaseVolume(id);
+        AudioSource availableSource = GetAvailableSource(AmbienceBase);
         if (availableSource)
         {
+            AmbienceBase[availableSource] = volume;
             availableSource.clip = clip;
             availableSource.volume = volume * Settings.Inst.AmbienceVolume;
             availableSource.loop = loop;
@@ -72,11 +76,12 @@ public class Audio
     {
         AudioClip clip = Cache.LoadAudioClip($"SFX/{id}");
         if (!clip) return null;
-        
-        float volume = Volume.ContainsKey(id) ? Volume[id] : 1;
-        AudioSource availableSource = GetAvailableAudioSource();
+
+        float volume = BaseVolume(id);
+        AudioSource availableSource = GetAvailableSource(SfxBase);
         if (availableSource)
         {
+            SfxBase[availableSource] = volume;
             availableSource.clip = clip;
             availableSource.volume = volume * Settings.Inst.SfxVolume;
             availableSource.loop = loop;
@@ -91,24 +96,45 @@ public class Audio
         {
             audioSource.Stop();
             audioSource.loop = false;
+            SfxBase.Remove(audioSource);
         }
     }
 
-    private static AudioSource GetAvailableAmbienceSource()
+    public static void ApplyVolumeSettings()
     {
-        foreach (AudioSource source in _ambienceSources)
+        ApplyPool(BgmBase, Settings.Inst.BgmVolume);
+        ApplyPool(AmbienceBase, Settings.Inst.AmbienceVolume);
+        ApplyPool(SfxBase, Settings.Inst.SfxVolume);
+    }
+
+    private static void ApplyPool(Dictionary<AudioSource, float> bases, float setting)
+    {
+        foreach (KeyValuePair<AudioSource, float> pair in bases)
         {
-            if (!source.isPlaying)
+            if (pair.Key != null && pair.Key.isPlaying)
             {
-                return source;
+                pair.Key.volume = pair.Value * setting;
             }
+        }
+    }
+
+    private static float BaseVolume(SfxID id)
+    {
+        return Volume.TryGetValue(id, out float v) ? v : 1f;
+    }
+
+    private static AudioSource GetBgmSource()
+    {
+        foreach (AudioSource source in BgmBase.Keys)
+        {
+            return source;
         }
         return null;
     }
 
-    private static AudioSource GetAvailableAudioSource()
+    private static AudioSource GetAvailableSource(Dictionary<AudioSource, float> sources)
     {
-        foreach (AudioSource source in _audioSources)
+        foreach (AudioSource source in sources.Keys)
         {
             if (!source.isPlaying)
             {
