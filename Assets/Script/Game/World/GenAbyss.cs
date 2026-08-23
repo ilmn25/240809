@@ -20,7 +20,11 @@ public class GenAbyss : Gen
         // GenTaskPlateau.Run(currentCoordinate, currentChunk);
         // GenTaskWall.Run(currentCoordinate, currentChunk);
         GenTaskCaves.Run(currentCoordinate, currentChunk);
-        GenTaskEntity.Run(currentCoordinate, currentChunk);
     }
-    
+
+    // Owl statue beside spawn respawns the Guide after the chunks are generated.
+    protected override void GenPostWorld(World world)
+    {
+        GenTaskSpawnStatue.Run(world);
+    }
 }

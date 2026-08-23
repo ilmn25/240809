@@ -5,11 +5,12 @@ using UnityEngine;
 [Serializable]
 public enum GenType
 {
-    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon
+    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit
 }
 public class Gen
 {
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
+    protected virtual void GenPostWorld(World world) { }
     public virtual Vector3Int GetSize() => Vector3Int.one;
     public virtual Vector3Int GetSpawnPoint() => Vector3Int.zero;
     
@@ -20,6 +21,7 @@ public class Gen
         {GenType.SuperFlat, new GenSuperFlat()},
         {GenType.Backrooms, new GenBackrooms()},
         {GenType.Dungeon, new GenDungeon()},
+        {GenType.Edit, new GenEdit()},
     };
 
     /// <summary>
@@ -101,9 +103,13 @@ public class Gen
             }
         }
 
-        // A freshly generated world gets an owl statue at spawn so the Guide is
-        // always nearby (the statue is saved; the Guide is not).
-        AddSpawnStatue(world);
+        // Per-world-type post-processing (e.g. Abyss spawn statue).
+        gen.GenPostWorld(world);
+
+        // Spawn surface entities AFTER all block tasks so they sit on final terrain.
+        // Only the Abyss dimension uses natural surface entity spawning.
+        if (world.GenType == GenType.Abyss)
+            GenTaskEntity.RunAll(world);
 
         // Scatter a graveyard cluster in the grass biome.
         GenTaskGraveyard.Run(world);
@@ -121,44 +127,4 @@ public class Gen
         GenDungeonEntrance.Run(world);
     }
 
-    /// <summary>Places an owl statue beside the world's spawn point. Because NPCs
-    /// aren't saved, the statue (a saved static structure) respawns the Guide.</summary>
-    private static void AddSpawnStatue(World world)
-    {
-        Vector3Int spawnPos = world.SpawnPoint;
-
-        // Snap the spot beside spawn down onto the ground so the statue never floats.
-        int x = spawnPos.x + 2;
-        int z = spawnPos.z;
-        int surfaceY = FindSurfaceY(world, x, z);
-        if (surfaceY < 0) return;
-
-        Vector3Int spot = new Vector3Int(x, surfaceY, z);
-        Chunk chunk = world[World.GetChunkCoordinate(spot)];
-        if (chunk == null || chunk == Chunk.Zero) return;
-
-        chunk.StaticEntity.Add(Entity.CreateInfo(ID.OwlStatue, spot));
-    }
-
-    // Scans the full column (top to bottom) for the first air block directly above
-    // a solid block — the ground surface. Returns -1 if no surface exists.
-    private static int FindSurfaceY(World world, int x, int z)
-    {
-        for (int y = world.Bounds.y - 1; y >= 1; y--)
-        {
-            Vector3Int block = new Vector3Int(x, y, z);
-            Vector3Int chunkCoord = World.GetChunkCoordinate(block);
-            Chunk chunk = world[chunkCoord];
-            if (chunk == null || chunk == Chunk.Zero) continue;
-
-            int localX = block.x - chunkCoord.x;
-            int localY = block.y - chunkCoord.y;
-            int localZ = block.z - chunkCoord.z;
-            if (localY == 0) continue; // bottom block of a chunk — the block below is in the next chunk
-
-            if (chunk[localX, localY, localZ] == 0 && chunk[localX, localY - 1, localZ] != 0)
-                return y;
-        }
-        return -1;
-    }
 }

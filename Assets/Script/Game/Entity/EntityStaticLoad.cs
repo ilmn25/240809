@@ -57,6 +57,17 @@ public class EntityStaticLoad
         }
     }
 
+    /// <summary>Write active static entities back into their chunk.StaticEntity lists
+    /// (deduplicated) so world-data scans like SetPiece.Copy see placed structures.
+    /// Clears the chunk lists first since live entities were already moved out of them
+    /// on load; SnapshotToChunks then re-adds each machine's info exactly once.</summary>
+    public static void FlushToChunks()
+    {
+        foreach (var kv in ActiveEntities)
+            kv.Value.Item1.Clear();
+        SnapshotToChunks();
+    }
+
     /// <summary>Re-spawn static entities from their chunk lists.</summary>
     public static void LoadActiveChunks()
     {

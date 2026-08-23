@@ -230,6 +230,9 @@ public class Console : MonoBehaviour
             case "set":
                 SetPieceCommands();
                 break; 
+            case "edit":
+                EditSetPiece();
+                break; 
             case "air":
                 Print(NavMap.Get(Vector3Int.FloorToInt(Main.PlayerInfo.position)) == NavMap.Air ? "is air" : "not air");
                 break;  
@@ -244,7 +247,7 @@ public class Console : MonoBehaviour
                 }
                 else
                 {
-                    Print("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms|Dungeon");
+                    Print("Usage: world <Abyss|SkyBlock|SuperFlat|Backrooms|Dungeon|Edit");
                 }
                 break;
             case "flat":
@@ -464,4 +467,71 @@ public class Console : MonoBehaviour
             return pos;
         }
     } 
+
+    private static string _editName;
+    private static void EditSetPiece()
+    {
+        if (_command.Length < 2)
+        {
+            if (Save.Inst != null)
+                Scene.SwitchWorld(GenType.Abyss);
+            Print("exited setpiece editor");
+            return;
+        }
+
+        if (_command[1] == "save")
+        {
+            if (_editName == null || Save.Inst == null || Save.Inst.current != GenType.Edit)
+            {
+                Print("nothing to save — enter an editor with 'edit <name>' first");
+                return;
+            }
+            EntityStaticLoad.FlushToChunks();
+            Chunk edited = SetPiece.Copy();
+            EntityStaticLoad.LoadActiveChunks();
+            SetPiece.SaveSetPieceFile(edited, _editName);
+            Print("saved setpiece: " + _editName);
+            return;
+        }
+
+        string name = _command[1];
+        Chunk setPiece = SetPiece.LoadSetPieceFile(name);
+        if (setPiece == null)
+        {
+            Print("setpiece not found: " + name);
+            return;
+        }
+
+        // No active game (e.g. main menu) — spin up a standalone editor session.
+        bool bootstrap = Save.Inst == null;
+        if (bootstrap)
+            Save.Inst = new Save(GenType.Edit);
+
+        World editWorld = new World(GenType.Edit);
+        GenEdit.GenerateFlat(editWorld);
+
+        int size = setPiece.size;
+        Vector3Int center = new Vector3Int(editWorld.Bounds.x / 2, 1, editWorld.Bounds.z / 2);
+        Vector3Int pastePos = new Vector3Int(center.x - size / 2, 1, center.z - size / 2);
+        SetPiece.Paste(editWorld, pastePos, setPiece, setCorners: true);
+
+        Vector3Int spawn = new Vector3Int(center.x, size + 3, center.z);
+        editWorld.SpawnPoint = spawn;
+        Save.Inst.worlds[GenType.Edit] = editWorld;
+
+        _editName = name;
+        Main.CreativeMode = true;
+        Main.Fly = true;
+
+        if (bootstrap)
+        {
+            GUIMain.GUIMenu.Show(false);
+            _ = new CoroutineTask(Server.StartHost());
+        }
+        else
+        {
+            Scene.SwitchWorld(GenType.Edit, spawn);
+        }
+        Print("editing: " + name + " ('edit save' to save)");
+    }
 }

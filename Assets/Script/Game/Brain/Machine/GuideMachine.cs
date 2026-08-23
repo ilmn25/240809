@@ -47,12 +47,11 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
             };
         }
 
-        return tip("I'm the Guide. I can point you toward the way forward.",
-            tip("Start by gathering Flint and Sticks from the ground, and from mining dirt and boulders.",
-                tip("Craft a Workbench, then make a StoneHatchet and a StonePickaxe.",
-                    tip("Chop trees with the StoneHatchet for Log, and mine stone with the StonePickaxe for Gravel and ores.",
-                        tip("Build a Campfire to cook meat and turn Log into Charcoal.",
-                            tip("Then build a Furnace to smelt Steel — the path to the Sawmill and Stonecutter lies beyond."))))));
+        return tip("Are you also a delver?, welcome to the Abyss!",
+            tip("The Abyss is a dangerous place.",
+                tip("You can craft items using the resources you find.",
+                    tip("You can also build structures to protect yourself.",
+                        tip("Good luck!")))));
     }
 
     public void OnDrawGizmos()

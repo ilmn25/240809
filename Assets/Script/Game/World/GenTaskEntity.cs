@@ -91,9 +91,7 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
                             }
-
-                            // Forest floor ground items.
-                            if (rng.NextDouble() < GroundItemChance)
+                            else if (rng.NextDouble() < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
@@ -129,9 +127,7 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Meteor, position));
                             }
- 
-                            // Grass biome items on dirt surface
-                            if (rng.NextDouble() < GroundItemChance)
+                            else if (rng.NextDouble() < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
@@ -157,28 +153,44 @@ public class GenTaskEntity : Gen
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
                             }
-
-                            // Desert biome items on sand surface
-                            if (currentChunk[x, y, z] == Sand && rng.NextDouble() < GroundItemChance)
+                            else
                             {
-                                ID groundItem = PickDesertItem(rng);
-                                if (groundItem != ID.Null)
-                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
-                            }
-
-                            // Flint on stone and granite surfaces
-                            if ((currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite)
-                                && rng.NextDouble() < StoneGroundItemChance)
-                            {
-                                ID groundItem = PickStoneItem(rng);
-                                if (groundItem != ID.Null)
-                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                // No structure on this cell — surface items only.
+                                if (currentChunk[x, y, z] == Sand && rng.NextDouble() < GroundItemChance)
+                                {
+                                    ID groundItem = PickDesertItem(rng);
+                                    if (groundItem != ID.Null)
+                                        currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                }
+                                if ((currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite)
+                                    && rng.NextDouble() < StoneGroundItemChance)
+                                {
+                                    ID groundItem = PickStoneItem(rng);
+                                    if (groundItem != ID.Null)
+                                        currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    /// <summary>Runs entity spawning over every chunk AFTER all block tasks have
+    /// finished for the whole world, so surface features sit on final terrain instead
+    /// of terrain that later block tasks (mountains, voids, caves) will overwrite.</summary>
+    public static void RunAll(World world)
+    {
+        for (int cx = 0; cx < world.Size.x; cx++)
+            for (int cy = 0; cy < world.Size.y; cy++)
+                for (int cz = 0; cz < world.Size.z; cz++)
+                {
+                    Vector3Int coord = new Vector3Int(cx * World.ChunkSize, cy * World.ChunkSize, cz * World.ChunkSize);
+                    Chunk chunk = world[coord];
+                    if (chunk == null || chunk == Chunk.Zero) continue;
+                    Run(coord, chunk);
+                }
     }
 
     /// <summary>Desert items — spawn on sand surfaces.</summary>
