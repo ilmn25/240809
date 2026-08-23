@@ -26,6 +26,7 @@ public class Control
     public readonly ControlKey ActionSecondary = new (KeyCode.Mouse1);
     public readonly ControlKey ActionPrimaryNear = new (KeyCode.G);
     public readonly ControlKey ActionSecondaryNear = new (KeyCode.F);
+    public readonly ControlKey terraform = new (KeyCode.B);
     public readonly ControlKey OrbitLeft = new (KeyCode.Q);
     public readonly ControlKey OrbitRight = new (KeyCode.E);
     public readonly ControlKey CullUp = new (KeyCode.Mouse4);

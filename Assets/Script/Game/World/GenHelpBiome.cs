@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public enum BiomeType {Desert, Grass, Forest, Void, Mountain}
-public class GenHelpBiome : Gen
+public static class GenHelpBiome
 {
     /// <summary>
     /// Procedural biome layout driven by the branch/loop network and its

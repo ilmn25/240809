@@ -8,9 +8,9 @@ public class GenTaskPond : GenTaskScatter
     private const int MaxPonds = 8;
     private const int Attempts = 30;
 
-    public static void Run(World world)
+    public override void RunWorld(World world)
     {
-        System.Random rng = new System.Random((int)GetDeterministicOffset("Ponds"));
+        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("Ponds"));
         int count = rng.Next(MinPonds, MaxPonds + 1);
         for (int i = 0; i < count; i++)
             TryPlacePond(world, rng);

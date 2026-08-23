@@ -9,10 +9,10 @@ using UnityEngine;
 /// jittered per band with noise, so ravines read as natural ridged canyons
 /// instead of straight-sided tubes.
 /// </summary>
-public class GenTaskRavine : Gen
+public static class GenTaskRavine
 {
-    private static readonly float ErodeOffset = GetDeterministicOffset("RavineErode");
-    private static readonly float StepOffset = GetDeterministicOffset("RavineSteps");
+    private static readonly float ErodeOffset = Gen.GetDeterministicOffset("RavineErode");
+    private static readonly float StepOffset = Gen.GetDeterministicOffset("RavineSteps");
     /// <summary>Half-width (blocks) of the ridge band that becomes a chasm.</summary>
     private const float ChasmHalfWidth = 50f;
     /// <summary>Radius (blocks) around the spawn hub that is never carved, so

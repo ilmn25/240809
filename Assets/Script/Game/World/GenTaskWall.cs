@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskWall : Gen
+public static class GenTaskWall
 {
     private static int _id;
     private static int Brick => _id == 0 ? Block.ConvertID(ID.BrickBlock) : _id;

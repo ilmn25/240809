@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class GenTaskThrone : Gen
+public static class GenTaskThrone
 {
     private static int _id;
     private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private static readonly Chunk Throne = SetPiece.LoadSetPieceFile("Throne");
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        System.Random rng = CreateChunkRandom("Throne", currentCoordinate);
+        System.Random rng = Gen.CreateChunkRandom("Throne", currentCoordinate);
         if (rng.Next(0, 10) != 0) return; 
         for (int x = 0; x < World.ChunkSize - 6; x++)
         {
@@ -26,7 +26,7 @@ public class GenTaskThrone : Gen
         }
     }
 }
-public class GenTaskHouse : Gen
+public static class GenTaskHouse
 {
     private static int _id;
     private static int DirtBlock => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id; 
@@ -34,7 +34,7 @@ public class GenTaskHouse : Gen
     
     public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        System.Random rng = CreateChunkRandom("House", currentCoordinate);
+        System.Random rng = Gen.CreateChunkRandom("House", currentCoordinate);
         if (rng.Next(0, 15) != 0) return; 
         for (int x = 0; x < World.ChunkSize - 9; x++)
         {

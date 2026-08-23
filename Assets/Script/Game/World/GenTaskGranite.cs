@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class GenTaskGranite : Gen
+public class GenTaskGranite : IGenTask
 {
     private const float Scale = 0.3f;
     private const float Threshold = 0.5f;
     private const float MaxGraniteHeight = 180;
 
-    private static readonly float Offset = GetDeterministicOffset("Granite");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Granite");
 
     private static int _idGranite;
     private static int ID => _idGranite == 0 ? Block.ConvertID(global::ID.GraniteBlock) : _idGranite;
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         int chunkSize = World.ChunkSize;
 

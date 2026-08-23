@@ -7,10 +7,30 @@ public enum GenType
 {
     Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit
 }
-public class Gen
+/// <summary>A single generation step. Implement RunChunk for per-chunk block
+/// work; RunWorld for work once, after all chunks are generated.</summary>
+public interface IGenTask
 {
-    protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk) { }
-    protected virtual void GenPostWorld(World world) { }
+    void RunChunk(Vector3Int coord, Chunk chunk) { }
+    void RunWorld(World world) { }
+}
+
+public abstract class Gen
+{
+    // Ordered pipeline of tasks. Worlds with bespoke generation override
+    // GenChunk/GenPostWorld directly instead.
+    protected virtual IGenTask[] Tasks => Array.Empty<IGenTask>();
+
+    protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
+    {
+        foreach (IGenTask task in Tasks) task.RunChunk(currentCoordinate, currentChunk);
+    }
+
+    protected virtual void GenPostWorld(World world)
+    {
+        foreach (IGenTask task in Tasks) task.RunWorld(world);
+    }
+
     public virtual Vector3Int GetSize() => Vector3Int.one;
     public virtual Vector3Int GetSpawnPoint() => Vector3Int.zero;
     
@@ -103,29 +123,8 @@ public class Gen
             }
         }
 
-        // Per-world-type post-processing (e.g. Abyss spawn statue).
+        // Per-world-type post-processing (scatter tasks, setpieces, entity spawn).
         gen.GenPostWorld(world);
-
-        // Scatter a graveyard cluster in the grass biome.
-        GenTaskGraveyard.Run(world);
-
-        // Place raider camps (loot chest + tents + lamp).
-        GenTaskRaiderCamp.Run(world);
-
-        // Scatter a few ponds (each ringed with bushes).
-        GenTaskPond.Run(world);
-
-        // Place a fortified outpost watchtower.
-        GenOutpost.Run(world);
-
-        // Place a brick stairwell entrance to the dungeon.
-        GenDungeonEntrance.Run(world);
-
-        // Spawn surface entities LAST, after every block task and setpiece paste, so
-        // they sit on final terrain — otherwise setpiece carving strands them mid-air.
-        // Only the Abyss dimension uses natural surface entity spawning.
-        if (world.GenType == GenType.Abyss)
-            GenTaskEntity.RunAll(world);
     }
 
 }

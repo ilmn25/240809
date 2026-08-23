@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class GenTaskCaves : Gen
+public class GenTaskCaves : IGenTask
 {
     private const float Scale = 0.06f;
-    private static readonly float Offset = GetDeterministicOffset("Caves"); 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    private static readonly float Offset = Gen.GetDeterministicOffset("Caves"); 
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

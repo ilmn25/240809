@@ -17,6 +17,7 @@ public class DungeonDoorMachine : StructureMachine, IActionSecondaryInteract
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             SpawnsRubble = false,
+            GlowOn = true,
         };
     }
 

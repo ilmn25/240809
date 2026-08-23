@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskMaze : Gen
+public class GenTaskMaze : IGenTask
 {
     private const int WallHeight = 5;
     private const int FloorHeight = 2;
@@ -8,11 +8,11 @@ public class GenTaskMaze : Gen
     private static int _id;
     private static int ID => _id == 0 ? Block.ConvertID(global::ID.BackroomBlock) : _id;  
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         if (currentCoordinate.y != 0) return;
 
-        System.Random rng = CreateChunkRandom("Maze", currentCoordinate);
+        System.Random rng = Gen.CreateChunkRandom("Maze", currentCoordinate);
         bool[,] maze = HandleMazeAlgorithm(World.ChunkSize, World.ChunkSize, rng);
         
         for (int y = 0; y < World.ChunkSize; y++)

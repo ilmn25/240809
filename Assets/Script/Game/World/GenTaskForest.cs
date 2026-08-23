@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class GenTaskForest : Gen
+public class GenTaskForest : IGenTask
 {
     private static int _id;
     private static int Forest => _id == 0 ? Block.ConvertID(ID.ForestBlock) : _id;
     /// <summary>How many blocks deep the forest floor extends below the surface.</summary>
     private const int SurfaceDepth = 3;
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

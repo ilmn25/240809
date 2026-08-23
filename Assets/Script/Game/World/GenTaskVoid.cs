@@ -4,9 +4,9 @@ using UnityEngine;
 /// Removes all ground outside the landmass, so the world's edge is empty
 /// sky with no ground to stand on.
 /// </summary>
-public class GenTaskVoid : Gen
+public class GenTaskVoid : IGenTask
 {
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 public class GenTaskSpawnStatue : GenTaskScatter
 {
     /// <summary>Places the spawn statue, if the surface beside spawn exists.</summary>
-    public static void Run(World world)
+    public override void RunWorld(World world)
     {
         Vector3Int spawnPos = world.SpawnPoint;
 

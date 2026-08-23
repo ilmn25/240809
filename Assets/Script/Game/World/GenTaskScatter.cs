@@ -3,8 +3,11 @@ using UnityEngine;
 /// <summary>Shared helpers for the once-per-world scatter gen tasks (graveyard,
 /// raider camp, ponds): grass-surface picking, surface lookup, and static-entity
 /// placement into chunks.</summary>
-public abstract class GenTaskScatter : Gen
+public abstract class GenTaskScatter : IGenTask
 {
+    /// <summary>Places this world's scatter content.</summary>
+    public abstract void RunWorld(World world);
+
     /// <summary>Random grass-biome column with a surface, or (-1,0,0) if none found.</summary>
     protected static Vector3Int PickGrassCenter(World world, System.Random rng)
     {

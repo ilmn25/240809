@@ -11,9 +11,9 @@ public class GenTaskRaiderCamp : GenTaskScatter
     private const int ClusterRadius = 4;    // how far structures scatter from the chest
 
     /// <summary>Places the raider camps, if terrain permits.</summary>
-    public static void Run(World world)
+    public override void RunWorld(World world)
     {
-        System.Random rng = new System.Random((int)GetDeterministicOffset("RaiderCamp"));
+        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("RaiderCamp"));
 
         for (int i = 0; i < CampCount; i++)
         {
@@ -41,10 +41,8 @@ public class GenTaskRaiderCamp : GenTaskScatter
             PlaceEntity(world, spot, ID.DirtyTent);
         }
 
-        // A lamp powered by a generator so it glows at the camp.
+        // A lamp so it glows at the camp.
         Vector3Int lampSpot = ScatterAround(world, center, rng, ClusterRadius);
-        Vector3Int genSpot = ScatterAround(world, center, rng, ClusterRadius);
         if (lampSpot.x >= 0) PlaceEntity(world, lampSpot, ID.Lamp);
-        if (genSpot.x >= 0) PlaceEntity(world, genSpot, ID.Generator);
     }
 }

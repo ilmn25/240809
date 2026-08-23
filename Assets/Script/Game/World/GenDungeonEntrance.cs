@@ -6,14 +6,14 @@ using UnityEngine;
 public class GenDungeonEntrance : GenTaskScatter
 {
     /// <summary>How far below the surface the stairwell floor and door sit.</summary>
-    private const int DepthOffset = 5;
+    private const int DepthOffset = 10;
 
     private static readonly Chunk Entrance = SetPiece.LoadSetPieceFile("DungeonEntrance");
 
-    public static void Run(World world)
+    public override void RunWorld(World world)
     {
         if (Entrance == null) return;
-        System.Random rng = new System.Random((int)GetDeterministicOffset("DungeonEntrance"));
+        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("DungeonEntrance"));
         Vector3Int column = PickGrassCenter(world, rng);
         if (column.x < 0) return;
         int surfaceY = FindSurfaceY(world, column.x, column.z);

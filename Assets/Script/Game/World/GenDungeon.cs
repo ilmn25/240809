@@ -6,7 +6,7 @@ using UnityEngine;
 /// linked by doorways, fully enclosed by floor, walls and ceiling.</summary>
 public class GenDungeon : Gen
 {
-    private const int CeilingY = 12;   // 1-block ceiling; interior is y=1..CeilingY-1
+    private const int CeilingY = World.ChunkSize - 1;   // 1-block ceiling at the very top layer; interior is y=1..CeilingY-1
     private const int MaxRooms = 70;
     private const float ChestChance = 0.004f;
     private const float RubbleChance = 0.012f;
@@ -18,7 +18,7 @@ public class GenDungeon : Gen
 
     private static readonly Chunk Exit = SetPiece.LoadSetPieceFile("DungeonExit");
 
-    public override Vector3Int GetSize() => new Vector3Int(20, 4, 20);
+    public override Vector3Int GetSize() => new Vector3Int(20, 1, 20);
 
     public override Vector3Int GetSpawnPoint()
     {

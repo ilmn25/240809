@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GenTaskEntity : Gen
+public class GenTaskEntity : IGenTask
 {
     private static int _id;
     private static int _idForest;
@@ -31,7 +31,7 @@ public class GenTaskEntity : Gen
     private const double ForestHiveChance = 0.0006;
     private const double GrassOrchidChance = 0.005;
     private const double DirtTentChance = 0.0004;
-    private static readonly float PathOffset = GetDeterministicOffset("ForestPath");
+    private static readonly float PathOffset = Gen.GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
 
@@ -43,9 +43,9 @@ public class GenTaskEntity : Gen
         return noise > 0.5f - PathWidth && noise < 0.5f + PathWidth;
     }
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    private void SpawnChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
-        System.Random rng = CreateChunkRandom("Entity", currentCoordinate);
+        System.Random rng = Gen.CreateChunkRandom("Entity", currentCoordinate);
 
         for (int x = 0; x < World.ChunkSize; x++)
         {
@@ -185,7 +185,7 @@ public class GenTaskEntity : Gen
     /// <summary>Runs entity spawning over every chunk AFTER all block tasks have
     /// finished for the whole world, so surface features sit on final terrain instead
     /// of terrain that later block tasks (mountains, voids, caves) will overwrite.</summary>
-    public static void RunAll(World world)
+    public void RunWorld(World world)
     {
         for (int cx = 0; cx < world.Size.x; cx++)
             for (int cy = 0; cy < world.Size.y; cy++)
@@ -194,7 +194,7 @@ public class GenTaskEntity : Gen
                     Vector3Int coord = new Vector3Int(cx * World.ChunkSize, cy * World.ChunkSize, cz * World.ChunkSize);
                     Chunk chunk = world[coord];
                     if (chunk == null || chunk == Chunk.Zero) continue;
-                    Run(coord, chunk);
+                    SpawnChunk(coord, chunk);
                 }
     }
 

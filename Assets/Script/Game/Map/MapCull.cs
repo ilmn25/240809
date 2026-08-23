@@ -7,12 +7,14 @@ using UnityEngine.Rendering;
 public class MapCull
 { 
     private const float CULL_RESET_TIME = 5f;
+    private const int MaxOffset = 7;
     private static readonly int CullSyncDelay = 3;  
     private static readonly float AngleOffset = 12; // Angle in degrees 
     private static bool _delayBuffer;
     public static event Action SignalUpdateSpriteYCull;
  
     public static int CullSyncFrame = 0;  
+    public static int YOffset = 3;   
     public static bool YCheck = false;   
     public static int YThreshold = Int32.MaxValue; 
     
@@ -41,11 +43,11 @@ public class MapCull
     {
         if (Control.Inst.CullUp.KeyDown())
         {
-            YThreshold += 1;
+            YOffset = Mathf.Min(YOffset + 1, MaxOffset);
         }
         else if (Control.Inst.CullDown.KeyDown())
         {
-            YThreshold -= 1;
+            YOffset = Mathf.Max(YOffset - 1, 0);
         }
     }
 
@@ -64,21 +66,17 @@ public class MapCull
     {
         if (Time.frameCount > CullSyncFrame + 1)
         { 
-            if (YThreshold < (int)_playerPosition.y)
+            if (YCheck)
             {
-                YThreshold = (int)_playerPosition.y;
+                YThreshold = Mathf.Min((int)_playerPosition.y + YOffset, World.Inst.Bounds.y - 1);
             }
-            else if (YThreshold > (int)_playerPosition.y + 10)
-            {
-                YThreshold = (int)_playerPosition.y + 10;
-            }
-             
-            
+
             if (!_yCheckPrevious && YCheck) // enter
             {
                 if (float.IsInfinity(_lastCullEnterTime) || Time.time - _lastCullEnterTime > CULL_RESET_TIME)
                 {
-                    YThreshold = Mathf.FloorToInt(Main.Player.transform.position.y) + 2;
+                    YOffset = 3; // soft default
+                    YThreshold = Mathf.Min((int)_playerPosition.y + YOffset, World.Inst.Bounds.y - 1);
                 }
 
                 _lastCullEnterTime = Time.time;
@@ -189,6 +187,6 @@ public class MapCull
 
     public static void HandleScrollInput(float scroll)
     {
-        YThreshold += (scroll > 0) ? 1 : -1;
+        YOffset = Mathf.Clamp(YOffset + (scroll > 0 ? 1 : -1), 0, MaxOffset);
     }
 }

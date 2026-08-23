@@ -513,7 +513,7 @@ public class Console : MonoBehaviour
         int size = setPiece.size;
         Vector3Int center = new Vector3Int(editWorld.Bounds.x / 2, 1, editWorld.Bounds.z / 2);
         Vector3Int pastePos = new Vector3Int(center.x - size / 2, 1, center.z - size / 2);
-        SetPiece.Paste(editWorld, pastePos, setPiece, setCorners: true);
+        SetPiece.Paste(editWorld, pastePos, setPiece, setCorners: true, authorMode: true);
 
         Vector3Int spawn = new Vector3Int(center.x, size + 3, center.z);
         editWorld.SpawnPoint = spawn;
@@ -532,6 +532,6 @@ public class Console : MonoBehaviour
         {
             Scene.SwitchWorld(GenType.Edit, spawn);
         }
-        Print("editing: " + name + " ('edit save' to save)");
+        Print("editing: " + name );
     }
 }

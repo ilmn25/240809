@@ -1,17 +1,17 @@
 using System.Drawing;
 using UnityEngine;
 
-public class GenTaskStone : Gen
+public class GenTaskStone : IGenTask
 {
     private static float _x, _z, _value;
     private static int _height;
     private const float Scale = 0.05f;
-    private static readonly float Offset = GetDeterministicOffset("Stone");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Stone");
     private static int _id;
     private static int Stone => _id == 0 ? Block.ConvertID(ID.StoneBlock) : _id;
     private const int VerticalScale  = World.ChunkSize;
     
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

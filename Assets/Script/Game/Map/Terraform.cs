@@ -7,7 +7,7 @@ public static class Terraform
 
     public static readonly List<Vector3Int> PendingBlocks = new ();
     private static GameObject _blockObj;
-    private static bool _overlayEnabled = true;
+    private static bool _overlayEnabled;
     private static Vector3Int _coordinate;
     public static ID Target; 
 
@@ -36,12 +36,11 @@ public static class Terraform
             return;
         }
 
-        // The single preview object doubles as the aim highlight, so generic tools
-        // (cutting/building) that target structures also show an overlay.
+        bool mining = target == ID.MiningBox;
         ID blockID;
         float scale;
         bool overlay;
-        if (target == ID.MiningBox) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
+        if (mining) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
         else if (held.Type == ItemType.Structure) { blockID = ID.OverlayBlock; scale = 1f; overlay = true; }
         else if (held.Type == ItemType.Block) { blockID = held.ID; scale = 1f; overlay = false; }
         else if (held.Type == ItemType.Tool) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
@@ -53,7 +52,8 @@ public static class Terraform
             obj.name = key;
             BlockPreview.Apply(obj, blockID, scale);
         }
-        obj.SetActive(_overlayEnabled);
+        // The aim toggle only gates the mining overlay; build previews always show.
+        obj.SetActive(mining ? _overlayEnabled : true);
     }
     
     public static void Update()
@@ -66,11 +66,8 @@ public static class Terraform
             return;
         }
 
-        // Right-click toggles the cursor overlay — but only when it wasn't used to
-        // interact with something (cancel a mining box, open a chest, etc.).
-        bool interacting = Control.MouseTarget != null &&
-            Control.MouseTarget.GetComponentInParent<IActionSecondary>() != null;
-        if (Control.Inst.ActionSecondary.KeyDown() && !interacting)
+        // B-key toggles the mining aim overlay. Build previews are always shown.
+        if (Control.Inst.terraform.KeyDown())
             _overlayEnabled = !_overlayEnabled;
 
         Item held = Inventory.CurrentItemData;
@@ -78,11 +75,14 @@ public static class Terraform
                        Main.PlayerInfo.Machine.IsCurrentState<DefaultState>();
         bool usable = held != null && held.Type is ItemType.Tool or ItemType.Block or ItemType.Structure;
 
-        // The preview object snaps to the targeted cell whenever the overlay is enabled,
-        // a usable item is held, and the cursor is over the world (map or a structure).
-        // It stays visible during swings too (no DefaultState requirement).
+        bool mining = Target == ID.MiningBox;
+        bool aimVisible = mining ? _overlayEnabled : true;
+
+        // The preview object snaps to the targeted cell whenever visible, a usable item
+        // is held, and the cursor is over the world (map or a structure). It stays
+        // visible during swings too (no DefaultState requirement).
         Vector3Int cell = Aim.Cell();
-        if (_overlayEnabled && usable && Control.MouseLayer != -1 && World.IsInWorldBounds(cell))
+        if (aimVisible && usable && Control.MouseLayer != -1 && World.IsInWorldBounds(cell))
         {
             _blockObj.SetActive(true);
             Position(_blockObj, cell);
@@ -92,9 +92,9 @@ public static class Terraform
             _blockObj.SetActive(false);
         }
 
-        // Placing (including spawning mining boxes) requires the cursor preview to be
-        // on — right-clicking the overlay off also disables placement.
-        bool canPlace = _overlayEnabled && Target != ID.Null && overMap && HandleCoord();
+        // Placing requires the cursor preview to be on. For mining that means the
+        // toggle must be on; build always places.
+        bool canPlace = (mining ? _overlayEnabled : true) && Target != ID.Null && overMap && HandleCoord();
         if (canPlace && Control.Inst.ActionPrimary.Key())
             Place(held);
     }

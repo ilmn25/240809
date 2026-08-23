@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class GenTaskCrater : Gen
+public static class GenTaskCrater
 {
     private static readonly int CenterX = World.Inst.Bounds.x/2;
     private static readonly int CenterZ = World.Inst.Bounds.z/2;
     private static readonly int Radius = 24;
     private const float Scale = 0.1f;
     private static readonly int Steps = 16;
-    private static readonly float Offset = GetDeterministicOffset("Crater");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Crater");
     private static int _id;
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id; 
 

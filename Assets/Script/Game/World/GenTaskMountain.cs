@@ -6,7 +6,7 @@ using UnityEngine;
 /// but upward. Runs after the biome surfaces so the peaks stay rocky, and
 /// before voids/ravines so those still cut through them.
 /// </summary>
-public class GenTaskMountain : Gen
+public class GenTaskMountain : IGenTask
 {
     private const int Steps = 5;               // cliff ledges up each mountain
     private const float PeakScale = 1f;        // max peak height as a multiple of chunk size
@@ -14,7 +14,7 @@ public class GenTaskMountain : Gen
     private const int DirtCap = 2;             // grassy top thickness in blocks
     private const float NoiseStrength = 4f;
     private const float NoiseScale = 0.02f;
-    private static readonly float Offset = GetDeterministicOffset("Mountain");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Mountain");
 
     private static Vector3Int[] _centers;
     private static float[] _heightScale;       // per-mountain peak height variation
@@ -30,7 +30,7 @@ public class GenTaskMountain : Gen
             _heightScale[i] = 0.8f + 0.7f * Mathf.PerlinNoise(Offset + i * 13.7f, Offset + i * 7.9f);
     }
 
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         EnsureCenters();
         if (_centers == null || _centers.Length == 0) return;

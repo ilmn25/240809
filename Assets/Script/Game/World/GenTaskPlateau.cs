@@ -7,11 +7,11 @@ using UnityEngine;
 /// get a low cliff. Land connections and the spawn hub are left open so the
 /// world stays traversable.
 /// </summary>
-public class GenTaskPlateau : Gen
+public static class GenTaskPlateau
 {
     private const float NoiseStrength = 4f;
     private const float NoiseScale = 0.02f;
-    private static readonly float Offset = GetDeterministicOffset("Plateau");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Plateau");
     /// <summary>Plateau height in blocks — blocks walking but not the camera.</summary>
     private const float CliffHeight = 10f;
     /// <summary>Radius (blocks) around the spawn hub that is never raised.</summary>

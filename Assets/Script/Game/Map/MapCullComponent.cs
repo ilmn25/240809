@@ -127,6 +127,12 @@ public class MapCullComponent : MonoBehaviour
                 }           
                 if (_selfChunkPosition.y >= MapCull.YThreshold) // higher chunks (invis)
                 {
+                    if (_selfChunkPosition.y >= World.Inst.Bounds.y - World.ChunkSize) // at/above world top, never cull
+                    {
+                        _meshRenderer.enabled = true;
+                        _meshFilter.mesh = _meshData;
+                        return;
+                    }
                     while (Time.frameCount < MapCull.CullSyncFrame) await Task.Yield();
                     _meshRenderer.enabled = false;
                     // _meshFilter.mesh = _meshData;

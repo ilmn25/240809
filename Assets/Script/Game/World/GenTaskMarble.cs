@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class GenTaskMarble : Gen
+public class GenTaskMarble : IGenTask
 {
     private static float _x, _z, _value;
     private static int _height;
     private const float Scale = 0.05f;
-    private static readonly float Offset = GetDeterministicOffset("Marble");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Marble");
     private static int _id;
     
     private static int Marble => _id == 0 ? Block.ConvertID(ID.MarbleBlock) : _id;
     
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

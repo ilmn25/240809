@@ -20,6 +20,7 @@ public partial class GUIMenu
         ("Reveal Map", () => Control.Inst.RevealMap),
         ("Use Near", () => Control.Inst.ActionPrimaryNear),
         ("Pick Up", () => Control.Inst.ActionSecondaryNear),
+        ("Toggle Terraform", () => Control.Inst.terraform),
         ("Orbit Left", () => Control.Inst.OrbitLeft),
         ("Orbit Right", () => Control.Inst.OrbitRight),
         ("Jump", () => Control.Inst.Jump),

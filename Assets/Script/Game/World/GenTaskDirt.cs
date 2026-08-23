@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class GenTaskDirt : Gen
+public class GenTaskDirt : IGenTask
 {
     private static float _x, _z, _value;
     private static int _height;
     private const float Scale = 0.05f;
-    private static readonly float Offset = GetDeterministicOffset("Dirt");
+    private static readonly float Offset = Gen.GetDeterministicOffset("Dirt");
     private static int _id;
     
     private static int Dirt => _id == 0 ? Block.ConvertID(ID.GrassBlock) : _id;
     private const int VerticalScale  = World.ChunkSize;
     
-    public static void Run(Vector3Int currentCoordinate, Chunk currentChunk)
+    public void RunChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         for (int x = 0; x < World.ChunkSize; x++)
         {

@@ -36,6 +36,7 @@ public partial class Item
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         // Internal mining-box entity — placed by mining tools, never crafted by the player.
         AddBlockDefinition(ID.MiningBox);
+        AddBlockDefinition(ID.OverlayBlock);
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });
