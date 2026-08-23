@@ -253,11 +253,10 @@ public class Control
         float scroll = Input.GetAxis("Mouse ScrollWheel"); 
         if (scroll == 0) return;
 
-        if (!Input.GetKey(KeyCode.LeftAlt))
+        if (Input.GetKey(KeyCode.LeftAlt))
         {
-            // MapCull.HandleScrollInput(scroll);
-            ViewPort.HandleScrollInput(scroll); 
-        }  
+            ViewPort.HandleScrollInput(scroll);
+        }
         else
         {
             Inventory.HandleScrollInput(scroll);

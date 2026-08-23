@@ -156,8 +156,9 @@ public class Inventory
 
     public static void HandleScrollInput(float input)
     {
-        _buffer = (int)Mathf.Repeat(_buffer + (int)input, InventorySlotAmount); 
-        RefreshInventory(); 
+        int step = (int)Mathf.Sign(input);
+        _buffer = (int)Mathf.Repeat(Main.PlayerInfo.Storage.Key + step, InventorySlotAmount);
+        RefreshInventory();
     }
 
     public static void RefreshInventory()

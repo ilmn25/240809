@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private Image _image;
+    private Image _panel;
+    private Sprite _defaultPanel;
     private TextMeshProUGUI _text;
     public int slotNumber;
     public GUIStorage GUIStorage;
@@ -16,6 +18,8 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         GUIStorage.OnRefreshSlot += OnRefreshSlot;
         _image = transform.Find("Image").GetComponent<Image>();
         _text = transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        _panel = transform.Find("Panel").GetComponent<Image>();
+        _defaultPanel = _panel.sprite;
     }
 
     private void OnRefreshSlot(object sender, EventArgs e)
@@ -33,6 +37,13 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             _image.color = Color.clear;
             _text.text = "";
         } 
+
+        // Highlight the self-inventory's selected slot in red (hidden while an
+        // item is held on the cursor, since the cursor item takes over as held).
+        bool isSelected = ReferenceEquals(GUIStorage, GUIMain.StorageInv) &&
+                          slotNumber == GUIStorage.Storage.Key &&
+                          GUICursor.Data.isEmpty();
+        _panel.sprite = isSelected ? Cache.LoadSprite("GUI/PanelRed") : _defaultPanel;
     }
  
     
