@@ -107,7 +107,7 @@ public class SetPiece
             Info info = Entity.CreateInfo(entity.id, worldPos);
             if (info == null) info = (Info)Helper.Clone(entity);
             if (info == null) continue;
-            info.position = worldPos;
+            info.position = worldPos + SpawnOffsetOf(entity.id);
             chunk.StaticEntity.Add(info);
         }
 
@@ -139,6 +139,9 @@ public class SetPiece
                p.z >= 0 && p.z < world.Bounds.z;
     }
 
+    /// <summary>The SpawnOffset for an entity id (centers its prefab in its cell), or zero.</summary>
+    private static Vector3 SpawnOffsetOf(ID id)
+        => Entity.Dictionary.TryGetValue(id, out Entity e) ? e.SpawnOffset : Vector3.zero;
 
     private static bool IsEntityInRange(Vector3Int coord, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {

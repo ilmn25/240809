@@ -6,7 +6,7 @@ public class CharredRubbleMachine : StructureMachine
         return new SpriteStructureInfo()
         {
             Health = 40,
-            Loot = ID.Gravel,
+            Loot = ID.CharredRubble,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Mining,

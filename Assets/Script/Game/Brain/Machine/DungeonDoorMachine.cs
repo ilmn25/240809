@@ -23,6 +23,8 @@ public class DungeonDoorMachine : StructureMachine, IActionSecondaryInteract
     public void OnActionSecondary(Info info)
     {
         if (info is not PlayerInfo) return; // only players can use the door
-        Scene.SwitchWorld(GenType.Dungeon);
+        // The entrance door (on the surface) leads into the dungeon; the exit
+        // door placed inside the dungeon leads back to the surface.
+        Scene.SwitchWorld(Save.Inst.current == GenType.Dungeon ? GenType.Abyss : GenType.Dungeon);
     }
 }

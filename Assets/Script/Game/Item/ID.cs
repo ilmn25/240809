@@ -198,5 +198,8 @@ public enum ID
     Meteor,
     Meteorite,
     MourningWood,
-    DungeonDoor,
+    DungeonDoor,   
+    Hive,
+    Hornet,
+
 }

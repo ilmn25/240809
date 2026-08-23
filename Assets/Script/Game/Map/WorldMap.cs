@@ -167,22 +167,24 @@ public class WorldMap
 
                 int cx = wx / World.ChunkSize;
                 int lx = wx % World.ChunkSize;
-                int block = 0;
+                int block = 0;    // block to display (one below the topmost solid)
                 int surfaceY = 0;
+                int topBlock = 0; // topmost solid, used only if nothing sits beneath it
+                int topY = 0;
                 for (int cy = world.Size.y - 1; cy >= 0 && block == 0; cy--)
                 {
                     Chunk chunk = world[cx * World.ChunkSize, cy * World.ChunkSize, cz * World.ChunkSize];
                     if (chunk == null) continue;
                     for (int ly = World.ChunkSize - 1; ly >= 0; ly--)
                     {
-                        block = chunk[lx, ly, lz];
-                        if (block != 0)
-                        {
-                            surfaceY = cy * World.ChunkSize + ly;
-                            break;
-                        }
+                        int b = chunk[lx, ly, lz];
+                        if (b == 0) continue;
+                        int wy = cy * World.ChunkSize + ly;
+                        if (topBlock == 0) { topBlock = b; topY = wy; }
+                        else { block = b; surfaceY = wy; break; }
                     }
                 }
+                if (block == 0) { block = topBlock; surfaceY = topY; }
 
                 surfaceHeights[idx] = surfaceY;
                 pixels[idx] = block != 0 ? GetBlockColor(block) : VoidColor;

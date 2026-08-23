@@ -6,7 +6,7 @@ public class RubbleMachine : StructureMachine
         return new SpriteStructureInfo()
         {
             Health = 40,
-            Loot = ID.Gravel,
+            Loot = ID.Rubble,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Mining,

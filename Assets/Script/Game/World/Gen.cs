@@ -106,11 +106,6 @@ public class Gen
         // Per-world-type post-processing (e.g. Abyss spawn statue).
         gen.GenPostWorld(world);
 
-        // Spawn surface entities AFTER all block tasks so they sit on final terrain.
-        // Only the Abyss dimension uses natural surface entity spawning.
-        if (world.GenType == GenType.Abyss)
-            GenTaskEntity.RunAll(world);
-
         // Scatter a graveyard cluster in the grass biome.
         GenTaskGraveyard.Run(world);
 
@@ -125,6 +120,12 @@ public class Gen
 
         // Place a brick stairwell entrance to the dungeon.
         GenDungeonEntrance.Run(world);
+
+        // Spawn surface entities LAST, after every block task and setpiece paste, so
+        // they sit on final terrain — otherwise setpiece carving strands them mid-air.
+        // Only the Abyss dimension uses natural surface entity spawning.
+        if (world.GenType == GenType.Abyss)
+            GenTaskEntity.RunAll(world);
     }
 
 }

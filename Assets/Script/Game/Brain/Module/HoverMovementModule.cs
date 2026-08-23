@@ -10,6 +10,13 @@ public class HoverMovementModule : MovementModule
     public float StopDistance = 1.2f; // how close it flies before holding position
     public float TurnSpeed = 3f;      // how quickly it re-aims at the target
 
+    private const float RoamRadius = 5f;      // how far it drifts while idle
+    private const float RoamMinInterval = 2f; // seconds between idle course changes
+    private const float RoamMaxInterval = 4f;
+
+    private Vector3 _roamPoint;
+    private float _roamTimer;
+
     public HoverMovementModule(float hoverHeight = 3f, float stopDistance = 1.2f, float turnSpeed = 3f)
     {
         updateMode = UpdateMode.Everyone;
@@ -29,16 +36,17 @@ public class HoverMovementModule : MovementModule
         Vector3 toTarget = desired - pos;
         float distance = toTarget.magnitude;
 
-        if (distance > StopDistance)
+        float speed = Info.SpeedAir * Info.SpeedModifier;
+        if (speed <= 0f || distance <= StopDistance)
         {
-            // Steer the current velocity toward the target like a missile.
-            Vector3 desiredVelocity = (toTarget / distance) * Info.SpeedAir;
-            Info.Velocity = Vector3.MoveTowards(Info.Velocity, desiredVelocity, TurnSpeed * Info.SpeedAir * DeltaTime);
+            // Stopped (e.g., mid-swing) or overhead — bleed off speed and hover.
+            Info.Velocity = Vector3.MoveTowards(Info.Velocity, Vector3.zero, TurnSpeed * Info.SpeedAir * DeltaTime);
         }
         else
         {
-            // Overhead — bleed off speed and hover in place.
-            Info.Velocity = Vector3.MoveTowards(Info.Velocity, Vector3.zero, TurnSpeed * Info.SpeedAir * DeltaTime);
+            // Steer the current velocity toward the target like a missile.
+            Vector3 desiredVelocity = (toTarget / distance) * speed;
+            Info.Velocity = Vector3.MoveTowards(Info.Velocity, desiredVelocity, TurnSpeed * speed * DeltaTime);
         }
 
         Machine.transform.position = pos + Info.Velocity * DeltaTime;
@@ -50,6 +58,23 @@ public class HoverMovementModule : MovementModule
         MobInfo mob = Info as MobInfo;
         Info target = mob?.Target;
         if (target != null && !target.Destroyed) return target.position;
-        return Machine.transform.position; // no target — hover in place
+        return RoamPoint();
+    }
+
+    // No target — drift toward a fresh random point nearby every few seconds so
+    // idle fliers circle their spawn instead of freezing in mid-air.
+    private Vector3 RoamPoint()
+    {
+        _roamTimer -= DeltaTime;
+        if (_roamTimer <= 0f)
+        {
+            _roamTimer = Random.Range(RoamMinInterval, RoamMaxInterval);
+            Vector3 pos = Machine.transform.position;
+            _roamPoint = pos + new Vector3(
+                Random.Range(-RoamRadius, RoamRadius),
+                Random.Range(-RoamRadius * 0.5f, RoamRadius * 0.5f),
+                Random.Range(-RoamRadius, RoamRadius));
+        }
+        return _roamPoint;
     }
 }

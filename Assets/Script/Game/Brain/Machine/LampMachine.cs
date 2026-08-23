@@ -1,6 +1,5 @@
-/// <summary>A placeable lamp. Needs a nearby generator to light: right-click toggles
-/// its switch while powered, otherwise it explains it needs power. Furniture: placed
-/// directly, can't be broken, hammer picks it back up.</summary>
+/// <summary>A placeable lamp. Doesn't need power: right-click toggles its switch.
+/// Furniture: placed directly, can't be broken, hammer picks it back up.</summary>
 public class LampMachine : FurnitureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
@@ -11,23 +10,12 @@ public class LampMachine : FurnitureMachine, IActionSecondaryInteract
     public override void OnStart()
     {
         base.OnStart();
-        SetGlow(Powered && (Info is StructureInfo si && si.GlowOn));
-    }
-
-    public override void OnPoweredChanged(bool powered)
-    {
-        SetGlow(powered && (Info is StructureInfo si && si.GlowOn));
+        SetGlow(Info is StructureInfo si && si.GlowOn);
     }
 
     public void OnActionSecondary(Info info)
     {
         if (!(Info is StructureInfo structureInfo)) return;
-        if (!Powered)
-        {
-            Dialogue.Target = new Dialogue { Text = "Needs an electric source." };
-            Dialogue.Show(true);
-            return;
-        }
 
         structureInfo.GlowOn = !structureInfo.GlowOn;
         SetGlow(structureInfo.GlowOn);

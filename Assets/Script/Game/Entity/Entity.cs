@@ -236,6 +236,12 @@ public class Entity
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
                 AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<CharredRubbleMachine>(ID.CharredRubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.Rubble);
+                loot.Add(1, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Gravel);
+                loot = new (ID.CharredRubble);
+                loot.Add(1, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Gravel);
                 AddStructure<LampMachine>(ID.Lamp, Vector3Int.one, Main.IndexCollide);
                 AddStructure<GeneratorMachine>(ID.Generator, Vector3Int.one, Main.IndexCollide);
                 AddStructure<OwlStatueMachine>(ID.OwlStatue, Vector3Int.one, Main.IndexCollide);
@@ -250,6 +256,10 @@ public class Entity
                 AddStructure<SpiderNestMachine>(ID.SpiderNest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
+
+                AddStructure<HiveMachine>(ID.Hive, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.Hive);
+                loot.Add(1, 2, ID.BucketOfHoney);
 
                 AddStructure<DirtyTentMachine>(ID.DirtyTent, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.DirtyTent);
@@ -413,6 +423,9 @@ public class Entity
                 loot = new (ID.DemonEye);
                 loot.Add(1, 1, ID.Foul);
                 loot.Add(0.3f, 1, ID.Cytoplasm);
+
+                AddMob<HornetMachine>(ID.Hornet);
+                loot = new (ID.Hornet); // the hornet drops nothing
 
                 AddMob<PigeonMachine>(ID.Pigeon);
                 loot = new (ID.Pigeon); // the pigeon drops nothing
