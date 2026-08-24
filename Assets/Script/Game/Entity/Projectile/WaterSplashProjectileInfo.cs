@@ -41,11 +41,10 @@ public class WaterSplashProjectileInfo : SwingProjectileInfo
             if (projectile.SourceInfo is PlayerInfo player &&
                 player.Storage?.List != null && player.Storage.List.Count > 0)
             {
-                int key = Mathf.Clamp(player.Storage.Key, 0, player.Storage.List.Count - 1);
-                ItemSlot selected = player.Storage.List[key];
-                if (selected.Stack > 0 && selected.ID == ID.BucketOfWater)
+                ItemSlot selected = player.Storage.GetSelected();
+                if (selected != null && selected.Stack > 0 && selected.ID == ID.BucketOfWater)
                 {
-                    player.Storage.List[key] = new ItemSlot(ID.Bucket, 1);
+                    player.Storage.List[player.Storage.Key] = new ItemSlot(ID.Bucket, 1);
                     player.Storage.NotifyChanged();
                 }
             }

@@ -44,6 +44,14 @@ public class Storage
                 if (!SuppressRefresh) Inventory.RefreshInventory();
         }
 
+        /// <summary>The currently selected (highlighted) slot, clamped to valid
+        /// bounds. Returns null when the storage is empty.</summary>
+        public ItemSlot GetSelected()
+        {
+            if (List == null || List.Count == 0) return null;
+            return List[Mathf.Clamp(Key, 0, List.Count - 1)];
+        }
+
         public bool SetTool(OperationType operation)
         {
                 int targetKey = -1;

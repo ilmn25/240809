@@ -138,7 +138,8 @@ public partial class Item
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.ArrowTrap, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 3 } }, 150, description: "A trap that fires arrows at anyone who comes near.");
         AddStructureDefinition(ID.OldPot, null, 100, description: "A fragile old pot. Smash it for a surprise.");
-        AddStructureDefinition(ID.OilBarrel, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 3 }, { ID.Slag, 2 } }, 150, description: "A barrel of oil. It explodes when it catches fire.");
+        AddStructureDefinition(ID.OilBarrel, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 3 }, { ID.Slag, 2 } }, 150, description: "A barrel of oil. It explodes when it catches fire. Swing an empty bucket at it to collect the oil.");
+        AddStructureDefinition(ID.Barrel, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Steel, 1 } }, 100, description: "A plain wooden barrel. Fill it with a liquid to store it, or swing an empty bucket at a filled barrel to collect its contents.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
         AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
         AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into gold.");
@@ -431,6 +432,26 @@ public partial class Item
             },
             durability: -1,
             description: "A bucket filled with honey.",
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.BucketOfOil,
+            gesture: ItemGesture.Swing,
+            sfx: SfxID.HitMetal,
+            speed: 1.6f,
+            range: 1,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                Speed = 4,
+                Radius = 2,
+                Breaking = 0,
+                OperationType = OperationType.None
+            },
+            durability: -1,
+            description: "A bucket filled with oil. Collected from an oil barrel.",
             holdoutOffset: new Vector2(0.5f, 0)
         );
 

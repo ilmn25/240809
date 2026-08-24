@@ -207,5 +207,7 @@ public enum ID
     Sawblade,
     OldPot,
     OilBarrel,
+    Barrel,
+    BucketOfOil,
 
 }

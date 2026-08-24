@@ -123,8 +123,7 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         if (actor.Storage.List == null || actor.Storage.List.Count == 0)
             return false;
 
-        int key = Mathf.Clamp(actor.Storage.Key, 0, actor.Storage.List.Count - 1);
-        ItemSlot selectedSlot = actor.Storage.List[key];
+        ItemSlot selectedSlot = actor.Storage.GetSelected();
 
         if (selectedSlot.Stack <= 0 || !Crops.TryGetValue(selectedSlot.ID, out Crop crop))
             return false;

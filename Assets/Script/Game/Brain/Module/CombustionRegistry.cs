@@ -57,8 +57,11 @@ public static class CombustionRegistry
         Ash(ID.Bush, ID.Grass, ID.Deathcap, ID.Orchids);
 
         // Oil barrel: flammable, but it doesn't burn out normally — it explodes
-        // instead (OilBarrelMachine handles the explosion).
+        // instead (BarrelMachine handles the explosion).
         Register(ID.OilBarrel, new CombustionProfile(true));
+
+        // Plain barrel: burns like any wooden structure (no explosion).
+        BurnStructure(ID.Barrel);
     }
 
     /// <summary>Wooden structure: leaves charred rubble and drops its loot with

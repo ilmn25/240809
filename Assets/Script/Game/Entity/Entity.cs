@@ -264,11 +264,16 @@ public class Entity
 
                 AddStructure<OldPotMachine>(ID.OldPot, Vector3Int.one, Main.IndexCollide);
 
-                AddStructure<OilBarrelMachine>(ID.OilBarrel, Vector3Int.one, Main.IndexCollide);
+                AddStructure<BarrelMachine>(ID.OilBarrel, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OilBarrel);
                 loot.Add(1, 1, ID.Steel);
                 loot.Add(0.5f, 2, ID.Plank);
                 loot.Add(0.4f, 1, ID.Slag);
+
+                AddStructure<BarrelMachine>(ID.Barrel, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.Barrel);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(0.5f, 1, ID.Steel);
 
                 AddStructure<HiveMachine>(ID.Hive, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Hive);
