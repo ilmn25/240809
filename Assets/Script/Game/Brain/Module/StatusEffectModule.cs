@@ -14,6 +14,7 @@ public class StatusEffectModule : EntityModule
         public StatusEffect Definition;
         public float Remaining;
         public float TickTimer;
+        public int MaxHealthReduced;
     }
 
     public override void Update()
@@ -29,11 +30,13 @@ public class StatusEffectModule : EntityModule
             effect.Remaining -= dt;
             if (effect.Remaining <= 0f)
             {
+                RestoreMaxHealthPenalty(effect);
                 _effects.RemoveAt(i);
                 continue;
             }
 
-            if (effect.Definition.Type == EffectType.Slow) continue;
+            if (effect.Definition.Type == EffectType.Slow ||
+                effect.Definition.Type == EffectType.MaxHealthPenalty) continue;
 
             effect.TickTimer += dt;
             if (effect.TickTimer < effect.Definition.TickInterval) continue;
@@ -60,11 +63,14 @@ public class StatusEffectModule : EntityModule
             }
         }
 
-        _effects.Add(new ActiveEffect
+        ActiveEffect newEffect = new ActiveEffect
         {
             Definition = definition,
             Remaining = definition.Duration,
-        });
+        };
+        if (definition.Type == EffectType.MaxHealthPenalty)
+            ApplyMaxHealthPenalty(newEffect);
+        _effects.Add(newEffect);
     }
 
     /// <summary>Remove an active effect by its ID.</summary>
@@ -73,7 +79,10 @@ public class StatusEffectModule : EntityModule
         for (int i = _effects.Count - 1; i >= 0; i--)
         {
             if (_effects[i].Definition.EffectID == effectID)
+            {
+                RestoreMaxHealthPenalty(_effects[i]);
                 _effects.RemoveAt(i);
+            }
         }
     }
 
@@ -139,5 +148,38 @@ public class StatusEffectModule : EntityModule
             dynamicInfo.SpeedModifier = dynamicInfo.SpeedModifier / _slowMultiplier * multiplier;
 
         _slowMultiplier = multiplier;
+    }
+
+    private void ApplyMaxHealthPenalty(ActiveEffect effect)
+    {
+        int amount = effect.Definition.AmountPerTick;
+        if (EntityMachine.Info is PlayerInfo player)
+        {
+            player.BaseHealthMax = Mathf.Max(1, player.BaseHealthMax - amount);
+            player.HealthMax = Mathf.Max(1, player.HealthMax - amount);
+            if (player.Health > player.HealthMax) player.Health = player.HealthMax;
+        }
+        else if (EntityMachine.Info is DynamicInfo dynamicInfo)
+        {
+            dynamicInfo.HealthMax = Mathf.Max(1, dynamicInfo.HealthMax - amount);
+            if (dynamicInfo.Health > dynamicInfo.HealthMax) dynamicInfo.Health = dynamicInfo.HealthMax;
+        }
+        effect.MaxHealthReduced = amount;
+    }
+
+    private void RestoreMaxHealthPenalty(ActiveEffect effect)
+    {
+        if (effect.MaxHealthReduced == 0) return;
+        int amount = effect.MaxHealthReduced;
+        if (EntityMachine.Info is PlayerInfo player)
+        {
+            player.BaseHealthMax += amount;
+            player.HealthMax += amount;
+        }
+        else if (EntityMachine.Info is DynamicInfo dynamicInfo)
+        {
+            dynamicInfo.HealthMax += amount;
+        }
+        effect.MaxHealthReduced = 0;
     }
 }

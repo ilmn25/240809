@@ -19,6 +19,8 @@ public class ProjectileInfo
     public ID Sprite;
     public ID Ammo;
     public float Scale = 1;
+    /// <summary>Status effect applied to the victim on a successful hit.</summary>
+    public StatusEffect HitEffect;
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }

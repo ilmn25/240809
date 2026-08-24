@@ -7,7 +7,8 @@ public class SpiderMachine : GroundMobMachine
 {
     protected override bool UsesDoorBash => true;
 
-    private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
+    // Virtual so the viper can add its bloodclot hit effect.
+    protected virtual ProjectileInfo BiteProjectile { get; } = new ContactDamageProjectileInfo {
         Damage = 2,
         Knockback = 8,
         CritChance = 0.1f,

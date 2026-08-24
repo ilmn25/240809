@@ -257,6 +257,11 @@ public class Entity
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
 
+                AddStructure<ArrowTrapMachine>(ID.ArrowTrap, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.ArrowTrap);
+                loot.Add(1, 1, ID.Stake);
+                loot.Add(0.5f, 1, ID.Stake);
+
                 AddStructure<HiveMachine>(ID.Hive, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Hive);
                 loot.Add(1, 2, ID.BucketOfHoney);
@@ -390,6 +395,11 @@ public class Entity
                 AddMob<SpiderMachine>(ID.Spider);
                 loot = new (ID.Spider);
                 loot.Add(1, 2, ID.SpiderWeb);   
+
+                AddMob<ViperMachine>(ID.Viper);
+                loot = new (ID.Viper);
+                loot.Add(1, 2, ID.SpiderWeb);
+                loot.Add(0.5f, 1, ID.Blood);
 
                 AddMob<LichMachine>(ID.Lich);
                 loot = new (ID.Lich);

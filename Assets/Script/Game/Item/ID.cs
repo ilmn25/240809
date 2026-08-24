@@ -201,5 +201,8 @@ public enum ID
     DungeonDoor,   
     Hive,
     Hornet,
+    ArrowTrap,
+    Viper,
+    BloodClot,
 
 }

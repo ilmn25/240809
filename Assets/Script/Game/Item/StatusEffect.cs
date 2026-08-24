@@ -1,7 +1,7 @@
 using System;
 
 /// <summary>What a status effect does to its host each tick.</summary>
-public enum EffectType { Heal, Damage, Slow }
+public enum EffectType { Heal, Damage, Slow, MaxHealthPenalty }
 
 /// <summary>Data-driven definition of a status effect. Instances are applied to an
 /// entity via StatusEffectModule and tick on the host until their duration expires.</summary>

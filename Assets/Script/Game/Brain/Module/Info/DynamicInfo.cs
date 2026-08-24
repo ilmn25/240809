@@ -149,6 +149,8 @@ public class DynamicInfo : Info
         // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
         if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.controllerId != -1)
             projectile.SourceInfo.AcquireTarget(this);
+        if (Helper.IsHost() && projectile.Info.HitEffect != null)
+            Machine?.GetModule<StatusEffectModule>()?.Apply(projectile.Info.HitEffect);
         OnHit(projectile);
         return true;
     }
