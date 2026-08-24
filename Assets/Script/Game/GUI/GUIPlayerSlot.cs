@@ -53,6 +53,12 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
         if (Player == null) return;
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            GUIPlayerList.ToggleRest(Player);
+            GUIPlayerList.ShowInfo(Player);
+            return;
+        }
         if (GUIPlayerList.TryControl(Player))
             GUIPlayerList.ShowInfo(Player); // refresh while still hovering
     }

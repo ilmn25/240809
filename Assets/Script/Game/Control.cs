@@ -93,6 +93,14 @@ public class Control
         if (i < 0 || i >= global::Save.Inst.players.Count) return;
         if (i == CurrentPlayerIndex) return;
 
+        // Taking control un-rests the target so it isn't stuck standing still.
+        PlayerInfo nextPlayer = global::Save.Inst.players[i];
+        if (nextPlayer.Resting)
+        {
+            nextPlayer.Resting = false;
+            if (!Helper.IsHost()) PlayerSync.SendRest(nextPlayer.uid, false);
+        }
+
         int prevIndex = CurrentPlayerIndex;
         // Drop the outgoing character's stale input direction so it doesn't keep
         // walking (e.g. when it was mid-jump with a key held on swap).

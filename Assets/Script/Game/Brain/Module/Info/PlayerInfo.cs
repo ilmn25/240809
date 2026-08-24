@@ -16,8 +16,13 @@ public class PlayerInfo : MobInfo
     public int Hunger;
     public int HungerMax = 20;
     public float Stamina; 
+    [NonSerialized] public bool Resting;
 
     private const float WellFedThreshold = 0.85f;
+    private const float MoveHungerInterval = 45f;
+    private const float RestHealInterval = 1f;
+    private float _moveHungerAccumulator;
+    private float _restHealAccumulator;
     private static readonly StatusEffect WellFed = new StatusEffect(
         ID.WellFed, EffectType.Heal, duration: 120f, tickInterval: 60f, amountPerTick: 1, name: "Well Fed");
 
@@ -99,6 +104,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        UpdateMovementHunger();
 
         switch (PlayerStatus)
         {
@@ -119,6 +125,13 @@ public class PlayerInfo : MobInfo
                 break;
         }
 
+        if (Resting)
+        {
+            Direction = Vector3.zero;
+            SpeedTarget = 0;
+            RestHeal();
+        }
+
         UpdateWellFed();
         UpdateHungerStage();
 
@@ -128,7 +141,7 @@ public class PlayerInfo : MobInfo
         bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(uid);
         bool claimedByOtherClient = !Helper.IsHost() && !PlayerSync.CanLocalClientControl(uid);
 
-        if (isSelected && !blockedByOther && !claimedByOtherClient && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+        if (isSelected && !Resting && !blockedByOther && !claimedByOtherClient && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
         {
             TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
             AimPosition = Control.MouseTarget ?
@@ -138,7 +151,7 @@ public class PlayerInfo : MobInfo
             if (CurrentHungerStage == HungerStage.IV) { SpeedTarget = 0f; }
             else { SpeedTarget = Control.Inst.Sprint.Key() ? SpeedAir : SpeedGround; HandleMovement(); }
         }
-        else if (!isSelected && !blockedByOther)
+        else if (!isSelected && !blockedByOther && !Resting)
         {
             if (Target != null) AimPosition = Target.position;
             SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
@@ -231,6 +244,27 @@ public class PlayerInfo : MobInfo
 
         HealthMax = Mathf.Max(1, (int)(BaseHealthMax * multiplier));
         if (Health > HealthMax) Health = HealthMax;
+    }
+
+    private void UpdateMovementHunger()
+    {
+        if (!Helper.IsHost() || Resting) { _moveHungerAccumulator = 0; return; }
+        if (Direction == Vector3.zero) { _moveHungerAccumulator = 0; return; }
+        _moveHungerAccumulator += Helper.GetDeltaTime();
+        if (_moveHungerAccumulator < MoveHungerInterval) return;
+        _moveHungerAccumulator = 0;
+        if (Hunger > 0) Hunger--;
+        GUIBar.Update();
+    }
+
+    private void RestHeal()
+    {
+        if (!Helper.IsHost() || Health >= HealthMax) { _restHealAccumulator = 0; return; }
+        _restHealAccumulator += Helper.GetDeltaTime();
+        if (_restHealAccumulator < RestHealInterval) return;
+        _restHealAccumulator = 0;
+        Health++;
+        GUIBar.Update();
     }
 
     private void HandleMovement()

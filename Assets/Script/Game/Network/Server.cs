@@ -84,6 +84,7 @@ public static class Server
         DropSync.UnregisterHandlers();
         NetworkClient.UnregisterHandler<YourConnectionIdMessage>();
         NetworkServer.UnregisterHandler<ClientToServerPlayerMessage>();
+        NetworkServer.UnregisterHandler<PlayerRestMessage>();
         LampSync.UnregisterHandlers();
     }
 

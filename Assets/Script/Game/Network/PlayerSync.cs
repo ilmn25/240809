@@ -28,6 +28,7 @@ public struct PlayerSyncMessage : NetworkMessage
     public int hungerMax;
     public float stamina;
     public int playerStatus;
+    public bool resting;
 
     public Vector3 direction;
     public bool isGrounded;
@@ -68,6 +69,13 @@ public struct ClientToServerPlayerMessage : NetworkMessage
     public string destroyUid;        // item the client destroyed (pickup)
 
     public int selectedSlot;         // inventory slot index (-1 = none) the client has selected
+}
+
+/// <summary>Client asks the host to set a player's resting state.</summary>
+public struct PlayerRestMessage : NetworkMessage
+{
+    public string uid;
+    public bool resting;
 }
 
 // Storage sync moved to StorageSyncMessage (see StorageSync.cs)
@@ -171,6 +179,7 @@ public static class PlayerSync
     {
         NetworkClient.ReplaceHandler<PlayerSyncMessage>(OnPlayerSyncMessageReceived, false);
         NetworkServer.ReplaceHandler<ClientToServerPlayerMessage>(OnClientToServerPlayerMessageReceived, false);
+        NetworkServer.ReplaceHandler<PlayerRestMessage>(OnPlayerRestMessageReceived, false);
         NetworkClient.ReplaceHandler<YourConnectionIdMessage>(OnYourConnectionIdReceived, false);
         if (Application.isPlaying)
         {
@@ -252,6 +261,7 @@ public static class PlayerSync
             mana = player.Mana, sanity = player.Sanity,
             hunger = player.Hunger, hungerMax = player.HungerMax,
             stamina = player.Stamina, playerStatus = (int)player.PlayerStatus,
+            resting = player.Resting,
             direction = player.Direction, isGrounded = player.IsGrounded,
             speedCurrent = player.SpeedCurrent, speedTarget = player.SpeedTarget,
             faceTarget = player.FaceTarget, targetScreenDir = ScreenToWorldAligned(player.TargetScreenDir),
@@ -320,6 +330,13 @@ public static class PlayerSync
     // ═══════════════════════════════════════════════════════════════
 
     #region Client Send
+
+    /// <summary>Client asks the host to set a player's resting state.</summary>
+    public static void SendRest(string uid, bool resting)
+    {
+        if (Helper.IsHost() || !NetworkClient.isConnected || string.IsNullOrEmpty(uid)) return;
+        NetworkClient.Send(new PlayerRestMessage { uid = uid, resting = resting });
+    }
 
     public static void SendClientPlayerBatch()
     {
@@ -440,6 +457,7 @@ public static class PlayerSync
             pi.Hunger = msg.hunger; pi.HungerMax = msg.hungerMax;
             pi.Stamina = msg.stamina;
             pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
+            pi.Resting = msg.resting;
             pi.CharSprite = (ID)msg.charSprite;
         }
         else
@@ -520,6 +538,13 @@ public static class PlayerSync
 
         // If the host is spectating a player that just became free, auto-claim it
         TryHostClaimCurrentPlayer();
+    }
+
+    private static void OnPlayerRestMessageReceived(NetworkConnectionToClient _, PlayerRestMessage msg)
+    {
+        if (!NetworkServer.active || Save.Inst == null) return;
+        if (!Info.Dictionary.TryGetValue(msg.uid, out Info info) || info is not PlayerInfo pi) return;
+        pi.Resting = msg.resting;
     }
 
     /// <summary>If the host's current player is unclaimed, claim it so clients don't think it's free.</summary>
@@ -614,6 +639,7 @@ public static class PlayerSync
         pi.Hunger = msg.hunger; pi.HungerMax = msg.hungerMax;
         pi.Stamina = msg.stamina;
         pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
+        pi.Resting = msg.resting;
         pi.Direction = msg.direction; pi.IsGrounded = msg.isGrounded;
         pi.SpeedCurrent = msg.speedCurrent; pi.SpeedTarget = msg.speedTarget;
         pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);

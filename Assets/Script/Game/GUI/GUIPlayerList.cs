@@ -79,8 +79,10 @@ public class GUIPlayerList : GUI
             return;
         }
         string effects = player.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
+        string rest = player.Resting ? "Resting\n" : "";
         GUIMain.Cursor.Set(
             $"HP {player.Health}/{player.HealthMax}",
+            rest +
             $"Controlled by: {ControlStatus(player)}\n" +
             (effects.Length > 0 ? "Effects: " + effects + "\n" : "") +
             (IsControlling(player) ? "(controlling)" : "Click to select"));
@@ -100,8 +102,26 @@ public class GUIPlayerList : GUI
 
         int index = Save.Inst.players.IndexOf(player);
         if (index < 0) return false;
+        if (player.Resting) SetRest(player, false);
         Control.SwitchToPlayer(index);
         Audio.PlaySFX(SfxID.Text);
         return true;
+    }
+
+    /// <summary>Toggle whether the given player rests (stands still, regains
+    /// health, and stops burning hunger from walking).</summary>
+    public void ToggleRest(PlayerInfo player)
+    {
+        if (player == null) return;
+        SetRest(player, !player.Resting);
+    }
+
+    private void SetRest(PlayerInfo player, bool resting)
+    {
+        if (player == null || player.Resting == resting) return;
+        player.Resting = resting;
+        Audio.PlaySFX(SfxID.Text);
+        if (!Helper.IsHost())
+            PlayerSync.SendRest(player.uid, resting);
     }
 }

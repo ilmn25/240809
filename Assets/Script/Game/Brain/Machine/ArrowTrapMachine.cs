@@ -69,9 +69,9 @@ public class ArrowTrapMachine : StructureMachine
     private void FireArrow()
     {
         Vector3 rel = Main.PlayerInfo.position - transform.position;
-        Vector3 dir = Mathf.Abs(rel.x) > Mathf.Abs(rel.y)
+        Vector3 dir = Mathf.Abs(rel.x) > Mathf.Abs(rel.z)
             ? new Vector3(Mathf.Sign(rel.x), 0, 0)
-            : new Vector3(0, Mathf.Sign(rel.y), 0);
+            : new Vector3(0, 0, Mathf.Sign(rel.z));
         Vector3 origin = transform.position + dir;
 
         bool flaming = Random.value < FlameChance;

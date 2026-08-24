@@ -118,7 +118,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         { 
             HandleInput();
             
-            if (IsCurrentState<DefaultState>())
+            if (IsCurrentState<DefaultState>() && !Info.Resting)
             {
                 if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact)
                 { 
@@ -170,6 +170,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     // retargets via Info.Target while following.
     private void UpdateAllyBrain()
     {
+        if (Info.Resting)
+        {
+            Info.CancelTarget();
+            return;
+        }
         if (Info.PlayerStatus == PlayerStatus.Incapacitated) return;
         if (!IsCurrentState<DefaultState>() && !IsCurrentState<MobChaseAction>()) return;
         if (Info.ActionType is IActionType.PickUp or IActionType.Interact) return;
