@@ -262,6 +262,8 @@ public class Entity
                 loot.Add(1, 1, ID.Stake);
                 loot.Add(0.5f, 1, ID.Stake);
 
+                AddStructure<OldPotMachine>(ID.OldPot, Vector3Int.one, Main.IndexCollide);
+
                 AddStructure<HiveMachine>(ID.Hive, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Hive);
                 loot.Add(1, 2, ID.BucketOfHoney);

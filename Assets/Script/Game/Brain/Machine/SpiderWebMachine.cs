@@ -11,7 +11,7 @@ public class SpiderWebMachine : HarvestableMachine
     private int _timer;
     private bool _playerOnWeb;
 
-    public static Info CreateInfo()
+    public static new Info CreateInfo()
     {
         return new SpiderWebInfo
         {

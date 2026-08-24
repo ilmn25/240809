@@ -82,6 +82,14 @@ public static class HarvestableRegistry
         skeleton.Add(0.4f, 1, ID.Flint);
         skeleton.Add(0.35f, 1, ID.Femur);
         Register(ID.Skeleton, new HarvestableDefinition(skeleton));
+
+        // Old pot: smash to either pop a viper or spill loot (the either/or is
+        // handled by OldPotInfo.OnHarvest).
+        Loot pot = new Loot(ID.OldPot);
+        pot.Add(0.7f, 1, ID.Gold, ID.Copper);
+        pot.Add(0.4f, 1, ID.Steel, ID.Slag);
+        pot.Add(0.3f, 1, ID.Foul, ID.Bandages);
+        Register(ID.OldPot, new HarvestableDefinition(pot));
     }
 
     /// <summary>Register (or override) a harvestable definition.</summary>

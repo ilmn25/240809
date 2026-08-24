@@ -29,7 +29,18 @@ public class HarvestableInfo : SpriteStructureInfo
         if (RegrowTimer > 0f)
             return true;
 
-        // Roll the drop table.
+        // Defer the actual harvest (drops/destroy/regrow) to a virtual hook so
+        // subclasses can add bespoke behavior (e.g. the old pot popping a viper).
+        OnHarvest(definition);
+
+        return true;
+    }
+
+    /// <summary>What happens when this harvestable is harvested. Default rolls
+    /// the drop table, then destroys it or starts the regrow timer. Subclasses
+    /// can override, calling base to keep the default.</summary>
+    protected virtual void OnHarvest(HarvestableDefinition definition)
+    {
         definition.Drops?.Spawn(position);
 
         Audio.PlaySFX(SfxID.Item);
@@ -41,7 +52,5 @@ public class HarvestableInfo : SpriteStructureInfo
             Destroy();
         else if (definition.RegrowTime > 0f)
             RegrowTimer = definition.RegrowTime;
-
-        return true;
     }
 }
