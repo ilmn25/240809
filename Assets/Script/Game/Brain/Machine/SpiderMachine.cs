@@ -7,13 +7,16 @@ public class SpiderMachine : GroundMobMachine
 {
     protected override bool UsesDoorBash => true;
 
-    // Virtual so the viper can add its bloodclot hit effect.
-    protected virtual ProjectileInfo BiteProjectile { get; } = new ContactDamageProjectileInfo {
+    private readonly ProjectileInfo _biteProjectile = new ContactDamageProjectileInfo {
         Damage = 2,
         Knockback = 8,
         CritChance = 0.1f,
         Radius = 0.7f,
     };
+
+    /// <summary>Optional status effect applied by the bite. Subclasses (viper)
+    /// override this to add their venom.</summary>
+    protected virtual StatusEffect BiteHitEffect => null;
 
     private int _strafeTimer;
     private int _webTimer;
@@ -47,7 +50,8 @@ public class SpiderMachine : GroundMobMachine
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(BiteProjectile));
+        _biteProjectile.HitEffect = BiteHitEffect;
+        AddState(new MobAttackStopSwing(_biteProjectile));
         AddState(new EquipSelectState());
     }
 

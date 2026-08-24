@@ -20,6 +20,11 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
 
     public virtual void OnPoweredChanged(bool powered) { }
 
+    /// <summary>Projectiles need a source MobInfo; structures aren't mobs, so
+    /// they emit them with this neutral stand-in attributed to the given hitbox.</summary>
+    protected static MobInfo CreateProjectileSource(HitboxType targetHitbox) =>
+        new MobInfo { HitboxType = HitboxType.Enemy, targetHitboxType = targetHitbox };
+
     public override void OnSetup()
     {
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();

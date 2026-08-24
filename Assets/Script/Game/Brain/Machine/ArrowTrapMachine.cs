@@ -8,6 +8,7 @@ public class ArrowTrapMachine : StructureMachine
     private const float TriggerRange = 6f;   // player must be within this range to arm the trap
     private const float ArrowRange = 10f;    // how far the arrow travels
     private const float FireInterval = 1.5f; // seconds between shots
+    private const float FlameChance = 0.25f; // chance a shot is a flame arrow
 
     private static readonly RangedProjectileInfo Arrow = new RangedProjectileInfo {
         Sprite = ID.BulletProjectile,
@@ -20,7 +21,18 @@ public class ArrowTrapMachine : StructureMachine
         Class = ProjectileClass.Ranged,
     };
 
-    private readonly MobInfo _source = new MobInfo { HitboxType = HitboxType.Enemy, targetHitboxType = HitboxType.Player };
+    private static readonly RangedProjectileInfo FlameArrow = new FlameArrowProjectileInfo {
+        Sprite = ID.BulletProjectile,
+        Damage = 3,
+        Knockback = 6,
+        CritChance = 5,
+        LifeSpan = 200,
+        Speed = 12f,
+        Radius = 0.2f,
+        Class = ProjectileClass.Ranged,
+    };
+
+    private readonly MobInfo _source = CreateProjectileSource(HitboxType.Player);
 
     public static Info CreateInfo()
     {
@@ -61,6 +73,10 @@ public class ArrowTrapMachine : StructureMachine
             ? new Vector3(Mathf.Sign(rel.x), 0, 0)
             : new Vector3(0, Mathf.Sign(rel.y), 0);
         Vector3 origin = transform.position + dir;
-        Projectile.Spawn(origin, origin + dir * ArrowRange, Arrow, HitboxType.Player, _source);
+
+        bool flaming = Random.value < FlameChance;
+        if (flaming)
+            Particle.Create(origin, Particles.Fire, false);
+        Projectile.Spawn(origin, origin + dir * ArrowRange, flaming ? FlameArrow : Arrow, HitboxType.Player, _source);
     }
 }

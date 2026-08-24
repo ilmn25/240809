@@ -9,6 +9,10 @@ public class RangedProjectileInfo : ProjectileInfo
     public bool Lodge = false;
     public bool PickUp = false;
 
+    /// <summary>Hook called after a successful hit on an entity (before it is
+    /// deleted or lodged). Subclasses add extra on-hit effects here.</summary>
+    protected virtual void OnHitTarget(Projectile projectile, Machine target) { }
+
     public override void AI(Projectile projectile)
     {
         if (projectile.Target == null)
@@ -39,6 +43,7 @@ public class RangedProjectileInfo : ProjectileInfo
                  
                 if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
                 {
+                    OnHitTarget(projectile, (Machine)target);
                     if (Lodge)
                     {
                         projectile.Target = ((MobMachine)target).Info;

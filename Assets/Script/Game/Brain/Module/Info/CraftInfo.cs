@@ -20,7 +20,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         { ID.Stonecutter, new PoolDef(0, true, ID.Brick, ID.BrickBlock) },
         { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
-        { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.ArrowTrap) },
+        { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.ArrowTrap, ID.OilBarrel) },
         { ID.Merchant, new PoolDef(0, false, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
         { ID.Nomad, new PoolDef(4, false, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
     };

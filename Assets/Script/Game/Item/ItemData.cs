@@ -138,6 +138,7 @@ public partial class Item
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.ArrowTrap, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 3 } }, 150, description: "A trap that fires arrows at anyone who comes near.");
         AddStructureDefinition(ID.OldPot, null, 100, description: "A fragile old pot. Smash it for a surprise.");
+        AddStructureDefinition(ID.OilBarrel, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 3 }, { ID.Slag, 2 } }, 150, description: "A barrel of oil. It explodes when it catches fire.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
         AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
         AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into gold.");

@@ -75,6 +75,33 @@ public class NavMap
     /// <summary>True if the cell is fully empty (walkable, no door).</summary>
     public static bool IsAir(Vector3Int worldPosition) => Get(worldPosition) == Air;
 
+    /// <summary>True if any solid block occupies the given box footprint — the
+    /// standard mob/entity collider shape. Shared by MovementModule and any
+    /// entity that moves itself manually.</summary>
+    public static bool IsBlocked(Vector3 position, float halfX = 0.35f, float halfZ = 0.25f, float height = 0.7f)
+    {
+        int minX = Mathf.FloorToInt(position.x - halfX);
+        int maxX = Mathf.FloorToInt(position.x + halfX);
+        int minZ = Mathf.FloorToInt(position.z - halfZ);
+        int maxZ = Mathf.FloorToInt(position.z + halfZ);
+        int minY = Mathf.FloorToInt(position.y);
+        int maxY = Mathf.FloorToInt(position.y + height);
+
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                for (int z = minZ; z <= maxZ; z++)
+                {
+                    Vector3Int b = new Vector3Int(x, y, z);
+                    if (World.IsInWorldBounds(b) && Get(b) != Air)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /// <summary>True if the cell is navigable for pathfinding (air or door).</summary>
     public static bool IsNavigable(Vector3Int worldPosition)
     {

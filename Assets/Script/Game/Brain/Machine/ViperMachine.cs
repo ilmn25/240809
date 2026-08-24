@@ -5,13 +5,7 @@ public class ViperMachine : SpiderMachine
     private static readonly StatusEffect BloodClot = new StatusEffect(
         ID.BloodClot, EffectType.MaxHealthPenalty, duration: 20f, tickInterval: 1f, amountPerTick: 2, name: "Blood Clot");
 
-    protected override ProjectileInfo BiteProjectile { get; } = new ContactDamageProjectileInfo {
-        Damage = 2,
-        Knockback = 8,
-        CritChance = 0.1f,
-        Radius = 0.7f,
-        HitEffect = BloodClot,
-    };
+    protected override StatusEffect BiteHitEffect => BloodClot;
 
     public static new Info CreateInfo()
     {
@@ -27,7 +21,7 @@ public class ViperMachine : SpiderMachine
             SpeedAir = 7,
             PathJump = 2,
             PathAir = 4,
-            CharSprite = ID.Spider,
+            CharSprite = ID.Viper,
         };
     }
 }

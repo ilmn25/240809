@@ -25,7 +25,7 @@ public class SawbladeMachine : MobMachine
         return new EnemyInfo()
         {
             HealthMax = 30,
-            CharSprite = ID.Sawmill,
+            CharSprite = ID.Sawblade,
             DistDisengage = 20,
         };
     }
@@ -58,28 +58,5 @@ public class SawbladeMachine : MobMachine
         }
     }
 
-    private bool BlockedAhead(Vector3 dir)
-    {
-        Vector3 ahead = transform.position + dir * LookAhead;
-        int minX = Mathf.FloorToInt(ahead.x - 0.35f);
-        int maxX = Mathf.FloorToInt(ahead.x + 0.35f);
-        int minZ = Mathf.FloorToInt(ahead.z - 0.25f);
-        int maxZ = Mathf.FloorToInt(ahead.z + 0.25f);
-        int minY = Mathf.FloorToInt(ahead.y);
-        int maxY = Mathf.FloorToInt(ahead.y + 0.7f);
-
-        for (int y = minY; y <= maxY; y++)
-        {
-            for (int x = minX; x <= maxX; x++)
-            {
-                for (int z = minZ; z <= maxZ; z++)
-                {
-                    Vector3Int b = new Vector3Int(x, y, z);
-                    if (World.IsInWorldBounds(b) && NavMap.Get(b) != NavMap.Air)
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
+    private bool BlockedAhead(Vector3 dir) => NavMap.IsBlocked(transform.position + dir * LookAhead);
 }

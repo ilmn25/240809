@@ -206,5 +206,6 @@ public enum ID
     BloodClot,
     Sawblade,
     OldPot,
+    OilBarrel,
 
 }
