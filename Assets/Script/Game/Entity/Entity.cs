@@ -401,6 +401,11 @@ public class Entity
                 loot.Add(1, 2, ID.SpiderWeb);
                 loot.Add(0.5f, 1, ID.Blood);
 
+                AddMob<SawbladeMachine>(ID.Sawblade);
+                loot = new (ID.Sawblade);
+                loot.Add(1, 1, ID.Steel);
+                loot.Add(0.5f, 1, ID.Slag);
+
                 AddMob<LichMachine>(ID.Lich);
                 loot = new (ID.Lich);
                 loot.Add(1, 3, ID.DiamondAxe);
