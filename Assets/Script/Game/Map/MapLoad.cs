@@ -128,6 +128,27 @@ public class MapLoad
             }
         }
     }
+
+    /// <summary>True once every in-bounds render chunk around the player has been
+    /// loaded (mesh built and added to ActiveChunks). False until the traverse has
+    /// started, so callers can wait on this before revealing the map.</summary>
+    public static bool IsMapLoaded()
+    {
+        if (_traverseOffsets.Count == 0) return false;
+
+        foreach (var offset in _traverseOffsets)
+        {
+            Vector3Int chunkPos = new Vector3Int(
+                Scene.PlayerChunkPosition.x + offset.x * World.ChunkSize,
+                Scene.PlayerChunkPosition.y + offset.y * World.ChunkSize,
+                Scene.PlayerChunkPosition.z + offset.z * World.ChunkSize
+            );
+
+            if (World.IsInWorldBounds(chunkPos) && !ActiveChunks.ContainsKey(chunkPos))
+                return false;
+        }
+        return true;
+    }
     
     public static CancellationTokenSource CancellationTokenSourceKillGame = new CancellationTokenSource();
     private static async Task LoadChunksOntoScreenAsync(Vector3Int chunkCoord, bool replace = false)

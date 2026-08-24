@@ -90,7 +90,13 @@ public class Main : MonoBehaviour
         GUIMain.UpdateMenu();
         ScreenFade.Update();
         Environment.Update();
-        if (SceneMode != SceneMode.Game || !Player) return;
+        if (SceneMode != SceneMode.Game) return;
+        if (Intermission.Active)
+        {
+            Dialogue.Update();
+            return;
+        }
+        if (!Player) return;
         Terraform.Update();
         GUIMain.Update();
         Inventory.Update();

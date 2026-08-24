@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -119,6 +120,42 @@ public abstract class Gen
                     Chunk chunk = new Chunk();
                     world[coord] = chunk;
                     gen.GenChunk(coord, chunk);
+                }
+            }
+        }
+
+        // Per-world-type post-processing (scatter tasks, setpieces, entity spawn).
+        gen.GenPostWorld(world);
+    }
+
+    /// <summary>Coroutine version of <see cref="GenerateAllFor"/> that yields every
+    /// few chunks so generation runs over frames (e.g. during the intro dialogue).</summary>
+    public static IEnumerator GenerateAllForCoroutine(World world, Action<float> onProgress = null)
+    {
+        // Skip if already generated (loaded from save)
+        if (world[Vector3Int.zero] != null && world[Vector3Int.zero] != Chunk.Zero)
+        {
+            onProgress?.Invoke(1f);
+            yield break;
+        }
+
+        Gen gen = Dictionary[world.GenType];
+        int chunkSize = World.ChunkSize;
+        int total = world.Size.x * world.Size.y * world.Size.z;
+        int count = 0;
+        for (int cx = 0; cx < world.Size.x; cx++)
+        {
+            for (int cy = 0; cy < world.Size.y; cy++)
+            {
+                for (int cz = 0; cz < world.Size.z; cz++)
+                {
+                    Vector3Int coord = new Vector3Int(cx * chunkSize, cy * chunkSize, cz * chunkSize);
+                    Chunk chunk = new Chunk();
+                    world[coord] = chunk;
+                    gen.GenChunk(coord, chunk);
+                    count++;
+                    onProgress?.Invoke((float)count / total);
+                    if ((count & 7) == 0) yield return null;
                 }
             }
         }

@@ -11,6 +11,12 @@ public class HarvestableInfo : SpriteStructureInfo
     /// (bush cooldown). Persisted so the picked state survives save/load.</summary>
     public float RegrowTimer;
 
+    public HarvestableInfo()
+    {
+        // Harvestables are natural decor; if a hostile bashes one it must not leave rubble.
+        SpawnsRubble = false;
+    }
+
     public override bool OnHitInternal(Projectile projectile)
     {
         if (projectile.SourceInfo.Equipment == null ||

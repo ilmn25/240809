@@ -117,7 +117,6 @@ public static class Server
 
     private static void OnClientConnected()
     {
-        Console.Print("Connected to host");
         GUIMain.GUIMenu.Show(false);
     }
 

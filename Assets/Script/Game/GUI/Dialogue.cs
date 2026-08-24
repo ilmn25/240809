@@ -64,6 +64,24 @@ public class Dialogue
         Audio.PlaySFX(SfxID.Notification);
     }
 
+    /// <summary>Shows a multi-page event notice. The player advances through each
+    /// page (ActionSecondary) and it closes after the last one.</summary>
+    public static void ShowEventChain(params string[] messages)
+    {
+        Dialogue next = null;
+        for (int i = messages.Length - 1; i >= 0; i--)
+        {
+            next = new Dialogue
+            {
+                Text = messages[i],
+                Next = next == null ? null : new Dictionary<string, Dialogue> { { "", next } }
+            };
+        }
+        Target = next;
+        Show(true);
+        Audio.PlaySFX(SfxID.Notification);
+    }
+
     public static void Update()
     { 
         if (Showing){  
@@ -75,7 +93,7 @@ public class Dialogue
                 if (_scrollTask.Running)
                 {
                     _scrollTask.Stop();
-                    Main.GUIDialogueText.text = Target.Text;
+                    Main.GUIDialogueText.text = Target.Text; 
                 }
                 else
                 {

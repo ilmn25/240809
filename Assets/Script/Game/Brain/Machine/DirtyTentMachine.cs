@@ -26,6 +26,7 @@ public class DirtyTentMachine : StructureMachine
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting, // axe, like trees
             threshold = 1,
+            SpawnsRubble = false,
         };
     }
 

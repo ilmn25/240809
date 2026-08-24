@@ -26,6 +26,7 @@ public class HiveMachine : StructureMachine
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting, // axe, like the spider nest
             threshold = 1,
+            SpawnsRubble = false,
         };
     }
 

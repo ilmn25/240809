@@ -13,6 +13,7 @@ public class PondMachine : StructureMachine
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Mining,
             threshold = 1,
+            SpawnsRubble = false,
             Liquid = LiquidType.Water,
         };
     }

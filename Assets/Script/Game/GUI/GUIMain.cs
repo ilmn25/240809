@@ -226,6 +226,7 @@ public static class GUIMain
     {
         if (isShow)
         {
+            if (Intermission.Active) return;
             if (!Showing)
             {
                 Showing = true;

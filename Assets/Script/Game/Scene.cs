@@ -27,7 +27,7 @@ public class Scene
             Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
         new CoroutineTask(Quit(false)).Finished += _ => {
             Save.Inst.current = genType;
-            Start(); 
+            Start(false);
         };
     }
 
@@ -37,7 +37,7 @@ public class Scene
         Busy = true;
         new CoroutineTask(Quit(true)).Finished += _ => {
             Saves.LoadSave(save);
-            Start();
+            Start(false);
         };
     }
     
@@ -45,10 +45,10 @@ public class Scene
     {  
         if (Busy) return;
         Busy = true;
-        Start();
+        Start(true);
     }
     
-    private static void Start()
+    private static void Start(bool playIntro = false)
     {
         Tutorial.Reset();
 
@@ -62,24 +62,6 @@ public class Scene
 
         if (Helper.IsHost())
         {
-            // Generate ALL worlds up-front (Minecraft-style dimensions).
-            // Gen.GenerateAllFor skips worlds that already have data.
-            foreach (var kv in Save.Inst.worlds)
-            {
-                Gen.GenerateAllFor(kv.Value);
-                // Build map markers right after generation, while all static
-                // entities are still in the chunk lists (before they're loaded out).
-                kv.Value.Map?.BuildMarkers(kv.Value);
-            }
-
-            // Populate NavMap for the current (active) world.
-            World.Inst.PopulateNavMap();
-
-            foreach (PlayerInfo player in Save.Inst.players)
-            {
-                if (player.Machine == null) Entity.SpawnFromInfo(player, false);
-                player.Machine.transform.position = spawnPosition;
-            }
             _playerChunkPositionPrevious = Vector3Int.down;
         }
         else
@@ -103,14 +85,10 @@ public class Scene
         Control.SetPlayer(0);
         if (Helper.IsHost())
         {
-            PlayerInfo firstPlayer = global::Save.Inst.players[0];
-            PlayerSync.HostClaimPlayer(firstPlayer.uid);
-
-            // All chunks already exist — signal game ready immediately.
             Main.SceneMode = SceneMode.Game;
             Environment.Target = EnvironmentType.Null;
-            ScreenFade.FadeIn(1f, 2f);
             Busy = false;
+            Intermission.Start(playIntro);
         }
     }
     private static IEnumerator Quit(bool includePlayers)

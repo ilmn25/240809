@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public enum EnvironmentType
 {
-    Null, Black, Sunrise, Rapture, Day, DaySnow, Sunset, NightRainy, NightBright
+    Null, Black, Sunrise, Rapture, Day, DaySnow, Sunset, NightRainy, NightBright, Dim
 }
 public class Environment
 {
@@ -27,6 +27,14 @@ public class Environment
             SpotLight = Color.black,
             DirectionalLight = Color.black,
             BackgroundColor = Color.black,
+        });
+        Environments.Add(EnvironmentType.Dim, new Environment
+        {
+            AmbientLight = Helper.GetColor(16, 15, 28),
+            FogColor = Helper.GetColor(12, 11, 20),
+            SpotLight = Helper.GetColor(26, 25, 34),
+            DirectionalLight = Helper.GetColor(22, 20, 46),
+            BackgroundColor = Helper.GetColor(10, 10, 16)
         });
         Environments.Add(EnvironmentType.Rapture, new Environment
         {
