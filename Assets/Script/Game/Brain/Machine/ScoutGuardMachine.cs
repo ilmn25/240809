@@ -32,4 +32,13 @@ public class ScoutGuardMachine : ScoutMachine
         AddModule(new GuardModule());
         AddState(new MobReturnHome());
     }
+
+    /// <summary>Don't re-acquire a target while dragged off the leash or already
+    /// heading home — that fights the return-home pathing and freezes the guard.</summary>
+    protected override void UpdateAggro()
+    {
+        GuardModule guard = GetModule<GuardModule>();
+        if (guard.IsBeyondLeash || IsCurrentState<MobReturnHome>()) return;
+        base.UpdateAggro();
+    }
 }

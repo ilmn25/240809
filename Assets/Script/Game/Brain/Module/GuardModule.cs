@@ -12,11 +12,19 @@ public class GuardModule : MobModule
     /// <summary>How far from home the guard may be dragged before breaking off.</summary>
     private const float LeashRadius = 10f;
 
+    /// <summary>True when the guard has been dragged beyond its leash and should
+    /// break off its attack and return to the outpost.</summary>
+    public bool IsBeyondLeash =>
+        Vector3.Distance(Machine.transform.position, HomePosition) > LeashRadius;
+
     public override void Update()
     {
         if (!Helper.IsHost()) return;
 
-        if (Vector3.Distance(Machine.transform.position, HomePosition) > LeashRadius)
+        // Only kick off the return-home once. Re-entering MobReturnHome every
+        // frame calls SetTarget(Home), which clears the path and re-runs async
+        // pathfinding — the home route never completes and the guard freezes.
+        if (IsBeyondLeash && !Machine.IsCurrentState<MobReturnHome>())
         {
             Info.CancelTarget();
             Machine.SetState<MobReturnHome>();

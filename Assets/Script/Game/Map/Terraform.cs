@@ -43,7 +43,6 @@ public static class Terraform
         if (mining) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
         else if (held.Type == ItemType.Structure) { blockID = ID.OverlayBlock; scale = 1f; overlay = true; }
         else if (held.Type == ItemType.Block) { blockID = held.ID; scale = 1f; overlay = false; }
-        else if (held.Type == ItemType.Tool) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
         else { obj.SetActive(false); return; }
 
         string key = overlay ? "overlay" : held.ID.ToString();
@@ -73,7 +72,7 @@ public static class Terraform
         Item held = Inventory.CurrentItemData;
         bool overMap = Helper.isLayer(Control.MouseLayer, Main.IndexMap) &&
                        Main.PlayerInfo.Machine.IsCurrentState<DefaultState>();
-        bool usable = held != null && held.Type is ItemType.Tool or ItemType.Block or ItemType.Structure;
+        bool usable = held != null && (Aim.IsMiningTool() || held.Type is ItemType.Block or ItemType.Structure);
 
         bool mining = Target == ID.MiningBox;
         bool aimVisible = mining ? _overlayEnabled : true;

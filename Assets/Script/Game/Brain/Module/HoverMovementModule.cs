@@ -51,6 +51,13 @@ public class HoverMovementModule : MovementModule
 
         Machine.transform.position = pos + Info.Velocity * DeltaTime;
         Info.position = Machine.transform.position;
+
+        // Drive the sprite's facing from actual flight direction so flying
+        // enemies flip to face where they're moving (or hover in place when
+        // stopped), matching ground mobs.
+        Vector3 facing = Info.Velocity;
+        facing.y = 0f;
+        Info.Direction = facing.sqrMagnitude > 0.0001f ? facing.normalized : Vector3.zero;
     }
 
     private Vector3 Anchor()

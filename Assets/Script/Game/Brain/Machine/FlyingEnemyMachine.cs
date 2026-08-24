@@ -11,6 +11,7 @@ public abstract class FlyingEnemyMachine : MobMachine
     public override void OnStart()
     {
         AddModule(new HoverMovementModule(hoverHeight: 0.5f, stopDistance: 0.9f, turnSpeed: 2f));
+        AddModule(new GroundAnimationModule());
         AddModule(new MobSpriteCullModule());
         AddModule(new SpriteOrbitModule());
         AddState(new MobHit());
