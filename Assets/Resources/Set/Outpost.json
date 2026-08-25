@@ -60,6 +60,7 @@
   "entities": [
     { "id": "Campfire", "x": 3, "y": 1, "z": 3 },
     { "id": "Chest", "x": 2, "y": 1, "z": 2 },
-    { "id": "Lamp", "x": 5, "y": 1, "z": 5 }
+    { "id": "Lamp", "x": 5, "y": 1, "z": 5 },
+    { "id": "BulletinBoard", "x": 4, "y": 1, "z": 3 }
   ]
 }

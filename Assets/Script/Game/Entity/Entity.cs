@@ -249,6 +249,11 @@ public class Entity
                 loot.Add(1, 2, ID.StoneBlock);
                 loot.Add(0.5f, 2, ID.StoneBlock);
 
+                AddStructure<BulletinBoardMachine>(ID.BulletinBoard, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.BulletinBoard);
+                loot.Add(1, 2, ID.Plank);
+                loot.Add(0.5f, 2, ID.Sticks);
+
                 AddStructure<HeadstoneMachine>(ID.Headstone, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.Headstone);
                 loot.Add(1, 1, ID.StoneBlock);

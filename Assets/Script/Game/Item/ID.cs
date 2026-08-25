@@ -209,5 +209,6 @@ public enum ID
     OilBarrel,
     Barrel,
     BucketOfOil,
+    BulletinBoard,
 
 }

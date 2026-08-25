@@ -105,7 +105,6 @@ public class Main : MonoBehaviour
         ViewPort.Update();  
         MobSpawner.Update();
         DungeonMobSpawner.Update();
-        QuestmasterSpawner.Update();
         Lightning.Update();
     } 
     

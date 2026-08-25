@@ -130,6 +130,7 @@ public partial class Item
         AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
         AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
+        AddStructureDefinition(ID.BulletinBoard, null, 100, furniture: true, description: "A wooden bulletin board that serves as the Questmaster's home — the quest-giver lives and respawns here.");
         AddStructureDefinition(ID.OldRadio, null, 100, furniture: true, description: "An old radio — one of the key items a travelling merchant looks for. Found in chests.");
         AddStructureDefinition(ID.Scarecrow, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Stake, 2 } }, 100, furniture: true, description: "A scarecrow that keeps pigeons away from the surrounding area.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");

@@ -1,12 +1,12 @@
 using UnityEngine;
 
-/// <summary>Keeps exactly one Questmaster alive near the world spawn. NPCs aren't
+/// <summary>Keeps exactly one Questmaster alive at the outpost. NPCs aren't
 /// saved, so this respawns the quest-giver whenever it dies or is unloaded — the
 /// same way the Guide respawns from its statue.</summary>
 public static class QuestmasterSpawner
 {
     private const int CheckInterval = 300;  // frames between checks
-    private const float PlayerRadius = 40f; // only respawn when a player is near spawn
+    private const float PlayerRadius = 40f; // only respawn when a player is near the outpost
     private const float AdoptRadius = 24f;  // how close an existing questmaster counts
 
     private static int _timer;
@@ -17,13 +17,15 @@ public static class QuestmasterSpawner
     {
         if (!Helper.IsHost()) return;
         if (World.Inst == null) return;
+        if (Save.Inst.current != GenType.Abyss) return; // the outpost (and questmaster) live in the Abyss
 
         if (++_timer < CheckInterval) return;
         _timer = 0;
 
-        if (QuestmasterAlive()) return;
+        Vector3Int spawn = GenOutpost.GetQuestmasterSpawn(World.Inst);
+        if (spawn == Vector3Int.zero) return;
 
-        Vector3Int spawn = World.Inst.SpawnPoint;
+        if (QuestmasterAlive(spawn)) return;
         if (!AnyPlayerNear(spawn)) return;
 
         _questmaster = Entity.Spawn(ID.Questmaster, spawn);
@@ -37,13 +39,13 @@ public static class QuestmasterSpawner
         return false;
     }
 
-    private static bool QuestmasterAlive()
+    private static bool QuestmasterAlive(Vector3Int spawn)
     {
         if (_questmaster != null && !_questmaster.Destroyed && _questmaster.Machine != null)
             return true;
 
         // Adopt a nearby questmaster (e.g. after a reload) so we don't stack duplicates.
-        int count = Physics.OverlapSphereNonAlloc(World.Inst.SpawnPoint, AdoptRadius, ScanBuffer, Main.MaskEntity);
+        int count = Physics.OverlapSphereNonAlloc(spawn, AdoptRadius, ScanBuffer, Main.MaskEntity);
         for (int i = 0; i < count; i++)
         {
             if (ScanBuffer[i].TryGetComponent(out QuestmasterMachine qm) && !qm.Info.Destroyed)
