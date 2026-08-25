@@ -103,7 +103,8 @@ public class Main : MonoBehaviour
         Control.Update();
         MapCull.Update();
         ViewPort.Update();  
-        MobSpawner.Update(); 
+        MobSpawner.Update();
+        DungeonMobSpawner.Update();
         QuestmasterSpawner.Update();
         Lightning.Update();
     } 
