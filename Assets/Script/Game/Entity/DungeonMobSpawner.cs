@@ -1,9 +1,9 @@
 using UnityEngine;
 
-/// <summary>Keeps sawblades populated in the dungeon while a player is inside it.
-/// Mobs aren't persisted to chunks, so this respawns them near players up to a
-/// per-player cap (mirrors MobSpawner, but looks for brick floor tiles instead of
-/// the open-world surface so it never drops a blade onto the ceiling).</summary>
+/// <summary>Keeps sawblades and ballistas populated in the dungeon while a player is
+/// inside it. Mobs aren't persisted to chunks, so this respawns them near players up
+/// to a per-player cap (mirrors MobSpawner, but looks for brick floor tiles instead of
+/// the open-world surface so it never drops them onto the ceiling).</summary>
 public class DungeonMobSpawner
 {
     private const int SpawnInterval = 240;
@@ -35,11 +35,11 @@ public class DungeonMobSpawner
             if (nearby >= CapPerPlayer) continue;
 
             for (int i = 0; i < SpawnAttemptsPerTick; i++)
-                TrySpawnSawblade(pPos);
+                TrySpawnDungeonMob(pPos);
         }
     }
 
-    private static void TrySpawnSawblade(Vector3 playerPos)
+    private static void TrySpawnDungeonMob(Vector3 playerPos)
     {
         Vector3Int pos = new Vector3Int(
             Mathf.RoundToInt(playerPos.x + Random.Range(-Scene.RenderDistance, Scene.RenderDistance)),
@@ -53,6 +53,6 @@ public class DungeonMobSpawner
         if (NavMap.Get(pos) == NavMap.Air || !NavMap.IsAir(pos + Vector3Int.up)) return;
 
         pos.y = 1;
-        Entity.Spawn(ID.Sawblade, pos);
+        Entity.Spawn(Random.value < 0.5f ? ID.Sawblade : ID.Ballista, pos);
     }
 }

@@ -203,7 +203,7 @@ public enum ID
     DungeonDoor,   
     Hive,
     Hornet,
-    ArrowTrap,
+    Ballista,
     Viper,
     BloodClot,
     Sawblade,

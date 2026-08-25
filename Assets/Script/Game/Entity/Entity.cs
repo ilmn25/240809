@@ -264,11 +264,6 @@ public class Entity
                 loot = new (ID.SpiderNest);
                 loot.Add(1, 2, ID.Foul);
 
-                AddStructure<ArrowTrapMachine>(ID.ArrowTrap, Vector3Int.one, Main.IndexCollide);
-                loot = new (ID.ArrowTrap);
-                loot.Add(1, 1, ID.Stake);
-                loot.Add(0.5f, 1, ID.Stake);
-
                 AddStructure<OldPotMachine>(ID.OldPot, Vector3Int.one, Main.IndexCollide);
 
                 AddStructure<BarrelMachine>(ID.OilBarrel, Vector3Int.one, Main.IndexCollide);
@@ -423,6 +418,11 @@ public class Entity
 
                 AddMob<SawbladeMachine>(ID.Sawblade);
                 loot = new (ID.Sawblade);
+                loot.Add(1, 1, ID.Steel);
+                loot.Add(0.5f, 1, ID.Slag);
+
+                AddMob<BallistaMachine>(ID.Ballista);
+                loot = new (ID.Ballista);
                 loot.Add(1, 1, ID.Steel);
                 loot.Add(0.5f, 1, ID.Slag);
 

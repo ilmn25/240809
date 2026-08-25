@@ -21,7 +21,7 @@ public class MobSpawner
     private static readonly List<ID> GrassMobs = new() { ID.Sheep };
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
     private static readonly List<ID> DayMobs = new() { ID.Slime, ID.Pigeon, ID.Gnome };
-    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Raider, ID.Congregant, ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin, ID.Vampire, ID.Sawblade };
+    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Raider, ID.Congregant, ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin, ID.Vampire, ID.Sawblade, ID.Ballista };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
     private static readonly List<ID> RaptureMobs = new() { ID.Lich };
 

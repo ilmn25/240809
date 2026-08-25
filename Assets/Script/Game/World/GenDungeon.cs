@@ -11,7 +11,6 @@ public class GenDungeon : Gen
     private const float ChestChance = 0.004f;
     private const float RubbleChance = 0.012f;
     private const float OilBarrelChance = 0.006f;
-    private const float ArrowTrapChance = 0.008f;
     private const float OldPotChance = 0.01f;
     private const float SkeletonChance = 0.006f;
 
@@ -83,11 +82,9 @@ public class GenDungeon : Gen
                     PlaceEntity(world, ID.Rubble, x, 1, z);
                 else if (roll < ChestChance + RubbleChance + OilBarrelChance)
                     PlaceEntity(world, ID.OilBarrel, x, 1, z);
-                else if (roll < ChestChance + RubbleChance + OilBarrelChance + ArrowTrapChance)
-                    PlaceEntity(world, ID.ArrowTrap, x, 1, z);
-                else if (roll < ChestChance + RubbleChance + OilBarrelChance + ArrowTrapChance + OldPotChance)
+                else if (roll < ChestChance + RubbleChance + OilBarrelChance + OldPotChance)
                     PlaceEntity(world, ID.OldPot, x, 1, z);
-                else if (roll < ChestChance + RubbleChance + OilBarrelChance + ArrowTrapChance + OldPotChance + SkeletonChance)
+                else if (roll < ChestChance + RubbleChance + OilBarrelChance + OldPotChance + SkeletonChance)
                     PlaceEntity(world, ID.Skeleton, x, 1, z);
             }
         }

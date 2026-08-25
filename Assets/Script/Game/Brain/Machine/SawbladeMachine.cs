@@ -32,6 +32,7 @@ public class SawbladeMachine : MobMachine
 
     public override void OnStart()
     {
+        AddModule(new SpriteOrbitModule());
         _dir = Random.value < 0.5f ? Vector3.right : Vector3.forward;
         if (Random.value < 0.5f) _dir = -_dir;
         if (BlockedAhead(_dir)) _dir = -_dir;
