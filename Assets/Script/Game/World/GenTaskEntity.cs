@@ -47,6 +47,12 @@ public class GenTaskEntity : IGenTask
     {
         System.Random rng = Gen.CreateChunkRandom("Entity", currentCoordinate);
 
+        // Structures placed by earlier world tasks (raider tent, headstone, outpost,
+        // ...) live in chunk.StaticEntity but NOT in the terrain Map, so the surface
+        // scan below can't see them. Record how many already exist so we skip those
+        // cells and never spawn surface filler on top of them.
+        int preexistingStatic = currentChunk.StaticEntity.Count;
+
         for (int x = 0; x < World.ChunkSize; x++)
         {
             for (int y = 0; y < World.ChunkSize; y++)
@@ -59,6 +65,9 @@ public class GenTaskEntity : IGenTask
                         currentChunk[x, y + 1, z] == 0)
                     {
                         Vector3Int position = currentCoordinate + new Vector3Int(x, y + 1, z);
+
+                        if (HasStaticEntity(currentChunk, preexistingStatic, position))
+                            continue;
 
                         double roll = rng.NextDouble();
                         if (rng.NextDouble() < SurfaceSkeletonChance)
@@ -232,6 +241,17 @@ public class GenTaskEntity : IGenTask
         if ((chance += 0.55) > roll) return ID.Flint;
         if ((chance += 0.10) > roll) return ID.Gravel;
         return ID.Null;
+    }
+
+    /// <summary>True if any of the first <paramref name="count"/> static entities in
+    /// the chunk occupies <paramref name="position"/> (i.e. was placed by an earlier
+    /// gen task and already fills that cell).</summary>
+    private static bool HasStaticEntity(Chunk chunk, int count, Vector3Int position)
+    {
+        for (int i = 0; i < count; i++)
+            if (Vector3Int.FloorToInt(chunk.StaticEntity[i].position) == position)
+                return true;
+        return false;
     }
 
     // Scatters low-tier starter loot (crude tools, flint) around a skeleton.

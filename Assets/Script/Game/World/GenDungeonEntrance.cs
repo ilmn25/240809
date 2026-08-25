@@ -13,7 +13,7 @@ public class GenDungeonEntrance : GenTaskScatter
     public override void RunWorld(World world)
     {
         if (Entrance == null) return;
-        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("DungeonEntrance"));
+        System.Random rng = Gen.CreateWorldRandom("DungeonEntrance");
         Vector3Int column = PickGrassCenter(world, rng);
         if (column.x < 0) return;
         int surfaceY = FindSurfaceY(world, column.x, column.z);

@@ -10,7 +10,7 @@ public class GenTaskPond : GenTaskScatter
 
     public override void RunWorld(World world)
     {
-        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("Ponds"));
+        System.Random rng = Gen.CreateWorldRandom("Ponds");
         int count = rng.Next(MinPonds, MaxPonds + 1);
         for (int i = 0; i < count; i++)
             TryPlacePond(world, rng);

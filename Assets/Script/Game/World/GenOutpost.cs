@@ -9,7 +9,7 @@ public class GenOutpost : GenTaskScatter
     public override void RunWorld(World world)
     {
         if (Outpost == null) return;
-        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("Outpost"));
+        System.Random rng = Gen.CreateWorldRandom("Outpost");
         Vector3Int column = PickGrassCenter(world, rng);
         if (column.x < 0) return;
         int surfaceY = FindSurfaceY(world, column.x, column.z);

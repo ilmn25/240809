@@ -13,6 +13,7 @@ public class GenDungeon : Gen
     private const float OilBarrelChance = 0.006f;
     private const float ArrowTrapChance = 0.008f;
     private const float OldPotChance = 0.01f;
+    private const float SkeletonChance = 0.006f;
 
     private static int _stoneId;
     private static int Stone => _stoneId == 0 ? Block.ConvertID(ID.StoneBlock) : _stoneId;
@@ -86,6 +87,8 @@ public class GenDungeon : Gen
                     PlaceEntity(world, ID.ArrowTrap, x, 1, z);
                 else if (roll < ChestChance + RubbleChance + OilBarrelChance + ArrowTrapChance + OldPotChance)
                     PlaceEntity(world, ID.OldPot, x, 1, z);
+                else if (roll < ChestChance + RubbleChance + OilBarrelChance + ArrowTrapChance + OldPotChance + SkeletonChance)
+                    PlaceEntity(world, ID.Skeleton, x, 1, z);
             }
         }
     }

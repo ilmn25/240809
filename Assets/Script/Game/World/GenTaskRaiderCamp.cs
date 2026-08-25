@@ -13,7 +13,7 @@ public class GenTaskRaiderCamp : GenTaskScatter
     /// <summary>Places the raider camps, if terrain permits.</summary>
     public override void RunWorld(World world)
     {
-        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("RaiderCamp"));
+        System.Random rng = Gen.CreateWorldRandom("RaiderCamp");
 
         for (int i = 0; i < CampCount; i++)
         {

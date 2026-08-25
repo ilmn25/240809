@@ -13,7 +13,7 @@ public class GenTaskGraveyard : GenTaskScatter
     /// <summary>Places the graveyard, if any, for this world.</summary>
     public override void RunWorld(World world)
     {
-        System.Random rng = new System.Random((int)Gen.GetDeterministicOffset("Graveyard"));
+        System.Random rng = Gen.CreateWorldRandom("Graveyard");
 
         Vector3Int center = PickGrassCenter(world, rng);
         if (center.x < 0) return;

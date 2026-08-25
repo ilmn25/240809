@@ -8,8 +8,7 @@ public enum GenType
 {
     Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit
 }
-/// <summary>A single generation step. Implement RunChunk for per-chunk block
-/// work; RunWorld for work once, after all chunks are generated.</summary>
+/// <summary>A single generation step. RunChunk for per-chunk block work; RunWorld for work once, after all chunks are generated.</summary>
 public interface IGenTask
 {
     void RunChunk(Vector3Int coord, Chunk chunk) { }
@@ -18,8 +17,7 @@ public interface IGenTask
 
 public abstract class Gen
 {
-    // Ordered pipeline of tasks. Worlds with bespoke generation override
-    // GenChunk/GenPostWorld directly instead.
+    // Ordered pipeline of tasks. Bespoke worlds override GenChunk/GenPostWorld instead.
     protected virtual IGenTask[] Tasks => Array.Empty<IGenTask>();
 
     protected virtual void GenChunk(Vector3Int currentCoordinate, Chunk currentChunk)
@@ -45,29 +43,27 @@ public abstract class Gen
         {GenType.Edit, new GenEdit()},
     };
 
-    /// <summary>
-    /// Returns a deterministic Perlin-noise offset derived from the world seed and
-    /// a unique salt string.  This does NOT consume any shared Random state,
-    /// so it is safe to use in static field initializers without introducing
-    /// non-determinism.
-    /// </summary>
+    /// <summary>Deterministic Perlin-noise offset from world seed + salt; doesn't consume shared Random state.</summary>
     public static float GetDeterministicOffset(string salt)
     {
         int hash = CombineHashes(Save.Inst.seed, DeterministicStringHash(salt));
         return (float)(new System.Random(hash).NextDouble()) * 1000f;
     }
 
-    /// <summary>
-    /// Creates a System.Random seeded from the world seed + salt + chunk coordinate.
-    /// This ensures every chunk+task combination always gets the same random sequence,
-    /// regardless of execution order.
-    /// </summary>
+    /// <summary>System.Random seeded from world seed + salt + chunk coordinate (stable regardless of execution order).</summary>
     public static System.Random CreateChunkRandom(string salt, Vector3Int chunkCoord)
     {
         int hash = CombineHashes(Save.Inst.seed, 
                    CombineHashes(DeterministicStringHash(salt),
                    CombineHashes(chunkCoord.x, 
                    CombineHashes(chunkCoord.y, chunkCoord.z))));
+        return new System.Random(hash);
+    }
+
+    /// <summary>Whole-world System.Random from world seed + salt (full entropy; avoid (int)GetDeterministicOffset seeds).</summary>
+    public static System.Random CreateWorldRandom(string salt)
+    {
+        int hash = CombineHashes(Save.Inst.seed, DeterministicStringHash(salt));
         return new System.Random(hash);
     }
 
@@ -82,10 +78,7 @@ public abstract class Gen
         }
     }
 
-    /// <summary>
-    /// A stable string hash that produces the same value on all .NET
-    /// runtimes and platforms (unlike string.GetHashCode()).
-    /// </summary>
+    /// <summary>Stable string hash identical on all .NET runtimes (unlike string.GetHashCode()).</summary>
     private static int DeterministicStringHash(string str)
     {
         unchecked
@@ -97,11 +90,7 @@ public abstract class Gen
         }
     }
 
-    /// <summary>
-    /// Generates every chunk for the given world up-front (Terraria-style).
-    /// Skips worlds that already have data (e.g. loaded from a save file).
-    /// Does NOT write into NavMap — the caller is responsible for that.
-    /// </summary>
+    /// <summary>Generates every chunk up-front (Terraria-style); skips already-generated worlds; caller handles NavMap.</summary>
     public static void GenerateAllFor(World world)
     {
         // Skip if already generated (loaded from save)
@@ -128,8 +117,7 @@ public abstract class Gen
         gen.GenPostWorld(world);
     }
 
-    /// <summary>Coroutine version of <see cref="GenerateAllFor"/> that yields every
-    /// few chunks so generation runs over frames (e.g. during the intro dialogue).</summary>
+    /// <summary>Coroutine version of <see cref="GenerateAllFor"/> that yields every few chunks to spread over frames.</summary>
     public static IEnumerator GenerateAllForCoroutine(World world, Action<float> onProgress = null)
     {
         // Skip if already generated (loaded from save)
