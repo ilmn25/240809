@@ -86,6 +86,28 @@ public class Control
         CurrentPlayerIndex = i;
     }
 
+    /// <summary>Hand control to the first surviving party member. Used after the
+    /// currently controlled player dies so the game doesn't get stuck controlling a
+    /// removed character. Also claims ownership so the UI shows the new controller
+    /// as "You" instead of "Free".</summary>
+    public static void SetNextPlayer()
+    {
+        if (global::Save.Inst == null || global::Save.Inst.players.Count == 0) return;
+        // Already controlling a live member — nothing to do.
+        if (Main.PlayerInfo != null && Main.PlayerInfo.Machine != null) return;
+
+        for (int i = 0; i < global::Save.Inst.players.Count; i++)
+        {
+            PlayerInfo p = global::Save.Inst.players[i];
+            if (p == null || p.Machine == null || p.Destroyed) continue;
+
+            p.Resting = false;
+            SetPlayer(i);
+            if (Helper.IsHost()) PlayerSync.HostClaimPlayer(p.uid);
+            return;
+        }
+    }
+
     /// <summary>Switch control to the player at index <paramref name="i"/> and
     /// update network ownership (host claims/releases, client re-claims).</summary>
     public static void SwitchToPlayer(int i)

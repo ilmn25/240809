@@ -183,12 +183,15 @@ public class PlayerInfo : MobInfo
         EntityMachine?.Unload();
         Save.Inst.players.Remove(this);
 
-        if (wasControlled)
+        // Hand control to the next surviving party member. Covers both the normal
+        // case (this was the controlled player) and a dangling Main.PlayerInfo that
+        // still points at this removed player.
+        if (wasControlled || Main.PlayerInfo == this || Main.PlayerInfo?.Machine == null)
         {
             if (Save.Inst.players.Count == 0)
                 GUIMain.GUIMenu?.ShowDeath();
             else
-                Control.SetPlayer(0);
+                Control.SetNextPlayer();
         }
 
         GUIBar.Update();
