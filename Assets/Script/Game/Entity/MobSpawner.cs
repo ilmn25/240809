@@ -20,7 +20,9 @@ public class MobSpawner
 
     private static readonly List<ID> GrassMobs = new() { ID.Sheep };
     private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
-    private static readonly List<ID> DayMobs = new() { ID.Slime, ID.Pigeon, ID.Gnome };
+    private static readonly List<ID> DayMobs = new() { ID.Slime, ID.Pigeon };
+    private static readonly List<ID> RareDayMobs = new() { ID.Gnome };
+    private const float GnomeSpawnChance = 0.08f;
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Raider, ID.Congregant, ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin, ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
     private static readonly List<ID> RaptureMobs = new() { ID.Lich };
@@ -85,7 +87,7 @@ public class MobSpawner
         else if (isNight)
             pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
         else if (Random.value < 0.35f)
-            pool = DayMobs;   // slimes drift across the world during the day
+            pool = Random.value < GnomeSpawnChance ? RareDayMobs : DayMobs;   // slimes drift across the world during the day
         else
             pool = biome switch
             {

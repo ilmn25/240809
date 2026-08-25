@@ -213,5 +213,8 @@ public enum ID
     BucketOfOil,
     BulletinBoard,
     Turret,
-
+    DriedWell,
+    Chair,
+    Bookshelf,
+    FlameArrow,
 }

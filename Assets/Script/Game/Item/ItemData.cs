@@ -135,6 +135,9 @@ public partial class Item
         AddStructureDefinition(ID.BulletinBoard, null, 100, furniture: true, description: "A wooden bulletin board that serves as the Questmaster's home — the quest-giver lives and respawns here.");
         AddStructureDefinition(ID.OldRadio, null, 100, furniture: true, description: "An old radio — one of the key items a travelling merchant looks for. Found in chests.");
         AddStructureDefinition(ID.Scarecrow, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Stake, 2 } }, 100, furniture: true, description: "A scarecrow that keeps pigeons away from the surrounding area.");
+        AddStructureDefinition(ID.DriedWell, new Dictionary<ID, int> { { ID.StoneBlock, 6 }, { ID.Plank, 2 } }, 100, furniture: true, description: "A dried-up stone well, long since gone dry.");
+        AddStructureDefinition(ID.Chair, new Dictionary<ID, int> { { ID.Plank, 2 } }, 100, furniture: true, description: "A simple wooden chair.");
+        AddStructureDefinition(ID.Bookshelf, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Paper, 2 } }, 100, furniture: true, description: "A sturdy wooden bookshelf for storing tomes.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
         AddStructureDefinition(ID.DungeonDoor, null, 200, furniture: true, description: "A heavy brick door that descends into the dungeon depths.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");

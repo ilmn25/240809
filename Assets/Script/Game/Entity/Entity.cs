@@ -294,6 +294,9 @@ public class Entity
                 loot.Add(1, 2, ID.Steel);
                 loot.Add(0.5f, 1, ID.Steel);
                 loot.Add(1, 2, ID.Slag);
+                AddStructure<DriedWellMachine>(ID.DriedWell, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ChairMachine>(ID.Chair, Vector3Int.one, Main.IndexCollide);
+                AddStructure<BookshelfMachine>(ID.Bookshelf, Vector3Int.one, Main.IndexCollide);
                 loot.Add(0.5f, 1, ID.Glass);
                 loot = new (ID.Door);
                 loot.Add(1, 2, ID.Plank);

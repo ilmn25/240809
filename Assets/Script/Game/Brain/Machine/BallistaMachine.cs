@@ -10,8 +10,8 @@ public class BallistaMachine : MobMachine
     private const float FireInterval = 1.5f; // seconds between shots
     private const float BoltRange = 10f;     // how far the bolt travels
 
-    private static readonly RangedProjectileInfo Bolt = new RangedProjectileInfo {
-        Sprite = ID.BulletProjectile,
+    private static readonly FlameProjectile Bolt = new FlameProjectile {
+        Sprite = ID.FlameArrow,
         Damage = 3,
         Knockback = 6,
         CritChance = 5,
@@ -65,7 +65,7 @@ public class BallistaMachine : MobMachine
 
     private void Fire(Vector3 dir)
     {
-        Vector3 origin = transform.position + dir;
+        Vector3 origin = transform.position + dir + Vector3.up * 0.4f;
         Projectile.Spawn(origin, origin + dir * BoltRange, Bolt, Info.targetHitboxType, Info);
     }
 }
