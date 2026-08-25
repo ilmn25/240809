@@ -88,6 +88,8 @@ public partial class Item
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500, burnResult: ID.Charcoal);
         AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
+        AddMaterialDefinition(ID.Tulip, "A bright tulip that blooms in sunny meadows.");
+        AddMaterialDefinition(ID.Daisies, "A cheerful cluster of daisies growing in the grass.");
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
         AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
         AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.");

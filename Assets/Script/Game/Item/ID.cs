@@ -112,6 +112,8 @@ public enum ID
     ForestBlock,
     Deathcap,
     Orchids,
+    Tulip,
+    Daisies,
     Torch,
     BurnedTree,
     Rubble,

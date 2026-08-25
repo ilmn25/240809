@@ -222,6 +222,8 @@ public class Entity
                 AddStructure<HarvestableMachine>(ID.Grass, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<HarvestableMachine>(ID.Deathcap, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<HarvestableMachine>(ID.Orchids, Vector3Int.one, Main.IndexNoCollide);   
+                AddStructure<HarvestableMachine>(ID.Tulip, Vector3Int.one, Main.IndexNoCollide);
+                AddStructure<HarvestableMachine>(ID.Daisies, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<BedMachine>(ID.Bed, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SignMachine>(ID.Sign, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.Bed);

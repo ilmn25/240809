@@ -43,6 +43,14 @@ public class GenTaskEntity : IGenTask
         return noise > 0.5f - PathWidth && noise < 0.5f + PathWidth;
     }
 
+    private static ID PickMeadowFlower(System.Random rng)
+    {
+        double flower = rng.NextDouble();
+        if (flower < 0.34) return ID.Orchids;
+        if (flower < 0.67) return ID.Tulip;
+        return ID.Daisies;
+    }
+
     private void SpawnChunk(Vector3Int currentCoordinate, Chunk currentChunk)
     {
         System.Random rng = Gen.CreateChunkRandom("Entity", currentCoordinate);
@@ -126,7 +134,7 @@ public class GenTaskEntity : IGenTask
                             }
                             else if (roll <= (chance += GrassOrchidChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Orchids, position));
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(PickMeadowFlower(rng), position));
                             }
                             else if (roll <= (chance += DirtTentChance))
                             {

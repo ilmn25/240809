@@ -66,6 +66,14 @@ public static class HarvestableRegistry
         orchids.Add(1f, 1, ID.Orchids);
         Register(ID.Orchids, new HarvestableDefinition(orchids));
 
+        Loot tulip = new Loot(ID.Tulip);
+        tulip.Add(1f, 1, ID.Tulip);
+        Register(ID.Tulip, new HarvestableDefinition(tulip));
+
+        Loot daisies = new Loot(ID.Daisies);
+        daisies.Add(1f, 1, ID.Daisies);
+        Register(ID.Daisies, new HarvestableDefinition(daisies));
+
         // Wooden table: flammable decor that burns down to its wooden materials.
         Loot table = new Loot(ID.Table);
         table.Add(1f, 2, ID.Plank);
