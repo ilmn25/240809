@@ -53,6 +53,7 @@ public class DungeonMobSpawner
         if (NavMap.Get(pos) == NavMap.Air || !NavMap.IsAir(pos + Vector3Int.up)) return;
 
         pos.y = 1;
-        Entity.Spawn(Random.value < 0.5f ? ID.Sawblade : ID.Ballista, pos);
+        ID[] mobs = { ID.Sawblade, ID.Ballista, ID.Turret };
+        Entity.Spawn(mobs[Random.Range(0, mobs.Length)], pos);
     }
 }

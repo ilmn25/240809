@@ -212,5 +212,6 @@ public enum ID
     Barrel,
     BucketOfOil,
     BulletinBoard,
+    Turret,
 
 }

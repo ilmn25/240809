@@ -426,6 +426,11 @@ public class Entity
                 loot.Add(1, 1, ID.Steel);
                 loot.Add(0.5f, 1, ID.Slag);
 
+                AddMob<TurretMachine>(ID.Turret);
+                loot = new (ID.Turret);
+                loot.Add(0.7f, 5, ID.Bullet);
+                loot.Add(0.1f, 1, ID.Pistol);
+
                 AddMob<LichMachine>(ID.Lich);
                 loot = new (ID.Lich);
                 loot.Add(1, 3, ID.DiamondAxe);
