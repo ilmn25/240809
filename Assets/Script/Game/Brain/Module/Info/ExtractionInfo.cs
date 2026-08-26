@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// <summary>A converter that smelts relics down into gold. Drop a relic into its
 /// storage and it melts it down, paying out gold after a short time.</summary>
 [Serializable]
-public class CollectorInfo : ConverterInfo
+public class ExtractionInfo : ConverterInfo
 {
     private static readonly Dictionary<ID, int> RelicValue = new Dictionary<ID, int>
     {

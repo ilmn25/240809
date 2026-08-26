@@ -1,13 +1,13 @@
 using UnityEngine;
 
-/// <summary>A travelling collector that trades relics for gold, like the
-/// merchant but running a refinery. Interact to open its converter: drop a relic
-/// into its storage and it smelts it down into gold.</summary>
+/// <summary>A travelling trader that trades materials for gold, like the
+/// merchant but running a refinery. Interact to open its converter: drop a
+/// material into its storage and it smelts it down into gold.</summary>
 public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
 {
-    /// <summary>The collector's converter — holds the relic storage and the
-    /// relic-to-gold table. Kept off the mob Info (which must stay a PassiveInfo).</summary>
-    public CollectorInfo Converter { get; private set; }
+    /// <summary>The trader's converter — holds the material storage and the
+    /// material-to-gold table. Kept off the mob Info (which must stay a PassiveInfo).</summary>
+    public TraderInfo Converter { get; private set; }
 
     public static Info CreateInfo()
     {
@@ -25,7 +25,7 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         base.OnStart();
 
-        Converter = new CollectorInfo() { Storage = new Storage(9) };
+        Converter = new TraderInfo() { Storage = new Storage(9) };
         Converter.Machine = this;
         Converter.Initialize();
 
@@ -36,7 +36,7 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         if (Info.Target != null) return;
         Audio.PlaySFX(SfxID.Notification);
-        // The collector idles in MobIdle (not DefaultState), so toggle on
+        // The trader idles in MobIdle (not DefaultState), so toggle on
         // InContainerState instead of the chest's DefaultState pattern.
         if (IsCurrentState<InContainerState>())
             SetState<DefaultState>();
@@ -46,7 +46,7 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public override void OnUpdate()
     {
-        // A caravan collector follows the wagon and leaves when it's gone.
+        // A caravan trader follows the wagon and leaves when it's gone.
         if (Caravan != null)
         {
             // Don't interrupt an open converter or a hit reaction.

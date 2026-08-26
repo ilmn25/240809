@@ -2,7 +2,7 @@ public class RefineryMachine : ConverterMachine
 {
     public static Info CreateInfo()
     {
-        return new RefineryInfo()
+        return new ExtractionInfo()
         {
             Health = 500,
             Loot = ID.Refinery,
