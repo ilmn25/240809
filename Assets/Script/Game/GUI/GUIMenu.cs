@@ -301,7 +301,7 @@ public partial class GUIMenu
         };
     }
 
-    private static string Header(string name) => $"+-= ═.·:·. {name} .·:·.═ =-+\n";
+    private static string Header(string name) => $"+-= =.·:·. {name} .·:·.= =-+\n";
 
     private void ShowToast(string message)
     {
