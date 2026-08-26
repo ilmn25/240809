@@ -14,6 +14,6 @@ public class GenAbyss : Gen
         // World pass: dungeon entrance, spawn statue, surface scatter, entities last.
         new GenDungeonEntrance(), new GenTaskSpawnStatue(), new GenTaskGraveyard(),
         new GenTaskBeehiveArea(), new GenTaskRaiderCamp(), new GenTaskPond(),
-        new GenOutpost(), new GenTaskEntity(),
+        new GenOutpost(), new GenTaskTower(), new GenTaskEntity(),
     };
 }
