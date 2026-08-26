@@ -17,9 +17,9 @@ public class HornetMachine : FlyingEnemyMachine
             HealthMax = 3,
             DistAttack = 2,
             DistAlert = 7,
-            DistDisengage = 10,
+            DistDisengage = 7,
             SpeedGround = 0,
-            SpeedAir = 8f,
+            SpeedAir = 6f,
             CanFly = true,
         };
     }

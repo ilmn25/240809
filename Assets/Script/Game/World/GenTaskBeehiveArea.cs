@@ -10,7 +10,7 @@ public class GenTaskBeehiveArea : GenTaskScatter
     private const int MaxHives = 8;
     private const int MinFlowers = 30;
     private const int MaxFlowers = 45;
-    private const int ScatterRadius = 6;
+    private const int ScatterRadius = 14;
 
     /// <summary>Places the beehive meadow, if any, for this world.</summary>
     public override void RunWorld(World world)

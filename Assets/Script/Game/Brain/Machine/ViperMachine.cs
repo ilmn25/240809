@@ -7,6 +7,15 @@ public class ViperMachine : SpiderMachine
 
     protected override StatusEffect BiteHitEffect => BloodClot;
 
+    /// <summary>Unlike its docile spider ancestor, the viper is an aggressive
+    /// ambush predator: it locks onto the player on sight (like other hostile
+    /// mobs) and then uses the shared spider brain to chase, strafe and strike.</summary>
+    public override void OnUpdate()
+    {
+        UpdateAggro();
+        base.OnUpdate();
+    }
+
     public static new Info CreateInfo()
     {
         return new EnemyInfo()

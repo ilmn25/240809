@@ -154,7 +154,8 @@ public class PlayerInfo : MobInfo
         else if (!isSelected && !blockedByOther && !Resting)
         {
             if (Target != null) AimPosition = Target.position;
-            SpeedTarget = IsGrounded ? SpeedGround + 0.2f : SpeedAir * 2;
+            // AI-controlled party members move 1.5x faster 
+            SpeedTarget = (IsGrounded ? SpeedGround : SpeedAir) * 1.7f;
         }
         SpeedTarget *= SpeedModifier;
  

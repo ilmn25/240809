@@ -158,6 +158,8 @@ public class StatusEffectModule : EntityModule
             player.BaseHealthMax = Mathf.Max(1, player.BaseHealthMax - amount);
             player.HealthMax = Mathf.Max(1, player.HealthMax - amount);
             if (player.Health > player.HealthMax) player.Health = player.HealthMax;
+            // Refresh the HUD heart bar so the lowered max HP shows immediately.
+            if (Main.PlayerInfo == player) GUIBar.Update();
         }
         else if (EntityMachine.Info is DynamicInfo dynamicInfo)
         {
@@ -175,6 +177,8 @@ public class StatusEffectModule : EntityModule
         {
             player.BaseHealthMax += amount;
             player.HealthMax += amount;
+            // Refresh the HUD heart bar so the restored max HP shows immediately.
+            if (Main.PlayerInfo == player) GUIBar.Update();
         }
         else if (EntityMachine.Info is DynamicInfo dynamicInfo)
         {
