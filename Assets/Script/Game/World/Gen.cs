@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public enum GenType
 {
-    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit
+    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit, Maw
 }
 /// <summary>A single generation step. RunChunk for per-chunk block work; RunWorld for work once, after all chunks are generated.</summary>
 public interface IGenTask
@@ -41,6 +41,7 @@ public abstract class Gen
         {GenType.Backrooms, new GenBackrooms()},
         {GenType.Dungeon, new GenDungeon()},
         {GenType.Edit, new GenEdit()},
+        {GenType.Maw, new GenMaw()},
     };
 
     /// <summary>Deterministic Perlin-noise offset from world seed + salt; doesn't consume shared Random state.</summary>

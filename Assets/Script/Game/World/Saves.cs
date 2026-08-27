@@ -45,7 +45,17 @@ public class Saves
     {   
         Save.Inst = save.id == null ? save : (Helper.FileLoad<Save>(save.Path + SaveDataFile) ?? save);
         Main.PlayerInfo = Save.Inst.players[0];
-    } 
+    }
+
+    /// <summary>Ensures a World exists for every GenType (fixes saves made before
+    /// a new world type was added, so e.g. the Maw is always present).</summary>
+    public static void EnsureWorlds()
+    {
+        if (Save.Inst == null) return;
+        foreach (GenType gen in System.Enum.GetValues(typeof(GenType)))
+            if (!Save.Inst.worlds.ContainsKey(gen))
+                Save.Inst.worlds[gen] = new World(gen);
+    }
 }
 
 [Serializable]
@@ -63,6 +73,13 @@ public class Save
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
 
+    // The Maw's daily gold quota state (see MawQuota).
+    public int mawQuota = 15;
+    public int mawPaid;
+    public int mawDay = 1;
+    public int mawStreak;
+    public bool mawUnlocked;
+
     public Save(){}
     public Save(GenType gen)
     {
@@ -77,7 +94,8 @@ public class Save
             { GenType.SuperFlat, new World(GenType.SuperFlat) },
             { GenType.Backrooms, new World(GenType.Backrooms) },
             { GenType.Dungeon, new World(GenType.Dungeon) },
-            { GenType.Edit, new World(GenType.Edit) }
+            { GenType.Edit, new World(GenType.Edit) },
+            { GenType.Maw, new World(GenType.Maw) }
         };
 
         Vector3 spawnPosition = worlds[gen].SpawnPoint;

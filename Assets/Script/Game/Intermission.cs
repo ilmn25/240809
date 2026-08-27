@@ -55,6 +55,9 @@ public static class Intermission
         {
             if (player.Machine == null) Entity.SpawnFromInfo(player, false);
             player.Machine.transform.position = spawnPosition;
+            // Safe at the destination spawn — drop the world-switch protection so
+            // the player lands and resumes control instead of hovering mid-air.
+            player.EndWorldSwitchProtection();
         }
         PlayerSync.HostClaimPlayer(Save.Inst.players[0].uid);
 

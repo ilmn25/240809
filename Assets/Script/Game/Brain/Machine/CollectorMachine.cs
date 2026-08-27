@@ -63,10 +63,4 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
         UpdateFlee();
         Converter.Update();
     }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
-    }
 }

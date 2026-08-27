@@ -50,6 +50,24 @@ public class PlayerInfo : MobInfo
     private float _coyoteTimer;
     public PlayerStatus PlayerStatus = PlayerStatus.Respawn;
 
+    /// <summary>Puts the player into spawn protection (invulnerable, no control)
+    /// for a generous number of frames. Used during world switches so a player
+    /// whose transform is still at stale coordinates can't fall to their death
+    /// while the old world's ground is torn down and the new one loads.</summary>
+    public void GrantWorldSwitchProtection(int frames = 600)
+    {
+        PlayerStatus = PlayerStatus.Respawn;
+        IframesCurrent = Mathf.Max(IframesCurrent, frames);
+    }
+
+    /// <summary>Ends world-switch spawn protection early once the player has been
+    /// safely placed at the destination spawn (revives to full health/control).</summary>
+    public void EndWorldSwitchProtection()
+    {
+        if (PlayerStatus == PlayerStatus.Respawn)
+            Revive();
+    }
+
     public override void Initialize()
     { 
         base.Initialize(); 

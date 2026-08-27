@@ -217,4 +217,6 @@ public enum ID
     Chair,
     Bookshelf,
     FlameArrow,
+    MawDoor,
+    MawPit,
 }

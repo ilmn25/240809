@@ -130,6 +130,8 @@ public class Entity
                 AddStructure<WorkbenchMachine>(ID.Workbench, Vector3Int.one, Main.IndexCollide);
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<DungeonDoorMachine>(ID.DungeonDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
+                AddStructure<MawDoorMachine>(ID.MawDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
+                AddStructure<MawPitMachine>(ID.MawPit, new Vector3Int(2, 1, 2), Main.IndexSemiCollide, NavMap.Semi);
 
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);

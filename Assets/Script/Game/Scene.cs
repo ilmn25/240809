@@ -25,6 +25,13 @@ public class Scene
         ScreenFade.FadeOut(0.3f);
         if (spawnPoint.HasValue)
             Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
+        // The player machine survives the switch (Quit(false)), but its transform
+        // stays at the old world's coordinates until the new world finishes loading
+        // — where that column may be void/high and lethal. Grant spawn protection
+        // for the whole transition so players can't fall to their death.
+        if (Save.Inst != null)
+            foreach (PlayerInfo player in Save.Inst.players)
+                player?.GrantWorldSwitchProtection();
         new CoroutineTask(Quit(false)).Finished += _ => {
             Save.Inst.current = genType;
             Start(false);
@@ -51,6 +58,9 @@ public class Scene
     private static void Start(bool playIntro = false)
     {
         Tutorial.Reset();
+
+        // Saves from before a new world type was added won't have it — create it.
+        Saves.EnsureWorlds();
 
         Vector3 spawnPosition = World.Inst.SpawnPoint;
 

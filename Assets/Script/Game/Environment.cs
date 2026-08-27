@@ -178,6 +178,8 @@ public class Environment
             {
                 Time = 0;
                 Save.Inst.day++;
+                // Judge the previous day's Maw quota and set today's.
+                MawQuota.OnDayPassed();
                 // Auto-save at the start of each new day when enabled.
                 if (Settings.Inst != null && Settings.Inst.AutoSaveIndex == 1)
                     Saves.SaveGame();
