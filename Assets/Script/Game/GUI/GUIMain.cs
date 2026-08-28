@@ -143,8 +143,24 @@ public static class GUIMain
 
         string BuildTimeHudText()
         {
-            if (Save.Inst == null) return "Day ?, ??:??";
-            return $"Day {Save.Inst.day}, {Helper.FormatTime(Save.Inst.time)}";
+            if (Save.Inst == null) return "Day ?, ?";
+            // Countdown to nightfall (sunset at 18:00 = 3/4 through the day).
+            int minutesUntilNight = Mathf.Max(0, Environment.Length * 3 / 4 - Save.Inst.time);
+            return $"Day {Save.Inst.day}, {minutesUntilNight} minutes until night";
+        }
+
+        string BuildCameraDirText()
+        {
+            if (Camera.main == null) return "";
+            Vector3 fwd = Camera.main.transform.forward;
+            fwd.y = 0;
+            if (fwd.sqrMagnitude < 0.0001f) return "";
+            fwd.Normalize();
+            // North = -Z, East = +X, South = +Z, West = -X.
+            float angle = Mathf.Atan2(fwd.x, -fwd.z) * Mathf.Rad2Deg;
+            if (angle < 0) angle += 360f;
+            string[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
+            return dirs[Mathf.RoundToInt(angle / 45f) % 8];
         }
 
         string BuildTargetHudText(Info target)
@@ -200,22 +216,17 @@ public static class GUIMain
             return;
         }
 
-        int playerIndex = Control.CurrentPlayerIndex + 1;
-        int slotId = Main.PlayerInfo?.Storage != null ? Main.PlayerInfo.Storage.Key + 1 : 1;
-
         string uid = Main.PlayerInfo?.uid ?? "";
         bool isSpectating = Helper.IsHost()
             ? PlayerSync.IsClaimedByRemoteClient(uid)
             : !PlayerSync.CanLocalClientControl(uid);
-        string controlStatus = isSpectating
-            ? $"Spectating Player {playerIndex}"
-            : $"Controlling Player {playerIndex}";
+        string controlStatus = isSpectating ? "spectating" : "";
 
         string tutorial = Tutorial.BuildHudText();
         string effects = Main.PlayerInfo?.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
         Main.GUIHudText.text =
-            $"{BuildTimeHudText()}\n" +
-            $"{controlStatus} | Slot {slotId}\n" +
+            $"{BuildTimeHudText()} | {BuildCameraDirText()}\n" +
+            (controlStatus.Length > 0 ? controlStatus + "\n" : "") +
             BuildTargetHudText(Main.PlayerInfo?.Target) +
             (effects.Length > 0 ? "\nEffects: " + effects : "") +
             (tutorial.Length > 0 ? "\n" + tutorial : "") +
