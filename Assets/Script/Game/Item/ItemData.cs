@@ -42,6 +42,8 @@ public partial class Item
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.", materials: new Dictionary<ID, int> { { ID.Slag, 3 }, { ID.Charcoal, 1 } });
         AddMaterialDefinition(ID.Gunpowder, "A volatile black powder of charcoal and sulphur. Pours the fire into bullets and landmines.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Sulphur, 1 } }, craftStack: 4, time: 1000);
+        AddMaterialDefinition(ID.IncendiaryBullet, "Incendiary bullet rounds that set targets on fire.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Charcoal, 1 } }, craftStack: 5, time: 1500);
+        AddMaterialDefinition(ID.ShotgunRound, "Fat shotgun shells packed with powder and shot. Only a shotgun can fire them.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Casing, 1 }, { ID.Steel, 1 } }, craftStack: 4, time: 1500);
         AddConsumableDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
         AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
         AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
@@ -552,6 +554,79 @@ public partial class Item
             description: "Compact pistol, quick draw and moderate damage.",
             materials: new Dictionary<ID, int> { { ID.WoodBlock, 2 } },
             projectileOffset: 1.016f,
+            holdoutOffset: new Vector2(0.4f, -0.25f)
+        );
+
+        AddToolDefinition(
+            id: ID.Grenade,
+            gesture: ItemGesture.Shoot,
+            speed: 1.1f,
+            sfx: SfxID.Pistol,
+            projectileInfo: new GrenadeProjectileInfo {
+                Sprite = ID.Grenade,
+                Damage = 0,
+                Knockback = 0,
+                CritChance = 0,
+                LifeSpan = 132,          // ~2.2s fuse at 60fps
+                Speed = 16,
+                Radius = 0.3f,
+                Ammo = ID.Grenade,
+                Blast = new ExplosionProjectileInfo {
+                    Damage = 22,
+                    Knockback = 12,
+                    Radius = 3f,
+                    Sprite = ID.BulletProjectile,
+                    Class = ProjectileClass.Magic,
+                    SkipSource = true, // spares the thrower
+                },
+            },
+            description: "A throwable explosive. It arcs, then detonates in a blast — spares the thrower.",
+            materials: new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Casing, 1 }, { ID.Steel, 1 } },
+            projectileOffset: 1.1f,
+            stackSize: 5,
+            holdoutOffset: new Vector2(0.5f, 0)
+        );
+
+        AddToolDefinition(
+            id: ID.FlareGun,
+            gesture: ItemGesture.Shoot,
+            speed: 0.9f,
+            sfx: SfxID.Pistol,
+            projectileInfo: new FlameProjectile {
+                Sprite = ID.BulletProjectile,
+                Damage = 2,
+                Knockback = 5,
+                CritChance = 10,
+                LifeSpan = 10000,
+                Speed = 60,
+                Radius = 0.1f,
+                Ammo = ID.IncendiaryBullet,
+                Penetration = 1,
+            },
+            description: "A flare gun that fires incendiary rounds, setting targets ablaze.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 2 } },
+            projectileOffset: 1.4f,
+            holdoutOffset: new Vector2(0.4f, -0.25f)
+        );
+
+        AddToolDefinition(
+            id: ID.Shotgun,
+            gesture: ItemGesture.Shoot,
+            speed: 0.7f,
+            sfx: SfxID.Pistol,
+            projectileInfo: new RangedProjectileInfo {
+                Sprite = ID.BulletProjectile,
+                Damage = 3,
+                Knockback = 4,
+                CritChance = 5,
+                LifeSpan = 10000,
+                Speed = 60,
+                Radius = 0.1f,
+                Ammo = ID.ShotgunRound,
+            },
+            description: "A pump-action shotgun that looses a spread of shells.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.WoodBlock, 2 } },
+            projectileOffset: 1.4f,
             holdoutOffset: new Vector2(0.4f, -0.25f)
         );
 

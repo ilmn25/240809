@@ -224,4 +224,9 @@ public enum ID
     MetalSpikeTrap,
     Landmine,
     Gunpowder,
+    Grenade,
+    IncendiaryBullet,
+    FlareGun,
+    Shotgun,
+    ShotgunRound,
 }

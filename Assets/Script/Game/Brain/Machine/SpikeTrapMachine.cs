@@ -7,9 +7,12 @@ using Random = UnityEngine.Random;
 /// over it (and get stabbed) instead of being blocked.</summary>
 public class SpikeTrapMachine : StructureMachine
 {
-    private const int HitInterval = 30;   // frames between damage checks (~0.5s at 60fps)
+    private const int HitInterval = 30;    // frames between damage checks (~0.5s at 60fps)
     private const float HitRadius = 0.55f; // small sphere over the trap: catches creatures standing on it, not beside it
     private int _timer;
+
+    /// <summary>Which variant this placed trap is (wood vs metal).</summary>
+    private bool IsMetal => Info.id == ID.MetalSpikeTrap;
 
     private static readonly ContactDamageProjectileInfo WoodHit = new ContactDamageProjectileInfo {
         Damage = 2,
@@ -48,12 +51,11 @@ public class SpikeTrapMachine : StructureMachine
     {
         base.OnStart();
         _timer = Random.Range(0, HitInterval); // stagger so nearby traps don't all fire together
+        // Loot/health depend on which variant this is (CreateInfo runs before the id is known).
         if (Info is StructureInfo si)
         {
-            // Loot/health depend on which variant this is (CreateInfo runs before the id is known).
-            bool metal = Info.id == ID.MetalSpikeTrap;
             si.Loot = Info.id;
-            si.Health = metal ? 70 : 30;
+            si.Health = IsMetal ? 70 : 30;
         }
     }
 
@@ -65,7 +67,7 @@ public class SpikeTrapMachine : StructureMachine
         if (++_timer < HitInterval) return;
         _timer = 0;
 
-        ContactDamageProjectileInfo hit = Info.id == ID.MetalSpikeTrap ? MetalHit : WoodHit;
+        ContactDamageProjectileInfo hit = IsMetal ? MetalHit : WoodHit;
         // Spawn slightly above the floor to center the contact sphere on the
         // creatures standing on the trap.
         Vector3 pos = transform.position + Vector3.up * 0.35f;

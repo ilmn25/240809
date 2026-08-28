@@ -13,6 +13,9 @@ public class Projectile : MonoBehaviour
     public HitboxType TargetHitBoxType;
     public Vector3 Destination;
     public Vector3 Direction;
+    /// <summary>Per-projectile velocity (used by projectiles that arc, e.g. the
+    /// thrown grenade, which adds gravity each frame). Unused by straight shots.</summary>
+    public Vector3 Velocity;
     public MobInfo SourceInfo;
     public DynamicInfo Target;
     public Quaternion RelativeRotation;

@@ -32,7 +32,7 @@ public class LandmineMachine : StructureMachine
 
     public static Info CreateInfo()
     {
-        return new StructureInfo
+        return new LandmineInfo
         {
             Health = 20,
             Loot = ID.Landmine,
@@ -50,8 +50,6 @@ public class LandmineMachine : StructureMachine
         _armedAt = Time.time + ArmingDelay;
         _timer = Random.Range(0, CheckInterval);
         _detonated = false;
-        if (Info is StructureInfo si)
-            si.Loot = ID.Landmine;
     }
 
     public override void OnUpdate()
@@ -65,6 +63,15 @@ public class LandmineMachine : StructureMachine
 
         if (CreatureInArea())
             Explode();
+    }
+
+    /// <summary>Chain reaction hook called by LandmineInfo.OnDestroy when a blast
+    /// (no attacker) destroys this armed mine — it detonates too, so a minefield
+    /// goes up like dominoes.</summary>
+    public void OnBlastDestroyed()
+    {
+        if (_detonated || Time.time < _armedAt) return;
+        Explode();
     }
 
     /// <summary>True when a living creature (mob or player) is standing in the
@@ -98,6 +105,8 @@ public class LandmineMachine : StructureMachine
         // Consume the mine first so the blast doesn't break it (or drop its loot).
         Info.Destroy();
 
-        Projectile.Spawn(pos, pos, Explosion, HitboxType.All, _source);
+        // +forward so Direction isn't zero (avoids a LookRotation warning);
+        // direction is irrelevant for an instant area blast.
+        Projectile.Spawn(pos, pos + Vector3.forward, Explosion, HitboxType.All, _source);
     }
 }

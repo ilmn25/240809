@@ -298,14 +298,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             Info.Target = null;
             return;
         }
-        
-        if (Info.Equipment.Info.ProjectileInfo != null)
-        {
-            if (Info.Equipment.Info.ProjectileInfo.Ammo != ID.Null && 
-                Info.Storage.GetAmount(Info.Equipment.Info.ProjectileInfo.Ammo) == 0) return;
-            Info.Storage.RemoveItem(Info.Equipment.Info.ProjectileInfo.Ammo);
-        }
 
+        // Ammo is resolved and consumed in MobAttackShoot (guns fire whatever
+        // accepted ammo the shooter carries; throwables keep their own ammo).
         base.Attack();
 
         if (Info.Equipment.Durability != -1)

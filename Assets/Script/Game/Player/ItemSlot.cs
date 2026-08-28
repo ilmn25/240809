@@ -115,7 +115,8 @@ public class ItemSlot
                     }
                 }  
 
-                if (Info.ProjectileInfo.Ammo != ID.Null) text += " \n \nammo: " + Info.ProjectileInfo.Ammo;
+                if (Info.ProjectileInfo.Ammo != ID.Null)
+                    text += " \n \nammo: " + (AmmoRegistry.DescribeForGun(ID) ?? Info.ProjectileInfo.Ammo.ToString());
             } 
 
 

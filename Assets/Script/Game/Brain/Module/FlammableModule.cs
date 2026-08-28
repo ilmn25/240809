@@ -6,15 +6,15 @@ using UnityEngine;
 public class FlammableModule : EntityModule
 {
     /// <summary>How long (seconds) a structure burns before it is destroyed.</summary>
-    public float BurnDuration = 25f;
+    public float BurnDuration = 8f;
     /// <summary>Damage dealt per second while burning.</summary>
-    public float BurnDamagePerSecond = 4f;
+    public float BurnDamagePerSecond = 1f;
     /// <summary>Radius within which this fire can ignite other flammable entities.</summary>
     public float SpreadRadius = 2.5f;
     /// <summary>Chance per spread tick to ignite a nearby flammable entity.</summary>
-    public float SpreadChance = 0.12f;
+    public float SpreadChance = 0.08f;
     /// <summary>Seconds between spread attempts.</summary>
-    public float SpreadInterval = 2.5f;
+    public float SpreadInterval = 4f;
     /// <summary>Seconds between fire particle emissions.</summary>
     public float ParticleInterval = 0.5f;
     /// <summary>Seconds between smoke particle emissions.</summary>
