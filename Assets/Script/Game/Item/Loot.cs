@@ -20,9 +20,12 @@ public class Loot
     private readonly List<LootEntry> _table = new List<LootEntry>(); 
     public Loot(ID id)
     {
+        // One table per id: break/burn/mob/harvest paths all look loot up by
+        // id, so each entity registers its single table exactly once. Adding a
+        // second table for the same id throws here on purpose to catch mistakes.
         Dictionary.Add(id, this);
     }
-    
+
     public static Loot Gettable(ID id)
     {
         return Dictionary[id];

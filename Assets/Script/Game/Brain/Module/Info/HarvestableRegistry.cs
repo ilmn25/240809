@@ -100,6 +100,9 @@ public static class HarvestableRegistry
         Register(ID.OldPot, new HarvestableDefinition(pot));
 
         // Fallen tree: chop the dead wood for timber, consumed on harvest.
+        // Single table for this id — registered here so the burn path
+        // (CombustionRegistry.BurnStructure(ID.FallenTree)) finds it by id too.
+        // Harvest and burn therefore drop the same thing.
         Loot fallenTree = new Loot(ID.FallenTree);
         fallenTree.Add(1f, 2, ID.Log);
         fallenTree.Add(0.5f, 2, ID.Log);
