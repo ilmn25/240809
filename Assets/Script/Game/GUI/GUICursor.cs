@@ -87,7 +87,7 @@ public class GUICursor : GUI
         }
         else
         {
-            _cursorSlotImage.sprite = Resources.Load<Sprite>($"texture/sprite/{Data.ID}");
+            _cursorSlotImage.sprite = Resources.Load<Sprite>($"Texture/Sprite/{Data.ID}");
             _cursorSlotText.text = Data.Stack.ToString();
         } 
     } 

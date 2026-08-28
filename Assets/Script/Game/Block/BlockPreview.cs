@@ -29,7 +29,7 @@ public class BlockPreview
             // Create material
             Material meshMaterial = new(Resources.Load<Material>(Block.MeshMaterialPath))
             {
-                mainTexture = Resources.Load<Texture2D>($"texture/tileset/{blockID}")
+                mainTexture = Resources.Load<Texture2D>($"Texture/Tileset/{blockID}")
             };
 
             meshMaterial.SetFloat("_Mode", 3);
