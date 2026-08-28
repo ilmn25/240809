@@ -16,6 +16,7 @@ public class TraderInfo : ConverterInfo
         { ID.Charcoal, 1 },
         { ID.Sulphur, 2 },
         { ID.Casing, 2 },
+        { ID.Gunpowder, 3 },
         { ID.SteelSword, 5 },
         { ID.Rapier, 5 },
         { ID.DiamondAxe, 8 },

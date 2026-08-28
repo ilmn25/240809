@@ -132,6 +132,9 @@ public class Entity
                 AddStructure<DungeonDoorMachine>(ID.DungeonDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<MawDoorMachine>(ID.MawDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<MawPitMachine>(ID.MawPit, new Vector3Int(2, 1, 2), Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<SpikeTrapMachine>(ID.WoodSpikeTrap, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<SpikeTrapMachine>(ID.MetalSpikeTrap, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<LandmineMachine>(ID.Landmine, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
 
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);
@@ -323,16 +326,19 @@ public class Entity
                 AddMob<ScoutMachine>(ID.Chito); 
                 loot = new (ID.Chito);
                 loot.Add(0.7f, 5, ID.Bullet); 
+                loot.Add(0.4f, 2, ID.Gunpowder); 
                 loot.Add(0.1f, 1, ID.Pistol); 
                 
                 AddMob<ScoutMachine>(ID.Yuuri);
                 loot = new (ID.Yuuri);
                 loot.Add(0.7f, 5, ID.Bullet);  
+                loot.Add(0.4f, 2, ID.Gunpowder);  
                 loot.Add(0.1f, 1, ID.Pistol);  
 
                 AddMob<ScoutGuardMachine>(ID.ScoutGuard);
                 loot = new (ID.ScoutGuard);
                 loot.Add(0.7f, 5, ID.Bullet);
+                loot.Add(0.4f, 2, ID.Gunpowder);
                 loot.Add(0.1f, 1, ID.Pistol);
                 
                 AddMob<SheepMachine>(ID.Sheep);
@@ -437,6 +443,7 @@ public class Entity
                 AddMob<TurretMachine>(ID.Turret);
                 loot = new (ID.Turret);
                 loot.Add(0.7f, 5, ID.Bullet);
+                loot.Add(0.4f, 2, ID.Gunpowder);
                 loot.Add(0.1f, 1, ID.Pistol);
 
                 AddMob<LichMachine>(ID.Lich);

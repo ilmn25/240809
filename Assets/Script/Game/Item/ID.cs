@@ -220,4 +220,8 @@ public enum ID
     MawDoor,
     MawPit,
     Delver,
+    WoodSpikeTrap,
+    MetalSpikeTrap,
+    Landmine,
+    Gunpowder,
 }

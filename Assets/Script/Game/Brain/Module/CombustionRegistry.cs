@@ -52,6 +52,7 @@ public static class CombustionRegistry
         BurnStructure(ID.Bed);
         BurnStructure(ID.Sign);
         BurnStructure(ID.Table);
+        BurnStructure(ID.WoodSpikeTrap);
 
         // Plants and decor all smolder down to ash.
         Ash(ID.Bush, ID.Grass, ID.Deathcap, ID.Orchids, ID.Tulip, ID.Daisies);

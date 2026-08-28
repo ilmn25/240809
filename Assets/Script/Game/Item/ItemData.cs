@@ -38,9 +38,10 @@ public partial class Item
         AddBlockDefinition(ID.MiningBox);
         AddBlockDefinition(ID.OverlayBlock);
         // Materials
-        AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Gravel, 2 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
+        AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.", materials: new Dictionary<ID, int> { { ID.Slag, 3 }, { ID.Charcoal, 1 } });
+        AddMaterialDefinition(ID.Gunpowder, "A volatile black powder of charcoal and sulphur. Pours the fire into bullets and landmines.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Sulphur, 1 } }, craftStack: 4, time: 1000);
         AddConsumableDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
         AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
         AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
@@ -147,6 +148,9 @@ public partial class Item
         AddStructureDefinition(ID.OldPot, null, 100, description: "A fragile old pot. Smash it for a surprise.");
         AddStructureDefinition(ID.OilBarrel, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 3 }, { ID.Slag, 2 } }, 150, description: "A barrel of oil. It explodes when it catches fire. Swing an empty bucket at it to collect the oil.");
         AddStructureDefinition(ID.Barrel, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Steel, 1 } }, 100, description: "A plain wooden barrel. Fill it with a liquid to store it, or swing an empty bucket at a filled barrel to collect its contents.");
+        AddStructureDefinition(ID.WoodSpikeTrap, new Dictionary<ID, int> { { ID.Stake, 4 }, { ID.Plank, 2 } }, 60, description: "A crude board of sharpened stakes. Anything that steps on it gets hurt.", burnResult: ID.Charcoal);
+        AddStructureDefinition(ID.MetalSpikeTrap, new Dictionary<ID, int> { { ID.Stake, 6 }, { ID.Steel, 2 } }, 100, description: "A sturdier iron-spiked trap that hits much harder than wood.");
+        AddStructureDefinition(ID.Landmine, new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Steel, 2 }, { ID.Casing, 1 } }, 80, description: "A pressure-plate mine. Step on it and it detonates in a violent blast.");
         AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
         AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
         AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into gold.");
