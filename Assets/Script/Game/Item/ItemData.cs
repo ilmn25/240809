@@ -148,6 +148,8 @@ public partial class Item
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.OldPot, null, 100, description: "A fragile old pot. Smash it for a surprise.");
+        AddStructureDefinition(ID.FallenTree, null, 100, description: "A fallen tree lying in the woods. Chop it up for timber.");
+        AddStructureDefinition(ID.MudPile, null, 100, description: "A mound of wet earth. Dig it out for mud.");
         AddStructureDefinition(ID.OilBarrel, new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Plank, 3 }, { ID.Slag, 2 } }, 150, description: "A barrel of oil. It explodes when it catches fire. Swing an empty bucket at it to collect the oil.");
         AddStructureDefinition(ID.Barrel, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Steel, 1 } }, 100, description: "A plain wooden barrel. Fill it with a liquid to store it, or swing an empty bucket at a filled barrel to collect its contents.");
         AddStructureDefinition(ID.WoodSpikeTrap, new Dictionary<ID, int> { { ID.Stake, 4 }, { ID.Plank, 2 } }, 60, description: "A crude board of sharpened stakes. Anything that steps on it gets hurt.", burnResult: ID.Charcoal);

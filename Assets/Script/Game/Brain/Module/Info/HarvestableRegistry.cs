@@ -98,6 +98,22 @@ public static class HarvestableRegistry
         pot.Add(0.4f, 1, ID.Steel, ID.Slag);
         pot.Add(0.3f, 1, ID.Foul, ID.Bandages);
         Register(ID.OldPot, new HarvestableDefinition(pot));
+
+        // Fallen tree: chop the dead wood for timber, consumed on harvest.
+        Loot fallenTree = new Loot(ID.FallenTree);
+        fallenTree.Add(1f, 2, ID.Log);
+        fallenTree.Add(0.5f, 2, ID.Log);
+        fallenTree.Add(1f, 1, ID.Sticks);
+        fallenTree.Add(0.5f, 1, ID.Acorn);
+        Register(ID.FallenTree, new HarvestableDefinition(fallenTree));
+
+        // Mud pile: dig it out for mud and the occasional flint/gravel, consumed on harvest.
+        Loot mudPile = new Loot(ID.MudPile);
+        mudPile.Add(1f, 3, ID.Mud);
+        mudPile.Add(0.5f, 2, ID.Mud);
+        mudPile.Add(0.3f, 1, ID.Flint);
+        mudPile.Add(0.3f, 1, ID.Gravel);
+        Register(ID.MudPile, new HarvestableDefinition(mudPile));
     }
 
     /// <summary>Register (or override) a harvestable definition.</summary>

@@ -29,8 +29,11 @@ public class GenTaskEntity : IGenTask
     private const double ForestDeathcapChance = 0.00125;
     private const double ForestSpiderNestChance = 0.0008;
     private const double ForestHiveChance = 0.0006;
+    private const double ForestFallenTreeChance = 0.01;
     private const double GrassOrchidChance = 0.005;
     private const double DirtTentChance = 0.0004;
+    private const double DirtFallenTreeChance = 0.004;
+    private const double DirtMudPileChance = 0.006;
     private static readonly float PathOffset = Gen.GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
@@ -113,6 +116,10 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Hive, position));
                             }
+                            else if (roll <= (chance += ForestFallenTreeChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.FallenTree, position));
+                            }
                             else if (rng.NextDouble() < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
@@ -139,6 +146,14 @@ public class GenTaskEntity : IGenTask
                             else if (roll <= (chance += DirtTentChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.DirtyTent, position));
+                            }
+                            else if (roll <= (chance += DirtFallenTreeChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.FallenTree, position));
+                            }
+                            else if (roll <= (chance += DirtMudPileChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.MudPile, position));
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {

@@ -229,4 +229,6 @@ public enum ID
     FlareGun,
     Shotgun,
     ShotgunRound,
+    FallenTree,
+    MudPile,
 }

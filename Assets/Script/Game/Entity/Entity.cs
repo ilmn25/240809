@@ -107,6 +107,15 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Mud);
                 loot.Add(0.3f, 1, ID.Flint);
                 loot.Add(0.1f, 1, ID.Geode);
+
+                // Harvestable natural debris — chopped/digged by hand, drops via HarvestableRegistry.
+                AddStructure<HarvestableMachine>(ID.FallenTree, new Vector3Int(2, 1, 1), Main.IndexSemiCollide, NavMap.Semi);
+                // Breaking/burn loot for the fallen tree (harvest loot lives in HarvestableRegistry).
+                loot = new (ID.FallenTree);
+                loot.Add(1, 2, ID.Log);
+                loot.Add(0.5f, 2, ID.Log);
+                loot.Add(1, 1, ID.Sticks);
+                AddStructure<HarvestableMachine>(ID.MudPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ToolbenchMachine>(ID.Toolbench, Vector3Int.one, Main.IndexCollide);
