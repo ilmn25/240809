@@ -66,6 +66,7 @@ public class GUIPlayerList : GUI
     public static string ControlStatus(PlayerInfo player)
     {
         if (player == null) return "";
+        if (player.IsDelver) return "Delver"; // AI-only — never controllable
         if (IsControlling(player)) return "You";
         if (player.controllerId == -1) return "Free";
         return $"Player {player.controllerId + 1}";
@@ -85,7 +86,8 @@ public class GUIPlayerList : GUI
             rest +
             $"Controlled by: {ControlStatus(player)}\n" +
             (effects.Length > 0 ? "Effects: " + effects + "\n" : "") +
-            (IsControlling(player) ? "(controlling)" : "Click to select"));
+            (player.IsDelver ? "(AI — cannot control)" :
+             IsControlling(player) ? "(controlling)" : "Click to select"));
     }
 
     public void HideInfo()
@@ -98,6 +100,7 @@ public class GUIPlayerList : GUI
     public bool TryControl(PlayerInfo player)
     {
         if (player == null || IsControlling(player)) return false;
+        if (player.IsDelver) return false; // AI-only — cannot be selected
         if (player.controllerId != -1) return false; // controlled by someone else
 
         int index = Save.Inst.players.IndexOf(player);

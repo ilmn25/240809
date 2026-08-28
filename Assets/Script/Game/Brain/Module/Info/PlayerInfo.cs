@@ -10,6 +10,11 @@ public enum PlayerStatus {
 [System.Serializable]
 public class PlayerInfo : MobInfo
 {
+    /// <summary>True for AI-only "delver" entities — a player that is never
+    /// controlled by a human. Persists in the save's player list like a party
+    /// member but is excluded from control switching, client claims, and the
+    /// death handoff.</summary>
+    public bool IsDelver;
     public Storage Storage;
     public float Mana;
     public float Sanity;
@@ -202,12 +207,17 @@ public class PlayerInfo : MobInfo
         EntityMachine?.Unload();
         Save.Inst.players.Remove(this);
 
+        // Delvers are AI-only — their death never triggers party control handoff
+        // or the game-over screen (nobody was controlling them).
+        if (IsDelver) return;
+
         // Hand control to the next surviving party member. Covers both the normal
         // case (this was the controlled player) and a dangling Main.PlayerInfo that
         // still points at this removed player.
+        bool humansAlive = Save.Inst.players.Exists(p => !p.IsDelver && !p.Destroyed && p.Machine != null);
         if (wasControlled || Main.PlayerInfo == this || Main.PlayerInfo?.Machine == null)
         {
-            if (Save.Inst.players.Count == 0)
+            if (!humansAlive)
                 GUIMain.GUIMenu?.ShowDeath();
             else
                 Control.SetNextPlayer();

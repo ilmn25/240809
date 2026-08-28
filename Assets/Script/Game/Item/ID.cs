@@ -219,4 +219,5 @@ public enum ID
     FlameArrow,
     MawDoor,
     MawPit,
+    Delver,
 }

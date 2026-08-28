@@ -58,6 +58,31 @@ public partial class Item
         _ => "",
     };
 
+    // Shared construction for every item type (sprite scale, hand offset,
+    // rarity, description). Type-specific fields are set by each Add* method.
+    private static Item Make(ID id, ItemType type, string description, int stackSize, ItemRarity rarity = ItemRarity.Common, float scale = 0.6f)
+    {
+        return new Item
+        {
+            ID = id,
+            Type = type,
+            Gesture = ItemGesture.Swing,
+            StackSize = stackSize,
+            Rarity = rarity,
+            Scale = scale,
+            HoldoutOffset = new Vector2(0.5f, 0),
+            Description = description,
+        };
+    }
+
+    // Registers the item and its optional craft recipe in one place.
+    private static void Register(Item itemData, Dictionary<ID, int> materials = null, int craftStack = 1, int time = 0, string[] modifiers = null)
+    {
+        if (materials != null)
+            ItemRecipe.AddRecipe(itemData.ID, materials, craftStack, time, modifiers);
+        Dictionary[itemData.ID] = itemData;
+    }
+
     private static void AddMaterialDefinition(
         ID id,
         string description = "",
@@ -69,49 +94,17 @@ public partial class Item
         float despawnTime = 0f,
         ID burnResult = ID.Null)
     {
-
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = stackSize,
-            Rarity = ItemRarity.Common,
-            Scale = 0.6f,
-
-            Type = ItemType.Material,
-            Gesture = ItemGesture.Swing,
-            HoldoutOffset = new Vector2(0.5f, 0),
-
-            Pickupable = pickupable,
-            DespawnTime = despawnTime,
-
-            BurnResult = burnResult,
-
-            Description = description
-        };
-
-        if (materials != null)
-            ItemRecipe.AddRecipe(id, materials, craftStack, time, null);
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Material, description, stackSize);
+        itemData.Pickupable = pickupable;
+        itemData.DespawnTime = despawnTime;
+        itemData.BurnResult = burnResult;
+        Register(itemData, materials, craftStack, time);
     }
 
     private static void AddRelicDefinition(ID id, string description, ItemRarity rarity = ItemRarity.Rare)
     {
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = 1,
-            Rarity = rarity,
-            Scale = 0.6f,
-
-            Type = ItemType.Material,
-            Gesture = ItemGesture.Swing,
-            HoldoutOffset = new Vector2(0.5f, 0),
-
-            Description = description
-        };
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Material, description, 1, rarity);
+        Register(itemData);
     }
 
     private static void AddConsumableDefinition(
@@ -127,29 +120,13 @@ public partial class Item
         int maxHpBonus = 0,
         int maxHungerBonus = 0)
     {
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = stackSize,
-            Rarity = ItemRarity.Common,
-            Scale = 0.6f,
-
-            Type = ItemType.Consumable,
-            Gesture = ItemGesture.Swing,
-            HoldoutOffset = new Vector2(0.5f, 0),
-            HungerValue = hungerValue,
-            HealValue = healValue,
-            DamageValue = damageValue,
-            MaxHpBonus = maxHpBonus,
-            MaxHungerBonus = maxHungerBonus,
-
-            Description = description
-        };
-
-        if (materials != null)
-            ItemRecipe.AddRecipe(id, materials, craftStack, time, null);
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Consumable, description, stackSize);
+        itemData.HungerValue = hungerValue;
+        itemData.HealValue = healValue;
+        itemData.DamageValue = damageValue;
+        itemData.MaxHpBonus = maxHpBonus;
+        itemData.MaxHungerBonus = maxHungerBonus;
+        Register(itemData, materials, craftStack, time);
     }
 
     private static void AddBlockDefinition(
@@ -167,31 +144,12 @@ public partial class Item
         Entity.AddBlock(id);
         Block.AddBlockDefinition(id, breakThreshold, breakCost);
 
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = stackSize,
-            Rarity = ItemRarity.Common,
-
-            Scale = 0.6f,
-            Sfx = sfx,
-
-            Type = ItemType.Block,
-            Gesture = ItemGesture.Swing,
-
-            Speed = 4,
-            Range = 5,
-            HoldoutOffset = new Vector2(0.5f, 0),
-
-            BurnResult = burnResult,
-
-            Description = description
-        };
-
-        if (materials != null)
-            ItemRecipe.AddRecipe(id, materials, craftStack, time,null);
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Block, description, stackSize);
+        itemData.Sfx = sfx;
+        itemData.Speed = 4;
+        itemData.Range = 5;
+        itemData.BurnResult = burnResult;
+        Register(itemData, materials, craftStack, time);
     }
 
     private static void AddToolDefinition(
@@ -219,35 +177,19 @@ public partial class Item
     )
     {
 
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = stackSize,
-            Rarity = rarity,
-
-            Scale = 1,
-            Sfx = sfx,
-
-            Type = ItemType.Tool,
-            Gesture = gesture,
-
-            Speed = speed,
-            Range = range,
-            ProjectileInfo = projectileInfo,
-            Durability = durability,
-            StatusEffect = statusEffect,
-            ProjectileOffset = projectileOffset,
-            HoldoutOffset = holdoutOffset,
-            RotationOffset = rotationOffset,
-            Glow = glow,
-
-            Description = description
-        };
-
-        if (materials != null)
-            ItemRecipe.AddRecipe(id, materials, craftStack, time, modifiers);
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Tool, description, stackSize, rarity, scale: 1);
+        itemData.Gesture = gesture;
+        itemData.Sfx = sfx;
+        itemData.Speed = speed;
+        itemData.Range = range;
+        itemData.ProjectileInfo = projectileInfo;
+        itemData.Durability = durability;
+        itemData.StatusEffect = statusEffect;
+        itemData.ProjectileOffset = projectileOffset;
+        itemData.HoldoutOffset = holdoutOffset;
+        itemData.RotationOffset = rotationOffset;
+        itemData.Glow = glow;
+        Register(itemData, materials, craftStack, time, modifiers);
     }
 
     private static void AddStructureDefinition(
@@ -259,33 +201,13 @@ public partial class Item
         bool furniture = false,
         ID burnResult = ID.Null)
     {
-        Item itemData = new Item()
-        {
-            ID = id,
-            StackSize = 1,
-            Rarity = ItemRarity.Common,
-
-            Sfx = sfx,
-
-            Type = ItemType.Structure,
-            Furniture = furniture,
-            Gesture = ItemGesture.Swing,
-
-            Speed = 1,
-            Range = 5,
-            HoldoutOffset = new Vector2(0.5f, 0),
-
-            BurnResult = burnResult,
-
-            Description = description
-        };
-
-        if (materials != null)
-        {
-            ItemRecipe.AddRecipe(id, materials, 1, time, null);
-        }
-
-        Dictionary[id] = itemData;
+        Item itemData = Make(id, ItemType.Structure, description, 1, scale: 1);
+        itemData.Sfx = sfx;
+        itemData.Furniture = furniture;
+        itemData.Speed = 1;
+        itemData.Range = 5;
+        itemData.BurnResult = burnResult;
+        Register(itemData, materials, 1, time);
     }
 
     public static Item GetItem(ID id)

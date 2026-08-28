@@ -167,8 +167,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // Drives non-controlled party members: fight nearby hostiles, otherwise trail the leader.
     // SetState is a no-op when already in MobChaseAction, so calling it unconditionally just
-    // retargets via Info.Target while following.
-    private void UpdateAllyBrain()
+    // retargets via Info.Target while following. Protected so DelverMachine can drive itself
+    // with the same brain.
+    protected void UpdateAllyBrain()
     {
         if (Info.Resting)
         {

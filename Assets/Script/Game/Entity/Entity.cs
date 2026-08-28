@@ -314,6 +314,9 @@ public class Entity
                 loot.Add(0.5f, 2, ID.Stake); 
                  
                 AddMob<PlayerMachine>(ID.Player);
+                // Delvers are player-like AI-only entities (never human-controlled),
+                // persisted in the save's player list via PlayerInfo.IsDelver.
+                AddMob<DelverMachine>(ID.Delver);
 
                 AddMob<CorpseMachine>(ID.Corpse);
 

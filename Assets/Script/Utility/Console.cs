@@ -273,6 +273,9 @@ public class Console : MonoBehaviour
                     ScreenShake.Shake(40f, shakeMagnitude, shakeTime);
                 }
                 break;   
+            case "delver":
+                SpawnDelver();
+                break;
             case "j":
                 _ = new CoroutineTask(Server.StartClient(_command.Length > 1 ? _command[1] : null));
                 break;
@@ -381,6 +384,23 @@ public class Console : MonoBehaviour
                     Entity.Spawn(id, Vector3Int.FloorToInt(Main.PlayerInfo.position));
             } 
         }
+    }
+
+    /// <summary>Spawns an AI-only "delver" (a player-like entity that is never
+    /// human-controlled) near the current player and persists it in the save's
+    /// player list, so it survives save/load like a party member.</summary>
+    private static void SpawnDelver()
+    {
+        if (Save.Inst == null || Main.PlayerInfo == null)
+        {
+            Print("No active game.");
+            return;
+        }
+        Vector3 pos = Main.PlayerInfo.position + Vector3.right * 1.5f;
+        PlayerInfo delver = (PlayerInfo)Entity.CreateInfo(ID.Delver, pos);
+        Save.Inst.players.Add(delver);
+        Entity.SpawnFromInfo(delver, false);
+        Print("Delver joined the world (AI-only, persisted on save).");
     }
 
     private static void Teleport()

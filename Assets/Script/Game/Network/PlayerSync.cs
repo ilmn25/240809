@@ -141,6 +141,8 @@ public static class PlayerSync
     public static void HostClaimPlayer(string uid)
     {
         if (!NetworkServer.active || string.IsNullOrEmpty(uid)) return;
+        // Delvers are AI-only — never claimable by any client (host included).
+        if (Info.Dictionary.TryGetValue(uid, out Info claimInfo) && claimInfo is PlayerInfo { IsDelver: true }) return;
         int ctrl = PlayerControllers.GetValueOrDefault(uid, -1);
         if (ctrl == -1 || ctrl == 0)
         {
@@ -562,6 +564,7 @@ public static class PlayerSync
     /// Releases any previous claim from this connection (client tab-switched).</summary>
     private static bool TryClaimPlayer(NetworkConnectionToClient conn, PlayerInfo targetPlayer)
     {
+        if (targetPlayer.IsDelver) return false; // delvers are AI-only, never claimable
         int currentCtrl = PlayerControllers.GetValueOrDefault(targetPlayer.uid, -1);
         if (currentCtrl != -1 && currentCtrl != conn.connectionId)
             return false;

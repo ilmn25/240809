@@ -130,7 +130,9 @@ public static class GUIMain
 
         foreach (PlayerInfo player in Save.Inst.players)
         {
-            if (player == null || player.PlayerStatus != PlayerStatus.Incapacitated)
+            // Delvers are AI-only — they can't "carry" the run, so only humans count.
+            if (player == null || player.IsDelver) continue;
+            if (player.PlayerStatus != PlayerStatus.Incapacitated)
                 return;
         }
 

@@ -75,6 +75,8 @@ public class Control
 
     public static void SetPlayer(int i)
     {
+        if (i < 0 || i >= global::Save.Inst.players.Count) return;
+        if (global::Save.Inst.players[i].IsDelver) return; // delvers are AI-only, never controllable
         Main.PlayerInfo = global::Save.Inst.players[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
@@ -99,7 +101,7 @@ public class Control
         for (int i = 0; i < global::Save.Inst.players.Count; i++)
         {
             PlayerInfo p = global::Save.Inst.players[i];
-            if (p == null || p.Machine == null || p.Destroyed) continue;
+            if (p == null || p.Machine == null || p.Destroyed || p.IsDelver) continue;
 
             p.Resting = false;
             SetPlayer(i);
@@ -114,6 +116,7 @@ public class Control
     {
         if (i < 0 || i >= global::Save.Inst.players.Count) return;
         if (i == CurrentPlayerIndex) return;
+        if (global::Save.Inst.players[i].IsDelver) return; // delvers are AI-only, never controllable
 
         // Taking control un-rests the target so it isn't stuck standing still.
         PlayerInfo nextPlayer = global::Save.Inst.players[i];
@@ -177,7 +180,7 @@ public class Control
                 next = (next + 1) % count;
                 if (next == prevIndex) break; // wrapped around
                 var p = global::Save.Inst.players[next];
-                if (p.Machine != null) break;
+                if (p.Machine != null && !p.IsDelver) break; // skip AI-only delvers
             }
             if (next == prevIndex) return; // no other player in range
             Tutorial.OnSwap();
