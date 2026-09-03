@@ -1,7 +1,5 @@
 using UnityEngine;
 
-/// <summary>A bound NPC that can be rescued by right-clicking. On rescue it is
-/// converted into a player and added to the save's player list.</summary>
 public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
@@ -36,33 +34,28 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
     {
         if (!IsCurrentState<DefaultState>()) return;
 
-        // Bound NPC stays put — it can't move until rescued.
         if (Info.Target != null)
             Info.CancelTarget();
 
         SetState<MobIdle>();
     }
 
-    // Converts this bound NPC into a controllable player added to the save.
     private void Rescue()
     {
         if (Save.Inst == null) return;
 
-        // Narrative: the player finds a bound person and unties them.
         Dialogue.Target = new Dialogue
         {
-            Text = "\"It's a bound person. You untie them and they join your team.\"",
+            Text = "\"It's a bound person. You untie them and they follow you as an ally.\"",
             Sprite = Cache.LoadSprite("Sprite/BoundNPC"),
         };
         Dialogue.Show(true);
 
         Vector3 pos = transform.position;
-        PlayerInfo player = (PlayerInfo)Entity.CreateInfo(ID.Player, pos);
-        player.CharSprite = Info.CharSprite;
-        Save.Inst.players.Add(player);
+        PlayerInfo delver = (PlayerInfo)Entity.CreateInfo(ID.Delver, pos);
+        delver.CharSprite = Info.CharSprite;
 
-        // Spawn the new player's machine and remove this bound NPC.
-        Entity.SpawnFromInfo(player, true);
+        Entity.SpawnFromInfo(delver, false);
         Info.Destroy();
         Unload();
         Audio.PlaySFX(SfxID.Text);

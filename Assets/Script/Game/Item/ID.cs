@@ -231,4 +231,6 @@ public enum ID
     ShotgunRound,
     FallenTree,
     MudPile,
+    MercenaryTent,
+    Mercenary,
 }

@@ -295,6 +295,9 @@ public class Entity
                 loot.Add(1, 2, ID.Fabric);
                 loot.Add(0.5f, 1, ID.Fabric);
 
+                AddStructure<MercenaryTentMachine>(ID.MercenaryTent, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.MercenaryTent); // the mercenary tent drops nothing — hiring is the point
+
                 AddStructure<SpiderWebMachine>(ID.SpiderWeb, Vector3Int.one, Main.IndexNoCollide);
                 AddStructure<OldRadioMachine>(ID.OldRadio, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.OldRadio);
@@ -381,6 +384,9 @@ public class Entity
 
                 AddMob<QuestmasterMachine>(ID.Questmaster);
                 loot = new (ID.Questmaster); // the questmaster drops nothing
+
+                AddMob<MercenaryMachine>(ID.Mercenary);
+                loot = new (ID.Mercenary); // the mercenary drops nothing
 
                 AddMob<NomadMachine>(ID.Nomad);
                 loot = new (ID.Nomad); // the nomads drop nothing
