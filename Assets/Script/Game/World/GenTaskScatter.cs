@@ -1,14 +1,9 @@
 using UnityEngine;
 
-/// <summary>Shared helpers for the once-per-world scatter gen tasks (graveyard,
-/// raider camp, ponds): grass-surface picking, surface lookup, and static-entity
-/// placement into chunks.</summary>
 public abstract class GenTaskScatter : IGenTask
 {
-    /// <summary>Places this world's scatter content.</summary>
     public abstract void RunWorld(World world);
 
-    /// <summary>Random grass-biome column with a surface, or (-1,0,0) if none found.</summary>
     protected static Vector3Int PickGrassCenter(World world, System.Random rng)
     {
         for (int attempt = 0; attempt < 40; attempt++)
@@ -22,7 +17,30 @@ public abstract class GenTaskScatter : IGenTask
         return new Vector3Int(-1, 0, 0);
     }
 
-    /// <summary>Random surface position within <paramref name="radius"/> of a center, or (-1,0,0).</summary>
+    protected static Vector3Int PickGrassCenter(World world, System.Random rng, int maxAttempts, System.Func<Vector3Int, bool> accept)
+    {
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            Vector3Int column = PickGrassCenter(world, rng);
+            if (column.x < 0) return column;
+            if (accept(column)) return column;
+        }
+        return new Vector3Int(-1, 0, 0);
+    }
+
+    protected static Vector3Int PickFootprintOrigin(World world, System.Random rng, int size, int maxSpread = 2, int maxAttempts = 30)
+    {
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            Vector3Int column = PickGrassCenter(world, rng);
+            if (column.x < 0) return column;
+            int surfaceY = FindFootprintSurface(world, column.x, column.z, size, maxSpread);
+            if (surfaceY < 0) continue;
+            return new Vector3Int(column.x, surfaceY, column.z);
+        }
+        return new Vector3Int(-1, 0, 0);
+    }
+
     protected static Vector3Int ScatterAround(World world, Vector3Int center, System.Random rng, int radius)
     {
         for (int attempt = 0; attempt < 6; attempt++)
@@ -36,14 +54,12 @@ public abstract class GenTaskScatter : IGenTask
         return new Vector3Int(-1, 0, 0);
     }
 
-    /// <summary>Adds a static entity to the chunk containing <paramref name="cell"/>.</summary>
     protected static void PlaceEntity(World world, Vector3Int cell, ID id)
     {
         if (id == ID.Null) return;
         PlaceInfo(world, cell, Entity.CreateInfo(id, cell));
     }
 
-    /// <summary>Adds an already-created info (e.g. a filled chest) to its chunk.</summary>
     protected static void PlaceInfo(World world, Vector3Int cell, Info info)
     {
         if (info == null) return;
@@ -52,7 +68,6 @@ public abstract class GenTaskScatter : IGenTask
         chunk.StaticEntity.Add(info);
     }
 
-    /// <summary>First air block directly above a solid block (the ground surface). Returns -1 if none.</summary>
     protected static int FindSurfaceY(World world, int x, int z)
     {
         for (int y = world.Bounds.y - 1; y >= 1; y--)
@@ -71,5 +86,20 @@ public abstract class GenTaskScatter : IGenTask
                 return y;
         }
         return -1;
+    }
+
+    protected static int FindFootprintSurface(World world, int originX, int originZ, int size, int maxSpread = 2)
+    {
+        int minY = int.MaxValue;
+        int maxY = -1;
+        for (int dx = 0; dx < size; dx++)
+            for (int dz = 0; dz < size; dz++)
+            {
+                int y = FindSurfaceY(world, originX + dx, originZ + dz);
+                if (y < 0) return -1;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        return maxY - minY <= maxSpread ? minY : -1;
     }
 }

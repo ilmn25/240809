@@ -94,52 +94,56 @@ public class Inventory
             RefreshInventory();
         }
 
-        if (Control.Inst.Hotbar1.KeyDown())
-        {  
-            _buffer = 0;
-            RefreshInventory();
+        // While a dialogue choice menu is open the number keys pick the option,
+        // so don't also swap the selected hotbar slot.
+        if (!Dialogue.ChoicesActive)
+        {
+            if (Control.Inst.Hotbar1.KeyDown())
+            {
+                _buffer = 0;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar2.KeyDown())
+            {
+                _buffer = 1;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar3.KeyDown())
+            {
+                _buffer = 2;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar4.KeyDown())
+            {
+                _buffer = 3;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar5.KeyDown())
+            {
+                _buffer = 4;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar6.KeyDown())
+            {
+                _buffer = 5;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar7.KeyDown())
+            {
+                _buffer = 6;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar8.KeyDown())
+            {
+                _buffer = 7;
+                RefreshInventory();
+            }
+            else if (Control.Inst.Hotbar9.KeyDown())
+            {
+                _buffer = 8;
+                RefreshInventory();
+            }
         }
-        else if (Control.Inst.Hotbar2.KeyDown())
-        {  
-            _buffer = 1;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar3.KeyDown())
-        {  
-            _buffer = 2;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar4.KeyDown())
-        {  
-            _buffer = 3;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar5.KeyDown())
-        {  
-            _buffer = 4;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar6.KeyDown())
-        {  
-            _buffer = 5;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar7.KeyDown())
-        {  
-            _buffer = 6;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar8.KeyDown())
-        {  
-            _buffer = 7;
-            RefreshInventory();
-        }
-        else if (Control.Inst.Hotbar9.KeyDown())
-        {  
-            _buffer = 8;
-            RefreshInventory();
-        }
-         
 
         if (Main.PlayerInfo.Machine && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
         {

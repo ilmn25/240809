@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
@@ -23,17 +24,6 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
     public void OnActionSecondary(Info info)
     {
         if (Info.Target != null) return;
-        Hire(info);
-    }
-
-    public override void OnUpdate()
-    {
-        UpdateFlee();
-    }
-
-    private void Hire(Info info)
-    {
-        if (Save.Inst == null) return;
 
         PlayerInfo payer = info as PlayerInfo;
         if (payer == null) payer = Main.PlayerInfo;
@@ -50,6 +40,41 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
             return;
         }
 
+        ShowMenu(payer);
+    }
+
+    public override void OnUpdate()
+    {
+        UpdateFlee();
+    }
+
+    /// <summary>Offers to hire the mercenary or walk away.</summary>
+    private void ShowMenu(PlayerInfo payer)
+    {
+        Dialogue hire = new Dialogue
+        {
+            Text = $"\"Pleasure doing business.\" The mercenary takes the gold and joins you for {CompanionDuration:0} seconds.",
+            OnOpen = () => CompleteHire(payer),
+        };
+
+        Dialogue.Target = new Dialogue
+        {
+            Text = $"\"Need a hand? {HireCost} gold for a short contract.\"",
+            Next = new Dictionary<string, Dialogue>
+            {
+                [$"Hire for {HireCost} gold"] = hire,
+                ["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" },
+            },
+        };
+        Dialogue.Show(true);
+        Audio.PlaySFX(SfxID.Notification);
+    }
+
+    private void CompleteHire(PlayerInfo payer)
+    {
+        if (Save.Inst == null || payer?.Storage == null) return;
+        if (payer.Storage.Count(ID.Gold) < HireCost) return;
+
         payer.Storage.RemoveItem(ID.Gold, HireCost);
 
         PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);
@@ -59,8 +84,6 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
             delver.ExpireAt = Time.time + CompanionDuration;
 
         Tent?.Consume();
-
-        Dialogue.ShowEvent($"\"Pleasure doing business.\" {CompanionDuration:0}s left on their contract.");
 
         Info.Destroy();
         Unload();

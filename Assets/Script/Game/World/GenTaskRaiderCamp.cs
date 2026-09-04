@@ -1,34 +1,35 @@
 using UnityEngine;
 
-/// <summary>Places one or more raider camps: a central loot chest surrounded by
-/// 2-3 dirty tents and a lamp (powered by a nearby generator so it glows).
-/// Runs once per world, after chunk generation (like the graveyard).</summary>
 public class GenTaskRaiderCamp : GenTaskScatter
 {
-    private const int CampCount = 2;        // how many separate camps to place
+    private const int CampCount = 2;
     private const int MinTents = 2;
     private const int MaxTents = 3;
-    private const int ClusterRadius = 4;    // how far structures scatter from the chest
+    private const int ClusterRadius = 4;
 
-    /// <summary>Places the raider camps, if terrain permits.</summary>
     public override void RunWorld(World world)
     {
         System.Random rng = Gen.CreateWorldRandom("RaiderCamp");
+        int campSize = ClusterRadius * 2 + 1;
 
         for (int i = 0; i < CampCount; i++)
         {
-            Vector3Int column = PickGrassCenter(world, rng);
+            Vector3Int column = FindCampCenter(world, rng, campSize);
             if (column.x < 0) continue;
-            int surfaceY = FindSurfaceY(world, column.x, column.z);
-            if (surfaceY < 0) continue;
-            PlaceCamp(world, new Vector3Int(column.x, surfaceY, column.z), rng);
+            PlaceCamp(world, column, rng);
         }
     }
 
-    /// <summary>Places a camp cluster around the given surface center.</summary>
+    private static Vector3Int FindCampCenter(World world, System.Random rng, int campSize)
+    {
+        Vector3Int column = PickGrassCenter(world, rng, 40,
+            c => FindFootprintSurface(world, c.x - ClusterRadius, c.z - ClusterRadius, campSize, maxSpread: 3) >= 0);
+        if (column.x < 0) return column;
+        return new Vector3Int(column.x, FindSurfaceY(world, column.x, column.z), column.z);
+    }
+
     private static void PlaceCamp(World world, Vector3Int center, System.Random rng)
     {
-        // Central loot chest (with the standard chest loot table).
         ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, center);
         Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
         PlaceInfo(world, center, chest);
@@ -41,7 +42,6 @@ public class GenTaskRaiderCamp : GenTaskScatter
             PlaceEntity(world, spot, ID.DirtyTent);
         }
 
-        // A lamp so it glows at the camp.
         Vector3Int lampSpot = ScatterAround(world, center, rng, ClusterRadius);
         if (lampSpot.x >= 0) PlaceEntity(world, lampSpot, ID.Lamp);
     }

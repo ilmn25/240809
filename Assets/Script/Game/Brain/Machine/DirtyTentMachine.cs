@@ -1,20 +1,21 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/// <summary>A dirty tent structure that spawns and maintains a small band of
-/// raiders, scouts and their guards around it. Mobs aren't saved, so the tent
-/// respawns them over time, like a spider nest respawning its spiders.</summary>
-public class DirtyTentMachine : StructureMachine
+/// <summary>A dirty tent that keeps a small band of raiders, scouts and their
+/// guards around it. Mobs aren't saved, so the tent re-mans the camp each new day
+/// (or the next time the tent loads) until its band is back up to strength.</summary>
+public class DirtyTentMachine : SpawnerStructureMachine
 {
-    private const int CheckInterval = 200;   // frames between checks (~3.3s at 60 fps)
-    private const int RespawnDelay = 1200;   // frames before a lost mob respawns (~20s)
-    private const int MaxMobs = 4;
+    protected override int MaxUnits => 4;
 
-    private readonly List<GroundMobMachine> _mobs = new List<GroundMobMachine>();
-
-    private int _timer;
-    private int _respawnTimer;
+    // Ring spawn points so a freshly restored band doesn't stack on one cell.
+    private static readonly Vector3Int[] SpawnPoints =
+    {
+        new Vector3Int(1, 2, 0),
+        new Vector3Int(-1, 2, 0),
+        new Vector3Int(0, 2, 1),
+        new Vector3Int(0, 2, -1),
+    };
 
     public static Info CreateInfo()
     {
@@ -30,32 +31,11 @@ public class DirtyTentMachine : StructureMachine
         };
     }
 
-    public override void OnStart()
+    /// <summary>Spawns one band member at the next ring slot. Guards make up the
+    /// bulk of the band; the rest are roaming raiders and scouts.</summary>
+    protected override Info SpawnUnit(int index)
     {
-        base.OnStart();
-        _timer = Random.Range(0, CheckInterval); // stagger tents so they don't all fire at once
-    }
-
-    public override void OnUpdate()
-    {
-        base.OnUpdate();
-
-        if (++_timer < CheckInterval) return;
-        _timer = 0;
-
-        // Drop dead/spawned-from-elsewhere mobs we no longer own.
-        _mobs.RemoveAll(m => m == null || m.Info == null || m.Info.Destroyed);
-        if (_mobs.Count >= MaxMobs) return;
-
-        if (_respawnTimer > 0)
-        {
-            _respawnTimer--;
-            return;
-        }
-
-        // Spawn a mob beside the tent so it drops down next to it. Guards make
-        // up the bulk of the band; the rest are roaming raiders and scouts.
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
+        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + SpawnPoints[index % SpawnPoints.Length];
         ID mobID = Random.value < 0.5f ? ID.RaiderGuard : (Random.value < 0.5f ? ID.Raider : ID.Chito);
         Info mobInfo = Entity.Spawn(mobID, spawnPos);
         // Guards stick to this tent.
@@ -63,8 +43,6 @@ public class DirtyTentMachine : StructureMachine
             raiderGuard.HomePosition = transform.position;
         else if (mobInfo?.Machine is ScoutGuardMachine scoutGuard)
             scoutGuard.HomePosition = transform.position;
-        if (mobInfo?.Machine is GroundMobMachine mob)
-            _mobs.Add(mob);
-        _respawnTimer = RespawnDelay;
+        return mobInfo;
     }
 }

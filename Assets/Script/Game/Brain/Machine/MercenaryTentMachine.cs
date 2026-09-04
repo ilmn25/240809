@@ -1,15 +1,10 @@
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class MercenaryTentMachine : StructureMachine
+/// <summary>A tent that keeps one hireable mercenary beside it. NPCs aren't saved,
+/// so a fresh mercenary turns up each new day (or when the tent loads) whenever the
+/// current one dies.</summary>
+public class MercenaryTentMachine : SpawnerStructureMachine
 {
-    private const int CheckInterval = 200;
-    private const int RespawnDelay = 900;
-
-    private Info _mercenaryInfo;
-    private int _timer;
-    private int _respawnTimer;
-
     public static Info CreateInfo()
     {
         return new StructureInfo
@@ -24,37 +19,14 @@ public class MercenaryTentMachine : StructureMachine
         };
     }
 
-    public override void OnStart()
+    /// <summary>Spawns a fresh hireable mercenary beside the tent.</summary>
+    protected override Info SpawnUnit(int index)
     {
-        base.OnStart();
-        _timer = Random.Range(0, CheckInterval);
-    }
-
-    public override void OnUpdate()
-    {
-        base.OnUpdate();
-
-        if (++_timer < CheckInterval) return;
-        _timer = 0;
-
-        if (MercenaryAlive()) return;
-
-        if (_respawnTimer > 0)
-        {
-            _respawnTimer--;
-            return;
-        }
-
         Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        _mercenaryInfo = Entity.Spawn(ID.Mercenary, spawnPos);
-        if (_mercenaryInfo?.Machine is MercenaryMachine merc)
+        Info mercInfo = Entity.Spawn(ID.Mercenary, spawnPos);
+        if (mercInfo?.Machine is MercenaryMachine merc)
             merc.Tent = this;
-        _respawnTimer = RespawnDelay;
-    }
-
-    private bool MercenaryAlive()
-    {
-        return _mercenaryInfo != null && !_mercenaryInfo.Destroyed && _mercenaryInfo.Machine != null;
+        return mercInfo;
     }
 
     public void Consume()
