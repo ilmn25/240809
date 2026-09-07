@@ -60,10 +60,6 @@ public class GUIHealthBar : GUIBar
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartFull");
                         }
-                        else if (target - 1 <= Main.PlayerInfo.Health)
-                        {
-                                Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartHalf");
-                        }
                         else
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHeartEmpty");
@@ -87,10 +83,6 @@ public class GUIHungerBar : GUIBar
                         else if (target <= Main.PlayerInfo.Hunger)
                         {
                                 Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerFull");
-                        }
-                        else if (target - 1 <= Main.PlayerInfo.Hunger)
-                        {
-                                Bar[i].sprite = Cache.LoadSprite("Sprite/GUIHungerHalf");
                         }
                         else
                         {
