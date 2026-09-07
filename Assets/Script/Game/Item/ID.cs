@@ -233,4 +233,6 @@ public enum ID
     MudPile,
     MercenaryTent,
     Mercenary,
+    Cyclops,
+    CyclopsChest,
 }

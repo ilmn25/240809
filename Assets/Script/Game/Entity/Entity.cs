@@ -223,6 +223,9 @@ public class Entity
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 loot.Add(0.35f, 1, ID.OldRadio); 
 
+                // A sealed chest guarded by a Cyclops boss — see CyclopsChestMachine.
+                AddStructure<CyclopsChestMachine>(ID.CyclopsChest, Vector3Int.one, Main.IndexCollide);
+
                 AddStructure<SkeletonMachine>(ID.Skeleton, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 
                 AddStructure<HarvestableMachine>(ID.Bush, Vector3Int.one, Main.IndexNoCollide);
@@ -461,6 +464,13 @@ public class Entity
                 loot.Add(1, 3, ID.DiamondAxe);
                 loot.Add(0.5f, 2, ID.Meat);
                 loot.Add(0.3f, 1, ID.OldRadio);   
+
+                AddMob<CyclopsMachine>(ID.Cyclops);
+                loot = new (ID.Cyclops);
+                loot.Add(1, 2, ID.DiamondAxe);
+                loot.Add(0.7f, 1, ID.Gold);
+                loot.Add(0.5f, 3, ID.Meat);
+                loot.Add(0.4f, 1, ID.OldRadio);
 
                 AddMob<TreeMimicMachine>(ID.TreeMimic);
                 loot = new (ID.TreeMimic);
