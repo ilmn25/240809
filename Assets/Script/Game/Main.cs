@@ -72,6 +72,7 @@ public class Main : MonoBehaviour
         ViewPort.Initialize(); 
         Audio.Initialize();
         Control.Initialize();  
+        ScreenDamageFlash.Initialize();
          
         Item.Initialize();
         Entity.Initialize(); 
@@ -89,6 +90,7 @@ public class Main : MonoBehaviour
     {   
         GUIMain.UpdateMenu();
         ScreenFade.Update();
+        ScreenDamageFlash.Update();
         Environment.Update();
         if (SceneMode != SceneMode.Game) return;
         if (Intermission.Active)
@@ -116,6 +118,7 @@ public class Main : MonoBehaviour
     private void OnGUI()
     {
         ScreenFade.OnGUI();
+        ScreenDamageFlash.OnGUI();
     }
 
     private void OnApplicationQuit()

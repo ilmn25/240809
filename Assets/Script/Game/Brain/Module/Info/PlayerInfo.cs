@@ -100,6 +100,11 @@ public class PlayerInfo : MobInfo
     protected override void OnHit(Projectile projectile)
     {
         GUIBar.Update(); 
+        if (Main.PlayerInfo == this)
+        {
+            ScreenShake.Shake(55f, 0.3f, 0.22f);
+            ScreenDamageFlash.Show(0.42f, 0.28f);
+        }
         Machine.SetState<MobHit>();
 
         if (projectile.SourceInfo?.Machine is IItemThief)
