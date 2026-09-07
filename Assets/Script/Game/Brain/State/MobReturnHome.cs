@@ -1,7 +1,7 @@
 using UnityEngine;
 
-/// <summary>Paths the mob back to its fixed home position (its outpost/tent).
-/// Exits back to DefaultState once it arrives or gets stuck.</summary>
+/// <summary>Paths the mob back to its home. Exits back to DefaultState once it
+/// arrives or gets stuck.</summary>
 class MobReturnHome : MobState
 {
     public override void OnEnterState()
@@ -11,7 +11,12 @@ class MobReturnHome : MobState
 
     public override void OnUpdateState()
     {
-        if (Info.PathingStatus != PathingStatus.Pending)
+        // The home is the structure's own solid cell, which a ground mob can
+        // never step onto — pathing can hang on Pending forever there. Being
+        // back inside the leash radius is close enough to call it home.
+        GuardModule guard = Machine.GetModule<GuardModule>();
+        if (Info.PathingStatus != PathingStatus.Pending ||
+            (guard != null && !guard.IsBeyondLeash))
             Machine.SetState<DefaultState>();
     }
 }

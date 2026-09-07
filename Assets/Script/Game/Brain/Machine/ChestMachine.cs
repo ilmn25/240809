@@ -140,13 +140,13 @@ public class CyclopsChestMachine : ChestMachine
         }
     }
 
-    /// <summary>Spawns the Cyclops just east of the chest and leashes it here.</summary>
+    /// <summary>Spawns the Cyclops just east of the chest, leashed to it. The
+    /// chest itself unlocks once the guardian is destroyed (see OnUpdate).</summary>
     private void RaiseGuard()
     {
         Vector3Int cell = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 0, 0);
         Info spawned = Entity.Spawn(ID.Cyclops, cell);
-        if (spawned?.Machine is CyclopsMachine cyclops)
-            cyclops.HomePosition = transform.position;
+        GuardModule.Attach(spawned, transform.position);
         _guard = spawned;
     }
 

@@ -21,13 +21,10 @@ public class HiveMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Rings the spawns around the hive so the swarm fans out instead of stacking.</summary>
+    /// <summary>Spawns a hornet beside the hive.</summary>
     protected override Info SpawnUnit(int index)
     {
-        Vector3Int basePos = Vector3Int.FloorToInt(transform.position);
-        float angle = index * (Mathf.PI * 2f / MaxUnits);
-        Vector3Int spawnPos = basePos + new Vector3Int(
-            Mathf.RoundToInt(Mathf.Cos(angle) * 2f), 2, Mathf.RoundToInt(Mathf.Sin(angle) * 2f));
+        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
         return Entity.Spawn(ID.Hornet, spawnPos);
     }
 }

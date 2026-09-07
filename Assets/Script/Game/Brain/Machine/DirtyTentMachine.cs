@@ -1,21 +1,13 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/// <summary>A dirty tent that keeps a small band of raiders, scouts and their
-/// guards around it. Mobs aren't saved, so the tent re-mans the camp each new day
-/// (or the next time the tent loads) until its band is back up to strength.</summary>
+/// <summary>A dirty tent that keeps a small band of raiders, scouts and guards
+/// around it. Mobs aren't saved, so the tent re-mans the camp each new day
+/// (or when the tent loads). Every band member is leashed to the tent, so it
+/// returns home once dragged too far from camp.</summary>
 public class DirtyTentMachine : SpawnerStructureMachine
 {
     protected override int MaxUnits => 4;
-
-    // Ring spawn points so a freshly restored band doesn't stack on one cell.
-    private static readonly Vector3Int[] SpawnPoints =
-    {
-        new Vector3Int(1, 2, 0),
-        new Vector3Int(-1, 2, 0),
-        new Vector3Int(0, 2, 1),
-        new Vector3Int(0, 2, -1),
-    };
 
     public static Info CreateInfo()
     {
@@ -31,18 +23,13 @@ public class DirtyTentMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Spawns one band member at the next ring slot. Guards make up the
-    /// bulk of the band; the rest are roaming raiders and scouts.</summary>
+    /// <summary>Spawns one band member beside the tent, leashed to it.</summary>
     protected override Info SpawnUnit(int index)
     {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + SpawnPoints[index % SpawnPoints.Length];
+        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
         ID mobID = Random.value < 0.5f ? ID.RaiderGuard : (Random.value < 0.5f ? ID.Raider : ID.Chito);
         Info mobInfo = Entity.Spawn(mobID, spawnPos);
-        // Guards stick to this tent.
-        if (mobInfo?.Machine is RaiderGuardMachine raiderGuard)
-            raiderGuard.HomePosition = transform.position;
-        else if (mobInfo?.Machine is ScoutGuardMachine scoutGuard)
-            scoutGuard.HomePosition = transform.position;
+        GuardModule.Attach(mobInfo, transform.position);
         return mobInfo;
     }
 }

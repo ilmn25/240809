@@ -1,17 +1,7 @@
-using UnityEngine;
-
-/// <summary>A raider variant that guards its outpost (dirty tent). Guards aggro
-/// like a normal raider (near the guard itself), but deaggro and return home
-/// once dragged too far from the tent via the shared <see cref="GuardModule"/>.</summary>
+/// <summary>Raider variant that stands watch at a dirty tent. The tent attaches
+/// a GuardModule leash, so it deaggros and returns home once dragged too far.</summary>
 public class RaiderGuardMachine : RaiderMachine
 {
-    /// <summary>World position of the outpost this guard protects.</summary>
-    public Vector3 HomePosition
-    {
-        get => GetModule<GuardModule>().HomePosition;
-        set => GetModule<GuardModule>().HomePosition = value;
-    }
-
     public static new Info CreateInfo()
     {
         return new EnemyInfo()
@@ -21,21 +11,5 @@ public class RaiderGuardMachine : RaiderMachine
             DistDisengage = 20,
             DistRoam = 6,
         };
-    }
-
-    public override void OnStart()
-    {
-        base.OnStart();
-        AddModule(new GuardModule());
-        AddState(new MobReturnHome());
-    }
-
-    /// <summary>Don't re-acquire a target while dragged off the leash or already
-    /// heading home — that fights the return-home pathing and freezes the guard.</summary>
-    protected override void UpdateAggro()
-    {
-        GuardModule guard = GetModule<GuardModule>();
-        if (guard.IsBeyondLeash || IsCurrentState<MobReturnHome>()) return;
-        base.UpdateAggro();
     }
 }
