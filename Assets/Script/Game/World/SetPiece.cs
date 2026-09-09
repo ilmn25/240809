@@ -96,18 +96,10 @@ public class SetPiece
                     int blockID = setPiece[x, y, z];
                     if (blockID == -1) blockID = overlay;
                     if (blockID == overlay && !authorMode) continue;
-                    SetBlock(world, new Vector3Int(position.x + x, position.y + y, position.z + z), blockID);
+                    GenBlocks.SetBlock(world, new Vector3Int(position.x + x, position.y + y, position.z + z), blockID);
                 }
             }
         }
-    }
-
-    private static void SetBlock(World world, Vector3Int worldPos, int blockID)
-    {
-        if (!IsInBounds(world, worldPos)) return;
-        Chunk chunk = world[worldPos];
-        if (chunk == null || chunk == Chunk.Zero) return;
-        chunk[World.GetBlockCoordinate(worldPos)] = blockID;
     }
 
     private static bool IsInBounds(World world, Vector3Int p)

@@ -223,6 +223,26 @@ public class Entity
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 loot.Add(0.35f, 1, ID.OldRadio); 
 
+                AddStructure<RaiderCampChestMachine>(ID.RaiderCampChest, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.RaiderCampChest);
+                loot.Add(1, 1, ID.MetalChunks);
+                loot.Add(0.6f, 2, ID.Steel);
+                loot.Add(0.6f, 2, ID.Copper);
+                loot.Add(1, 3, ID.Brick);
+                loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
+                loot.Add(1, 1, ID.Spear, ID.StoneHatchet);
+                loot.Add(0.35f, 1, ID.OldRadio);
+
+                AddStructure<DungeonChestMachine>(ID.DungeonChest, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.DungeonChest);
+                loot.Add(1, 1, ID.MetalChunks);
+                loot.Add(0.6f, 2, ID.Steel);
+                loot.Add(0.6f, 2, ID.Copper);
+                loot.Add(1, 3, ID.Brick);
+                loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
+                loot.Add(1, 1, ID.Spear, ID.StoneHatchet);
+                loot.Add(0.35f, 1, ID.OldRadio);
+
                 // A sealed chest guarded by a Cyclops boss — see CyclopsChestMachine.
                 AddStructure<CyclopsChestMachine>(ID.CyclopsChest, Vector3Int.one, Main.IndexCollide);
 

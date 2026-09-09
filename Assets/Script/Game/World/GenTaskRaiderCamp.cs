@@ -30,9 +30,7 @@ public class GenTaskRaiderCamp : GenTaskScatter
 
     private static void PlaceCamp(World world, Vector3Int center, System.Random rng)
     {
-        ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, center);
-        Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
-        PlaceInfo(world, center, chest);
+        PlaceEntity(world, center, ID.RaiderCampChest);
 
         int tentCount = rng.Next(MinTents, MaxTents + 1);
         for (int i = 0; i < tentCount; i++)

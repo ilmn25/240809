@@ -235,4 +235,6 @@ public enum ID
     Mercenary,
     Cyclops,
     CyclopsChest,
+    RaiderCampChest,
+    DungeonChest,
 }

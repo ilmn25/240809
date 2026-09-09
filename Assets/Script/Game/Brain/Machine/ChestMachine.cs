@@ -26,21 +26,39 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
     }
 }
 
-public class LootChestMachine : ChestMachine
+public abstract class LootChestMachine : ChestMachine
 {
-    public static Info CreateInfo()
+    protected virtual string SpritePath => "Sprite/Chest";
+
+    public override void OnSetup()
+    {
+        base.OnSetup();
+        SpriteRenderer.sprite = Cache.LoadSprite(SpritePath);
+    }
+
+    protected static ContainerInfo CreateLootContainer(ID lootID)
     {
         Storage storage = new Storage(9);
-        Loot.Gettable(ID.Chest).AddToContainer(storage);
+        Loot.Gettable(lootID).AddToContainer(storage);
         return new ContainerInfo()
         {
             Health = 500,
-            Loot = ID.PineTree,
+            Loot = ID.Null,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             Storage = storage
         };
     }
+}
+
+public class RaiderCampChestMachine : LootChestMachine
+{
+    public static Info CreateInfo() => CreateLootContainer(ID.RaiderCampChest);
+}
+
+public class DungeonChestMachine : LootChestMachine
+{
+    public static Info CreateInfo() => CreateLootContainer(ID.DungeonChest);
 }
 public class BasicChestMachine : ChestMachine
 {
@@ -58,19 +76,12 @@ public class BasicChestMachine : ChestMachine
     }
 }
 
-/// <summary>A sealed chest guarded by a Cyclops boss (DST-style guardian). The
-/// Cyclops stands guard beside the chest and the chest stays sealed while it
-/// lives — slaying it drops the Cyclops's own loot and opens the chest for
-/// good. Sealed chests spill nothing when smashed; only the guardian's death
-/// opens them.</summary>
 public class CyclopsChestInfo : ContainerInfo
 {
-    /// <summary>True once the guarding Cyclops has been slain — the chest is openable.</summary>
     public bool Unlocked;
 
     public override void OnDestroy(MobInfo info)
     {
-        // Sealed chests yield nothing when destroyed — kill the guardian to open it.
         if (Unlocked)
             base.OnDestroy(info);
     }
@@ -83,7 +94,7 @@ public class CyclopsChestMachine : ChestMachine
     public static Info CreateInfo()
     {
         Storage storage = new Storage(9);
-        Loot.Gettable(ID.Chest).AddToContainer(storage); // boss-tier container loot
+        Loot.Gettable(ID.Chest).AddToContainer(storage);
         return new CyclopsChestInfo()
         {
             Health = 500,
@@ -99,7 +110,6 @@ public class CyclopsChestMachine : ChestMachine
     public override void OnSetup()
     {
         base.OnSetup();
-        // Looks like a normal chest until it's opened.
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/Chest");
     }
 
@@ -117,7 +127,6 @@ public class CyclopsChestMachine : ChestMachine
     public override void OnStart()
     {
         base.OnStart();
-        // (Re)loaded while still sealed — put its Cyclops back on post.
         if (Helper.IsHost() && !ChestInfo.Unlocked)
             RaiseGuard();
     }
@@ -127,7 +136,6 @@ public class CyclopsChestMachine : ChestMachine
         base.OnUpdate();
         if (!Helper.IsHost() || ChestInfo.Unlocked) return;
 
-        // The guardian fell — the seal breaks for good.
         if (_guard != null && _guard.Destroyed)
         {
             _guard = null;
@@ -136,12 +144,10 @@ public class CyclopsChestMachine : ChestMachine
         }
         else if (_guard == null || _guard.Machine == null)
         {
-            RaiseGuard(); // lost without dying (unloaded) — raise a fresh one
+            RaiseGuard();
         }
     }
 
-    /// <summary>Spawns the Cyclops just east of the chest, leashed to it. The
-    /// chest itself unlocks once the guardian is destroyed (see OnUpdate).</summary>
     private void RaiseGuard()
     {
         Vector3Int cell = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 0, 0);

@@ -69,24 +69,7 @@ public abstract class GenTaskScatter : IGenTask
     }
 
     protected static int FindSurfaceY(World world, int x, int z)
-    {
-        for (int y = world.Bounds.y - 1; y >= 1; y--)
-        {
-            Vector3Int block = new Vector3Int(x, y, z);
-            Vector3Int chunkCoord = World.GetChunkCoordinate(block);
-            Chunk chunk = world[chunkCoord];
-            if (chunk == null || chunk == Chunk.Zero) continue;
-
-            int localX = block.x - chunkCoord.x;
-            int localY = block.y - chunkCoord.y;
-            int localZ = block.z - chunkCoord.z;
-            if (localY == 0) continue;
-
-            if (chunk[localX, localY, localZ] == 0 && chunk[localX, localY - 1, localZ] != 0)
-                return y;
-        }
-        return -1;
-    }
+        => GenBlocks.FindSurfaceY(world, x, z);
 
     protected static int FindFootprintSurface(World world, int originX, int originZ, int size, int maxSpread = 2)
     {

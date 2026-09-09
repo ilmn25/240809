@@ -21,16 +21,13 @@ public class CyclopsMachine : HostileMeleeMachine
         return new EnemyInfo()
         {
             HealthMax = 400,
-            // No dedicated sprite yet — reuse the lich's look. Once a
-            // "Sprite/Cyclops" texture exists, drop this to default to it.
-            CharSprite = ID.Lich,
             DistAttack = 2,
-            DistAlert = 10,    // notices looters from a ways off
+            DistAlert = 7,    // notices looters from a ways off
             DistDisengage = 16,
             DistRoam = 4,
-            SpeedGround = 0.6f,
-            SpeedAir = 1.0f,
-            SpeedLogic = 0.8f,
+            SpeedGround = 2.5f,
+            SpeedAir = 3f,
+            SpeedLogic = 2.6f,
             PathJump = 1,
             PathAir = 3,
         };

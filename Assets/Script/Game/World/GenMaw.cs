@@ -78,9 +78,9 @@ public class GenMaw : Gen
             for (int z = CenterZ - pad; z <= CenterZ + pad; z++)
             {
                 for (int y = FloorY; y <= FloorY + 2; y++)
-                    SetBlock(world, new Vector3Int(x, y, z), 0);
+                    GenBlocks.SetBlock(world, new Vector3Int(x, y, z), 0);
                 for (int y = FloorY - 1; y >= FloorY - 3; y--)
-                    SetBlock(world, new Vector3Int(x, y, z), Stone);
+                    GenBlocks.SetBlock(world, new Vector3Int(x, y, z), Stone);
             }
 
         // The facility is a 14-cube set piece — anchor its floor to the pad.
@@ -108,54 +108,7 @@ public class GenMaw : Gen
             // Just south of the facility, on the flat centre pad where the player spawns.
             int x = CenterX + dx;
             int z = CenterZ - 15 + dz;
-            PlaceScatter(world, new Vector3Int(x, FindSurface(world, x, z), z), id);
+            GenBlocks.PlaceEntity(world, new Vector3Int(x, GenBlocks.FindSurfaceY(world, x, z), z), id);
         }
-    }
-
-    /// <summary>Adds a scatter entity to its chunk — structures to StaticEntity
-    /// (persist + show on the map), loose items to DynamicEntity (spawn as items).</summary>
-    private static void PlaceScatter(World world, Vector3Int cell, ID id)
-    {
-        if (cell.y < 0) return; // no surface found
-        Info info = Entity.CreateInfo(id, cell);
-        if (info == null) return;
-        Chunk chunk = world[World.GetChunkCoordinate(cell)];
-        if (chunk == null || chunk == Chunk.Zero) return;
-
-        if (Entity.Dictionary.ContainsKey(id))
-            chunk.StaticEntity.Add(info);
-        else
-            chunk.DynamicEntity.Add(info);
-    }
-
-    /// <summary>First air block directly above a solid block, or -1.</summary>
-    private static int FindSurface(World world, int x, int z)
-    {
-        for (int y = world.Bounds.y - 1; y >= 1; y--)
-        {
-            Vector3Int block = new Vector3Int(x, y, z);
-            Vector3Int chunkCoord = World.GetChunkCoordinate(block);
-            Chunk chunk = world[chunkCoord];
-            if (chunk == null || chunk == Chunk.Zero) continue;
-
-            int localX = block.x - chunkCoord.x;
-            int localY = block.y - chunkCoord.y;
-            int localZ = block.z - chunkCoord.z;
-            if (localY == 0) continue;
-
-            if (chunk[localX, localY, localZ] == 0 && chunk[localX, localY - 1, localZ] != 0)
-                return y;
-        }
-        return -1;
-    }
-
-    private static void SetBlock(World world, Vector3Int worldPos, int blockID)
-    {
-        if (worldPos.x < 0 || worldPos.x >= world.Bounds.x ||
-            worldPos.y < 0 || worldPos.y >= world.Bounds.y ||
-            worldPos.z < 0 || worldPos.z >= world.Bounds.z) return;
-        Chunk chunk = world[worldPos];
-        if (chunk == null || chunk == Chunk.Zero) return;
-        chunk[World.GetBlockCoordinate(worldPos)] = blockID;
     }
 }
