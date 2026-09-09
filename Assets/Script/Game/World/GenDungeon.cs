@@ -20,6 +20,7 @@ public class GenDungeon : Gen
 
     private static readonly Chunk Exit = SetPiece.LoadSetPieceFile("DungeonExit");
     private static readonly Chunk Boss = SetPiece.LoadSetPieceFile("DungeonRoomBoss");
+    private static readonly Chunk LootRoom = SetPiece.LoadSetPieceFile("DungeonRoomLoot");
 
     private static int _stoneId, _brickId;
     private static int Stone => _stoneId == 0 ? Block.ConvertID(ID.StoneBlock) : _stoneId;
@@ -61,15 +62,15 @@ public class GenDungeon : Gen
         if (Exit != null)
             SetPiece.Paste(world, new Vector3Int(spawn.x - 6, 0, spawn.z - 11), Exit);
 
-        // Boss room: the floor tile farthest from the exit — a far dead-end of
-        // the branching layout (the room blob is connected, so it's reachable).
-        if (Boss != null)
-        {
-            Vector2Int far = FarthestFloor(grid, width, depth, new Vector2Int(spawn.x, spawn.z));
-            int ox = Mathf.Clamp(far.x - Boss.size / 2, 0, width - Boss.size);
-            int oz = Mathf.Clamp(far.y - Boss.size / 2, 0, depth - Boss.size);
-            SetPiece.Paste(world, new Vector3Int(ox, 0, oz), Boss);
-        }
+        // Boss room at the floor tile farthest from the exit, loot room beside it.
+        Vector2Int far = FarthestFloor(grid, width, depth, new Vector2Int(spawn.x, spawn.z));
+        int ox = Mathf.Clamp(far.x - Boss.size / 2, 0, width - Boss.size);
+        int oz = Mathf.Clamp(far.y - Boss.size / 2, 0, depth - Boss.size);
+        SetPiece.Paste(world, new Vector3Int(ox, 0, oz), Boss);
+
+        int lx = ox + Boss.size;
+        if (lx + LootRoom.size > width) lx = ox - LootRoom.size;
+        SetPiece.Paste(world, new Vector3Int(lx, 0, Mathf.Clamp(far.y - LootRoom.size / 2, 0, depth - LootRoom.size)), LootRoom);
     }
 
     /// <summary>The floor tile furthest (squared distance) from <paramref name="from"/>.</summary>
