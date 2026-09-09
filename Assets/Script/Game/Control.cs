@@ -14,6 +14,10 @@ public class Control
     public static Vector3 MousePosition; //position of mouse target 
     public static Transform MouseTarget;
     public static int MouseLayer; // -1 means hit void
+    /// <summary>True while the mouse hovers an object the player can interact with
+    /// from here (a right-click interactable or a pickupable ground item). Drives
+    /// which icon the world cursor shows (Aim vs Interact).</summary>
+    public static bool HoverInteract;
     
     public readonly ControlKey Inv = new (KeyCode.F3);
     public readonly ControlKey Map = new (KeyCode.M);
@@ -169,6 +173,10 @@ public class Control
     
     public static void Update()
     {
+        // Reset each frame; HandleInput re-enables it when the hovered target is
+        // actionable. (Early returns below would otherwise leave it stale.)
+        HoverInteract = false;
+
         if (Inst.SwapChar.KeyDown())
         { 
             Audio.PlaySFX(SfxID.Text);
@@ -305,7 +313,15 @@ public class Control
             MouseTarget = _mouseRaycastInfo.collider.transform;
         }
         else MouseTarget = null;
-        
+
+        // Whether the world cursor should switch to the "Interact" icon: the hovered
+        // target is a right-click interactable or pickupable item within reach.
+        HoverInteract = MouseTarget != null
+            && MouseTarget.gameObject != Main.Player
+            && !Dialogue.Showing
+            && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange
+            && IsHoverInteractable(MouseTarget);
+
         if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
         { 
     
@@ -328,6 +344,22 @@ public class Control
                 } 
             }
         } 
+    }
+
+    /// <summary>True when the hovered target is something the player can interact with
+    /// by right-clicking: an IActionSecondaryInteract object (chest, door, NPC, …) or
+    /// a pickupable ground item. Non-pickupable items (blood pools) don't count.</summary>
+    private static bool IsHoverInteractable(Transform target)
+    {
+        if (!target.TryGetComponent<IActionSecondary>(out IActionSecondary action)) return false;
+
+        if (action is IActionSecondaryPickUp)
+        {
+            if (action is not EntityMachine machine || machine.Info is not ItemInfo itemInfo) return false;
+            return itemInfo.item.Info.Pickupable;
+        }
+
+        return action is IActionSecondaryInteract;
     }
     private static void HandleRaycast()
     { 

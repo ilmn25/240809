@@ -28,14 +28,6 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
 
 public abstract class LootChestMachine : ChestMachine
 {
-    protected virtual string SpritePath => "Sprite/Chest";
-
-    public override void OnSetup()
-    {
-        base.OnSetup();
-        SpriteRenderer.sprite = Cache.LoadSprite(SpritePath);
-    }
-
     protected static ContainerInfo CreateLootContainer(ID lootID)
     {
         Storage storage = new Storage(9);

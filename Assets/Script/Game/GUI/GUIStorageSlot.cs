@@ -49,6 +49,9 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Pointer is over an interactive slot: cursor shows the Interact icon and
+        // world actions are suppressed. Set before the guards so it always applies.
+        GUIMain.IsHover = true;
         if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
         if (GUIStorage.IsDrag) return;
@@ -60,6 +63,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
  
     public void OnPointerExit(PointerEventData eventData)
     {
+        GUIMain.IsHover = false;
         if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
         GUIStorage.SetInfoPanel();

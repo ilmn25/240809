@@ -15,6 +15,8 @@ public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Pointer is over an interactive button: cursor shows the Interact icon.
+        GUIMain.IsHover = true;
         Audio.PlaySFX(SfxID.Text);
         ScaleSlot(1.1f);
         IsHovered = true;
@@ -23,6 +25,7 @@ public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
  
     public void OnPointerExit(PointerEventData eventData)
     {
+        GUIMain.IsHover = false;
         ScaleSlot(1f);
         IsHovered = false;
         GUIMain.Cursor.Set();

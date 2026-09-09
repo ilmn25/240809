@@ -35,6 +35,8 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Pointer is over an interactive row: cursor shows the Interact icon.
+        GUIMain.IsHover = true;
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
         if (Player == null) return;
         Audio.PlaySFX(SfxID.Text);
@@ -44,6 +46,7 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        GUIMain.IsHover = false;
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
         GUIPlayerList.HideInfo();
         ScaleSlot(1f);
