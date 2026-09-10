@@ -142,8 +142,7 @@ public class CyclopsChestMachine : ChestMachine
 
     private void RaiseGuard()
     {
-        Vector3Int cell = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 0, 0);
-        Info spawned = Entity.Spawn(ID.Cyclops, cell);
+        Info spawned = Entity.Spawn(ID.Cyclops, Vector3Int.FloorToInt(transform.position));
         GuardModule.Attach(spawned, transform.position);
         _guard = spawned;
     }

@@ -22,12 +22,9 @@ public class OwlStatueMachine : SpawnerStructureMachine, IActionSecondaryInterac
         AddModule(new NightGlowModule());
     }
 
-    /// <summary>Spawns a new guide beside the statue so it drops down and stands next to it.</summary>
+    /// <summary>Spawns a new guide in the statue's own cell; it walks free on its own.</summary>
     protected override Info SpawnUnit(int index)
-    {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        return Entity.Spawn(ID.Guide, spawnPos);
-    }
+        => Entity.Spawn(ID.Guide, Vector3Int.FloorToInt(transform.position));
 
     public void OnActionSecondary(Info info)
     {

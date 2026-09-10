@@ -42,8 +42,7 @@ public class GnomeMachine : GroundMobMachine
 
         for (int i = 0; i < RatCount; i++)
         {
-            Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(i + 1, 1, 0);
-            Info ratInfo = Entity.Spawn(ID.Rat, spawnPos);
+            Info ratInfo = Entity.Spawn(ID.Rat, Vector3Int.FloorToInt(transform.position));
             if (ratInfo?.Machine is RatMachine rat)
                 rat.Gnome = this;
         }

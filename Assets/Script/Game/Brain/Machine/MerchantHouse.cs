@@ -46,9 +46,8 @@ public class MerchantHouse
             return;
         }
 
-        // Spawn a new merchant next to the bed.
-        Vector3Int spawnPos = Vector3Int.FloorToInt(_bed.transform.position) + new Vector3Int(2, 0, 2);
-        _merchantInfo = Entity.Spawn(ID.Merchant, spawnPos);
+        // Spawn a new merchant in the bed's own cell; it walks free on its own.
+        _merchantInfo = Entity.Spawn(ID.Merchant, Vector3Int.FloorToInt(_bed.transform.position));
         Console.Print("someone is approaching your outpost...");
         _respawnTimer = RespawnDelay;
     }

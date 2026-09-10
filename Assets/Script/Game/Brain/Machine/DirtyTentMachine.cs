@@ -23,12 +23,12 @@ public class DirtyTentMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Spawns one band member beside the tent, leashed to it.</summary>
+    /// <summary>Spawns one band member in the tent's own cell; it walks free on
+    /// its own and stays leashed to the tent.</summary>
     protected override Info SpawnUnit(int index)
     {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
         ID mobID = Random.value < 0.5f ? ID.RaiderGuard : (Random.value < 0.5f ? ID.Raider : ID.Chito);
-        Info mobInfo = Entity.Spawn(mobID, spawnPos);
+        Info mobInfo = Entity.Spawn(mobID, Vector3Int.FloorToInt(transform.position));
         GuardModule.Attach(mobInfo, transform.position);
         return mobInfo;
     }

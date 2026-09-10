@@ -24,10 +24,7 @@ public class BulletinBoardMachine : SpawnerStructureMachine
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/Sign");
     }
 
-    /// <summary>Spawns a new questmaster beside the board so it drops down and stands next to it.</summary>
+    /// <summary>Spawns a new questmaster in the board's own cell; it walks free on its own.</summary>
     protected override Info SpawnUnit(int index)
-    {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        return Entity.Spawn(ID.Questmaster, spawnPos);
-    }
+        => Entity.Spawn(ID.Questmaster, Vector3Int.FloorToInt(transform.position));
 }

@@ -19,11 +19,11 @@ public class MercenaryTentMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Spawns a fresh hireable mercenary beside the tent.</summary>
+    /// <summary>Spawns a fresh hireable mercenary in the tent's own cell; it
+    /// walks free on its own.</summary>
     protected override Info SpawnUnit(int index)
     {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        Info mercInfo = Entity.Spawn(ID.Mercenary, spawnPos);
+        Info mercInfo = Entity.Spawn(ID.Mercenary, Vector3Int.FloorToInt(transform.position));
         if (mercInfo?.Machine is MercenaryMachine merc)
             merc.Tent = this;
         return mercInfo;

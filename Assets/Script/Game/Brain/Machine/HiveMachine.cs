@@ -21,10 +21,7 @@ public class HiveMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Spawns a hornet beside the hive.</summary>
+    /// <summary>Spawns a hornet in the hive's own cell; it flies free on its own.</summary>
     protected override Info SpawnUnit(int index)
-    {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        return Entity.Spawn(ID.Hornet, spawnPos);
-    }
+        => Entity.Spawn(ID.Hornet, Vector3Int.FloorToInt(transform.position));
 }

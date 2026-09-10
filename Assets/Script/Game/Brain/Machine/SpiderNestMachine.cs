@@ -21,11 +21,11 @@ public class SpiderNestMachine : SpawnerStructureMachine
         };
     }
 
-    /// <summary>Spawns a spider beside the nest, leashed to it.</summary>
+    /// <summary>Spawns a spider in the nest's own cell; it walks free on its own
+    /// and stays leashed to the nest.</summary>
     protected override Info SpawnUnit(int index)
     {
-        Vector3Int spawnPos = Vector3Int.FloorToInt(transform.position) + new Vector3Int(1, 2, 0);
-        Info spider = Entity.Spawn(ID.Spider, spawnPos);
+        Info spider = Entity.Spawn(ID.Spider, Vector3Int.FloorToInt(transform.position));
         GuardModule.Attach(spider, transform.position);
         return spider;
     }

@@ -112,6 +112,34 @@ public class NavMap
     /// <summary>True if a cell is passable but pathfinding should avoid it when possible.</summary>
     public static bool IsSemiBlocking(byte value) => value == Door;
 
+    /// <summary>Nearest in-world cell the standard mob collider can stand in,
+    /// searched outward from <paramref name="origin"/>. Lets an entity that spawned
+    /// (or got sealed) inside solid blocks find a spot to walk back out to.</summary>
+    public static bool TryFindOpenSpot(Vector3Int origin, int maxRadius, out Vector3Int cell)
+    {
+        for (int radius = 0; radius <= maxRadius; radius++)
+        {
+            for (int dy = -radius; dy <= radius; dy++)
+            {
+                for (int dx = -radius; dx <= radius; dx++)
+                {
+                    for (int dz = -radius; dz <= radius; dz++)
+                    {
+                        if (Mathf.Max(Mathf.Abs(dx), Mathf.Max(Mathf.Abs(dy), Mathf.Abs(dz))) != radius)
+                            continue; // only the shell at this distance
+                        cell = origin + new Vector3Int(dx, dy, dz);
+                        if (World.IsInWorldBounds(cell) &&
+                            !IsBlocked(new Vector3(cell.x + 0.5f, cell.y, cell.z + 0.5f)))
+                            return true;
+                    }
+                }
+            }
+        }
+
+        cell = origin;
+        return false;
+    }
+
     public static void Set(Vector3Int worldPosition, byte value)
     {
         if (_map == null || !World.IsInWorldBounds(worldPosition)) return;

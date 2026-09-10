@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class GroundMovementModule : MovementModule
 {  
+    private const int UnstickRadius = 8;   // how far to look for an open cell
+    private const float UnstickSpeed = 6f; // blocks/sec while climbing out of solid rock
+
     public GroundMovementModule() { updateMode = UpdateMode.Everyone; }
 
     private float _speedTarget;
@@ -14,6 +17,23 @@ public class GroundMovementModule : MovementModule
         _abstractPos = Info.position;
     }
 
+    /// <summary>If the entity is buried in solid blocks (spawned inside terrain,
+    /// or a door/slab closed around it) every collision step is blocked, so walk
+    /// it straight out to the nearest open cell. Returns true while escaping.</summary>
+    private bool TryEscapeSolid()
+    {
+        Vector3 position = Machine.transform.position;
+        if (!NavMap.IsBlocked(position)) return false;
+        if (!NavMap.TryFindOpenSpot(Vector3Int.FloorToInt(position), UnstickRadius, out Vector3Int cell))
+            return false;
+
+        Info.Velocity = Vector3.zero;
+        Machine.transform.position = Vector3.MoveTowards(position,
+            new Vector3(cell.x + 0.5f, cell.y, cell.z + 0.5f), UnstickSpeed * DeltaTime);
+        Info.position = Machine.transform.position;
+        return true;
+    }
+
     public override void Update()
     { 
         if (Info.Health <= 0) return;
@@ -24,6 +44,11 @@ public class GroundMovementModule : MovementModule
         if (Machine.transform.position.y < -1) Machine.transform.position = Helper.AddToVector(Machine.transform.position, 0, 100, 0);
         
         DeltaTime = Helper.GetDeltaTime();
+
+        // Spawned/pushed inside solid blocks: collision would freeze every step,
+        // so walk to the nearest open cell first.
+        if (TryEscapeSolid()) { _abstractPos = Machine.transform.position; return; }
+
         if (!Info.IsInRenderRange) {
             _abstractPos += Info.Direction * (DeltaTime * Info.SpeedLogic);
             if (Vector3.Distance(Info.TargetPointPosition, _abstractPos) < 0.2f)
