@@ -11,8 +11,9 @@ public class GenAbyss : Gen
         new GenTaskStone(), new GenTaskGranite(), new GenTaskMarble(), new GenTaskDirt(),
         new GenTaskSand(), new GenTaskForest(), new GenTaskMountain(), new GenTaskVoid(),
         new GenTaskCaves(),
-        // World pass: dungeon entrance, spawn statue, surface scatter, entities last.
-        new GenDungeonEntrance(), new GenMawEntrance(), new GenTaskSpawnStatue(), new GenTaskGraveyard(),
+        // World pass: dungeon entrance, spawn statue, spawn portal, surface scatter, entities last.
+        new GenDungeonEntrance(), new GenMawEntrance(), new GenTaskSpawnStatue(), new GenTaskSpawnPortal(),
+        new GenTaskGraveyard(),
         new GenTaskBeehiveArea(), new GenTaskRaiderCamp(), new GenTaskPond(),
         new GenOutpost(), new GenTaskTower(), new GenTaskEntity(),
     };

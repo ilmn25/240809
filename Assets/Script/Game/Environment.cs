@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public enum EnvironmentType
 {
-    Null, Black, Sunrise, Rapture, Day, DaySnow, Sunset, NightRainy, NightBright, Dim
+    Null, Black, Sunrise, Rapture, Day, DaySnow, Sunset, NightRainy, NightBright, Dim, Backrooms
 }
 public class Environment
 {
@@ -92,6 +92,17 @@ public class Environment
             DirectionalLight = Helper.GetColor(254, 57, 90),
             BackgroundColor = Helper.GetColor(75, 59, 55)
         });
+        Environments.Add(EnvironmentType.Backrooms, new Environment
+        {
+            // Half the brightness of the Day ambient, warm-tinted: the backrooms'
+            // permanent fluorescent glow — lit enough to read the maze, dim enough
+            // that the corners stay oppressive.
+            AmbientLight = Helper.GetColor(112, 110, 96),
+            FogColor = Helper.GetColor(78, 76, 66),
+            SpotLight = Helper.GetColor(150, 141, 104),
+            DirectionalLight = Helper.GetColor(120, 117, 102),
+            BackgroundColor = Helper.GetColor(58, 56, 48)
+        });
         _ = new CoroutineTask(Clock());
     }       
      
@@ -134,6 +145,16 @@ public class Environment
         _currentTransitionTime = 0;
     }
 
+    /// <summary>
+    /// Environment forced by the dimension the player is standing in, overriding the
+    /// time-of-day weather. The backrooms are lit by a permanent half-bright glow;
+    /// every other dimension follows the weather (Null = no override).
+    /// </summary>
+    private static EnvironmentType DimensionEnvironment()
+        => Save.Inst != null && Save.Inst.current == GenType.Backrooms
+            ? EnvironmentType.Backrooms
+            : EnvironmentType.Null;
+
     public static IEnumerator Clock()
     {
         while (true)
@@ -147,10 +168,15 @@ public class Environment
     {
         if (Save.Inst == null) return;
 
-        if (Target == EnvironmentType.Null)
-            SetTarget(Weather);
-        else
+        // An explicit Target (menu, intermission) outranks everything; otherwise the
+        // dimension's own lighting wins over the weather.
+        EnvironmentType dimension = DimensionEnvironment();
+        if (Target != EnvironmentType.Null)
             SetTarget(Target);
+        else if (dimension != EnvironmentType.Null)
+            SetTarget(dimension);
+        else
+            SetTarget(Weather);
 
         if (_currentTransitionTime < TransitionLength - 1)
         {

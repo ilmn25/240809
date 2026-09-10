@@ -237,4 +237,5 @@ public enum ID
     CyclopsChest,
     RaiderCampChest,
     DungeonChest,
+    Threshold,
 }

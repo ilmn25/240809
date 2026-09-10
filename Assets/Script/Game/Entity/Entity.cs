@@ -135,6 +135,7 @@ public class Entity
                 AddStructure<DoorMachine>(ID.Door, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<DungeonDoorMachine>(ID.DungeonDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<MawDoorMachine>(ID.MawDoor, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
+                AddStructure<ThresholdPortalMachine>(ID.Threshold, new Vector3Int(1, 2, 1), Main.IndexCollide, NavMap.Door);
                 AddStructure<MawPitMachine>(ID.MawPit, new Vector3Int(2, 1, 2), Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SpikeTrapMachine>(ID.WoodSpikeTrap, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<SpikeTrapMachine>(ID.MetalSpikeTrap, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
