@@ -1,9 +1,17 @@
-using UnityEngine;
-
-public class GenBackrooms : Gen
+/// <summary>Temporary backrooms: the shared room-set-piece engine with a palette of
+/// BackroomBlock room pieces (placeholder copies of the dungeon rooms) and no content.</summary>
+public class GenBackrooms : GenRoomLayout
 {
-    public override Vector3Int GetSize() => new Vector3Int(60, 1, 60);
-    public override Vector3Int GetSpawnPoint() => new Vector3Int(GetSize().x / 2 * World.ChunkSize + 1, 2, GetSize().z / 2 * World.ChunkSize + 1);
+    private static readonly string[] Palette =
+    {
+        "BackroomRoom", "BackroomRoomCross", "BackroomRoomPillars",
+        "BackroomRoomCave", "BackroomRoomCells",
+    };
 
-    protected override IGenTask[] Tasks => new IGenTask[] { new GenTaskMaze() };
+    private static int _id;
+    private static int Backroom => _id == 0 ? Block.ConvertID(ID.BackroomBlock) : _id;
+
+    protected override int MatrixBlock => Backroom;
+    protected override string[] RoomNames => Palette;
+    protected override string LayoutSalt => "BackroomsLayout";
 }

@@ -201,6 +201,8 @@ public class Environment
     {
         if (Time == 0)
         { 
+            Weather = EnvironmentType.DaySnow;
+            return;
             // Rapture is a rare day-long event (15% chance), but never before
             // day 10 — the early game stays calm.
             if (Save.Inst.day >= 10 && Random.value < 0.15f)
