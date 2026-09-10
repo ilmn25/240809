@@ -119,7 +119,7 @@ public class DoorBashModule : MobModule
         for (int i = 0; i < count; i++)
         {
             if (BashBuffer[i].TryGetComponent(out EntityMachine em) &&
-                em.Info is StructureInfo si && !si.Destroyed)
+                em is DoorMachine && em.Info is StructureInfo si && !si.Destroyed)
                 return si;
         }
         return null;

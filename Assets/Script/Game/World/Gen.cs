@@ -119,18 +119,14 @@ public abstract class Gen
     }
 
     /// <summary>Coroutine version of <see cref="GenerateAllFor"/> that yields every few chunks to spread over frames.</summary>
-    public static IEnumerator GenerateAllForCoroutine(World world, Action<float> onProgress = null)
+    public static IEnumerator GenerateAllForCoroutine(World world)
     {
         // Skip if already generated (loaded from save)
         if (world[Vector3Int.zero] != null && world[Vector3Int.zero] != Chunk.Zero)
-        {
-            onProgress?.Invoke(1f);
             yield break;
-        }
 
         Gen gen = Dictionary[world.GenType];
         int chunkSize = World.ChunkSize;
-        int total = world.Size.x * world.Size.y * world.Size.z;
         int count = 0;
         for (int cx = 0; cx < world.Size.x; cx++)
         {
@@ -143,8 +139,7 @@ public abstract class Gen
                     world[coord] = chunk;
                     gen.GenChunk(coord, chunk);
                     count++;
-                    onProgress?.Invoke((float)count / total);
-                    if ((count & 7) == 0) yield return null;
+                    if ((count & 139) == 0) yield return null;
                 }
             }
         }
