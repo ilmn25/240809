@@ -93,15 +93,12 @@ public class Environment
             BackgroundColor = Helper.GetColor(75, 59, 55)
         });
         Environments.Add(EnvironmentType.Backrooms, new Environment
-        {
-            // Only a touch dimmer than the Day weather, warm-tinted: the backrooms'
-            // permanent fluorescent glow — bright enough to read the maze at a glance,
-            // but still a shade dimmer than the surface.
-            AmbientLight = Helper.GetColor(203, 200, 190),
-            FogColor = Helper.GetColor(105, 99, 124),
-            SpotLight = Helper.GetColor(177, 128, 79),
-            DirectionalLight = Helper.GetColor(122, 112, 109),
-            BackgroundColor = Helper.GetColor(104, 102, 123)
+        { 
+            AmbientLight = Helper.GetColor(245, 242, 230),
+            FogColor = Helper.GetColor(190, 184, 205),
+            SpotLight = Helper.GetColor(255, 219, 154),
+            DirectionalLight = Helper.GetColor(214, 206, 198),
+            BackgroundColor = Helper.GetColor(198, 195, 212)
         });
         _ = new CoroutineTask(Clock());
     }       
@@ -227,8 +224,8 @@ public class Environment
     {
         if (Time == 0)
         { 
-            Weather = EnvironmentType.DaySnow;
-            return;
+            // Weather = EnvironmentType.DaySnow;
+            // return;
             // Rapture is a rare day-long event (15% chance), but never before
             // day 10 — the early game stays calm.
             if (Save.Inst.day >= 10 && Random.value < 0.15f)

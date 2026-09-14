@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>Places a few large circular brick towers (Set/Tower.json) in the grass
+/// <summary>Places a few circular brick towers (Set/Tower.json) in the grass
 /// biome, partially buried below the surface (like the dungeon entrance). Runs
 /// once per world, after chunk generation (like the outpost and raider camp).</summary>
 public class GenTaskTower : GenTaskScatter
 {
     private const int TowerCount = 3;       // how many towers to place
-    private const int MinSeparation = 48;   // keep towers from overlapping each other
-    private const int DepthOffset = 10;     // how far below the surface the base sits
+    private const int MinSeparation = 60;   // keep towers from overlapping each other
+    private const int DepthOffset = 6;      // how far below the surface the base sits (half as deep as before, matching the smaller tower)
 
     private static readonly Chunk Tower = SetPiece.LoadSetPieceFile("Tower");
 

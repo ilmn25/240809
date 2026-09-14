@@ -10,7 +10,7 @@ public class GenAbyss : Gen
         // Chunk pass: base land → biome surfaces → mountains → void edge → caves.
         new GenTaskStone(), new GenTaskGranite(), new GenTaskMarble(), new GenTaskDirt(),
         new GenTaskSand(), new GenTaskForest(), new GenTaskMountain(), new GenTaskVoid(),
-        new GenTaskCaves(),
+        // new GenTaskCaves(),
         // World pass: dungeon entrance, spawn statue, spawn portal, surface scatter, entities last.
         new GenDungeonEntrance(), new GenMawEntrance(), new GenTaskSpawnStatue(), new GenTaskSpawnPortal(),
         new GenTaskGraveyard(),

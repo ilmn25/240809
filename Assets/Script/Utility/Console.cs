@@ -440,6 +440,31 @@ public class Console : MonoBehaviour
             SetPiece.Pos2 = SetPosition(SetPiece.Pos2,  new Vector3Int(-1, 0, -1));
             Print("set as corner 2:" + SetPiece.Pos2); 
         }  
+        else if (_command[1] == "move")
+        {
+            if (TryParseDelta(out Vector3Int delta))
+            {
+                SetPiece.Pos1 += delta;
+                SetPiece.Pos2 += delta;
+                Print($"moved bounding box by {delta}: {SetPiece.Pos1} .. {SetPiece.Pos2}");
+            }
+        }
+        else if (_command[1] == "move1")
+        {
+            if (TryParseDelta(out Vector3Int delta))
+            {
+                SetPiece.Pos1 += delta;
+                Print($"moved corner 1 by {delta}: {SetPiece.Pos1}");
+            }
+        }
+        else if (_command[1] == "move2")
+        {
+            if (TryParseDelta(out Vector3Int delta))
+            {
+                SetPiece.Pos2 += delta;
+                Print($"moved corner 2 by {delta}: {SetPiece.Pos2}");
+            }
+        }
         else if (_command[1] == "copy")
         {
             World.UnloadWorld();
@@ -470,6 +495,10 @@ public class Console : MonoBehaviour
             World.LoadWorld();
             Print("pasted");
         }
+        else if (_command[1] == "fill")
+        {
+            FillSelection();
+        }
 
         return;
 
@@ -485,6 +514,70 @@ public class Console : MonoBehaviour
                 pos += new Vector3Int(x, y, z);
             } 
             return pos;
+        }
+
+        // Parses "set move|move1|move2 <x> <y> <z>" into an offset.
+        bool TryParseDelta(out Vector3Int delta)
+        {
+            delta = Vector3Int.zero;
+            if (_command.Length < 5 ||
+                !int.TryParse(_command[2], out int x) ||
+                !int.TryParse(_command[3], out int y) ||
+                !int.TryParse(_command[4], out int z))
+            {
+                Print($"usage: set {_command[1]} <x> <y> <z>");
+                return false;
+            }
+            delta = new Vector3Int(x, y, z);
+            return true;
+        }
+
+        // Fills the Pos1..Pos2 box with a block id (numeric, or an ID name).
+        void FillSelection()
+        {
+            if (_command.Length < 3)
+            {
+                Print("usage: set fill <blockID|ID>");
+                return;
+            }
+            if (SetPiece.Pos1 == Vector3Int.zero || SetPiece.Pos2 == Vector3Int.zero)
+            {
+                Print("set both corners first (set 1 / set 2)");
+                return;
+            }
+
+            int blockID;
+            if (int.TryParse(_command[2], out int numericID))
+                blockID = numericID == -1 ? Block.ConvertID(ID.OverlayBlock) : numericID;
+            else if (Enum.TryParse(_command[2], true, out ID stringID) && Block.TryConvertID(stringID, out int convertedID))
+                blockID = convertedID;
+            else
+            {
+                Print("unknown block id: " + _command[2]);
+                return;
+            }
+
+            if (blockID != 0 && Block.GetBlock(blockID) == null)
+            {
+                Print("unknown block id: " + _command[2]);
+                return;
+            }
+
+            Vector3Int min = new Vector3Int(
+                Mathf.Min(SetPiece.Pos1.x, SetPiece.Pos2.x),
+                Mathf.Min(SetPiece.Pos1.y, SetPiece.Pos2.y),
+                Mathf.Min(SetPiece.Pos1.z, SetPiece.Pos2.z));
+            Vector3Int max = new Vector3Int(
+                Mathf.Max(SetPiece.Pos1.x, SetPiece.Pos2.x),
+                Mathf.Max(SetPiece.Pos1.y, SetPiece.Pos2.y),
+                Mathf.Max(SetPiece.Pos1.z, SetPiece.Pos2.z));
+
+            for (int x = min.x; x <= max.x; x++)
+                for (int y = min.y; y <= max.y; y++)
+                    for (int z = min.z; z <= max.z; z++)
+                        World.SetBlock(new Vector3Int(x, y, z), blockID);
+
+            Print($"filled {min} .. {max} with block {blockID}");
         }
     } 
 

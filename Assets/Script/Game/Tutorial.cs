@@ -92,7 +92,7 @@ public static class Tutorial
     public static string BuildHudText()
     {
         if (!Settings.Inst.TutorialEnabled || _progress >= LabelCount) return "";
-        return "\u2192 " + BuildLabel(_progress) + ProgressSuffix();
+        return "> " + BuildLabel(_progress) + ProgressSuffix();
     }
 
     private static int LabelCount => 11;

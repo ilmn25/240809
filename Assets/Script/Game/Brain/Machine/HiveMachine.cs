@@ -5,7 +5,7 @@ using UnityEngine;
 /// (or when the hive loads).</summary>
 public class HiveMachine : SpawnerStructureMachine
 {
-    protected override int MaxUnits => 8;
+    protected override int MaxUnits => 4;
 
     public static Info CreateInfo()
     {

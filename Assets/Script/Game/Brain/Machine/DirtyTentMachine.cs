@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 /// returns home once dragged too far from camp.</summary>
 public class DirtyTentMachine : SpawnerStructureMachine
 {
-    protected override int MaxUnits => 4;
+    protected override int MaxUnits => 2;
 
     public static Info CreateInfo()
     {

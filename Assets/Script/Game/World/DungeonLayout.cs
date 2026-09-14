@@ -64,7 +64,9 @@ public static class DungeonLayout
     /// <summary>Grows a dungeon inside a <paramref name="width"/> x
     /// <paramref name="depth"/> tile grid. <paramref name="pieces"/> are the room set
     /// pieces to fill it with; <paramref name="anchorPiece"/> (optional) is forced into
-    /// the centred spawn room.</summary>
+    /// the centred spawn room and pasted there, so the world centre is its centre. When
+    /// no anchor piece is given a random room only reserves the footprint — callers that
+    /// lay their own piece over the spawn (the dungeon's exit stairwell) want that.</summary>
     public static DungeonPlan Generate(int width, int depth, int maxRooms, int seed,
         IList<Chunk> pieces, Chunk anchorPiece = null)
     {
@@ -81,6 +83,10 @@ public static class DungeonLayout
         Vector2Int anchorOrigin = new Vector2Int(width / 2 - anchor.Width / 2,
                                                  depth / 2 - anchor.Height / 2);
         Commit(anchor, anchorOrigin, plan);
+        // An authored anchor piece IS the spawn room — it must be pasted, not merely
+        // reserved, or the room never appears (Render only pastes plan.rooms).
+        if (anchorPiece != null)
+            plan.rooms.Add(new RoomPlacement { room = anchor, origin = anchorOrigin });
         EnqueueSockets(open, anchor, anchorOrigin, used);
 
         int iterations = 0;
