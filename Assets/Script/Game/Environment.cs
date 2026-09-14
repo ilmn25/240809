@@ -94,14 +94,14 @@ public class Environment
         });
         Environments.Add(EnvironmentType.Backrooms, new Environment
         {
-            // Half the brightness of the Day ambient, warm-tinted: the backrooms'
-            // permanent fluorescent glow — lit enough to read the maze, dim enough
-            // that the corners stay oppressive.
-            AmbientLight = Helper.GetColor(112, 110, 96),
-            FogColor = Helper.GetColor(78, 76, 66),
-            SpotLight = Helper.GetColor(150, 141, 104),
-            DirectionalLight = Helper.GetColor(120, 117, 102),
-            BackgroundColor = Helper.GetColor(58, 56, 48)
+            // Only a touch dimmer than the Day weather, warm-tinted: the backrooms'
+            // permanent fluorescent glow — bright enough to read the maze at a glance,
+            // but still a shade dimmer than the surface.
+            AmbientLight = Helper.GetColor(203, 200, 190),
+            FogColor = Helper.GetColor(105, 99, 124),
+            SpotLight = Helper.GetColor(177, 128, 79),
+            DirectionalLight = Helper.GetColor(122, 112, 109),
+            BackgroundColor = Helper.GetColor(104, 102, 123)
         });
         _ = new CoroutineTask(Clock());
     }       
