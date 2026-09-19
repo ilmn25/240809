@@ -139,7 +139,7 @@ public abstract class Gen
                     world[coord] = chunk;
                     gen.GenChunk(coord, chunk);
                     count++;
-                    if ((count & 139) == 0) yield return null;
+                    if ((count & 50) == 0) yield return null;
                 }
             }
         }

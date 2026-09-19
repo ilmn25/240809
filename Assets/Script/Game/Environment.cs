@@ -104,7 +104,7 @@ public class Environment
     }       
      
     public const int Length = 60 * 24;
-    private const float Speed = 0.48f; // seconds per in-game minute — 20% longer days
+    public const float SecondsPerGameMinute = 0.48f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous = EnvironmentType.Black;
@@ -156,7 +156,7 @@ public class Environment
     {
         while (true)
         {
-            yield return new WaitForSeconds(Speed);
+            yield return new WaitForSeconds(SecondsPerGameMinute);
             if (Helper.IsHost()) MoveTime(1);
         }
     }
