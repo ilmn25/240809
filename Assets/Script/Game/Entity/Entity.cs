@@ -109,7 +109,7 @@ public class Entity
                 loot.Add(0.1f, 1, ID.Geode);
 
                 // Harvestable natural debris — chopped/digged by hand, drops via HarvestableRegistry.
-                AddStructure<HarvestableMachine>(ID.FallenTree, new Vector3Int(2, 1, 1), Main.IndexSemiCollide, NavMap.Semi);
+                AddStructure<HarvestableMachine>(ID.FallenTree, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<HarvestableMachine>(ID.MudPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 
                 AddStructure<ComputerMachine>(ID.Computer, Vector3Int.one, Main.IndexCollide);

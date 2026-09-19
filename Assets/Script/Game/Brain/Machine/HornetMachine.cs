@@ -19,7 +19,7 @@ public class HornetMachine : FlyingEnemyMachine
             DistAlert = 7,
             DistDisengage = 7,
             SpeedGround = 0,
-            SpeedAir = 6f,
+            SpeedAir = 4f,
             CanFly = true,
         };
     }

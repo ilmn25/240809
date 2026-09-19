@@ -98,11 +98,26 @@ public partial class Block
         if (id == 0) return ID.Null;
         return _blockIDMap.InttoString[id];
     }
- 
+
+    /// <summary>Numeric block id for a string id, or false when the id isn't a
+    /// registered block (e.g. an item/spawnable). Unlike <see cref="ConvertID(ID)"/>
+    /// this never throws for unknown ids.</summary>
+    public static bool TryConvertID(ID stringID, out int id)
+    {
+        foreach (KeyValuePair<int, ID> pair in _blockIDMap.InttoString)
+            if (pair.Value == stringID)
+            {
+                id = pair.Key;
+                return true;
+            }
+        id = 0;
+        return false;
+    }
+
     public static Vector2Int GetTileRect(int index)
-    { 
+    {
         int targetRow = index / TilesPerRow;
-        int targetCol = index % TilesPerRow;  
+        int targetCol = index % TilesPerRow;
 
         return new Vector2Int(Colx[targetCol], Rowy[targetRow]);
     }

@@ -1,30 +1,43 @@
 using UnityEngine;
 
-/// <summary>Temporary backrooms: the shared room-set-piece engine with a palette of
-/// BackroomBlock room pieces (placeholder copies of the dungeon rooms). The only
-/// content is the threshold portal home, standing in the spawn room.</summary>
-public class GenBackrooms : GenRoomLayout
+/// <summary>The backrooms: the same piece-backed socket layout as the dungeon (see
+/// <see cref="DungeonLayout"/>), filled with the Backroom* room pieces and carved out of
+/// solid BackroomBlock. The spawn room is <c>BackroomThreshold</c> (the piece carrying
+/// the Computer), and the return portal always stands on its centre.</summary>
+public class GenBackrooms : GenSocketRooms
 {
-    private static readonly string[] Palette =
+    // The room pieces the layout fills the backrooms with.
+    private static readonly Chunk[] Pieces =
     {
-        "BackroomRoom", "BackroomRoomCross", "BackroomRoomPillars",
-        "BackroomRoomCave", "BackroomRoomCells",
+        SetPiece.LoadSetPieceFile("Backroom"),
+        SetPiece.LoadSetPieceFile("BackroomCross"),
+        SetPiece.LoadSetPieceFile("BackroomPillars"),
+        SetPiece.LoadSetPieceFile("BackroomCave"),
+        SetPiece.LoadSetPieceFile("BackroomCells"),
+        SetPiece.LoadSetPieceFile("BackroomBoss"),
+        SetPiece.LoadSetPieceFile("BackroomLoot"),
+        SetPiece.LoadSetPieceFile("BackroomTreasure"),
     };
+
+    /// <summary>The spawn room — the authored piece that carries the Computer.</summary>
+    private static readonly Chunk ThresholdRoom = SetPiece.LoadSetPieceFile("BackroomThreshold");
 
     private static int _id;
     private static int Backroom => _id == 0 ? Block.ConvertID(ID.BackroomBlock) : _id;
 
     protected override int MatrixBlock => Backroom;
-    protected override string[] RoomNames => Palette;
     protected override string LayoutSalt => "BackroomsLayout";
+    protected override Chunk[] RoomPieces => Pieces;
+    protected override Chunk AnchorPiece => ThresholdRoom;
 
-    /// <summary>Stands the return portal in the middle of the world (the spawn point).
-    /// Its twin waits in the middle of the Abyss, so right-clicking either one crosses
-    /// the threshold.</summary>
-    protected override void BuildContent(World world)
+    protected override void GenPostWorld(World world)
     {
+        BuildLayout(world);
+
+        // The return portal always stands on the spawn point — the centre of the anchor
+        // room, which DungeonLayout places centred on the world. Its twin waits on the
+        // Abyss spawn point.
         Vector3Int spawn = GetSpawnPoint();
-        // The spawn point is the middle of the spawn room, whose floor is the piece's y0.
         GenBlocks.PlaceEntity(world, new Vector3Int(spawn.x, 1, spawn.z), ID.Threshold);
     }
 }

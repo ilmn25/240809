@@ -28,7 +28,7 @@ public class GenTaskEntity : IGenTask
     private const double ForestGrassChance = 0.06;
     private const double ForestDeathcapChance = 0.00125;
     private const double ForestSpiderNestChance = 0.0008;
-    private const double ForestHiveChance = 0.0006;
+    private const double ForestHiveChance = 0.0003;
     private const double ForestFallenTreeChance = 0.01;
     private const double GrassOrchidChance = 0.005;
     private const double DirtTentChance = 0.0004;

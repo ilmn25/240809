@@ -6,8 +6,8 @@ using UnityEngine;
 /// cluster.</summary>
 public class GenTaskBeehiveArea : GenTaskScatter
 {
-    private const int MinHives = 5;
-    private const int MaxHives = 8;
+    private const int MinHives = 2;
+    private const int MaxHives = 4;
     private const int MinFlowers = 30;
     private const int MaxFlowers = 45;
     private const int ScatterRadius = 14;
