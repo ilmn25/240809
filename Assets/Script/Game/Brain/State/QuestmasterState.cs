@@ -50,7 +50,7 @@ public class QuestmasterState : MobState
         return new Dialogue
         {
             Text = "Another task, then. " + quest.Describe(),
-            Sprite = Cache.LoadSprite("Sprite/Guide"),
+            Sprite = Cache.LoadSprite("Sprite/Questmaster"),
         };
     }
 
@@ -59,7 +59,7 @@ public class QuestmasterState : MobState
         return new Dialogue
         {
             Text = "Done already? " + quest.CompleteText,
-            Sprite = Cache.LoadSprite("Sprite/Guide"),
+            Sprite = Cache.LoadSprite("Sprite/Questmaster"),
         };
     }
 }

@@ -34,7 +34,7 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
+        if (IsEngaged) return;
         Audio.PlaySFX(SfxID.Notification);
         // The trader idles in MobIdle (not DefaultState), so toggle on
         // InContainerState instead of the chest's DefaultState pattern.

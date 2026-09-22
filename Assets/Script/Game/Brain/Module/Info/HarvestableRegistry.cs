@@ -103,19 +103,22 @@ public static class HarvestableRegistry
         // Single table for this id — registered here so the burn path
         // (CombustionRegistry.BurnStructure(ID.FallenTree)) finds it by id too.
         // Harvest and burn therefore drop the same thing.
+        // Yields halved vs. the original table, which rolled 2 Log guaranteed,
+        // a 50% chance of 2 more Log, 1 Stick, and a 50% chance of an Acorn.
         Loot fallenTree = new Loot(ID.FallenTree);
-        fallenTree.Add(1f, 2, ID.Log);
-        fallenTree.Add(0.5f, 2, ID.Log);
-        fallenTree.Add(1f, 1, ID.Sticks);
-        fallenTree.Add(0.5f, 1, ID.Acorn);
+        fallenTree.Add(1f, 1, ID.Log);
+        fallenTree.Add(0.5f, 1, ID.Log);
+        fallenTree.Add(0.5f, 1, ID.Sticks);
+        fallenTree.Add(0.25f, 1, ID.Acorn);
         Register(ID.FallenTree, new HarvestableDefinition(fallenTree));
 
         // Mud pile: dig it out for mud and the occasional flint/gravel, consumed on harvest.
+        // Yields halved vs. the original table, which rolled 3 Mud guaranteed,
+        // a 50% chance of 2 more Mud, and 30% chances of Flint and Gravel.
         Loot mudPile = new Loot(ID.MudPile);
-        mudPile.Add(1f, 3, ID.Mud);
-        mudPile.Add(0.5f, 2, ID.Mud);
-        mudPile.Add(0.3f, 1, ID.Flint);
-        mudPile.Add(0.3f, 1, ID.Gravel);
+        mudPile.Add(1f, 2, ID.Mud);
+        mudPile.Add(0.15f, 1, ID.Flint);
+        mudPile.Add(0.15f, 1, ID.Gravel);
         Register(ID.MudPile, new HarvestableDefinition(mudPile));
     }
 

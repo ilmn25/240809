@@ -6,7 +6,9 @@ using UnityEngine;
 [Serializable]
 public enum GenType
 {
-    Abyss, SkyBlock, SuperFlat, Backrooms, Dungeon, Edit, Maw
+    // 1 (SkyBlock) was removed together with Set/SkyBlock.json. Values are explicit so
+    // saves written before the removal keep resolving to the same worlds.
+    Abyss = 0, SuperFlat = 2, Backrooms = 3, Dungeon = 4, Edit = 5, Maw = 6
 }
 /// <summary>A single generation step. RunChunk for per-chunk block work; RunWorld for work once, after all chunks are generated.</summary>
 public interface IGenTask
@@ -36,7 +38,6 @@ public abstract class Gen
     public static readonly Dictionary<GenType, Gen> Dictionary = new ()
     {
         {GenType.Abyss, new GenAbyss()},
-        {GenType.SkyBlock, new GenSkyBlock()},
         {GenType.SuperFlat, new GenSuperFlat()},
         {GenType.Backrooms, new GenBackrooms()},
         {GenType.Dungeon, new GenDungeon()},

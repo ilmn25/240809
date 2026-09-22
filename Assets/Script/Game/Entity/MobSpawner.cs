@@ -23,6 +23,10 @@ public class MobSpawner
     private static readonly List<ID> DayMobs = new() { ID.Slime, ID.Pigeon };
     private static readonly List<ID> RareDayMobs = new() { ID.Gnome };
     private const float GnomeSpawnChance = 0.08f;
+
+    /// <summary>Per-attempt chance of the bound-NPC encounter — very rare.
+    /// Only rolled in daylight (see <see cref="TrySpawnGroup"/>).</summary>
+    private const float BoundNPCSpawnChance = 0.002f;
     private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Raider, ID.Congregant, ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin, ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret };
     private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
     private static readonly List<ID> RaptureMobs = new() { ID.Lich };
@@ -79,6 +83,16 @@ public class MobSpawner
 
         if (!FindSurfacePosition(ref spawnPos))
             return;
+
+        // Very rare daylight encounter: a person bound and left out in the wilds.
+        // Untie them (secondary interact) for a permanent Delver ally. Rapture is
+        // excluded so the only thing out there is the Lich hunt.
+        if (!isNight && Save.Inst.weather != EnvironmentType.Rapture &&
+            Random.value < BoundNPCSpawnChance)
+        {
+            Entity.Spawn(ID.BoundNPC, spawnPos);
+            return;
+        }
 
         BiomeType biome = GenHelpBiome.GetBiomeType(spawnPos.x, spawnPos.z);
         List<ID> pool;

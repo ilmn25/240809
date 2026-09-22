@@ -27,7 +27,7 @@ public class WatchdogMachine : HostileMeleeMachine
             SpeedAir = 7,      // bear is 6 — 1 unit faster
             PathJump = 2,
             PathAir = 4,
-            CharSprite = ID.Bear, // no dedicated sprite — reuse the bear
+            CharSprite = ID.Watchdog,
         };
     }
 

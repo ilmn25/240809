@@ -25,7 +25,7 @@ public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopke
             DistAttack = 2,
             DistDisengage = 40,
             IsNPC = true,
-            CharSprite = ID.Merchant, // reuse the merchant's look
+            CharSprite = ID.Nomad,
         };
     }
 
@@ -41,7 +41,7 @@ public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopke
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
+        if (IsEngaged) return;
 
         if (IsLeader)
         {

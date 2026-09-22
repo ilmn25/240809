@@ -90,7 +90,6 @@ public class Save
         worlds = new Dictionary<GenType, World>()
         {
             { GenType.Abyss, new World(GenType.Abyss) },
-            { GenType.SkyBlock, new World(GenType.SkyBlock) },
             { GenType.SuperFlat, new World(GenType.SuperFlat) },
             { GenType.Backrooms, new World(GenType.Backrooms) },
             { GenType.Dungeon, new World(GenType.Dungeon) },

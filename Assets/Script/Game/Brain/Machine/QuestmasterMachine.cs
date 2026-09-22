@@ -14,7 +14,7 @@ public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
             DistRoam = 3,
             DistEscape = 17,
             IsNPC = true,
-            CharSprite = ID.Guide, // reuse the guide sprite for now
+            CharSprite = ID.Questmaster,
         };
     }
 

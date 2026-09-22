@@ -238,4 +238,5 @@ public enum ID
     RaiderCampChest,
     DungeonChest,
     Threshold,
+    Cow,
 }

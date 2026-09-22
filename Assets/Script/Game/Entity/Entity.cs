@@ -417,6 +417,11 @@ public class Entity
 
                 AddMob<CaravanMachine>(ID.Caravan);
                 loot = new (ID.Caravan); // the caravan drops nothing
+
+                AddMob<CowMachine>(ID.Cow);
+                loot = new (ID.Cow);
+                loot.Add(1, 2, ID.Meat);
+                loot.Add(0.5f, 1, ID.Meat);
                 
                 AddMob<BugMachine>(ID.SnareFlea); 
                 loot = new (ID.SnareFlea);

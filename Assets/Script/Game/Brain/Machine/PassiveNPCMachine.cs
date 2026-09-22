@@ -25,6 +25,10 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
+    /// <summary>True while focused on a real threat — the escort wagon doesn't count.</summary>
+    protected bool IsEngaged =>
+        Info.Target != null && (Caravan == null || Info.Target != Caravan.Info);
+
     /// <summary>Cluster around the wagon as a group, and leave once the wagon is
     /// gone. Call from OnUpdate when part of a caravan.</summary>
     protected void UpdateCaravanFollow()
@@ -40,6 +44,13 @@ public abstract class PassiveNPCMachine : GroundMobMachine
             Info.Target = Caravan.Info;
             Info.PathingStatus = PathingStatus.Pending;
             if (!IsCurrentState<MobChase>()) SetState<MobChase>();
+        }
+        else if (Info.Target == Caravan.Info)
+        {
+            // Caught up: drop the wagon as a target and linger in place.
+            // CancelTarget (not null) resets pathing, which dereferences Info.Target.
+            Info.CancelTarget();
+            SetState<MobIdle>();
         }
         else if (IsCurrentState<MobChase>())
             SetState<MobIdle>();

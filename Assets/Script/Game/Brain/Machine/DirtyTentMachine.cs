@@ -27,7 +27,7 @@ public class DirtyTentMachine : SpawnerStructureMachine
     /// its own and stays leashed to the tent.</summary>
     protected override Info SpawnUnit(int index)
     {
-        ID mobID = Random.value < 0.5f ? ID.RaiderGuard : (Random.value < 0.5f ? ID.Raider : ID.Chito);
+        ID mobID = Random.value < 0.5f ? ID.RaiderGuard : ID.ScoutGuard;
         Info mobInfo = Entity.Spawn(mobID, Vector3Int.FloorToInt(transform.position));
         GuardModule.Attach(mobInfo, transform.position);
         return mobInfo;

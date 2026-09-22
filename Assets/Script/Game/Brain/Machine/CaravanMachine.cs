@@ -13,6 +13,7 @@ public class CaravanMachine : GroundMobMachine
     private const float FleeDistance = 30f;
     private const float FollowerSpread = 2f;
     private const int FollowerCount = 2;
+    private const int CowCount = 2;        // cattle that trail the wagon
     private const float VisitDuration = 120f; // seconds the wagon camps before fleeing
 
     private bool _fleeing;
@@ -37,7 +38,7 @@ public class CaravanMachine : GroundMobMachine
             SpeedAir = 7,
             DistRoam = 0,
             IsNPC = true,
-            CharSprite = ID.Merchant, // no dedicated wagon sprite
+            CharSprite = ID.Caravan,
         };
     }
 
@@ -64,6 +65,14 @@ public class CaravanMachine : GroundMobMachine
         Info collectorInfo = Entity.Spawn(ID.Collector, Event.SpawnPointAround(here, FollowerSpread));
         if (collectorInfo?.Machine is CollectorMachine collector)
             collector.Caravan = this;
+
+        // A pair of cattle tags along too, trailing the wagon like the nomads.
+        for (int i = 0; i < CowCount; i++)
+        {
+            Info cowInfo = Entity.Spawn(ID.Cow, Event.SpawnPointAround(here, FollowerSpread));
+            if (cowInfo?.Machine is CowMachine cow)
+                cow.Caravan = this;
+        }
 
         _ = new CoroutineTask(VisitTimer());
     }
