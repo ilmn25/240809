@@ -93,18 +93,18 @@ public class Environment
             BackgroundColor = Helper.GetColor(75, 59, 55)
         });
         Environments.Add(EnvironmentType.Backrooms, new Environment
-        { 
-            AmbientLight = Helper.GetColor(245, 242, 230),
-            FogColor = Helper.GetColor(190, 184, 205),
-            SpotLight = Helper.GetColor(255, 219, 154),
-            DirectionalLight = Helper.GetColor(214, 206, 198),
-            BackgroundColor = Helper.GetColor(198, 195, 212)
+        {
+            AmbientLight = Helper.GetColor(215, 212, 195),
+            FogColor = Helper.GetColor(112, 108, 95),
+            SpotLight = Helper.GetColor(190, 172, 120),
+            DirectionalLight = Helper.GetColor(128, 124, 108),
+            BackgroundColor = Helper.GetColor(108, 105, 88)
         });
         _ = new CoroutineTask(Clock());
     }       
      
     public const int Length = 60 * 24;
-    private const float Speed = 0.48f; // seconds per in-game minute — 20% longer days
+    public const float SecondsPerGameMinute = 0.48f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous = EnvironmentType.Black;
@@ -156,7 +156,7 @@ public class Environment
     {
         while (true)
         {
-            yield return new WaitForSeconds(Speed);
+            yield return new WaitForSeconds(SecondsPerGameMinute);
             if (Helper.IsHost()) MoveTime(1);
         }
     }

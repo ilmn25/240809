@@ -148,7 +148,7 @@ public static class GUIMain
             if (Save.Inst == null) return "Day ?, ?";
             // Countdown to nightfall (sunset at 18:00 = 3/4 through the day).
             int minutesUntilNight = Mathf.Max(0, Environment.Length * 3 / 4 - Save.Inst.time);
-            return $"Day {Save.Inst.day}, {minutesUntilNight} minutes until night";
+            return $"Day {Save.Inst.day}, {minutesUntilNight} minutes until night\n{RaidEvent.GetCountdownText()}";
         }
 
         string BuildCameraDirText()

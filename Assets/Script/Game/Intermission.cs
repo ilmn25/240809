@@ -23,6 +23,7 @@ public static class Intermission
     private static IEnumerator Play(bool playIntro)
     {
         Active = playIntro;
+        CoroutineTask generationTask = new CoroutineTask(GenerateWorlds());
         if (playIntro)
         {
             Environment.Target = EnvironmentType.Dim;
@@ -31,24 +32,9 @@ public static class Intermission
             while (Dialogue.Showing) yield return null;
         }
 
-        Main.GUIMenu.gameObject.SetActive(true);
-        Main.GUIMenu.text = "Loading... 0%";
-        long total = 0;
-        foreach (var kv in Save.Inst.worlds)
-            total += (long)kv.Value.Size.x * kv.Value.Size.y * kv.Value.Size.z;
-        long done = 0;
-        foreach (var kv in Save.Inst.worlds)
-        {
-            long wc = (long)kv.Value.Size.x * kv.Value.Size.y * kv.Value.Size.z;
-            yield return Gen.GenerateAllForCoroutine(kv.Value, p =>
-                Main.GUIMenu.text = total > 0
-                    ? $"Loading... {Mathf.RoundToInt(100f * (done + p * wc) / total)}%"
-                    : "");
-            kv.Value.Map?.BuildMarkers(kv.Value);
-            done += wc;
-        }
-        Main.GUIMenu.gameObject.SetActive(false);
+        while (generationTask.Running) yield return null;
 
+        Main.GUIMenu.gameObject.SetActive(false);
         World.Inst.PopulateNavMap();
         Vector3 spawnPosition = World.Inst.SpawnPoint;
         foreach (PlayerInfo player in Save.Inst.players)
@@ -68,5 +54,14 @@ public static class Intermission
         yield return new WaitForSeconds(1f);
         ScreenFade.FadeIn(1f, 0.5f);
         Active = false;
+    }
+
+    private static IEnumerator GenerateWorlds()
+    {
+        foreach (var kv in Save.Inst.worlds)
+        {
+            yield return Gen.GenerateAllForCoroutine(kv.Value);
+            kv.Value.Map?.BuildMarkers(kv.Value);
+        }
     }
 }

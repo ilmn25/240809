@@ -4,6 +4,9 @@ using Random = UnityEngine.Random;
 
 public static class RaidEvent
 {
+    private const int RaidIntervalDays = 3;
+    private const int RaidHour = 19;
+    private const int RaidTime = RaidHour * 60;
     private const float SpawnDistance = 10f;
     private const float PrepareTime = 30f;
     private const float SpawnInterval = 2f;
@@ -40,9 +43,22 @@ public static class RaidEvent
 
     public static void Subscribe() => Environment.HourlyTriggered += OnHour;
 
+    public static string GetCountdownText()
+    {
+        if (Save.Inst == null) return "";
+
+        int daysUntilRaid = (RaidIntervalDays - Save.Inst.day % RaidIntervalDays) % RaidIntervalDays;
+        if (daysUntilRaid == 0 && Save.Inst.time >= RaidTime)
+            daysUntilRaid = RaidIntervalDays;
+
+        return daysUntilRaid == 0
+            ? "Raid today"
+            : $"Raid in {daysUntilRaid} day{(daysUntilRaid == 1 ? "" : "s")}";
+    }
+
     private static void OnHour(int hour, int day)
     {
-        if (hour != 19 || day % 3 != 0) return;
+        if (hour != RaidHour || day % RaidIntervalDays != 0) return;
 
         _activeRaidTask?.Stop();
         _activeRaidTask = new CoroutineTask(ExecuteRaid(GetRaidType(day)));
