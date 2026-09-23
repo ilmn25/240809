@@ -14,6 +14,16 @@ public class Storage
 
         public string Name;
 
+        /// <summary>Player-facing title for this storage's window: the explicit name if
+        /// one was set, otherwise derived from the owning Info, otherwise a generic
+        /// fallback. Hand-built containers (see TraderInfo.Create) never pass through
+        /// Entity.CreateInfo, so they can have no id at all. The enum is qualified
+        /// because this class declares its own <see cref="ID"/> field.</summary>
+        public string DisplayName =>
+            Name
+            ?? (info != null && info.id != global::ID.Null ? Helper.ToDisplayName(info.id) : null)
+            ?? "Storage";
+
         // when true, AddItem/RemoveItem won't trigger Inventory.RefreshInventory
         [NonSerialized] public bool SuppressRefresh;
         // when true, Storage.NotifyChanged won't fire Storage.OnChanged (used during bulk transfers)

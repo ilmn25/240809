@@ -29,53 +29,31 @@ public abstract class PassiveNPCMachine : GroundMobMachine
     protected bool IsEngaged =>
         Info.Target != null && (Caravan == null || Info.Target != Caravan.Info);
 
-    /// <summary>Cluster around the wagon as a group, and leave once the wagon is
-    /// gone. Call from OnUpdate when part of a caravan.</summary>
-    protected void UpdateCaravanFollow()
+    /// <summary>Handle a real threat: flee it, turning to fight back when cornered, and
+    /// drop it once it gets away. Returns true while a threat is being handled so callers
+    /// can skip their usual idling/escort behavior. The escort wagon never counts.</summary>
+    protected bool UpdateThreat()
     {
-        if (Caravan == null || Caravan.Info == null || Caravan.Info.Destroyed)
+        if (!IsEngaged) return false;
+
+        if (Helper.SquaredDistance(Info.Target.position, transform.position) >
+            Info.DistDisengage * Info.DistDisengage)
         {
-            Leave();
-            return;
+            Info.CancelTarget(); // the threat got away — calm down
+            return false;
         }
 
-        if (Vector3.Distance(Caravan.transform.position, transform.position) > Info.DistAttack)
-        {
-            Info.Target = Caravan.Info;
-            Info.PathingStatus = PathingStatus.Pending;
-            if (!IsCurrentState<MobChase>()) SetState<MobChase>();
-        }
-        else if (Info.Target == Caravan.Info)
-        {
-            // Caught up: drop the wagon as a target and linger in place.
-            // CancelTarget (not null) resets pathing, which dereferences Info.Target.
-            Info.CancelTarget();
-            SetState<MobIdle>();
-        }
-        else if (IsCurrentState<MobChase>())
-            SetState<MobIdle>();
-    }
-
-    protected void Leave()
-    {
-        Info.Destroy();
-        Unload();
+        SetState<MobEscapeFight<MobAttackSwing>>(); // flee, but fight back when cornered
+        return true;
     }
 
     /// <summary>Flee from the current threat, fighting back only when cornered;
-    /// otherwise linger in place. Call from OnUpdate.</summary>
+    /// otherwise linger in place. Call from OnUpdate when not part of a caravan.</summary>
     protected void UpdateFlee()
     {
         if (!IsCurrentState<DefaultState>()) return;
 
-        if (Info.Target != null)
-        {
-            if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-                Info.CancelTarget(); // the threat got away — calm down
-            else
-                SetState<MobEscapeFight<MobAttackSwing>>(); // flee, but fight back when cornered
-            return;
-        }
+        if (UpdateThreat()) return;
 
         SetState<MobIdle>(); // lingers in place (long idle from OnStart)
     }

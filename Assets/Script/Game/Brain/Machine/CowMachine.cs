@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A placid cow that travels with the visiting bandwagon. Spawned by
 /// CaravanMachine beside the nomads, it trails the wagon and leaves with it —
-/// the animal counterpart of PassiveNPCMachine.UpdateCaravanFollow.</summary>
+/// the animal counterpart of the caravan escort.</summary>
 public class CowMachine : AnimalMachine
 {
     /// <summary>The wagon this cow belongs to, set by CaravanMachine when it
@@ -40,21 +40,18 @@ public class CowMachine : AnimalMachine
         {
             // Don't interrupt a hit reaction.
             if (IsCurrentState<MobHit>()) return;
-            UpdateCaravanFollow();
+
+            // A real threat outranks the escort wagon.
+            if (UpdateThreat()) return;
+
+            UpdateCaravanFollow(Caravan);
             return;
         }
 
         // Left to itself the cow is docile: it grazes, and only runs from a threat.
         if (!IsCurrentState<DefaultState>()) return;
 
-        if (Info.Target != null)
-        {
-            if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-                Info.CancelTarget(); // the threat got away — settle down
-            else
-                SetState<MobEscape>();
-            return;
-        }
+        if (UpdateThreat()) return;
 
         if (Random.value > 0.5f)
             SetState<MobRoam>();
@@ -62,30 +59,17 @@ public class CowMachine : AnimalMachine
             SetState<MobIdle>();
     }
 
-    /// <summary>Cluster around the wagon as it travels, and leave once it's gone.</summary>
-    private void UpdateCaravanFollow()
+    /// <summary>Run from a real threat, and settle down once it gets away. Returns true
+    /// while a threat is being handled — the escort wagon doesn't count.</summary>
+    private bool UpdateThreat()
     {
-        if (Caravan.Info == null || Caravan.Info.Destroyed)
-        {
-            Info.Destroy();
-            Unload();
-            return;
-        }
+        if (Info.Target == null || (Caravan != null && Info.Target == Caravan.Info)) return false;
 
-        if (Vector3.Distance(Caravan.transform.position, transform.position) > Info.DistAttack)
-        {
-            Info.Target = Caravan.Info;
-            Info.PathingStatus = PathingStatus.Pending;
-            if (!IsCurrentState<MobChase>()) SetState<MobChase>();
-        }
-        else if (Info.Target == Caravan.Info)
-        {
-            // Caught up: drop the wagon as a target and linger in place.
-            // CancelTarget (not null) resets pathing, which dereferences Info.Target.
-            Info.CancelTarget();
-            SetState<MobIdle>();
-        }
-        else if (IsCurrentState<MobChase>())
-            SetState<MobIdle>();
+        if (Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
+            Info.CancelTarget(); // the threat got away — settle down
+        else
+            SetState<MobEscape>();
+
+        return true;
     }
 }

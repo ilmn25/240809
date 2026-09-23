@@ -1,5 +1,6 @@
 /// <summary>A barrel that can hold a liquid. Swinging an empty bucket at a filled
 /// barrel collects the liquid into the bucket and empties the barrel.</summary>
+[System.Serializable]
 public class BarrelInfo : SpriteStructureInfo
 {
     /// <summary>The liquid currently stored in the barrel. None = empty barrel.</summary>

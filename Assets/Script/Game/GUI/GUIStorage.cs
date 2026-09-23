@@ -15,7 +15,6 @@ public class  GUIStorage : GUI
     public Storage Storage; 
     public int RowAmount = 1;
     public int SlotAmount = 9;
-    private string Name => Storage.Name ?? Storage.info?.id.ToString() ?? "Storage";
     protected int CurrentSlotKey = -1;
     /// <summary>True while the mouse is over any storage slot (inventory management
     /// takes priority over cursor quick-actions).</summary>
@@ -26,7 +25,7 @@ public class  GUIStorage : GUI
     private void OnRefresh(object sender, EventArgs e)
     {
         if (Storage != null)
-            Text.text = Name;
+            Text.text = Storage.DisplayName;
     }
     public new void Initialize()
     {  

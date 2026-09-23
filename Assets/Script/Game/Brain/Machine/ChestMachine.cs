@@ -68,6 +68,7 @@ public class BasicChestMachine : ChestMachine
     }
 }
 
+[System.Serializable]
 public class CyclopsChestInfo : ContainerInfo
 {
     public bool Unlocked;

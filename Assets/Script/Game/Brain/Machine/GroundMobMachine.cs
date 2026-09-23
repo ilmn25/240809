@@ -27,6 +27,42 @@ public abstract class GroundMobMachine : MobMachine
         GetModule<GroundPathingModule>().DrawGizmos();
     }
 
+    /// <summary>Cluster around the given caravan wagon as it travels, and leave the
+    /// world once the wagon is gone. Call from OnUpdate while a wagon is assigned
+    /// (see PassiveNPCMachine and CowMachine).</summary>
+    protected void UpdateCaravanFollow(CaravanMachine caravan)
+    {
+        if (caravan == null || caravan.Info == null || caravan.Info.Destroyed)
+        {
+            LeaveCaravan();
+            return;
+        }
+
+        if (Helper.SquaredDistance(caravan.transform.position, transform.position) >
+            Info.DistAttack * Info.DistAttack)
+        {
+            Info.Target = caravan.Info;
+            Info.PathingStatus = PathingStatus.Pending;
+            if (!IsCurrentState<MobChase>()) SetState<MobChase>();
+        }
+        else if (Info.Target == caravan.Info)
+        {
+            // Caught up: drop the wagon as a target and linger in place.
+            // CancelTarget (not null) resets pathing, which dereferences Info.Target.
+            Info.CancelTarget();
+            SetState<MobIdle>();
+        }
+        else if (IsCurrentState<MobChase>())
+            SetState<MobIdle>();
+    }
+
+    /// <summary>Removes this mob from the world now that its caravan has left.</summary>
+    protected void LeaveCaravan()
+    {
+        Info.Destroy();
+        Unload();
+    }
+
     /// <summary>Lock onto the nearest player or friendly NPC on sight; release it
     /// once it retreats well out of disengage range. Hostile mobs call this from
     /// their OnUpdate; leashed mobs (GuardModule) skip re-acquiring while off

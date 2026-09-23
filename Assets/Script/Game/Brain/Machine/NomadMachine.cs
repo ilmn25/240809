@@ -4,7 +4,7 @@ using UnityEngine;
 /// (IsLeader) opens a shop that sells goods for specific resources; the rest just
 /// cluster around the wagon and trade a line of dialogue. When spawned by a
 /// caravan the nomad follows the wagon and leaves with it (see
-/// PassiveNPCMachine.UpdateCaravanFollow).</summary>
+/// GroundMobMachine.UpdateCaravanFollow).</summary>
 public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopkeeper
 {
     /// <summary>True for the single shopkeeper of a visiting bandwagon.</summary>
@@ -66,7 +66,11 @@ public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopke
             // Don't interrupt an open shop or a hit reaction.
             if (IsCurrentState<ShopState>() || IsCurrentState<MobHit>())
                 return;
-            UpdateCaravanFollow();
+
+            // A real threat outranks the escort wagon.
+            if (UpdateThreat()) return;
+
+            UpdateCaravanFollow(Caravan);
             return;
         }
 

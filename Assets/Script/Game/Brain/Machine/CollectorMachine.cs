@@ -25,42 +25,42 @@ public class CollectorMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         base.OnStart();
 
-        Converter = new TraderInfo() { Storage = new Storage(9) };
-        Converter.Machine = this;
-        Converter.Initialize();
-
+        Converter = TraderInfo.Create(this, ID.Collector);
         AddState(new InContainerState() { Storage = Converter.Storage });
     }
 
     public void OnActionSecondary(Info info)
     {
         if (IsEngaged) return;
+
         Audio.PlaySFX(SfxID.Notification);
-        // The trader idles in MobIdle (not DefaultState), so toggle on
-        // InContainerState instead of the chest's DefaultState pattern.
+
+        // The trader idles in MobIdle rather than DefaultState, so toggle the container
+        // state directly instead of following the chest's DefaultState pattern.
         if (IsCurrentState<InContainerState>())
-            SetState<DefaultState>();
+            SetState<MobIdle>();
         else
             SetState<InContainerState>();
     }
 
     public override void OnUpdate()
     {
+        // The converter keeps refining whatever else the trader is doing.
+        Converter.Update();
+
         // A caravan trader follows the wagon and leaves when it's gone.
         if (Caravan != null)
         {
             // Don't interrupt an open converter or a hit reaction.
-            if (IsCurrentState<InContainerState>() || IsCurrentState<MobHit>())
-            {
-                Converter.Update();
-                return;
-            }
-            UpdateCaravanFollow();
-            Converter.Update();
+            if (IsCurrentState<InContainerState>() || IsCurrentState<MobHit>()) return;
+
+            // A real threat outranks the escort wagon.
+            if (UpdateThreat()) return;
+
+            UpdateCaravanFollow(Caravan);
             return;
         }
 
         UpdateFlee();
-        Converter.Update();
     }
 }

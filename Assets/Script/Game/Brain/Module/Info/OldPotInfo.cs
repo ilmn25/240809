@@ -3,6 +3,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>A fragile old pot. Smashing it (with any tool) either pops out a
 /// viper or spills loot — never both.</summary>
+[System.Serializable]
 public class OldPotInfo : HarvestableInfo
 {
     private const float ViperChance = 0.35f;

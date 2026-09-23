@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>The travelling bandwagon's wagon. On arrival it spawns a small camp
 /// of followers — nomads and a collector — that cluster around it (see
-/// PassiveNPCMachine.UpdateCaravanFollow). After a set time the wagon flees and
+/// GroundMobMachine.UpdateCaravanFollow). After a set time the wagon flees and
 /// despawns; the followers leave with it.</summary>
 public class CaravanMachine : GroundMobMachine
 {
