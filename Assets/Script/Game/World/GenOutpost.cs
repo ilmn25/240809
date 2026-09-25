@@ -9,7 +9,7 @@ public class GenOutpost : GenTaskScatter
         if (Outpost == null) return;
         System.Random rng = Gen.CreateWorldRandom("Outpost");
 
-        Vector3Int origin = PickFootprintOrigin(world, rng, Outpost.size);
+        Vector3Int origin = PickFootprintOrigin(world, rng, Outpost.size, spawnMargin: Outpost.size);
         if (origin.x < 0) return;
 
         SetPiece.Paste(world, origin, Outpost);

@@ -7,7 +7,7 @@ public class SlimeMachine : MobMachine
         return new SlimeInfo()
         {
             HealthMax = 6,
-            Defense = 1,
+            Defense = 0,
             DistAttack = 3,
             DistAlert = 64,
             DistDisengage = 96,

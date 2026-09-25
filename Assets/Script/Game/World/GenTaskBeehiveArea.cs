@@ -17,7 +17,7 @@ public class GenTaskBeehiveArea : GenTaskScatter
     {
         System.Random rng = Gen.CreateWorldRandom("BeehiveArea");
 
-        Vector3Int center = PickGrassCenter(world, rng);
+        Vector3Int center = PickGrassCenter(world, rng, ScatterRadius);
         if (center.x < 0) return;
 
         var occupied = new System.Collections.Generic.HashSet<Vector3Int>();

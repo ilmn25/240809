@@ -14,7 +14,7 @@ public class GenDungeonEntrance : GenTaskScatter
     {
         if (Entrance == null) return;
         System.Random rng = Gen.CreateWorldRandom("DungeonEntrance");
-        Vector3Int column = PickGrassCenter(world, rng);
+        Vector3Int column = PickGrassCenter(world, rng, Entrance.size / 2);
         if (column.x < 0) return;
         int surfaceY = FindSurfaceY(world, column.x, column.z);
         if (surfaceY < 0) return;

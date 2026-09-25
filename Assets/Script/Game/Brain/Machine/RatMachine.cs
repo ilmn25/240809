@@ -22,7 +22,7 @@ public class RatMachine : GroundMobMachine, IItemThief
     {
         return new EnemyInfo()
         {
-            HealthMax = 10,
+            HealthMax = 5,
             DistAttack = 2,
             DistAlert = 12,
             DistDisengage = FleeDistance,

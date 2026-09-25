@@ -22,7 +22,7 @@ public class GenTaskTower : GenTaskScatter
         {
             for (int attempt = 0; attempt < 40; attempt++)
             {
-                Vector3Int column = PickGrassCenter(world, rng);
+                Vector3Int column = PickGrassCenter(world, rng, Tower.size / 2);
                 if (column.x < 0) break;
                 int surfaceY = FindSurfaceY(world, column.x, column.z);
                 if (surfaceY < 0) continue;

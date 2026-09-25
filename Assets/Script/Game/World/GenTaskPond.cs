@@ -22,6 +22,7 @@ public class GenTaskPond : GenTaskScatter
         {
             int x = rng.Next(2, world.Bounds.x - 2);
             int z = rng.Next(2, world.Bounds.z - 2);
+            if (!IsClearOfSpawn(world.SpawnPoint, x, z)) continue;
             int surfaceY = FindSurfaceY(world, x, z);
             if (surfaceY < 0) continue;
 

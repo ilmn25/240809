@@ -15,7 +15,7 @@ public class GnomeMachine : GroundMobMachine
     {
         return new GnomeInfo()
         {
-            HealthMax = 20,
+            HealthMax = 5,
             DistAttack = 1,
             DistAlert = 16,
             DistDisengage = FleeDistance,

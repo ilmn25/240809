@@ -436,8 +436,7 @@ public class Entity
                 loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
                 
                 AddMob<SlimeMachine>(ID.Slime);
-                loot =  new (ID.Slime);
-                loot.Add(1, 2, ID.Cytoplasm); 
+                loot = new (ID.Slime); // the slime drops nothing; its split babies carry the cytoplasm
 
                 AddMob<BabySlimeMachine>(ID.BabySlime);
                 loot = new (ID.BabySlime);

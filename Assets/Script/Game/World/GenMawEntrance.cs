@@ -9,7 +9,7 @@ public class GenMawEntrance : GenTaskScatter
         if (Entrance == null) return;
         System.Random rng = Gen.CreateWorldRandom("MawEntrance");
 
-        Vector3Int origin = PickFootprintOrigin(world, rng, Entrance.size);
+        Vector3Int origin = PickFootprintOrigin(world, rng, Entrance.size, spawnMargin: Entrance.size);
         if (origin.x < 0) return;
 
         SetPiece.Paste(world, origin, Entrance);

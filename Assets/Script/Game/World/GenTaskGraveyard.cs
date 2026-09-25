@@ -15,7 +15,7 @@ public class GenTaskGraveyard : GenTaskScatter
     {
         System.Random rng = Gen.CreateWorldRandom("Graveyard");
 
-        Vector3Int center = PickGrassCenter(world, rng);
+        Vector3Int center = PickGrassCenter(world, rng, ScatterRadius);
         if (center.x < 0) return;
 
         int count = rng.Next(MinHeadstones, MaxHeadstones + 1);

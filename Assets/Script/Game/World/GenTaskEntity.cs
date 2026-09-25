@@ -54,7 +54,7 @@ public class GenTaskEntity : IGenTask
         return ID.Daisies;
     }
 
-    private void SpawnChunk(Vector3Int currentCoordinate, Chunk currentChunk)
+    private void SpawnChunk(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int spawn)
     {
         System.Random rng = Gen.CreateChunkRandom("Entity", currentCoordinate);
 
@@ -80,8 +80,13 @@ public class GenTaskEntity : IGenTask
                         if (HasStaticEntity(currentChunk, preexistingStatic, position))
                             continue;
 
+                        // The spawn clearing (map centre) stays free of structures — no
+                        // tents, spider nests, hives, chests, skeletons or meteors next to spawn.
+                        bool spawnClearing = !GenTaskScatter.IsClearOfSpawn(spawn, position.x, position.z);
+
                         double roll = rng.NextDouble();
-                        if (rng.NextDouble() < SurfaceSkeletonChance)
+                        bool skeletonRoll = rng.NextDouble() < SurfaceSkeletonChance;
+                        if (skeletonRoll && !spawnClearing)
                         {
                             currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Skeleton, position));
                             SpawnSkeletonLoot(currentCoordinate, currentChunk, position, rng);
@@ -110,11 +115,11 @@ public class GenTaskEntity : IGenTask
                             }
                             else if (roll <= (chance += ForestSpiderNestChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
+                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
                             }
                             else if (roll <= (chance += ForestHiveChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Hive, position));
+                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Hive, position));
                             }
                             else if (roll <= (chance += ForestFallenTreeChance))
                             {
@@ -145,7 +150,7 @@ public class GenTaskEntity : IGenTask
                             }
                             else if (roll <= (chance += DirtTentChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.DirtyTent, position));
+                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.DirtyTent, position));
                             }
                             else if (roll <= (chance += DirtFallenTreeChance))
                             {
@@ -162,7 +167,7 @@ public class GenTaskEntity : IGenTask
                             }
                             else if (roll <= (chance += SurfaceMeteorChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Meteor, position));
+                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Meteor, position));
                             }
                             else if (rng.NextDouble() < GroundItemChance)
                             {
@@ -177,9 +182,12 @@ public class GenTaskEntity : IGenTask
                             bool isDesert = GenHelpBiome.GetBiomeType(position.x, position.z) == BiomeType.Desert;
                             if (roll <= chance)
                             {
-                                ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, position);
-                                Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
-                                currentChunk.StaticEntity.Add(chest);
+                                if (!spawnClearing)
+                                {
+                                    ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, position);
+                                    Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
+                                    currentChunk.StaticEntity.Add(chest);
+                                }
                             } 
                             else if (isDesert && roll <= (chance += SurfaceSandStructureChance))
                             {
@@ -226,7 +234,7 @@ public class GenTaskEntity : IGenTask
                     Vector3Int coord = new Vector3Int(cx * World.ChunkSize, cy * World.ChunkSize, cz * World.ChunkSize);
                     Chunk chunk = world[coord];
                     if (chunk == null || chunk == Chunk.Zero) continue;
-                    SpawnChunk(coord, chunk);
+                    SpawnChunk(coord, chunk, world.SpawnPoint);
                 }
     }
 

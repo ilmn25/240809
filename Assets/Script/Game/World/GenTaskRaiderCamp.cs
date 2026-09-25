@@ -6,24 +6,27 @@ public class GenTaskRaiderCamp : GenTaskScatter
     private const int MinTents = 2;
     private const int MaxTents = 3;
     private const int ClusterRadius = 4;
+    /// <summary>Width of the flat square a camp needs (ClusterRadius on both sides of its centre).</summary>
+    private const int CampSize = ClusterRadius * 2 + 1;
 
     public override void RunWorld(World world)
     {
         System.Random rng = Gen.CreateWorldRandom("RaiderCamp");
-        int campSize = ClusterRadius * 2 + 1;
 
         for (int i = 0; i < CampCount; i++)
         {
-            Vector3Int column = FindCampCenter(world, rng, campSize);
+            Vector3Int column = FindCampCenter(world, rng);
             if (column.x < 0) continue;
             PlaceCamp(world, column, rng);
         }
     }
 
-    private static Vector3Int FindCampCenter(World world, System.Random rng, int campSize)
+    /// <summary>A flat camp-sized patch of grass clear of the spawn clearing, snapped to its
+    /// surface, or (-1, 0, 0).</summary>
+    private static Vector3Int FindCampCenter(World world, System.Random rng)
     {
-        Vector3Int column = PickGrassCenter(world, rng, 40,
-            c => FindFootprintSurface(world, c.x - ClusterRadius, c.z - ClusterRadius, campSize, maxSpread: 3) >= 0);
+        Vector3Int column = PickGrassColumn(world, rng, 40, ClusterRadius,
+            (x, z) => FindFootprintSurface(world, x - ClusterRadius, z - ClusterRadius, CampSize, maxSpread: 3) >= 0);
         if (column.x < 0) return column;
         return new Vector3Int(column.x, FindSurfaceY(world, column.x, column.z), column.z);
     }

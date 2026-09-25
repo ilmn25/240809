@@ -6,7 +6,7 @@ public class BabySlimeMachine : SlimeMachine
     {
         return new EnemyInfo()
         {
-            HealthMax = 8,
+            HealthMax = 3,
             Defense = 0,
             DistAttack = 2,
             DistAlert = 64,

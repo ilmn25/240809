@@ -4,6 +4,9 @@ using UnityEngine;
 [System.Serializable]
 public class SlimeInfo : EnemyInfo
 {
+    /// <summary>Guaranteed number of babyslimes a slime splits into on death.</summary>
+    private const int BabyCount = 2;
+
     [System.NonSerialized] private bool _spawnedBaby;
 
     protected override void OnUpdate()
@@ -11,7 +14,9 @@ public class SlimeInfo : EnemyInfo
         if (Health <= 0 && !_spawnedBaby)
         {
             _spawnedBaby = true;
-            Entity.Spawn(ID.BabySlime, Vector3Int.FloorToInt(Machine.transform.position));
+            Vector3Int position = Vector3Int.FloorToInt(Machine.transform.position);
+            for (int i = 0; i < BabyCount; i++)
+                Entity.Spawn(ID.BabySlime, position);
         }
         base.OnUpdate();
     }
