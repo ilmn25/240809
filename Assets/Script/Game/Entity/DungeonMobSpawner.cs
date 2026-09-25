@@ -25,14 +25,8 @@ public class DungeonMobSpawner
         {
             if (player.Machine == null || player.controllerId == -1) continue;
 
-            int nearby = 0;
             Vector3 pPos = player.Machine.transform.position;
-            foreach (var em in EntityDynamicLoad.ActiveEntities)
-            {
-                if (em == null || em.Info is PlayerInfo) continue;
-                if (Vector3.Distance(em.transform.position, pPos) <= Scene.LogicDistance) nearby++;
-            }
-            if (nearby >= CapPerPlayer) continue;
+            if (MobSpawner.CountMobs(near: pPos, radius: Scene.LogicDistance) >= CapPerPlayer) continue;
 
             for (int i = 0; i < SpawnAttemptsPerTick; i++)
                 TrySpawnDungeonMob(pPos);

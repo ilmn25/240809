@@ -12,8 +12,8 @@ public class RatMachine : GroundMobMachine, IItemThief
     public GnomeMachine Gnome;
 
     private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
-        Damage = 4,
-        Knockback = 6,
+        Damage = 1,
+        Knockback = 5,
         CritChance = 0.1f,
         Radius = 0.8f,
     };

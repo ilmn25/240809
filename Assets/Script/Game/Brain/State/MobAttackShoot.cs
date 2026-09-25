@@ -5,25 +5,19 @@ public class MobAttackShoot : MobState
 
     public override void OnEnterState()
     {
-        if (Info.Equipment.Info.ProjectileInfo == null)
+        Item equipment = Info.Equipment?.Info;
+        ProjectileInfo projectile = equipment?.ProjectileInfo;
+        if (projectile == null)
         {
             Machine.SetState<DefaultState>();
             return;
         }
 
-        ProjectileInfo projectile = Info.Equipment.Info.ProjectileInfo;
-
-        // Player-held guns fire whatever accepted ammo the shooter carries (any
-        // bullet for regular guns, shotgun rounds for the shotgun); the ammo's
-        // projectile is used and one round is consumed. Ammo is resolved exactly
-        // once here, so PlayerMachine.Attack no longer handles it. Throwable
-        // weapons (spear) and non-player shooters (scouts, turrets) keep the
-        // equipment's own projectile + ammo as-is.
         if (Info is PlayerInfo player)
         {
-            if (AmmoRegistry.IsGun(Info.Equipment.ID))
+            if (AmmoRegistry.IsGun(equipment.ID))
             {
-                ID ammo = AmmoRegistry.PickFor(Info.Equipment.ID, player.Storage);
+                ID ammo = AmmoRegistry.PickFor(equipment.ID, player.Storage);
                 if (ammo == ID.Null)
                 {
                     Machine.SetState<DefaultState>();
@@ -43,9 +37,9 @@ public class MobAttackShoot : MobState
             }
         }
 
-        Audio.PlaySFX(Info.Equipment.Info.Sfx);
-        Info.SpriteToolEffect.localPosition = Vector3.right * Info.Equipment.Info.ProjectileOffset;
-        Info.Animator.speed = Info.Equipment.Info.Speed; 
+        Audio.PlaySFX(equipment.Sfx);
+        Info.SpriteToolEffect.localPosition = Vector3.right * equipment.ProjectileOffset;
+        Info.Animator.speed = equipment.Speed; 
         Info.Animator.Play("EquipShoot", 0, 0f);
          
         Info.SpeedModifier = 0.3f;
@@ -53,10 +47,10 @@ public class MobAttackShoot : MobState
         Vector3 direction = Info.GetDirection();
         
         ProjectileSync.SpawnProjectile(Info,
-            Info.SpriteToolTrack.position + direction * Info.Equipment.Info.ProjectileOffset,
+            Info.SpriteToolTrack.position + direction * equipment.ProjectileOffset,
             Info.AimPosition,
             projectile,
-            Info.targetHitboxType, Info.Equipment.ID);
+            Info.targetHitboxType, equipment.ID);
 
         if (Main.PlayerInfo == Info)
             ScreenShake.Shake(40f, 0.035f, 1f / 60f, direction);

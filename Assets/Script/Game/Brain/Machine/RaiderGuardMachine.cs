@@ -1,5 +1,3 @@
-/// <summary>Raider variant that stands watch at a dirty tent. The tent attaches
-/// a GuardModule leash, so it deaggros and returns home once dragged too far.</summary>
 public class RaiderGuardMachine : RaiderMachine
 {
     public static new Info CreateInfo()
@@ -7,9 +5,9 @@ public class RaiderGuardMachine : RaiderMachine
         return new EnemyInfo()
         {
             HealthMax = 16,
-            DistAlert = 10,   // notices intruders a bit sooner than a raider
+            DistAlert = 10,
             DistDisengage = 20,
-            DistRoam = 6,
+            DistRoam = 2,
         };
     }
 }

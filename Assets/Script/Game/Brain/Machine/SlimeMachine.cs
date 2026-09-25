@@ -1,29 +1,24 @@
 using UnityEngine;
 
 public class SlimeMachine : MobMachine
-{   
-    private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
-        Damage = 1,
-        Knockback = 10,
-        CritChance = 0.1f,
-        Radius = 0.7f,
-    };
-    
+{
     public static Info CreateInfo()
     {
         return new SlimeInfo()
         {
-            HealthMax = 16,
+            HealthMax = 6,
             Defense = 1,
             DistAttack = 3,
+            DistAlert = 64,
+            DistDisengage = 96,
             PathJump = 3,
             PathAir = 6,
             DistRoam = 15,
             DistStrafe = 3,
             SpeedGround = 0,
             SpeedLogic = 2,
-            SpeedAir = 14,
-            JumpVelocity = 15,
+            SpeedAir = 7,
+            JumpVelocity = 10,
             DecelerationTime = 0,
             AccelerationTime = 0.1f,
             NormalSkipAmount = 3,
@@ -51,6 +46,8 @@ public class SlimeMachine : MobMachine
 
     public override void OnUpdate()
     {
+        UpdateAggro();
+
         if (IsCurrentState<DefaultState>())
         {
             if (Info.Target != null)

@@ -1,14 +1,16 @@
 using UnityEngine;
 
-public class BabySlimeMachine : MobMachine
+public class BabySlimeMachine : SlimeMachine
 {
-    public static Info CreateInfo()
+    public static new Info CreateInfo()
     {
         return new EnemyInfo()
         {
             HealthMax = 8,
             Defense = 0,
             DistAttack = 2,
+            DistAlert = 64,
+            DistDisengage = 96,
             PathJump = 3,
             PathAir = 6,
             DistRoam = 12,
@@ -24,55 +26,5 @@ public class BabySlimeMachine : MobMachine
             MaxStuckCount = 700,
             PointLostDistance = 7,
         };
-    }
-
-    public override void OnStart()
-    {
-        AddModule(new SlimeMovementModule());
-        AddModule(new GroundPathingModule());
-        AddModule(new MobSpriteCullModule());
-        AddModule(new SpriteOrbitModule());
-        AddModule(new DoorBashModule());
-
-        AddState(new MobIdle());
-        AddState(new MobChase());
-        AddState(new MobRoam());
-        AddState(new MobHit());
-        AddState(new MobAttackPounce(1));
-    }
-
-    public override void OnUpdate()
-    {
-        if (IsCurrentState<DefaultState>())
-        {
-            if (Info.Target != null)
-            {
-                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-                {
-                    Info.AimPosition = Info.Target.position;
-                    SetState<MobAttackPounce>();
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
-                    SetState<MobRoam>();
-                }
-                else
-                {
-                    SetState<MobChase>();
-                }
-            }
-            else
-            {
-                switch (Random.Range(1, 3))
-                {
-                    case 1:
-                        SetState<MobRoam>();
-                        break;
-                    case 2:
-                        SetState<MobIdle>();
-                        break;
-                }
-            }
-        }
     }
 }

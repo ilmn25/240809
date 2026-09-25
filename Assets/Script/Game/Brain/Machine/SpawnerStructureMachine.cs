@@ -17,6 +17,19 @@ public abstract class SpawnerStructureMachine : StructureMachine
     /// structures (owl statue, tents) keep 1; swarms override this higher.</summary>
     protected virtual int MaxUnits => 1;
 
+    /// <summary>The info shared by every spawner structure: chopped with an axe and
+    /// never leaving rubble. Subclasses wrap this in their own CreateInfo.</summary>
+    protected static StructureInfo CreateSpawnerInfo(int health, ID loot) => new()
+    {
+        Health = health,
+        Loot = loot,
+        SfxHit = SfxID.HitStone,
+        SfxDestroy = SfxID.HitStone,
+        operationType = OperationType.Cutting,
+        threshold = 1,
+        SpawnsRubble = false,
+    };
+
     private readonly List<Info> _units = new List<Info>();
     private int _seenDay = int.MinValue;
 

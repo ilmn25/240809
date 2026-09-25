@@ -5,19 +5,7 @@ using UnityEngine;
 /// current one dies.</summary>
 public class MercenaryTentMachine : SpawnerStructureMachine
 {
-    public static Info CreateInfo()
-    {
-        return new StructureInfo
-        {
-            Health = 120,
-            Loot = ID.MercenaryTent,
-            SfxHit = SfxID.HitStone,
-            SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Cutting,
-            threshold = 1,
-            SpawnsRubble = false,
-        };
-    }
+    public static Info CreateInfo() => CreateSpawnerInfo(120, ID.MercenaryTent);
 
     /// <summary>Spawns a fresh hireable mercenary in the tent's own cell; it
     /// walks free on its own.</summary>

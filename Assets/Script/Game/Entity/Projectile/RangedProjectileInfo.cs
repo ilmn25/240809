@@ -40,17 +40,22 @@ public class RangedProjectileInfo : ProjectileInfo
             
                 IActionPrimary target = HitBuffer[i].GetComponent<IActionPrimaryAttack>();
                 if (target == null || projectile.SourceInfo.Machine == (Machine)target) continue;
-                 
-                if (((Machine)target).GetModule<Info>().OnHitInternal(projectile))
+
+                Info targetInfo = ((Machine)target).GetModule<Info>();
+                if (targetInfo.OnHitInternal(projectile))
                 {
                     OnHitTarget(projectile, (Machine)target);
-                    if (Lodge)
+                    // Only mobs have a hand mount to ride along with; a lodged
+                    // throwable that hits a plant or structure just drops there.
+                    if (Lodge && targetInfo is DynamicInfo dynamicTarget)
                     {
-                        projectile.Target = ((MobMachine)target).Info;
+                        projectile.Target = dynamicTarget;
                         projectile.RelativeRotation = Quaternion.Inverse(projectile.Target.SpriteToolTrack.rotation) * projectile.transform.rotation;
                     }
                     else
                     {
+                        if (PickUp && Ammo != ID.Null)
+                            Entity.SpawnItem(Ammo, projectile.transform.position);
                         projectile.Delete();
                     }
                     break;

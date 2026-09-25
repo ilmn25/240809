@@ -513,6 +513,7 @@ public partial class Item
             materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Stake, 2 } },
             projectileOffset: 1.016f,
             stackSize: 20,
+            durability: -1,
             holdoutOffset: new Vector2(0.65f, 0),
             rotationOffset: 45
         );
@@ -588,6 +589,7 @@ public partial class Item
             materials: new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Casing, 1 }, { ID.Steel, 1 } },
             projectileOffset: 1.1f,
             stackSize: 5,
+            durability: -1,
             holdoutOffset: new Vector2(0.5f, 0)
         );
 

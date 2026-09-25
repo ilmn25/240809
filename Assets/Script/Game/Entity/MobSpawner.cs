@@ -1,173 +1,154 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Terraria-style mob spawning.
-/// Mobs spawn in groups within logic range of each player, up to a per-player cap.
-/// Spawn pools are biome-aware and respect day/night cycles.
-/// </summary>
+using Random = UnityEngine.Random;
+using Pool = System.Collections.Generic.List<(ID id, float weight)>;
+
 public class MobSpawner
 {
-    private const int SpawnInterval = 320;
-    private const int MobCapPerPlayer = 9;
-    private const int SpawnAttemptsPerTick = 3;
+    private const int SpawnInterval = 240;
+    private const int SpawnAttemptsPerTick = 5;
+    private const int MobCapPerPlayer = 18;
+    private const int EventSpawnAttemptsPerTick = 8;
+    private const int EventMobCapPerPlayer = 28;
+    private const int DungeonSpawnAttemptsPerTick = 6;
+    private const int DungeonMobCapPerPlayer = 3;
+    private const float DayRoamerChance = 0.5f;
     private const float PassiveMobRarity = 0.1f;
-    private const int PassiveMobCap = 12;
-    private const int EventMobCapPerPlayer = 16;
-    private const int EventSpawnAttemptsPerTick = 6;
+    private const int PassiveMobCap = 24;
+    private const float BoundNPCSpawnChance = 0.002f;
 
     private static int _timer;
 
-    private static readonly List<ID> GrassMobs = new() { ID.Sheep };
-    private static readonly List<ID> ForestMobs = new() { ID.Hen, ID.Rooster, ID.Chick };
-    private static readonly List<ID> DayMobs = new() { ID.Slime, ID.Pigeon };
-    private static readonly List<ID> RareDayMobs = new() { ID.Gnome };
-    private const float GnomeSpawnChance = 0.08f;
+    private static readonly Pool DayRoamers = new()
+    {
+        (ID.Slime, 4f), (ID.Pigeon, 0.5f), (ID.Gnome, 0.5f),
+    };
 
-    /// <summary>Per-attempt chance of the bound-NPC encounter — very rare.
-    /// Only rolled in daylight (see <see cref="TrySpawnGroup"/>).</summary>
-    private const float BoundNPCSpawnChance = 0.002f;
-    private static readonly List<ID> NightMobs = new() { ID.SnareFlea, ID.Raider, ID.Congregant, ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin, ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret };
-    private static readonly List<ID> DesertNightMobs = new() { ID.SnareFlea };
-    private static readonly List<ID> RaptureMobs = new() { ID.Lich };
+    private static readonly Dictionary<BiomeType, Pool> DayByBiome = new()
+    {
+        [BiomeType.Grass] = Uniform(ID.Sheep),
+        [BiomeType.Forest] = Uniform(ID.Hen, ID.Rooster, ID.Chick),
+    };
 
-    /// <summary>True during Rapture or a full-moon (bright) night — spawns ramp up.</summary>
-    private static bool IsEventActive =>
-        Save.Inst.weather == EnvironmentType.Rapture ||
-        Save.Inst.weather == EnvironmentType.NightBright;
+    private static readonly Pool DesertNightMobs = Uniform(ID.SnareFlea);
+    private static readonly Pool RaptureMobs = Uniform(ID.Lich);
+    private static readonly Pool DungeonMobs = Uniform(ID.Sawblade, ID.Ballista, ID.Turret);
+    private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Raider, ID.Congregant,
+        ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin,
+        ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret);
 
     public static void Update()
     {
-        if (!Helper.IsHost()) return;
-        if (Main.CreativeMode) return;
+        if (!Helper.IsHost() || Main.CreativeMode) return;
 
-        _timer++;
-        if (_timer < SpawnInterval) return;
+        if (++_timer < SpawnInterval) return;
         _timer = 0;
 
-        bool eventActive = IsEventActive;
-        int capPerPlayer = eventActive ? EventMobCapPerPlayer : MobCapPerPlayer;
-        int attemptsPerTick = eventActive ? EventSpawnAttemptsPerTick : SpawnAttemptsPerTick;
+        bool dungeon = Save.Inst.current == GenType.Dungeon;
+        bool eventActive = !dungeon && Save.Inst.weather is EnvironmentType.Rapture or EnvironmentType.NightBright;
+        int cap = dungeon ? DungeonMobCapPerPlayer : eventActive ? EventMobCapPerPlayer : MobCapPerPlayer;
+        int attempts = dungeon ? DungeonSpawnAttemptsPerTick : eventActive ? EventSpawnAttemptsPerTick : SpawnAttemptsPerTick;
+        bool night = Save.Inst.weather is EnvironmentType.NightRainy or EnvironmentType.NightBright;
 
-        int totalMobs = EntityDynamicLoad.ActiveEntities.Count;
-        int globalCap = Save.Inst.players.Count * capPerPlayer;
-        if (totalMobs >= globalCap) return;
-
-        bool isNight = Save.Inst.weather == EnvironmentType.NightRainy || Save.Inst.weather == EnvironmentType.NightBright;
+        if (!dungeon && CountMobs() >= Save.Inst.players.Count * cap) return;
 
         foreach (var player in Save.Inst.players)
         {
             if (player.Machine == null || player.controllerId == -1) continue;
 
-            int nearby = 0;
             Vector3 pPos = player.Machine.transform.position;
-            foreach (var em in EntityDynamicLoad.ActiveEntities)
-            {
-                if (em == null || em.Info is PlayerInfo) continue;
-                if (Vector3.Distance(em.transform.position, pPos) <= Scene.LogicDistance)
-                    nearby++;
-            }
-            if (nearby >= capPerPlayer) continue;
+            if (CountMobs(near: pPos, radius: Scene.LogicDistance) >= cap) continue;
 
-            for (int i = 0; i < attemptsPerTick; i++)
-                TrySpawnGroup(pPos, isNight);
+            for (int i = 0; i < attempts; i++)
+            {
+                if (dungeon) TrySpawnDungeonMob(pPos);
+                else TrySpawnGroup(pPos, night);
+            }
         }
     }
 
-    private static void TrySpawnGroup(Vector3 playerPos, bool isNight)
+    private static void TrySpawnDungeonMob(Vector3 playerPos)
+    {
+        Vector3Int pos = new(
+            Mathf.RoundToInt(playerPos.x + Random.Range(-Scene.RenderDistance, Scene.RenderDistance)),
+            0,
+            Mathf.RoundToInt(playerPos.z + Random.Range(-Scene.RenderDistance, Scene.RenderDistance)));
+
+        if (!World.IsInWorldBounds(pos) || NavMap.Get(pos) == NavMap.Air || !NavMap.IsAir(pos + Vector3Int.up))
+            return;
+
+        pos.y = 1;
+        Entity.Spawn(PickWeighted(DungeonMobs), pos);
+    }
+
+    private static void TrySpawnGroup(Vector3 playerPos, bool night)
     {
         float angle = Random.Range(0f, Mathf.PI * 2f);
         float dist = Random.Range(Scene.RenderDistance + 2, Scene.LogicDistance - 2);
-        Vector3Int spawnPos = Vector3Int.FloorToInt(
+        Vector3Int pos = Vector3Int.FloorToInt(
             playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * dist);
 
-        if (!FindSurfacePosition(ref spawnPos))
-            return;
+        if (!FindSurfacePosition(ref pos)) return;
 
-        // Very rare daylight encounter: a person bound and left out in the wilds.
-        // Untie them (secondary interact) for a permanent Delver ally. Rapture is
-        // excluded so the only thing out there is the Lich hunt.
-        if (!isNight && Save.Inst.weather != EnvironmentType.Rapture &&
-            Random.value < BoundNPCSpawnChance)
+        if (!night && Save.Inst.weather != EnvironmentType.Rapture && Random.value < BoundNPCSpawnChance)
         {
-            Entity.Spawn(ID.BoundNPC, spawnPos);
+            Entity.Spawn(ID.BoundNPC, pos);
             return;
         }
 
-        BiomeType biome = GenHelpBiome.GetBiomeType(spawnPos.x, spawnPos.z);
-        List<ID> pool;
-        if (Save.Inst.weather == EnvironmentType.Rapture)
-            pool = RaptureMobs;
-        else if (isNight)
-            pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
-        else if (Random.value < 0.35f)
-            pool = Random.value < GnomeSpawnChance ? RareDayMobs : DayMobs;   // slimes drift across the world during the day
-        else
-            pool = biome switch
-            {
-                BiomeType.Grass => GrassMobs,
-                BiomeType.Forest => ForestMobs,
-                _ => null,
-            };
+        BiomeType biome = GenHelpBiome.GetBiomeType(pos.x, pos.z);
+        Pool pool;
+        if (Save.Inst.weather == EnvironmentType.Rapture) pool = RaptureMobs;
+        else if (night) pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
+        else if (Random.value < DayRoamerChance) pool = DayRoamers;
+        else pool = DayByBiome.TryGetValue(biome, out Pool byBiome) ? byBiome : null;
 
         if (pool == null || pool.Count == 0) return;
+        ID mobID = PickWeighted(pool);
 
-        ID mobID = pool[Random.Range(0, pool.Count)];
+        if (IsPassiveMob(mobID) &&
+            (Random.value < PassiveMobRarity || CountMobs(m => IsPassiveMob(m.id)) >= PassiveMobCap))
+            return;
 
-        if (!isNight)
+        if (mobID != ID.Sheep)
         {
-            if (Random.value < PassiveMobRarity) return;
-            if (CountPassiveMobs() >= PassiveMobCap) return;
-        }
-
-        if (mobID == ID.Sheep)
-        {
-            int herd = Random.Range(1, 3);
-            for (int i = 0; i < herd; i++)
-                Entity.Spawn(ID.Sheep, spawnPos);
+            Entity.Spawn(mobID, pos);
             return;
         }
 
-        Entity.Spawn(mobID, spawnPos);
+        for (int herd = Random.Range(1, 3); herd > 0; herd--)
+            Entity.Spawn(ID.Sheep, pos);
     }
 
-    /// <summary>Counts currently-active passive farm animals (sheep/poultry).</summary>
-    private static int CountPassiveMobs()
+    public static int CountMobs(Func<MobInfo, bool> where = null, Vector3 near = default, float radius = 0f) =>
+        EntityDynamicLoad.ActiveEntities.Count(em =>
+            em?.Info is MobInfo mob && mob is not PlayerInfo &&
+            (radius <= 0f || Vector3.Distance(em.transform.position, near) <= radius) &&
+            (where == null || where(mob)));
+
+    private static bool IsPassiveMob(ID id) => id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick;
+
+    private static Pool Uniform(params ID[] ids) => ids.Select(id => (id, 1f)).ToList();
+
+    private static ID PickWeighted(Pool pool)
     {
-        int count = 0;
-        foreach (var em in EntityDynamicLoad.ActiveEntities)
-        {
-            if (em == null || em.Info is not MobInfo mob) continue;
-            if (mob.id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick) count++;
-        }
-        return count;
+        float roll = Random.value * pool.Sum(e => e.weight);
+        foreach (var (id, weight) in pool)
+            if ((roll -= weight) <= 0f) return id;
+        return pool[^1].id;
     }
 
-    /// <summary>Scan downward from the given position to find the first
-    /// air block directly above a solid block — the surface.</summary>
     private static bool FindSurfacePosition(ref Vector3Int pos)
     {
-        int worldBottom = 0;
-        int worldTop = World.Inst.Bounds.y;
-
         pos.x = Mathf.Clamp(pos.x, 0, World.Inst.Bounds.x - 1);
         pos.z = Mathf.Clamp(pos.z, 0, World.Inst.Bounds.z - 1);
 
-        // Start at the top of the world and scan down.
-        pos.y = worldTop - 1;
-        while (pos.y > worldBottom)
-        {
-            bool currentAir = NavMap.Get(pos) == NavMap.Air;
-            pos.y--;
-            bool belowSolid = NavMap.Get(pos) != NavMap.Air;
-
-            if (currentAir && belowSolid)
-            {
-                // pos.y is now the solid block; surface is one above.
-                pos.y++;
+        for (pos.y = World.Inst.Bounds.y - 1; pos.y > 0; pos.y--)
+            if (NavMap.Get(pos) == NavMap.Air && NavMap.Get(pos + Vector3Int.down) != NavMap.Air)
                 return true;
-            }
-        }
-        return false; // no valid surface found
+        return false;
     }
 }
