@@ -34,7 +34,7 @@ public class GenTaskEntity : IGenTask
     private const double ForestFallenTreeChance = 0.01;
     private const double ForestOysterShroomChance = 0.004;
     private const double ForestToadstoolChance = 0.002;
-    private const double GrassOrchidChance = 0.005;
+    private const double FlowerCHance = 0.009;
     private const double DirtTentChance = 0.0004;
     private const double DirtFallenTreeChance = 0.004;
     private const double DirtMudPileChance = 0.006;
@@ -157,7 +157,7 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
                             }
-                            else if (roll <= (chance += GrassOrchidChance))
+                            else if (roll <= (chance += FlowerCHance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(PickMeadowFlower(rng), position));
                             }
@@ -292,7 +292,7 @@ public class GenTaskEntity : IGenTask
         double chance = 0;
 
         if ((chance += 0.40) > roll) return ID.Sticks;
-        if ((chance += 0.40) > roll) return ID.Mud;
+        if ((chance += 0.15) > roll) return ID.Mud;
         if ((chance += 0.55) > roll) return ID.Flint;
         if ((chance += 0.10) > roll) return ID.Gravel;
         return ID.Null;
