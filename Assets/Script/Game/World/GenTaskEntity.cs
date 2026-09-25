@@ -30,10 +30,13 @@ public class GenTaskEntity : IGenTask
     private const double ForestSpiderNestChance = 0.0008;
     private const double ForestHiveChance = 0.0003;
     private const double ForestFallenTreeChance = 0.01;
+    private const double ForestOysterShroomChance = 0.004;
+    private const double ForestToadstoolChance = 0.002;
     private const double GrassOrchidChance = 0.005;
     private const double DirtTentChance = 0.0004;
     private const double DirtFallenTreeChance = 0.004;
     private const double DirtMudPileChance = 0.006;
+    private const double DirtToadstoolChance = 0.003;
     private static readonly float PathOffset = Gen.GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
@@ -113,6 +116,14 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Deathcap, position));
                             }
+                            else if (roll <= (chance += ForestOysterShroomChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.OysterShrooms, position));
+                            }
+                            else if (roll <= (chance += ForestToadstoolChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Toadstool, position));
+                            }
                             else if (roll <= (chance += ForestSpiderNestChance))
                             {
                                 if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
@@ -159,6 +170,10 @@ public class GenTaskEntity : IGenTask
                             else if (roll <= (chance += DirtMudPileChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.MudPile, position));
+                            }
+                            else if (roll <= (chance += DirtToadstoolChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Toadstool, position));
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {

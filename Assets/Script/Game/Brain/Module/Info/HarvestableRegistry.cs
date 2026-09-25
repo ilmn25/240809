@@ -70,6 +70,14 @@ public static class HarvestableRegistry
         daisies.Add(1f, 1, ID.Daisies);
         Register(ID.Daisies, new HarvestableDefinition(daisies));
 
+        Loot oysterShrooms = new Loot(ID.OysterShrooms);
+        oysterShrooms.Add(1f, 1, ID.OysterShrooms);
+        Register(ID.OysterShrooms, new HarvestableDefinition(oysterShrooms));
+
+        Loot toadstool = new Loot(ID.Toadstool);
+        toadstool.Add(1f, 1, ID.Toadstool);
+        Register(ID.Toadstool, new HarvestableDefinition(toadstool));
+
         Loot table = new Loot(ID.Table);
         table.Add(1f, 2, ID.Plank);
         table.Add(0.5f, 2, ID.Sticks);

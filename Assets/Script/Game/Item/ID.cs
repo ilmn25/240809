@@ -239,4 +239,6 @@ public enum ID
     DungeonChest,
     Threshold,
     Cow,
+    OysterShrooms,
+    Toadstool,
 }
