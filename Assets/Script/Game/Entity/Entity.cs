@@ -78,13 +78,6 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Flint);
                 loot.Add(0.15f, 1, ID.Geode);
 
-                AddStructure<IronDepositMachine>(ID.IronDeposit, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.IronDeposit);
-                loot.Add(1, 2, ID.MetalChunks);
-                loot.Add(0.6f, 2, ID.MetalChunks);
-                loot.Add(0.5f, 1, ID.Gravel);
-                loot.Add(0.5f, 1, ID.Flint);
-
                 AddStructure<MeteorMachine>(ID.Meteor, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.Meteor);
                 loot.Add(1, 3, ID.Meteorite);
@@ -92,8 +85,8 @@ public class Entity
                 loot.Add(0.5f, 1, ID.MetalChunks);
                 loot.Add(0.5f, 1, ID.CopperChunks);
 
-                AddStructure<SandSlabMachine>(ID.SandSlab, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.SandSlab);
+                AddStructure<SandPileMachine>(ID.SandPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.SandPile);
                 loot.Add(1, 2, ID.Sand);
                 loot.Add(0.7f, 1, ID.Sand);
                 loot.Add(0.5f, 1, ID.Gravel);
@@ -105,6 +98,22 @@ public class Entity
                 loot.Add(1, 2, ID.Sand);
                 loot.Add(0.7f, 1, ID.Sand);
                 loot.Add(0.5f, 1, ID.Mud);
+                loot.Add(0.3f, 1, ID.Flint);
+                loot.Add(0.1f, 1, ID.Geode);
+
+                AddStructure<RockPileMachine>(ID.RockPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.RockPile);
+                loot.Add(1, 2, ID.Gravel);
+                loot.Add(0.7f, 1, ID.Gravel);
+                loot.Add(0.5f, 1, ID.Flint);
+                loot.Add(0.3f, 1, ID.MetalChunks);
+                loot.Add(0.1f, 1, ID.Geode);
+
+                AddStructure<IronBoulderMachine>(ID.IronBoulder, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
+                loot = new (ID.IronBoulder);
+                loot.Add(1, 3, ID.MetalChunks);
+                loot.Add(0.7f, 2, ID.MetalChunks);
+                loot.Add(0.5f, 1, ID.Gravel);
                 loot.Add(0.3f, 1, ID.Flint);
                 loot.Add(0.1f, 1, ID.Geode);
 

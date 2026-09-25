@@ -94,7 +94,7 @@ public enum ID
     CopperChunks,
     Copper,
     Chick,
-    SandSlab,
+    SandPile,
     SandDebris,
     Sand,
     Glass,
@@ -196,7 +196,6 @@ public enum ID
     CrimsonSoup,
     DemonEye,
     OakTree,
-    IronDeposit,
     Meteor,
     Meteorite,
     MourningWood,
@@ -241,4 +240,6 @@ public enum ID
     Cow,
     OysterShrooms,
     Toadstool,
+    RockPile,
+    IronBoulder,
 }

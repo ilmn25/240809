@@ -17,6 +17,8 @@ public class GenTaskEntity : IGenTask
     private const double SurfaceChestChance = 0.0002;
     private const double SurfaceSkeletonChance = 0.0001;
     private const double SurfaceSlabChance = 0.0098;
+    private const double SurfaceRockPileChance = 0.006;
+    private const double SurfaceIronBoulderChance = 0.0015;
     private const double SurfaceSandStructureChance = 0.0098;
     private const double SurfaceMeteorChance = 0.0004;
     /// <summary>Chance per surface block to spawn a ground item.</summary>
@@ -177,8 +179,7 @@ public class GenTaskEntity : IGenTask
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {
-                                ID boulder = rng.NextDouble() < 0.15 ? ID.IronDeposit : ID.StoneBoulder;
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(boulder, position));
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
                             }
                             else if (roll <= (chance += SurfaceMeteorChance))
                             {
@@ -206,7 +207,7 @@ public class GenTaskEntity : IGenTask
                             } 
                             else if (isDesert && roll <= (chance += SurfaceSandStructureChance))
                             {
-                                ID spawnID = rng.NextDouble() <= 0.5 ? ID.SandSlab : ID.SandDebris;
+                                ID spawnID = rng.NextDouble() <= 0.5 ? ID.SandPile : ID.SandDebris;
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(spawnID, position));
                             }
                             else if (!isDesert && roll <= (chance += SurfaceSlabChance))
@@ -215,6 +216,7 @@ public class GenTaskEntity : IGenTask
                             }
                             else
                             {
+                                bool isRock = currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite;
                                 // No structure on this cell — surface items only.
                                 if (currentChunk[x, y, z] == Sand && rng.NextDouble() < GroundItemChance)
                                 {
@@ -222,8 +224,15 @@ public class GenTaskEntity : IGenTask
                                     if (groundItem != ID.Null)
                                         currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
                                 }
-                                if ((currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite)
-                                    && rng.NextDouble() < StoneGroundItemChance)
+                                else if (isRock && rng.NextDouble() < SurfaceRockPileChance)
+                                {
+                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.RockPile, position));
+                                }
+                                else if (isRock && rng.NextDouble() < SurfaceIronBoulderChance)
+                                {
+                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.IronBoulder, position));
+                                }
+                                else if (isRock && rng.NextDouble() < StoneGroundItemChance)
                                 {
                                     ID groundItem = PickStoneItem(rng);
                                     if (groundItem != ID.Null)
