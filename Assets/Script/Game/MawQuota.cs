@@ -1,23 +1,24 @@
 using UnityEngine;
 
-/// <summary>The Maw's daily gold quota. The company demands a quota of gold
-/// every day; players feed gold into the pit (<see cref="MawPitMachine"/>) to
+/// <summary>The Maw's daily coin quota. The company demands a quota of coin value
+/// every day; players feed coins into the pit (<see cref="MawPitMachine"/>) to
 /// fill it. Each new day (hooked into <see cref="Environment.MoveTime"/>) the
 /// previous day's quota is judged: meet it and the Maw rewards you (+max health)
 /// and raises the next quota; fail and it devours a piece of your strength
 /// (-max health) and the quota resets.</summary>
 public static class MawQuota
 {
-    public const int BaseQuota = 15;
-    public const int QuotaStep = 5;
-    public const int MaxQuota = 200;
+    /// <summary>Quota amounts are copper value.</summary>
+    public const int BaseQuota = Trade.CopperPerGold;
+    public const int QuotaStep = 5 * Trade.CopperPerSilver;
+    public const int MaxQuota = 10 * Trade.CopperPerGold;
 
     /// <summary>Ensures the current quota cycle is initialised for today. Call
     /// before reading/writing quota state (old saves default to 0).</summary>
     private static void Initialize()
     {
         if (Save.Inst == null) return;
-        if (Save.Inst.mawQuota <= 0) Save.Inst.mawQuota = BaseQuota;
+        if (Save.Inst.mawQuota < BaseQuota) Save.Inst.mawQuota = BaseQuota;
         if (Save.Inst.mawDay != Save.Inst.day)
         {
             Save.Inst.mawDay = Save.Inst.day;
@@ -27,7 +28,7 @@ public static class MawQuota
 
     private static bool IsFull => Save.Inst != null && Save.Inst.mawPaid >= Save.Inst.mawQuota;
 
-    /// <summary>Called when the pit consumes gold. Returns the amount credited.</summary>
+    /// <summary>Called when the pit devours coins. Returns the copper value credited.</summary>
     public static int Deposit(int amount)
     {
         if (Save.Inst == null || amount <= 0) return 0;

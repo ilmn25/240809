@@ -20,6 +20,8 @@ public class PassiveInfo : MobInfo
         SpeedTarget *= SpeedModifier;
         if (Health <= 0)
         {
+            if (Machine.IsInteracting)
+                Machine.SetState<DefaultState>();
             Loot.Gettable(((EntityMachine)Machine).Info.id).Spawn(Machine.transform.position);
             Destroy();
             Audio.PlaySFX(DeathSfx);
@@ -28,6 +30,8 @@ public class PassiveInfo : MobInfo
 
     protected override void OnHit(Projectile projectile)
     {
+        if (Machine.IsInteracting) return;
+
         if (Target == null)
         {
             Machine.SetState<DefaultState>();

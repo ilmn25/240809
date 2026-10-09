@@ -93,7 +93,7 @@ public static class HarvestableRegistry
         Register(ID.Skeleton, new HarvestableDefinition(skeleton));
 
         Loot pot = new Loot(ID.OldPot);
-        pot.Add(0.7f, 1, ID.Gold, ID.Copper);
+        pot.Add(0.7f, 1, ID.Silver, ID.Copper);
         pot.Add(0.4f, 1, ID.Steel, ID.Slag);
         pot.Add(0.3f, 1, ID.Foul, ID.Bandages);
         Register(ID.OldPot, new HarvestableDefinition(pot));

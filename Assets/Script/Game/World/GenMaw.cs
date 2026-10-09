@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>A small, desolate rocky world — the Maw's extraction site. A single
 /// large brick facility (Set/MawFacility.json) sits at the centre where the
-/// company's extractors turn relics into gold. Relics, geodes and ore litter the
+/// company's extractors turn relics into coin. Relics, geodes and ore litter the
 /// rock so there's always something to extract for the daily quota.</summary>
 public class GenMaw : Gen
 {

@@ -2,8 +2,8 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>The travelling bandwagon's wagon. On arrival it spawns a small camp
-/// of followers — nomads and a collector — that cluster around it (see
-/// GroundMobMachine.UpdateCaravanFollow). After a set time the wagon flees and
+/// of followers — nomads, a collector and a money changer — that cluster around it
+/// (see GroundMobMachine.UpdateCaravanFollow). After a set time the wagon flees and
 /// despawns; the followers leave with it.</summary>
 public class CaravanMachine : GroundMobMachine
 {
@@ -54,17 +54,12 @@ public class CaravanMachine : GroundMobMachine
         // Spawn the camp; the first nomad is the shopkeeper, everyone follows the wagon.
         for (int i = 0; i < FollowerCount; i++)
         {
-            Info nomadInfo = Entity.Spawn(ID.Nomad, Event.SpawnPointAround(here, FollowerSpread));
-            if (nomadInfo?.Machine is NomadMachine nomad)
-            {
-                nomad.Caravan = this;
-                if (i == 0) nomad.IsLeader = true;
-            }
+            NomadMachine nomad = SpawnFollower<NomadMachine>(ID.Nomad, here);
+            if (nomad != null && i == 0) nomad.IsLeader = true;
         }
 
-        Info collectorInfo = Entity.Spawn(ID.Collector, Event.SpawnPointAround(here, FollowerSpread));
-        if (collectorInfo?.Machine is CollectorMachine collector)
-            collector.Caravan = this;
+        SpawnFollower<CollectorMachine>(ID.Collector, here);
+        SpawnFollower<ExchangerMachine>(ID.Exchanger, here);
 
         // A pair of cattle tags along too, trailing the wagon like the nomads.
         for (int i = 0; i < CowCount; i++)
@@ -75,6 +70,19 @@ public class CaravanMachine : GroundMobMachine
         }
 
         _ = new CoroutineTask(VisitTimer());
+    }
+
+    /// <summary>Spawns one of the camp's people next to the wagon, handing it the
+    /// wagon to trail. Returns null when the spawn failed.</summary>
+    private T SpawnFollower<T>(ID id, Vector3Int here) where T : PassiveNPCMachine
+    {
+        if (Entity.Spawn(id, Event.SpawnPointAround(here, FollowerSpread))?.Machine is T follower)
+        {
+            follower.Caravan = this;
+            return follower;
+        }
+
+        return null;
     }
 
     public override void OnUpdate()

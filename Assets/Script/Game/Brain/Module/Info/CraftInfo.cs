@@ -7,13 +7,27 @@ using Random = UnityEngine.Random;
 public class CraftInfo : SpriteStructureInfo
 {
 private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Toolbench, ID.Torch, ID.MulchBlock);
+
+    private static readonly ID[] MaterialWants =
+    {
+        ID.LeadChunks, ID.MetalChunks, ID.Meteorite, ID.Log, ID.Plank, ID.Sticks, ID.Wool,
+        ID.Flint, ID.Gravel, ID.Sand, ID.Slag, ID.Charcoal, ID.Steel, ID.Lead, ID.Sulphur, ID.Casing,
+        ID.Gunpowder, ID.Geode, ID.Fossil,
+    };
+
+    private static readonly ID[] RelicWants =
+    {
+        ID.PetrifiedDelver, ID.ThousandMenWedge, ID.StarCompass, ID.UnheardBell, ID.SunSphere,
+        ID.BlazeReap, ID.CradleOfBlood, ID.HornOfPlenty,
+    };
+
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
         { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap, ID.CrockPot) },
         { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.Sawmill, ID.FieldStation, ID.Scarecrow, ID.Chair, ID.Bookshelf, ID.DriedWell) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },
-        { ID.Furnace, new PoolDef(0, true, ID.Slag, ID.Steel, ID.Copper) },
+        { ID.Furnace, new PoolDef(0, true, ID.Slag, ID.Steel, ID.Lead) },
         { ID.Smelter, new PoolDef(0, true, ID.Glass) },
         { ID.MasonryWorkbench, new PoolDef(0, true, ID.Anvil, ID.Smelter, ID.Furnace, ID.Stonecutter, ID.OwlStatue) },
         { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest) },
@@ -21,10 +35,9 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.OilBarrel, ID.Barrel) },
-        { ID.Merchant, new PoolDef(0, false, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
-        { ID.Nomad, new PoolDef(4, false, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
+        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },        { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
     };
-    
+
     public readonly List<ID> Pending = new List<ID>();
     public int Max = 10;
     public SfxID Sfx;
@@ -46,7 +59,16 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         if (Sfx != SfxID.Null)
             Audio.PlaySFX(Sfx);
 
-        if (_counter == ItemRecipe.Dictionary[Pending[0]].Time)
+        // Drop queued items that no longer have a recipe (e.g. copper after it
+        // became a coin) so old queues can't stall or throw.
+        ItemRecipe recipe = ItemRecipe.GetRecipe(Pending[0]);
+        if (recipe == null)
+        {
+            Pending.RemoveAt(0);
+            return;
+        }
+
+        if (_counter == recipe.Time)
         {
             Entity.SpawnItem(Pending[0], Machine.transform.position + OutputOffset(), stackOnSpawn: false);
             Tutorial.OnCraft(Pending[0]);
@@ -78,6 +100,14 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
             SfxHit = sfxHit,
             SfxDestroy = sfxDestroy,
         };
+    }
+
+    /// <summary>Items this shop will buy from the player, paying their sell price.</summary>
+    public bool WantsItem(ID itemID)
+    {
+        ID poolID = id != ID.Null ? id : Loot;
+        if (!PoolDefs.TryGetValue(poolID, out PoolDef def) || def.Wants == null) return false;
+        return System.Array.IndexOf(def.Wants, itemID) >= 0;
     }
 
     public Storage GetStoragePool()
@@ -156,14 +186,19 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         public readonly ID[] Items;
         public readonly int RandomCount;
         public readonly bool Shared;
+        public readonly ID[] Wants;
         public Storage SharedStorage;
 
-        public PoolDef(int randomCount, bool shared, params ID[] items)
+        public PoolDef(int randomCount, bool shared, ID[] wants, params ID[] items)
         {
             Items = items;
             RandomCount = randomCount;
             Shared = shared;
+            Wants = wants;
         }
+
+        public PoolDef(int randomCount, bool shared, params ID[] items)
+            : this(randomCount, shared, null, items) { }
     }
 
 }

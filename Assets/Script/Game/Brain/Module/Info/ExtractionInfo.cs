@@ -1,25 +1,23 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>A converter that smelts relics down into gold. Drop a relic into its
-/// storage and it melts it down, paying out gold after a short time.</summary>
+/// <summary>A converter that smelts relics down into coin. Drop a relic into its
+/// storage and it melts it down, paying out coins worth the relic after a short time.</summary>
 [Serializable]
 public class ExtractionInfo : ConverterInfo
 {
-    private static readonly Dictionary<ID, int> RelicValue = new Dictionary<ID, int>
+    /// <summary>Relics the extractor melts down, paid out at the relic's worth in coins.</summary>
+    private static readonly ID[] Accepted =
     {
-        { ID.PetrifiedDelver, 3 },
-        { ID.ThousandMenWedge, 5 },
-        { ID.StarCompass, 8 },
-        { ID.UnheardBell, 8 },
-        { ID.SunSphere, 10 },
-        { ID.BlazeReap, 15 },
+        ID.PetrifiedDelver, ID.ThousandMenWedge, ID.StarCompass, ID.UnheardBell,
+        ID.SunSphere, ID.BlazeReap,
     };
 
-    protected override IReadOnlyList<ID> GetOutputs(ID input)
-    {
-        return RelicValue.ContainsKey(input) ? new[] { ID.Gold } : null;
-    }
+    protected override bool Accepts(ID input) => Array.IndexOf(Accepted, input) >= 0;
 
-    protected override int OutputAmount(ID input) => RelicValue[input];
+    protected override void PayOut(ID input)
+    {
+        foreach (KeyValuePair<ID, int> coin in Trade.Split(Trade.Worth(input)))
+            SpawnOutput(coin.Key, coin.Value);
+    }
 }

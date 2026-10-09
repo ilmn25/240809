@@ -27,13 +27,8 @@ public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        Info.CancelTarget();
+        BeginInteraction();
         SetState<QuestmasterState>();
-    }
-
-    public override void OnUpdate()
-    {
-        UpdateFlee();
     }
 
     public void OnDrawGizmos()

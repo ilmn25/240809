@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 [System.Serializable]
 public class ItemSlot
@@ -9,6 +10,12 @@ public class ItemSlot
     public ID ID;
     public string Modifier;
     public bool Locked;
+
+    [OnDeserialized]
+    private void MigrateLegacyIds(StreamingContext context)
+    {
+        if (ID == ID.CopperChunksLegacy) ID = ID.LeadChunks;
+    }
     [NonSerialized] private Item _item;
     public Item Info
     {
@@ -33,108 +40,74 @@ public class ItemSlot
         return $"{Item.GetItem(ingredient.Key).Name} ({have}/{ingredient.Value})";
     }
 
-    public string ToString(bool ingredients)
+    private string IngredientsText(bool ingredients)
+    {
+        if (!ingredients) return "";
+        ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
+        if (recipe == null) return "";
+
+        string text = " \n \ningredients: ";
+        foreach (var ingredient in recipe.Ingredients)
+            text += "\n" + IngredientText(ingredient);
+        return text;
+    }
+
+    public string ToString(bool ingredients, string cost = null)
+    {
+        string stats = Info.Type switch
+        {
+            ItemType.Structure => "structure",
+            ItemType.Block or ItemType.Material => Stack + "x",
+            ItemType.Consumable => Stack + "x" + ConsumableStats(),
+            ItemType.Tool => ToolStats(),
+            _ => null,
+        };
+        if (stats == null) return "";
+
+        string costBlock = cost == null
+            ? IngredientsText(ingredients || Info.Type == ItemType.Structure)
+            : " \n \n" + cost;
+        return stats + costBlock + "\n \n" + Info.Description;
+    } 
+
+    private string ConsumableStats()
     {
         string text = "";
-        if (Info.Type == ItemType.Structure)
-        {
-            text += "structure";
-            ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-            text += " \ningredients: ";
-            if (recipe != null)
-                foreach (var ingredient in recipe.Ingredients)
-                    text += "\n" + IngredientText(ingredient);
-            text += "\n \n" + Info.Description;
-        }
-        else 
-        if (Info.Type == ItemType.Block || Info.Type == ItemType.Material)
-        { 
-            text += Stack + "x";
-
-            if (ingredients)
-            {
-                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-                if (recipe != null)
-                {
-                    text += " \n \ningredients: ";
-                    foreach (var ingredient in recipe.Ingredients)
-                        text += "\n" + IngredientText(ingredient);
-                }
-            }
-
-            text += "\n \n" + Info.Description;
-        }
-        else if (Info.Type == ItemType.Consumable)
-        {
-            text += Stack + "x";
-
-            if (Info.HealValue > 0)
-                text += "\n \nrestores " + Info.HealValue + " health";
-            if (Info.HungerValue > 0)
-                text += "\n \nrestores " + Info.HungerValue + " hunger";
-            if (Info.MaxHpBonus > 0)
-                text += "\n \npermanently increases max health by " + Info.MaxHpBonus;
-            if (Info.MaxHungerBonus > 0)
-                text += "\n \npermanently increases max hunger by " + Info.MaxHungerBonus;
-
-
-            if (ingredients)
-            {
-                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-                if (recipe != null)
-                {
-                    text += " \n \ningredients: ";
-                    foreach (var ingredient in recipe.Ingredients)
-                        text += "\n" + IngredientText(ingredient);
-                }
-            }
-
-            text += "\n \n" + Info.Description;
-        }
-        else if (Info.Type == ItemType.Tool)
-        { 
-            if (Durability != -1) text += Durability + "x\n";
-
-            if (Info.ProjectileInfo != null)
-            {
-                text += Info.ProjectileInfo.Damage + " damage";
-                text += " \n" + Info.ProjectileInfo.Knockback + " knockback\n";
-                if (Info.ProjectileInfo.Breaking != 0)
-                {
-                    switch (Info.ProjectileInfo.OperationType)
-                    {
-                        case OperationType.Building:
-                            text += " \nbuilding " + Info.ProjectileInfo.Breaking;
-                            break;
-                        case OperationType.Mining:
-                            text += " \nmining " + Info.ProjectileInfo.Breaking;
-                            break;
-                        case OperationType.Cutting:
-                            text += " \nbreaking " + Info.ProjectileInfo.Breaking;
-                            break;
-                    }
-                }  
-
-                if (Info.ProjectileInfo.Ammo != ID.Null)
-                    text += " \n \nammo: " + (AmmoRegistry.DescribeForGun(ID) ?? Info.ProjectileInfo.Ammo.ToString());
-            } 
-
-
-            if (ingredients)
-            {
-                text += " \n \ningredients: ";
-                ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-                if (recipe != null)
-                {
-                    foreach (var ingredient in recipe.Ingredients)
-                        text += "\n" + IngredientText(ingredient);
-                }
-            }
-
-            text += "\n \n" + Info.Description;
-        }
+        if (Info.HealValue > 0)
+            text += "\n \nrestores " + Info.HealValue + " health";
+        if (Info.HungerValue > 0)
+            text += "\n \nrestores " + Info.HungerValue + " hunger";
+        if (Info.MaxHpBonus > 0)
+            text += "\n \npermanently increases max health by " + Info.MaxHpBonus;
+        if (Info.MaxHungerBonus > 0)
+            text += "\n \npermanently increases max hunger by " + Info.MaxHungerBonus;
         return text;
-    } 
+    }
+
+    private string ToolStats()
+    {
+        string text = "";
+        if (Durability != -1) text += Durability + "x\n";
+
+        if (Info.ProjectileInfo == null) return text;
+
+        text += Info.ProjectileInfo.Damage + " damage";
+        text += " \n" + Info.ProjectileInfo.Knockback + " knockback\n";
+        if (Info.ProjectileInfo.Breaking != 0)
+        {
+            text += Info.ProjectileInfo.OperationType switch
+            {
+                OperationType.Building => " \nbuilding " + Info.ProjectileInfo.Breaking,
+                OperationType.Mining => " \nmining " + Info.ProjectileInfo.Breaking,
+                OperationType.Cutting => " \nbreaking " + Info.ProjectileInfo.Breaking,
+                _ => "",
+            };
+        }
+
+        if (Info.ProjectileInfo.Ammo != ID.Null)
+            text += " \n \nammo: " + (AmmoRegistry.DescribeForGun(ID) ?? Info.ProjectileInfo.Ammo.ToString());
+        return text;
+    }
 
     public void clear()
     {

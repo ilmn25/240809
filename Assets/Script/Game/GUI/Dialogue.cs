@@ -170,7 +170,7 @@ public class Dialogue
         return choices;
     }
 
-    /// <summary>The body plus numbered options, e.g. "1 > Hire for 5 gold".</summary>
+    /// <summary>The body plus numbered options, e.g. "1 > Hire for 5 silver".</summary>
     private static string BuildDisplayText(string body, List<KeyValuePair<string, Dialogue>> choices)
     {
         if (choices == null || choices.Count == 0) return body ?? "";

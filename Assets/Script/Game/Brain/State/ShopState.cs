@@ -4,6 +4,8 @@ using System.Collections.Generic;
 /// CraftInfo comes from the MerchantMachine's Shop instead of the entity's own Info.</summary>
 public class ShopState : State
 {
+    public override bool IsInteraction => true;
+
     private CraftInfo _shop;
 
     public override void OnEnterState()
@@ -14,7 +16,7 @@ public class ShopState : State
         Storage storage = _shop.GetStoragePool();
         EnsureSlotCount(storage, GUIMain.GUICraft.SlotAmount);
 
-        GUIMain.GUICraft.UseCraftingInfo(_shop);
+        GUIMain.GUICraft.UseShop(_shop);
 
         GUIMain.RefreshStorage();
         GUIMain.Show(true);

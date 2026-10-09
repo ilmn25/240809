@@ -83,7 +83,8 @@ public class Entity
                 loot.Add(1, 3, ID.Meteorite);
                 loot.Add(0.7f, 2, ID.Meteorite);
                 loot.Add(0.5f, 1, ID.MetalChunks);
-                loot.Add(0.5f, 1, ID.CopperChunks);
+                loot.Add(0.5f, 1, ID.LeadChunks);
+                loot.Add(0.5f, 1, ID.LeadChunks);
 
                 AddStructure<SandPileMachine>(ID.SandPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.SandPile);
@@ -416,6 +417,9 @@ public class Entity
 
                 AddMob<CollectorMachine>(ID.Collector);
                 loot = new (ID.Collector); // the collector drops nothing
+
+                AddMob<ExchangerMachine>(ID.Exchanger);
+                loot = new (ID.Exchanger); // the money changer drops nothing
 
                 AddMob<QuestmasterMachine>(ID.Questmaster);
                 loot = new (ID.Questmaster); // the questmaster drops nothing

@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
 {
-    public const int HireCost = 5;
+    /// <summary>Hire price in copper (5 silver).</summary>
+    public const int HireCost = 5 * Trade.CopperPerSilver;
     public const float CompanionDuration = 45f;
 
     public MercenaryTentMachine Tent;
@@ -23,7 +24,7 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
+        BeginInteraction();
 
         PlayerInfo payer = info as PlayerInfo;
         if (payer == null) payer = Main.PlayerInfo;
@@ -33,19 +34,14 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
             return;
         }
 
-        int gold = payer.Storage.Count(ID.Gold);
-        if (gold < HireCost)
+        int carried = Trade.Count(payer.Storage);
+        if (carried < HireCost)
         {
-            Dialogue.ShowEvent($"\"I need {HireCost} gold. You only have {gold}.\"");
+            Dialogue.ShowEvent($"\"I need {Trade.Format(HireCost)}. You only have {Trade.Format(carried)}.\"");
             return;
         }
 
         ShowMenu(payer);
-    }
-
-    public override void OnUpdate()
-    {
-        UpdateFlee();
     }
 
     /// <summary>Offers to hire the mercenary or walk away.</summary>
@@ -53,29 +49,25 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         Dialogue hire = new Dialogue
         {
-            Text = $"\"Pleasure doing business.\" The mercenary takes the gold and joins you for {CompanionDuration:0} seconds.",
+            Text = $"\"Pleasure doing business.\" The mercenary takes the coin and joins you for {CompanionDuration:0} seconds.",
             OnOpen = () => CompleteHire(payer),
         };
 
-        Dialogue.Target = new Dialogue
+        ShowDialogue(new Dialogue
         {
-            Text = $"\"Need a hand? {HireCost} gold for a short contract.\"",
+            Text = $"\"Need a hand? {Trade.Format(HireCost)} for a short contract.\"",
             Next = new Dictionary<string, Dialogue>
             {
-                [$"Hire for {HireCost} gold"] = hire,
+                [$"Hire for {Trade.Format(HireCost)}"] = hire,
                 ["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" },
             },
-        };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
+        });
     }
 
     private void CompleteHire(PlayerInfo payer)
     {
         if (Save.Inst == null || payer?.Storage == null) return;
-        if (payer.Storage.Count(ID.Gold) < HireCost) return;
-
-        payer.Storage.RemoveItem(ID.Gold, HireCost);
+        if (!Trade.TrySpend(payer.Storage, HireCost)) return;
 
         PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);
         companion.CharSprite = ID.Raider;

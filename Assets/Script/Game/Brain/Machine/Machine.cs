@@ -55,6 +55,8 @@ public abstract class Machine : MonoBehaviour
     {
         return StateCurrent is T;
     }
+
+    public bool IsInteracting => StateCurrent != null && StateCurrent.IsInteraction;
     
     public T AddModule<T>(T module) where T : Module
     {

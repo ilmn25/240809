@@ -41,39 +41,11 @@ public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopke
 
     public void OnActionSecondary(Info info)
     {
-        if (IsEngaged) return;
+        BeginInteraction();
 
         if (IsLeader)
-        {
-            Dialogue.Target = new Dialogue { Text = "The road is long. Take a look at what we've gathered." };
-            Dialogue.Show(true);
-            Audio.PlaySFX(SfxID.Notification);
-            SetState<ShopState>();
-        }
+            OpenShop("The road is long. Take a look at what we've gathered.");
         else
-        {
-            Dialogue.Target = new Dialogue { Text = "We trade where the winds take us. Safe travels." };
-            Dialogue.Show(true);
-            Audio.PlaySFX(SfxID.Notification);
-        }
-    }
-
-    public override void OnUpdate()
-    {
-        // A caravan nomad follows the wagon and leaves when it's gone.
-        if (Caravan != null)
-        {
-            // Don't interrupt an open shop or a hit reaction.
-            if (IsCurrentState<ShopState>() || IsCurrentState<MobHit>())
-                return;
-
-            // A real threat outranks the escort wagon.
-            if (UpdateThreat()) return;
-
-            UpdateCaravanFollow(Caravan);
-            return;
-        }
-
-        UpdateFlee();
+            ShowDialogue("We trade where the winds take us. Safe travels.");
     }
 }

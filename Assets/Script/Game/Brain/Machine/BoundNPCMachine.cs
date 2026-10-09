@@ -26,7 +26,6 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
         Rescue();
     }
 

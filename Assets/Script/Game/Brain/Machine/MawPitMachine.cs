@@ -1,11 +1,11 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/// <summary>The Maw's collection pit — an invisible 2x2 area. Any gold dropped
+/// <summary>The Maw's collection pit — an invisible 2x2 area. Any coin dropped
 /// into the area is devoured and counted toward the daily quota (see MawQuota).</summary>
 public class MawPitMachine : StructureMachine
 {
-    private const int ProcessInterval = 30; // frames between gold processing (~0.5s at 60fps)
+    private const int ProcessInterval = 30; // frames between coin processing (~0.5s at 60fps)
     private int _timer;
 
     private static readonly Collider[] CollisionArray = new Collider[40];
@@ -49,12 +49,12 @@ public class MawPitMachine : StructureMachine
         if (++_timer < ProcessInterval) return;
         _timer = 0;
 
-        CountGoldInArea();
+        CountCoinsInArea();
     }
 
-    /// <summary>Counts (and devours) gold items resting inside the pit's 2x2 area,
-    /// crediting each to the daily quota.</summary>
-    private void CountGoldInArea()
+    /// <summary>Counts (and devours) coins resting inside the pit's 2x2 area, crediting
+    /// each to the daily quota at its copper value.</summary>
+    private void CountCoinsInArea()
     {
         // Same +0.5 offset as the collider so the box covers the 2x2 block area
         // (blocks bx..bx+1 / bz..bz+1) instead of being shifted half a block.
@@ -73,9 +73,9 @@ public class MawPitMachine : StructureMachine
 
             ItemMachine itemMachine = col.GetComponent<ItemMachine>();
             if (itemMachine == null || itemMachine.Info is not ItemInfo item) continue;
-            if (item.item == null || item.item.ID != ID.Gold) continue;
+            if (item.item == null || !Trade.IsCoin(item.item.ID)) continue;
 
-            MawQuota.Deposit(item.item.Stack);
+            MawQuota.Deposit(Trade.Worth(item.item.ID) * item.item.Stack);
             item.Destroy();
         }
     }

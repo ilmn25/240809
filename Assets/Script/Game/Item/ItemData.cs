@@ -30,8 +30,9 @@ public partial class Item
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);
         loot.Add(0.5f, 1, ID.MetalChunks);
-        loot.Add(0.5f, 1, ID.CopperChunks);
-        loot.Add(0.5f, 1, ID.CopperChunks);
+        loot.Add(0.5f, 1, ID.LeadChunks);
+        loot.Add(0.5f, 1, ID.LeadChunks);
+        loot.Add(0.5f, 1, ID.LeadChunks);
         AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.", burnResult: ID.Charcoal);
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         // Internal mining-box entity — placed by mining tools, never crafted by the player.
@@ -39,7 +40,7 @@ public partial class Item
         AddBlockDefinition(ID.OverlayBlock);
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
-        AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 1 } });
+        AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Lead, 2 }, { ID.Steel, 1 } });
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.", materials: new Dictionary<ID, int> { { ID.Slag, 3 }, { ID.Charcoal, 1 } });
         AddMaterialDefinition(ID.Gunpowder, "A volatile black powder of charcoal and sulphur. Pours the fire into bullets and landmines.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Sulphur, 1 } }, craftStack: 4, time: 1000);
         AddMaterialDefinition(ID.IncendiaryBullet, "Incendiary bullet rounds that set targets on fire.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Charcoal, 1 } }, craftStack: 5, time: 1500);
@@ -79,8 +80,9 @@ public partial class Item
         AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
         AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.");
         AddMaterialDefinition(ID.Meteorite, "Rare meteoric ore from a fallen meteor.");
-        AddMaterialDefinition(ID.CopperChunks, "Chunks of copper ore for smelting.");
-        AddMaterialDefinition(ID.Copper, "Strong forged copper for crafting and building.", materials: new Dictionary<ID, int> { { ID.CopperChunks, 3 }, { ID.Charcoal, 2 } }, time:2000);
+        AddMaterialDefinition(ID.LeadChunks, "Chunks of lead ore for smelting.");
+        AddMaterialDefinition(ID.Lead, "Strong forged lead for crafting and building.", materials: new Dictionary<ID, int> { { ID.LeadChunks, 3 }, { ID.Charcoal, 2 } }, time:2000);
+        AddMaterialDefinition(ID.Copper, "A minted copper coin, the smallest denomination.", stackSize: 20, worth: 1);
         AddMaterialDefinition(ID.Charcoal, "Burned wood fuel for smelting.", materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
         AddMaterialDefinition(ID.Steel, "Strong forged metal for high-tier items.", materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 }, {ID.Charcoal, 2} }, time:2000);
         AddMaterialDefinition(ID.Brick, "Refined brick piece for sturdy construction.", materials: new Dictionary<ID, int> { { ID.Slag, 3 } }, time:1500);
@@ -99,7 +101,8 @@ public partial class Item
         AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
         AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.");
         AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.");
-        AddMaterialDefinition(ID.Gold, "A gleaming bar of refined gold, minted from a refinery.");
+        AddMaterialDefinition(ID.Gold, "A gleaming gold coin, the largest denomination.", stackSize: 20, worth: 400);
+        AddMaterialDefinition(ID.Silver, "A polished silver coin, worth twenty copper.", stackSize: 20, worth: 20);
         AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.");
         AddConsumableDefinition(ID.CradleOfBlood, 0, "A dark cradle brimming with vital blood. Consuming it permanently increases your max health.", stackSize: 5, maxHpBonus: 2);
         AddRelicDefinition(ID.StarCompass, "A relic of the Abyss that always points the way to the deepest treasures, no matter how far the descent.", ItemRarity.Epic);
@@ -135,7 +138,7 @@ public partial class Item
         AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Plant any seed in it to grow a crop.");
         AddStructureDefinition(ID.CrockPot, new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.StoneBlock, 4 }, { ID.Sticks, 2 } }, 150, description: "A crock pot that cooks food. Add raw ingredients and it cooks them.");
         AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
-        AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
+        AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Lead, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
         AddStructureDefinition(ID.BulletinBoard, null, 100, furniture: true, description: "A wooden bulletin board that serves as the Questmaster's home — the quest-giver lives and respawns here.");
         AddStructureDefinition(ID.MercenaryTent, null, 100, description: "A canvas tent at the outpost where a mercenary can be hired.");
@@ -148,9 +151,9 @@ public partial class Item
         AddStructureDefinition(ID.DungeonDoor, null, 200, furniture: true, description: "A heavy brick door that descends into the dungeon depths.");
         AddStructureDefinition(ID.MawDoor, new Dictionary<ID, int> { { ID.StoneBlock, 8 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 200, furniture: true, description: "A heavy brick door that leads to the Maw's extraction facility.");
         AddStructureDefinition(ID.Threshold, null, 200, furniture: true, description: "A shimmering threshold portal. Right-click to step through to the backrooms.");
-        AddStructureDefinition(ID.MawPit, new Dictionary<ID, int> { { ID.StoneBlock, 6 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 100, furniture: true, description: "The Maw's collection pit — drop gold into its area to fill the daily quota.");
+        AddStructureDefinition(ID.MawPit, new Dictionary<ID, int> { { ID.StoneBlock, 6 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 100, furniture: true, description: "The Maw's collection pit — drop coins into its area to fill the daily quota.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
-        AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Copper, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
+        AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Lead, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
         AddStructureDefinition(ID.OldPot, null, 100, description: "A fragile old pot. Smash it for a surprise.");
         AddStructureDefinition(ID.FallenTree, null, 100, description: "A fallen tree lying in the woods. Chop it up for timber.");
         AddStructureDefinition(ID.MudPile, null, 100, description: "A mound of wet earth. Dig it out for mud.");
@@ -159,9 +162,9 @@ public partial class Item
         AddStructureDefinition(ID.WoodSpikeTrap, new Dictionary<ID, int> { { ID.Stake, 4 }, { ID.Plank, 2 } }, 60, description: "A crude board of sharpened stakes. Anything that steps on it gets hurt.", burnResult: ID.Charcoal);
         AddStructureDefinition(ID.MetalSpikeTrap, new Dictionary<ID, int> { { ID.Stake, 6 }, { ID.Steel, 2 } }, 100, description: "A sturdier iron-spiked trap that hits much harder than wood.");
         AddStructureDefinition(ID.Landmine, new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Steel, 2 }, { ID.Casing, 1 } }, 80, description: "A pressure-plate mine. Step on it and it detonates in a violent blast.");
-        AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Copper, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
+        AddStructureDefinition(ID.LightningRod, new Dictionary<ID, int> { { ID.Lead, 3 }, { ID.Steel, 2 }, { ID.Stake, 2 } }, 100, description: "Attracts lightning during storms, protecting the surrounding area.");
         AddStructureDefinition(ID.Pulverizer, new Dictionary<ID, int> { { ID.StoneBlock, 10 }, { ID.Steel, 4 } }, 200, description: "Crushes geodes into ores and fossils.");
-        AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into gold.");
+        AddStructureDefinition(ID.Refinery, new Dictionary<ID, int> { { ID.StoneBlock, 12 }, { ID.Steel, 6 }, { ID.Glass, 2 } }, 200, description: "Melts valuable items down into coin.");
 
         // Tools
         AddToolDefinition(

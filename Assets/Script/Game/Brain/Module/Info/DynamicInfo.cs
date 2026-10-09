@@ -140,7 +140,8 @@ public class DynamicInfo : Info
         IframesCurrent = Iframes; 
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage() - Defense;
-        KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
+        if (!(IsNPC && Machine.IsInteracting))
+            KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), Particles.Blood, false);
         // Leave a non-pickupable blood pool on the ground that despawns offscreen.
         if (Helper.IsHost())

@@ -30,10 +30,12 @@ public partial class ItemRecipe
 
     public static bool IsCraftable (ID stringID)
     {
+        if (!Dictionary.TryGetValue(stringID, out ItemRecipe itemRecipe)) return false;
+
         // Creative mode: everything is craftable without resources.
         if (Main.CreativeMode) return true;
 
-        foreach (var ingredient in Dictionary[stringID].Ingredients)
+        foreach (var ingredient in itemRecipe.Ingredients)
         {
             int needed = ingredient.Value;
             int available = Main.PlayerInfo.Storage.GetAmount(ingredient.Key);
@@ -53,8 +55,12 @@ public partial class ItemRecipe
     {
         Tutorial.OnCraft(stringID);
         TakeIngredients(stringID);
-        
-        ItemSlot craftedItem = new ItemSlot(stringID, Dictionary[stringID].Stack);
+        GiveItem(stringID, Dictionary[stringID].Stack, isCursor);
+    }
+
+    public static void GiveItem(ID stringID, int stack, bool isCursor = true)
+    {
+        ItemSlot craftedItem = new ItemSlot(stringID, stack);
         
         if (isCursor && (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem)))
         {

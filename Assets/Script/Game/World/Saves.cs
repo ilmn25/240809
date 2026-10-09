@@ -73,8 +73,8 @@ public class Save
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
 
-    // The Maw's daily gold quota state (see MawQuota).
-    public int mawQuota = 15;
+    // The Maw's daily coin quota state (see MawQuota).
+    public int mawQuota = MawQuota.BaseQuota;
     public int mawPaid;
     public int mawDay = 1;
     public int mawStreak;

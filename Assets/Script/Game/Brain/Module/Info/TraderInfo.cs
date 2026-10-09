@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>A converter that smelts materials down into gold. Drop a material
-/// into its storage and it melts it down, paying out gold after a short time.</summary>
+/// <summary>A converter that smelts materials down into coin. Drop a material
+/// into its storage and it melts it down, paying out coins worth the item.</summary>
 [Serializable]
 public class TraderInfo : ConverterInfo
 {
@@ -22,26 +22,20 @@ public class TraderInfo : ConverterInfo
         return trader;
     }
 
-    private static readonly Dictionary<ID, int> GoldValue = new Dictionary<ID, int>
+    /// <summary>Scrap the refinery melts down, paid out at the item's worth in coins.</summary>
+    private static readonly ID[] Accepted =
     {
-        { ID.Geode, 2 },
-        { ID.Fossil, 4 },
-        { ID.Copper, 1 },
-        { ID.Steel, 3 },
-        { ID.Slag, 1 },
-        { ID.Charcoal, 1 },
-        { ID.Sulphur, 2 },
-        { ID.Casing, 2 },
-        { ID.Gunpowder, 3 },
-        { ID.SteelSword, 5 },
-        { ID.Rapier, 5 },
-        { ID.DiamondAxe, 8 },
+        ID.Geode, ID.Fossil, ID.LeadChunks, ID.Lead, ID.Steel, ID.Slag, ID.Charcoal,
+        ID.Sulphur, ID.Casing, ID.Gunpowder, ID.SteelSword, ID.Rapier, ID.DiamondAxe,
     };
 
-    protected override IReadOnlyList<ID> GetOutputs(ID input)
-    {
-        return GoldValue.ContainsKey(input) ? new[] { ID.Gold } : null;
-    }
+    public static bool IsAccepted(ID input) => Array.IndexOf(Accepted, input) >= 0;
 
-    protected override int OutputAmount(ID input) => GoldValue[input];
+    protected override bool Accepts(ID input) => IsAccepted(input);
+
+    protected override void PayOut(ID input)
+    {
+        foreach (KeyValuePair<ID, int> coin in Trade.Split(Trade.Worth(input)))
+            SpawnOutput(coin.Key, coin.Value);
+    }
 }

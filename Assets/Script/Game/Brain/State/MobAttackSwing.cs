@@ -22,8 +22,15 @@ class MobAttackSwing : MobState {
                 Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
                 Info.AimPosition,
                 _equipment.ProjectileInfo,
-                Info.targetHitboxType, Info.Equipment.ID);
+                GetTargetHitbox(), Info.Equipment.ID);
         } 
+    }
+
+    private HitboxType GetTargetHitbox()
+    {
+        if (Info.IsNPC && Info.Target is DynamicInfo threat && threat.HitboxType == HitboxType.Enemy)
+            return HitboxType.Enemy;
+        return Info.targetHitboxType;
     }
     
     public override void OnEnterState()

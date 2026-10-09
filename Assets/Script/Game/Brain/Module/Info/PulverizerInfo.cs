@@ -8,7 +8,7 @@ public class PulverizerInfo : ConverterInfo
 {
     private static readonly ID[] Ores =
     {
-        ID.Copper,
+        ID.Lead,
         ID.Steel,
         ID.Slag,
         ID.Charcoal,

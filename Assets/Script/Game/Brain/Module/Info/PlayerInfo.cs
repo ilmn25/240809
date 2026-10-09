@@ -29,7 +29,7 @@ public class PlayerInfo : MobInfo
     private float _moveHungerAccumulator;
     private float _restHealAccumulator;
     private static readonly StatusEffect WellFed = new StatusEffect(
-        ID.WellFed, EffectType.Heal, duration: 120f, tickInterval: 60f, amountPerTick: 1, name: "Well Fed");
+        ID.WellFed, EffectType.Heal, duration: 120f, tickInterval: 40f, amountPerTick: 1, name: "Well Fed");
 
     public int BaseHealthMax;
     private enum HungerStage { None, I, II, III, IV, V }

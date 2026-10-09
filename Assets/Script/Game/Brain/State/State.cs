@@ -11,7 +11,9 @@ public abstract class State
     public State Parent;
     public Info Info => ((EntityMachine)Machine).Info;
     public global::Module.UpdateMode updateMode = global::Module.UpdateMode.OwnerOnly;
- 
+
+    public virtual bool IsInteraction => false;
+
     public virtual void Initialize() {}
     public virtual void OnEnterState() {}
     public virtual void OnUpdateState() {}

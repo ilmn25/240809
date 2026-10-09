@@ -269,9 +269,6 @@ public static class Questmaster
     {
         ID item = CollectPool[Mathf.Clamp(Tier / 2, 0, CollectPool.Length - 1)];
         int required = 5 + Tier * 3;
-        return new CollectQuest(item, required, new Dictionary<ID, int>
-        {
-            { ID.Copper, 2 + Tier },
-        });
+        return new CollectQuest(item, required, Trade.Coins(3 * required * Trade.Worth(item)));
     }
 }

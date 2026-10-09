@@ -35,16 +35,8 @@ public class MerchantMachine : PassiveNPCMachine, IActionSecondaryInteract, ISho
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
-        Dialogue.Target = new Dialogue { Text = "I've been tracking this signal for ages..." };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
-        SetState<ShopState>();
-    }
-
-    public override void OnUpdate()
-    {
-        UpdateFlee();
+        BeginInteraction();
+        OpenShop("I've been tracking this signal for ages...");
     }
 
     public void OnDrawGizmos()

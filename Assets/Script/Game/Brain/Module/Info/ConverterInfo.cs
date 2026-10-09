@@ -9,6 +9,16 @@ public abstract class ConverterInfo : ContainerInfo
     protected virtual int OutputAmount(ID input) => 1;
     protected virtual int ConvertTime => 90;
 
+    /// <summary>True when this converter takes the item. Defaults to having outputs.</summary>
+    protected virtual bool Accepts(ID input) => GetOutputs(input) != null;
+
+    /// <summary>Pays out one converted input; the input slot is cleared afterwards.</summary>
+    protected virtual void PayOut(ID input)
+    {
+        foreach (ID outId in GetOutputs(input))
+            SpawnOutput(outId, OutputAmount(input));
+    }
+
     [NonSerialized] private int _counter;
 
     public virtual bool IsConverting()
@@ -17,7 +27,7 @@ public abstract class ConverterInfo : ContainerInfo
         foreach (ItemSlot slot in Storage.List)
         {
             if (slot.isEmpty()) continue;
-            if (GetOutputs(slot.ID) != null) return true;
+            if (Accepts(slot.ID)) return true;
         }
         return false;
     }
@@ -55,7 +65,7 @@ public abstract class ConverterInfo : ContainerInfo
         foreach (ItemSlot slot in Storage.List)
         {
             if (slot.isEmpty()) continue;
-            if (GetOutputs(slot.ID) != null) continue;
+            if (Accepts(slot.ID)) continue;
             Entity.SpawnItem(slot, Machine.transform.position + OutputOffset());
             slot.clear();
             changed = true;
@@ -77,8 +87,7 @@ public abstract class ConverterInfo : ContainerInfo
         }
 
         if (!Tick()) return;
-        foreach (ID outId in GetOutputs(target.ID))
-            SpawnOutput(outId, OutputAmount(target.ID));
+        PayOut(target.ID);
         target.clear();
         Storage.NotifyChanged();
     }

@@ -91,7 +91,7 @@ public enum ID
     CookedChicken,
     Mud,
     MulchBlock,
-    CopperChunks,
+    CopperChunksLegacy,
     Copper,
     Chick,
     SandPile,
@@ -242,4 +242,8 @@ public enum ID
     Toadstool,
     RockPile,
     IronBoulder,
+    Silver,
+    LeadChunks,
+    Lead,
+    Exchanger,
 }

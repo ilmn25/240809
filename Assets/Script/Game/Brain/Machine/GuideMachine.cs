@@ -23,7 +23,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (Info.Target != null) return;
+        BeginInteraction();
 
         PlayerInfo payer = info as PlayerInfo;
         if (payer == null) payer = Main.PlayerInfo;
@@ -34,11 +34,6 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
         }
 
         ShowMenu(payer);
-    }
-
-    public override void OnUpdate()
-    {
-        UpdateFlee();
     }
 
     /// <summary>The flower types the payer is short of, FlowerCost being the mark.</summary>
@@ -78,14 +73,12 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
         options["Ask for advice"] = CreateGuideDialogue();
         options["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" };
 
-        Dialogue.Target = new Dialogue
+        ShowDialogue(new Dialogue
         {
             Text = $"\"Need a hand? {FlowerCost} of each flower buys you a short escort.\"",
             Sprite = Cache.LoadSprite("Sprite/Guide"),
             Next = options,
-        };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
+        });
     }
 
     /// <summary>Pays the flowers and spawns a temporary Guide companion, like a hired mercenary.</summary>

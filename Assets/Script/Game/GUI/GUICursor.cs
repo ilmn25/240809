@@ -61,7 +61,7 @@ public class GUICursor : GUI
         UpdateCursorSlot();
     }
 
-    public void SetItemSlotInfo(ItemSlot item = null, bool ingredient = false)
+    public void SetItemSlotInfo(ItemSlot item = null, bool ingredient = false, string cost = null)
     {
         if (item == null)
         {
@@ -69,7 +69,7 @@ public class GUICursor : GUI
             return;
         }
         Text.text = item.Info.Name;
-        _infoSlotText.text = item.ToString(ingredient);
+        _infoSlotText.text = item.ToString(ingredient, cost);
         Show(true); 
     } 
     
@@ -95,19 +95,24 @@ public class GUICursor : GUI
         if (Data.Stack == 0)
         {
             bool overGui = GUIMain.IsHover || GUIStorage.HoveringSlot;
-            _itemSprite = null;
             SetCursorIcon(Control.HoverInteract || overGui ? _interactIcon : _aimIcon, "");
         }
         else
         {
-            // Cache the loaded held-item sprite so per-frame refreshes skip the load.
-            if (_itemSpriteId != Data.ID)
-            {
-                _itemSpriteId = Data.ID;
-                _itemSprite = Resources.Load<Sprite>($"Texture/Sprite/{Data.ID}");
-            }
-            SetCursorIcon(_itemSprite, Data.Stack.ToString());
+            SetCursorIcon(HeldItemIcon(Data.ID), Data.Stack.ToString());
         } 
+    }
+
+    /// <summary>The held item's sprite, loaded once per distinct item id.</summary>
+    private static Sprite HeldItemIcon(ID id)
+    {
+        if (_itemSpriteId != id)
+        {
+            _itemSpriteId = id;
+            _itemSprite = Resources.Load<Sprite>($"Texture/Sprite/{id}");
+        }
+
+        return _itemSprite;
     }
 
     /// <summary>Applies a cursor icon/text only when it actually changes, so the

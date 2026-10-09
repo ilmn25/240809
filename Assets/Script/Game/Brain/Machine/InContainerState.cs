@@ -1,5 +1,7 @@
 public class InContainerState : State
 {
+    public override bool IsInteraction => true;
+
     public Storage Storage;
     private int _playerIndex = -1;
     public override void OnEnterState()

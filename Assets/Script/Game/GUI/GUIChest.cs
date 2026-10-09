@@ -10,6 +10,12 @@ public class GUIChest : GUIStorage
         }
         if (Input.GetKey(KeyCode.LeftShift))
         {
+            if (TrySell(Storage.List[CurrentSlotKey]))
+            {
+                Audio.PlaySFX(SfxID.Item);
+                return;
+            }
+
             if (GUIMain.StorageInv == this)
             {
                 if (GUIMain.Storage.Showing)
@@ -93,7 +99,22 @@ public class GUIChest : GUIStorage
     }
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        GUIMain.Cursor.SetItemSlotInfo(itemSlot, false);
-        // GUIMain.InfoPanel.Set(itemSlot.GetItemInfo(false));
+        string cost = null;
+        if (GUIMain.StorageInv == this && GUIMain.GUICraft is { IsShop: true } shop && shop.ActiveCraftInfo.WantsItem(itemSlot.ID))
+            cost = $"sell for {Trade.Format(Trade.SellPrice(itemSlot.ID) * itemSlot.Stack)} (shift-click)";
+
+        GUIMain.Cursor.SetItemSlotInfo(itemSlot, false, cost);
+    }
+
+    /// <summary>Sells the hovering slot's stack to the open shop, when it deals in that item.</summary>
+    private bool TrySell(ItemSlot slot)
+    {
+        if (GUIMain.StorageInv != this || slot.isEmpty()) return false;
+        if (GUIMain.GUICraft is not { IsShop: true } shop || !shop.ActiveCraftInfo.WantsItem(slot.ID)) return false;
+
+        int worth = Trade.SellPrice(slot.ID) * slot.Stack;
+        Storage.RemoveItem(slot.ID, slot.Stack, CurrentSlotKey);
+        Trade.Pay(Storage, worth);
+        return true;
     }
 }

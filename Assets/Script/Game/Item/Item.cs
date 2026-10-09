@@ -31,6 +31,10 @@ public partial class Item
     public int MaxHungerBonus; // permanent max-hunger increase when consumed (0 = none)
     public bool Glow; // lights up the held tool's Glow light (torch, ...)
 
+    /// <summary>Trade value in copper, authored per item (0 = derive from the recipe,
+    /// see Trade).</summary>
+    public int Worth;
+
     /// <summary>What a burnable item turns into when burned. Null = not burnable
     /// (single source of truth: no separate Burnable flag).</summary>
     public ID BurnResult = ID.Null;
@@ -92,12 +96,14 @@ public partial class Item
         int stackSize = 15,
         bool pickupable = true,
         float despawnTime = 0f,
-        ID burnResult = ID.Null)
+        ID burnResult = ID.Null,
+        int worth = 0)
     {
         Item itemData = Make(id, ItemType.Material, description, stackSize);
         itemData.Pickupable = pickupable;
         itemData.DespawnTime = despawnTime;
         itemData.BurnResult = burnResult;
+        itemData.Worth = worth;
         Register(itemData, materials, craftStack, time);
     }
 
@@ -106,7 +112,6 @@ public partial class Item
         Item itemData = Make(id, ItemType.Material, description, 1, rarity);
         Register(itemData);
     }
-
     private static void AddConsumableDefinition(
         ID id,
         int hungerValue,
@@ -118,7 +123,8 @@ public partial class Item
         int healValue = 0,
         int damageValue = 0,
         int maxHpBonus = 0,
-        int maxHungerBonus = 0)
+        int maxHungerBonus = 0,
+        int worth = 0)
     {
         Item itemData = Make(id, ItemType.Consumable, description, stackSize);
         itemData.HungerValue = hungerValue;
@@ -126,6 +132,7 @@ public partial class Item
         itemData.DamageValue = damageValue;
         itemData.MaxHpBonus = maxHpBonus;
         itemData.MaxHungerBonus = maxHungerBonus;
+        itemData.Worth = worth;
         Register(itemData, materials, craftStack, time);
     }
 
@@ -139,7 +146,8 @@ public partial class Item
         int craftStack = 1,
         int time = 0,
         int stackSize = 100,
-        ID burnResult = ID.Null)
+        ID burnResult = ID.Null,
+        int worth = 0)
     {
         Entity.AddBlock(id);
         Block.AddBlockDefinition(id, breakThreshold, breakCost);
@@ -149,6 +157,7 @@ public partial class Item
         itemData.Speed = 4;
         itemData.Range = 5;
         itemData.BurnResult = burnResult;
+        itemData.Worth = worth;
         Register(itemData, materials, craftStack, time);
     }
 
@@ -173,7 +182,8 @@ public partial class Item
         int craftStack = 1,
         int time = 0,
         string[] modifiers = null,
-        bool glow = false
+        bool glow = false,
+        int worth = 0
     )
     {
 
@@ -189,6 +199,7 @@ public partial class Item
         itemData.HoldoutOffset = holdoutOffset;
         itemData.RotationOffset = rotationOffset;
         itemData.Glow = glow;
+        itemData.Worth = worth;
         Register(itemData, materials, craftStack, time, modifiers);
     }
 
@@ -199,7 +210,8 @@ public partial class Item
         SfxID sfx = SfxID.HitSand,
         string description = "",
         bool furniture = false,
-        ID burnResult = ID.Null)
+        ID burnResult = ID.Null,
+        int worth = 0)
     {
         Item itemData = Make(id, ItemType.Structure, description, 1, scale: 1);
         itemData.Sfx = sfx;
@@ -207,6 +219,7 @@ public partial class Item
         itemData.Speed = 1;
         itemData.Range = 5;
         itemData.BurnResult = burnResult;
+        itemData.Worth = worth;
         Register(itemData, materials, 1, time);
     }
 

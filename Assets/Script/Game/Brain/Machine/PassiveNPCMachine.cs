@@ -20,14 +20,65 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         AddState(new MobEscapeFight<MobAttackSwing>());
         AddState(new MobAttackSwing());
         AddState(new EquipSelectState());
+        AddState(new DialogueState(new Dialogue()));
 
         // Carries a blade to defend itself if attacked.
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
     }
 
+    public override void OnUpdate()
+    {
+        if (UpdateEscort()) return;
+
+        if (!IsCurrentState<DefaultState>()) return;
+
+        if (UpdateThreat()) return;
+
+        SetState<MobIdle>(); // lingers in place (long idle from OnStart)
+    }
+
+    /// <summary>Follows the escort wagon, or handles a threat outranking it. Callers skip
+    /// their usual idling while an interaction or hit reaction is running.</summary>
+    private bool UpdateEscort()
+    {
+        if (Caravan == null) return false;
+
+        if (IsInteracting || IsCurrentState<MobHit>()) return true;
+
+        if (UpdateThreat()) return true;
+
+        UpdateCaravanFollow(Caravan);
+        return true;
+    }
+
     /// <summary>True while focused on a real threat — the escort wagon doesn't count.</summary>
     protected bool IsEngaged =>
         Info.Target != null && (Caravan == null || Info.Target != Caravan.Info);
+
+    protected void BeginInteraction()
+    {
+        if (IsEngaged) Info.CancelTarget();
+    }
+
+    protected void ShowDialogue(string text)
+    {
+        ShowDialogue(new Dialogue { Text = text });
+    }
+
+    protected void ShowDialogue(Dialogue dialogue)
+    {
+        DialogueState state = GetState<DialogueState>();
+        state.Dialogue = dialogue;
+        SetState<DialogueState>();
+    }
+
+    protected void OpenShop(string greeting)
+    {
+        Dialogue.Target = new Dialogue { Text = greeting };
+        Dialogue.Show(true);
+        Audio.PlaySFX(SfxID.Notification);
+        SetState<ShopState>();
+    }
 
     /// <summary>Handle a real threat: flee it, turning to fight back when cornered, and
     /// drop it once it gets away. Returns true while a threat is being handled so callers
@@ -45,16 +96,5 @@ public abstract class PassiveNPCMachine : GroundMobMachine
 
         SetState<MobEscapeFight<MobAttackSwing>>(); // flee, but fight back when cornered
         return true;
-    }
-
-    /// <summary>Flee from the current threat, fighting back only when cornered;
-    /// otherwise linger in place. Call from OnUpdate when not part of a caravan.</summary>
-    protected void UpdateFlee()
-    {
-        if (!IsCurrentState<DefaultState>()) return;
-
-        if (UpdateThreat()) return;
-
-        SetState<MobIdle>(); // lingers in place (long idle from OnStart)
     }
 }
