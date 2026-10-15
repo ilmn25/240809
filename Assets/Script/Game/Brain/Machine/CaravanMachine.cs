@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>The travelling bandwagon's wagon. On arrival it spawns a small camp
 /// of followers — nomads, a collector and a money changer — that cluster around it
-/// (see GroundMobMachine.UpdateCaravanFollow). After a set time the wagon flees and
+/// (see GroundMobMachine.UpdateCaravanFollow). After a set time the wagon
 /// despawns; the followers leave with it.</summary>
 public class CaravanMachine : GroundMobMachine
 {
@@ -11,11 +11,11 @@ public class CaravanMachine : GroundMobMachine
     private const int ArriveHour = 8;      // morning arrival
     private const float SpawnDistance = 10f;
     private const float FleeDistance = 30f;
+    private const float FleeSpeed = 6f;
     private const float FollowerSpread = 2f;
     private const int FollowerCount = 2;
     private const int CowCount = 2;        // cattle that trail the wagon
-    private const float VisitDuration = 120f; // seconds the wagon camps before fleeing
-
+    private const float VisitDuration = 300f; // seconds before the wagon leaves
     private bool _fleeing;
 
     public static void Subscribe() => Environment.HourlyTriggered += OnHour;
@@ -34,9 +34,8 @@ public class CaravanMachine : GroundMobMachine
         return new PassiveInfo()
         {
             HealthMax = 100,
-            SpeedGround = 6,
+            SpeedGround = 0,
             SpeedAir = 7,
-            DistRoam = 0,
             IsNPC = true,
             CharSprite = ID.Caravan,
         };
@@ -87,14 +86,14 @@ public class CaravanMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
-        // Fleeing is handled entirely by the MobFleeDespawn state.
     }
 
-    public void StartFlee()
+    private void StartFlee()
     {
         if (_fleeing) return;
         _fleeing = true;
 
+        Info.SpeedGround = FleeSpeed;
         Info.Target = Main.PlayerInfo;
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobFleeDespawn>();
