@@ -16,9 +16,9 @@ public class Storage
 
         /// <summary>Player-facing title for this storage's window: the explicit name if
         /// one was set, otherwise derived from the owning Info, otherwise a generic
-        /// fallback. Hand-built containers (see TraderInfo.Create) never pass through
-        /// Entity.CreateInfo, so they can have no id at all. The enum is qualified
-        /// because this class declares its own <see cref="ID"/> field.</summary>
+        /// fallback. A hand-built container can have no id at all, since it never passes
+        /// through Entity.CreateInfo. The enum is qualified because this class declares
+        /// its own <see cref="ID"/> field.</summary>
         public string DisplayName =>
             Name
             ?? (info != null && info.id != global::ID.Null ? Helper.ToDisplayName(info.id) : null)

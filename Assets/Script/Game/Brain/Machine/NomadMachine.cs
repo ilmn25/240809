@@ -5,46 +5,42 @@ using UnityEngine;
 /// cluster around the wagon and trade a line of dialogue. When spawned by a
 /// caravan the nomad follows the wagon and leaves with it (see
 /// GroundMobMachine.UpdateCaravanFollow).</summary>
-public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, IShopkeeper
+public class NomadMachine : PassiveNPCMachine, IActionSecondaryInteract, ITrader
 {
     /// <summary>True for the single shopkeeper of a visiting bandwagon.</summary>
     public bool IsLeader;
 
-    /// <summary>The leader's shop inventory, shown through the craft UI. Created
-    /// fresh per nomad so Pending/crafting state never bleeds between instances.</summary>
-    public CraftInfo Shop { get; private set; }
+    /// <summary>The goods this leader sells, shown through the craft UI. Created fresh per
+    /// nomad so trade state never bleeds between instances.</summary>
+    public CraftInfo Menu { get; private set; }
+
+    public TradeMode Mode => TradeMode.Shop;
 
     public static Info CreateInfo()
     {
-        return new PassiveInfo()
-        {
-            HealthMax = 50,
-            SpeedGround = 5,
-            SpeedAir = 6,
-            DistRoam = 3,
-            DistAttack = 2,
-            DistDisengage = 40,
-            IsNPC = true,
-            CharSprite = ID.Nomad,
-        };
+        PassiveInfo info = PassiveInfo.CreateNpc();
+        info.DistAttack = 2;
+        info.DistDisengage = 40;
+        info.CharSprite = ID.Nomad;
+        return info;
     }
 
     public override void OnStart()
     {
         base.OnStart();
 
-        AddState(new ShopState());
+        AddState(new TradeState());
 
-        // A CraftInfo whose id resolves to the shared NomadPool of goods for sale.
-        Shop = new CraftInfo { id = ID.Nomad };
+        Menu = new CraftInfo { id = ID.Nomad };
     }
 
     public void OnActionSecondary(Info info)
     {
         BeginInteraction();
 
+        // The leader opens its shop the moment you interact; the rest just talk.
         if (IsLeader)
-            OpenShop("The road is long. Take a look at what we've gathered.");
+            ToggleStation<TradeState>("The road is long. Take a look at what we've gathered.");
         else
             ShowDialogue("We trade where the winds take us. Safe travels.");
     }

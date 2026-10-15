@@ -324,8 +324,12 @@ public class Control
 
         if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
         { 
-    
-            if (Inst.ActionSecondary.KeyDown() && !Dialogue.Showing && MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+            // GUIMain.IsHover: the pointer rests on a GUI slot/button, so the GUI owns the
+            // click. Without this the station's own right-click (craft/buy/sell) also reaches
+            // whatever stands behind the window and re-interacts with it.
+            if (Inst.ActionSecondary.KeyDown() && !Dialogue.Showing && !GUIMain.IsHover &&
+                MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null &&
+                Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
             { 
                 IAction action = MouseTarget.GetComponent<IActionSecondary>();
                 if (action != null)

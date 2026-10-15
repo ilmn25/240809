@@ -7,6 +7,16 @@ public enum ItemGesture { Swing, Poke, Cast, Shoot}
 
 public partial class Item
 {
+    /// <summary>Coins per tier: 20 copper to a silver, 20 silver to a gold, so a full
+    /// stack of one tier is exactly one coin of the next. Coin worth is in copper, and
+    /// everything coin-related (prices, payouts, quota) is derived from these. Coins carry
+    /// that trade as their craft recipe, so the money changer's exchange (and any craft UI)
+    /// turns a full stack of a tier into one coin of the tier above.</summary>
+    public const int CoinsPerTier = 20;
+    public const int CopperWorth = 1;
+    public const int SilverWorth = CoinsPerTier * CopperWorth;
+    public const int GoldWorth = CoinsPerTier * SilverWorth;
+
     public static void Initialize()
     {
         Loot loot;
@@ -18,14 +28,14 @@ public partial class Item
         loot.Add(0.5f, 1, ID.Slag);
         loot.Add(0.5f, 1, ID.Brick);
         AddBlockDefinition(ID.MarbleBlock, 200, 1, SfxID.HitMetal, description: "Polished marble block with a pristine look.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 }, { ID.BrickBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.GrassBlock, 80, 1, SfxID.HitStone, description: "Basic dirt block, useful for filling and farming.");
+        AddBlockDefinition(ID.GrassBlock, 80, 1, SfxID.HitStone, description: "Basic dirt block, useful for filling and farming.", worth: 2);
         loot = new (ID.GrassBlock);
         loot.Add(1, 3, ID.Mud);
         loot.Add(0.5f, 1, ID.Flint);
         loot.Add(0.5f, 1, ID.Sticks);
         AddBlockDefinition(ID.SandBlock, 40, 1, SfxID.HitSand, description: "Fine sand block used for glassmaking and terrain.", materials: new Dictionary<ID, int> { { ID.StoneBlock, 1 } }, craftStack: 2);
         AddBlockDefinition(ID.BackroomBlock, 200, 2, SfxID.HitStone, description: "Mysterious block from the backroom; fragile to danger.", materials: new Dictionary<ID, int> { { ID.GrassBlock, 1 } }, craftStack: 2);
-        AddBlockDefinition(ID.StoneBlock, 150, 1, SfxID.HitStone, description: "Common stone block, the foundation of many builds.");
+        AddBlockDefinition(ID.StoneBlock, 150, 1, SfxID.HitStone, description: "Common stone block, the foundation of many builds.", worth: 2);
         loot = new (ID.StoneBlock);
         loot.Add(1, 3, ID.Gravel);
         loot.Add(0.5f, 1, ID.MetalChunks);
@@ -33,7 +43,7 @@ public partial class Item
         loot.Add(0.5f, 1, ID.LeadChunks);
         loot.Add(0.5f, 1, ID.LeadChunks);
         loot.Add(0.5f, 1, ID.LeadChunks);
-        AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.", burnResult: ID.Charcoal);
+        AddBlockDefinition(ID.WoodBlock, 100, 2, SfxID.HitStone, description: "Wood block from trees; a basic construction material.", burnResult: ID.Charcoal, worth: 4);
         AddBlockDefinition(ID.GraniteBlock, 100, 2, SfxID.HitStone, description: "Hard granite block, tough and reliable.");
         // Internal mining-box entity — placed by mining tools, never crafted by the player.
         AddBlockDefinition(ID.MiningBox);
@@ -46,12 +56,12 @@ public partial class Item
         AddMaterialDefinition(ID.IncendiaryBullet, "Incendiary bullet rounds that set targets on fire.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Charcoal, 1 } }, craftStack: 5, time: 1500);
         AddMaterialDefinition(ID.ShotgunRound, "Fat shotgun shells packed with powder and shot. Only a shotgun can fire them.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 2 }, { ID.Casing, 1 }, { ID.Steel, 1 } }, craftStack: 4, time: 1500);
         AddConsumableDefinition(ID.Foul, 3, "Fresh poultry meat from wild fowl.");
-        AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.");
+        AddConsumableDefinition(ID.Meat, 4, "Raw meat, can be cooked for better healing.", worth: 3);
         AddConsumableDefinition(ID.CookedMeat, 8, "Cooked meat, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Meat, 1 } }, time:2000);
         AddConsumableDefinition(ID.CookedChicken, 8, "Cooked chicken, restores more health than raw.", materials: new Dictionary<ID, int> { { ID.Foul, 1 } }, time:2000);
-        AddConsumableDefinition(ID.Egg, 3, "A fresh egg laid by a hen.");
-        AddConsumableDefinition(ID.Corn, 4, "A fresh ear of corn, hearty and filling.", stackSize: 20);
-        AddConsumableDefinition(ID.Pumpkin, 5, "A plump pumpkin, substantial and filling.", stackSize: 10);
+        AddConsumableDefinition(ID.Egg, 3, "A fresh egg laid by a hen.", worth: 3);
+        AddConsumableDefinition(ID.Corn, 4, "A fresh ear of corn, hearty and filling.", stackSize: 20, worth: 3);
+        AddConsumableDefinition(ID.Pumpkin, 5, "A plump pumpkin, substantial and filling.", stackSize: 10, worth: 3);
         AddConsumableDefinition(ID.CookedEgg, 5, "A cooked egg, warm and filling.", stackSize: 20);
         AddConsumableDefinition(ID.CookedBerries, 4, "Warm cooked berries, sweet and filling.", stackSize: 20);
         AddConsumableDefinition(ID.CookedCorn, 7, "A roasted ear of corn, hearty and filling.", stackSize: 20);
@@ -59,58 +69,58 @@ public partial class Item
         AddConsumableDefinition(ID.StarBun, 10, "A star-shaped bun from the surface, sweet and filling.", stackSize: 20);
         AddConsumableDefinition(ID.AbyssDelicacy, 14, "A layered delicacy of deep-abyss ingredients, deeply filling.", stackSize: 10);
         AddConsumableDefinition(ID.CrimsonSoup, 12, "A rich crimson soup, warming and restorative.", stackSize: 10);
-        AddConsumableDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20);
+        AddConsumableDefinition(ID.Berries, 2, "A small handful of wild berries, edible for a little hunger.", stackSize: 20, worth: 2);
         AddConsumableDefinition(ID.CookedDeathcap, 0, "A cooked mushroom that restores health.", materials: new Dictionary<ID, int> { { ID.Deathcap, 1 } }, time: 2000, healValue: 6);
         AddConsumableDefinition(ID.Bandages, 0, "Clean bandages that patch up wounds.", materials: new Dictionary<ID, int> { { ID.Fabric, 1 } }, healValue: 6);
-        AddMaterialDefinition(ID.Sand, "Loose sand collected from desert debris and deposits.");
+        AddMaterialDefinition(ID.Sand, "Loose sand collected from desert debris and deposits.", worth: 2);
         AddMaterialDefinition(ID.Glass, "Smelted glass used for windows and light fixtures.", materials: new Dictionary<ID, int> { { ID.Sand, 2 } }, time: 1800);
-        AddMaterialDefinition(ID.Shell, "A tiny collection of shells found on the ground.");
-        AddMaterialDefinition(ID.Mud, "Wet earth used for mulch and ground work.");
-        AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.");
-        AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.", burnResult: ID.Charcoal);
-        AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.");
-        AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.");
+        AddMaterialDefinition(ID.Shell, "A tiny collection of shells found on the ground.", worth: 3);
+        AddMaterialDefinition(ID.Mud, "Wet earth used for mulch and ground work.", worth: 2);
+        AddMaterialDefinition(ID.Gravel, "Loose gravel chunks for crafting and building.", worth: 2);
+        AddMaterialDefinition(ID.Sticks, "A small bundle of sticks for tools and torches.", burnResult: ID.Charcoal, worth: 2);
+        AddMaterialDefinition(ID.Cytoplasm, "Strange viscous substance from creatures.", worth: 4);
+        AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.", worth: 2);
         AddMaterialDefinition(ID.Blood, "A pool of blood left behind by a wounded creature.", pickupable: false);
-        AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.");
+        AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.", worth: 2);
         AddMaterialDefinition(ID.CornSeed, "A kernel of dried corn, ready to plant.", materials: new Dictionary<ID, int> { { ID.Corn, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.PumpkinSeed, "A seed saved from a pumpkin, ready to plant.", materials: new Dictionary<ID, int> { { ID.Pumpkin, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.Paper, "Thin paper used for notes or blueprints.", materials: new Dictionary<ID, int> { { ID.Plank, 1 }, { ID.Charcoal, 1 } }, burnResult: ID.Charcoal);
-        AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.", burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.Wool, "Soft wool, used for cloth and insulation.", burnResult: ID.Charcoal, worth: 5);
         AddMaterialDefinition(ID.Fabric, "Woven fabric, ideal for wearable gear.", materials: new Dictionary<ID, int> { { ID.Wool, 2 } }, time:1500, burnResult: ID.Charcoal);
-        AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.");
-        AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.");
-        AddMaterialDefinition(ID.Meteorite, "Rare meteoric ore from a fallen meteor.");
-        AddMaterialDefinition(ID.LeadChunks, "Chunks of lead ore for smelting.");
+        AddMaterialDefinition(ID.Flint, "Sharp stone shards for toolmaking.", worth: 3);
+        AddMaterialDefinition(ID.MetalChunks, "Chunks of metal for smelting.", worth: 6);
+        AddMaterialDefinition(ID.Meteorite, "Rare meteoric ore from a fallen meteor.", worth: 8);
+        AddMaterialDefinition(ID.LeadChunks, "Chunks of lead ore for smelting.", worth: 5);
         AddMaterialDefinition(ID.Lead, "Strong forged lead for crafting and building.", materials: new Dictionary<ID, int> { { ID.LeadChunks, 3 }, { ID.Charcoal, 2 } }, time:2000);
-        AddMaterialDefinition(ID.Copper, "A minted copper coin, the smallest denomination.", stackSize: 20, worth: 1);
+        AddMaterialDefinition(ID.Copper, "A minted copper coin, the smallest denomination.", stackSize: CoinsPerTier, worth: CopperWorth);
         AddMaterialDefinition(ID.Charcoal, "Burned wood fuel for smelting.", materials: new Dictionary<ID, int> { { ID.Log, 2 } }, time:1500);
         AddMaterialDefinition(ID.Steel, "Strong forged metal for high-tier items.", materials: new Dictionary<ID, int> { { ID.MetalChunks, 3 }, {ID.Charcoal, 2} }, time:2000);
         AddMaterialDefinition(ID.Brick, "Refined brick piece for sturdy construction.", materials: new Dictionary<ID, int> { { ID.Slag, 3 } }, time:1500);
         AddMaterialDefinition(ID.Stake, "Wooden stake for defense and traps.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, burnResult: ID.Charcoal);
         AddMaterialDefinition(ID.Slag, "Molten industrial residue used in crafting.", materials: new Dictionary<ID, int> { { ID.Gravel, 3 }, {ID.Charcoal, 2} }, time:1500);
-        AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.", burnResult: ID.Charcoal);
-        AddMaterialDefinition(ID.MourningWood, "Eerie wood harvested from a tree mimic.", burnResult: ID.Charcoal);
+        AddMaterialDefinition(ID.Log, "A solid tree log, base for many constructions.", burnResult: ID.Charcoal, worth: 4);
+        AddMaterialDefinition(ID.MourningWood, "Eerie wood harvested from a tree mimic.", burnResult: ID.Charcoal, worth: 6);
         AddMaterialDefinition(ID.Plank, "Wooden plank crafted from logs.", materials: new Dictionary<ID, int> { { ID.Log, 3 } }, time:1500, burnResult: ID.Charcoal);
-        AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2);
-        AddConsumableDefinition(ID.OysterShrooms, 3, "A cluster of oyster mushrooms, tender and savoury.");
-        AddConsumableDefinition(ID.Toadstool, 2, "A spotted toadstool. Eating it raw hurts.", damageValue: 2);
-        AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.");
-        AddMaterialDefinition(ID.Tulip, "A bright tulip that blooms in sunny meadows.");
-        AddMaterialDefinition(ID.Daisies, "A cheerful cluster of daisies growing in the grass.");
-        AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.");
-        AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15);
-        AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.");
-        AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.");
-        AddMaterialDefinition(ID.Gold, "A gleaming gold coin, the largest denomination.", stackSize: 20, worth: 400);
-        AddMaterialDefinition(ID.Silver, "A polished silver coin, worth twenty copper.", stackSize: 20, worth: 20);
-        AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.");
-        AddConsumableDefinition(ID.CradleOfBlood, 0, "A dark cradle brimming with vital blood. Consuming it permanently increases your max health.", stackSize: 5, maxHpBonus: 2);
-        AddRelicDefinition(ID.StarCompass, "A relic of the Abyss that always points the way to the deepest treasures, no matter how far the descent.", ItemRarity.Epic);
-        AddRelicDefinition(ID.UnheardBell, "A relic of the Abyss that rings only in silence, its tone said to reveal what lies hidden in the dark.", ItemRarity.Epic);
-        AddRelicDefinition(ID.BlazeReap, "A relic of the Abyss that draws the fire of the deep, ready to rain destruction from on high.", ItemRarity.Legendary);
-        AddRelicDefinition(ID.ThousandMenWedge, "A relic of the Abyss, a vast spike driven into the stone where countless Delvers once gathered.", ItemRarity.Rare);
-        AddRelicDefinition(ID.SunSphere, "A relic of the Abyss that holds a sliver of the sun, faintly warm to the touch.", ItemRarity.Epic);
-        AddConsumableDefinition(ID.HornOfPlenty, 0, "An ever-brimming horn of abundance. Consuming it permanently increases your max hunger.", stackSize: 5, maxHungerBonus: 4);
+        AddConsumableDefinition(ID.Deathcap, 2, "A rare poisonous mushroom. Eating it raw hurts.", damageValue: 2, worth: 4);
+        AddConsumableDefinition(ID.OysterShrooms, 3, "A cluster of oyster mushrooms, tender and savoury.", worth: 4);
+        AddConsumableDefinition(ID.Toadstool, 2, "A spotted toadstool. Eating it raw hurts.", damageValue: 2, worth: 4);
+        AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.", worth: 2);
+        AddMaterialDefinition(ID.Tulip, "A bright tulip that blooms in sunny meadows.", worth: 2);
+        AddMaterialDefinition(ID.Daisies, "A cheerful cluster of daisies growing in the grass.", worth: 2);
+        AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.", worth: 2);
+        AddMaterialDefinition(ID.BirdShit, "A lump of bird droppings dropped by a pigeon.", stackSize: 15, worth: 2);
+        AddMaterialDefinition(ID.Geode, "A dense rock waiting to be cracked open. Crush it in a pulverizer.", worth: 15);
+        AddMaterialDefinition(ID.Fossil, "A fossilized remnant shaken loose from a crushed geode.", worth: 20);
+        AddMaterialDefinition(ID.Gold, "A gleaming gold coin, the largest denomination.", materials: new Dictionary<ID, int> { { ID.Silver, CoinsPerTier } }, stackSize: CoinsPerTier, worth: GoldWorth);
+        AddMaterialDefinition(ID.Silver, "A polished silver coin, worth twenty copper.", materials: new Dictionary<ID, int> { { ID.Copper, CoinsPerTier } }, stackSize: CoinsPerTier, worth: SilverWorth);
+        AddMaterialDefinition(ID.PetrifiedDelver, "The calcified or crystallized remains of an explorer from a bygone era. Their body has fused with the environment, and the relic is lodged in their chest or hands like a heart.", worth: 3 * GoldWorth);
+        AddConsumableDefinition(ID.CradleOfBlood, 0, "A dark cradle brimming with vital blood. Consuming it permanently increases your max health.", stackSize: 5, maxHpBonus: 2, worth: 5 * GoldWorth);
+        AddRelicDefinition(ID.StarCompass, "A relic of the Abyss that always points the way to the deepest treasures, no matter how far the descent.", ItemRarity.Epic, worth: 8 * GoldWorth);
+        AddRelicDefinition(ID.UnheardBell, "A relic of the Abyss that rings only in silence, its tone said to reveal what lies hidden in the dark.", ItemRarity.Epic, worth: 8 * GoldWorth);
+        AddRelicDefinition(ID.BlazeReap, "A relic of the Abyss that draws the fire of the deep, ready to rain destruction from on high.", ItemRarity.Legendary, worth: 15 * GoldWorth);
+        AddRelicDefinition(ID.ThousandMenWedge, "A relic of the Abyss, a vast spike driven into the stone where countless Delvers once gathered.", ItemRarity.Rare, worth: 5 * GoldWorth);
+        AddRelicDefinition(ID.SunSphere, "A relic of the Abyss that holds a sliver of the sun, faintly warm to the touch.", ItemRarity.Epic, worth: 10 * GoldWorth);
+        AddConsumableDefinition(ID.HornOfPlenty, 0, "An ever-brimming horn of abundance. Consuming it permanently increases your max hunger.", stackSize: 5, maxHungerBonus: 4, worth: 5 * GoldWorth);
 
         // Structures
         AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
@@ -123,7 +133,7 @@ public partial class Item
         AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.", burnResult: ID.Charcoal);
         AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.", burnResult: ID.Charcoal);
         AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
-        AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.");
+        AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.", worth: 4);
         loot = new (ID.ForestBlock);
         loot.Add(1, 3, ID.Mud);
         loot.Add(0.5f, 1, ID.Flint);

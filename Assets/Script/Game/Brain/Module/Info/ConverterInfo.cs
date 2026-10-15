@@ -93,7 +93,44 @@ public abstract class ConverterInfo : ContainerInfo
     }
 }
 
-public class CrockPotInfo : ConverterInfo
+/// <summary>A converter that consumes a batch of ingredients from its storage and
+/// produces one output: the crock pot's dishes.</summary>
+public abstract class BatchConverterInfo : ConverterInfo
+{
+    /// <summary>The batch this converter can run right now, or null when it can't.</summary>
+    protected abstract (Dictionary<ID, int> Ingredients, ID Output)? MatchBatch();
+
+    public override bool IsConverting() => Storage?.List != null && MatchBatch() != null;
+
+    public override void Update()
+    {
+        if (!CanProcess()) return;
+        if (!Tick()) return;
+
+        (Dictionary<ID, int> ingredients, ID output)? match = MatchBatch();
+        if (match == null) return;
+
+        Consume(match.Value.ingredients);
+        SpawnOutput(match.Value.output);
+        Storage.NotifyChanged();
+    }
+
+    /// <summary>Takes the matched ingredients out of the storage, pulling from as many
+    /// slots as the batch needs.</summary>
+    private void Consume(Dictionary<ID, int> needed)
+    {
+        foreach (ItemSlot slot in Storage.List)
+        {
+            if (slot.isEmpty() || !needed.TryGetValue(slot.ID, out int need)) continue;
+            int take = Mathf.Min(slot.Stack, need);
+            needed[slot.ID] = need - take;
+            slot.Stack -= take;
+            if (slot.Stack <= 0) slot.clear();
+        }
+    }
+}
+
+public class CrockPotInfo : BatchConverterInfo
 {
     private static readonly (Dictionary<ID, int> Ingredients, ID Dish)[] Recipes = new[]
     {
@@ -104,30 +141,7 @@ public class CrockPotInfo : ConverterInfo
 
     protected override int ConvertTime => 120;
 
-    public override bool IsConverting() => MatchRecipe() != null;
-
-    public override void Update()
-    {
-        if (!CanProcess()) return;
-        if (!Tick()) return;
-
-        (Dictionary<ID, int> ingredients, ID dish)? match = MatchRecipe();
-        if (match == null) return;
-
-        Dictionary<ID, int> needed = match.Value.ingredients;
-        foreach (ItemSlot slot in Storage.List)
-        {
-            if (slot.isEmpty() || !needed.ContainsKey(slot.ID)) continue;
-            int take = Mathf.Min(slot.Stack, needed[slot.ID]);
-            needed[slot.ID] -= take;
-            slot.Stack -= take;
-            if (slot.Stack <= 0) slot.clear();
-        }
-        SpawnOutput(match.Value.dish);
-        Storage.NotifyChanged();
-    }
-
-    private (Dictionary<ID, int>, ID)? MatchRecipe()
+    protected override (Dictionary<ID, int>, ID)? MatchBatch()
     {
         var available = new Dictionary<ID, int>();
         foreach (ItemSlot slot in Storage.List)

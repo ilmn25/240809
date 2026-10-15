@@ -107,9 +107,10 @@ public partial class Item
         Register(itemData, materials, craftStack, time);
     }
 
-    private static void AddRelicDefinition(ID id, string description, ItemRarity rarity = ItemRarity.Rare)
+    private static void AddRelicDefinition(ID id, string description, ItemRarity rarity = ItemRarity.Rare, int worth = 0)
     {
         Item itemData = Make(id, ItemType.Material, description, 1, rarity);
+        itemData.Worth = worth;
         Register(itemData);
     }
     private static void AddConsumableDefinition(

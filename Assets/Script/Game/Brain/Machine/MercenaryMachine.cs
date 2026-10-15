@@ -11,15 +11,9 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public static Info CreateInfo()
     {
-        return new PassiveInfo()
-        {
-            HealthMax = 50,
-            SpeedGround = 5,
-            SpeedAir = 6,
-            DistRoam = 3,
-            CharSprite = ID.Raider,
-            IsNPC = true,
-        };
+        PassiveInfo info = PassiveInfo.CreateNpc();
+        info.CharSprite = ID.Raider;
+        return info;
     }
 
     public void OnActionSecondary(Info info)

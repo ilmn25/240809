@@ -5,27 +5,31 @@ public class GUICraft : GUIStorage
 {
     public Storage DefaultStorage;
     public CraftInfo ActiveCraftInfo { get; private set; }
-    public bool IsShop { get; private set; }
+    /// <summary>What clicking a slot does while a window is open. Crafting is the default, so
+    /// the player's own pool always crafts.</summary>
+    public TradeMode Mode { get; private set; }
+
+    /// <summary>Short name of what a slot click does, shown in the HUD.</summary>
+    public string ActionLabel => Mode switch
+    {
+        TradeMode.Shop => "buy",
+        TradeMode.Sell => "sell",
+        _ => "craft",
+    };
 
     public void UseDefaultStorage()
     {
         ActiveCraftInfo = null;
-        IsShop = false;
+        Mode = TradeMode.Craft;
         Storage = DefaultStorage;
     }
 
-    public void UseCraftingInfo(CraftInfo craftInfo)
+    /// <summary>Shows a menu in the given mode: its slots then do whatever that mode says.</summary>
+    public void Use(CraftInfo menu, TradeMode mode)
     {
-        ActiveCraftInfo = craftInfo;
-        IsShop = false;
-        Storage = craftInfo.GetStoragePool();
-    }
-
-    public void UseShop(CraftInfo shop)
-    {
-        ActiveCraftInfo = shop;
-        IsShop = true;
-        Storage = shop.GetStoragePool();
+        ActiveCraftInfo = menu;
+        Mode = mode;
+        Storage = menu.GetStoragePool();
     }
 
     protected override void ActionPrimaryDown()
@@ -48,10 +52,17 @@ public class GUICraft : GUIStorage
     {
         Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
 
-        // A shop sells its stock for coins; a station crafts from the recipe.
-        if (IsShop)
+        // A shop sells its stock for coins; a collector's window buys the clicked item;
+        // a station crafts from the recipe.
+        if (Mode == TradeMode.Shop)
         {
             Buy(item);
+            return;
+        }
+
+        if (Mode == TradeMode.Sell)
+        {
+            Sell(item);
             return;
         }
 
@@ -83,6 +94,17 @@ public class GUICraft : GUIStorage
         ItemRecipe.GiveItem(item.ID, ItemRecipe.GetRecipe(item.ID)?.Stack ?? 1);
     }
 
+    /// <summary>Sells one of the listed scrap out of the player's inventory, paying out
+    /// coins worth it.</summary>
+    private static void Sell(Item item)
+    {
+        Storage player = Main.PlayerInfo?.Storage;
+        if (player == null || player.RemoveItem(item.ID, 1) > 0) return;
+
+        Audio.PlaySFX(SfxID.Item);
+        Trade.Pay(player, Trade.Worth(item.ID));
+    }
+
     protected void SyncCraftStorage()
     {
         if (ActiveCraftInfo == null) return;
@@ -91,11 +113,19 @@ public class GUICraft : GUIStorage
 
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
-        if (IsShop)
+        if (Mode == TradeMode.Shop)
         {
             string cost = $"price: {Trade.Format(Trade.Worth(itemSlot.ID))} " +
                           $"(you have {Trade.Format(Trade.Count(Main.PlayerInfo?.Storage))})";
             GUIMain.Cursor.SetItemSlotInfo(itemSlot, false, cost);
+            return;
+        }
+
+        if (Mode == TradeMode.Sell)
+        {
+            int carried = Main.PlayerInfo?.Storage?.GetAmount(itemSlot.ID) ?? 0;
+            GUIMain.Cursor.SetItemSlotInfo(itemSlot, false,
+                $"sells for {Trade.Format(Trade.Worth(itemSlot.ID))} (you have {carried})");
             return;
         }
 

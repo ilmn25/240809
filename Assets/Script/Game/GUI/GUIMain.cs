@@ -191,9 +191,10 @@ public static class GUIMain
         {
             if (GUIStorage.HoveringSlot)
             {
-                // Crafting slots use left/right-click to craft/queue.
+                // What a click on a slot does in the open window: a shop buys, a collector's
+                // window sells, a crafting station crafts.
                 if (GUIStorage.Hovered == GUIMain.GUICraft)
-                    return "LMB/hold RMB: craft";
+                    return $"LMB/hold RMB: {GUIMain.GUICraft.ActionLabel}";
 
                 // Shift+LMB moves to the chest when hovering the player inventory with
                 // the chest open; otherwise it drops the stack.

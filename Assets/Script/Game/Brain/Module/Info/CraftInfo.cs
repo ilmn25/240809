@@ -35,12 +35,19 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.OilBarrel, ID.Barrel) },
-        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },        { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
+        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
+        { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
+
+        // The money changer's coin trades: clicking a coin in the exchange crafts it from a
+        // full stack of the tier below (see ItemData), so no craft time is involved.
+        { ID.Exchanger, new PoolDef(0, false, ID.Silver, ID.Gold) },
+
+        // The collector's scrap: each one buys five random pieces of cheap junk, and clicking
+        // a listed piece sells it for coins worth it (see GUICraft.Sell).
+        { ID.Collector, new PoolDef(5, false, ID.Slag, ID.Charcoal, ID.LeadChunks, ID.Gravel, ID.Sand, ID.Flint, ID.Shell, ID.Mud, ID.Ash, ID.BirdShit, ID.SpiderWeb, ID.Sticks, ID.Cytoplasm, ID.Wool) },
     };
 
     public readonly List<ID> Pending = new List<ID>();
-    public int Max = 10;
-    public SfxID Sfx;
 
     [NonSerialized] private int _counter;
     [NonSerialized] private Storage _pool;
@@ -56,11 +63,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         if (Pending.Count == 0)
             return;
 
-        if (Sfx != SfxID.Null)
-            Audio.PlaySFX(Sfx);
-
-        // Drop queued items that no longer have a recipe (e.g. copper after it
-        // became a coin) so old queues can't stall or throw.
+        // Drop queued items that no longer have a recipe, so a stale queue can't stall.
         ItemRecipe recipe = ItemRecipe.GetRecipe(Pending[0]);
         if (recipe == null)
         {
@@ -147,22 +150,6 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
     public static Storage GetPlayerPool()
     {
         return PlayerPool;
-    }
-
-    private static Storage CreatePool(params ID[] recipes)
-    {
-        Storage storage = new Storage(9);
-        foreach (ID recipe in recipes)
-            storage.CreateAndAddItem(recipe);
-
-        return storage;
-    }
-
-    private static Storage CreatePool(string name, params ID[] recipes)
-    {
-        Storage storage = CreatePool(recipes);
-        storage.Name = name;
-        return storage;
     }
 
     private static Storage CreateNoRefreshPool(params ID[] recipes)

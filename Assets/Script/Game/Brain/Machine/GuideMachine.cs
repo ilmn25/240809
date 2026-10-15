@@ -9,17 +9,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     /// <summary>Every meadow flower the Guide asks for, two of each.</summary>
     private static readonly ID[] FlowerTypes = { ID.Orchids, ID.Tulip, ID.Daisies };
 
-    public static Info CreateInfo()
-    {
-        return new PassiveInfo()
-        {
-            HealthMax = 50,
-            SpeedGround = 5,
-            SpeedAir = 6,
-            DistRoam = 3,
-            IsNPC = true,
-        };
-    }
+    public static Info CreateInfo() => PassiveInfo.CreateNpc();
 
     public void OnActionSecondary(Info info)
     {

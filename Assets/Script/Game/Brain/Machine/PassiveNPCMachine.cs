@@ -72,12 +72,29 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         SetState<DialogueState>();
     }
 
-    protected void OpenShop(string greeting)
+    /// <summary>Shows a one-line greeting, typically over a station the caller opens right
+    /// after. Shown directly rather than through DialogueState: entering the station would
+    /// exit that state, which closes the line on the spot.</summary>
+    protected void ShowGreeting(string text, Sprite portrait = null)
     {
-        Dialogue.Target = new Dialogue { Text = greeting };
+        Dialogue.Target = new Dialogue { Text = text, Sprite = portrait };
         Dialogue.Show(true);
         Audio.PlaySFX(SfxID.Notification);
-        SetState<ShopState>();
+    }
+
+    /// <summary>Opens the trader's station, or closes it when it is already open — the same
+    /// toggle a crafting station uses. Re-opening an open station would only raise a second
+    /// greeting, which hides the inventory GUI with nothing left to bring it back.</summary>
+    protected void ToggleStation<T>(string greeting, Sprite portrait = null) where T : State
+    {
+        if (IsCurrentState<T>())
+        {
+            SetState<DefaultState>();
+            return;
+        }
+
+        ShowGreeting(greeting, portrait);
+        SetState<T>();
     }
 
     /// <summary>Handle a real threat: flee it, turning to fight back when cornered, and

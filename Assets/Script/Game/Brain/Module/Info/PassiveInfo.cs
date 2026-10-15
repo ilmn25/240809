@@ -3,6 +3,18 @@ using System;
 [System.Serializable]
 public class PassiveInfo : MobInfo
 {
+    /// <summary>The baseline info for a friendly NPC — a trader, the guide, a rescued person:
+    /// tough enough to survive a stray hit and roaming a short leash. Callers add their own
+    /// sprite or combat reach on top.</summary>
+    public static PassiveInfo CreateNpc() => new PassiveInfo()
+    {
+        HealthMax = 50,
+        SpeedGround = 5,
+        SpeedAir = 6,
+        DistRoam = 3,
+        IsNPC = true,
+    };
+
     public override void Initialize()
     {
         base.Initialize();

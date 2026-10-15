@@ -100,7 +100,7 @@ public class GUIChest : GUIStorage
     protected override void SetInfoPanel(ItemSlot itemSlot)
     {
         string cost = null;
-        if (GUIMain.StorageInv == this && GUIMain.GUICraft is { IsShop: true } shop && shop.ActiveCraftInfo.WantsItem(itemSlot.ID))
+        if (GUIMain.StorageInv == this && GUIMain.GUICraft is { Mode: TradeMode.Shop } shop && shop.ActiveCraftInfo.WantsItem(itemSlot.ID))
             cost = $"sell for {Trade.Format(Trade.SellPrice(itemSlot.ID) * itemSlot.Stack)} (shift-click)";
 
         GUIMain.Cursor.SetItemSlotInfo(itemSlot, false, cost);
@@ -110,7 +110,7 @@ public class GUIChest : GUIStorage
     private bool TrySell(ItemSlot slot)
     {
         if (GUIMain.StorageInv != this || slot.isEmpty()) return false;
-        if (GUIMain.GUICraft is not { IsShop: true } shop || !shop.ActiveCraftInfo.WantsItem(slot.ID)) return false;
+        if (GUIMain.GUICraft is not { Mode: TradeMode.Shop } shop || !shop.ActiveCraftInfo.WantsItem(slot.ID)) return false;
 
         int worth = Trade.SellPrice(slot.ID) * slot.Stack;
         Storage.RemoveItem(slot.ID, slot.Stack, CurrentSlotKey);

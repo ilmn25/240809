@@ -107,20 +107,6 @@ public static class Trade
             storage.CreateAndAddItem(coin.Key, coin.Value);
     }
 
-    /// <summary>Trades every full batch of <paramref name="from"/> for one of the next
-    /// tier. Returns how many items were exchanged.</summary>
-    public static int Exchange(Storage storage, ID from, ID to, int batch)
-    {
-        if (storage?.List == null || batch <= 0) return 0;
-
-        int trades = storage.Count(from) / batch;
-        if (trades <= 0) return 0;
-
-        storage.RemoveItem(from, trades * batch);
-        storage.CreateAndAddItem(to, trades);
-        return trades;
-    }
-
     /// <summary>Splits a copper amount into coin stacks, largest tier first.</summary>
     public static IEnumerable<KeyValuePair<ID, int>> Split(int copper)
     {

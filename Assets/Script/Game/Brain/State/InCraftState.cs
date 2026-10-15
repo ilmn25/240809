@@ -7,10 +7,9 @@ public class InCraftState : State
         Audio.PlaySFX(SfxID.Text);
 
         _craftInfo = (CraftInfo)Info;
-        Storage storage = _craftInfo.GetStoragePool();
-        EnsureSlotCount(storage, GUIMain.GUICraft.SlotAmount);
+        GUIMain.GUICraft.FitSlots(_craftInfo.GetStoragePool());
 
-        GUIMain.GUICraft.UseCraftingInfo(_craftInfo);
+        GUIMain.GUICraft.Use(_craftInfo, TradeMode.Craft);
 
         GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
@@ -39,14 +38,5 @@ public class InCraftState : State
         }
 
         _craftInfo = null;
-    }
-
-    private static void EnsureSlotCount(Storage storage, int targetCount)
-    {
-        if (storage.List == null)
-            storage.List = new System.Collections.Generic.List<ItemSlot>(targetCount);
-
-        while (storage.List.Count < targetCount)
-            storage.List.Add(new ItemSlot());
     }
 }

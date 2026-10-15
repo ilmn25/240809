@@ -102,6 +102,19 @@ public class  GUIStorage : GUI
         }
     }
 
+    /// <summary>Pads a storage out to the number of slots this window draws. Pools are
+    /// built with exactly as many slots as they hold, which is fewer than the window
+    /// shows, so a station's storage must be fitted before it is displayed.</summary>
+    public void FitSlots(Storage storage)
+    {
+        int count = SlotAmount * RowAmount;
+        if (storage.List == null)
+            storage.List = new List<ItemSlot>(count);
+
+        while (storage.List.Count < count)
+            storage.List.Add(new ItemSlot());
+    }
+
     protected virtual void ActionPrimaryDown() {}
     protected virtual void ActionSecondaryDown() {} 
     protected virtual void ActionSecondaryKey() {} 

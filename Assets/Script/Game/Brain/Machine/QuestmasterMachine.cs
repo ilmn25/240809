@@ -6,16 +6,10 @@ public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()
     {
-        return new PassiveInfo()
-        {
-            HealthMax = 50,
-            SpeedGround = 5,
-            SpeedAir = 6,
-            DistRoam = 3,
-            DistEscape = 17,
-            IsNPC = true,
-            CharSprite = ID.Questmaster,
-        };
+        PassiveInfo info = PassiveInfo.CreateNpc();
+        info.DistEscape = 17;
+        info.CharSprite = ID.Questmaster;
+        return info;
     }
 
     public override void OnStart()
