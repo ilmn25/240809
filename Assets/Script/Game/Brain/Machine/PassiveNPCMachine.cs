@@ -68,7 +68,7 @@ public abstract class PassiveNPCMachine : GroundMobMachine
     protected void ShowDialogue(Dialogue dialogue)
     {
         DialogueState state = GetState<DialogueState>();
-        state.Dialogue = dialogue;
+        state.DialogueData = dialogue;
         SetState<DialogueState>();
     }
 

@@ -10,14 +10,13 @@ public class Control
     public static int CurrentPlayerIndex = 0;
     
     private static RaycastHit _mouseRaycastInfo;
-    public static Vector3 MouseDirection; //direction of ray from camera to mouse target 
-    public static Vector3 MousePosition; //position of mouse target 
+    public static Vector3 MouseDirection;
+    public static Vector3 MousePosition;
     public static Transform MouseTarget;
-    public static int MouseLayer; // -1 means hit void
-    /// <summary>True while the mouse hovers an object the player can interact with
-    /// from here (a right-click interactable or a pickupable ground item). Drives
-    /// which icon the world cursor shows (Aim vs Interact).</summary>
+    public static int MouseLayer;
     public static bool HoverInteract;
+    private static Transform _dialogueSource;
+    private static Transform _pendingInteract;
     
     public readonly ControlKey Inv = new (KeyCode.F3);
     public readonly ControlKey Map = new (KeyCode.M);
@@ -80,26 +79,19 @@ public class Control
     public static void SetPlayer(int i)
     {
         if (i < 0 || i >= global::Save.Inst.players.Count) return;
-        if (global::Save.Inst.players[i].IsDelver) return; // delvers are AI-only, never controllable
+        if (global::Save.Inst.players[i].IsDelver) return;
         Main.PlayerInfo = global::Save.Inst.players[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
         Inventory.RefreshInventory();
         GUIBar.Update();
-        // Immediate HUD sync so a swap to an alive/dead character shows/hides
-        // the inventory correctly (also enforced every frame in GUIMain.Update).
         GUIMain.SyncHudVisibility();
         CurrentPlayerIndex = i;
     }
 
-    /// <summary>Hand control to the first surviving party member. Used after the
-    /// currently controlled player dies so the game doesn't get stuck controlling a
-    /// removed character. Also claims ownership so the UI shows the new controller
-    /// as "You" instead of "Free".</summary>
     public static void SetNextPlayer()
     {
         if (global::Save.Inst == null || global::Save.Inst.players.Count == 0) return;
-        // Already controlling a live member — nothing to do.
         if (Main.PlayerInfo != null && Main.PlayerInfo.Machine != null) return;
 
         for (int i = 0; i < global::Save.Inst.players.Count; i++)
@@ -114,15 +106,12 @@ public class Control
         }
     }
 
-    /// <summary>Switch control to the player at index <paramref name="i"/> and
-    /// update network ownership (host claims/releases, client re-claims).</summary>
     public static void SwitchToPlayer(int i)
     {
         if (i < 0 || i >= global::Save.Inst.players.Count) return;
         if (i == CurrentPlayerIndex) return;
-        if (global::Save.Inst.players[i].IsDelver) return; // delvers are AI-only, never controllable
+        if (global::Save.Inst.players[i].IsDelver) return;
 
-        // Taking control un-rests the target so it isn't stuck standing still.
         PlayerInfo nextPlayer = global::Save.Inst.players[i];
         if (nextPlayer.Resting)
         {
@@ -131,24 +120,17 @@ public class Control
         }
 
         int prevIndex = CurrentPlayerIndex;
-        // Drop the outgoing character's stale input direction so it doesn't keep
-        // walking (e.g. when it was mid-jump with a key held on swap).
         PlayerInfo prev = global::Save.Inst.players[prevIndex];
         if (prev != null)
         {
             prev.Direction = Vector3.zero;
             prev.Velocity = new Vector3(0f, prev.Velocity.y, 0f);
-            // Clear a stale pickup/interact action before releasing control. The ally
-            // brain (UpdateAllyBrain) bails out on PickUp/Interact, so a leftover action
-            // would freeze this player in place once it becomes an ally after the swap.
             if (prev.ActionType is IActionType.PickUp or IActionType.Interact)
             {
                 prev.CancelTarget();
                 prev.ActionType = IActionType.Follow;
             }
         }
-        // Return any cursor-held item to the outgoing player's inventory before
-        // switching control; AddItem drops it to the world if the inventory is full.
         if (!GUICursor.Data.isEmpty() && prev?.Storage != null)
         {
             prev.Storage.AddItem(GUICursor.Data);
@@ -158,12 +140,10 @@ public class Control
 
         if (!Helper.IsHost())
         {
-            // Immediately claim the new player so the host doesn't broadcast stale controllerId.
             PlayerSync.SendClientPlayerBatch();
         }
         else
         {
-            // Host: update player ownership so clients see the change
             string prevUid = global::Save.Inst.players[prevIndex].uid;
             string newUid = global::Save.Inst.players[i].uid;
             PlayerSync.HostReleasePlayer(prevUid);
@@ -173,8 +153,6 @@ public class Control
     
     public static void Update()
     {
-        // Reset each frame; HandleInput re-enables it when the hovered target is
-        // actionable. (Early returns below would otherwise leave it stale.)
         HoverInteract = false;
 
         if (Inst.SwapChar.KeyDown())
@@ -186,11 +164,11 @@ public class Control
             for (int i = 0; i < count; i++)
             {
                 next = (next + 1) % count;
-                if (next == prevIndex) break; // wrapped around
+                if (next == prevIndex) break;
                 var p = global::Save.Inst.players[next];
-                if (p.Machine != null && !p.IsDelver) break; // skip AI-only delvers
+                if (p.Machine != null && !p.IsDelver) break;
             }
-            if (next == prevIndex) return; // no other player in range
+            if (next == prevIndex) return;
             Tutorial.OnSwap();
             SwitchToPlayer(next);
         }
@@ -215,8 +193,9 @@ public class Control
             PlayerMachine.RecallAllies();
         }
 
-        // The map handles its own input (drag/zoom) — no world interaction while open.
         if (GUIMain.Map is { IsOpen: true }) return;
+
+        HandlePendingInteraction();
 
         HandleActionButton();
         
@@ -237,7 +216,6 @@ public class Control
 
     private static void HandleActionButton()
     {
-        // Spectating clients cannot interact
         if (GUIMain.CursorActive) return;
         if (!Helper.IsHost() && NetworkClient.isConnected &&
             Main.PlayerInfo != null &&
@@ -259,7 +237,6 @@ public class Control
 
             if (Helper.IsHost() || NetworkClient.isConnected)
             {
-                // Host/Client: state machine handles pathfinding + pickup via MobChaseAction
                 Main.PlayerInfo.Target = info;
                 Main.PlayerInfo.ActionType = IActionType.PickUp;
             }
@@ -276,8 +253,6 @@ public class Control
             if (collider.gameObject == Main.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
-            // Skip non-pickupable items (blood pools) so they don't block picking
-            // up a real item that's slightly farther away.
             if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable)
                 continue;
             distance = Helper.SquaredDistance(collider.transform.position, Main.Player.transform.position);
@@ -314,45 +289,76 @@ public class Control
         }
         else MouseTarget = null;
 
-        // Whether the world cursor should switch to the "Interact" icon: the hovered
-        // target is a right-click interactable or pickupable item within reach.
-        HoverInteract = MouseTarget != null
-            && MouseTarget.gameObject != Main.Player
-            && !Dialogue.Showing
-            && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange
-            && IsHoverInteractable(MouseTarget);
+        bool clicked = Inst.ActionSecondary.KeyDown() && !GUIMain.IsHover;
+        bool sameSpeaker = _dialogueSource != null && _dialogueSource == MouseTarget;
+        bool boxBusy = Dialogue.Showing || (Main.GUIDialogue != null && Main.GUIDialogue.activeSelf);
 
-        if (MouseTarget && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange)
-        { 
-            // GUIMain.IsHover: the pointer rests on a GUI slot/button, so the GUI owns the
-            // click. Without this the station's own right-click (craft/buy/sell) also reaches
-            // whatever stands behind the window and re-interacts with it.
-            if (Inst.ActionSecondary.KeyDown() && !Dialogue.Showing && !GUIMain.IsHover &&
-                MouseTarget.gameObject != Main.Player && Main.PlayerInfo.Machine != null &&
-                Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
-            { 
-                IAction action = MouseTarget.GetComponent<IActionSecondary>();
-                if (action != null)
-                {
-                    if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo itemInfo)
-                    {
-                        // Skip non-pickupable items (e.g. blood pools) — they can't be collected.
-                        if (!itemInfo.item.Info.Pickupable) return;
+        if (clicked && boxBusy && !sameSpeaker)
+        {
+            Dialogue.Show(false);
+            _dialogueSource = null;
+            _pendingInteract = HoveringWorld() && IsHoverInteractable(MouseTarget) ? MouseTarget : null;
+            return;
+        }
 
-                        // Both host and client: state machine handles pathfinding + pickup
-                        Main.PlayerInfo.Target = ((EntityMachine)action).Info;
-                        Main.PlayerInfo.ActionType = IActionType.PickUp;
-                    }
-                    else if (action is IActionSecondaryInteract interact)
-                        interact.OnActionSecondary(Main.PlayerInfo);
-                } 
-            }
-        } 
+        HoverInteract = HoveringWorld() && !Dialogue.Showing && IsHoverInteractable(MouseTarget);
+
+        if (clicked && HoveringWorld() && Main.PlayerInfo.Machine != null)
+            RunInteract(MouseTarget);
     }
 
-    /// <summary>True when the hovered target is something the player can interact with
-    /// by right-clicking: an IActionSecondaryInteract object (chest, door, NPC, …) or
-    /// a pickupable ground item. Non-pickupable items (blood pools) don't count.</summary>
+    private static bool HoveringWorld()
+    {
+        return MouseTarget != null
+            && MouseTarget.gameObject != Main.Player
+            && Vector3.Distance(MousePosition, Main.ViewPortObject.transform.position) < InteractRange;
+    }
+
+    private static void RunInteract(Transform target, bool queued = false)
+    {
+        IAction action = target.GetComponent<IActionSecondary>();
+        if (action == null) return;
+
+        if (action is IActionSecondaryPickUp && ((EntityMachine)action).Info is ItemInfo itemInfo)
+        {
+            if (!queued && (Dialogue.Showing ||
+                !Main.PlayerInfo.Machine.IsCurrentState<DefaultState>()))
+                return;
+
+            if (!itemInfo.item.Info.Pickupable) return;
+
+            Main.PlayerInfo.Target = itemInfo;
+            Main.PlayerInfo.ActionType = IActionType.PickUp;
+        }
+        else if (action is IActionSecondaryInteract interact)
+        {
+            if (!queued && !Main.PlayerInfo.Machine.IsCurrentState<DefaultState>() &&
+                !Dialogue.Showing)
+                return;
+
+            _dialogueSource = target;
+            interact.OnActionSecondary(Main.PlayerInfo);
+        }
+    }
+
+    private static void HandlePendingInteraction()
+    {
+        if (_pendingInteract == null) return;
+
+        if (Dialogue.Showing)
+        {
+            _pendingInteract = null;
+            return;
+        }
+        if (Main.GUIDialogue != null && Main.GUIDialogue.activeSelf) return;
+
+        Transform target = _pendingInteract;
+        _pendingInteract = null;
+        if (Main.PlayerInfo?.Machine == null) return;
+
+        RunInteract(target, true);
+    }
+
     private static bool IsHoverInteractable(Transform target)
     {
         if (!target.TryGetComponent<IActionSecondary>(out IActionSecondary action)) return false;
@@ -371,7 +377,6 @@ public class Control
         
         if (MapCull.YCheck)
         {
-            // Calculate the position in the camera's direction where y = yThreshold 
             float yThreshold = MapCull.YThreshold + 0.05f;
             Vector3 thresholdPoint = ray.origin + ray.direction * ((yThreshold - ray.origin.y) / ray.direction.y);
             

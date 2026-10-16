@@ -20,7 +20,7 @@ public class QuestmasterState : DialogueState
         if (complete)
             Questmaster.CompleteQuest(Machine.transform.position); // drops rewards, clears the quest
 
-        Dialogue = complete
+        DialogueData = complete
             ? CreateCompletionDialogue(quest)
             : CreateObjectiveDialogue(quest);
 

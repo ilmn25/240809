@@ -63,6 +63,14 @@ public class Dialogue
             }
         }
     }
+
+    /// <summary>Refreshes the visible dialogue after replacing the active node.</summary>
+    public static void Refresh()
+    {
+        if (!Showing) return;
+        SetDialogue();
+    }
+
     /// <summary>Shows a one-line event notice (e.g. the full moon rising, a
     /// bandwagon arriving) with a notification sound.</summary>
     public static void ShowEvent(string message)
@@ -95,7 +103,7 @@ public class Dialogue
         if (!Showing) return;
 
         List<KeyValuePair<string, Dialogue>> choices = GetChoices(Target);
-        bool interact = Control.Inst.ActionSecondary.KeyDown() || Control.Inst.ActionSecondaryNear.KeyDown();
+        bool interact = Control.Inst.ActionSecondaryNear.KeyDown();
 
         // Choice menus only reveal early on interact; a number must be pressed.
         if (choices != null)
