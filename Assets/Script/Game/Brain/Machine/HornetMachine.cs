@@ -28,7 +28,7 @@ public class HornetMachine : FlyingEnemyMachine
     {
         Info.targetHitboxType = HitboxType.Friendly; // sting players, NPCs and animals
         base.OnStart();
-        AddState(new MobAttackStopSwing(StingProjectile));
+        AddState(new MobAttackSwing(StingProjectile));
     }
 
     protected override bool IsThreat(Info i)
@@ -40,6 +40,6 @@ public class HornetMachine : FlyingEnemyMachine
     protected override void AttackTarget()
     {
         Info.AimPosition = Info.Target.position;
-        SetState<MobAttackStopSwing>();
+        SetState<MobAttackSwing>();
     }
 }

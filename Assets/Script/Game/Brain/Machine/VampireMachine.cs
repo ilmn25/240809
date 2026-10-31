@@ -50,7 +50,7 @@ public class VampireMachine : GroundMobMachine
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(BiteProjectile));
+        AddState(new MobAttackSwing(BiteProjectile));
         AddState(new EquipSelectState());
     }
 
@@ -68,27 +68,11 @@ public class VampireMachine : GroundMobMachine
 
         if (!IsCurrentState<DefaultState>()) return;
 
-        // Aggressive: lock onto the player on sight, drop them once they flee.
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        bool playerInRange = playerAlive &&
-            Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
-        if (playerInRange && Info.Target != Main.PlayerInfo)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (!playerInRange && Info.Target == Main.PlayerInfo &&
-                 Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage)
-        {
-            Info.CancelTarget();
-        }
+        UpdatePlayerAggro();
 
         if (Info.Target == null)
         {
-            if (Random.value > 0.5f)
-                SetState<MobRoam>();
-            else
-                SetState<MobIdle>();
+            RoamOrIdle();
             return;
         }
 
@@ -100,21 +84,10 @@ public class VampireMachine : GroundMobMachine
             return;
         }
 
-        float dist = Vector3.Distance(Info.Target.position, transform.position);
-        if (dist < Info.DistAttack)
-        {
-            Info.AimPosition = Info.Target.position;
+        if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
             _pendingTeleport = true; // blink away after this attack finishes
-            SetState<MobAttackStopSwing>();
-        }
-        else if (Info.PathingStatus == PathingStatus.Stuck)
-        {
-            SetState<MobRoam>();
-        }
-        else
-        {
-            SetState<MobChase>();
-        }
+
+        EngageTarget();
     }
 
     /// <summary>Called when the vampire is hit — it queues a teleport dodge that

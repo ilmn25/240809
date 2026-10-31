@@ -60,5 +60,49 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
             best = npc;
         return best;
     }
+
+    /// <summary>Lock onto the player on sight and drop them once they retreat past
+    /// disengage range. For mobs that ignore NPCs; <see cref="UpdateAggro"/> also picks
+    /// up friendly NPCs.</summary>
+    protected void UpdatePlayerAggro()
+    {
+        PlayerInfo player = Main.PlayerInfo;
+        bool alive = player != null && !player.Destroyed;
+        bool inRange = alive && Vector3.Distance(player.position, transform.position) < Info.DistAlert;
+
+        if (inRange && Info.Target != player)
+        {
+            Info.Target = player;
+            Info.PathingStatus = PathingStatus.Pending;
+        }
+        else if (!inRange && Info.Target == player &&
+                 Vector3.Distance(player.position, transform.position) > Info.DistDisengage)
+            Info.CancelTarget();
+    }
+
+    /// <summary>Next step of a melee engagement: swing when the target is in reach, roam
+    /// when pathing is stuck, otherwise chase. False when there is no target.</summary>
+    protected bool EngageTarget()
+    {
+        if (Info.Target == null) return false;
+
+        if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
+        {
+            Info.AimPosition = Info.Target.position;
+            SetState<MobAttackSwing>();
+        }
+        else if (Info.PathingStatus == PathingStatus.Stuck)
+            SetState<MobRoam>();
+        else
+            SetState<MobChase>();
+        return true;
+    }
+
+    /// <summary>Wander when there is nothing to fight.</summary>
+    protected void RoamOrIdle()
+    {
+        if (Random.value > 0.5f) SetState<MobRoam>();
+        else SetState<MobIdle>();
+    }
      
 }

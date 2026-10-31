@@ -43,7 +43,7 @@ public class MannequinMachine : GroundMobMachine
         AddState(new MobChase());
         AddState(new MobRoam());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(StrikeProjectile));
+        AddState(new MobAttackSwing(StrikeProjectile));
         AddState(new MobMannequinFrozen());
         AddState(new EquipSelectState());
     }
@@ -51,9 +51,6 @@ public class MannequinMachine : GroundMobMachine
     public override void OnUpdate()
     {
         bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        float playerDist = playerAlive
-            ? Vector3.Distance(Main.PlayerInfo.position, transform.position)
-            : float.MaxValue;
 
         // Weeping-angel freeze: while the player looks at us, we can neither move
         // nor attack.
@@ -68,40 +65,10 @@ public class MannequinMachine : GroundMobMachine
         if (IsCurrentState<MobMannequinFrozen>())
             SetState<DefaultState>();
 
-        bool playerInRange = playerAlive && playerDist < Info.DistAlert;
-        if (playerInRange && Info.Target != Main.PlayerInfo)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (!playerInRange && Info.Target == Main.PlayerInfo && playerDist > Info.DistDisengage)
-        {
-            Info.CancelTarget();
-        }
+        UpdatePlayerAggro();
 
-        if (IsCurrentState<DefaultState>())
-        {
-            if (Info.Target != null)
-            {
-                if (playerDist < Info.DistAttack)
-                {
-                    Info.AimPosition = Info.Target.position;
-                    SetState<MobAttackStopSwing>();
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
-                    SetState<MobRoam>();
-                }
-                else
-                {
-                    SetState<MobChase>();
-                }
-            }
-            else if (Random.value > 0.5f)
-                SetState<MobRoam>();
-            else
-                SetState<MobIdle>();
-        }
+        if (!IsCurrentState<DefaultState>()) return;
+        if (!EngageTarget()) RoamOrIdle();
     }
 
     /// <summary>True when the player's facing (mouse) direction points at us —

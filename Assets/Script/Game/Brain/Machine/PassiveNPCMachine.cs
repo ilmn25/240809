@@ -28,6 +28,11 @@ public abstract class PassiveNPCMachine : GroundMobMachine
     {
         if (IsInteracting || IsCurrentState<MobHit>()) return;
 
+        // A swing that is already playing must finish. Re-deciding every frame cancels
+        // it the moment knockback pushes the target out of reach, so the NPC would
+        // restart the telegraph on every hit it lands and never complete a swing.
+        if (IsCurrentState<MobAttackSwing>()) return;
+
         if (UpdateThreat()) return;
         if (Caravan != null)
         {

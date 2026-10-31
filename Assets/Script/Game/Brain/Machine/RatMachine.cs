@@ -42,7 +42,7 @@ public class RatMachine : GroundMobMachine, IItemThief
         AddState(new MobChase());
         AddState(new MobRoam());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(BiteProjectile));
+        AddState(new MobAttackSwing(BiteProjectile));
         AddState(new EquipSelectState());
     }
 
@@ -78,7 +78,7 @@ public class RatMachine : GroundMobMachine, IItemThief
         if (dist < Info.DistAttack)
         {
             Info.AimPosition = Main.PlayerInfo.position;
-            SetState<MobAttackStopSwing>();
+            SetState<MobAttackSwing>();
             return;
         }
 

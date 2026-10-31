@@ -47,7 +47,7 @@ public class VisitorMachine : GroundMobMachine
         AddState(new MobChaseAction());
         AddState(new MobRoam());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(ClawProjectile));
+        AddState(new MobAttackSwing(ClawProjectile));
         AddState(new MobEscape());
         AddState(new EquipSelectState());
     }
@@ -59,24 +59,13 @@ public class VisitorMachine : GroundMobMachine
         // Enraged: chase and kill the attacker, then flee and despawn.
         if (_enraged)
         {
-            if (Info.Target != null)
-            {
-                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-                {
-                    Info.AimPosition = Info.Target.position;
-                    SetState<MobAttackStopSwing>();
-                }
-                else
-                    SetState<MobChase>();
-            }
+            if (EngageTarget()) return;
+
+            // Target killed or fled — run away, then despawn shortly after.
+            if (++_fleeTimer >= FleeDelay)
+                Leave();
             else
-            {
-                // Target killed or fled — run away, then despawn shortly after.
-                if (++_fleeTimer >= FleeDelay)
-                    Leave();
-                else
-                    SetState<MobEscape>();
-            }
+                SetState<MobEscape>();
             return;
         }
 

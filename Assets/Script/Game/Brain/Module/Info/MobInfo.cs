@@ -67,6 +67,18 @@ public class MobInfo : DynamicInfo
         Target = target;
         ActionType = IActionType.Hit;
     }
+
+    /// <summary>React to being hit: drop what we were doing, take the attacker as the new
+    /// target and play the hit reaction.</summary>
+    protected void Retaliate(Projectile projectile)
+    {
+        if (Target == null)
+            Machine.SetState<DefaultState>();
+
+        Target = projectile.SourceInfo;
+        PathingStatus = PathingStatus.Reached;
+        Machine.SetState<MobHit>();
+    }
     
     protected override void OnUpdate()
     { 
