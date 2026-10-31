@@ -18,6 +18,7 @@ public partial class GUIMenu
     private CoroutineTask _scrollTask;
     private string _toast;
     private CoroutineTask _toastTask;
+    private bool _dying;
     public bool Showing { get; private set; }
 
     public void Show(bool isShow)
@@ -55,8 +56,23 @@ public partial class GUIMenu
 
     public void ShowDeath()
     {
+        if (_dying) return;
+        _dying = true;
+        _ = new CoroutineTask(DeathSequence());
+    }
+
+    /// <summary>Fades to black, tears the world down, then reveals the Game Over screen
+    /// over the empty scene so the death never pops up over the live world.</summary>
+    private IEnumerator DeathSequence()
+    {
+        ScreenFade.FadeOut(0.6f);
+        yield return new WaitForSeconds(0.8f);
+
+        TearDownWorld();
+        _dying = false;
         _screen = MenuScreen.Death;
         Show(true);
+        ScreenFade.FadeIn(1f, 0f);
     }
 
     /// <summary>Hide the menu and clear any transition so a fresh new/loaded game
@@ -403,6 +419,15 @@ public partial class GUIMenu
     {
         ScreenFade.FadeOut(0.5f);
         yield return new WaitForSeconds(0.6f);
+        TearDownWorld();
+        ShowMain();
+        ScreenFade.FadeIn(1f, 0f);
+    }
+
+    /// <summary>Stops game mode, returns players to the pool, unloads the world and stops
+    /// hosting. Callers fade to black first.</summary>
+    private static void TearDownWorld()
+    {
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
         // Return players to the pool while still hosting (they aren't tracked by
@@ -421,7 +446,5 @@ public partial class GUIMenu
         // Reset environment to the bright menu default so the screen isn't black.
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         Environment.Target = EnvironmentType.DaySnow;
-        ShowMain();
-        ScreenFade.FadeIn(1f, 0f);
     }
 }

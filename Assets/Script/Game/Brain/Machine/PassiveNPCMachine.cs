@@ -18,6 +18,7 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         AddState(new MobHit());
         AddState(new MobAttackSwing());
         AddState(new DialogueState(new Dialogue()));
+        AddState(new EquipSelectState());
 
         // Carries a blade to defend itself if attacked.
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
@@ -41,11 +42,6 @@ public abstract class PassiveNPCMachine : GroundMobMachine
     protected void BeginInteraction()
     {
         if (Info.Target is EnemyInfo) Info.CancelTarget();
-    }
-
-    protected void ShowDialogue(string text)
-    {
-        ShowDialogue(new Dialogue { Text = text });
     }
 
     protected void ShowDialogue(Dialogue dialogue)

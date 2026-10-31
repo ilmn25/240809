@@ -15,15 +15,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         BeginInteraction();
 
-        PlayerInfo payer = info as PlayerInfo;
-        if (payer == null) payer = Main.PlayerInfo;
-        if (payer?.Storage == null)
-        {
-            Dialogue.ShowEvent("The guide looks at you expectantly.");
-            return;
-        }
-
-        ShowMenu(payer);
+        ShowMenu(info as PlayerInfo ?? Main.PlayerInfo);
     }
 
     /// <summary>The flower types the payer is short of, FlowerCost being the mark.</summary>
@@ -39,35 +31,22 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     /// <summary>Offers to hire the Guide like the mercenary, or to hear his tips.</summary>
     private void ShowMenu(PlayerInfo payer)
     {
-        Dictionary<string, Dialogue> options = new Dictionary<string, Dialogue>();
-
-        List<ID> missing = MissingFlowers(payer);
-        if (missing.Count == 0)
-        {
-            options[$"Recruit for {FlowerCost} of each flower"] = new Dialogue
-            {
-                Text = $"\"I'll walk with you a while.\" The Guide takes the flowers and joins you for {CompanionDuration:0} seconds.",
-                Sprite = Cache.LoadSprite("Sprite/Guide"),
-                OnOpen = () => CompleteRecruit(payer),
-            };
-        }
-        else
-        {
-            options["Recruit"] = new Dialogue
-            {
-                Text = $"\"I need {FlowerCost} of each flower — still missing {string.Join(", ", missing)}.\"",
-                Sprite = Cache.LoadSprite("Sprite/Guide"),
-            };
-        }
-
-        options["Ask for advice"] = CreateGuideDialogue();
-        options["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" };
+        Sprite portrait = Cache.LoadSprite("Sprite/Guide");
 
         ShowDialogue(new Dialogue
         {
             Text = $"\"Need a hand? {FlowerCost} of each flower buys you a short escort.\"",
-            Sprite = Cache.LoadSprite("Sprite/Guide"),
-            Next = options,
+            Sprite = portrait,
+            Next = new Dictionary<string, Dialogue>
+            {
+                [$"Recruit for {FlowerCost} of each flower"] = new Dialogue
+                {
+                    Text = $"\"I'll walk with you a while.\" The Guide takes the flowers and joins you for {CompanionDuration:0} seconds.",
+                    Sprite = portrait,
+                    OnOpen = () => CompleteRecruit(payer),
+                },
+                ["Ask for advice"] = CreateGuideDialogue(),
+            },
         });
     }
 
