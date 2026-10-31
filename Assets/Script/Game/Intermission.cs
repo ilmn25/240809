@@ -11,8 +11,7 @@ public static class Intermission
     private static readonly string[] NewGameIntro =
     {
         "You wake in the Abyss — a place with no name and no memory of you, though it knows your footsteps.",
-        "Beneath the dark, something breathes in time with your heartbeat... and it has been waiting a very long time.",
-        "Do not fall asleep again."
+        "Beneath the dark, something breathes in time with your heartbeat... and it has been waiting a very long time."
     };
 
     public static void Start(bool playIntro = false)

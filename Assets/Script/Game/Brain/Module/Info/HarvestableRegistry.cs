@@ -107,6 +107,7 @@ public static class HarvestableRegistry
 
         Loot mudPile = new Loot(ID.MudPile);
         mudPile.Add(1f, 3, ID.Mud);
+        mudPile.Add(0.5f, 1, ID.Sticks);
         mudPile.Add(0.2f, 1, ID.Flint);
         mudPile.Add(0.2f, 1, ID.Gravel);
         Register(ID.MudPile, new HarvestableDefinition(mudPile));

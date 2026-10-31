@@ -18,14 +18,14 @@ public static class EnvParticle
 
     public static bool Set(EnvParticles target)
     {
-        if (target == EnvParticles.Null)
-        {
-            return false;
-        }
-
         GameObject particleObject = List[target];
         bool currentlyActive = particleObject.activeSelf;
         particleObject.SetActive(!currentlyActive);
         return !currentlyActive;
+    }
+
+    public static void SetActive(EnvParticles target, bool active)
+    {
+        List[target].SetActive(active);
     }
 }

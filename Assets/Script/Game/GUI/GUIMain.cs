@@ -146,8 +146,16 @@ public static class GUIMain
         string BuildTimeHudText()
         {
             if (Save.Inst == null) return "Day ?, ?";
-            // Countdown to nightfall (sunset at 18:00 = 3/4 through the day).
-            int minutesUntilNight = Mathf.Max(0, Environment.Length * 3 / 4 - Save.Inst.time);
+            if (Save.Inst.time >= Environment.NightStartTime &&
+                Save.Inst.weather is EnvironmentType.NightRainy or EnvironmentType.NightBright)
+            {
+                string nightType = Save.Inst.weather == EnvironmentType.NightBright
+                    ? "Bright"
+                    : "Rainy";
+                return $"Day {Save.Inst.day}, {nightType} night\n{RaidEvent.GetCountdownText()}";
+            }
+
+            int minutesUntilNight = Mathf.Max(0, Environment.NightStartTime - Save.Inst.time);
             return $"Day {Save.Inst.day}, {minutesUntilNight} minutes until night\n{RaidEvent.GetCountdownText()}";
         }
 

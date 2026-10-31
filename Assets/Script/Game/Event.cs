@@ -9,6 +9,7 @@ public static class Event
     static Event()
     {
         RaidEvent.Subscribe();
+        Lightning.Subscribe();
         RainEvent.Subscribe();
         LeafEvent.Subscribe();
         VisitorSpawner.Subscribe();
@@ -40,21 +41,16 @@ public static class Event
 
 public static class RainEvent
 {
-    private const int ToggleChance = 25;
-
     public static void Subscribe()
     {
-        Environment.HourlyTriggered += OnHour;
+        Environment.WeatherChanged += OnWeatherChanged;
     }
 
-    private static void OnHour(int hour, int day)
+    private static void OnWeatherChanged(EnvironmentType weather)
     {
-        if (Random.Range(0, 100) >= ToggleChance) return;
-
-        EnvParticles particleType = Environment.Target == EnvironmentType.DaySnow
-            ? EnvParticles.Snow
-            : EnvParticles.Rain;
-        EnvParticle.Set(particleType);
+        Environment settings = Environment.Environments[weather];
+        EnvParticle.SetActive(EnvParticles.Rain, settings.Rain);
+        EnvParticle.SetActive(EnvParticles.Snow, settings.Snow);
     }
 }
 

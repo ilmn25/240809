@@ -104,6 +104,7 @@ public class Main : MonoBehaviour
         Inventory.Update();
         Control.Update();
         MapCull.Update();
+        Environment.UpdatePlayerLight();
         ViewPort.Update();  
         MobSpawner.Update();
         Lightning.Update();
