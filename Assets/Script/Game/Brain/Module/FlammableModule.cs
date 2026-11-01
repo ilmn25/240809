@@ -57,10 +57,22 @@ public class FlammableModule : EntityModule
         if (info.FireLevel <= 0f) return;
 
         float dt = Helper.GetDeltaTime();
+        _burnTime += dt;
+
+        // Fire lasts exactly one BurnDuration — the same span as the Burn status
+        // effect applied by Ignite. Structures are consumed by it; anything else
+        // (players, mobs) just goes out, which also stops the fire particles.
+        if (_burnTime >= BurnDuration)
+        {
+            if (info is StructureInfo)
+                BurnOut(info);
+            else
+                Extinguish(info);
+            return;
+        }
 
         info.FireLevel = Mathf.Min(1f, info.FireLevel + dt * 0.5f);
 
-        _burnTime += dt;
         _spreadTimer += dt;
         _particleTimer += dt;
         _smokeTimer += dt;
@@ -82,11 +94,22 @@ public class FlammableModule : EntityModule
             _spreadTimer = 0f;
             FireRegistry.SpreadFrom(this);
         }
+    }
 
-        // Structures are consumed by fire; living entities just burn until the
-        // Burn status effect expires (or they die from the damage).
-        if (info is StructureInfo && _burnTime >= BurnDuration)
-            BurnOut(info);
+    /// <summary>Put out the fire without consuming the entity. FireRegistry
+    /// registration is kept so nearby fires can ignite it again later.</summary>
+    private void Extinguish(Info info)
+    {
+        info.FireLevel = 0f;
+        ResetTimers();
+    }
+
+    private void ResetTimers()
+    {
+        _burnTime = 0f;
+        _spreadTimer = 0f;
+        _particleTimer = 0f;
+        _smokeTimer = 0f;
     }
 
     /// <summary>Ignite this entity. Returns true if it started burning.</summary>
@@ -98,10 +121,7 @@ public class FlammableModule : EntityModule
         if (info.FireLevel > 0f) return false;
 
         info.FireLevel = 0.15f;
-        _burnTime = 0f;
-        _spreadTimer = 0f;
-        _particleTimer = 0f;
-        _smokeTimer = 0f;
+        ResetTimers();
 
         // Route the burn damage through the status effect system so it ticks
         // uniformly (structures and living entities) and shows as "Burning".
@@ -115,7 +135,7 @@ public class FlammableModule : EntityModule
     /// <summary>Destroy a structure once it has burned out.</summary>
     private void BurnOut(Info info)
     {
-        info.FireLevel = 0f;
+        Extinguish(info);
         FireRegistry.Unregister(this);
         GetModule<StatusEffectModule>()?.Remove(ID.Burn);
 
