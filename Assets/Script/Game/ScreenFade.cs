@@ -16,12 +16,6 @@ public static class ScreenFade
     private static float _fadeDelay = 0f;    // seconds to hold the current alpha before animating
     private static Texture2D _blackTexture;
 
-    /// <summary>Current overlay alpha (0 = transparent, 1 = black).</summary>
-    public static float Alpha => _alpha;
-
-    /// <summary>True while a fade animation is in progress.</summary>
-    public static bool IsFading => _alpha != _targetAlpha;
-
     private static void EnsureTexture()
     {
         if (_blackTexture == null)

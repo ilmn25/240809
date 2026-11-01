@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Toolbench, ID.Torch, ID.MulchBlock);
+private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Spear, ID.Toolbench, ID.Torch, ID.MulchBlock);
 
     private static readonly ID[] MaterialWants =
     {
@@ -23,7 +23,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
 
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
-        { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Spear, ID.Hammer) },
+        { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Hammer) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap, ID.CrockPot) },
         { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.Sawmill, ID.FieldStation, ID.Scarecrow, ID.Chair, ID.Bookshelf, ID.DriedWell) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },
@@ -32,7 +32,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         { ID.MasonryWorkbench, new PoolDef(0, true, ID.Anvil, ID.Smelter, ID.Furnace, ID.Stonecutter, ID.OwlStatue) },
         { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest) },
         { ID.Stonecutter, new PoolDef(0, true, ID.Brick, ID.BrickBlock) },
-        { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench) },
+        { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench, ID.Shelf) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.OilBarrel, ID.Barrel) },
         { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },

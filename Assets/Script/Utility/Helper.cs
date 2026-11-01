@@ -171,25 +171,6 @@ public static class Helper
         return combined;
     }
 
-    public static void CloneFolder(string sourcePath, string destPath)
-    {
-        string source = SavePath + sourcePath;
-        string dest = SavePath + destPath;
-        DeleteFolder(destPath); 
-        Directory.CreateDirectory(source);
-        Directory.CreateDirectory(dest);
-        foreach (string filePath in Directory.GetFiles(source))
-        {
-            File.Copy(filePath, dest + Path.GetFileName(filePath), true);
-        }
-    }
-    public static void DeleteFolder(string path)
-    {
-        string fullPath = SavePath + path;
-        if (Directory.Exists(fullPath))
-            Directory.Delete(fullPath, true);
-    }
-
     public static void SaveScreenShot(string filePath)
     { 
         Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);

@@ -16,7 +16,6 @@ public class GUI
     private Vector2 _dragOffset;
     public CoroutineTask ScaleTask;
     public bool Showing = true;
-    private GameObject _shadow; 
 
     protected TextMeshProUGUI Text;
     private CoroutineTask _textScrollTask;

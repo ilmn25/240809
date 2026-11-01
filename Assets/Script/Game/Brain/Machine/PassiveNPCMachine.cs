@@ -90,6 +90,13 @@ public abstract class PassiveNPCMachine : GroundMobMachine
              Info.DistDisengage * Info.DistDisengage))
             Info.CancelTarget();
 
+        // Anything that is not an enemy — the player who clipped us with a swing (Retaliate
+        // takes the projectile source), a farm animal that fought back — can never be
+        // engaged here. Drop it: the scan below only runs when there is no target, so
+        // keeping such a target makes the NPC ignore every enemy and idle in place forever.
+        if (Info.Target != null && Info.Target != Caravan?.Info && Info.Target is not EnemyInfo)
+            Info.CancelTarget();
+
         if (Info.Target == null || Info.Target == Caravan?.Info)
         {
             Info.Target = EntityScan.FindNearest(transform.position, Info.DistAlert,

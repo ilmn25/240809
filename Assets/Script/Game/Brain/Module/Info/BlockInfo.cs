@@ -23,6 +23,9 @@ public class BlockInfo : StructureInfo
     {
         World.SetBlock(Coordinate, id == ID.MiningBox ? 0 : Block.ConvertID(id));
         Terraform.PendingBlocks.Remove(Coordinate);
+        // This entity's cell belongs to the terrain now, so drop it from its chunk;
+        // otherwise it is re-spawned every time the chunk reloads.
+        RemoveFromChunk();
     }
 
     public override string ToString()

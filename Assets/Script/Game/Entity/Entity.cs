@@ -54,26 +54,26 @@ public class Entity
                 loot.Add(1, 4, ID.Log);
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 1, ID.Sticks);
-                loot.Add(0.5f, 1, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(0.5f, 2, ID.Sticks);
 
                 AddStructure<BirchTreeMachine>(ID.BirchTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.BirchTree);
                 loot.Add(1, 6, ID.Log);
                 loot.Add(0.8f, 2, ID.Log);
                 loot.Add(0.6f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 1, ID.Sticks);
-                loot.Add(0.5f, 1, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(0.5f, 2, ID.Sticks);
                 
                 AddStructure<OakTreeMachine>(ID.OakTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.OakTree);
                 loot.Add(1, 8, ID.Log);
                 loot.Add(0.8f, 3, ID.Log);
                 loot.Add(0.6f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 3, ID.Sticks);
                 
                 AddStructure<StoneBoulderMachine>(ID.StoneBoulder, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.StoneBoulder);
@@ -351,7 +351,10 @@ public class Entity
                 AddStructure<DriedWellMachine>(ID.DriedWell, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ChairMachine>(ID.Chair, Vector3Int.one, Main.IndexCollide);
                 AddStructure<BookshelfMachine>(ID.Bookshelf, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ShelfMachine>(ID.Shelf, Vector3Int.one, Main.IndexCollide);
                 loot.Add(0.5f, 1, ID.Glass);
+                loot = new (ID.Shelf);
+                loot.Add(1, 1, ID.Shelf);
                 loot = new (ID.Door);
                 loot.Add(1, 2, ID.Plank);
                 loot.Add(0.5f, 1, ID.Plank);

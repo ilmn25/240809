@@ -1,11 +1,8 @@
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public static class Event
 {
-    public static event Action Updated;
-
     static Event()
     {
         RaidEvent.Subscribe();
@@ -29,11 +26,6 @@ public static class Event
     public static Vector3Int SpawnPointAroundPlayer(float distance)
     {
         return SpawnPointAround(Vector3Int.FloorToInt(Main.PlayerInfo.position), distance);
-    }
-
-    public static void TriggerUpdate()
-    {
-        Updated?.Invoke();
     }
 }
  

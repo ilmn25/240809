@@ -7,7 +7,6 @@ public abstract class EntityMachine : Machine, IInfoProvider
     public Entity Entity;
     private bool _initialSetup = false;   
 
-    public static Info NewInfo() => new Info();
     public virtual void OnSetup() {}
     
     public void Initialize(Info info) { 

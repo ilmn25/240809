@@ -81,7 +81,7 @@ public static class Terraform
         // is held, and the cursor is over the world (map or a structure). It stays
         // visible during swings too (no DefaultState requirement).
         Vector3Int cell = Aim.Cell();
-        if (aimVisible && usable && Control.MouseLayer != -1 && World.IsInWorldBounds(cell))
+        if (aimVisible && usable && Control.MouseLayer != -1 && World.IsInWorldBounds(cell) && IsCellPlaceable(cell))
         {
             _blockObj.SetActive(true);
             Position(_blockObj, cell);
@@ -130,30 +130,32 @@ public static class Terraform
             return;
         }
 
-        if (Main.CreativeMode)
-        {
-            if (Target == ID.MiningBox)
-                World.SetBlock(_coordinate);
-            else
-            {
-                Main.PlayerInfo.Storage.CreateAndAddItem(Target);
-                World.SetBlock(_coordinate, Block.ConvertID(Target)); 
-            }
-            return;
-        }
-        
+        // The mining box is an overlay marker on an existing block, not terrain.
         if (Target == ID.MiningBox)
         {
-            // The mining box is an overlay on an existing block — refuse to place it
-            // on empty/unregistered ground so BlockInfo.Initialize doesn't crash.
+            if (Main.CreativeMode)
+            {
+                World.SetBlock(_coordinate);
+                return;
+            }
+            // Refuse to place it on empty/unregistered ground so BlockInfo.Initialize
+            // doesn't crash.
             if (Block.GetBlock(World.GetBlock(_coordinate)) == null)
                 return;
             Entity.Spawn(ID.MiningBox, _coordinate);
             return;
         }
 
+        // Blocks are terrain: writing one in places it outright, no build phase.
+        if (Main.CreativeMode)
+        {
+            Main.PlayerInfo.Storage.CreateAndAddItem(Target);
+            World.SetBlock(_coordinate, Block.ConvertID(Target));
+            return;
+        }
+
         Tutorial.OnBlockPlaced();
-        Entity.Spawn(Target, _coordinate);
+        World.SetBlock(_coordinate, Block.ConvertID(Target));
         RemoveHeldItem();
     }
 
@@ -166,11 +168,21 @@ public static class Terraform
     }
      
     
+    /// <summary>Whether the aimed cell accepts a placement: the mining box is an
+    /// overlay on an existing block, everything else needs an empty cell so placing
+    /// can never silently overwrite terrain (or waste blocks on a filled cell).</summary>
+    private static bool IsCellPlaceable(Vector3Int cell)
+    {
+        return Target == ID.MiningBox
+            ? Block.GetBlock(World.GetBlock(cell)) != null
+            : World.GetBlock(cell) == 0;
+    }
+
     private static bool HandleCoord()
     {
         Vector3Int adjustedPoint = Aim.Cell();
         if (PendingBlocks.Contains(adjustedPoint) || !Scene.InPlayerBlockRange(adjustedPoint, 3) ||
-            !World.IsInWorldBounds(adjustedPoint)) return false; 
+            !World.IsInWorldBounds(adjustedPoint) || !IsCellPlaceable(adjustedPoint)) return false; 
         _coordinate = adjustedPoint;
         return true;
     } 

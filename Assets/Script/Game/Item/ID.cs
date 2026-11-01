@@ -246,4 +246,5 @@ public enum ID
     LeadChunks,
     Lead,
     Exchanger,
+    Shelf,
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
+    private enum MenuScreen { Main, Host, Seed, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
     private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -15,6 +15,8 @@ public partial class GUIMenu
     private MenuScreen _returnScreen;
     private MenuScreen _loadReturn = MenuScreen.Main;
     private MenuScreen _settingsReturn = MenuScreen.Pause;
+    private string _seedInput = "";
+    private const int MaxSeedLength = 9;
     private CoroutineTask _scrollTask;
     private string _toast;
     private CoroutineTask _toastTask;
@@ -111,6 +113,12 @@ public partial class GUIMenu
 
         if (!Showing) return;
 
+        if (_screen == MenuScreen.Seed)
+        {
+            HandleSeedInput();
+            return;
+        }
+
         if (_screen == MenuScreen.Keybind)
         {
             if (Input.GetKeyDown(KeyCode.Escape)) { Audio.PlaySFX(SfxID.Text); _rebinding = false; ShowKeybinds(); return; }
@@ -166,6 +174,9 @@ public partial class GUIMenu
             case MenuScreen.Host:
                 TransitionTo(MenuScreen.Main);
                 break;
+            case MenuScreen.Seed:
+                TransitionTo(MenuScreen.Host);
+                break;
             case MenuScreen.Load:
                 TransitionTo(_loadReturn);
                 break;
@@ -203,7 +214,7 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Host:
-                if (n == 1) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(LoadingThen(() => { ScreenFade.FadeOut(0.3f); Save.Inst = new Save(GenType.Abyss); _ = new CoroutineTask(Server.StartHost()); ResetToNeutral(); })); }
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); _seedInput = string.Empty; TransitionTo(MenuScreen.Seed); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Host; _loadPage = 0; TransitionTo(MenuScreen.Load); }
                 break;
 
@@ -306,6 +317,7 @@ public partial class GUIMenu
         {
             MenuScreen.Main => Header("MORIMORI") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
+            MenuScreen.Seed => Header("New Game") + RenderSeed(),
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
             MenuScreen.Settings => Header("Settings") + RenderSettings(),
@@ -374,6 +386,53 @@ public partial class GUIMenu
         }
         done?.Invoke();
     }
+    /// <summary>Types digits into the seed field (Backspace erases); Enter starts a
+    /// new game with that seed, an empty field means a random seed.</summary>
+    private void HandleSeedInput()
+    {
+        bool changed = false;
+        foreach (char c in Input.inputString)
+        {
+            if (c == '\b')
+            {
+                if (_seedInput.Length > 0)
+                {
+                    _seedInput = _seedInput.Remove(_seedInput.Length - 1);
+                    changed = true;
+                }
+            }
+            else if (c == '\n' || c == '\r')
+            {
+                StartNewGame(_seedInput.Length == 0 ? (int?)null : int.Parse(_seedInput));
+                return;
+            }
+            else if (char.IsDigit(c) && _seedInput.Length < MaxSeedLength)
+            {
+                _seedInput += c;
+                changed = true;
+            }
+        }
+        if (changed) RenderNoScroll();
+    }
+
+    private string RenderSeed()
+    {
+        string value = _seedInput.Length > 0 ? _seedInput + "|" : "| (empty > random)";
+        return $"World Seed\n{value}\n\nType digits, Backspace > Erase\nEnter > Start";
+    }
+
+    private void StartNewGame(int? seed)
+    {
+        Audio.PlaySFX(SfxID.Text);
+        _ = new CoroutineTask(LoadingThen(() =>
+        {
+            ScreenFade.FadeOut(0.3f);
+            Save.Inst = new Save(GenType.Abyss, seed);
+            _ = new CoroutineTask(Server.StartHost());
+            ResetToNeutral();
+        }));
+    }
+
     private string RenderLoad()
     {
         if (Saves.Inst.List.Count == 0)
@@ -385,7 +444,7 @@ public partial class GUIMenu
             int index = start + i;
             if (index >= Saves.Inst.List.Count) break;
             Save save = Saves.Inst.List[index];
-            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players)\n");
+            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players) #{save.seed}\n");
         }
         return sb.ToString();
     }
