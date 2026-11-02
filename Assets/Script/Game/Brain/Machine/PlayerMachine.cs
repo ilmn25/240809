@@ -1,4 +1,5 @@
  
+using System.Collections.Generic;
 using UnityEngine;
  
 public class PlayerMachine : MobMachine, IActionSecondaryInteract
@@ -173,12 +174,21 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     {
         if (Info.Resting)
         {
+            _lootTarget = null;
             Info.CancelTarget();
             return;
         }
         if (Info.PlayerStatus == PlayerStatus.Incapacitated) return;
         if (!IsCurrentState<DefaultState>() && !IsCurrentState<MobChaseAction>()) return;
-        if (Info.ActionType is IActionType.PickUp or IActionType.Interact) return;
+
+        // A pending pickup/interaction owns the brain until it completes or gets dropped.
+        bool waitingOnTarget = Info.ActionType is IActionType.PickUp or IActionType.Interact;
+        if (waitingOnTarget && Info.Target != null) return;
+        if (waitingOnTarget)
+        {
+            if (Info.ActionType == IActionType.PickUp) BlacklistLoot(_lootTarget);
+            Info.ActionType = IActionType.Follow;
+        }
 
         bool lowHealth = Info.Health <= Info.HealthMax / 4;
 
@@ -193,6 +203,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (TryAcquireEnemyTarget())
         {
             Info.ActionType = IActionType.Hit;
+            SetState<MobChaseAction>();
+            return;
+        }
+
+        // Sweep up nearby drops before getting back to work or following.
+        if (TryAcquireLootTarget())
+        {
             SetState<MobChaseAction>();
             return;
         }
@@ -284,6 +301,88 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     private MobInfo FindNearestThreat()
     {
         return EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is MobInfo m && IsThreat(m)) as MobInfo;
+    }
+
+    // ---- Loot pickup ----
+
+    private const float LootRadius = 4f;
+    private const float LootRetryDelay = 30f;
+    private const int LootBlacklistSize = 32;
+
+    // Items this ally already failed to walk to, keyed by uid and holding a retry time.
+    private readonly Dictionary<string, float> _unreachableLoot = new Dictionary<string, float>();
+
+    // The item currently being collected, kept so a cancelled pickup can be blacklisted.
+    private ItemInfo _lootTarget;
+
+    /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.</summary>
+    private bool TryAcquireLootTarget()
+    {
+        if (EntityScan.FindNearest(transform.position, LootRadius, IsWantedLoot) is not ItemInfo item)
+            return false;
+
+        _lootTarget = item;
+        Info.Target = item;
+        Info.ActionType = IActionType.PickUp;
+        // Force the pathing module to repath at the item instead of standing on a
+        // "reached" status left over from following the leader.
+        Info.PathingStatus = PathingStatus.Pending;
+        return true;
+    }
+
+    private bool IsWantedLoot(Info info)
+    {
+        if (info is not ItemInfo item || item.Destroyed) return false;
+        if (item.item == null || item.item.isEmpty() || !item.item.Info.Pickupable) return false;
+        if (!HasRoomFor(item.item)) return false;
+        if (_unreachableLoot.TryGetValue(item.uid, out float retryAt) && Time.time < retryAt) return false;
+        return !IsLootClaimed(item);
+    }
+
+    // Leave it for whoever is already walking to it (the leader, or another ally).
+    private static bool IsLootClaimed(ItemInfo item)
+    {
+        if (Save.Inst?.players == null) return false;
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == null || player.Destroyed) continue;
+            if (player.Target == item &&
+                (player.ActionType == IActionType.PickUp || player.ActionType == IActionType.Interact))
+                return true;
+        }
+        return false;
+    }
+
+    private bool HasRoomFor(ItemSlot slot)
+    {
+        List<ItemSlot> slots = Info.Storage?.List;
+        if (slots == null) return false;
+        foreach (ItemSlot owned in slots)
+        {
+            if (owned == null) continue;
+            if (owned.isEmpty()) return true;
+            if (owned.isSame(slot) && !owned.isFull()) return true;
+        }
+        return false;
+    }
+
+    private void BlacklistLoot(ItemInfo item)
+    {
+        if (item == null) return;
+        _lootTarget = null;
+        // A destroyed item was collected successfully — nothing to blacklist.
+        if (item.Destroyed) return;
+
+        _unreachableLoot[item.uid] = Time.time + LootRetryDelay;
+        if (_unreachableLoot.Count <= LootBlacklistSize) return;
+
+        float now = Time.time;
+        List<string> expired = new List<string>();
+        foreach (KeyValuePair<string, float> entry in _unreachableLoot)
+        {
+            if (entry.Value <= now) expired.Add(entry.Key);
+        }
+        foreach (string uid in expired) _unreachableLoot.Remove(uid);
     }
 
     public override void Attack()
