@@ -110,41 +110,37 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     }
     
     public override void OnUpdate()
-    {   
+    {
         Info.position = transform.position;
 
         bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(Info.uid);
 
-        if (Main.PlayerInfo == Info && !blockedByOther)
-        { 
-            HandleInput();
-            
-            if (IsCurrentState<DefaultState>() && !Info.Resting)
-            {
-                if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact)
-                { 
-                    SetState<MobChaseAction>();
-                }
-                else if (!GUIStorage.HoveringSlot && GUIMain.Map is not { IsOpen: true })
-                {
-                    switch (Info.Equipment?.Info.Type)
-                    {
-                        case ItemType.Tool: 
-                            if (Control.Inst.ActionPrimary.Key() && !IsBugged())
-                                Attack();
-                            break;
-                        case ItemType.Consumable:
-                            if (Control.Inst.ActionPrimary.KeyDown())
-                                SetState<MobConsume>();
-                            break;
-                    }
-                } 
-            } 
-        }
-        else if (!blockedByOther)
+        if (blockedByOther) return;
+        if (Main.PlayerInfo == Info)
         {
-            UpdateAllyBrain();
-        } 
+            HandleInput();
+            if (!IsCurrentState<DefaultState>() || Info.Resting) return;
+
+            if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact)
+            {
+                SetState<MobChaseAction>();
+                return;
+            }
+
+            if (GUIStorage.HoveringSlot || GUIMain.Map is { IsOpen: true }) return;
+            switch (Info.Equipment?.Info.Type)
+            {
+                case ItemType.Tool when Control.Inst.ActionPrimary.Key() && !IsBugged():
+                    Attack();
+                    break;
+                case ItemType.Consumable when Control.Inst.ActionPrimary.KeyDown():
+                    SetState<MobConsume>();
+                    break;
+            }
+            return;
+        }
+
+        UpdateAllyBrain();
     }
      
     // ---- Ally AI (Death Road to Canada style) ----
@@ -214,13 +210,12 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Work a structure: the assigned one, or whatever the leader marked.
-        StructureInfo work = null;
-        if (Info.Target is StructureInfo assigned && Info.ActionType is IActionType.Hit or IActionType.Dig)
-            work = assigned;
-        else if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed &&
-                 Main.PlayerInfo.Target is StructureInfo leaderTask && !leaderTask.Destroyed)
-            work = leaderTask;
+        StructureInfo work = Info.Target is StructureInfo assigned &&
+                             Info.ActionType is IActionType.Hit or IActionType.Dig
+            ? assigned
+            : Main.PlayerInfo?.Target is StructureInfo leaderTask && !leaderTask.Destroyed
+                ? leaderTask
+                : null;
 
         // No compatible tool — don't lock onto it, follow the leader instead.
         if (work != null && Info.Storage.SetTool(work.operationType))
@@ -231,14 +226,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Idle: trail the controlling character.
         if (!IsCurrentState<DefaultState>()) return;
-
-        if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.ActionType = IActionType.Follow;
-        }
+        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
+        Info.Target = Main.PlayerInfo;
+        Info.ActionType = IActionType.Follow;
         SetState<MobChaseAction>();
     }
 
@@ -247,7 +238,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     // away. Unarmed allies just trail.
     private bool TryAcquireEnemyTarget()
     {
-        if (Info.Equipment == null) return false;
+        if (!CanAllyFight()) return false;
         if (Main.PlayerInfo == null) return false; // nothing to defend / follow
 
         Vector3 leaderPos = Main.PlayerInfo.position;
@@ -273,6 +264,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (enemy == null || Vector3.Distance(leaderPos, enemy.position) > Info.DistAlert) return false;
         Info.Target = enemy;
         return true;
+    }
+
+    // Gathering/building tools also have swing projectiles, but allies must not
+    // treat those as weapons when they are carrying out their follow behavior.
+    private bool CanAllyFight()
+    {
+        ProjectileInfo projectile = Info.Equipment?.Info?.ProjectileInfo;
+        return projectile != null && projectile.Damage >= 2;
     }
 
     // Flees from the nearest nearby hostile (used when low on health).
