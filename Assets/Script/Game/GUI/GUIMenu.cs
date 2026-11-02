@@ -417,8 +417,7 @@ public partial class GUIMenu
 
     private string RenderSeed()
     {
-        string value = _seedInput.Length > 0 ? _seedInput + "|" : "| (empty > random)";
-        return $"World Seed\n{value}\n\nType digits, Backspace > Erase\nEnter > Start";
+        return $"World Seed (numbers only): {_seedInput}\n\nBackspace > Erase\nEnter > Start";
     }
 
     private void StartNewGame(int? seed)

@@ -11,9 +11,10 @@ public enum EnvironmentType
 public class Environment
 {
     public const int NightStartTime = 60 * 19;
-    public const float SpawnLightRadius = 30f;
+    public const float SpawnLightRadius = 10f;
     private const float NormalSpotLightIntensity = 4000f;
     private const float BaseSpotLightIntensity = 10000f;
+    private const float SpotLightFadeSpeed = 4000f;
     public static Dictionary<EnvironmentType, Environment> Environments = new ();
     public static event Action<int, int> HourlyTriggered;
     public static event Action<EnvironmentType> WeatherChanged;
@@ -220,14 +221,9 @@ public class Environment
 
         bool isNight = Save.Inst.time >= NightStartTime &&
                        Save.Inst.weather is EnvironmentType.NightRainy or EnvironmentType.NightBright;
-        if (!isNight)
-        {
-            Main.SpotLight.intensity = NormalSpotLightIntensity;
-            return;
-        }
-
-        bool nearSpawn = IsPlayerNearSpawn();
-        Main.SpotLight.intensity = nearSpawn ? BaseSpotLightIntensity : NormalSpotLightIntensity;
+        float target = isNight && IsPlayerNearSpawn() ? BaseSpotLightIntensity : NormalSpotLightIntensity;
+        Main.SpotLight.intensity = Mathf.MoveTowards(Main.SpotLight.intensity, target,
+            SpotLightFadeSpeed * UnityEngine.Time.deltaTime);
     }
 
     private static bool IsPlayerNearSpawn()

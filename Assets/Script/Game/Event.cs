@@ -6,7 +6,6 @@ public static class Event
     static Event()
     {
         RaidEvent.Subscribe();
-        Lightning.Subscribe();
         RainEvent.Subscribe();
         LeafEvent.Subscribe();
         VisitorSpawner.Subscribe();

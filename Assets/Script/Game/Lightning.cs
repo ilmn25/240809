@@ -12,27 +12,20 @@ public static class Lightning
     private const float DamageRadius = 3f;
     private const int Damage = 25;
 
-    private static float _nextStrike;
-
-    public static void Subscribe()
-    {
-        Environment.WeatherChanged += OnWeatherChanged;
-    }
-
-    private static void OnWeatherChanged(EnvironmentType weather)
-    {
-        Environment settings = Environment.Environments[weather];
-        _nextStrike = settings.Lightning
-            ? Random.Range(MinInterval, MaxInterval)
-            : 0f;
-    }
+    // Seconds until the next strike; negative when no strike is scheduled.
+    private static float _nextStrike = -1f;
 
     public static void Update()
     {
         if (!Helper.IsHost() || Save.Inst == null) return;
         if (Save.Inst.players.Count == 0) return;
         Environment settings = Environment.Environments[Save.Inst.weather];
-        if (!settings.Lightning) return;
+        if (!settings.Lightning)
+        {
+            _nextStrike = -1f;
+            return;
+        }
+        if (_nextStrike < 0f) _nextStrike = Random.Range(MinInterval, MaxInterval);
         _nextStrike -= Time.deltaTime;
         if (_nextStrike > 0f) return;
         _nextStrike = Random.Range(MinInterval, MaxInterval);
