@@ -73,15 +73,16 @@ public class Dialogue
 
     /// <summary>Shows a one-line event notice (e.g. the full moon rising, a
     /// bandwagon arriving) with a notification sound.</summary>
-    public static void ShowEvent(string message)
+    public static void ShowEvent(string message, Sprite sprite = null)
     {
-        Target = new Dialogue { Text = message };
+        Target = new Dialogue { Text = message, Sprite = sprite };
         Show(true);
         Audio.PlaySFX(SfxID.Notification);
     }
 
     /// <summary>Shows a multi-page event notice. The player advances through each
-    /// page (ActionSecondary) and it closes after the last one.</summary>
+    /// page (the interact key, or a right click on empty space) and it closes
+    /// after the last one.</summary>
     public static void ShowEventChain(params string[] messages)
     {
         Dialogue next = null;
@@ -102,27 +103,32 @@ public class Dialogue
     {
         if (!Showing) return;
 
-        List<KeyValuePair<string, Dialogue>> choices = GetChoices(Target);
-        bool interact = Control.Inst.ActionSecondaryNear.KeyDown();
+        // Right clicking empty world space advances like the interact key, so
+        // pages can be flipped without reaching for F.
+        bool advance = Control.Inst.ActionSecondaryNear.KeyDown() ||
+            (Control.Inst.ActionSecondary.KeyDown() && !GUIMain.IsHover && Control.CursorOverEmptiness());
 
-        // Choice menus only reveal early on interact; a number must be pressed.
+        List<KeyValuePair<string, Dialogue>> choices = GetChoices(Target);
+
+        // Choice menus only reveal early on advance; a number must be pressed.
         if (choices != null)
         {
             if (_scrollTask != null && _scrollTask.Running)
             {
-                if (interact)
-                {
-                    Audio.PlaySFX(SfxID.Text);
-                    _scrollTask.Stop();
-                    Main.GUIDialogueText.text = _displayText;
-                }
+                if (advance) Advance();
             }
             else
                 HandleChoiceKeys(choices);
             return;
         }
 
-        if (!interact) return;
+        if (advance) Advance();
+    }
+
+    /// <summary>Finishes the text scroll, or moves to the next page and closes
+    /// after the last one. Choice nodes only support finishing the scroll early.</summary>
+    private static void Advance()
+    {
         Audio.PlaySFX(SfxID.Text);
 
         if (_scrollTask != null && _scrollTask.Running)
@@ -131,6 +137,8 @@ public class Dialogue
             Main.GUIDialogueText.text = _displayText;
             return;
         }
+
+        if (ChoicesActive) return;
 
         if (Target.Next != null)
         {

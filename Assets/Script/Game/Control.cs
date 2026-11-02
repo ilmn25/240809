@@ -283,11 +283,6 @@ public class Control
     private static void HandleInput()
     {
         if (GUIMain.CursorActive) return;
-        if (MouseLayer != -1 && MouseLayer != Main.MaskMap)
-        {
-            MouseTarget = _mouseRaycastInfo.collider.transform;
-        }
-        else MouseTarget = null;
 
         bool clicked = Inst.ActionSecondary.KeyDown() && !GUIMain.IsHover;
         bool sameSpeaker = _dialogueSource != null && _dialogueSource == MouseTarget;
@@ -295,9 +290,14 @@ public class Control
 
         if (clicked && boxBusy && !sameSpeaker)
         {
+            // Empty space advances the page (handled by Dialogue.Update); only
+            // another interactable swaps the open dialogue for its own.
+            if (!IsCursorOnInteractable()) return;
+
+            Audio.PlaySFX(SfxID.Text);
             Dialogue.Show(false);
             _dialogueSource = null;
-            _pendingInteract = HoveringWorld() && IsHoverInteractable(MouseTarget) ? MouseTarget : null;
+            _pendingInteract = HoveringWorld() ? MouseTarget : null;
             return;
         }
 
@@ -359,6 +359,20 @@ public class Control
         RunInteract(target, true);
     }
 
+    /// <summary>True when the cursor is over empty or non-interactable world
+    /// space. Re-raycasts first so callers outside <see cref="Update"/> (the
+    /// dialogue, which runs during the intermission too) see the live target.</summary>
+    public static bool CursorOverEmptiness()
+    {
+        HandleRaycast();
+        return !IsCursorOnInteractable();
+    }
+
+    private static bool IsCursorOnInteractable()
+    {
+        return MouseTarget != null && IsHoverInteractable(MouseTarget);
+    }
+
     private static bool IsHoverInteractable(Transform target)
     {
         if (!target.TryGetComponent<IActionSecondary>(out IActionSecondary action)) return false;
@@ -385,6 +399,7 @@ public class Control
                 MouseLayer = Main.MaskMap;
                 MousePosition = Vector3Int.FloorToInt(thresholdPoint); ;
                 MouseDirection = Vector3.down;
+                MouseTarget = null;
                 return;
             }
             ray = new Ray(thresholdPoint, ray.direction);
@@ -400,9 +415,13 @@ public class Control
             MouseLayer = _mouseRaycastInfo.collider.includeLayers; 
             MousePosition = _mouseRaycastInfo.point;
             MouseDirection = ray.direction;
+            MouseTarget = MouseLayer != Main.MaskMap ? _mouseRaycastInfo.collider.transform : null;
         }
         else
+        {
             MouseLayer = -1;
+            MouseTarget = null;
+        }
     }
  
  

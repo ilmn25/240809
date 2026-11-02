@@ -77,9 +77,7 @@ public abstract class PassiveNPCMachine : GroundMobMachine
     /// exit that state, which closes the line on the spot.</summary>
     protected void ShowGreeting(string text, Sprite portrait = null)
     {
-        Dialogue.Target = new Dialogue { Text = text, Sprite = portrait };
-        Dialogue.Show(true);
-        Audio.PlaySFX(SfxID.Notification);
+        Dialogue.ShowEvent(text, portrait);
     }
 
     /// <summary>Opens the trader's station, or closes it when it is already open — the same
