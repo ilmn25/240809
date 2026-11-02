@@ -6,6 +6,11 @@ public class SheepMachine : AnimalMachine
     // Shared scratch buffer for herd scans (results are consumed before the next call).
     private static readonly Collider[] SheepScanBuffer = new Collider[16];
 
+    /// <summary>Minimum seconds between pounces. Sheep attack by jumping, so this
+    /// keeps a retaliating flock from bouncing non-stop.</summary>
+    private const float PounceInterval = 3f;
+    private float _nextPounceTime;
+
     protected override string DialogueText => "baaaa";
 
     public static Info CreateInfo()
@@ -51,7 +56,13 @@ public class SheepMachine : AnimalMachine
         {
             // Retaliate against the player who attacked us (or a flockmate).
             RallyHerd();
-            AttackOrChase();
+            bool inAttackRange = Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack;
+            // Keep closing in, but only pounce once the jump cooldown has elapsed.
+            if (!inAttackRange || Time.time >= _nextPounceTime)
+            {
+                if (inAttackRange) _nextPounceTime = Time.time + PounceInterval;
+                AttackOrChase();
+            }
         }
         else if (playerAlive && playerDist < Info.DistAttack)
         {

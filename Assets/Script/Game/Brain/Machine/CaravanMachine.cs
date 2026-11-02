@@ -50,12 +50,9 @@ public class CaravanMachine : GroundMobMachine
 
         Vector3Int here = Vector3Int.FloorToInt(transform.position);
 
-        // Spawn the camp; the first nomad is the shopkeeper, everyone follows the wagon.
+        // Spawn the camp; everyone follows the wagon.
         for (int i = 0; i < FollowerCount; i++)
-        {
-            NomadMachine nomad = SpawnFollower<NomadMachine>(ID.Nomad, here);
-            if (nomad != null && i == 0) nomad.IsLeader = true;
-        }
+            SpawnFollower<NomadMachine>(ID.Nomad, here);
 
         SpawnFollower<CollectorMachine>(ID.Collector, here);
         SpawnFollower<ExchangerMachine>(ID.Exchanger, here);

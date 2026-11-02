@@ -98,7 +98,7 @@ public class CultistMachine : GroundMobMachine
         int count = 0;
         foreach (var em in EntityDynamicLoad.ActiveEntities)
         {
-            if (em != null && em is ThrallMachine && !em.Info.Destroyed)
+            if (em != null && em.Info.id == ID.Thrall && !em.Info.Destroyed)
                 count++;
         }
         return count;

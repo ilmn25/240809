@@ -16,7 +16,6 @@ public partial class ViewPort
     public static event Action UpdateOrbitRotate;
     public static event Action OnOrbitRotate;
     
-    private static Coroutine _orbitCoroutine; 
     private static float _screenWidth;
     private static float _screenHeight; 
     private static float _targetFOV = 24;
@@ -68,7 +67,6 @@ public partial class ViewPort
  
     public static void HandleScrollInput(float input)
     {  
-        // DISTANCE -= input * FOV_CHANGE_SPEED;
         _targetFOV -= input * FOVChangeSpeed;
         _targetFOV = Mathf.Clamp(_targetFOV, 10, Settings.MaxFOVs[Settings.Inst.MaxFOVIndex]);
     }

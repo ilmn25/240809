@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
+    private enum MenuScreen { Main, Host, Seed, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
     private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -15,9 +15,12 @@ public partial class GUIMenu
     private MenuScreen _returnScreen;
     private MenuScreen _loadReturn = MenuScreen.Main;
     private MenuScreen _settingsReturn = MenuScreen.Pause;
+    private string _seedInput = "";
+    private const int MaxSeedLength = 9;
     private CoroutineTask _scrollTask;
     private string _toast;
     private CoroutineTask _toastTask;
+    private bool _dying;
     public bool Showing { get; private set; }
 
     public void Show(bool isShow)
@@ -55,8 +58,23 @@ public partial class GUIMenu
 
     public void ShowDeath()
     {
+        if (_dying) return;
+        _dying = true;
+        _ = new CoroutineTask(DeathSequence());
+    }
+
+    /// <summary>Fades to black, tears the world down, then reveals the Game Over screen
+    /// over the empty scene so the death never pops up over the live world.</summary>
+    private IEnumerator DeathSequence()
+    {
+        ScreenFade.FadeOut(0.6f);
+        yield return new WaitForSeconds(0.8f);
+
+        TearDownWorld();
+        _dying = false;
         _screen = MenuScreen.Death;
         Show(true);
+        ScreenFade.FadeIn(1f, 0f);
     }
 
     /// <summary>Hide the menu and clear any transition so a fresh new/loaded game
@@ -94,6 +112,12 @@ public partial class GUIMenu
         }
 
         if (!Showing) return;
+
+        if (_screen == MenuScreen.Seed)
+        {
+            HandleSeedInput();
+            return;
+        }
 
         if (_screen == MenuScreen.Keybind)
         {
@@ -150,6 +174,9 @@ public partial class GUIMenu
             case MenuScreen.Host:
                 TransitionTo(MenuScreen.Main);
                 break;
+            case MenuScreen.Seed:
+                TransitionTo(MenuScreen.Host);
+                break;
             case MenuScreen.Load:
                 TransitionTo(_loadReturn);
                 break;
@@ -187,7 +214,7 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Host:
-                if (n == 1) { Audio.PlaySFX(SfxID.Text); _ = new CoroutineTask(LoadingThen(() => { ScreenFade.FadeOut(0.3f); Save.Inst = new Save(GenType.Abyss); _ = new CoroutineTask(Server.StartHost()); ResetToNeutral(); })); }
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); _seedInput = string.Empty; TransitionTo(MenuScreen.Seed); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Host; _loadPage = 0; TransitionTo(MenuScreen.Load); }
                 break;
 
@@ -290,6 +317,7 @@ public partial class GUIMenu
         {
             MenuScreen.Main => Header("MORIMORI") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
+            MenuScreen.Seed => Header("New Game") + RenderSeed(),
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
             MenuScreen.Settings => Header("Settings") + RenderSettings(),
@@ -358,6 +386,52 @@ public partial class GUIMenu
         }
         done?.Invoke();
     }
+    /// <summary>Types digits into the seed field (Backspace erases); Enter starts a
+    /// new game with that seed, an empty field means a random seed.</summary>
+    private void HandleSeedInput()
+    {
+        bool changed = false;
+        foreach (char c in Input.inputString)
+        {
+            if (c == '\b')
+            {
+                if (_seedInput.Length > 0)
+                {
+                    _seedInput = _seedInput.Remove(_seedInput.Length - 1);
+                    changed = true;
+                }
+            }
+            else if (c == '\n' || c == '\r')
+            {
+                StartNewGame(_seedInput.Length == 0 ? (int?)null : int.Parse(_seedInput));
+                return;
+            }
+            else if (char.IsDigit(c) && _seedInput.Length < MaxSeedLength)
+            {
+                _seedInput += c;
+                changed = true;
+            }
+        }
+        if (changed) RenderNoScroll();
+    }
+
+    private string RenderSeed()
+    {
+        return $"World Seed (numbers only): {_seedInput}\n\nBackspace > Erase\nEnter > Start";
+    }
+
+    private void StartNewGame(int? seed)
+    {
+        Audio.PlaySFX(SfxID.Text);
+        _ = new CoroutineTask(LoadingThen(() =>
+        {
+            ScreenFade.FadeOut(0.3f);
+            Save.Inst = new Save(GenType.Abyss, seed);
+            _ = new CoroutineTask(Server.StartHost());
+            ResetToNeutral();
+        }));
+    }
+
     private string RenderLoad()
     {
         if (Saves.Inst.List.Count == 0)
@@ -369,7 +443,7 @@ public partial class GUIMenu
             int index = start + i;
             if (index >= Saves.Inst.List.Count) break;
             Save save = Saves.Inst.List[index];
-            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players)\n");
+            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players) #{save.seed}\n");
         }
         return sb.ToString();
     }
@@ -403,6 +477,15 @@ public partial class GUIMenu
     {
         ScreenFade.FadeOut(0.5f);
         yield return new WaitForSeconds(0.6f);
+        TearDownWorld();
+        ShowMain();
+        ScreenFade.FadeIn(1f, 0f);
+    }
+
+    /// <summary>Stops game mode, returns players to the pool, unloads the world and stops
+    /// hosting. Callers fade to black first.</summary>
+    private static void TearDownWorld()
+    {
         GUIMain.OnGameEnd();
         Main.SceneMode = SceneMode.Menu;
         // Return players to the pool while still hosting (they aren't tracked by
@@ -421,7 +504,5 @@ public partial class GUIMenu
         // Reset environment to the bright menu default so the screen isn't black.
         Environment.SetStartEnvironment(EnvironmentType.DaySnow);
         Environment.Target = EnvironmentType.DaySnow;
-        ShowMain();
-        ScreenFade.FadeIn(1f, 0f);
     }
 }

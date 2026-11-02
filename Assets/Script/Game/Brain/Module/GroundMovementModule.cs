@@ -7,9 +7,7 @@ public class GroundMovementModule : MovementModule
 
     public GroundMovementModule() { updateMode = UpdateMode.Everyone; }
 
-    private float _speedTarget;
     private float _speedAdjust; 
-    private Vector3 _previousPosition;
     private Vector3 _directionBuffer = Vector3.zero;
     private Vector3 _abstractPos;
     public override void Initialize()

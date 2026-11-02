@@ -1,12 +1,7 @@
 
-public enum Tag
-{
-    Busy, Alert, Angry
-}
 public abstract class State
 {
     public static DefaultState DefaultState = new DefaultState();
-    public Tag[] Tags;
     public Machine Machine;
     public State Parent;
     public Info Info => ((EntityMachine)Machine).Info;

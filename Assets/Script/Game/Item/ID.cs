@@ -247,4 +247,5 @@ public enum ID
     Lead,
     Exchanger,
     BloodBlack,
+    Shelf,
 }

@@ -355,14 +355,4 @@ public class PlayerInfo : MobInfo
             Direction.z > 0.001f ? 1f : Direction.z < -0.001f ? -1f : 0f
         );
     }
- 
-    // for later passive effects boosts
-    public float GetRange()
-    {
-        return 1 * Inventory.CurrentItemData.Range;
-    }
-    public float GetSpeed()
-    {
-        return 1 * Inventory.CurrentItemData.Speed;
-    } 
 }

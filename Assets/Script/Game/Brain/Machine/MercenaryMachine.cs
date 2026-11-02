@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
@@ -20,7 +19,7 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         BeginInteraction();
 
-        PlayerInfo payer = (PlayerInfo)info;
+        PlayerInfo payer = info as PlayerInfo ?? Main.PlayerInfo;
 
         int carried = Trade.Count(payer.Storage);
         if (carried < HireCost)
@@ -32,28 +31,19 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
         ShowMenu(payer);
     }
 
-    /// <summary>Offers to hire the mercenary or walk away.</summary>
+    /// <summary>Offers a short contract and hires on the spot.</summary>
     private void ShowMenu(PlayerInfo payer)
     {
-        Dialogue hire = new Dialogue
-        {
-            Text = $"\"Pleasure doing business.\" The mercenary takes the coin and joins you for {CompanionDuration:0} seconds.",
-            OnOpen = () => CompleteHire(payer),
-        };
-
         ShowDialogue(new Dialogue
         {
             Text = $"\"Need a hand? {Trade.Format(HireCost)} for a short contract.\"",
-            Next = new Dictionary<string, Dialogue>
-            {
-                [$"Hire for {Trade.Format(HireCost)}"] = hire,
-                ["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" },
-            },
+            OnOpen = () => CompleteHire(payer),
         });
     }
 
     private void CompleteHire(PlayerInfo payer)
     {
+        if (Save.Inst == null || payer?.Storage == null) return;
         if (!Trade.TrySpend(payer.Storage, HireCost)) return;
 
         PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);

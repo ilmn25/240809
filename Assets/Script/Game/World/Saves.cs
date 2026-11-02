@@ -81,10 +81,13 @@ public class Save
     public bool mawUnlocked;
 
     public Save(){}
-    public Save(GenType gen)
+    public Save(GenType gen) : this(gen, null) {}
+
+    /// <param name="seed">Fixed world seed; null picks a random one.</param>
+    public Save(GenType gen, int? seed)
     {
         current = gen;
-        seed = UnityEngine.Random.Range(1, 1000000);
+        this.seed = seed ?? UnityEngine.Random.Range(1, 1000000);
 
         players = new List<PlayerInfo>();
         worlds = new Dictionary<GenType, World>()

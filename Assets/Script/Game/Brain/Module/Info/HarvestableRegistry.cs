@@ -44,13 +44,13 @@ public static class HarvestableRegistry
     public static void Initialize()
     {
         Loot bush = new Loot(ID.Bush);
-        bush.Add(1f, 1, ID.Sticks);
+        bush.Add(1f, 2, ID.Sticks);
         bush.Add(1f, 1, ID.Berries);
         bush.Add(0.5f, 1, ID.Berries);
         Register(ID.Bush, new HarvestableDefinition(bush, destroyOnHarvest: false, regrowTime: 20f));
 
         Loot grass = new Loot(ID.Grass);
-        grass.Add(0.04f, 1, ID.Sticks, ID.Flint);
+        grass.Add(0.10f, 1, ID.Sticks, ID.Flint);
         grass.Add(0.01f, 1, ID.CornSeed, ID.PumpkinSeed);
         Register(ID.Grass, new HarvestableDefinition(grass));
 
@@ -101,12 +101,13 @@ public static class HarvestableRegistry
         Loot fallenTree = new Loot(ID.FallenTree);
         fallenTree.Add(1f, 1, ID.Log);
         fallenTree.Add(0.5f, 1, ID.Log);
-        fallenTree.Add(0.5f, 1, ID.Sticks);
+        fallenTree.Add(0.7f, 2, ID.Sticks);
         fallenTree.Add(0.25f, 1, ID.Acorn);
         Register(ID.FallenTree, new HarvestableDefinition(fallenTree));
 
         Loot mudPile = new Loot(ID.MudPile);
         mudPile.Add(1f, 3, ID.Mud);
+        mudPile.Add(0.5f, 2, ID.Sticks);
         mudPile.Add(0.2f, 1, ID.Flint);
         mudPile.Add(0.2f, 1, ID.Gravel);
         Register(ID.MudPile, new HarvestableDefinition(mudPile));

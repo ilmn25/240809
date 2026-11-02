@@ -9,6 +9,12 @@ public class Entity
         public Vector3 Bounds;
         public ID PrefabName;
         public Type Machine;
+        /// <summary>Info factory for entities whose machine type is shared by several ids
+        /// (e.g. every armed brute spawns <see cref="HostileMeleeMachine"/>). Null falls
+        /// back to the machine type's static CreateInfo().</summary>
+        public Func<Info> InfoFactory;
+        /// <summary>Combat data for the shared hostile melee brain.</summary>
+        public MeleeEnemy Melee;
         public int Collision;
         public bool StaticLoad;
         public Vector3 SpawnOffset;
@@ -48,26 +54,26 @@ public class Entity
                 loot.Add(1, 4, ID.Log);
                 loot.Add(0.5f, 1, ID.Log);
                 loot.Add(0.5f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 1, ID.Sticks);
-                loot.Add(0.5f, 1, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(0.5f, 2, ID.Sticks);
 
                 AddStructure<BirchTreeMachine>(ID.BirchTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.BirchTree);
                 loot.Add(1, 6, ID.Log);
                 loot.Add(0.8f, 2, ID.Log);
                 loot.Add(0.6f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 1, ID.Sticks);
-                loot.Add(0.5f, 1, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(0.5f, 2, ID.Sticks);
                 
                 AddStructure<OakTreeMachine>(ID.OakTree, new Vector3Int(1, 3, 1), Main.IndexCollide);
                 loot = new (ID.OakTree);
                 loot.Add(1, 8, ID.Log);
                 loot.Add(0.8f, 3, ID.Log);
                 loot.Add(0.6f, 1, ID.Acorn);
-                loot.Add(1, 1, ID.Sticks);
-                loot.Add(0.7f, 2, ID.Sticks);
+                loot.Add(1, 2, ID.Sticks);
+                loot.Add(0.7f, 3, ID.Sticks);
                 
                 AddStructure<StoneBoulderMachine>(ID.StoneBoulder, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.StoneBoulder);
@@ -345,7 +351,10 @@ public class Entity
                 AddStructure<DriedWellMachine>(ID.DriedWell, Vector3Int.one, Main.IndexCollide);
                 AddStructure<ChairMachine>(ID.Chair, Vector3Int.one, Main.IndexCollide);
                 AddStructure<BookshelfMachine>(ID.Bookshelf, Vector3Int.one, Main.IndexCollide);
+                AddStructure<ShelfMachine>(ID.Shelf, Vector3Int.one, Main.IndexCollide);
                 loot.Add(0.5f, 1, ID.Glass);
+                loot = new (ID.Shelf);
+                loot.Add(1, 1, ID.Shelf);
                 loot = new (ID.Door);
                 loot.Add(1, 2, ID.Plank);
                 loot.Add(0.5f, 1, ID.Plank);
@@ -442,11 +451,15 @@ public class Entity
                 loot = new (ID.SnareFlea);
                 loot.Add(0.5f, 6, ID.Sticks); 
                 
-                AddMob<RaiderMachine>(ID.Raider);
+                AddMob<HostileMeleeMachine>(ID.Raider,
+                        () => new EnemyInfo { HealthMax = 16, DistRoam = 7, DistAlert = 12, DistDisengage = 18 },
+                        new MeleeEnemy { Weapon = ID.SteelSword, EvadeChance = 0.1f });
                 loot = new (ID.Raider);
                 loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
 
-                AddMob<RaiderGuardMachine>(ID.RaiderGuard);
+                AddMob<HostileMeleeMachine>(ID.RaiderGuard,
+                        () => new EnemyInfo { HealthMax = 16, DistAlert = 10, DistDisengage = 20, DistRoam = 2 },
+                        new MeleeEnemy { Weapon = ID.SteelSword, EvadeChance = 0.1f });
                 loot = new (ID.RaiderGuard);
                 loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
                 
@@ -462,13 +475,39 @@ public class Entity
                 loot.Add(1, 2, ID.Foul);  
                 loot.Add(0.5f, 1, ID.Wool);  
 
-                AddMob<BearMachine>(ID.Bear);
+                AddMob<HostileMeleeMachine>(ID.Bear,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 42, DistAttack = 2, DistAlert = 16, DistDisengage = 18,
+                                DistRoam = 6, SpeedGround = 4, SpeedAir = 6, PathJump = 2, PathAir = 4,
+                        },
+                        new MeleeEnemy
+                        {
+                                Projectile = new ContactDamageProjectileInfo
+                                {
+                                        Damage = 3, Knockback = 14, CritChance = 0.1f, Radius = 0.9f,
+                                },
+                        });
                 loot = new (ID.Bear);
                 loot.Add(1, 2, ID.Meat);
                 loot.Add(0.5f, 1, ID.Meat);
                 loot.Add(0.4f, 1, ID.Foul);
 
-                AddMob<WatchdogMachine>(ID.Watchdog);
+                AddMob<HostileMeleeMachine>(ID.Watchdog,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 42, DistAttack = 2, DistAlert = 16, DistDisengage = 18,
+                                DistRoam = 6, SpeedGround = 5, SpeedAir = 7, PathJump = 2, PathAir = 4,
+                        },
+                        new MeleeEnemy
+                        {
+                                Projectile = new ContactDamageProjectileInfo
+                                {
+                                        Damage = 2, Knockback = 12, CritChance = 0.1f, Radius = 0.9f,
+                                },
+                                // Predicts melee swings and dodges back out of range.
+                                Setup = mob => mob.AddModule(new MeleeDodgeModule()),
+                        });
                 loot = new (ID.Watchdog);
                 loot.Add(1, 2, ID.Meat);
                 loot.Add(0.5f, 1, ID.Meat);
@@ -499,13 +538,39 @@ public class Entity
                 loot.Add(0.4f, 2, ID.Gunpowder);
                 loot.Add(0.1f, 1, ID.Pistol);
 
-                AddMob<LichMachine>(ID.Lich);
+                AddMob<LichMachine>(ID.Lich,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 200, DistAttack = 2, DistAlert = 30, DistDisengage = 30,
+                                DistRoam = 5, SpeedGround = 0.8f, SpeedAir = 1.0f, SpeedLogic = 0.8f,
+                                PathJump = 1, PathAir = 3,
+                        },
+                        new MeleeEnemy
+                        {
+                                Projectile = new ContactDamageProjectileInfo
+                                {
+                                        Damage = 10, Knockback = 30, CritChance = 0.1f, Radius = 1.2f,
+                                },
+                        });
                 loot = new (ID.Lich);
                 loot.Add(1, 3, ID.DiamondAxe);
                 loot.Add(0.5f, 2, ID.Meat);
                 loot.Add(0.3f, 1, ID.OldRadio);   
 
-                AddMob<CyclopsMachine>(ID.Cyclops);
+                AddMob<HostileMeleeMachine>(ID.Cyclops,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 400, DistAttack = 2, DistAlert = 7, DistDisengage = 16,
+                                DistRoam = 4, SpeedGround = 2.5f, SpeedAir = 3f, SpeedLogic = 2.6f,
+                                PathJump = 1, PathAir = 3,
+                        },
+                        new MeleeEnemy
+                        {
+                                Projectile = new ContactDamageProjectileInfo
+                                {
+                                        Damage = 12, Knockback = 40, CritChance = 0.1f, Radius = 1.4f,
+                                },
+                        });
                 loot = new (ID.Cyclops);
                 loot.Add(1, 2, ID.DiamondAxe);
                 loot.Add(0.7f, 1, ID.Gold);
@@ -551,17 +616,35 @@ public class Entity
                 AddMob<RatMachine>(ID.Rat);
                 loot = new (ID.Rat); // the rat drops nothing
 
-                AddMob<CongregantMachine>(ID.Congregant);
+                AddMob<HostileMeleeMachine>(ID.Congregant,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 18, DistAlert = 12, DistDisengage = 18, DistRoam = 6,
+                                SpeedGround = 4, SpeedAir = 5,
+                        },
+                        new MeleeEnemy { Weapon = ID.CrudeHatchet });
                 loot = new (ID.Congregant);
                 loot.Add(0.5f, 1, ID.CrudeHatchet);
                 loot.Add(0.3f, 1, ID.Foul);
 
-                AddMob<AcolyteMachine>(ID.Acolyte);
+                AddMob<HostileMeleeMachine>(ID.Acolyte,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 18, DistAlert = 12, DistDisengage = 18, DistRoam = 6,
+                                SpeedGround = 4, SpeedAir = 5,
+                        },
+                        new MeleeEnemy { Weapon = ID.Torch });
                 loot = new (ID.Acolyte);
                 loot.Add(0.5f, 1, ID.Torch);
                 loot.Add(0.3f, 1, ID.Foul);
 
-                AddMob<HereticMachine>(ID.Heretic);
+                AddMob<HostileMeleeMachine>(ID.Heretic,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 16, DistAlert = 12, DistDisengage = 18, DistRoam = 6,
+                                SpeedGround = 5, SpeedAir = 6,
+                        },
+                        new MeleeEnemy { Weapon = ID.Dagger });
                 loot = new (ID.Heretic);
                 loot.Add(0.5f, 1, ID.Dagger);
                 loot.Add(0.3f, 1, ID.Foul);
@@ -571,7 +654,19 @@ public class Entity
                 loot.Add(0.5f, 1, ID.Foul);
                 loot.Add(0.3f, 1, ID.BloodBlack);
 
-                AddMob<ThrallMachine>(ID.Thrall);
+                AddMob<HostileMeleeMachine>(ID.Thrall,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 8, DistAlert = 14, DistDisengage = 18, DistRoam = 5,
+                                SpeedGround = 4, SpeedAir = 5, PathJump = 1, PathAir = 3,
+                        },
+                        new MeleeEnemy
+                        {
+                                Projectile = new ContactDamageProjectileInfo
+                                {
+                                        Damage = 1, Knockback = 6, CritChance = 0.05f, Radius = 0.7f,
+                                },
+                        });
                 loot = new (ID.Thrall); // the thrall drops nothing
                   
                 Dictionary.Add(ID.ItemPrefab, new Entity
@@ -586,7 +681,7 @@ public class Entity
                  
         }
 
-        private static void AddMob<T>(ID id) where T : EntityMachine
+        private static void AddMob<T>(ID id, Func<Info> infoFactory = null, MeleeEnemy melee = null) where T : EntityMachine
         {
                 Dictionary.Add(id, new Entity
                 {
@@ -596,6 +691,8 @@ public class Entity
                         Machine = typeof(T),
                         StaticLoad = false,
                         SpawnOffset = MidAir,
+                        InfoFactory = infoFactory,
+                        Melee = melee,
                 });
         }
 
@@ -736,10 +833,14 @@ public class Entity
                         Entity entity = Dictionary[id];
 
                         MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+                        Info info = entity.InfoFactory != null
+                                ? entity.InfoFactory()
+                                : method != null && method.ReturnType == typeof(Info)
+                                        ? (Info)method.Invoke(null, null)
+                                        : null;
 
-                        if (method != null && method.ReturnType == typeof(Info))
+                        if (info != null)
                         {
-                                Info info = (Info)method.Invoke(null, null);
                                 info.id = id;
                                 info.position = worldPosition + entity.SpawnOffset;
                                 return info;

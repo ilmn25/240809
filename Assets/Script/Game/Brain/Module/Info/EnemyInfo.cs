@@ -31,14 +31,8 @@ public class EnemyInfo : MobInfo
     }
 
     protected override void OnHit(Projectile projectile)
-    { 
-        if (Target == null)
-        { 
-            Machine.SetState<DefaultState>(); 
-        } 
-        Target = projectile.SourceInfo;
-        PathingStatus = PathingStatus.Reached;  
-        Machine.SetState<MobHit>();
+    {
+        Retaliate(projectile);
     }
  
 }

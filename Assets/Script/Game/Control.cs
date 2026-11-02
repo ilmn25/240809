@@ -284,27 +284,40 @@ public class Control
     {
         if (GUIMain.CursorActive) return;
 
+        MouseTarget = MouseLayer != -1 && MouseLayer != Main.MaskMap
+            ? _mouseRaycastInfo.collider.transform
+            : null;
+
         bool clicked = Inst.ActionSecondary.KeyDown() && !GUIMain.IsHover;
-        bool sameSpeaker = _dialogueSource != null && _dialogueSource == MouseTarget;
-        bool boxBusy = Dialogue.Showing || (Main.GUIDialogue != null && Main.GUIDialogue.activeSelf);
-
-        if (clicked && boxBusy && !sameSpeaker)
-        {
-            // Empty space advances the page (handled by Dialogue.Update); only
-            // another interactable swaps the open dialogue for its own.
-            if (!IsCursorOnInteractable()) return;
-
-            Audio.PlaySFX(SfxID.Text);
-            Dialogue.Show(false);
-            _dialogueSource = null;
-            _pendingInteract = HoveringWorld() ? MouseTarget : null;
-            return;
-        }
+        if (clicked && HandleDialogueClick()) return;
 
         HoverInteract = HoveringWorld() && !Dialogue.Showing && IsHoverInteractable(MouseTarget);
 
         if (clicked && HoveringWorld() && Main.PlayerInfo.Machine != null)
             RunInteract(MouseTarget);
+    }
+
+    /// <summary>Consumes a right-click while a dialogue box is open. Returns true when the
+    /// click belonged to the dialogue and must not also start an interaction.</summary>
+    private static bool HandleDialogueClick()
+    {
+        bool boxBusy = Dialogue.Showing || (Main.GUIDialogue != null && Main.GUIDialogue.activeSelf);
+        if (!boxBusy) return false;
+
+        bool sameSpeaker = _dialogueSource != null && _dialogueSource == MouseTarget;
+
+        // A plain line from the same speaker is left to Dialogue.Update, which advances
+        // the page. Anything else closes the box; clicking a different target also queues
+        // that target so the interaction resumes once the box is gone.
+        if (sameSpeaker && !Dialogue.ChoicesActive) return true;
+
+        Dialogue.Show(false);
+        _dialogueSource = null;
+
+        if (!sameSpeaker && HoveringWorld() && IsHoverInteractable(MouseTarget))
+            _pendingInteract = MouseTarget;
+
+        return true;
     }
 
     private static bool HoveringWorld()

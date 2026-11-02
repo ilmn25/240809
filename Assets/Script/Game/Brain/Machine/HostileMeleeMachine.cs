@@ -1,50 +1,70 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-/// <summary>Base for hostile melee mobs that chase the player down and freeze to
-/// swing when in range. Provides the shared door-bashing module stack, the
-/// standard melee states, the aggro-on-sight target acquisition, and the common
-/// chase → stop-and-swing brain. Subclasses only supply the attack projectile
-/// (and any special-case OnUpdate hooks).</summary>
-public abstract class HostileMeleeMachine : GroundMobMachine
+/// <summary>Per-id combat data for <see cref="HostileMeleeMachine"/>. Registered with the
+/// entity in <see cref="Entity.Initialize"/>, so an enemy is a row of data — stats, weapon
+/// or natural projectile, dodge chance — instead of its own machine class.</summary>
+public sealed class MeleeEnemy
+{
+    /// <summary>Weapon the mob swings. <see cref="ID.Null"/> when it attacks with
+    /// <see cref="Projectile"/> instead.</summary>
+    public ID Weapon = ID.Null;
+
+    /// <summary>Natural weapon used instead of an equipped item.</summary>
+    public ProjectileInfo Projectile;
+
+    /// <summary>Chance to dodge back instead of swinging when the target is in range.</summary>
+    public float EvadeChance;
+
+    /// <summary>Extra setup the mob needs, such as an additional module.</summary>
+    public Action<HostileMeleeMachine> Setup;
+}
+
+/// <summary>Hostile melee mob: aggroes on sight, chases the target down and freezes to
+/// swing when it closes to melee range. Every armed brute, beast and boss shares this one
+/// brain; what differs between them is the registered <see cref="MeleeEnemy"/> data.</summary>
+public class HostileMeleeMachine : GroundMobMachine
 {
     protected override bool UsesDoorBash => true;
 
-    /// <summary>The melee projectile swung at the target.</summary>
-    protected abstract ProjectileInfo AttackProjectile { get; }
+    private MeleeEnemy _melee;
 
     public override void OnStart()
     {
         base.OnStart();
+
+        _melee = Entity.Dictionary.TryGetValue(Info.id, out Entity data) ? data.Melee : null;
+
         AddState(new MobIdle());
         AddState(new MobChase());
         AddState(new MobRoam());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(AttackProjectile));
+        AddState(new MobAttackSwing(_melee?.Projectile));
         AddState(new EquipSelectState());
+        if (_melee != null && _melee.EvadeChance > 0f)
+            AddState(new MobEvade());
+
+        if (_melee != null && _melee.Weapon != ID.Null)
+            Info.SetEquipment(new ItemSlot(_melee.Weapon));
+
+        _melee?.Setup?.Invoke(this);
     }
 
     public override void OnUpdate()
     {
         UpdateAggro();
+        if (!IsCurrentState<DefaultState>()) return;
 
-        if (!IsCurrentState<DefaultState>())
-            return;
-
-        if (Info.Target != null)
+        // Dodge back instead of swinging every so often.
+        if (_melee != null && _melee.EvadeChance > 0f && Info.Target != null &&
+            Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack &&
+            Random.value < _melee.EvadeChance)
         {
-            if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-            {
-                Info.AimPosition = Info.Target.position;
-                SetState<MobAttackStopSwing>();
-            }
-            else if (Info.PathingStatus == PathingStatus.Stuck)
-                SetState<MobRoam>();
-            else
-                SetState<MobChase>();
+            SetState<MobEvade>();
+            return;
         }
-        else if (Random.value > 0.5f)
-            SetState<MobRoam>();
-        else
-            SetState<MobIdle>();
+
+        if (!EngageTarget()) RoamOrIdle();
     }
 }

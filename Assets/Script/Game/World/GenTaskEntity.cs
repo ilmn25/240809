@@ -280,9 +280,9 @@ public class GenTaskEntity : IGenTask
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.75) > roll) return ID.Flint;
+        if ((chance += 0.55) > roll) return ID.Flint;
         if ((chance += 0.15) > roll) return ID.Gravel;
-        if ((chance += 0.05) > roll) return ID.Sticks;
+        if ((chance += 0.30) > roll) return ID.Sticks;
         return ID.Null;
     }
 
@@ -291,10 +291,9 @@ public class GenTaskEntity : IGenTask
         double roll = rng.NextDouble();
         double chance = 0;
 
-        if ((chance += 0.40) > roll) return ID.Sticks;
+        if ((chance += 0.70) > roll) return ID.Sticks;
         if ((chance += 0.15) > roll) return ID.Mud;
-        if ((chance += 0.55) > roll) return ID.Flint;
-        if ((chance += 0.10) > roll) return ID.Gravel;
+        if ((chance += 0.40) > roll) return ID.Flint;
         return ID.Null;
     }
 

@@ -1,26 +1,31 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/// <summary>Strikes bolts around the player on rainy nights. A lightning rod
-/// within RodRadius catches the bolt and shields that area; otherwise the bolt
-/// deals damage to everything in its blast radius.</summary>
+/// <summary>Strikes bolts around the player when the current environment enables
+/// lightning. Environment data controls timing, range, protection, and damage.</summary>
 public static class Lightning
 {
-    private const float MinInterval = 20f;   // seconds between bolts
+    private const float MinInterval = 20f;
     private const float MaxInterval = 45f;
-    private const float StrikeRange = 30f;   // max distance a bolt lands from the player
-    private const float RodRadius = 10f;      // how close a rod must be to catch a bolt
-    private const float DamageRadius = 3f;   // AoE radius around the impact
+    private const float StrikeRange = 30f;
+    private const float RodRadius = 10f;
+    private const float DamageRadius = 3f;
     private const int Damage = 25;
 
-    private static float _nextStrike;
+    // Seconds until the next strike; negative when no strike is scheduled.
+    private static float _nextStrike = -1f;
 
     public static void Update()
     {
         if (!Helper.IsHost() || Save.Inst == null) return;
         if (Save.Inst.players.Count == 0) return;
-        if (Save.Inst.weather != EnvironmentType.NightRainy) return;
-
+        Environment settings = Environment.Environments[Save.Inst.weather];
+        if (!settings.Lightning)
+        {
+            _nextStrike = -1f;
+            return;
+        }
+        if (_nextStrike < 0f) _nextStrike = Random.Range(MinInterval, MaxInterval);
         _nextStrike -= Time.deltaTime;
         if (_nextStrike > 0f) return;
         _nextStrike = Random.Range(MinInterval, MaxInterval);
@@ -32,10 +37,10 @@ public static class Lightning
             player.z + Random.Range(-StrikeRange, StrikeRange));
 
         Info rod = EntityScan.FindNearest(spot, RodRadius, i => i.id == ID.LightningRod);
-        Strike(rod != null ? rod.position : spot, rod == null);
+        Strike(rod != null ? rod.position : spot, rod == null, settings);
     }
 
-    private static void Strike(Vector3 position, bool dealDamage)
+    private static void Strike(Vector3 position, bool dealDamage, Environment settings)
     {
         Vector3 impact = new Vector3(position.x, position.y + 0.1f, position.z);
         Particle.Create(impact, Particles.Lightning, false);

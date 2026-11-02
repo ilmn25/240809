@@ -9,13 +9,6 @@ using UnityEngine;
 /// </summary>
 public static class BurnUtil
 {
-    /// <summary>Whether the item is marked combustible.</summary>
-    public static bool IsBurnable(ID id)
-    {
-        Item item = Item.GetItem(id);
-        return item != null && item.BurnResult != ID.Null;
-    }
-
     /// <summary>What an item becomes when burned: its burn result if it is
     /// burnable, otherwise the item unchanged.</summary>
     public static ID BurnResultOf(ID id)

@@ -10,13 +10,22 @@ public enum EnvironmentType
 }
 public class Environment
 {
+    public const int NightStartTime = 60 * 19;
+    public const float SpawnLightRadius = 10f;
+    private const float NormalSpotLightIntensity = 4000f;
+    private const float BaseSpotLightIntensity = 10000f;
+    private const float SpotLightFadeSpeed = 4000f;
     public static Dictionary<EnvironmentType, Environment> Environments = new ();
     public static event Action<int, int> HourlyTriggered;
+    public static event Action<EnvironmentType> WeatherChanged;
     public Color AmbientLight;
     public Color FogColor;
     public Color SpotLight;
     public Color DirectionalLight;
     public Color BackgroundColor;
+    public bool Rain;
+    public bool Snow;
+    public bool Lightning;
 
     static Environment()
     {
@@ -58,7 +67,8 @@ public class Environment
             FogColor = Helper.GetColor(146, 146, 146),
             SpotLight = Helper.GetColor(97, 97, 97),
             DirectionalLight = Helper.GetColor(105, 101, 159),
-            BackgroundColor = Helper.GetColor(131, 131, 135)
+            BackgroundColor = Helper.GetColor(131, 131, 135),
+            Snow = true
         });
         Environments.Add(EnvironmentType.Sunset, new Environment
         {
@@ -74,7 +84,9 @@ public class Environment
             FogColor = Color.black,
             SpotLight = Helper.GetColor(97, 97, 97),
             DirectionalLight = Helper.GetColor(91, 56, 255),
-            BackgroundColor = Helper.GetColor(45, 50, 63)
+            BackgroundColor = Helper.GetColor(45, 50, 63),
+            Rain = true,
+            Lightning = true
         });
         Environments.Add(EnvironmentType.NightBright, new Environment
         {
@@ -104,11 +116,12 @@ public class Environment
     }       
      
     public const int Length = 60 * 24;
-    public const float SecondsPerGameMinute = 0.48f;
+    public const float SecondsPerGameMinute = 0.24f;
     private const int TransitionLength = 200;
     private static int _currentTransitionTime;  
     private static EnvironmentType _previous = EnvironmentType.Black;
     private static EnvironmentType _current = EnvironmentType.Black; 
+    private static EnvironmentType _lastWeather = EnvironmentType.Null;
     public static EnvironmentType Target = EnvironmentType.Null;
     private static int Time
     {
@@ -118,7 +131,13 @@ public class Environment
     private static EnvironmentType Weather
     {
         get => Save.Inst.weather;
-        set => Save.Inst.weather = value;
+        set
+        {
+            if (Save.Inst.weather == value) return;
+            Save.Inst.weather = value;
+            _lastWeather = value;
+            WeatherChanged?.Invoke(value);
+        }
     }
 
     /// <summary>
@@ -164,6 +183,11 @@ public class Environment
     public static void Update() 
     {
         if (Save.Inst == null) return;
+        if (_lastWeather != Save.Inst.weather)
+        {
+            _lastWeather = Save.Inst.weather;
+            WeatherChanged?.Invoke(_lastWeather);
+        }
 
         // An explicit Target (menu, intermission) outranks everything; otherwise the
         // dimension's own lighting wins over the weather.
@@ -187,6 +211,28 @@ public class Environment
                 Color.Lerp(previous.DirectionalLight, current.DirectionalLight, t),
                 Color.Lerp(previous.BackgroundColor, current.BackgroundColor, t)); 
         }
+    }
+
+    /// <summary>Boosts the world spotlight during the night near the world spawn.</summary>
+    public static void UpdatePlayerLight()
+    {
+        if (Main.SpotLight == null || Save.Inst == null || Main.PlayerInfo == null || World.Inst == null)
+            return;
+
+        bool isNight = Save.Inst.time >= NightStartTime &&
+                       Save.Inst.weather is EnvironmentType.NightRainy or EnvironmentType.NightBright;
+        float target = isNight && IsPlayerNearSpawn() ? BaseSpotLightIntensity : NormalSpotLightIntensity;
+        Main.SpotLight.intensity = Mathf.MoveTowards(Main.SpotLight.intensity, target,
+            SpotLightFadeSpeed * UnityEngine.Time.deltaTime);
+    }
+
+    private static bool IsPlayerNearSpawn()
+    {
+        Vector3 playerPosition = Main.PlayerInfo.position;
+        Vector3 spawnPosition = World.Inst.SpawnPoint;
+        playerPosition.y = 0f;
+        spawnPosition.y = 0f;
+        return (playerPosition - spawnPosition).sqrMagnitude <= SpawnLightRadius * SpawnLightRadius;
     }
 
     public static void MoveTime(int amount)
@@ -241,7 +287,15 @@ public class Environment
                 Weather = EnvironmentType.Day;
         } 
         else if (Time == 60 * 18)
+        {
             Weather = EnvironmentType.Sunset;
+            if (Main.PlayerInfo != null &&
+                World.Inst != null &&
+                !IsPlayerNearSpawn())
+            {
+                Dialogue.ShowEvent("It will be dark soon. I should stay near base...");
+            }
+        }
         else if (Time == 60 * 19)
             // The full moon (bright night) only rises after day 10.
             if (Save.Inst.day >= 10 && Random.value < 0.7f)

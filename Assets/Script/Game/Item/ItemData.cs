@@ -158,6 +158,7 @@ public partial class Item
         AddStructureDefinition(ID.DriedWell, new Dictionary<ID, int> { { ID.StoneBlock, 6 }, { ID.Plank, 2 } }, 100, furniture: true, description: "A dried-up stone well, long since gone dry.");
         AddStructureDefinition(ID.Chair, new Dictionary<ID, int> { { ID.Plank, 2 } }, 100, furniture: true, description: "A simple wooden chair.");
         AddStructureDefinition(ID.Bookshelf, new Dictionary<ID, int> { { ID.Plank, 4 }, { ID.Paper, 2 } }, 100, furniture: true, description: "A sturdy wooden bookshelf for storing tomes.");
+        AddStructureDefinition(ID.Shelf, new Dictionary<ID, int> { { ID.Log, 6 }, { ID.Sticks, 4 } }, 100, description: "A wooden shelf that holds a stack of stored items.");
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
         AddStructureDefinition(ID.DungeonDoor, null, 200, furniture: true, description: "A heavy brick door that descends into the dungeon depths.");
         AddStructureDefinition(ID.MawDoor, new Dictionary<ID, int> { { ID.StoneBlock, 8 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 200, furniture: true, description: "A heavy brick door that leads to the Maw's extraction facility.");
@@ -381,6 +382,10 @@ public partial class Item
                 CritChance = 10,
                 Speed = 2,
                 Radius = 2,
+                // Breaking only gates which blocks the hammer may place (block break
+                // thresholds are 1-2); how fast building goes is a fixed rate per
+                // second of swinging, so cheap blocks finish in ~5s and stronger ones
+                // take proportionally longer.
                 Breaking = 3,
                 OperationType = OperationType.Building
             },
@@ -526,7 +531,7 @@ public partial class Item
                 Ammo = ID.Spear
             },
             description: "A throwable spear that can pierce enemies.",
-            materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Stake, 2 } },
+            materials: new Dictionary<ID, int> { { ID.Sticks, 3 } },
             projectileOffset: 1.016f,
             stackSize: 20,
             durability: -1,

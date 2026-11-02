@@ -1,29 +1,44 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
-
+/// <summary>Melee attack: telegraph, swing, cooldown. Mobs either swing the weapon they
+/// have equipped (its projectile is spawned through ProjectileSync) or, when handed a
+/// fixed projectile, attack with that and plant their feet while doing it.</summary>
 class MobAttackSwing : MobState {
 
     public MobAttackSwing() { updateMode = global::Module.UpdateMode.Everyone; }
 
+    /// <summary>For mobs that attack with a natural weapon instead of an equipped item.</summary>
+    public MobAttackSwing(ProjectileInfo naturalWeapon) : this()
+    {
+        _naturalWeapon = naturalWeapon;
+    }
+
     private Item _equipment;
+    private readonly ProjectileInfo _naturalWeapon;
     private CoroutineTask _task;
 
     private const float TelegraphTime = 0.1f;
     private const float SwingTime = 0.167f;
     private const float CooldownTime = 1f;
 
-    public void Attack()
+    private void Attack()
     {
-        if (_equipment?.ProjectileInfo != null && Info.Equipment != null)
+        if (_naturalWeapon != null)
         {
-            Vector3 direction = Info.GetDirection();
-            ProjectileSync.SpawnProjectile(Info,
-                Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
-                Info.AimPosition,
-                _equipment.ProjectileInfo,
-                GetTargetHitbox(), Info.Equipment.ID);
-        } 
+            Projectile.Spawn(Info.SpriteToolTrack.position, Info.AimPosition,
+                _naturalWeapon, Info.targetHitboxType, Info);
+            return;
+        }
+
+        if (_equipment?.ProjectileInfo == null || Info.Equipment == null) return;
+
+        Vector3 direction = Info.GetDirection();
+        ProjectileSync.SpawnProjectile(Info,
+            Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
+            Info.AimPosition,
+            _equipment.ProjectileInfo,
+            GetTargetHitbox(), Info.Equipment.ID);
     }
 
     private HitboxType GetTargetHitbox()
@@ -32,20 +47,22 @@ class MobAttackSwing : MobState {
             return HitboxType.Enemy;
         return Info.targetHitboxType;
     }
-    
+
     public override void OnEnterState()
-    { 
+    {
         _task?.Stop();
         _task = null;
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
-        Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0); 
-        _equipment = Info.Equipment.Info; 
-        Info.SpeedModifier = 0.25f;
+        _equipment = Info.Equipment?.Info;
+        if (_equipment != null)
+            Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
+        // Armed mobs keep creeping in; natural attackers freeze until the swing is done.
+        Info.SpeedModifier = _naturalWeapon != null ? 0f : 0.25f;
         Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
         if (Helper.IsHost() || Info.IsOwner())
             _task = new CoroutineTask(SwingRoutine());
     }
-    
+
     private IEnumerator SwingRoutine()
     {
         yield return new WaitForSeconds(TelegraphTime / Info.Animator.speed);
@@ -54,9 +71,9 @@ class MobAttackSwing : MobState {
         Attack();
 
         yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
-        Info.Animator.speed = Main.CreativeMode ? 70 : _equipment.Speed;
-        Audio.PlaySFX(_equipment.Sfx);
-        Info.SpeedModifier = 0.8f;
+        Audio.PlaySFX(_equipment?.Sfx ?? SfxID.HitMob);
+        Info.Animator.speed = Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f);
+        Info.SpeedModifier = _naturalWeapon != null ? 0f : 0.8f;
         Info.Animator.Play("EquipSwingCooldown", 0, 0f);
 
         yield return new WaitForSeconds(CooldownTime / Info.Animator.speed);
@@ -70,7 +87,7 @@ class MobAttackSwing : MobState {
         _task?.Stop();
         _task = null;
         Info.Animator.speed = 1f;
-        Info.Animator.Play("EquipIdle", 0, 0f);  
+        Info.Animator.Play("EquipIdle", 0, 0f);
         Info.SpeedModifier = 1f;
     }
 }

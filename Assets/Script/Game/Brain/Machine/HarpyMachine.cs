@@ -47,80 +47,45 @@ public class HarpyMachine : GroundMobMachine
         AddState(new MobRoam());
         AddState(new MobEvade());
         AddState(new MobHit());
-        AddState(new MobAttackStopSwing(TalonProjectile));
+        AddState(new MobAttackSwing(TalonProjectile));
         AddState(new EquipSelectState());
     }
 
     public override void OnUpdate()
     {
-        if (IsCurrentState<DefaultState>())
+        if (!IsCurrentState<DefaultState>()) return;
+
+        // Aggressive: lock onto the player on sight, drop them once they flee.
+        UpdatePlayerAggro();
+
+        if (Info.Target == null)
         {
-            // Aggressive: lock onto the player on sight, drop them once they flee.
-            bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-            bool playerInRange = playerAlive &&
-                Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
-            if (playerInRange && Info.Target != Main.PlayerInfo)
-            {
-                Info.Target = Main.PlayerInfo;
-                Info.PathingStatus = PathingStatus.Pending;
-            }
-            else if (!playerInRange && Info.Target == Main.PlayerInfo &&
-                     Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage)
-            {
-                Info.CancelTarget();
-            }
-
-            if (Info.Target == null)
-            {
-                _committed = false;
-                if (Random.value > 0.5f)
-                    SetState<MobRoam>();
-                else
-                    SetState<MobIdle>();
-                return;
-            }
-
-            float dist = Vector3.Distance(Info.Target.position, transform.position);
-
-            // Latch onto the attack once enough harpies group up, so a few of them
-            // spreading out mid-dive doesn't make the group re-stalk.
-            if (!_committed && GroupedHarpies() >= GroupAttackCount)
-                _committed = true;
-
-            // Not committed yet — stalk from a distance.
-            if (!_committed)
-            {
-                if (dist < StalkDistance)
-                {
-                    // Too close while stalking: back off to keep the stalk distance.
-                    SetState<MobEvade>();
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
-                    SetState<MobRoam>();
-                }
-                else
-                {
-                    SetState<MobStalk>();
-                }
-                return;
-            }
-
-            // Committed — dive in and attack.
-            if (dist < Info.DistAttack)
-            {
-                Info.AimPosition = Info.Target.position;
-                SetState<MobAttackStopSwing>();
-            }
-            else if (Info.PathingStatus == PathingStatus.Stuck)
-            {
-                SetState<MobRoam>();
-            }
-            else
-            {
-                SetState<MobChase>();
-            }
+            _committed = false;
+            RoamOrIdle();
+            return;
         }
+
+        float dist = Vector3.Distance(Info.Target.position, transform.position);
+
+        // Latch onto the attack once enough harpies group up, so a few of them
+        // spreading out mid-dive doesn't make the group re-stalk.
+        if (!_committed && GroupedHarpies() >= GroupAttackCount)
+            _committed = true;
+
+        // Not committed yet — stalk from a distance.
+        if (!_committed)
+        {
+            if (dist < StalkDistance)
+                SetState<MobEvade>(); // too close while stalking: back off
+            else if (Info.PathingStatus == PathingStatus.Stuck)
+                SetState<MobRoam>();
+            else
+                SetState<MobStalk>();
+            return;
+        }
+
+        // Committed — dive in and attack.
+        EngageTarget();
     }
 
     /// <summary>Counts how many harpies are grouped near this one (including itself).</summary>

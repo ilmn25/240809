@@ -4,7 +4,6 @@ public class RangedProjectileInfo : ProjectileInfo
 {
     public int LifeSpan; 
     public int Penetration; // ignored for now
-    public bool Self = true;
     public bool Stuck = false;
     public bool Lodge = false;
     public bool PickUp = false;

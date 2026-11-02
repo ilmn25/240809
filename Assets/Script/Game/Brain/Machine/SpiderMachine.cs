@@ -51,7 +51,7 @@ public class SpiderMachine : GroundMobMachine
         AddState(new MobEvade());
         AddState(new MobHit());
         _biteProjectile.HitEffect = BiteHitEffect;
-        AddState(new MobAttackStopSwing(_biteProjectile));
+        AddState(new MobAttackSwing(_biteProjectile));
         AddState(new EquipSelectState());
     }
 
@@ -66,7 +66,6 @@ public class SpiderMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
-        // Lay a web behind us occasionally while active, up to a per-spider cap.
         // Lay a web in the morning only (first 8 hours of the day), up to a per-spider cap.
         bool isMorning = Save.Inst.time < 60 * 8;
         if (Helper.IsHost() && isMorning && _websLaid < MaxWebs && ++_webTimer >= 900 && Random.value < 0.4f)
@@ -83,37 +82,22 @@ public class SpiderMachine : GroundMobMachine
         // Spiders only hunt when alerted — stepping on/breaking a web calls
         // Investigate(), or being hit sets a target (EnemyInfo.OnHit). They do
         // NOT aggro on sight, so they stay docile until provoked.
-        if (IsCurrentState<DefaultState>())
+        if (!IsCurrentState<DefaultState>()) return;
+
+        // Erratic: dart sideways every so often while closing in.
+        if (Info.Target != null && Info.PathingStatus != PathingStatus.Stuck &&
+            Vector3.Distance(Info.Target.position, transform.position) >= Info.DistAttack)
         {
-            if (Info.Target != null)
+            if (++_strafeTimer > 90 && Random.value < 0.5f)
             {
-                if (Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)
-                {
-                    Info.AimPosition = Info.Target.position;
-                    SetState<MobAttackStopSwing>();
-                }
-                else if (Info.PathingStatus == PathingStatus.Stuck)
-                {
-                    SetState<MobRoam>();
-                }
-                // Erratic: dart sideways every so often while closing in.
-                else if (++_strafeTimer > 90 && Random.value < 0.5f)
-                {
-                    _strafeTimer = 0;
-                    SetState<MobStrafe>();
-                }
-                else
-                {
-                    SetState<MobChase>();
-                }
+                _strafeTimer = 0;
+                SetState<MobStrafe>();
             }
             else
-            {
-                if (Random.value > 0.5f)
-                    SetState<MobRoam>();
-                else
-                    SetState<MobIdle>();
-            }
+                SetState<MobChase>();
+            return;
         }
+
+        if (!EngageTarget()) RoamOrIdle();
     }
 }

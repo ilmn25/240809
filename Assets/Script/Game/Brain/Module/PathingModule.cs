@@ -26,8 +26,6 @@ public abstract class PathingModule : MobModule
     protected int NextPoint;
     private int _nextPointQueued = -1;
     
-    private float _nextPointDistance; 
-    private float _targetDistance;
     private float _selfMoveDistance;
     private Vector3 _targetPositionPrevious;
     private Vector3 _selfPositionPrevious; 

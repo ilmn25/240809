@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>Base for passive NPCs (merchant, guide, questmaster, nomad). They
-/// flee from attackers but fight back if cornered.</summary>
+/// defend themselves against nearby enemies.</summary>
 public abstract class PassiveNPCMachine : GroundMobMachine
 {
     /// <summary>The wagon this NPC belongs to, set by CaravanMachine when it
@@ -14,13 +14,11 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         base.OnStart();
 
         AddState(new MobIdle(600)); // lingers in place longer than the animals
-        AddState(new MobRoam());
         AddState(new MobChase());
         AddState(new MobHit());
-        AddState(new MobEscapeFight<MobAttackSwing>());
         AddState(new MobAttackSwing());
-        AddState(new EquipSelectState());
         AddState(new DialogueState(new Dialogue()));
+        AddState(new EquipSelectState());
 
         // Carries a blade to defend itself if attacked.
         Info.SetEquipment(new ItemSlot(ID.SteelSword));
@@ -28,41 +26,27 @@ public abstract class PassiveNPCMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
-        if (UpdateEscort()) return;
+        if (IsInteracting || IsCurrentState<MobHit>()) return;
 
-        if (!IsCurrentState<DefaultState>()) return;
+        // A swing that is already playing must finish. Re-deciding every frame cancels
+        // it the moment knockback pushes the target out of reach, so the NPC would
+        // restart the telegraph on every hit it lands and never complete a swing.
+        if (IsCurrentState<MobAttackSwing>()) return;
 
         if (UpdateThreat()) return;
+        if (Caravan != null)
+        {
+            UpdateCaravanFollow(Caravan);
+            return;
+        }
 
+        if (!IsCurrentState<DefaultState>()) return;
         SetState<MobIdle>(); // lingers in place (long idle from OnStart)
     }
 
-    /// <summary>Follows the escort wagon, or handles a threat outranking it. Callers skip
-    /// their usual idling while an interaction or hit reaction is running.</summary>
-    private bool UpdateEscort()
-    {
-        if (Caravan == null) return false;
-
-        if (IsInteracting || IsCurrentState<MobHit>()) return true;
-
-        if (UpdateThreat()) return true;
-
-        UpdateCaravanFollow(Caravan);
-        return true;
-    }
-
-    /// <summary>True while focused on a real threat — the escort wagon doesn't count.</summary>
-    protected bool IsEngaged =>
-        Info.Target != null && (Caravan == null || Info.Target != Caravan.Info);
-
     protected void BeginInteraction()
     {
-        if (IsEngaged) Info.CancelTarget();
-    }
-
-    protected void ShowDialogue(string text)
-    {
-        ShowDialogue(new Dialogue { Text = text });
+        if (Info.Target is EnemyInfo) Info.CancelTarget();
     }
 
     protected void ShowDialogue(Dialogue dialogue)
@@ -95,21 +79,40 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         SetState<T>();
     }
 
-    /// <summary>Handle a real threat: flee it, turning to fight back when cornered, and
-    /// drop it once it gets away. Returns true while a threat is being handled so callers
-    /// can skip their usual idling/escort behavior. The escort wagon never counts.</summary>
+    /// <summary>Handles a nearby threat and returns true while the NPC is busy with it.</summary>
     protected bool UpdateThreat()
     {
-        if (!IsEngaged) return false;
+        if (Info.Target is EnemyInfo enemy &&
+            (enemy.Destroyed ||
+             Helper.SquaredDistance(enemy.position, transform.position) >
+             Info.DistDisengage * Info.DistDisengage))
+            Info.CancelTarget();
 
-        if (Helper.SquaredDistance(Info.Target.position, transform.position) >
-            Info.DistDisengage * Info.DistDisengage)
+        // Anything that is not an enemy — the player who clipped us with a swing (Retaliate
+        // takes the projectile source), a farm animal that fought back — can never be
+        // engaged here. Drop it: the scan below only runs when there is no target, so
+        // keeping such a target makes the NPC ignore every enemy and idle in place forever.
+        if (Info.Target != null && Info.Target != Caravan?.Info && Info.Target is not EnemyInfo)
+            Info.CancelTarget();
+
+        if (Info.Target == null || Info.Target == Caravan?.Info)
         {
-            Info.CancelTarget(); // the threat got away — calm down
-            return false;
+            Info.Target = EntityScan.FindNearest(transform.position, Info.DistAlert,
+                info => info is EnemyInfo threat && !threat.Destroyed);
+            if (Info.Target != null)
+                Info.PathingStatus = PathingStatus.Pending;
         }
 
-        SetState<MobEscapeFight<MobAttackSwing>>(); // flee, but fight back when cornered
+        if (Info.Target is not EnemyInfo) return false;
+
+        if (Helper.SquaredDistance(Info.Target.position, transform.position) <
+            Info.DistAttack * Info.DistAttack)
+        {
+            Info.AimPosition = Info.Target.position;
+            SetState<MobAttackSwing>();
+        }
+        else
+            SetState<MobChase>();
         return true;
     }
 }
