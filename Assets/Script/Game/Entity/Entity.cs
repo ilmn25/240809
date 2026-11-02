@@ -481,7 +481,7 @@ public class Entity
                 AddMob<ViperMachine>(ID.Viper);
                 loot = new (ID.Viper);
                 loot.Add(1, 2, ID.SpiderWeb);
-                loot.Add(0.5f, 1, ID.Blood);
+                loot.Add(0.5f, 1, ID.BloodBlack);
 
                 AddMob<SawbladeMachine>(ID.Sawblade);
                 loot = new (ID.Sawblade);
@@ -531,7 +531,7 @@ public class Entity
 
                 AddMob<VampireMachine>(ID.Vampire);
                 loot = new (ID.Vampire);
-                loot.Add(0.3f, 1, ID.Blood);
+                loot.Add(0.3f, 1, ID.BloodBlack);
                 loot.Add(0.1f, 1, ID.Foul);
 
                 AddMob<DemonEyeMachine>(ID.DemonEye);
@@ -569,7 +569,7 @@ public class Entity
                 AddMob<CultistMachine>(ID.Cultist);
                 loot = new (ID.Cultist);
                 loot.Add(0.5f, 1, ID.Foul);
-                loot.Add(0.3f, 1, ID.Blood);
+                loot.Add(0.3f, 1, ID.BloodBlack);
 
                 AddMob<ThrallMachine>(ID.Thrall);
                 loot = new (ID.Thrall); // the thrall drops nothing

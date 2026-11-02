@@ -119,7 +119,7 @@ public enum ID
     Rubble,
     Ash,
     Rapier,
-    Blood,
+    BloodRed,
     Berries,
     Door,
     Generator,
@@ -246,4 +246,5 @@ public enum ID
     LeadChunks,
     Lead,
     Exchanger,
+    BloodBlack,
 }

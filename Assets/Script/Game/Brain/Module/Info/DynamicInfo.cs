@@ -142,10 +142,11 @@ public class DynamicInfo : Info
         Health -= projectile.Info.GetDamage() - Defense;
         if (!(IsNPC && Machine.IsInteracting))
             KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
-        Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), Particles.Blood, false);
+        bool blackBlood = HitboxType == HitboxType.Enemy;
+        Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), blackBlood ? Particles.BloodBlack : Particles.BloodRed, false);
         // Leave a non-pickupable blood pool on the ground that despawns offscreen.
         if (Helper.IsHost())
-            Entity.SpawnItem(ID.Blood, Machine.transform.position, stackOnSpawn: false);
+            Entity.SpawnItem(blackBlood ? ID.BloodBlack : ID.BloodRed, Machine.transform.position, stackOnSpawn: false);
         // Only a user-controlled player acquires a target from hitting something;
         // AI allies (controllerId == -1) shouldn't lock onto whatever they swing at.
         if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.controllerId != -1)

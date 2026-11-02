@@ -73,7 +73,7 @@ public class ItemInfo : Info
 
     public void OnActionSecondary(Info info)
     {        
-        // Non-pickupable items (blood) can't be collected.
+        // Non-pickupable items (blood pools) can't be collected.
         if (!item.Info.Pickupable) return;
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
