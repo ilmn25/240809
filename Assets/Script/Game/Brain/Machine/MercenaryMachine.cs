@@ -20,13 +20,7 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         BeginInteraction();
 
-        PlayerInfo payer = info as PlayerInfo;
-        if (payer == null) payer = Main.PlayerInfo;
-        if (payer?.Storage == null)
-        {
-            Dialogue.ShowEvent("The mercenary looks at you expectantly.");
-            return;
-        }
+        PlayerInfo payer = (PlayerInfo)info;
 
         int carried = Trade.Count(payer.Storage);
         if (carried < HireCost)
@@ -60,7 +54,6 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     private void CompleteHire(PlayerInfo payer)
     {
-        if (Save.Inst == null || payer?.Storage == null) return;
         if (!Trade.TrySpend(payer.Storage, HireCost)) return;
 
         PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);

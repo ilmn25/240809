@@ -15,15 +15,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         BeginInteraction();
 
-        PlayerInfo payer = info as PlayerInfo;
-        if (payer == null) payer = Main.PlayerInfo;
-        if (payer?.Storage == null)
-        {
-            Dialogue.ShowEvent("The guide looks at you expectantly.");
-            return;
-        }
-
-        ShowMenu(payer);
+        ShowMenu((PlayerInfo)info);
     }
 
     /// <summary>The flower types the payer is short of, FlowerCost being the mark.</summary>
@@ -36,7 +28,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
         return missing;
     }
 
-    /// <summary>Offers to hire the Guide like the mercenary, or to hear his tips.</summary>
+    /// <summary>Offers to hire the Guide like the mercenary.</summary>
     private void ShowMenu(PlayerInfo payer)
     {
         Dictionary<string, Dialogue> options = new Dictionary<string, Dialogue>();
@@ -60,7 +52,6 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
             };
         }
 
-        options["Ask for advice"] = CreateGuideDialogue();
         options["Leave"] = new Dialogue { Text = "\"Stay safe out there.\"" };
 
         ShowDialogue(new Dialogue
@@ -74,7 +65,6 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     /// <summary>Pays the flowers and spawns a temporary Guide companion, like a hired mercenary.</summary>
     private void CompleteRecruit(PlayerInfo payer)
     {
-        if (Save.Inst == null || payer?.Storage == null) return;
         if (MissingFlowers(payer).Count > 0) return;
 
         foreach (ID flower in FlowerTypes)
@@ -88,27 +78,6 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
 
         Info.Destroy();
         Unload();
-    }
-
-    // Steps the player through the early-game progression. Pressing the interact
-    // key again advances to the next tip.
-    private static Dialogue CreateGuideDialogue()
-    {
-        Dialogue tip(string text, Dialogue next = null)
-        {
-            return new Dialogue
-            {
-                Text = text,
-                Sprite = Cache.LoadSprite("Sprite/Guide"),
-                Next = next == null ? null : new Dictionary<string, Dialogue> { [""] = next },
-            };
-        }
-
-        return tip("Are you also a delver?, welcome to the Abyss!",
-            tip("The Abyss is a dangerous place.",
-                tip("You can craft items using the resources you find.",
-                    tip("You can also build structures to protect yourself.",
-                        tip("Good luck!")))));
     }
 
     public void OnDrawGizmos()
