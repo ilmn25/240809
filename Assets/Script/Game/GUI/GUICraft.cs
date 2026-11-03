@@ -1,3 +1,5 @@
+using System.Text;
+
 public class GUICraft : GUIStorage
 {
     protected override string PanelSprite => "GUI/Crafting";
@@ -29,9 +31,40 @@ public class GUICraft : GUIStorage
                 int carried = Main.PlayerInfo?.Storage?.GetAmount(slot.ID) ?? 0;
                 return $"{slot.Info.Name}\nsells for {Trade.Format(Trade.Worth(slot.ID))} (you have {carried})";
             }
-            return $"{slot.Info.Name}\n{slot.ToString(ItemRecipe.GetRecipe(slot.ID) != null)}";
+            return $"{slot.Info.Name}\n{CraftingDetails(slot)}";
         }
     }
+
+    private static string CraftingDetails(ItemSlot slot)
+    {
+        ItemRecipe recipe = ItemRecipe.GetRecipe(slot.ID);
+        if (recipe == null) return slot.ToString(false);
+
+        StringBuilder text = new StringBuilder(slot.ToString(false));
+        text.Append("\n \ningredients:");
+        foreach (var ingredient in recipe.Ingredients)
+        {
+            int available = Main.PlayerInfo?.Storage?.GetAmount(ingredient.Key) ?? 0;
+            if (GUIMain.Storage != null && GUIMain.Storage.Showing)
+                available += GUIMain.Storage.Storage.GetAmount(ingredient.Key);
+
+            Item ingredientItem = Item.GetItem(ingredient.Key);
+            string color = available < ingredient.Value
+                ? "#FF5555"
+                : RarityColor(ingredientItem.Rarity);
+            text.Append($"\n<color={color}>{ingredientItem.Name} ({available}/{ingredient.Value})</color>");
+        }
+
+        return text.ToString();
+    }
+
+    private static string RarityColor(ItemRarity rarity) => rarity switch
+    {
+        ItemRarity.Rare => "#55AAFF",
+        ItemRarity.Epic => "#C66CFF",
+        ItemRarity.Legendary => "#FFAA33",
+        _ => "#FFFFFF",
+    };
 
     public void UseDefaultStorage()
     {

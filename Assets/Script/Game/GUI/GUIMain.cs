@@ -263,7 +263,7 @@ public static class GUIMain
             return;
 
         Main.GUIMenu.text = text;
-        _craftingTextTask = TextScroller.HandleScroll(Main.GUIMenu, speed: 1150);
+        _craftingTextTask = TextScroller.HandleScroll(Main.GUIMenu, speed: 150);
     }
 
     public static void Show(bool isShow)
