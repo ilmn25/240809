@@ -23,10 +23,19 @@
             
             IEnumerator ScrollText(string line, TextMeshProUGUI textBox, int speed, CoroutineTask scrollTask = null)
             { 
-                foreach (var letter in line.ToCharArray())        
-                {  
-                    textBox.text += letter;
-                    yield return new WaitForSeconds(1f / speed);
+                float progress = 0;
+                int shown = 0;
+                while (shown < line.Length)
+                {
+                    progress += Time.unscaledDeltaTime * speed;
+                    int target = Mathf.Min(line.Length, Mathf.FloorToInt(progress));
+                    if (target > shown)
+                    {
+                        textBox.text = line.Substring(0, target);
+                        shown = target;
+                    }
+
+                    yield return null;
                 }
             }
         }

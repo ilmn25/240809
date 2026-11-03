@@ -7,6 +7,9 @@ public static class GUIMain
     private const float HideDuration = 0.2f;
     
     private static CoroutineTask _showTask;
+    private static CoroutineTask _craftingTextTask;
+    private static string _craftingText;
+    private static bool _menuWasShowing;
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
     public static GUICraft GUICraft;
@@ -156,7 +159,8 @@ public static class GUIMain
             }
 
             int minutesUntilNight = Mathf.Max(0, Environment.NightStartTime - Save.Inst.time);
-            return $"Day {Save.Inst.day}, {minutesUntilNight} minutes until night\n{RaidEvent.GetCountdownText()}";
+            string countdown = Helper.FormatDuration(minutesUntilNight * Environment.SecondsPerGameMinute);
+            return $"Day {Save.Inst.day}, {countdown} until night\n{RaidEvent.GetCountdownText()}";
         }
 
         string BuildCameraDirText()
@@ -235,6 +239,7 @@ public static class GUIMain
 
         string tutorial = Tutorial.BuildHudText();
         string effects = Main.PlayerInfo?.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
+        UpdateCraftingMenuText();
         Main.GUIHudText.text =
             $"{BuildTimeHudText()} | {BuildCameraDirText()}\n" +
             (controlStatus.Length > 0 ? controlStatus + "\n" : "") +
@@ -242,6 +247,23 @@ public static class GUIMain
             (effects.Length > 0 ? "\nEffects: " + effects : "") +
             (tutorial.Length > 0 ? "\n" + tutorial : "") +
             "\n" + BuildShortcutsText();
+    }
+
+    private static void UpdateCraftingMenuText()
+    {
+        string text = GUIMenu.Showing ? "" : GUIStorage.Hovered?.HoveredItemText ?? "";
+        bool menuStateChanged = _menuWasShowing != GUIMenu.Showing;
+        _menuWasShowing = GUIMenu.Showing;
+        if (text == _craftingText && !menuStateChanged) return;
+
+        _craftingTextTask?.Stop();
+        _craftingText = text;
+        Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || text.Length > 0);
+        if (text.Length == 0)
+            return;
+
+        Main.GUIMenu.text = text;
+        _craftingTextTask = TextScroller.HandleScroll(Main.GUIMenu, speed: 1150);
     }
 
     public static void Show(bool isShow)

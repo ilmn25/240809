@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class GUIChest : GUIStorage
 {
+    protected override string PanelSprite =>
+        ReferenceEquals(this, GUIMain.StorageInv) ? "GUI/Inventory" : "GUI/Container";
+
     protected override void ActionPrimaryDown()
     {
         if (Storage.List[CurrentSlotKey].isEmpty() && GUICursor.Data.isEmpty())
@@ -97,15 +100,6 @@ public class GUIChest : GUIStorage
             Storage.NotifyChanged();
         }
     }
-    protected override void SetInfoPanel(ItemSlot itemSlot)
-    {
-        string cost = null;
-        if (GUIMain.StorageInv == this && GUIMain.GUICraft is { Mode: TradeMode.Shop } shop && shop.ActiveCraftInfo.WantsItem(itemSlot.ID))
-            cost = $"sell for {Trade.Format(Trade.SellPrice(itemSlot.ID) * itemSlot.Stack)} (shift-click)";
-
-        GUIMain.Cursor.SetItemSlotInfo(itemSlot, false, cost);
-    }
-
     /// <summary>Sells the hovering slot's stack to the open shop, when it deals in that item.</summary>
     private bool TrySell(ItemSlot slot)
     {

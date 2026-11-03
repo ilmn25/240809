@@ -1,8 +1,7 @@
-using Mirror;
-using UnityEngine;
-
 public class GUICraft : GUIStorage
 {
+    protected override string PanelSprite => "GUI/Crafting";
+
     public Storage DefaultStorage;
     public CraftInfo ActiveCraftInfo { get; private set; }
     /// <summary>What clicking a slot does while a window is open. Crafting is the default, so
@@ -16,6 +15,23 @@ public class GUICraft : GUIStorage
         TradeMode.Sell => "sell",
         _ => "craft",
     };
+
+    /// <summary>Details for the hovered recipe.</summary>
+    public override string HoveredItemText
+    {
+        get
+        {
+            if (CurrentSlot is not { Stack: > 0 } slot) return "";
+            if (Mode == TradeMode.Shop)
+                return $"{slot.Info.Name}\nprice: {Trade.Format(Trade.Worth(slot.ID))}";
+            if (Mode == TradeMode.Sell)
+            {
+                int carried = Main.PlayerInfo?.Storage?.GetAmount(slot.ID) ?? 0;
+                return $"{slot.Info.Name}\nsells for {Trade.Format(Trade.Worth(slot.ID))} (you have {carried})";
+            }
+            return $"{slot.Info.Name}\n{slot.ToString(ItemRecipe.GetRecipe(slot.ID) != null)}";
+        }
+    }
 
     public void UseDefaultStorage()
     {
@@ -111,29 +127,4 @@ public class GUICraft : GUIStorage
         StorageSync.SendCraftUpdate(ActiveCraftInfo.uid, Storage, ActiveCraftInfo.Pending);
     }
 
-    protected override void SetInfoPanel(ItemSlot itemSlot)
-    {
-        if (Mode == TradeMode.Shop)
-        {
-            string cost = $"price: {Trade.Format(Trade.Worth(itemSlot.ID))} " +
-                          $"(you have {Trade.Format(Trade.Count(Main.PlayerInfo?.Storage))})";
-            GUIMain.Cursor.SetItemSlotInfo(itemSlot, false, cost);
-            return;
-        }
-
-        if (Mode == TradeMode.Sell)
-        {
-            int carried = Main.PlayerInfo?.Storage?.GetAmount(itemSlot.ID) ?? 0;
-            GUIMain.Cursor.SetItemSlotInfo(itemSlot, false,
-                $"sells for {Trade.Format(Trade.Worth(itemSlot.ID))} (you have {carried})");
-            return;
-        }
-
-        GUIMain.Cursor.SetItemSlotInfo(itemSlot, ShowIngredients(itemSlot.ID));
-    }
-
-    private static bool ShowIngredients(ID id)
-    {
-        return ItemRecipe.GetRecipe(id) != null;
-    }
 }

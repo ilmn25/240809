@@ -85,6 +85,12 @@ public static class Helper
         return $"{hour12}:{minutes % 60:00} {suffix}";
     }
 
+    public static string FormatDuration(float seconds)
+    {
+        int total = Mathf.CeilToInt(Mathf.Max(0f, seconds));
+        return $"{total / 60}:{total % 60:00}";
+    }
+
     public static string ToDisplayName(ID id, bool lowercase = false)
     {
         string text = Regex.Replace(id.ToString(), "(?<!^)([A-Z])", " $1");

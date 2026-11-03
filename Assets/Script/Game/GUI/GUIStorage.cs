@@ -2,19 +2,21 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-public class  GUIStorage : GUI
+public abstract class GUIStorage : GUI
 {  
     public EventHandler OnRefreshSlot;
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
     private int _cooldown = 0;
-    private int _cooldownSpeed = 40;
+    private int _cooldownSpeed = 40;    
     
     public Storage Storage; 
     public int RowAmount = 1;
     public int SlotAmount = 9;
+    protected abstract string PanelSprite { get; }
     protected int CurrentSlotKey = -1;
     /// <summary>True while the mouse is over any storage slot (inventory management
     /// takes priority over cursor quick-actions).</summary>
@@ -32,6 +34,8 @@ public class  GUIStorage : GUI
         GameObject = Object.Instantiate(Resources.Load<GameObject>($"Prefab/GUIStorage"),
             Main.GUIInv.transform);
         Text = GameObject.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+        GameObject.transform.Find("Panel").GetComponent<Image>().sprite =
+            Cache.LoadSprite(PanelSprite);
         GameObject.GetComponent<HoverModule>().GUI = this;
         Rect = GameObject.GetComponent<RectTransform>();
         base.Initialize();
@@ -126,18 +130,23 @@ public class  GUIStorage : GUI
         
         if (currentSlotKey == -1)
         {
-            GUIMain.Cursor.SetItemSlotInfo();
             GUIMain.InfoPanel.Set();
             return;
         } 
-        ItemSlot slot = Storage.List[currentSlotKey];
-        if (slot.Stack != 0)
-        { 
-            SetInfoPanel(slot);
-            return;
-        }
-        GUIMain.Cursor.SetItemSlotInfo();
         GUIMain.InfoPanel.Set();
     }
-    protected virtual void SetInfoPanel(ItemSlot itemSlot) { }
+    public virtual string HoveredItemText
+    {
+        get
+        {
+            return CurrentSlot is not { Stack: > 0 } slot
+                ? ""
+                : $"{slot.Info.Name}\n{slot.ToString(false)}";
+        }
+    }
+
+    protected ItemSlot CurrentSlot =>
+        CurrentSlotKey >= 0 && Storage != null && CurrentSlotKey < Storage.List.Count
+            ? Storage.List[CurrentSlotKey]
+            : null;
 }
