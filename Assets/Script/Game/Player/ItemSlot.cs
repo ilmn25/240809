@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text;
 
 [System.Serializable]
 public class ItemSlot
@@ -34,79 +35,98 @@ public class ItemSlot
         Durability = Item.GetItem(id).Durability;
     }
     
-    private string IngredientText(KeyValuePair<ID, int> ingredient)
+    /// <summary>Name plus the stack count for items that stack: "wood x 5".</summary>
+    public string Title
     {
-        int have = Main.PlayerInfo?.Storage?.GetAmount(ingredient.Key) ?? 0;
-        return $"{Item.GetItem(ingredient.Key).Name} ({have}/{ingredient.Value})";
-    }
-
-    private string IngredientsText(bool ingredients)
-    {
-        if (!ingredients) return "";
-        ItemRecipe recipe = ItemRecipe.GetRecipe(ID);
-        if (recipe == null) return "";
-
-        string text = " \n \ningredients: ";
-        foreach (var ingredient in recipe.Ingredients)
-            text += "\n" + IngredientText(ingredient);
-        return text;
-    }
-
-    public string ToString(bool ingredients, string cost = null)
-    {
-        string stats = Info.Type switch
+        get
         {
-            ItemType.Structure => "structure",
-            ItemType.Block or ItemType.Material => Stack + "x",
-            ItemType.Consumable => Stack + "x" + ConsumableStats(),
-            ItemType.Tool => ToolStats(),
-            _ => null,
-        };
-        if (stats == null) return "";
+            bool stacks = Info.Type is ItemType.Block or ItemType.Material or ItemType.Consumable;
+            return stacks ? $"{Info.Name} x {Stack}" : Info.Name;
+        }
+    }
 
-        string costBlock = cost == null
-            ? IngredientsText(ingredients || Info.Type == ItemType.Structure)
-            : " \n \n" + cost;
-        return stats + costBlock + "\n \n" + Info.Description;
-    } 
+    /// <summary>Tooltip body: one "label value" stat per line, then the item description.</summary>
+    public string Describe() => JoinSections(string.Join("\n", StatLines()), Info.Description);
 
-    private string ConsumableStats()
+    /// <summary>Full tooltip: the title, then <see cref="Describe"/> directly beneath it.</summary>
+    public string Tooltip()
     {
-        string text = "";
+        string body = Describe();
+        return body.Length == 0 ? Title : Title + "\n" + body;
+    }
+
+    /// <summary>Joins the non-empty sections with a single blank line.</summary>
+    private static string JoinSections(params string[] sections)
+    {
+        StringBuilder text = new StringBuilder();
+        foreach (string section in sections)
+        {
+            if (string.IsNullOrWhiteSpace(section)) continue;
+            if (text.Length > 0) text.Append("\n\n");
+            text.Append(section.TrimEnd());
+        }
+        return text.ToString();
+    }
+
+    /// <summary>Every stat this item type has, in a fixed order so the same information always
+    /// lands in the same place: what it does, then what it costs to use.</summary>
+    private IEnumerable<string> StatLines()
+    {
+        switch (Info.Type)
+        {
+            case ItemType.Structure:
+                yield return "structure";
+                break;
+
+            case ItemType.Tool:
+                foreach (string line in ToolStats())
+                    yield return line;
+                break;
+
+            case ItemType.Consumable:
+                foreach (string line in ConsumableStats())
+                    yield return line;
+                break;
+        }
+    }
+
+    private IEnumerable<string> ConsumableStats()
+    {
         if (Info.HealValue > 0)
-            text += "\n \nrestores " + Info.HealValue + " health";
+            yield return "restores " + Info.HealValue + " health";
         if (Info.HungerValue > 0)
-            text += "\n \nrestores " + Info.HungerValue + " hunger";
+            yield return "restores " + Info.HungerValue + " hunger";
         if (Info.MaxHpBonus > 0)
-            text += "\n \npermanently increases max health by " + Info.MaxHpBonus;
+            yield return "permanently increases max health by " + Info.MaxHpBonus;
         if (Info.MaxHungerBonus > 0)
-            text += "\n \npermanently increases max hunger by " + Info.MaxHungerBonus;
-        return text;
+            yield return "permanently increases max hunger by " + Info.MaxHungerBonus;
     }
 
-    private string ToolStats()
+    private IEnumerable<string> ToolStats()
     {
-        string text = "";
-        if (Durability != -1) text += Durability + "x\n";
+        if (Durability != -1)
+            yield return "durability " + Durability;
 
-        if (Info.ProjectileInfo == null) return text;
+        ProjectileInfo projectile = Info.ProjectileInfo;
+        if (projectile == null) yield break;
 
-        text += Info.ProjectileInfo.Damage + " damage";
-        text += " \n" + Info.ProjectileInfo.Knockback + " knockback\n";
-        if (Info.ProjectileInfo.Breaking != 0)
-        {
-            text += Info.ProjectileInfo.OperationType switch
+        yield return "damage " + projectile.Damage;
+        yield return "knockback " + projectile.Knockback;
+
+        string breaking = projectile.Breaking == 0
+            ? ""
+            : projectile.OperationType switch
             {
-                OperationType.Building => " \nbuilding " + Info.ProjectileInfo.Breaking,
-                OperationType.Mining => " \nmining " + Info.ProjectileInfo.Breaking,
-                OperationType.Cutting => " \nbreaking " + Info.ProjectileInfo.Breaking,
+                OperationType.Building => "building " + projectile.Breaking,
+                OperationType.Mining => "mining " + projectile.Breaking,
+                OperationType.Cutting => "breaking " + projectile.Breaking,
                 _ => "",
             };
-        }
+        if (breaking.Length > 0)
+            yield return breaking;
 
-        if (Info.ProjectileInfo.Ammo != ID.Null)
-            text += " \n \nammo: " + (AmmoRegistry.DescribeForGun(ID) ?? Info.ProjectileInfo.Ammo.ToString());
-        return text;
+        if (projectile.Ammo != ID.Null)
+            yield return "ammo " + (AmmoRegistry.DescribeForGun(ID) ?? projectile.Ammo.ToString());
     }
 
     public void clear()

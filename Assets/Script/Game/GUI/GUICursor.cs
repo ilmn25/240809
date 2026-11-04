@@ -61,15 +61,15 @@ public class GUICursor : GUI
         UpdateCursorSlot();
     }
 
-    public void SetItemSlotInfo(ItemSlot item = null, bool ingredient = false, string cost = null)
+    public void SetItemSlotInfo(ItemSlot item = null)
     {
         if (item == null)
         {
             Show(false);
             return;
         }
-        Text.text = item.Info.Name;
-        _infoSlotText.text = item.ToString(ingredient, cost);
+        Text.text = item.Title;
+        _infoSlotText.text = item.Describe();
         Show(true); 
     } 
     

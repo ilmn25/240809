@@ -52,6 +52,15 @@ public partial class Item
     public string Name => Helper.ToDisplayName(ID, lowercase: true);
     public string Description;
 
+    /// <summary>Rich-text color of this item's rarity, for tooltips.</summary>
+    public string RarityColor => Rarity switch
+    {
+        ItemRarity.Rare => "#55AAFF",
+        ItemRarity.Epic => "#C66CFF",
+        ItemRarity.Legendary => "#FFAA33",
+        _ => "#FFFFFF",
+    };
+
     /// <summary>Short action shown in the HUD for the held item (e.g. "place", "eat").
     /// Empty when the item has no quick action.</summary>
     public string ActionLabel => Type switch

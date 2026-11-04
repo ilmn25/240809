@@ -1,5 +1,3 @@
-using System.Text;
-
 public class GUICraft : GUIStorage
 {
     protected override string PanelSprite => "GUI/Crafting";
@@ -18,53 +16,31 @@ public class GUICraft : GUIStorage
         _ => "craft",
     };
 
-    /// <summary>Details for the hovered recipe.</summary>
+    /// <summary>Details for the hovered item.</summary>
     public override string HoveredItemText
     {
         get
         {
             if (CurrentSlot is not { Stack: > 0 } slot) return "";
-            if (Mode == TradeMode.Shop)
-                return $"{slot.Info.Name}\nprice: {Trade.Format(Trade.Worth(slot.ID))}";
-            if (Mode == TradeMode.Sell)
-            {
-                int carried = Main.PlayerInfo?.Storage?.GetAmount(slot.ID) ?? 0;
-                return $"{slot.Info.Name}\nsells for {Trade.Format(Trade.Worth(slot.ID))} (you have {carried})";
-            }
-            return $"{slot.Info.Name}\n{CraftingDetails(slot)}";
+            return slot.Tooltip();
         }
     }
 
-    private static string CraftingDetails(ItemSlot slot)
+    /// <summary>Recipe label: what the hovered stock costs when trading, its recipe when crafting.</summary>
+    public override string HoveredItemDetails
     {
-        ItemRecipe recipe = ItemRecipe.GetRecipe(slot.ID);
-        if (recipe == null) return slot.ToString(false);
-
-        StringBuilder text = new StringBuilder(slot.ToString(false));
-        text.Append("\n \ningredients:");
-        foreach (var ingredient in recipe.Ingredients)
+        get
         {
-            int available = Main.PlayerInfo?.Storage?.GetAmount(ingredient.Key) ?? 0;
-            if (GUIMain.Storage != null && GUIMain.Storage.Showing)
-                available += GUIMain.Storage.Storage.GetAmount(ingredient.Key);
-
-            Item ingredientItem = Item.GetItem(ingredient.Key);
-            string color = available < ingredient.Value
-                ? "#FF5555"
-                : RarityColor(ingredientItem.Rarity);
-            text.Append($"\n<color={color}>{ingredientItem.Name} ({available}/{ingredient.Value})</color>");
+            if (CurrentSlot is not { Stack: > 0 } slot) return "";
+            return Mode switch
+            {
+                TradeMode.Shop => $"price: {Trade.Format(Trade.Worth(slot.ID))}",
+                TradeMode.Sell =>
+                    $"sells for {Trade.Format(Trade.Worth(slot.ID))} (you have {Main.PlayerInfo?.Storage?.GetAmount(slot.ID) ?? 0})",
+                _ => ItemRecipe.GetRecipe(slot.ID)?.DescribeIngredients(colored: true) ?? "",
+            };
         }
-
-        return text.ToString();
     }
-
-    private static string RarityColor(ItemRarity rarity) => rarity switch
-    {
-        ItemRarity.Rare => "#55AAFF",
-        ItemRarity.Epic => "#C66CFF",
-        ItemRarity.Legendary => "#FFAA33",
-        _ => "#FFFFFF",
-    };
 
     public void UseDefaultStorage()
     {
@@ -81,25 +57,14 @@ public class GUICraft : GUIStorage
         Storage = menu.GetStoragePool();
     }
 
-    protected override void ActionPrimaryDown()
-    {
-        if (Storage.List[CurrentSlotKey].Stack == 0)
-            return;
+    protected override void ActionPrimaryDown() => QueueOrCraftItem();
 
-        QueueOrCraftItem();
-    }
-    
-    protected override void ActionSecondaryKey()
-    {
-        if (Storage.List[CurrentSlotKey].Stack == 0)
-            return;
-
-        QueueOrCraftItem();
-    }
+    protected override void ActionSecondaryKey() => QueueOrCraftItem();
 
     private void QueueOrCraftItem()
     {
-        Item item = Item.GetItem(Storage.List[CurrentSlotKey].ID);
+        if (CurrentSlot is not { Stack: > 0 } slot) return;
+        Item item = Item.GetItem(slot.ID);
 
         // A shop sells its stock for coins; a collector's window buys the clicked item;
         // a station crafts from the recipe.
@@ -115,10 +80,7 @@ public class GUICraft : GUIStorage
             return;
         }
 
-        if (!ItemRecipe.IsCraftable(item.ID))
-            return;
-
-        if (!ItemRecipe.Dictionary.TryGetValue(item.ID, out ItemRecipe recipe))
+        if (!ItemRecipe.Dictionary.TryGetValue(item.ID, out ItemRecipe recipe) || !recipe.IsCraftable())
             return;
 
         if (recipe.Time == 0 || item.Type == ItemType.Structure)

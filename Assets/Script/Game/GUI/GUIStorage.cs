@@ -10,7 +10,7 @@ public abstract class GUIStorage : GUI
     public EventHandler OnRefreshSlot;
     private const int SlotSize = 30;
     private readonly Vector2 _margin = new Vector2(10, 10);
-    private int _cooldown = 0;
+    private int _cooldown;
     private int _cooldownSpeed = 40;    
     
     public Storage Storage; 
@@ -20,7 +20,7 @@ public abstract class GUIStorage : GUI
     protected int CurrentSlotKey = -1;
     /// <summary>True while the mouse is over any storage slot (inventory management
     /// takes priority over cursor quick-actions).</summary>
-    public static bool HoveringSlot;
+    public static bool HoveringSlot => Hovered != null;
     /// <summary>The storage currently hovered (null when not hovering a slot).</summary>
     public static GUIStorage Hovered;
 
@@ -125,23 +125,27 @@ public abstract class GUIStorage : GUI
     public void SetInfoPanel(int currentSlotKey = -1)
     { 
         CurrentSlotKey = currentSlotKey;
-        HoveringSlot = currentSlotKey != -1;
         Hovered = currentSlotKey != -1 ? this : null;
-        
-        if (currentSlotKey == -1)
-        {
-            GUIMain.InfoPanel.Set();
-            return;
-        } 
         GUIMain.InfoPanel.Set();
     }
     public virtual string HoveredItemText
     {
         get
         {
-            return CurrentSlot is not { Stack: > 0 } slot
-                ? ""
-                : $"{slot.Info.Name}\n{slot.ToString(false)}";
+            if (CurrentSlot is not { Stack: > 0 } slot) return "";
+            return slot.Tooltip();
+        }
+    }
+
+    /// <summary>Secondary block shown in the recipe label beside the tooltip: the recipe of a
+    /// structure in plain storage, otherwise empty.</summary>
+    public virtual string HoveredItemDetails
+    {
+        get
+        {
+            if (CurrentSlot is not { Stack: > 0 } slot) return "";
+            if (slot.Info.Type != ItemType.Structure) return "";
+            return ItemRecipe.GetRecipe(slot.ID)?.DescribeIngredients() ?? "";
         }
     }
 

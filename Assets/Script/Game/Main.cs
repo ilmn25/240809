@@ -48,6 +48,7 @@ public class Main : MonoBehaviour
     public static GameObject GUICursorSlot;
  
     public static TextMeshProUGUI GUIMenu;
+    public static TextMeshProUGUI GUIRecipe;
     public static TextMeshProUGUI GUIConsole;
     public void Awake()
     { 
@@ -151,6 +152,9 @@ public class Main : MonoBehaviour
         
         GUIObject = GameObject.Find("GUI");
         GUIMenu = GUIObject.transform.Find("Menu").GetComponent<TextMeshProUGUI>();
+        GUIRecipe = GUIObject.transform.Find("Recipe").GetComponent<TextMeshProUGUI>();
+        // Only shown while hovering a slot, so never let the authored scene text show.
+        GUIRecipe.gameObject.SetActive(false);
         GUIConsole = GUIObject.transform.Find("Console").GetComponent<TextMeshProUGUI>();
         GUIInv = GUIObject.transform.Find("Inventory").gameObject;
         GUIHudText = GUIInv.transform.Find("HUD").GetComponent<TextMeshProUGUI>();

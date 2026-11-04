@@ -1,21 +1,20 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
  
 public partial class ItemRecipe 
 {
-    public static Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
+    private const string ShortageColor = "#FF5555";
+
+    public static readonly Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
 
     public int Stack;
     public int Time;
     public Dictionary<ID, int> Ingredients;
     public string[] Modifiers;
  
-    public static ItemRecipe GetRecipe(ID stringID)
-    {
-        if (Dictionary.ContainsKey(stringID))
-            return Dictionary[stringID];
-        return null;
-    }
+    public static ItemRecipe GetRecipe(ID stringID) =>
+        Dictionary.TryGetValue(stringID, out ItemRecipe recipe) ? recipe : null;
     
     public static void AddRecipe(ID stringID, Dictionary<ID, int> ingredients, int stack, int time, string[] modifiers)
     {
@@ -28,27 +27,46 @@ public partial class ItemRecipe
         });
     }
 
-    public static bool IsCraftable (ID stringID)
+    /// <summary>How many of an item the player can reach: their own pool plus the storage
+    /// open beside the crafting window.</summary>
+    public static int AvailableAmount(ID item)
     {
-        if (!Dictionary.TryGetValue(stringID, out ItemRecipe itemRecipe)) return false;
+        int available = Main.PlayerInfo?.Storage?.GetAmount(item) ?? 0;
+        if (GUIMain.Storage is { Showing: true })
+            available += GUIMain.Storage.Storage.GetAmount(item);
+        return available;
+    }
 
+    public bool IsCraftable()
+    {
         // Creative mode: everything is craftable without resources.
         if (Main.CreativeMode) return true;
 
-        foreach (var ingredient in itemRecipe.Ingredients)
+        foreach (var ingredient in Ingredients)
         {
-            int needed = ingredient.Value;
-            int available = Main.PlayerInfo.Storage.GetAmount(ingredient.Key);
-            
-            // Also check opened storage if the chest GUI is visible
-            if (GUIMain.Storage != null && GUIMain.Storage.Showing)
-            {
-                available += GUIMain.Storage.Storage.GetAmount(ingredient.Key);
-            }
-            
-            if (available < needed) return false;
-        } 
+            if (AvailableAmount(ingredient.Key) < ingredient.Value) return false;
+        }
         return true;
+    }
+
+    /// <summary>Ingredient list as tooltip lines: "ingredients:" followed by "name (have/need)".
+    /// Colored lines turn red while the player is short, otherwise they take the
+    /// ingredient's rarity color. Empty when the recipe needs nothing.</summary>
+    public string DescribeIngredients(bool colored = false)
+    {
+        if (Ingredients == null || Ingredients.Count == 0) return "";
+
+        StringBuilder text = new StringBuilder("ingredients:");
+        foreach (var ingredient in Ingredients)
+        {
+            Item item = Item.GetItem(ingredient.Key);
+            int have = AvailableAmount(ingredient.Key);
+            string line = $"{item.Name} ({have}/{ingredient.Value})";
+            text.Append('\n').Append(colored
+                ? $"<color={(have < ingredient.Value ? ShortageColor : item.RarityColor)}>{line}</color>"
+                : line);
+        }
+        return text.ToString();
     }
     
     public static void CraftItem(ID stringID, bool isCursor = true)

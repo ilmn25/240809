@@ -7,8 +7,9 @@ public static class GUIMain
     private const float HideDuration = 0.2f;
     
     private static CoroutineTask _showTask;
-    private static CoroutineTask _craftingTextTask;
-    private static string _craftingText;
+    private static string _hoveredText;
+    private static string _hoveredDetails;
+    private static bool _tooltipShown;
     private static bool _menuWasShowing;
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
@@ -82,6 +83,9 @@ public static class GUIMain
         // The cursor only follows in game mode, so hide it in the menu to avoid
         // a stuck, non-moving cursor.
         if (Main.GUICursor != null) Main.GUICursor.SetActive(false);
+        // Menu screens own this corner of the HUD, and the tooltip update does not run
+        // outside game mode, so the recipe label must be cleared here.
+        if (GUIMenu.Showing) Main.GUIRecipe.gameObject.SetActive(false);
         GUIMenu.Update();
     }
 
@@ -239,7 +243,7 @@ public static class GUIMain
 
         string tutorial = Tutorial.BuildHudText();
         string effects = Main.PlayerInfo?.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
-        UpdateCraftingMenuText();
+        UpdateHoveredTooltip();
         Main.GUIHudText.text =
             $"{BuildTimeHudText()} | {BuildCameraDirText()}\n" +
             (controlStatus.Length > 0 ? controlStatus + "\n" : "") +
@@ -249,21 +253,28 @@ public static class GUIMain
             "\n" + BuildShortcutsText();
     }
 
-    private static void UpdateCraftingMenuText()
+    private static void UpdateHoveredTooltip()
     {
-        string text = GUIMenu.Showing ? "" : GUIStorage.Hovered?.HoveredItemText ?? "";
-        bool menuStateChanged = _menuWasShowing != GUIMenu.Showing;
+        // Hovering only counts while the inventory GUI is open and no full-screen menu is up,
+        // so a closed window or an opened menu cannot leave a tooltip behind.
+        GUIStorage hovered = Showing && !GUIMenu.Showing ? GUIStorage.Hovered : null;
+        string text = hovered?.HoveredItemText ?? "";
+        bool showTooltip = text.Length > 0;
+        // The recipe label is part of the tooltip, never shown on its own.
+        string details = showTooltip ? hovered.HoveredItemDetails : "";
+
+        bool changed = text != _hoveredText || details != _hoveredDetails ||
+                       showTooltip != _tooltipShown || _menuWasShowing != GUIMenu.Showing;
+        _hoveredText = text;
+        _hoveredDetails = details;
+        _tooltipShown = showTooltip;
         _menuWasShowing = GUIMenu.Showing;
-        if (text == _craftingText && !menuStateChanged) return;
+        if (!changed) return;
 
-        _craftingTextTask?.Stop();
-        _craftingText = text;
-        Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || text.Length > 0);
-        if (text.Length == 0)
-            return;
-
+        Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || showTooltip);
         Main.GUIMenu.text = text;
-        _craftingTextTask = TextScroller.HandleScroll(Main.GUIMenu, speed: 150);
+        Main.GUIRecipe.gameObject.SetActive(showTooltip && details.Length > 0);
+        Main.GUIRecipe.text = details;
     }
 
     public static void Show(bool isShow)
