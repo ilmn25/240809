@@ -16,7 +16,7 @@ public partial class GUIMenu
     private MenuScreen _loadReturn = MenuScreen.Main;
     private MenuScreen _settingsReturn = MenuScreen.Pause;
     private string _seedInput = "";
-    private const int MaxSeedLength = 9;
+    private const int MaxSeedLength = 12;
     private CoroutineTask _scrollTask;
     private string _toast;
     private CoroutineTask _toastTask;
@@ -386,7 +386,7 @@ public partial class GUIMenu
         }
         done?.Invoke();
     }
-    /// <summary>Types digits into the seed field (Backspace erases); Enter starts a
+    /// <summary>Types letters into the seed field (Backspace erases); 1 (or Enter) starts a
     /// new game with that seed, an empty field means a random seed.</summary>
     private void HandleSeedInput()
     {
@@ -401,14 +401,14 @@ public partial class GUIMenu
                     changed = true;
                 }
             }
-            else if (c == '\n' || c == '\r')
+            else if (c == '\n' || c == '\r' || c == '1')
             {
-                StartNewGame(_seedInput.Length == 0 ? (int?)null : int.Parse(_seedInput));
+                StartNewGame(_seedInput.Length == 0 ? (int?)null : Gen.HashSeed(_seedInput), _seedInput);
                 return;
             }
-            else if (char.IsDigit(c) && _seedInput.Length < MaxSeedLength)
+            else if (char.IsLetter(c) && _seedInput.Length < MaxSeedLength)
             {
-                _seedInput += c;
+                _seedInput += char.ToLowerInvariant(c);
                 changed = true;
             }
         }
@@ -417,16 +417,17 @@ public partial class GUIMenu
 
     private string RenderSeed()
     {
-        return $"World Seed (numbers only): {_seedInput}\n\nBackspace > Erase\nEnter > Start";
+        string typed = _seedInput.Length == 0 ? "_" : _seedInput;
+        return $"Select Seed: {typed}\n\n1 > Skip/Confirm\nBackspace > Erase";
     }
 
-    private void StartNewGame(int? seed)
+    private void StartNewGame(int? seed, string seedText = null)
     {
         Audio.PlaySFX(SfxID.Text);
         _ = new CoroutineTask(LoadingThen(() =>
         {
             ScreenFade.FadeOut(0.3f);
-            Save.Inst = new Save(GenType.Abyss, seed);
+            Save.Inst = new Save(GenType.Abyss, seed, seedText);
             _ = new CoroutineTask(Server.StartHost());
             ResetToNeutral();
         }));
@@ -443,7 +444,8 @@ public partial class GUIMenu
             int index = start + i;
             if (index >= Saves.Inst.List.Count) break;
             Save save = Saves.Inst.List[index];
-            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players) #{save.seed}\n");
+            string seed = string.IsNullOrEmpty(save.seedText) ? save.seed.ToString() : save.seedText;
+            sb.Append($"{i + 1} > Day {save.day}, {Helper.FormatTime(save.time)} ({save.players.Count} players) #{seed}\n");
         }
         return sb.ToString();
     }

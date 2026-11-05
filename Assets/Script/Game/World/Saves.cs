@@ -69,6 +69,8 @@ public class Save
     public EnvironmentType weather = EnvironmentType.Sunrise;
     public GenType current;
     public int seed;
+    /// <summary>The phrase the player typed for the seed, if any (letters only).</summary>
+    public string seedText;
     public QuestState quest = new();
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
@@ -84,10 +86,12 @@ public class Save
     public Save(GenType gen) : this(gen, null) {}
 
     /// <param name="seed">Fixed world seed; null picks a random one.</param>
-    public Save(GenType gen, int? seed)
+    /// <param name="seedText">Phrase the player typed for the seed, shown in save listings.</param>
+    public Save(GenType gen, int? seed, string seedText = null)
     {
         current = gen;
         this.seed = seed ?? UnityEngine.Random.Range(1, 1000000);
+        this.seedText = seedText;
 
         players = new List<PlayerInfo>();
         worlds = new Dictionary<GenType, World>()

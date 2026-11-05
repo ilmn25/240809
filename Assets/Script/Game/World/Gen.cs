@@ -69,6 +69,13 @@ public abstract class Gen
         return new System.Random(hash);
     }
 
+    /// <summary>Turns a typed seed phrase (letters) into a stable world seed.</summary>
+    public static int HashSeed(string text)
+    {
+        int hash = DeterministicStringHash(text.ToLowerInvariant());
+        return hash == 0 ? 1 : hash;
+    }
+
     private static int CombineHashes(int h1, int h2)
     {
         unchecked
