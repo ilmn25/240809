@@ -16,16 +16,6 @@ public class GUICraft : GUIStorage
         _ => "craft",
     };
 
-    /// <summary>Details for the hovered item.</summary>
-    public override string HoveredItemText
-    {
-        get
-        {
-            if (CurrentSlot is not { Stack: > 0 } slot) return "";
-            return slot.Tooltip();
-        }
-    }
-
     /// <summary>Recipe label: what the hovered stock costs when trading, its recipe when crafting.</summary>
     public override string HoveredItemDetails
     {

@@ -44,28 +44,14 @@ public class ItemSlot
         }
     }
 
-    /// <summary>Total stat lines every tooltip reserves. Tools use the most (durability,
-    /// damage, knockback, breaking, ammo), so padding to five keeps the description on the
-    /// same line no matter which item is hovered.</summary>
-    private const int StatLineCount = 5;
-
-    /// <summary>Tooltip body: one "label value" stat per line, then the item description.
-    /// Missing stats keep their line, so the description never moves.</summary>
+    /// <summary>Tooltip body: the item description, then one "number label" stat per line.</summary>
     public string Describe()
     {
-        List<string> lines = new List<string>(StatLineCount);
-        lines.AddRange(StatLines());
-        bool hasDescription = !string.IsNullOrWhiteSpace(Info.Description);
+        string stats = string.Join("\n", StatLines());
+        string description = Info.Description?.TrimEnd() ?? "";
 
-        if (hasDescription)
-        {
-            while (lines.Count < StatLineCount)
-                lines.Add("");
-            return string.Join("\n", lines) + "\n\n" + Info.Description.TrimEnd();
-        }
-
-        // Nothing follows the stats, so no line needs reserving.
-        return string.Join("\n", lines);
+        if (stats.Length == 0) return description;
+        return description.Length == 0 ? stats : description + "\n\n" + stats;
     }
 
     /// <summary>Full tooltip: the title, then <see cref="Describe"/> directly beneath it.</summary>
@@ -81,8 +67,14 @@ public class ItemSlot
     {
         switch (Info.Type)
         {
+            case ItemType.Block:
+                foreach (string line in BlockStats())
+                    yield return line;
+                break;
+
             case ItemType.Structure:
-                yield return "structure";
+                foreach (string line in StructureStats())
+                    yield return line;
                 break;
 
             case ItemType.Tool:
@@ -95,6 +87,29 @@ public class ItemSlot
                     yield return line;
                 break;
         }
+    }
+
+    /// <summary>How much punishment a placed block takes, and how strong a tool must be
+    /// to work it (see Block.BreakCost / Block.BreakThreshold).</summary>
+    private IEnumerable<string> BlockStats()
+    {
+        Block block = Block.GetBlock(ID);
+        if (block == null) yield break;
+
+        yield return block.BreakCost + " durability";
+        if (block.BreakThreshold > 0)
+            yield return block.BreakThreshold + " breaking required";
+    }
+
+    /// <summary>Same two numbers for a placeable structure, taken from the machine's
+    /// authored info (see Item.InitializeStructureStats).</summary>
+    private IEnumerable<string> StructureStats()
+    {
+        if (!Item.TryGetStructureStats(ID, out (float Health, int Threshold) stats)) yield break;
+
+        yield return stats.Health.ToString("0.#") + " durability";
+        if (stats.Threshold > 0)
+            yield return stats.Threshold + " breaking required";
     }
 
     private IEnumerable<string> ConsumableStats()
@@ -120,17 +135,18 @@ public class ItemSlot
         yield return projectile.Damage + " damage";
         yield return projectile.Knockback + " knockback";
 
-        string breaking = projectile.Breaking == 0
-            ? ""
-            : projectile.OperationType switch
+        if (projectile.Breaking > 0)
+        {
+            string operation = projectile.OperationType switch
             {
-                OperationType.Building => projectile.Breaking + " building",
-                OperationType.Mining => projectile.Breaking + " mining",
-                OperationType.Cutting => projectile.Breaking + " breaking",
+                OperationType.Building => "building",
+                OperationType.Mining => "mining",
+                OperationType.Cutting => "breaking",
                 _ => "",
             };
-        if (breaking.Length > 0)
-            yield return breaking;
+            if (operation.Length > 0)
+                yield return projectile.Breaking + " " + operation;
+        }
 
         if (projectile.Ammo != ID.Null)
             yield return "ammo " + (AmmoRegistry.DescribeForGun(ID) ?? projectile.Ammo.ToString());

@@ -233,6 +233,29 @@ public partial class Item
         Register(itemData, materials, 1, time);
     }
 
+    /// <summary>Authored HP and required tool tier per placeable structure, for tooltips.</summary>
+    private static readonly Dictionary<ID, (float Health, int Threshold)> StructureStats = new();
+
+    /// <summary>Collects every structure's HP and breaking requirement from the machine
+    /// that spawns it, which is the only place those values are authored. Runs once at
+    /// startup: machines build a fresh info each call and containers allocate a storage,
+    /// so this is far too expensive to repeat while hovering slots.</summary>
+    public static void InitializeStructureStats()
+    {
+        if (StructureStats.Count > 0) return;
+
+        foreach (Item item in Dictionary.Values)
+        {
+            if (item.Type != ItemType.Structure) continue;
+            if (!Entity.Dictionary.ContainsKey(item.ID)) continue;
+            if (Entity.CreateInfo(item.ID, Vector3.zero) is not StructureInfo info) continue;
+            StructureStats[item.ID] = (info.Health, info.threshold);
+        }
+    }
+
+    public static bool TryGetStructureStats(ID id, out (float Health, int Threshold) stats) =>
+        StructureStats.TryGetValue(id, out stats);
+
     public static Item GetItem(ID id)
     {
         if (Dictionary.ContainsKey(id))

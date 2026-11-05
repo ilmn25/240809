@@ -80,6 +80,7 @@ public class Main : MonoBehaviour
         Block.Initialize();   
         HarvestableRegistry.Initialize();
         CombustionRegistry.Initialize();
+        Item.InitializeStructureStats();
         
         Saves.Initialize();    
         GUIMain.Initialize();    

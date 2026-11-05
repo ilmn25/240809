@@ -9,7 +9,6 @@ public static class GUIMain
     private static CoroutineTask _showTask;
     private static string _hoveredText;
     private static string _hoveredDetails;
-    private static bool _tooltipShown;
     private static bool _menuWasShowing;
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
@@ -259,23 +258,21 @@ public static class GUIMain
         // so a closed window or an opened menu cannot leave a tooltip behind.
         GUIStorage hovered = Showing && !GUIMenu.Showing ? GUIStorage.Hovered : null;
         string text = hovered?.HoveredItemText ?? "";
-        bool showTooltip = text.Length > 0;
-        // The recipe label is part of the tooltip, never shown on its own.
-        string details = showTooltip ? hovered.HoveredItemDetails : "";
+        string details = hovered?.HoveredItemDetails ?? "";
 
         bool changed = text != _hoveredText || details != _hoveredDetails ||
-                       showTooltip != _tooltipShown || _menuWasShowing != GUIMenu.Showing;
+                       _menuWasShowing != GUIMenu.Showing;
         _hoveredText = text;
         _hoveredDetails = details;
-        _tooltipShown = showTooltip;
         _menuWasShowing = GUIMenu.Showing;
         if (!changed) return;
 
-        Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || showTooltip);
+        bool hovering = text.Length > 0;
+        Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || hovering);
         Main.GUIMenu.text = text;
-        // The recipe/price label keeps the same slot for every hovered item, even when it
-        // has nothing to show, so the tooltip layout never shifts.
-        Main.GUIRecipe.gameObject.SetActive(showTooltip);
+        // The recipe/price label keeps the same spot for every hovered item, even when it
+        // has nothing to show, so the tooltip never shifts.
+        Main.GUIRecipe.gameObject.SetActive(hovering);
         Main.GUIRecipe.text = details;
     }
 
