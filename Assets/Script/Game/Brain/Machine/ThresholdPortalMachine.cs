@@ -1,7 +1,7 @@
 using UnityEngine;
 
-/// <summary>An upright threshold portal: one stands beside the overworld spawn and
-/// its twin stands in the backrooms. Right-clicking either steps through to the other.
+/// <summary>An upright threshold portal: it stands on the backrooms spawn point.
+/// Right-clicking it steps back out to the Abyss.
 /// Its sprite comes from the ID (<c>Threshold</c> -> Sprite/Threshold).</summary>
 public class ThresholdPortalMachine : StructureMachine, IActionSecondaryInteract
 {

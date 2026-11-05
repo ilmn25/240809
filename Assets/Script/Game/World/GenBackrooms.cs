@@ -35,8 +35,7 @@ public class GenBackrooms : GenSocketRooms
         BuildLayout(world);
 
         // The return portal always stands on the spawn point — the centre of the anchor
-        // room, which DungeonLayout places centred on the world. Its twin waits on the
-        // Abyss spawn point.
+        // room, which DungeonLayout places centred on the world.
         Vector3Int spawn = GetSpawnPoint();
         GenBlocks.PlaceEntity(world, new Vector3Int(spawn.x, 1, spawn.z), ID.Threshold);
     }

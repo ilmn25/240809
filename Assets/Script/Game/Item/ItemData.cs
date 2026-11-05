@@ -162,7 +162,7 @@ public partial class Item
         AddStructureDefinition(ID.Door, new Dictionary<ID, int> { { ID.Plank, 4 } }, 100, description: "A wooden door. Right-click to open or close it.");
         AddStructureDefinition(ID.DungeonDoor, null, 200, furniture: true, description: "A heavy brick door that descends into the dungeon depths.");
         AddStructureDefinition(ID.MawDoor, new Dictionary<ID, int> { { ID.StoneBlock, 8 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 200, furniture: true, description: "A heavy brick door that leads to the Maw's extraction facility.");
-        AddStructureDefinition(ID.Threshold, null, 200, furniture: true, description: "A shimmering threshold portal. Right-click to step through to the backrooms.");
+        AddStructureDefinition(ID.Threshold, null, 200, furniture: true, description: "A shimmering threshold portal. Right-click to step back out into the Abyss.");
         AddStructureDefinition(ID.MawPit, new Dictionary<ID, int> { { ID.StoneBlock, 6 }, { ID.Brick, 4 }, { ID.Steel, 2 } }, 100, furniture: true, description: "The Maw's collection pit — drop coins into its area to fill the daily quota.");
         AddStructureDefinition(ID.Pond, new Dictionary<ID, int> { { ID.StoneBlock, 4 }, { ID.SandBlock, 2 } }, 100, description: "A shallow pond of fresh water. Swing an empty bucket at it to fill it.");
         AddStructureDefinition(ID.Sprinkler, new Dictionary<ID, int> { { ID.Lead, 2 }, { ID.Steel, 2 }, { ID.StoneBlock, 3 } }, 100, description: "Automatically waters nearby planters.");
