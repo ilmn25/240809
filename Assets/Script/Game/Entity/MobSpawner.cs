@@ -19,18 +19,23 @@ public class MobSpawner
     private const float PassiveMobRarity = 0.1f;
     private const int PassiveMobCap = 24;
     private const float BoundNPCSpawnChance = 0.002f;
+    private const int CrowFlockMin = 2;
+    private const int CrowFlockMax = 3;
+    private const int CrowCap = 8; // crows kept alive near a player (ambience, not a swarm)
+    private const float CrowSpawnNear = 8f; // closest a flock lands to the player
 
     private static int _timer;
 
     private static readonly Pool DayRoamers = new()
     {
-        (ID.Slime, 3), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
+        (ID.Slime, 3), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
     };
 
+    // Crow weights are per flock (each flock is 2-3 birds), not per bird.
     private static readonly Dictionary<BiomeType, Pool> DayByBiome = new()
     {
-        [BiomeType.Grass] = Uniform(ID.Sheep),
-        [BiomeType.Forest] = Uniform(ID.Hen, ID.Rooster, ID.Chick),
+        [BiomeType.Grass] = new Pool { (ID.Sheep, 1f), (ID.Crow, 0.25f) },
+        [BiomeType.Forest] = new Pool { (ID.Hen, 1f), (ID.Rooster, 1f), (ID.Chick, 1f), (ID.Crow, 0.5f) },
     };
 
     private static readonly Pool DesertNightMobs = Uniform(ID.SnareFlea);
@@ -113,6 +118,15 @@ public class MobSpawner
             (Random.value < PassiveMobRarity || CountMobs(m => IsPassiveMob(m.id)) >= PassiveMobCap))
             return;
 
+        if (mobID == ID.Crow)
+        {
+            // Crows have their own cap so a sky full of birds never crowds out the
+            // other daytime spawns sharing the global mob cap.
+            if (CountMobs(m => m.id == ID.Crow, near: playerPos, radius: Scene.LogicDistance) < CrowCap)
+                SpawnCrowFlock(playerPos);
+            return;
+        }
+
         if (mobID != ID.Sheep)
         {
             Entity.Spawn(mobID, pos);
@@ -123,12 +137,29 @@ public class MobSpawner
             Entity.Spawn(ID.Sheep, pos);
     }
 
+    /// <summary>Crows arrive in loose flocks a bit closer than other spawns, so they
+    /// land in view instead of out past the render distance.</summary>
+    private static void SpawnCrowFlock(Vector3 playerPos)
+    {
+        for (int i = Random.Range(CrowFlockMin, CrowFlockMax + 1); i > 0; i--)
+        {
+            float angle = Random.Range(0f, Mathf.PI * 2f);
+            float distance = Random.Range(CrowSpawnNear, Scene.RenderDistance - 2f);
+            Vector3Int spot = Vector3Int.FloorToInt(
+                playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * distance);
+            if (FindSurfacePosition(ref spot))
+                Entity.Spawn(ID.Crow, spot);
+        }
+    }
+
     public static int CountMobs(Func<MobInfo, bool> where = null, Vector3 near = default, float radius = 0f) =>
         EntityDynamicLoad.ActiveEntities.Count(em =>
             em?.Info is MobInfo mob && mob is not PlayerInfo &&
             (radius <= 0f || Vector3.Distance(em.transform.position, near) <= radius) &&
             (where == null || where(mob)));
 
+    // Crows are ambient birds, not farm animals — they skip the rarity gate so
+    // flocks show up regularly, the way they do in Don't Starve.
     private static bool IsPassiveMob(ID id) => id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick;
 
     private static Pool Uniform(params ID[] ids) => ids.Select(id => (id, 1f)).ToList();

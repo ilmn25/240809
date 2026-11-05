@@ -610,6 +610,11 @@ public class Entity
                 AddMob<PigeonMachine>(ID.Pigeon);
                 loot = new (ID.Pigeon); // the pigeon drops nothing
 
+                AddMob<CrowMachine>(ID.Crow);
+                loot = new (ID.Crow);
+                loot.Add(1, 1, ID.Foul);
+                loot.Add(0.4f, 1, ID.Foul);
+
                 AddMob<GnomeMachine>(ID.Gnome);
                 loot = new (ID.Gnome); // the gnome drops its stolen items on death
 
