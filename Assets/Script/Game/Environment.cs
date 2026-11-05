@@ -54,10 +54,10 @@ public class Environment
         });
         Environments.Add(EnvironmentType.Day, new Environment
         {
-            AmbientLight = Helper.GetColor(224, 224, 224),
-            FogColor = Helper.GetColor(50, 50, 50),
-            SpotLight = Helper.GetColor(198, 192, 180),
-            DirectionalLight = Helper.GetColor(130, 130, 130)
+            AmbientLight = Helper.GetColor(255, 222, 206),
+            FogColor = Helper.GetColor(72, 48, 37),
+            SpotLight = Helper.GetColor(157, 136, 134),
+            DirectionalLight = Helper.GetColor(196, 138, 104)
         });
         // A dry day: the same light level, but warm and dusty.
         Environments.Add(EnvironmentType.DryDay, new Environment

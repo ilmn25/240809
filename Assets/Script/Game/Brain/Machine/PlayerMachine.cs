@@ -203,13 +203,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Sweep up nearby drops before getting back to work or following.
-        if (TryAcquireLootTarget())
-        {
-            SetState<MobChaseAction>();
-            return;
-        }
-
+        // Work a structure: the assigned one, or whatever the leader marked.
         StructureInfo work = Info.Target is StructureInfo assigned &&
                              Info.ActionType is IActionType.Hit or IActionType.Dig
             ? assigned
@@ -226,6 +220,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
+        // Only scavenge once there is no job left: claiming a drop writes the item into
+        // Info.Target, which is the only place the assigned structure is remembered.
+        if (TryAcquireLootTarget())
+        {
+            SetState<MobChaseAction>();
+            return;
+        }
+
         if (!IsCurrentState<DefaultState>()) return;
         if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
         Info.Target = Main.PlayerInfo;
@@ -238,8 +240,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     // away. Unarmed allies just trail.
     private bool TryAcquireEnemyTarget()
     {
-        if (!CanAllyFight()) return false;
         if (Main.PlayerInfo == null) return false; // nothing to defend / follow
+
+        // Only fight with something that can actually strike. Sticks, blocks, food and other
+        // non-tools have no ProjectileInfo, so MobAttackSwing just plays the animation and
+        // deals nothing — a stack of sticks must not pull an NPC into a fight. Tools (hatchet,
+        // pickaxe, club, guns) all have one, so a woodcutter still defends itself.
+        if (Info.Equipment?.Info?.ProjectileInfo == null) return false;
 
         Vector3 leaderPos = Main.PlayerInfo.position;
 
@@ -264,14 +271,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (enemy == null || Vector3.Distance(leaderPos, enemy.position) > Info.DistAlert) return false;
         Info.Target = enemy;
         return true;
-    }
-
-    // Gathering/building tools also have swing projectiles, but allies must not
-    // treat those as weapons when they are carrying out their follow behavior.
-    private bool CanAllyFight()
-    {
-        ProjectileInfo projectile = Info.Equipment?.Info?.ProjectileInfo;
-        return projectile != null && projectile.Damage >= 2;
     }
 
     // Flees from the nearest nearby hostile (used when low on health).

@@ -560,7 +560,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "+-= .\xB7:\xB7. Menu .\xB7:\xB7.=-+\n "
+  m_text: "placeholder \nplaceholder \nplaceholder \nplaceholder placeholder "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ec91fa2440ae4f55853be1e16ece1e95, type: 2}
   m_sharedMaterial: {fileID: -4486078137813936661, guid: ec91fa2440ae4f55853be1e16ece1e95, type: 2}
@@ -949,7 +949,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -11.64, y: -94.2}
+  m_AnchoredPosition: {x: -50, y: -136}
   m_SizeDelta: {x: 253.7, y: 340.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1984113338
@@ -972,7 +972,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: recipe
+  m_text: recipe here
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ec91fa2440ae4f55853be1e16ece1e95, type: 2}
   m_sharedMaterial: {fileID: -4486078137813936661, guid: ec91fa2440ae4f55853be1e16ece1e95, type: 2}
