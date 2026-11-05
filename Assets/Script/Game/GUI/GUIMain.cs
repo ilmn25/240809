@@ -273,7 +273,9 @@ public static class GUIMain
 
         Main.GUIMenu.gameObject.SetActive(GUIMenu.Showing || showTooltip);
         Main.GUIMenu.text = text;
-        Main.GUIRecipe.gameObject.SetActive(showTooltip && details.Length > 0);
+        // The recipe/price label keeps the same slot for every hovered item, even when it
+        // has nothing to show, so the tooltip layout never shifts.
+        Main.GUIRecipe.gameObject.SetActive(showTooltip);
         Main.GUIRecipe.text = details;
     }
 
