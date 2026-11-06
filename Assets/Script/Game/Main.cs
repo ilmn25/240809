@@ -42,9 +42,7 @@ public class Main : MonoBehaviour
     public static Image GUIImageRenderer;
     public static TextMeshProUGUI GUIDialogueText;
     public static GameObject GUIInv;
-    public static GameObject GUIInfoPanel;
     public static GameObject GUICursor;
-    public static GameObject GUICursorInfo;
     public static GameObject GUICursorSlot;
  
     public static TextMeshProUGUI GUIMenu;
@@ -165,10 +163,8 @@ public class Main : MonoBehaviour
         GUIDialogueText = GUIDialogue.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GUIImage = GUIObject.transform.Find("Image").gameObject;
         GUIImageRenderer = GUIImage.GetComponent<Image>(); 
-        GUIInfoPanel = GUIInv.transform.Find("Info").gameObject;
-        
+
         GUICursor = GUIObject.transform.Find("Cursor").Find("Cursor").gameObject;
-        GUICursorInfo = GUICursor.transform.Find("Info").gameObject;    
         GUICursorSlot = GUICursor.transform.Find("Slot").gameObject;
     }
     

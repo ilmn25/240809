@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +6,6 @@ public class GUICursor : GUI
 {
     public static ItemSlot Data = new ItemSlot();
 
-    private static TextMeshProUGUI _infoSlotText;
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
     private static Sprite _aimIcon;      // default cursor icon when nothing is held / hovered
@@ -19,14 +17,8 @@ public class GUICursor : GUI
 
     public new void Initialize()
     {
-        ShowSpeed = 0.25f;
-        HideSpeed = 0.1f;
-        
         Rect = Main.GUICursor.GetComponent<RectTransform>();
-        GameObject = Main.GUICursorInfo;
         base.Initialize();        
-        _infoSlotText = Main.GUICursorInfo.transform.Find("Info").GetComponent<TextMeshProUGUI>(); 
-        Text = Main.GUICursorInfo.transform.Find("Text").GetComponent<TextMeshProUGUI>(); 
         _cursorSlotText = Main.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         _cursorSlotImage = Main.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
         // The slot's default image is the aim cursor; fall back to it if a resource is missing.
@@ -61,30 +53,6 @@ public class GUICursor : GUI
         UpdateCursorSlot();
     }
 
-    public void SetItemSlotInfo(ItemSlot item = null)
-    {
-        if (item == null)
-        {
-            Show(false);
-            return;
-        }
-        Text.text = item.Title;
-        _infoSlotText.text = item.Describe();
-        Show(true); 
-    } 
-    
-    public void Set(string title = "", string description = "")
-    {
-        if (title == "")
-        {
-            Show(false);
-            return;
-        }
-        Text.text = title;
-        _infoSlotText.text = description;
-        Show(true); 
-    } 
-    
     public static void UpdateCursorSlot()
     { 
         // Always show the cursor. A held item takes the icon over, otherwise swap

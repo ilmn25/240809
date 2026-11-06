@@ -40,7 +40,6 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
         if (Player == null) return;
         Audio.PlaySFX(SfxID.Text);
-        GUIPlayerList.ShowInfo(Player);
         ScaleSlot(1.1f);
     }
 
@@ -48,7 +47,6 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         GUIMain.IsHover = false;
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
-        GUIPlayerList.HideInfo();
         ScaleSlot(1f);
     }
 
@@ -59,11 +57,9 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             GUIPlayerList.ToggleRest(Player);
-            GUIPlayerList.ShowInfo(Player);
             return;
         }
-        if (GUIPlayerList.TryControl(Player))
-            GUIPlayerList.ShowInfo(Player); // refresh while still hovering
+        GUIPlayerList.TryControl(Player);
     }
 
     private void ScaleSlot(float scale)

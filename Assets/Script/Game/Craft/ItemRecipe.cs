@@ -5,6 +5,7 @@ using UnityEngine;
 public partial class ItemRecipe 
 {
     private const string ShortageColor = "#FF5555";
+    private const string FulfilledColor = "#8FE38F";
 
     public static readonly Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
 
@@ -50,8 +51,8 @@ public partial class ItemRecipe
     }
 
     /// <summary>Ingredient list as tooltip lines: "ingredients:" followed by "name (have/need)".
-    /// Colored lines turn red while the player is short, otherwise they take the
-    /// ingredient's rarity color. Empty when the recipe needs nothing.</summary>
+    /// Colored lines turn red while the player is short and a soft green once the amount
+    /// is met. Empty when the recipe needs nothing.</summary>
     public string DescribeIngredients(bool colored = false)
     {
         if (Ingredients == null || Ingredients.Count == 0) return "";
@@ -63,7 +64,7 @@ public partial class ItemRecipe
             int have = AvailableAmount(ingredient.Key);
             string line = $"{item.Name} ({have}/{ingredient.Value})";
             text.Append('\n').Append(colored
-                ? $"<color={(have < ingredient.Value ? ShortageColor : item.RarityColor)}>{line}</color>"
+                ? $"<color={(have < ingredient.Value ? ShortageColor : FulfilledColor)}>{line}</color>"
                 : line);
         }
         return text.ToString();

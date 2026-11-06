@@ -22,10 +22,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {  
             HitboxType = HitboxType.Friendly,
             targetHitboxType = HitboxType.Passive,
-            Storage = new Storage(9)
-            {
-                Name = "Inventory"
-            },
+            Storage = new Storage(9),
             HealthMax = 18,
             Defense = 0,
             Mana = 100,
@@ -64,10 +61,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobEscape());
         AddState(new EquipSelectState());   
-        AddState(new InContainerState()
-        {
-            Storage = Info.Storage
-        });
 
         // Apply the selected inventory slot as the held tool so it renders in hand.
         // The controlled player gets this via Inventory.RefreshInventory; allies need it here.
@@ -81,10 +74,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
-        if (IsCurrentState<InContainerState>())
-            SetState<DefaultState>();
-        else 
-            SetState<InContainerState>();
+        // A bag is UI, not a state of its owner: opening it here would stall the ally's
+        // brain (which only runs in Default/MobChaseAction) for as long as it is looked at.
+        ContainerWindow.Toggle(Info);
     }
     
     /// <summary>True while a snare flea is latched on (its Bugged slow is active).</summary>

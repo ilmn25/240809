@@ -13,9 +13,8 @@ public static class GUIMain
     public static GUIStorage StorageInv;
     public static GUIStorage Storage; 
     public static GUICraft GUICraft;
-    public static GUIInfoPanel InfoPanel;
-    public static GUIPlayerList PlayerList;
     public static GUICursor Cursor;
+    public static GUIPlayerList PlayerList;
     public static GUIMenu GUIMenu;
     public static GUIMap Map;
 
@@ -32,7 +31,6 @@ public static class GUIMain
         
         Cursor = new GUICursor();
         Cursor.Initialize();
-        Cursor.Show(false);
         
         StorageInv = new GUIChest()
         {
@@ -61,11 +59,6 @@ public static class GUIMain
             Position = new Vector2(300, 205), 
         };
         GUICraft.Initialize();
-         
-        
-        InfoPanel = new GUIInfoPanel();
-        InfoPanel.Initialize();
-        InfoPanel.Show(false);
         
         PlayerList = new GUIPlayerList();
         PlayerList.Initialize();
@@ -91,12 +84,14 @@ public static class GUIMain
     /// <summary>Call when leaving game mode to hide the inventory GUI.</summary>
     public static void OnGameEnd()
     {
+        ContainerWindow.Close();
         Show(false);
     }
 
     public static void Update()
     {
         SyncHudVisibility();
+        ContainerWindow.Update();
 
         // Re-show the cursor now that we're in game mode (hidden while in menu).
         if (Main.GUICursor != null) Main.GUICursor.SetActive(true);
@@ -107,7 +102,6 @@ public static class GUIMain
         Storage.Update();
         GUICraft.Update();
         PlayerList.Update();
-        InfoPanel.UpdateDrag();
         Map.Update();
         UpdateHudText();
         CheckAllDowned();
@@ -304,7 +298,6 @@ public static class GUIMain
 
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(false, HideDuration, Main.GUIInv, 0));
-                Cursor.SetItemSlotInfo();
                 // _showTask.Finished += (bool isManual) => 
                 // {
                 //     Game.GUIInv.SetActive(false);
