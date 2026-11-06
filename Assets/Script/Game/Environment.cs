@@ -12,9 +12,17 @@ public class Environment
 {
     public const int NightStartTime = 60 * 19;
     public const float SpawnLightRadius = 10f;
-    private const float NormalSpotLightIntensity = 4000f;
-    private const float BaseSpotLightIntensity = 10000f;
+    private const float RestingSpotLightIntensity = 4000f;
+    private const float FullSpotLightIntensity = 14000f;
     private const float SpotLightFadeSpeed = 4000f;
+
+    // How far each nearby light pushes the player's spotlight toward
+    // FullSpotLightIntensity. Contributions add up before the total is clamped, so
+    // overlapping light saturates instead of blowing the spotlight out.
+    private const float SpawnGlowWeight = 1f;
+    private const float TorchGlowWeight = 0.7f;
+    private const float SurroundingGlowWeight = 0.9f;
+
     public static Dictionary<EnvironmentType, Environment> Environments = new ();
     public static event Action<int, int> HourlyTriggered;
     public static event Action<EnvironmentType> WeatherChanged;
@@ -212,23 +220,53 @@ public class Environment
         }
     }
 
-    /// <summary>The lit hole at the centre of the map (the spawn) brightens the world
-    /// spotlight, scaled by how dark the current weather is: during the lit hours it adds
-    /// almost nothing, at night it floods the base.</summary>
+    /// <summary>
+    /// Drives the player's permanent spotlight from the light around them: the lit hole
+    /// at the spawn, a torch in hand and any nearby lamp, forge or fire all brighten it.
+    /// Only the night is dark enough for that to matter, so every other weather leaves
+    /// the spotlight at its resting intensity. Sources stack but the total is clamped,
+    /// so a torch beside the spawn never overdrives the spot.
+    /// </summary>
     public static void UpdatePlayerLight()
     {
         if (Main.SpotLight == null || Save.Inst == null || Main.PlayerInfo == null || World.Inst == null)
             return;
 
-        float target = NormalSpotLightIntensity;
-        if (IsPlayerNearSpawn())
-        {
-            float darkness = 1f - Environments[_current].AmbientLight.grayscale;
-            target = Mathf.Lerp(NormalSpotLightIntensity, BaseSpotLightIntensity, darkness);
-        }
-
+        float glow = PlayerLightGlow();
+        float target = Mathf.Lerp(RestingSpotLightIntensity, FullSpotLightIntensity, glow);
         Main.SpotLight.intensity = Mathf.MoveTowards(Main.SpotLight.intensity, target,
             SpotLightFadeSpeed * UnityEngine.Time.deltaTime);
+    }
+
+    /// <summary>The only weathers dark enough for a local light to stand out.
+    /// Every brighter one keeps the spotlight at its resting intensity.</summary>
+    private static bool IsNight(EnvironmentType type) =>
+        type is EnvironmentType.NightRainy or EnvironmentType.NightBright;
+
+    /// <summary>0..1: how lit the player's surroundings are, once the current darkness
+    /// is taken into account. Zero outside the night.</summary>
+    private static float PlayerLightGlow()
+    {
+        if (!IsNight(_current)) return 0f;
+
+        float darkness = 1f - Environments[_current].AmbientLight.grayscale;
+        float glow = 0f;
+
+        if (IsPlayerNearSpawn())
+            glow += SpawnGlowWeight;
+        if (IsHoldingLight())
+            glow += TorchGlowWeight;
+        glow += SurroundingGlowWeight * WorldLights.GlowAt(Main.PlayerInfo.position);
+
+        return Mathf.Clamp01(glow) * darkness;
+    }
+
+    /// <summary>True when the held item burns (a torch): it already casts its own glow
+    /// light, so the spotlight should follow it.</summary>
+    private static bool IsHoldingLight()
+    {
+        ItemSlot held = Main.PlayerInfo.Equipment;
+        return held != null && !held.isEmpty() && held.Info != null && held.Info.Glow;
     }
 
     private static bool IsPlayerNearSpawn()
@@ -294,7 +332,8 @@ public class Environment
             else
                 Weather = EnvironmentType.Day;
         } 
-        else if (Time == 60 * 18)
+        // Sunset runs for two hours (17:00-19:00) so the evening light lingers.
+        else if (Time == 60 * 17)
         {
             Weather = EnvironmentType.Sunset;
             if (Main.PlayerInfo != null &&

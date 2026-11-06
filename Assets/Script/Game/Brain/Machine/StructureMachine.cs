@@ -30,6 +30,7 @@ public class StructureMachine : EntityMachine, IActionPrimaryResource
         SpriteRenderer = transform.Find("Sprite").GetComponent<SpriteRenderer>();
         SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + Info.id);
         GlowLight = transform.Find("Sprite/Glow")?.GetComponent<Light>();
+        WorldLights.Register(GlowLight);
         AttachmentRenderer = transform.Find("Sprite/Attachment")?.GetComponent<SpriteRenderer>();
         SetGlow(false);
     }

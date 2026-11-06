@@ -520,7 +520,7 @@ public partial class Item
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = ID.Spear,
-                Damage = 2,
+                Damage = 4,
                 Knockback = 10,
                 CritChance = 10,
                 LifeSpan = 10000,

@@ -17,7 +17,10 @@ public class ParticleComponent : MonoBehaviour
         transform.position = position;
         transform.rotation = ViewPort.CurrentRotation;
         if (_glow == null)
+        {
             _glow = transform.Find("Sprite/Glow")?.GetComponent<Light>();
+            WorldLights.Register(_glow);
+        }
         if (_glow != null)
             _glow.enabled = id == Particles.Fire;
         string variation = max > 0 ? UnityEngine.Random.Range(1, max+1).ToString() : "";
