@@ -57,7 +57,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (GUIStorage.IsDrag) return;
         if (GUIStorage.Storage.List[slotNumber].Stack != 0)
             Audio.PlaySFX(SfxID.Text);
-        GUIStorage.SetInfoPanel(slotNumber);
+        GUIStorage.SetHoveredSlot(slotNumber);
         ScaleSlot(1.1f);
     }
  
@@ -66,7 +66,7 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         GUIMain.IsHover = false;
         if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
-        GUIStorage.SetInfoPanel();
+        GUIStorage.SetHoveredSlot();
         ScaleSlot(1f);
     }
 

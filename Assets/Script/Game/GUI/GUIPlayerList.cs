@@ -62,39 +62,6 @@ public class GUIPlayerList : GUI
             : player.controllerId == PlayerSync.MyConnectionId;
     }
 
-    /// <summary>Human-readable control status for the given player.</summary>
-    public static string ControlStatus(PlayerInfo player)
-    {
-        if (player == null) return "";
-        if (player.IsDelver) return "Delver"; // AI-only — never controllable
-        if (IsControlling(player)) return "You";
-        if (player.controllerId == -1) return "Free";
-        return $"Player {player.controllerId + 1}";
-    }
-
-    public void ShowInfo(PlayerInfo player)
-    {
-        if (player == null)
-        {
-            HideInfo();
-            return;
-        }
-        string effects = player.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
-        string rest = player.Resting ? "Resting\n" : "";
-        GUIMain.Cursor.Set(
-            $"HP {player.Health}/{player.HealthMax}",
-            rest +
-            $"Controlled by: {ControlStatus(player)}\n" +
-            (effects.Length > 0 ? "Effects: " + effects + "\n" : "") +
-            (player.IsDelver ? "(AI — cannot control)" :
-             IsControlling(player) ? "(controlling)" : "Click to select"));
-    }
-
-    public void HideInfo()
-    {
-        GUIMain.Cursor.Set();
-    }
-
     /// <summary>Take control of the given player if it's free (or already ours).
     /// Returns true if control was taken.</summary>
     public bool TryControl(PlayerInfo player)

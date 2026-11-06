@@ -62,9 +62,9 @@ public static class HarvestableRegistry
         orchids.Add(1f, 1, ID.Orchids);
         Register(ID.Orchids, new HarvestableDefinition(orchids));
 
-        Loot tulip = new Loot(ID.Tulip);
-        tulip.Add(1f, 1, ID.Tulip);
-        Register(ID.Tulip, new HarvestableDefinition(tulip));
+        Loot tulips = new Loot(ID.Tulips);
+        tulips.Add(1f, 1, ID.Tulips);
+        Register(ID.Tulips, new HarvestableDefinition(tulips));
 
         Loot daisies = new Loot(ID.Daisies);
         daisies.Add(1f, 1, ID.Daisies);
@@ -77,6 +77,11 @@ public static class HarvestableRegistry
         Loot toadstool = new Loot(ID.Toadstool);
         toadstool.Add(1f, 1, ID.Toadstool);
         Register(ID.Toadstool, new HarvestableDefinition(toadstool));
+
+        Loot cotton = new Loot(ID.Cotton);
+        cotton.Add(1f, 1, ID.Cotton);
+        cotton.Add(0.5f, 1, ID.Cotton);
+        Register(ID.Cotton, new HarvestableDefinition(cotton));
 
         Loot table = new Loot(ID.Table);
         table.Add(1f, 2, ID.Plank);

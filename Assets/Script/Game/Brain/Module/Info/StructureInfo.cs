@@ -70,10 +70,9 @@ public class StructureInfo : Info
             WarnToolTooWeak(attacker);
             return false;
         }
-        // User-controlled players acquire the target from hitting a structure; AI
-        // allies (controllerId == -1) keep the target their brain assigned.
-        if (attacker is not PlayerInfo || attacker.controllerId != -1)
-            attacker.AcquireTarget(this);
+        // AI-controlled players ignore this (see PlayerInfo.AcquireTarget), so their brain
+        // keeps the target it assigned instead of the structure they clipped.
+        attacker.AcquireTarget(this);
         return true;
     }
 

@@ -20,8 +20,9 @@ public static class Trade
         { ID.Mud, 2 }, { ID.Flint, 3 }, { ID.Ash, 2 }, { ID.Shell, 3 }, { ID.Wool, 5 },
         { ID.MetalChunks, 6 }, { ID.LeadChunks, 5 }, { ID.Meteorite, 8 }, { ID.Acorn, 2 },
         { ID.Cytoplasm, 4 }, { ID.SpiderWeb, 2 }, { ID.BirdShit, 2 }, { ID.Geode, 15 },
-        { ID.Fossil, 20 }, { ID.Orchids, 2 }, { ID.Tulip, 2 }, { ID.Daisies, 2 },
+        { ID.Fossil, 20 }, { ID.Orchids, 2 }, { ID.Tulips, 2 }, { ID.Daisies, 2 },
         { ID.Deathcap, 4 }, { ID.OysterShrooms, 4 }, { ID.Toadstool, 4 }, { ID.Berries, 2 },
+        { ID.Cotton, 3 },
         { ID.Meat, 3 }, { ID.Egg, 3 }, { ID.Corn, 3 }, { ID.Pumpkin, 3 },
 
         { ID.PetrifiedDelver, 3 * CopperPerGold }, { ID.ThousandMenWedge, 5 * CopperPerGold },

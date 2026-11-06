@@ -2,6 +2,14 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization; 
 public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
+
+public static class ActionTypeExtensions
+{
+    /// <summary>Pick-up and interaction targets are held until they complete or the carrier
+    /// moves, so every "is this a pending interaction?" test goes through here.</summary>
+    public static bool IsPickUpOrInteract(this IActionType actionType)
+        => actionType is IActionType.PickUp or IActionType.Interact;
+}
  
 [System.Serializable]
 public class MobInfo : DynamicInfo
@@ -37,6 +45,11 @@ public class MobInfo : DynamicInfo
     [NonSerialized] public Vector3 AimPosition; 
     [NonSerialized] public PathingStatus PathingStatus = PathingStatus.Pending;
 
+    /// <summary>True once this mob has damaged a player. HitboxType can't express hostility —
+    /// tree mimics and enraged visitors carry a passive hitbox — so "it hurt us" is the one
+    /// signal that is always true, and allies fight anything flying this flag.</summary>
+    [NonSerialized] public bool HostileToPlayers;
+
     // Animation inputs are serialized by EntitySync for remote clients.
 
     public override void Initialize()
@@ -46,6 +59,7 @@ public class MobInfo : DynamicInfo
         // previous owner's held item (SpriteTool). Clear it so the new entity doesn't
         // appear to be holding an item it doesn't have.
         Equipment = null;
+        HostileToPlayers = false;
         if (SpriteTool != null)
         {
             SetToolGlow(false);
@@ -61,12 +75,17 @@ public class MobInfo : DynamicInfo
         Machine.SetState<DefaultState>();
     }
 
-    /// <summary>Acquire a target from landing a hit.</summary>
-    public void AcquireTarget(Info target)
+    /// <summary>Acquire a target from landing a hit. Overridden by entity types that own
+    /// their targeting policy (see <see cref="PlayerInfo.AcquireTarget"/>).</summary>
+    public virtual void AcquireTarget(Info target)
     {
         Target = target;
         ActionType = IActionType.Hit;
     }
+
+    /// <summary>Record that this mob has attacked a player, so the party treats it as a
+    /// threat even when its hitbox type is passive.</summary>
+    public void MarkHostile() => HostileToPlayers = true;
 
     /// <summary>React to being hit: drop what we were doing, take the attacker as the new
     /// target and play the hit reaction.</summary>

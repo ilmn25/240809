@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -24,16 +23,10 @@ public abstract class GUIStorage : GUI
     /// <summary>The storage currently hovered (null when not hovering a slot).</summary>
     public static GUIStorage Hovered;
 
-    private void OnRefresh(object sender, EventArgs e)
-    {
-        if (Storage != null)
-            Text.text = Storage.DisplayName;
-    }
     public new void Initialize()
     {  
         GameObject = Object.Instantiate(Resources.Load<GameObject>($"Prefab/GUIStorage"),
             Main.GUIInv.transform);
-        Text = GameObject.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         GameObject.transform.Find("Panel").GetComponent<Image>().sprite =
             Cache.LoadSprite(PanelSprite);
         GameObject.GetComponent<HoverModule>().GUI = this;
@@ -57,7 +50,6 @@ public abstract class GUIStorage : GUI
             guiStorageSlot.slotNumber = row * SlotAmount + column;
             guiStorageSlot.GUIStorage = this;
         }
-        OnRefreshSlot += OnRefresh;
     }
  
     
@@ -66,7 +58,7 @@ public abstract class GUIStorage : GUI
         if (!GUIMain.Showing || !Showing)
         {
             if (CurrentSlotKey != -1)
-                SetInfoPanel();
+                SetHoveredSlot();
             return;
         }
 
@@ -122,11 +114,12 @@ public abstract class GUIStorage : GUI
     protected virtual void ActionPrimaryDown() {}
     protected virtual void ActionSecondaryDown() {} 
     protected virtual void ActionSecondaryKey() {} 
-    public void SetInfoPanel(int currentSlotKey = -1)
+    /// <summary>Tracks which slot the cursor is over so the HUD can describe it.
+    /// Null (-1) when the cursor leaves the window.</summary>
+    public void SetHoveredSlot(int currentSlotKey = -1)
     { 
         CurrentSlotKey = currentSlotKey;
         Hovered = currentSlotKey != -1 ? this : null;
-        GUIMain.InfoPanel.Set();
     }
     public virtual string HoveredItemText
     {

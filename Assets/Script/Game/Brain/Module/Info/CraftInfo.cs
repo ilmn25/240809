@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Spear, ID.Toolbench, ID.Torch, ID.MulchBlock);
+private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Spear, ID.Toolbench, ID.Torch, ID.MulchBlock);
 
     private static readonly ID[] MaterialWants =
     {
@@ -44,7 +44,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
 
         // The collector's scrap: each one buys five random pieces of cheap junk, and clicking
         // a listed piece sells it for coins worth it (see GUICraft.Sell).
-        { ID.Collector, new PoolDef(5, false, ID.Slag, ID.Charcoal, ID.LeadChunks, ID.Gravel, ID.Sand, ID.Flint, ID.Shell, ID.Mud, ID.Ash, ID.BirdShit, ID.SpiderWeb, ID.Sticks, ID.Cytoplasm, ID.Wool) },
+        { ID.Collector, new PoolDef(5, false, ID.Slag, ID.Charcoal, ID.LeadChunks, ID.Gravel, ID.Sand, ID.Flint, ID.Shell, ID.Mud, ID.Ash, ID.BirdShit, ID.SpiderWeb, ID.Sticks, ID.Cytoplasm, ID.Wool, ID.Cotton) },
     };
 
     public readonly List<ID> Pending = new List<ID>();
@@ -119,15 +119,14 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         if (!PoolDefs.TryGetValue(poolID, out PoolDef def))
             return null;
 
-        return def.Shared ? def.SharedStorage ??= Build(def, poolID)
-                          : _pool ??= Build(def, poolID);
+        return def.Shared ? def.SharedStorage ??= Build(def)
+                          : _pool ??= Build(def);
     }
 
-    private static Storage Build(PoolDef def, ID poolID)
+    private static Storage Build(PoolDef def)
     {
         ID[] items = def.RandomCount > 0 ? PickRandom(def.Items, def.RandomCount) : def.Items;
         Storage storage = new NoRefreshStorage(items.Length);
-        storage.Name = Helper.ToDisplayName(poolID);
         foreach (ID item in items)
             storage.CreateAndAddItem(item);
 
@@ -158,13 +157,6 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool("Crafting", ID.
         foreach (ID recipe in recipes)
             storage.CreateAndAddItem(recipe);
 
-        return storage;
-    }
-
-    private static Storage CreateNoRefreshPool(string name, params ID[] recipes)
-    {
-        Storage storage = CreateNoRefreshPool(recipes);
-        storage.Name = name;
         return storage;
     }
 

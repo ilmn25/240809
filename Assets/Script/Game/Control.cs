@@ -6,6 +6,9 @@ using UnityEngine;
 public class Control
 {
     private const int InteractRange = 2;
+    /// <summary>Seconds the player must stand beside a teammate before that
+    /// teammate's inventory opens on its own.</summary>
+    private const float ProximityInventoryDelay = 1f;
     public static Control Inst = new Control(); 
     public static int CurrentPlayerIndex = 0;
     
@@ -17,6 +20,9 @@ public class Control
     public static bool HoverInteract;
     private static Transform _dialogueSource;
     private static Transform _pendingInteract;
+    private static PlayerInfo _proximityTeammate;
+    private static float _proximityTimer;
+    private static bool _proximityAttempted;
     
     public readonly ControlKey Inv = new (KeyCode.F3);
     public readonly ControlKey Map = new (KeyCode.M);
@@ -125,7 +131,7 @@ public class Control
         {
             prev.Direction = Vector3.zero;
             prev.Velocity = new Vector3(0f, prev.Velocity.y, 0f);
-            if (prev.ActionType is IActionType.PickUp or IActionType.Interact)
+            if (prev.ActionType.IsPickUpOrInteract())
             {
                 prev.CancelTarget();
                 prev.ActionType = IActionType.Follow;
@@ -205,6 +211,8 @@ public class Control
         
         HandleInput();
 
+        UpdateProximityInventory();
+
         if (Inst.ActionPrimary.KeyDown() && !GUIMain.IsHover && !GUIMain.CursorActive &&
             Main.PlayerInfo?.Equipment?.Info.Type == ItemType.Tool &&
             Main.PlayerInfo.Machine is EntityMachine em &&
@@ -253,7 +261,7 @@ public class Control
             if (collider.gameObject == Main.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
-            if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable)
+            if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.CanPickUp)
                 continue;
             distance = Helper.SquaredDistance(collider.transform.position, Main.Player.transform.position);
             if (distance < nearestDistance)
@@ -263,6 +271,84 @@ public class Control
             }
         }
         return nearTarget; 
+    }
+
+    /// <summary>Standing beside a teammate opens their inventory, so items can be handed
+    /// over without right-clicking them. The bag goes through <see cref="ContainerWindow"/>,
+    /// which leaves the teammate's machine alone; that window closes itself when the player
+    /// walks off, so walking here just re-arms the dwell.
+    /// </summary>
+    private static void UpdateProximityInventory()
+    {
+        if (GetMovementAxis() != Vector2Int.zero)
+        {
+            _proximityTimer = 0f;
+            _proximityAttempted = false;
+        }
+
+        PlayerInfo teammate = FindNearestTeammate();
+
+        if (teammate != _proximityTeammate)
+        {
+            _proximityTeammate = teammate;
+            _proximityTimer = 0f;
+            _proximityAttempted = false;
+        }
+
+        if (teammate == null || _proximityAttempted) return;
+
+        if (!CanAutoOpenInventory())
+        {
+            _proximityTimer = 0f;
+            return;
+        }
+
+        _proximityTimer += Time.deltaTime;
+        if (_proximityTimer < ProximityInventoryDelay) return;
+
+        _proximityTimer = 0f;
+        _proximityAttempted = true;
+        ContainerWindow.Open(teammate);
+    }
+
+    /// <summary>The teammate whose inventory would open if the player stayed put.</summary>
+    private static PlayerInfo FindNearestTeammate()
+    {
+        if (Main.Player == null || Main.PlayerInfo == null || global::Save.Inst?.players == null) return null;
+
+        PlayerInfo nearest = null;
+        float nearestDistance = ContainerWindow.ProximityRange * ContainerWindow.ProximityRange;
+        foreach (PlayerInfo player in global::Save.Inst.players)
+        {
+            if (player == null || player == Main.PlayerInfo || player.Destroyed || player.Storage == null) continue;
+            if (player.Machine is not PlayerMachine machine) continue;
+            if (player.PlayerStatus == PlayerStatus.Incapacitated) continue;
+
+            float distance = Helper.SquaredDistance(machine.transform.position, Main.Player.transform.position);
+            if (distance > nearestDistance) continue;
+
+            nearestDistance = distance;
+            nearest = player;
+        }
+        return nearest;
+    }
+
+    /// <summary>Whether the world is in a state where a window may pop open unasked:
+    /// alive and idle, no dialogue or menu up, nothing else already open.</summary>
+    private static bool CanAutoOpenInventory()
+    {
+        if (Main.PlayerInfo?.Machine == null) return false;
+        if (!Main.PlayerInfo.Machine.IsCurrentState<DefaultState>()) return false;
+        // The dwell counts standing still, so the timer only builds once the player stops.
+        if (GetMovementAxis() != Vector2Int.zero) return false;
+        if (!GUIMain.Showing || GUIMain.Storage.Showing) return false;
+        if (Scene.Busy) return false;
+        if (GUIMain.GUIMenu.Showing || Dialogue.Showing) return false;
+        if (GUIMain.Map is { IsOpen: true }) return false;
+        if (!Helper.IsHost() && NetworkClient.isConnected &&
+            !PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid))
+            return false;
+        return true;
     }
  
     private static void HandleScroll()
@@ -338,7 +424,7 @@ public class Control
                 !Main.PlayerInfo.Machine.IsCurrentState<DefaultState>()))
                 return;
 
-            if (!itemInfo.item.Info.Pickupable) return;
+            if (!itemInfo.CanPickUp) return;
 
             Main.PlayerInfo.Target = itemInfo;
             Main.PlayerInfo.ActionType = IActionType.PickUp;
@@ -393,7 +479,7 @@ public class Control
         if (action is IActionSecondaryPickUp)
         {
             if (action is not EntityMachine machine || machine.Info is not ItemInfo itemInfo) return false;
-            return itemInfo.item.Info.Pickupable;
+            return itemInfo.CanPickUp;
         }
 
         return action is IActionSecondaryInteract;

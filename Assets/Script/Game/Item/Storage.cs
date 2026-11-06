@@ -12,18 +12,6 @@ public class Storage
         public int Key;
         public Info info;
 
-        public string Name;
-
-        /// <summary>Player-facing title for this storage's window: the explicit name if
-        /// one was set, otherwise derived from the owning Info, otherwise a generic
-        /// fallback. A hand-built container can have no id at all, since it never passes
-        /// through Entity.CreateInfo. The enum is qualified because this class declares
-        /// its own <see cref="ID"/> field.</summary>
-        public string DisplayName =>
-            Name
-            ?? (info != null && info.id != global::ID.Null ? Helper.ToDisplayName(info.id) : null)
-            ?? "Storage";
-
         // when true, AddItem/RemoveItem won't trigger Inventory.RefreshInventory
         [NonSerialized] public bool SuppressRefresh;
         // when true, Storage.NotifyChanged won't fire Storage.OnChanged (used during bulk transfers)
@@ -48,10 +36,18 @@ public class Storage
         public void NotifyChanged()
         {
                 if (!SuppressSync) OnChanged?.Invoke(this);
-                if (info is not MobInfo mobInfo || List == null || List.Count == 0) return;
-                ItemSlot selectedSlot = List[Key];
-                mobInfo.SetEquipment(selectedSlot is { Stack: > 0 } ? selectedSlot : null);
+                if (info is not MobInfo || List == null || List.Count == 0) return;
+                ApplySelectedEquipment();
                 if (!SuppressRefresh) Inventory.RefreshInventory();
+        }
+
+        /// <summary>Hold whatever the selected slot contains (nothing when it is empty),
+        /// so the owner renders the right item in hand.</summary>
+        public void ApplySelectedEquipment()
+        {
+                if (info is not MobInfo mobInfo) return;
+                ItemSlot selected = GetSelected();
+                mobInfo.SetEquipment(selected is { Stack: > 0 } ? selected : null);
         }
 
         /// <summary>The currently selected (highlighted) slot, clamped to valid
@@ -62,20 +58,62 @@ public class Storage
             return List[Mathf.Clamp(Key, 0, List.Count - 1)];
         }
 
+        /// <summary>Whether a slot's contents could be added: there is an empty slot, or a
+        /// slot holding the same item has room left to stack.</summary>
+        public bool CanFit(ItemSlot slot)
+        {
+                if (List == null) return false;
+                foreach (ItemSlot owned in List)
+                {
+                        if (owned == null) continue;
+                        if (owned.isEmpty() || owned.isSame(slot) && !owned.isFull()) return true;
+                }
+                return false;
+        }
+
+        /// <summary>Hold the best carried tool for the given operation. False when the bag
+        /// has no tool for it.</summary>
         public bool SetTool(OperationType operation)
         {
+                return EquipBest(item => item.ProjectileInfo.OperationType == operation
+                        ? item.ProjectileInfo.Breaking
+                        : null);
+        }
+
+        /// <summary>Hold the best carried weapon, so an ally that was working with a tool can
+        /// fight. A real weapon (2+ damage) wins, but any damaging item beats an empty hand —
+        /// gathering tools deal 1 damage, so an ally holding only a pickaxe still fights.
+        /// Items that can't land a hit (no ammo, 0-damage hammer) never qualify.</summary>
+        public bool SetWeapon()
+        {
+                return EquipBest(item => CanUseAsWeapon(item.ID, item.ProjectileInfo)
+                        ? item.ProjectileInfo.Damage
+                        : null);
+        }
+
+        /// <summary>Whether this item can actually land a hit: it deals damage and, if it
+        /// needs ammo, the owner is carrying some.</summary>
+        private bool CanUseAsWeapon(ID itemID, ProjectileInfo projectile)
+        {
+                if (projectile.Damage < 1) return false;
+                if (AmmoRegistry.IsGun(itemID)) return AmmoRegistry.PickFor(itemID, this) != global::ID.Null;
+                return projectile.Ammo == global::ID.Null || GetAmount(projectile.Ammo) > 0;
+        }
+
+        /// <summary>Hold the carried item with the highest score. A null score means the item
+        /// is not eligible; a score of 0 or less never beats an empty hand.</summary>
+        private bool EquipBest(Func<Item, int?> score)
+        {
                 int targetKey = -1;
-                int targetBreaking = 0;
+                int targetScore = 0;
                 for (int i = 0; i < List.Count; i++)
                 {
                         Item item = Item.GetItem(List[i].ID);
-                        if (item == null || item.ProjectileInfo == null) continue;
-                        if (operation == item.ProjectileInfo.OperationType &&
-                            targetBreaking < item.ProjectileInfo.Breaking)
-                        {
-                                targetBreaking = item.ProjectileInfo.Breaking;
-                                targetKey = i;
-                        }
+                        if (item?.ProjectileInfo == null) continue;
+                        int? value = score(item);
+                        if (value == null || value <= targetScore) continue;
+                        targetScore = value.Value;
+                        targetKey = i;
                 }
 
                 if (targetKey == -1) return false;

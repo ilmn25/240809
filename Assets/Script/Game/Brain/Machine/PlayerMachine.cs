@@ -1,16 +1,19 @@
- 
-using System.Collections.Generic;
+
 using UnityEngine;
  
 public class PlayerMachine : MobMachine, IActionSecondaryInteract
 {
     private new PlayerInfo Info => GetModule<PlayerInfo>();
 
-    private bool EnsureCompatibleToolForTarget()
-    {
-        if (Info.Target is not StructureInfo structureTarget) return true;
+    // Party leader the allies follow; null when there is nobody left to follow.
+    private static PlayerInfo Leader => Main.PlayerInfo is PlayerInfo { Destroyed: false } leader ? leader : null;
 
-        if (Info.Storage.SetTool(structureTarget.operationType)) return true;
+    // Equip the tool Info.Target needs. False (with the target dropped) when the bag has no
+    // such tool left — the human path stops the swing, an ally stops the job.
+    private bool EnsureToolForTarget()
+    {
+        if (Info.Target is not StructureInfo target) return true;
+        if (Info.Storage.SetTool(target.operationType)) return true;
 
         Info.CancelTarget();
         return false;
@@ -22,12 +25,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {  
             HitboxType = HitboxType.Friendly,
             targetHitboxType = HitboxType.Passive,
-            Storage = new Storage(9)
-            {
-                Name = "Inventory"
-            },
+            Storage = new Storage(9),
             HealthMax = 18,
-            Defense = 0,
             Mana = 100,
             Sanity = 100,
             Stamina = 100,
@@ -46,7 +45,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             HitSfx = SfxID.HitPlayer, 
             CharSprite = ID.Chito 
         };
-        player.Storage.Key = 0;
         return player;
     }
     public override void OnStart()
@@ -64,27 +62,17 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobEscape());
         AddState(new EquipSelectState());   
-        AddState(new InContainerState()
-        {
-            Storage = Info.Storage
-        });
 
         // Apply the selected inventory slot as the held tool so it renders in hand.
         // The controlled player gets this via Inventory.RefreshInventory; allies need it here.
-        Storage storage = Info.Storage;
-        if (storage?.List != null && storage.Key >= 0 && storage.Key < storage.List.Count)
-        {
-            ItemSlot selected = storage.List[storage.Key];
-            Info.SetEquipment(selected is { Stack: > 0 } ? selected : null);
-        }
+        Info.Storage.ApplySelectedEquipment();
     }
 
     public void OnActionSecondary(Info info)
     {
-        if (IsCurrentState<InContainerState>())
-            SetState<DefaultState>();
-        else 
-            SetState<InContainerState>();
+        // A bag is UI, not a state of its owner: opening it here would stall the ally's
+        // brain (which only runs in Default/MobChaseAction) for as long as it is looked at.
+        ContainerWindow.Toggle(Info);
     }
     
     /// <summary>True while a snare flea is latched on (its Bugged slow is active).</summary>
@@ -98,30 +86,32 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             transform.position = new Vector3(Main.Player.transform.position.x , World.Inst.Bounds.y + 40, Main.Player.transform.position.z);
         }
          
-        if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact &&
-            (Input.GetKeyDown(KeyCode.A) ||
-             Input.GetKeyDown(KeyCode.W) ||
-             Input.GetKeyDown(KeyCode.S) ||
-             Input.GetKeyDown(KeyCode.D) ||
-             Input.GetKeyDown(KeyCode.Space)))
-        { 
+        if (Info.Target != null && Info.ActionType.IsPickUpOrInteract() && AnyMoveKeyDown())
+        {
             Info.CancelTarget();
-        } 
+        }
+    }
+
+    // Moving cancels a pending pickup/interaction. Uses the bound Control keys instead of
+    // hard-coded KeyCodes so rebinds keep working.
+    private static bool AnyMoveKeyDown()
+    {
+        Control control = Control.Inst;
+        return control.Up.KeyDown() || control.Down.KeyDown() || control.Left.KeyDown() ||
+               control.Right.KeyDown() || control.Jump.KeyDown();
     }
     
     public override void OnUpdate()
     {
         Info.position = transform.position;
 
-        bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(Info.uid);
-
-        if (blockedByOther) return;
+        if (PlayerSync.IsClaimedByRemoteClient(Info.uid)) return;
         if (Main.PlayerInfo == Info)
         {
             HandleInput();
             if (!IsCurrentState<DefaultState>() || Info.Resting) return;
 
-            if (Info.Target != null && Info.ActionType is IActionType.PickUp or IActionType.Interact)
+            if (Info.Target != null && Info.ActionType.IsPickUpOrInteract())
             {
                 SetState<MobChaseAction>();
                 return;
@@ -145,15 +135,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     // ---- Ally AI (Death Road to Canada style) ----
 
-    /// <summary>Recall all allies: cancel their current target/action. The ally brain
-    /// then auto-follows the leader. Runs on the host (authority over ally AI).</summary>
+    /// <summary>Recall all allies: cancel their current target/action, so the brain
+    /// falls back to following the leader. Runs on the host (authority over ally AI).</summary>
     public static void RecallAllies()
     {
-        if (Save.Inst == null || Main.PlayerInfo == null) return;
-        // Un-mark any structure the leader had allies work, so the handoff can't
-        // re-assign it the moment the ally's target is cancelled.
-        if (Main.PlayerInfo.Target is StructureInfo)
-            Main.PlayerInfo.Target = null;
+        if (Save.Inst?.players == null) return;
         foreach (PlayerInfo player in Save.Inst.players)
         {
             if (player == Main.PlayerInfo || player.Destroyed) continue;
@@ -162,15 +148,20 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
     }
 
-    // Drives non-controlled party members: fight nearby hostiles, otherwise trail the leader.
-    // SetState is a no-op when already in MobChaseAction, so calling it unconditionally just
-    // retargets via Info.Target while following. Protected so DelverMachine can drive itself
-    // with the same brain.
+    // Drives non-controlled party members. Priority order:
+    //   1. finish a fight already under way,
+    //   2. finish the structure job this ally was ordered to do,
+    //   3. roaming/targetless: pick a new fight or sweep up loot,
+    //   4. otherwise trail the leader.
+    // Allies never adopt the leader's target — the only way they get a structure job is by
+    // the player controlling them and hitting it, which leaves the target on the ally when
+    // control moves on. SetState is a no-op when already in MobChaseAction, so calling it
+    // unconditionally just retargets via Info.Target while following. Protected so
+    // DelverMachine can drive itself with the same brain.
     protected void UpdateAllyBrain()
     {
         if (Info.Resting)
         {
-            _lootTarget = null;
             Info.CancelTarget();
             return;
         }
@@ -178,100 +169,93 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (!IsCurrentState<DefaultState>() && !IsCurrentState<MobChaseAction>()) return;
 
         // A pending pickup/interaction owns the brain until it completes or gets dropped.
-        bool waitingOnTarget = Info.ActionType is IActionType.PickUp or IActionType.Interact;
-        if (waitingOnTarget && Info.Target != null) return;
-        if (waitingOnTarget)
+        if (Info.ActionType.IsPickUpOrInteract())
         {
-            if (Info.ActionType == IActionType.PickUp) BlacklistLoot(_lootTarget);
+            if (Info.Target != null) return;
             Info.ActionType = IActionType.Follow;
         }
 
-        bool lowHealth = Info.Health <= Info.HealthMax / 4;
+        // Harvestables (grass, flowers, mud piles, fallen logs) are pickup-scale decor;
+        // an ally shouldn't stay locked onto one instead of following the leader.
+        if (Info.Target is HarvestableInfo)
+            Info.CancelTarget();
 
-        // Low health: don't fight — flee from nearby hostiles, else keep working/following.
-        if (lowHealth && TryFleeEnemy())
+        // Low health: don't fight — flee from nearby hostiles, else keep following.
+        if (Info.Health <= Info.HealthMax / 4 && TryFleeEnemy())
         {
             SetState<MobEscape>();
             return;
         }
 
-        // A threat takes priority over cutting — don't let a sheep you clipped kill you.
-        if (TryAcquireEnemyTarget())
-        {
-            Info.ActionType = IActionType.Hit;
-            SetState<MobChaseAction>();
-            return;
-        }
-
-        // Work a structure: the assigned one, or whatever the leader marked.
-        StructureInfo work = Info.Target is StructureInfo assigned &&
-                             Info.ActionType is IActionType.Hit or IActionType.Dig
-            ? assigned
-            : Main.PlayerInfo?.Target is StructureInfo leaderTask && !leaderTask.Destroyed
-                ? leaderTask
-                : null;
-
-        // No compatible tool — don't lock onto it, follow the leader instead.
-        if (work != null && Info.Storage.SetTool(work.operationType))
-        {
-            Info.Target = work;
-            Info.ActionType = IActionType.Hit;
-            SetState<MobChaseAction>();
-            return;
-        }
-
-        // Only scavenge once there is no job left: claiming a drop writes the item into
-        // Info.Target, which is the only place the assigned structure is remembered.
-        if (TryAcquireLootTarget())
+        // Priority, highest first: fighting, then the structure job this ally was ordered to
+        // do. Only a roaming/targetless ally picks up loot.
+        if (TryEngageEnemy() || TryContinueWork() || TryAcquireLootTarget())
         {
             SetState<MobChaseAction>();
             return;
         }
 
         if (!IsCurrentState<DefaultState>()) return;
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
-        Info.Target = Main.PlayerInfo;
+        if (Leader is not PlayerInfo leader) return;
+        Info.Target = leader;
         Info.ActionType = IActionType.Follow;
         SetState<MobChaseAction>();
     }
 
-    // Anchored to the leader: fights enemies on sight, and retaliates against a passive mob
-    // that is attacking a player. Breaks off and re-follows the leader if the fight drags it
-    // away. Unarmed allies just trail.
-    private bool TryAcquireEnemyTarget()
+    // Keeps the ally fighting. It stays on the enemy it already engaged — that fight may
+    // drift out to disengage range — and otherwise engages the nearest threat around the
+    // leader. Either way it needs something it can actually swing.
+    private bool TryEngageEnemy()
     {
-        if (Main.PlayerInfo == null) return false; // nothing to defend / follow
+        if (Leader is not PlayerInfo leader) return false;
 
-        // Only fight with something that can actually strike. Sticks, blocks, food and other
-        // non-tools have no ProjectileInfo, so MobAttackSwing just plays the animation and
-        // deals nothing — a stack of sticks must not pull an NPC into a fight. Tools (hatchet,
-        // pickaxe, club, guns) all have one, so a woodcutter still defends itself.
-        if (Info.Equipment?.Info?.ProjectileInfo == null) return false;
+        MobInfo enemy = Info.Target as MobInfo;
+        bool engaged = enemy != null && !enemy.Destroyed && IsThreat(enemy);
 
-        Vector3 leaderPos = Main.PlayerInfo.position;
-
-        // Keep the current target while it's still a threat and the fight stays near.
-        if (Info.Target is MobInfo current && IsThreat(current))
+        if (engaged)
         {
-            if (current.Destroyed ||
-                Vector3.Distance(leaderPos, current.position) > Info.DistDisengage ||
-                Vector3.Distance(leaderPos, transform.position) > Info.DistAlert)
+            if (IsBeyondAlert(leader.position) ||
+                Vector3.Distance(leader.position, enemy.position) > Info.DistDisengage)
             {
                 Info.CancelTarget();
                 return false;
             }
-            return true;
+        }
+        else
+        {
+            // Don't start new fights while away from the leader — head back first.
+            if (IsBeyondAlert(leader.position)) return false;
+
+            enemy = FindNearestThreat();
+            if (enemy == null || Vector3.Distance(leader.position, enemy.position) > Info.DistAlert) return false;
         }
 
-        // Don't pick new fights while away from the leader — head back first.
-        if (Vector3.Distance(leaderPos, transform.position) > Info.DistAlert) return false;
+        // Draw a weapon first: an ally that just finished a job is still holding its pickaxe.
+        if (!Info.Storage.SetWeapon())
+        {
+            if (engaged) Info.CancelTarget();
+            return false;
+        }
 
-        // Engage the nearest threat near the leader.
-        MobInfo enemy = FindNearestThreat();
-        if (enemy == null || Vector3.Distance(leaderPos, enemy.position) > Info.DistAlert) return false;
         Info.Target = enemy;
+        Info.ActionType = IActionType.Hit;
         return true;
     }
+
+    // An ally finishes the structure job it was ordered to do — the target it kept from the
+    // last time the player controlled it and hit that structure. Runs until the structure is
+    // gone or the tool it needs breaks; nothing here ever adopts another player's target.
+    private bool TryContinueWork()
+    {
+        if (Info.Target is not StructureInfo job || job.Destroyed) return false;
+        if (!EnsureToolForTarget()) return false;
+
+        Info.ActionType = IActionType.Hit;
+        return true;
+    }
+
+    // True when the ally has strayed past its alert radius from the given point.
+    private bool IsBeyondAlert(Vector3 from) => Vector3.Distance(from, transform.position) > Info.DistAlert;
 
     // Flees from the nearest nearby hostile (used when low on health).
     private bool TryFleeEnemy()
@@ -282,16 +266,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return true;
     }
 
-    // A threat is any enemy (attacked on sight) or a passive mob that is actually
-    // attacking a player. A docile sheep/chicken merely fleeing is not a threat —
-    // PassiveInfo defaults ActionType to Hit for all passives, so we rely on the
-    // sheep's Retaliating flag (set only when it's hit and fights back) instead of
-    // ActionType, which would wrongly flag innocent farm animals.
+    // A threat is anything the party must defend against: an enemy, a mob that has already
+    // damaged a player (tree mimics and enraged visitors are hostile despite a passive
+    // hitbox), or a passive animal that is fighting back. Docile animals use their target as
+    // a flee anchor, so PassiveInfo's default ActionType can't be used as the signal.
     private bool IsThreat(MobInfo mob)
     {
         if (mob == null || mob.Destroyed) return false;
-        if (mob.HitboxType == HitboxType.Enemy) return true;
-        if (mob.HitboxType != HitboxType.Passive) return false;
+        if (mob.HitboxType == HitboxType.Enemy || mob.HostileToPlayers) return true;
         return mob is SheepInfo sheep && sheep.Retaliating;
     }
 
@@ -303,15 +285,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // ---- Loot pickup ----
 
-    private const float LootRadius = 4f;
-    private const float LootRetryDelay = 30f;
-    private const int LootBlacklistSize = 32;
-
-    // Items this ally already failed to walk to, keyed by uid and holding a retry time.
-    private readonly Dictionary<string, float> _unreachableLoot = new Dictionary<string, float>();
-
-    // The item currently being collected, kept so a cancelled pickup can be blacklisted.
-    private ItemInfo _lootTarget;
+    /// <summary>How close a drop must already be before an ally detours to grab it — about
+    /// touching distance, so allies don't wander off chasing loot.</summary>
+    private const float LootRadius = 1f;
 
     /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.</summary>
     private bool TryAcquireLootTarget()
@@ -319,11 +295,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (EntityScan.FindNearest(transform.position, LootRadius, IsWantedLoot) is not ItemInfo item)
             return false;
 
-        _lootTarget = item;
         Info.Target = item;
         Info.ActionType = IActionType.PickUp;
-        // Force the pathing module to repath at the item instead of standing on a
-        // "reached" status left over from following the leader.
+        // Fresh action, not reached yet. Repathing itself is automatic: the pathing module
+        // rebuilds whenever Info.Target stops matching the path it holds.
         Info.PathingStatus = PathingStatus.Pending;
         return true;
     }
@@ -331,9 +306,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     private bool IsWantedLoot(Info info)
     {
         if (info is not ItemInfo item || item.Destroyed) return false;
-        if (item.item == null || item.item.isEmpty() || !item.item.Info.Pickupable) return false;
-        if (!HasRoomFor(item.item)) return false;
-        if (_unreachableLoot.TryGetValue(item.uid, out float retryAt) && Time.time < retryAt) return false;
+        if (!item.CanPickUp) return false;
+        if (!Info.Storage.CanFit(item.item)) return false;
         return !IsLootClaimed(item);
     }
 
@@ -344,48 +318,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         foreach (PlayerInfo player in Save.Inst.players)
         {
             if (player == null || player.Destroyed) continue;
-            if (player.Target == item &&
-                (player.ActionType == IActionType.PickUp || player.ActionType == IActionType.Interact))
-                return true;
+            if (player.Target == item && player.ActionType.IsPickUpOrInteract()) return true;
         }
         return false;
-    }
-
-    private bool HasRoomFor(ItemSlot slot)
-    {
-        List<ItemSlot> slots = Info.Storage?.List;
-        if (slots == null) return false;
-        foreach (ItemSlot owned in slots)
-        {
-            if (owned == null) continue;
-            if (owned.isEmpty()) return true;
-            if (owned.isSame(slot) && !owned.isFull()) return true;
-        }
-        return false;
-    }
-
-    private void BlacklistLoot(ItemInfo item)
-    {
-        if (item == null) return;
-        _lootTarget = null;
-        // A destroyed item was collected successfully — nothing to blacklist.
-        if (item.Destroyed) return;
-
-        _unreachableLoot[item.uid] = Time.time + LootRetryDelay;
-        if (_unreachableLoot.Count <= LootBlacklistSize) return;
-
-        float now = Time.time;
-        List<string> expired = new List<string>();
-        foreach (KeyValuePair<string, float> entry in _unreachableLoot)
-        {
-            if (entry.Value <= now) expired.Add(entry.Key);
-        }
-        foreach (string uid in expired) _unreachableLoot.Remove(uid);
     }
 
     public override void Attack()
     {
-        if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid) && !EnsureCompatibleToolForTarget())
+        if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid) && !EnsureToolForTarget())
         {
             return;
         }

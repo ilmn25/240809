@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 { 
     private TextMeshProUGUI _text;
-    [NonSerialized] public string Info;
     [NonSerialized] public bool IsHovered;
     private void Start()
     {
@@ -20,7 +19,6 @@ public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         Audio.PlaySFX(SfxID.Text);
         ScaleSlot(1.1f);
         IsHovered = true;
-        if (Info != null) GUIMain.Cursor.Set(_text.text, Info);
     }
  
     public void OnPointerExit(PointerEventData eventData)
@@ -28,7 +26,6 @@ public class GUIButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         GUIMain.IsHover = false;
         ScaleSlot(1f);
         IsHovered = false;
-        GUIMain.Cursor.Set();
     }
     private void ScaleSlot(float scale)
     {

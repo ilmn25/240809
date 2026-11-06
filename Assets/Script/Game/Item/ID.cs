@@ -112,7 +112,7 @@ public enum ID
     ForestBlock,
     Deathcap,
     Orchids,
-    Tulip,
+    Tulips,
     Daisies,
     Torch,
     BurnedTree,
@@ -249,4 +249,5 @@ public enum ID
     BloodBlack,
     Shelf,
     Crow,
+    Cotton,
 }

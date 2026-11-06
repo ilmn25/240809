@@ -39,6 +39,7 @@ public class GenTaskEntity : IGenTask
     private const double DirtFallenTreeChance = 0.004;
     private const double DirtMudPileChance = 0.006;
     private const double DirtToadstoolChance = 0.003;
+    private const double DirtCottonChance = 0.004;
     private static readonly float PathOffset = Gen.GetDeterministicOffset("ForestPath");
     private const float PathScale = 0.02f;
     private const float PathWidth = 0.03f;
@@ -55,11 +56,11 @@ public class GenTaskEntity : IGenTask
     {
         double flower = rng.NextDouble();
         if (flower < 0.34) return ID.Orchids;
-        if (flower < 0.67) return ID.Tulip;
+        if (flower < 0.67) return ID.Tulips;
         return ID.Daisies;
     }
 
-    private void SpawnChunk(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int spawn)
+    private void SpawnChunk(World world, Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int spawn)
     {
         System.Random rng = Gen.CreateChunkRandom("Entity", currentCoordinate);
 
@@ -93,8 +94,7 @@ public class GenTaskEntity : IGenTask
                         bool skeletonRoll = rng.NextDouble() < SurfaceSkeletonChance;
                         if (skeletonRoll && !spawnClearing)
                         {
-                            currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Skeleton, position));
-                            SpawnSkeletonLoot(currentCoordinate, currentChunk, position, rng);
+                            GenTaskScatter.SpawnSkeletonCorpse(world, position, rng);
                             continue; // one structure per cell — skip the biome spawn
                         }
                         if (currentChunk[x, y, z] == Forest)
@@ -177,6 +177,10 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Toadstool, position));
                             }
+                            else if (roll <= (chance += DirtCottonChance))
+                            {
+                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Cotton, position));
+                            }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {
                                 currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
@@ -258,7 +262,7 @@ public class GenTaskEntity : IGenTask
                     Vector3Int coord = new Vector3Int(cx * World.ChunkSize, cy * World.ChunkSize, cz * World.ChunkSize);
                     Chunk chunk = world[coord];
                     if (chunk == null || chunk == Chunk.Zero) continue;
-                    SpawnChunk(coord, chunk, world.SpawnPoint);
+                    SpawnChunk(world, coord, chunk, world.SpawnPoint);
                 }
     }
 
@@ -306,33 +310,5 @@ public class GenTaskEntity : IGenTask
             if (Vector3Int.FloorToInt(chunk.StaticEntity[i].position) == position)
                 return true;
         return false;
-    }
-
-    // Scatters low-tier starter loot (crude tools, flint) around a skeleton.
-    private static void SpawnSkeletonLoot(Vector3Int currentCoordinate, Chunk currentChunk, Vector3Int position, System.Random rng)
-    {
-        int count = rng.Next(1, 3);
-        for (int i = 0; i < count; i++)
-        {
-            int lx = position.x + rng.Next(-1, 2);
-            int lz = position.z + rng.Next(-1, 2);
-            int localX = lx - currentCoordinate.x;
-            int localZ = lz - currentCoordinate.z;
-            if (localX < 0 || localX >= World.ChunkSize || localZ < 0 || localZ >= World.ChunkSize) continue;
-            ID item = PickSkeletonLoot(rng);
-            if (item != ID.Null)
-                currentChunk.DynamicEntity.Add(Entity.CreateInfo(item, new Vector3Int(lx, position.y, lz)));
-        }
-    }
-
-    private static ID PickSkeletonLoot(System.Random rng)
-    {
-        double roll = rng.NextDouble();
-        double chance = 0;
-        if ((chance += 0.25) > roll) return ID.CrudeHatchet;
-        if ((chance += 0.25) > roll) return ID.CrudePickaxe;
-        if ((chance += 0.2) > roll) return ID.CrudeMallet;
-        if ((chance += 0.2) > roll) return ID.Flint;
-        return ID.Sticks;
     }
 }

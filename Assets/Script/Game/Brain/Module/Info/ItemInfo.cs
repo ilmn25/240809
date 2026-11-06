@@ -71,10 +71,13 @@ public class ItemInfo : Info
         PositionDirty = false;
     }
 
+    /// <summary>Whether this drop can actually be collected: an empty or non-pickupable
+    /// slot (blood pools) can't be picked up.</summary>
+    public bool CanPickUp => item != null && !item.isEmpty() && item.Info.Pickupable;
+
     public void OnActionSecondary(Info info)
     {        
-        // Non-pickupable items (blood pools) can't be collected.
-        if (!item.Info.Pickupable) return;
+        if (!CanPickUp) return;
         if (Vector3.Distance(position, info.Machine.transform.position) < 3f) 
         { 
             Audio.PlaySFX(SfxID.Item);
