@@ -62,9 +62,9 @@ public static class HarvestableRegistry
         orchids.Add(1f, 1, ID.Orchids);
         Register(ID.Orchids, new HarvestableDefinition(orchids));
 
-        Loot tulip = new Loot(ID.Tulip);
-        tulip.Add(1f, 1, ID.Tulip);
-        Register(ID.Tulip, new HarvestableDefinition(tulip));
+        Loot tulips = new Loot(ID.Tulips);
+        tulips.Add(1f, 1, ID.Tulips);
+        Register(ID.Tulips, new HarvestableDefinition(tulips));
 
         Loot daisies = new Loot(ID.Daisies);
         daisies.Add(1f, 1, ID.Daisies);

@@ -7,7 +7,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
     public const float CompanionDuration = 45f;
 
     /// <summary>Every meadow flower the Guide asks for, two of each.</summary>
-    private static readonly ID[] FlowerTypes = { ID.Orchids, ID.Tulip, ID.Daisies };
+    private static readonly ID[] FlowerTypes = { ID.Orchids, ID.Tulips, ID.Daisies };
 
     public static Info CreateInfo() => PassiveInfo.CreateNpc();
 

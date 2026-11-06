@@ -103,7 +103,7 @@ public class GenTaskSpawnGarden : GenTaskScatter
     {
         double flower = rng.NextDouble();
         if (flower < 0.34) return ID.Orchids;
-        if (flower < 0.67) return ID.Tulip;
+        if (flower < 0.67) return ID.Tulips;
         return ID.Daisies;
     }
 }
