@@ -249,4 +249,5 @@ public enum ID
     BloodBlack,
     Shelf,
     Crow,
+    Cotton,
 }

@@ -26,6 +26,7 @@ public class GenTaskSpawnGarden : GenTaskScatter
         (35, GardenRadius - 1, PickFlower),
         (10, 4, _ => ID.FallenTree),
         (10, 4, _ => ID.MudPile),
+        (5, 4, _ => ID.Cotton),
     };
 
     /// <summary>Sows the skeletons, then decorates the free grass columns around spawn,

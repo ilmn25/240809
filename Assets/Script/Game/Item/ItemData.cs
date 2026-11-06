@@ -106,6 +106,7 @@ public partial class Item
         AddConsumableDefinition(ID.OysterShrooms, 3, "A cluster of oyster mushrooms, tender and savoury.", worth: 4);
         AddConsumableDefinition(ID.Toadstool, 2, "A spotted toadstool. Eating it raw hurts.", damageValue: 2, worth: 4);
         AddMaterialDefinition(ID.Orchids, "A delicate wild orchid that grows in grassy meadows.", worth: 2);
+        AddMaterialDefinition(ID.Cotton, "Fluffy cotton bolls, spun into thread and cloth.", burnResult: ID.Charcoal, worth: 3);
         AddMaterialDefinition(ID.Tulips, "A bright tulips that blooms in sunny meadows.", worth: 2);
         AddMaterialDefinition(ID.Daisies, "A cheerful cluster of daisies growing in the grass.", worth: 2);
         AddMaterialDefinition(ID.Ash, "Fine grey ash left behind by fire.", worth: 2);

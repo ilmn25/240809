@@ -78,6 +78,11 @@ public static class HarvestableRegistry
         toadstool.Add(1f, 1, ID.Toadstool);
         Register(ID.Toadstool, new HarvestableDefinition(toadstool));
 
+        Loot cotton = new Loot(ID.Cotton);
+        cotton.Add(1f, 1, ID.Cotton);
+        cotton.Add(0.5f, 1, ID.Cotton);
+        Register(ID.Cotton, new HarvestableDefinition(cotton));
+
         Loot table = new Loot(ID.Table);
         table.Add(1f, 2, ID.Plank);
         table.Add(0.5f, 2, ID.Sticks);

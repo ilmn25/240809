@@ -57,7 +57,7 @@ public static class CombustionRegistry
 
         // Plants and decor all smolder down to ash.
         Ash(ID.Bush, ID.Grass, ID.Deathcap, ID.Orchids, ID.Tulips, ID.Daisies);
-        Ash(ID.OysterShrooms, ID.Toadstool);
+        Ash(ID.OysterShrooms, ID.Toadstool, ID.Cotton);
 
         // Oil barrel: flammable, but it doesn't burn out normally — it explodes
         // instead (BarrelMachine handles the explosion).

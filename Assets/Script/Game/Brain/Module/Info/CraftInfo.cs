@@ -44,7 +44,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
         // The collector's scrap: each one buys five random pieces of cheap junk, and clicking
         // a listed piece sells it for coins worth it (see GUICraft.Sell).
-        { ID.Collector, new PoolDef(5, false, ID.Slag, ID.Charcoal, ID.LeadChunks, ID.Gravel, ID.Sand, ID.Flint, ID.Shell, ID.Mud, ID.Ash, ID.BirdShit, ID.SpiderWeb, ID.Sticks, ID.Cytoplasm, ID.Wool) },
+        { ID.Collector, new PoolDef(5, false, ID.Slag, ID.Charcoal, ID.LeadChunks, ID.Gravel, ID.Sand, ID.Flint, ID.Shell, ID.Mud, ID.Ash, ID.BirdShit, ID.SpiderWeb, ID.Sticks, ID.Cytoplasm, ID.Wool, ID.Cotton) },
     };
 
     public readonly List<ID> Pending = new List<ID>();
