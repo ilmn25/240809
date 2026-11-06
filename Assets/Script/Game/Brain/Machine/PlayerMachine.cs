@@ -170,7 +170,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     {
         if (Info.Resting)
         {
-            _lootTarget = null;
             Info.CancelTarget();
             return;
         }
@@ -180,11 +179,12 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         // A pending pickup/interaction owns the brain until it completes or gets dropped.
         bool waitingOnTarget = Info.ActionType is IActionType.PickUp or IActionType.Interact;
         if (waitingOnTarget && Info.Target != null) return;
-        if (waitingOnTarget)
-        {
-            if (Info.ActionType == IActionType.PickUp) BlacklistLoot(_lootTarget);
-            Info.ActionType = IActionType.Follow;
-        }
+        if (waitingOnTarget) Info.ActionType = IActionType.Follow;
+
+        // Harvestables (grass, flowers, mud piles, fallen logs) are pickup-scale decor;
+        // an ally shouldn't stay locked onto one instead of following the leader.
+        if (Info.Target is HarvestableInfo)
+            Info.CancelTarget();
 
         bool lowHealth = Info.Health <= Info.HealthMax / 4;
 
@@ -210,10 +210,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        StructureInfo work = Info.Target is StructureInfo assigned &&
+        StructureInfo work = Info.Target is StructureInfo assigned && IsAllyWork(assigned) &&
                              Info.ActionType is IActionType.Hit or IActionType.Dig
             ? assigned
-            : Main.PlayerInfo?.Target is StructureInfo leaderTask && !leaderTask.Destroyed
+            : Main.PlayerInfo?.Target is StructureInfo leaderTask && IsAllyWork(leaderTask)
                 ? leaderTask
                 : null;
 
@@ -266,6 +266,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return true;
     }
 
+    // Allies chip in on structures the leader works, but never lock onto harvestables
+    // (grass, flowers, mud piles, fallen logs) — those are pickup-scale decor, not jobs.
+    private static bool IsAllyWork(StructureInfo structure)
+        => !structure.Destroyed && structure is not HarvestableInfo;
+
     // Gathering/building tools also have swing projectiles, but allies must not
     // treat those as weapons when they are carrying out their follow behavior.
     private bool CanAllyFight()
@@ -304,15 +309,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // ---- Loot pickup ----
 
-    private const float LootRadius = 4f;
-    private const float LootRetryDelay = 30f;
-    private const int LootBlacklistSize = 32;
-
-    // Items this ally already failed to walk to, keyed by uid and holding a retry time.
-    private readonly Dictionary<string, float> _unreachableLoot = new Dictionary<string, float>();
-
-    // The item currently being collected, kept so a cancelled pickup can be blacklisted.
-    private ItemInfo _lootTarget;
+    private const float LootRadius = 1.5f;
 
     /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.</summary>
     private bool TryAcquireLootTarget()
@@ -320,7 +317,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (EntityScan.FindNearest(transform.position, LootRadius, IsWantedLoot) is not ItemInfo item)
             return false;
 
-        _lootTarget = item;
         Info.Target = item;
         Info.ActionType = IActionType.PickUp;
         // Force the pathing module to repath at the item instead of standing on a
@@ -334,7 +330,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (info is not ItemInfo item || item.Destroyed) return false;
         if (item.item == null || item.item.isEmpty() || !item.item.Info.Pickupable) return false;
         if (!HasRoomFor(item.item)) return false;
-        if (_unreachableLoot.TryGetValue(item.uid, out float retryAt) && Time.time < retryAt) return false;
         return !IsLootClaimed(item);
     }
 
@@ -363,25 +358,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             if (owned.isSame(slot) && !owned.isFull()) return true;
         }
         return false;
-    }
-
-    private void BlacklistLoot(ItemInfo item)
-    {
-        if (item == null) return;
-        _lootTarget = null;
-        // A destroyed item was collected successfully — nothing to blacklist.
-        if (item.Destroyed) return;
-
-        _unreachableLoot[item.uid] = Time.time + LootRetryDelay;
-        if (_unreachableLoot.Count <= LootBlacklistSize) return;
-
-        float now = Time.time;
-        List<string> expired = new List<string>();
-        foreach (KeyValuePair<string, float> entry in _unreachableLoot)
-        {
-            if (entry.Value <= now) expired.Add(entry.Key);
-        }
-        foreach (string uid in expired) _unreachableLoot.Remove(uid);
     }
 
     public override void Attack()
