@@ -301,7 +301,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // ---- Loot pickup ----
 
-    private const float LootRadius = 1.5f;
+    private const float LootRadius = 2f;
 
     /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.</summary>
     private bool TryAcquireLootTarget()
@@ -311,8 +311,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         Info.Target = item;
         Info.ActionType = IActionType.PickUp;
-        // Force the pathing module to repath at the item instead of standing on a
-        // "reached" status left over from following the leader.
+        // Fresh action, not reached yet. Repathing itself is automatic: the pathing module
+        // rebuilds whenever Info.Target stops matching the path it holds.
         Info.PathingStatus = PathingStatus.Pending;
         return true;
     }

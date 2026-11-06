@@ -20,6 +20,14 @@ public abstract class PathingModule : MobModule
 
     private bool _repathRoutine; 
     private bool _isPathFinding; 
+    private bool _repathRequested;
+    private int _pathGeneration;
+
+    /// <summary>Target the path being walked was computed for. Callers retarget by assigning
+    /// <see cref="Info.Target"/>, and re-entering the chase state is a no-op, so the path can
+    /// silently belong to the previous target. The module checks this before walking, so no
+    /// caller can leave the entity moving along a route it no longer wants.</summary>
+    private Info _pathTarget;
     
     protected List<Node> Path;
     private List<Node> _pathQueued; 
@@ -44,6 +52,10 @@ public abstract class PathingModule : MobModule
         PathingTarget = pathingTarget;
         Path = null;
         _nextPointQueued = -1;
+        // Any path still being computed belongs to the previous target; drop it instead of
+        // letting it land and be walked.
+        _pathGeneration++;
+        _pathTarget = pathingTarget == PathingTarget.Target ? Info.Target : null;
         Info.PathingStatus = PathingStatus.Pending;
         Info.Direction = Vector3.zero;
         RepathCount = 0;
@@ -89,6 +101,25 @@ public abstract class PathingModule : MobModule
      
     public override void Update()
     {
+        // The target can be replaced while this path is still the "current" one (the brain
+        // retargets mid-chase, which SetState treats as a no-op). Rebuild at the new target
+        // rather than walking the old route.
+        if (PathingTarget == PathingTarget.Target && Info.Target != _pathTarget)
+        {
+            if (Info.Target != null)
+            {
+                SetTarget(PathingTarget.Target);
+            }
+            else
+            {
+                PathingTarget = PathingTarget.None;
+                Path = null;
+                Info.Direction = Vector3.zero;
+                Info.PathingStatus = PathingStatus.Stuck;
+            }
+            return;
+        }
+
         if (Info.PathingStatus != PathingStatus.Pending || PathingTarget == PathingTarget.None) return;
         Info.Direction = Vector3.zero;       
         if (!_repathRoutine) CheckRepathRoutine();
@@ -252,19 +283,40 @@ public abstract class PathingModule : MobModule
     
     protected async void Repath()
     {
-        if (_isPathFinding) return;
+        if (_isPathFinding)
+        {
+            // Whoever asked last wins: recompute for the current target when this one lands.
+            _repathRequested = true;
+            return;
+        }
         _isPathFinding = true;
+        int generation = _pathGeneration;
         try
         { 
-            _pathQueued = await GetPath();  
-            if (Machine.transform) _nextPointQueued = GetNeartestPoint(); 
+            List<Node> path = await GetPath();  
+            // The target changed while this path was being computed, so it routes to the old
+            // one — discard it and let the queued repath run instead.
+            if (generation == _pathGeneration && Machine.transform)
+            {
+                _pathQueued = path;
+                _nextPointQueued = GetNeartestPoint();
+            }
         }
         catch (Exception ex)
         {
             if (ex is not MissingReferenceException && ex is not NullReferenceException )
                 throw new Exception("An exception occurred in GetPath method.", ex);
         }
-        _isPathFinding = false; 
+        finally
+        {
+            _isPathFinding = false; 
+        }
+
+        if (_repathRequested)
+        {
+            _repathRequested = false;
+            Repath();
+        }
     }
         
     private int GetNeartestPoint()
