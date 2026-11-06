@@ -1,7 +1,8 @@
 using UnityEngine;
 
-/// <summary>A pigeon that flies in from a distance, hovers high above the player,
-/// drops a poop projectile straight down on them, then flies away and despawns.
+/// <summary>A pigeon that flies down from the sky, bobbing along in flapping
+/// arcs — flap up, arc down, flap again — high above the player, drops a poop
+/// projectile straight down on them, then flies away and despawns.
 /// It uses HoverFlightModule to stay airborne at all times (immune to gravity and
 /// the floor), and MobFleeDespawn to fly away once it's done.</summary>
 public class PigeonMachine : GroundMobMachine
@@ -16,6 +17,10 @@ public class PigeonMachine : GroundMobMachine
     };
 
     private const float HoverHeight = 6f;   // how high above the player it hovers
+    private const float SkySpawnHeight = 22f; // how high above the ground it flies down from
+    private const float DescentSpeed = 8f;  // how fast it glides down out of the sky
+    private const float FlapVelocity = 10f; // upward kick of each wing flap
+    private const float FlapDrop = 0.6f;    // how far it sinks between flaps
     private const int FleeDistance = 30;     // how far it flees before despawning
     private const float ScarecrowRadius = 12f; // radius around a scarecrow pigeons avoid
     private const int DepartDelay = 30;      // frames (~0.5s) before flying off after the drop
@@ -49,16 +54,20 @@ public class PigeonMachine : GroundMobMachine
 
         _hover = AddModule(new HoverFlightModule {
             HoverHeight = HoverHeight,
+            FlapVelocity = FlapVelocity,
+            FlapDrop = FlapDrop,
+            MaxDescent = DescentSpeed,
         });
 
         AddState(new MobFleeDespawn(FleeDistance));
         AddState(new EquipSelectState());
 
-        // Spawn point is on the ground — lift it to hover height immediately so it
-        // is airborne (and visibly flying in) from the very first frame.
+        // The spawn point is on the ground — lift it high into the sky so the pigeon
+        // flies down into view instead of popping in at hover height already.
         Vector3 pos = transform.position;
-        pos.y += HoverHeight;
+        pos.y = Mathf.Min(pos.y + SkySpawnHeight, World.Inst.Bounds.y - 1f);
         transform.position = pos;
+        Info.position = pos;
     }
 
     public override void OnUpdate()

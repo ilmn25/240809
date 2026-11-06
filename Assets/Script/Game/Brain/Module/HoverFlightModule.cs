@@ -1,18 +1,21 @@
 using UnityEngine;
 
-/// <summary>Keeps a flying mob airborne at a fixed height above a target anchor
-/// (defaults to the player) and flies it in toward it, then hovers once overhead.
-/// Altitude is maintained with the same jump logic the pathfinder uses: when the
-/// mob is below the hover height it sets Direction.y > 0 so GroundMovement gives
-/// it a jump — keeping it airborne without pinning or zeroing its velocity.</summary>
+/// <summary>Keeps a flying mob airborne around a fixed height above a target anchor
+/// (defaults to the player) and flies it in toward it, then bobs in place once
+/// overhead. Altitude is held the way a flapping bird does it — a wing-flap impulse
+/// kicks velocity up, gravity pulls it back down in an arc, and it flaps again as it
+/// falls below the band, giving the bouncing flight harpies get from jumping. When it
+/// starts out high above the band (a sky spawn) it brakes its fall into a steady glide
+/// down instead of plummeting.</summary>
 public class HoverFlightModule : MobModule
 {
     public HoverFlightModule() { updateMode = UpdateMode.Everyone; }
 
     public float HoverHeight = 10f;
     public float ApproachDistance = 2.5f;
-
-    private const float HoverTolerance = 0.5f;
+    public float FlapVelocity = 10f; // upward kick of one wing flap
+    public float FlapDrop = 0.6f;    // how far below the hover height it falls before flapping
+    public float MaxDescent = 8f;    // fastest it sinks while gliding down from above
 
     /// <summary>True once the mob has flown in and is hovering over the anchor.</summary>
     public bool IsOverhead { get; private set; }
@@ -29,11 +32,11 @@ public class HoverFlightModule : MobModule
         float desiredY = anchor.y + HoverHeight;
         Vector3 pos = Machine.transform.position;
 
-        // Fleeing (or leaving) — flee drives horizontal; just keep it airborne so it
-        // stays at hover height while it flies away.
+        // Fleeing (or leaving) — flee drives horizontal; just flap so it stays airborne
+        // at hover height while it flies away.
         if (Machine.IsCurrentState<MobFleeDespawn>() || (Machine is PigeonMachine p && p.Leaving))
         {
-            Info.Direction.y = pos.y < desiredY - HoverTolerance ? 1f : 0f;
+            Fly(pos.y, desiredY);
             return;
         }
 
@@ -47,11 +50,27 @@ public class HoverFlightModule : MobModule
         if (!IsOverhead)
             dir = new Vector3(there.x - here.x, 0, there.z - here.z).normalized;
 
-        // Jump to hover height when below it, exactly like pathfinding triggers a
-        // jump (Direction.y > 0 → GroundMovement.HandleJump sets JumpVelocity).
-        if (pos.y < desiredY - HoverTolerance)
-            dir.y = 1f;
-
         Info.Direction = dir;
+        Fly(pos.y, desiredY);
+    }
+
+    /// <summary>Vertical control: glide down steadily while high above the hover band
+    /// (a sky spawn dropping in), otherwise flap on the way down to bounce along it.</summary>
+    private void Fly(float y, float desiredY)
+    {
+        // High above the band — brake the fall so it swoops down instead of plummeting.
+        if (y > desiredY + FlapDrop)
+        {
+            Info.Velocity.y = Mathf.Max(Info.Velocity.y, -MaxDescent);
+            return;
+        }
+
+        // Only flap on the way down — flapping while still rising would cancel the arc
+        // and turn the bounce into a flat glide.
+        if (Info.Velocity.y > 0f) return;
+        if (y > desiredY - FlapDrop) return;
+
+        Info.Velocity.y = FlapVelocity;
+        Info.IsGrounded = false;
     }
 }
