@@ -21,7 +21,7 @@ class MobChaseAction : MobState {
             return;
         }
 
-        if (Main.PlayerInfo == Info && Info.ActionType != IActionType.Interact && Info.ActionType != IActionType.PickUp)
+        if (Main.PlayerInfo == Info && !Info.ActionType.IsPickUpOrInteract())
         {
             Info.CancelTarget();
             return;

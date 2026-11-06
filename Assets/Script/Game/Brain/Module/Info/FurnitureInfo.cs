@@ -13,10 +13,9 @@ public class FurnitureInfo : StructureInfo
         if (projectile.SourceInfo.Equipment == null ||
             projectile.SourceInfo.Equipment.Info.ProjectileInfo?.OperationType != OperationType.Building)
             return false;
-        // User-controlled players acquire the target from hitting it, so the
-        // swing's AbstractHit (pickup) fires on this entity.
-        if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.controllerId != -1)
-            projectile.SourceInfo.AcquireTarget(this);
+        // Only a human-controlled player acquires the target here; an AI player's own
+        // hit-acquisition policy decides (PlayerInfo.AcquireTarget).
+        projectile.SourceInfo.AcquireTarget(this);
         return true;
     }
 

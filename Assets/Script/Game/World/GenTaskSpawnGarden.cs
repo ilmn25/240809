@@ -1,20 +1,21 @@
 using UnityEngine;
 
 /// <summary>Decorates the ground around the world spawn with grass, wild flowers and starter
-/// harvestables (fallen trees for wood, mud piles for mud), plus a couple of old skeletons
-/// with loot dropped beside them, so a freshly spawned player has gathering material within a
-/// few steps of where they start. Density fades smoothly outwards over the outer few blocks
-/// instead of ending at a hard edge. Runs once per world, after chunk generation, before
-/// <see cref="GenTaskEntity"/>.</summary>
+/// harvestables (fallen trees for wood, mud piles for mud), so a freshly spawned player has
+/// gathering material within a few steps of where they start. Density fades smoothly outwards
+/// over the outer few blocks instead of ending at a hard edge, and a few old skeletons with
+/// loot dropped beside them ring the faded rim. Runs once per world, after chunk generation,
+/// before <see cref="GenTaskEntity"/>.</summary>
 public class GenTaskSpawnGarden : GenTaskScatter
 {
     /// <summary>Radius (blocks) around spawn where the garden has faded out entirely.</summary>
     public const int GardenRadius = 8;
 
-    /// <summary>Radius (blocks) around spawn that the skeletons are dropped in.</summary>
-    private const int CorpseRadius = 2;
-    private const int MinCorpses = 2;
-    private const int MaxCorpses = 3;
+    /// <summary>Corpses sit out in the garden's fading rim, never on top of the spawn point.</summary>
+    private const int CorpseMinRadius = 5;
+    private const int CorpseMaxRadius = GardenRadius;
+    private const int MinCorpses = 3;
+    private const int MaxCorpses = 4;
 
     /// <summary>What can grow in a garden column. <c>Weight</c> is the relative chance right
     /// at the spawn point; <c>FadeRadius</c> is how far out that decoration thins to nothing,
@@ -47,14 +48,26 @@ public class GenTaskSpawnGarden : GenTaskScatter
         });
     }
 
+    /// <summary>Spreads the corpses evenly around the garden's fading rim, with a little wobble
+    /// so the ring doesn't look mechanical.</summary>
     private static void PlaceCorpses(World world, System.Random rng, Vector3Int spawn)
     {
         int count = rng.Next(MinCorpses, MaxCorpses + 1);
         for (int i = 0; i < count; i++)
         {
-            Vector3Int cell = PickFreeSurfaceCell(world, rng, spawn, CorpseRadius);
-            if (cell.x < 0) continue;
-            SpawnSkeletonCorpse(world, cell, rng, lootCell => !IsOccupied(world, lootCell));
+            float baseAngle = (float)i / count * Mathf.PI * 2f;
+            for (int attempt = 0; attempt < 8; attempt++)
+            {
+                float angle = baseAngle + (float)(rng.NextDouble() - 0.5) * 0.8f;
+                float radius = Mathf.Lerp(CorpseMinRadius, CorpseMaxRadius, (float)rng.NextDouble());
+                int x = spawn.x + Mathf.RoundToInt(Mathf.Cos(angle) * radius);
+                int z = spawn.z + Mathf.RoundToInt(Mathf.Sin(angle) * radius);
+                if (!TrySurfaceCell(world, x, z, out Vector3Int cell)) continue;
+                if (IsOccupied(world, cell)) continue;
+
+                SpawnSkeletonCorpse(world, cell, rng, lootCell => !IsOccupied(world, lootCell));
+                break;
+            }
         }
     }
 

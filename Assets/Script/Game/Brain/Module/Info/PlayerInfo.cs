@@ -109,6 +109,19 @@ public class PlayerInfo : MobInfo
 
         if (projectile.SourceInfo?.Machine is IItemThief)
             DropHeldItem();
+
+        // Whatever hurt a party member is hostile from now on, whoever it hurt.
+        if (projectile.SourceInfo is not MobInfo { Machine: not null } attacker) return;
+        attacker.MarkHostile();
+
+        // An AI player fights back. A human player's target is mouse-driven, and a work order
+        // is left alone so mining still runs to completion.
+        if (controllerId != -1) return;
+        if (Target is StructureInfo { Destroyed: false }) return;
+
+        Target = attacker;
+        ActionType = IActionType.Hit;
+        PathingStatus = PathingStatus.Pending;
     }
 
     [NonSerialized] public ItemInfo DroppedItem;
@@ -118,6 +131,15 @@ public class PlayerInfo : MobInfo
     public bool CanBeRobbed =>
         !Destroyed && Health > 0 && PlayerStatus != PlayerStatus.Incapacitated &&
         Equipment != null && !Equipment.isEmpty();
+
+    /// <summary>Only a player with human input takes a target from landing a hit (that is
+    /// how swinging at a tree starts mining it). An AI-controlled player's brain owns its
+    /// target, so a swing that clips a tree while fighting must not turn into a mining job.</summary>
+    public override void AcquireTarget(Info target)
+    {
+        if (controllerId == -1) return;
+        base.AcquireTarget(target);
+    }
 
     public bool DropHeldItem()
     {
@@ -169,7 +191,7 @@ public class PlayerInfo : MobInfo
         bool blockedByOther = PlayerSync.IsClaimedByRemoteClient(uid);
         bool claimedByOtherClient = !Helper.IsHost() && !PlayerSync.CanLocalClientControl(uid);
 
-        if (isSelected && !Resting && !blockedByOther && !claimedByOtherClient && (Target == null || ActionType != IActionType.PickUp && ActionType != IActionType.Interact))
+        if (isSelected && !Resting && !blockedByOther && !claimedByOtherClient && (Target == null || !ActionType.IsPickUpOrInteract()))
         {
             TargetScreenDir = (Input.mousePosition - new Vector3(Screen.width / 2f, Screen.height / 2f, 0)).normalized;
             AimPosition = Control.MouseTarget ?

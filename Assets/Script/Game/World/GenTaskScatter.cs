@@ -70,26 +70,6 @@ public abstract class GenTaskScatter : IGenTask
             }
     }
 
-    /// <summary>A random free grass surface cell within <paramref name="radius"/> of
-    /// <paramref name="center"/>, never the centre column itself, or (-1, 0, 0) when none
-    /// is found.</summary>
-    protected static Vector3Int PickFreeSurfaceCell(World world, System.Random rng, Vector3Int center,
-        int radius, int attempts = 12)
-    {
-        int radiusSquared = radius * radius;
-        for (int attempt = 0; attempt < attempts; attempt++)
-        {
-            int dx = rng.Next(-radius, radius + 1);
-            int dz = rng.Next(-radius, radius + 1);
-            if (dx * dx + dz * dz > radiusSquared) continue;
-            if (dx == 0 && dz == 0) continue; // leave the centre column clear
-            if (!TrySurfaceCell(world, center.x + dx, center.z + dz, out Vector3Int cell)) continue;
-            if (IsOccupied(world, cell)) continue;
-            return cell;
-        }
-        return new Vector3Int(-1, 0, 0);
-    }
-
     /// <summary>Rolls up to <paramref name="attempts"/> random grass columns that have a
     /// surface and clear the spawn clearing by <paramref name="spawnMargin"/> blocks,
     /// returning the first one that also satisfies <paramref name="accept"/> (y is unused),

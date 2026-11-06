@@ -131,7 +131,7 @@ public class Control
         {
             prev.Direction = Vector3.zero;
             prev.Velocity = new Vector3(0f, prev.Velocity.y, 0f);
-            if (prev.ActionType is IActionType.PickUp or IActionType.Interact)
+            if (prev.ActionType.IsPickUpOrInteract())
             {
                 prev.CancelTarget();
                 prev.ActionType = IActionType.Follow;
@@ -261,7 +261,7 @@ public class Control
             if (collider.gameObject == Main.Player) continue;
             target = collider.gameObject.GetComponent<T>();
             if (target == null) continue;
-            if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.item.Info.Pickupable)
+            if (target is EntityMachine em && em.Info is ItemInfo itemInfo && !itemInfo.CanPickUp)
                 continue;
             distance = Helper.SquaredDistance(collider.transform.position, Main.Player.transform.position);
             if (distance < nearestDistance)
@@ -424,7 +424,7 @@ public class Control
                 !Main.PlayerInfo.Machine.IsCurrentState<DefaultState>()))
                 return;
 
-            if (!itemInfo.item.Info.Pickupable) return;
+            if (!itemInfo.CanPickUp) return;
 
             Main.PlayerInfo.Target = itemInfo;
             Main.PlayerInfo.ActionType = IActionType.PickUp;
@@ -479,7 +479,7 @@ public class Control
         if (action is IActionSecondaryPickUp)
         {
             if (action is not EntityMachine machine || machine.Info is not ItemInfo itemInfo) return false;
-            return itemInfo.item.Info.Pickupable;
+            return itemInfo.CanPickUp;
         }
 
         return action is IActionSecondaryInteract;
