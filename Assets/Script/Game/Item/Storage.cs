@@ -122,15 +122,23 @@ public class Storage
                 return true;
         }
 
+        /// <summary>Drop everything in this storage on the ground around
+        /// <paramref name="position"/>, emptying it. One ground item per slot.</summary>
+        public void DropAll(Vector3 position, bool stackOnSpawn = true)
+        {
+                if (List == null) return;
+                foreach (ItemSlot itemSlot in List)
+                {
+                        if (itemSlot is not { Stack: > 0 }) continue;
+                        Entity.SpawnItem(itemSlot, position, stackOnSpawn);
+                }
+                List.Clear();
+        }
+
         public void Explode(Vector3 position)
         {
                 if (!Helper.IsHost()) return;
-                foreach (ItemSlot itemSlot in List)
-                {
-                        if (itemSlot.isEmpty()) continue;
-                        Entity.SpawnItem(itemSlot, Vector3Int.FloorToInt(position));
-                }
-
+                DropAll(position);
                 Dictionary.Remove(ID);
         }
 

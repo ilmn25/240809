@@ -28,4 +28,15 @@ public class Chunk
         get => Map[position.x + size * (position.y + size * position.z)];
         set => Map[position.x + size * (position.y + size * position.z)] = value;
     } 
+
+    /// <summary>Record a generated entity in this chunk: registered ids persist as static
+    /// entities, loose items (unregistered ids) as dynamic ones. Returns null when the id
+    /// has no info.</summary>
+    public Info PlaceEntity(ID id, Vector3Int cell)
+    {
+        Info info = Entity.CreateInfo(id, cell);
+        if (info == null) return null;
+        (Entity.Dictionary.ContainsKey(id) ? StaticEntity : DynamicEntity).Add(info);
+        return info;
+    }
 } 

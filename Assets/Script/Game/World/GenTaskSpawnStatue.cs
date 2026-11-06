@@ -16,6 +16,6 @@ public class GenTaskSpawnStatue : GenTaskScatter
         int surfaceY = FindSurfaceY(world, x, z);
         if (surfaceY < 0) return;
 
-        PlaceEntity(world, new Vector3Int(x, surfaceY, z), ID.OwlStatue);
+        GenBlocks.PlaceEntity(world, new Vector3Int(x, surfaceY, z), ID.OwlStatue);
     }
 }

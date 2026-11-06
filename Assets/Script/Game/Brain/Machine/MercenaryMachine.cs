@@ -46,11 +46,8 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
         if (Save.Inst == null || payer?.Storage == null) return;
         if (!Trade.TrySpend(payer.Storage, HireCost)) return;
 
-        PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);
-        companion.CharSprite = ID.Raider;
-        companion.Storage.CreateAndAddItem(ID.SteelSword);
-        if (Entity.SpawnFromInfo(companion, false) is DelverMachine delver)
-            delver.ExpireAt = Time.time + CompanionDuration;
+        DelverMachine.Spawn(transform.position, ID.Raider, persist: false,
+            expireAt: Time.time + CompanionDuration, startingWeapon: ID.SteelSword);
 
         Tent?.Consume();
 

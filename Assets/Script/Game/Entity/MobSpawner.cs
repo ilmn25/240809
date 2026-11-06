@@ -28,7 +28,7 @@ public class MobSpawner
 
     private static readonly Pool DayRoamers = new()
     {
-        (ID.Slime, 3), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
+        (ID.Slime, 2.1f), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
     };
 
     // Crow weights are per flock (each flock is 2-3 birds), not per bird.
@@ -96,7 +96,7 @@ public class MobSpawner
         Vector3Int pos = Vector3Int.FloorToInt(
             playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * dist);
 
-        if (!FindSurfacePosition(ref pos)) return;
+        if (!NavMap.TryFindSurface(ref pos)) return;
 
         if (!night && Save.Inst.weather != EnvironmentType.Rapture && Random.value < BoundNPCSpawnChance)
         {
@@ -147,7 +147,7 @@ public class MobSpawner
             float distance = Random.Range(CrowSpawnNear, Scene.RenderDistance - 2f);
             Vector3Int spot = Vector3Int.FloorToInt(
                 playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * distance);
-            if (FindSurfacePosition(ref spot))
+            if (NavMap.TryFindSurface(ref spot))
                 Entity.Spawn(ID.Crow, spot);
         }
     }
@@ -170,16 +170,5 @@ public class MobSpawner
         foreach (var (id, weight) in pool)
             if ((roll -= weight) <= 0f) return id;
         return pool[^1].id;
-    }
-
-    private static bool FindSurfacePosition(ref Vector3Int pos)
-    {
-        pos.x = Mathf.Clamp(pos.x, 0, World.Inst.Bounds.x - 1);
-        pos.z = Mathf.Clamp(pos.z, 0, World.Inst.Bounds.z - 1);
-
-        for (pos.y = World.Inst.Bounds.y - 1; pos.y > 0; pos.y--)
-            if (NavMap.Get(pos) == NavMap.Air && NavMap.Get(pos + Vector3Int.down) != NavMap.Air)
-                return true;
-        return false;
     }
 }

@@ -41,67 +41,46 @@ public class Loot
         _table.Add(new LootEntry(chance, amount, itemIDs));
     }
 
-    public void Spawn(Vector3 position)
+    /// <summary>Roll the whole table, yielding one item id per successful chance roll.
+    /// The single place loot is rolled — every drop path consumes this.</summary>
+    private IEnumerable<ID> Roll()
     {
-        Vector3Int worldPosition = Vector3Int.FloorToInt(position);
-
-        foreach (var entry in _table)
+        foreach (LootEntry entry in _table)
         {
-            List<ID> items = entry.ItemIDs;
-
-            for (int i = 0; i <  entry.Amount; i++)
+            for (int i = 0; i < entry.Amount; i++)
             {
-                if (Random.value <= entry.Chance)
-                {
-                    ID itemID = items[Random.Range(0, items.Count)];
-                    Entity.SpawnItem(itemID, worldPosition, stackOnSpawn: false);
-                }
+                if (Random.value > entry.Chance) continue;
+                yield return entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
             }
         }
+    }
+
+    public void Spawn(Vector3 position)
+    {
+        foreach (ID itemID in Roll())
+            Entity.SpawnItem(itemID, position, stackOnSpawn: false);
     }
 
     public void SpawnOneRandom(Vector3 position)
     {
         if (_table.Count == 0) return;
-        
-        Vector3Int worldPosition = Vector3Int.FloorToInt(position);
-        var entry = _table[Random.Range(0, _table.Count)];
+
+        LootEntry entry = _table[Random.Range(0, _table.Count)];
         ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
-        Entity.SpawnItem(itemID, worldPosition, stackOnSpawn: false);
+        Entity.SpawnItem(itemID, position, stackOnSpawn: false);
     }
 
     /// <summary>Roll the loot table at the burn site, converting any burnable
     /// item (wood, plants) to its burn result (e.g. charcoal).</summary>
     public void SpawnBurned(Vector3 position)
     {
-        Vector3Int worldPosition = Vector3Int.FloorToInt(position);
-
-        foreach (LootEntry entry in _table)
-        {
-            for (int i = 0; i < entry.Amount; i++)
-            {
-                if (Random.value <= entry.Chance)
-                {
-                    ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
-                    Entity.SpawnItem(BurnUtil.BurnResultOf(itemID), worldPosition, stackOnSpawn: false);
-                }
-            }
-        }
+        foreach (ID itemID in Roll())
+            Entity.SpawnItem(BurnUtil.BurnResultOf(itemID), position, stackOnSpawn: false);
     }
-    
+
     public void AddToContainer(Storage storage)
-    { 
-        foreach (var entry in _table)
-        {
-            List<ID> items = entry.ItemIDs;
-            for (int i = 0; i < entry.Amount; i++)
-            {
-                if (Random.value <= entry.Chance)
-                {
-                    ID itemID = items[Random.Range(0, items.Count)];
-                    storage.CreateAndAddItem(itemID);
-                }
-            } 
-        }
+    {
+        foreach (ID itemID in Roll())
+            storage.CreateAndAddItem(itemID);
     }
 }

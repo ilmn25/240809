@@ -108,41 +108,41 @@ public class GenTaskEntity : IGenTask
                             {
                                 double treeRoll = rng.NextDouble();
                                 ID treeID = treeRoll <= 0.7 ? ID.PineTree : treeRoll <= 0.95 ? ID.BirchTree : ID.OakTree;
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
+                                currentChunk.PlaceEntity(treeID, position);
                             }
                             else if (roll <= (chance += ForestGrassChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
+                                currentChunk.PlaceEntity(ID.Grass, position);
                             }
                             else if (roll <= (chance += ForestDeathcapChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Deathcap, position));
+                                currentChunk.PlaceEntity(ID.Deathcap, position);
                             }
                             else if (roll <= (chance += ForestOysterShroomChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.OysterShrooms, position));
+                                currentChunk.PlaceEntity(ID.OysterShrooms, position);
                             }
                             else if (roll <= (chance += ForestToadstoolChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Toadstool, position));
+                                currentChunk.PlaceEntity(ID.Toadstool, position);
                             }
                             else if (roll <= (chance += ForestSpiderNestChance))
                             {
-                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.SpiderNest, position));
+                                if (!spawnClearing) currentChunk.PlaceEntity(ID.SpiderNest, position);
                             }
                             else if (roll <= (chance += ForestHiveChance))
                             {
-                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Hive, position));
+                                if (!spawnClearing) currentChunk.PlaceEntity(ID.Hive, position);
                             }
                             else if (roll <= (chance += ForestFallenTreeChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.FallenTree, position));
+                                currentChunk.PlaceEntity(ID.FallenTree, position);
                             }
                             else if (rng.NextDouble() < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
-                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                    currentChunk.PlaceEntity(groundItem, position);
                             }
                         }
                         else if (currentChunk[x, y, z] == Dirt)
@@ -151,49 +151,49 @@ public class GenTaskEntity : IGenTask
                             if (roll <= chance)
                             {
                                 ID treeID = rng.NextDouble() <= 0.8 ? ID.PineTree : ID.BirchTree;
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(treeID, position));
+                                currentChunk.PlaceEntity(treeID, position);
                             }
                             else if (roll <= (chance += DirtGrassChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Grass, position));
+                                currentChunk.PlaceEntity(ID.Grass, position);
                             }
                             else if (roll <= (chance += FlowerCHance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(PickMeadowFlower(rng), position));
+                                currentChunk.PlaceEntity(PickMeadowFlower(rng), position);
                             }
                             else if (roll <= (chance += DirtTentChance))
                             {
-                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.DirtyTent, position));
+                                if (!spawnClearing) currentChunk.PlaceEntity(ID.DirtyTent, position);
                             }
                             else if (roll <= (chance += DirtFallenTreeChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.FallenTree, position));
+                                currentChunk.PlaceEntity(ID.FallenTree, position);
                             }
                             else if (roll <= (chance += DirtMudPileChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.MudPile, position));
+                                currentChunk.PlaceEntity(ID.MudPile, position);
                             }
                             else if (roll <= (chance += DirtToadstoolChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Toadstool, position));
+                                currentChunk.PlaceEntity(ID.Toadstool, position);
                             }
                             else if (roll <= (chance += DirtCottonChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Cotton, position));
+                                currentChunk.PlaceEntity(ID.Cotton, position);
                             }
                             else if (roll <= (chance += SurfaceSlabChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
+                                currentChunk.PlaceEntity(ID.StoneBoulder, position);
                             }
                             else if (roll <= (chance += SurfaceMeteorChance))
                             {
-                                if (!spawnClearing) currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.Meteor, position));
+                                if (!spawnClearing) currentChunk.PlaceEntity(ID.Meteor, position);
                             }
                             else if (rng.NextDouble() < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
-                                    currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                    currentChunk.PlaceEntity(groundItem, position);
                             }
                         }
                         else
@@ -204,19 +204,18 @@ public class GenTaskEntity : IGenTask
                             {
                                 if (!spawnClearing)
                                 {
-                                    ContainerInfo chest = (ContainerInfo)Entity.CreateInfo(ID.Chest, position);
+                                    ContainerInfo chest = (ContainerInfo)currentChunk.PlaceEntity(ID.Chest, position);
                                     Loot.Gettable(ID.Chest).AddToContainer(chest.Storage);
-                                    currentChunk.StaticEntity.Add(chest);
                                 }
                             } 
                             else if (isDesert && roll <= (chance += SurfaceSandStructureChance))
                             {
                                 ID spawnID = rng.NextDouble() <= 0.5 ? ID.SandPile : ID.SandDebris;
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(spawnID, position));
+                                currentChunk.PlaceEntity(spawnID, position);
                             }
                             else if (!isDesert && roll <= (chance += SurfaceSlabChance))
                             {
-                                currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.StoneBoulder, position));
+                                currentChunk.PlaceEntity(ID.StoneBoulder, position);
                             }
                             else
                             {
@@ -226,21 +225,21 @@ public class GenTaskEntity : IGenTask
                                 {
                                     ID groundItem = PickDesertItem(rng);
                                     if (groundItem != ID.Null)
-                                        currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                        currentChunk.PlaceEntity(groundItem, position);
                                 }
                                 else if (isRock && rng.NextDouble() < SurfaceRockPileChance)
                                 {
-                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.RockPile, position));
+                                    currentChunk.PlaceEntity(ID.RockPile, position);
                                 }
                                 else if (isRock && rng.NextDouble() < SurfaceIronBoulderChance)
                                 {
-                                    currentChunk.StaticEntity.Add(Entity.CreateInfo(ID.IronBoulder, position));
+                                    currentChunk.PlaceEntity(ID.IronBoulder, position);
                                 }
                                 else if (isRock && rng.NextDouble() < StoneGroundItemChance)
                                 {
                                     ID groundItem = PickStoneItem(rng);
                                     if (groundItem != ID.Null)
-                                        currentChunk.DynamicEntity.Add(Entity.CreateInfo(groundItem, position));
+                                        currentChunk.PlaceEntity(groundItem, position);
                                 }
                             }
                         }

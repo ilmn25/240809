@@ -171,13 +171,10 @@ public static class ItemSync
                 info = Entity.CreateInfo((ID)itemId, message.positions[i]);
                 info.uid = uid;
                 info.position = message.positions[i];
-                if (info is ItemInfo itemInfo)
-                {
-                    if (itemInfo.item == null || itemInfo.item.ID == ID.Null)
-                        itemInfo.item = new ItemSlot((ID)itemId);
-                    if (message.itemAmounts != null && i < message.itemAmounts.Length && message.itemAmounts[i] > 1)
-                        itemInfo.item.Stack = message.itemAmounts[i];
-                }
+                // CreateInfo already filled the slot from the item id.
+                if (info is ItemInfo itemInfo &&
+                    message.itemAmounts != null && i < message.itemAmounts.Length && message.itemAmounts[i] > 1)
+                    itemInfo.item.Stack = message.itemAmounts[i];
                 EntitySync.InfoMap[uid] = info;
                 Entity.SpawnFromInfo(info, true);
                 continue;

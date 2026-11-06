@@ -162,7 +162,7 @@ public enum ID
     LightningRod,
     Nomad,
     WellFed,
-    Corpse,
+    Corpse, // unused: player deaths now leave a Skeleton entity with loot dropped nearby; kept so later IDs don't shift
     Scarecrow,
     Questmaster,
     BabySlime,

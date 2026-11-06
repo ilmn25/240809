@@ -397,9 +397,7 @@ public class Console : MonoBehaviour
             return;
         }
         Vector3 pos = Main.PlayerInfo.position + Vector3.right * 1.5f;
-        PlayerInfo delver = (PlayerInfo)Entity.CreateInfo(ID.Delver, pos);
-        Save.Inst.players.Add(delver);
-        Entity.SpawnFromInfo(delver, false);
+        DelverMachine.Spawn(pos);
         Print("Delver joined the world (AI-only, persisted on save).");
     }
 

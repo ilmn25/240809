@@ -35,13 +35,13 @@ public class GenTaskGraveyard : GenTaskScatter
         if (chunk == null || chunk == Chunk.Zero) return;
 
         // Headstone sits on the surface.
-        chunk.StaticEntity.Add(Entity.CreateInfo(ID.Headstone, surface));
+        chunk.PlaceEntity(ID.Headstone, surface);
 
         // Skeleton and loot buried beneath the headstone (loot stacked above).
         SetAir(world, surface + new Vector3Int(0, -2, 0));
         SetAir(world, surface + new Vector3Int(0, -3, 0));
-        PlaceEntity(world, surface + new Vector3Int(0, -3, 0), ID.Skeleton);
-        PlaceEntity(world, surface + new Vector3Int(0, -2, 0), PickGraveLoot(rng));
+        GenBlocks.PlaceEntity(world, surface + new Vector3Int(0, -3, 0), ID.Skeleton);
+        GenBlocks.PlaceEntity(world, surface + new Vector3Int(0, -2, 0), PickGraveLoot(rng));
     }
 
     /// <summary>Clears the block at <paramref name="cell"/> to air.</summary>

@@ -33,17 +33,17 @@ public class GenTaskRaiderCamp : GenTaskScatter
 
     private static void PlaceCamp(World world, Vector3Int center, System.Random rng)
     {
-        PlaceEntity(world, center, ID.RaiderCampChest);
+        GenBlocks.PlaceEntity(world, center, ID.RaiderCampChest);
 
         int tentCount = rng.Next(MinTents, MaxTents + 1);
         for (int i = 0; i < tentCount; i++)
         {
             Vector3Int spot = ScatterAround(world, center, rng, ClusterRadius);
             if (spot.x < 0) continue;
-            PlaceEntity(world, spot, ID.DirtyTent);
+            GenBlocks.PlaceEntity(world, spot, ID.DirtyTent);
         }
 
         Vector3Int lampSpot = ScatterAround(world, center, rng, ClusterRadius);
-        if (lampSpot.x >= 0) PlaceEntity(world, lampSpot, ID.Lamp);
+        if (lampSpot.x >= 0) GenBlocks.PlaceEntity(world, lampSpot, ID.Lamp);
     }
 }

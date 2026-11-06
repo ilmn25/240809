@@ -27,7 +27,7 @@ public class GenTaskBeehiveArea : GenTaskScatter
         {
             Vector3Int spot = ScatterAround(world, center, rng, ScatterRadius);
             if (spot.x < 0) continue;
-            PlaceEntity(world, spot, ID.Hive);
+            GenBlocks.PlaceEntity(world, spot, ID.Hive);
             occupied.Add(spot);
         }
 
@@ -37,7 +37,7 @@ public class GenTaskBeehiveArea : GenTaskScatter
             Vector3Int spot = ScatterAround(world, center, rng, ScatterRadius);
             if (spot.x < 0) continue;
             if (!occupied.Add(spot)) continue;
-            PlaceEntity(world, spot, PickMeadowFlower(rng));
+            GenBlocks.PlaceEntity(world, spot, PickMeadowFlower(rng));
         }
     }
 

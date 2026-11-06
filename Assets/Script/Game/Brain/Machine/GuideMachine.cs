@@ -73,11 +73,8 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
         foreach (ID flower in FlowerTypes)
             payer.Storage.RemoveItem(flower, FlowerCost);
 
-        PlayerInfo companion = (PlayerInfo)Entity.CreateInfo(ID.Delver, transform.position);
-        companion.CharSprite = ID.Guide;
-        companion.Storage.CreateAndAddItem(ID.SteelSword);
-        if (Entity.SpawnFromInfo(companion, false) is DelverMachine delver)
-            delver.ExpireAt = Time.time + CompanionDuration;
+        DelverMachine.Spawn(transform.position, ID.Guide, persist: false,
+            expireAt: Time.time + CompanionDuration, startingWeapon: ID.SteelSword);
 
         Info.Destroy();
         Unload();

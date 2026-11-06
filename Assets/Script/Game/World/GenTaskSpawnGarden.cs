@@ -45,7 +45,7 @@ public class GenTaskSpawnGarden : GenTaskScatter
             if (IsOccupied(world, cell)) return;
 
             float distance = Vector2.Distance(new Vector2(x, z), new Vector2(spawn.x, spawn.z));
-            PlaceEntity(world, cell, PickDecoration(rng, distance));
+            GenBlocks.PlaceEntity(world, cell, PickDecoration(rng, distance));
         });
     }
 

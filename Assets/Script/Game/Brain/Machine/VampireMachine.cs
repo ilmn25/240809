@@ -111,41 +111,13 @@ public class VampireMachine : GroundMobMachine
         if (away.sqrMagnitude < 0.01f) away = Vector3.right;
 
         Vector3Int dest = Vector3Int.FloorToInt(pos + away * Random.Range(TeleportRange * 0.5f, TeleportRange));
-        dest.x = Mathf.Clamp(dest.x, 1, World.Inst.Bounds.x - 1);
-        dest.z = Mathf.Clamp(dest.z, 1, World.Inst.Bounds.z - 1);
 
-        // Snap down to the surface so we don't teleport into the ground.
-        if (!FindSurfacePosition(ref dest))
+        // Snap to the surface so we don't teleport into the ground.
+        if (!NavMap.TryFindSurface(ref dest))
             return; // no valid spot — stay put
 
         transform.position = dest;
         Info.PathingStatus = PathingStatus.Pending;
         Particle.Create(dest + Vector3.up * 0.5f, Particles.Smoke, false);
-    }
-
-    /// <summary>Scan downward from the given position to find the first air block
-    /// directly above a solid block — the surface. Returns false if none found.</summary>
-    private static bool FindSurfacePosition(ref Vector3Int pos)
-    {
-        int worldBottom = 0;
-        int worldTop = World.Inst.Bounds.y;
-
-        pos.x = Mathf.Clamp(pos.x, 0, World.Inst.Bounds.x - 1);
-        pos.z = Mathf.Clamp(pos.z, 0, World.Inst.Bounds.z - 1);
-
-        pos.y = worldTop - 1;
-        while (pos.y > worldBottom)
-        {
-            bool currentAir = NavMap.Get(pos) == NavMap.Air;
-            pos.y--;
-            bool belowSolid = NavMap.Get(pos) != NavMap.Air;
-
-            if (currentAir && belowSolid)
-            {
-                pos.y++;
-                return true;
-            }
-        }
-        return false;
     }
 }

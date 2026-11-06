@@ -116,17 +116,6 @@ public abstract class GenTaskScatter : IGenTask
         return new Vector3Int(-1, 0, 0);
     }
 
-    /// <summary>Adds a structure to the chunk holding <paramref name="cell"/>. Scatter output
-    /// is always static, unlike <see cref="GenBlocks.PlaceEntity"/> which routes loose items
-    /// to DynamicEntity.</summary>
-    protected static void PlaceEntity(World world, Vector3Int cell, ID id)
-    {
-        if (id == ID.Null) return;
-        Info info = Entity.CreateInfo(id, cell);
-        if (info == null) return;
-        GenBlocks.ChunkAt(world, cell)?.StaticEntity.Add(info);
-    }
-
     protected static int FindSurfaceY(World world, int x, int z)
         => GenBlocks.FindSurfaceY(world, x, z);
 
@@ -153,7 +142,7 @@ public abstract class GenTaskScatter : IGenTask
     public static void SpawnSkeletonCorpse(World world, Vector3Int cell, System.Random rng,
         System.Func<Vector3Int, bool> isFree = null)
     {
-        PlaceEntity(world, cell, ID.Skeleton);
+        GenBlocks.PlaceEntity(world, cell, ID.Skeleton);
 
         int count = rng.Next(1, 3);
         for (int i = 0; i < count; i++)

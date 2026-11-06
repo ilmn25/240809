@@ -374,8 +374,6 @@ public class Entity
                 // persisted in the save's player list via PlayerInfo.IsDelver.
                 AddMob<DelverMachine>(ID.Delver);
 
-                AddMob<CorpseMachine>(ID.Corpse);
-
                 AddMob<ScoutMachine>(ID.Chito); 
                 loot = new (ID.Chito);
                 loot.Add(0.7f, 5, ID.Bullet); 
@@ -726,49 +724,47 @@ public class Entity
                 SpawnItem(new ItemSlot(id, amount), worldPosition, stackOnSpawn, amount, velocity, despawn);
         }
 
+        /// <summary>Drop <paramref name="slot"/>'s contents as ground items, taking at
+        /// most <paramref name="amount"/> and splitting them into full stacks. Returns
+        /// the last item spawned, or null when the slot was empty.</summary>
         public static ItemInfo SpawnItem(ItemSlot slot, Vector3 worldPosition, bool stackOnSpawn = true, int amount = 999, Vector3 velocity = default, int despawn = -1)
-        {  
-                Entity entity = Dictionary[ID.ItemPrefab];
-                int target = slot.Stack - amount;
+        {
+                int remaining = Mathf.Min(slot.Stack, amount);
+                // Items land inside the cell they were dropped in, whatever fractional
+                // world position the drop came from.
+                Vector3 cell = Vector3Int.FloorToInt(worldPosition);
                 ItemInfo spawned = null;
-                while (slot.Stack != target && !slot.isEmpty())
+                while (remaining > 0)
                 {
-                        GameObject gameObject = ObjectPool.GetObject(ID.ItemPrefab);
-                        gameObject.transform.position = Vector3Int.FloorToInt(worldPosition) + entity.SpawnOffset;
+                        int stack = Mathf.Min(remaining, slot.Info.StackSize);
+                        remaining -= stack;
 
-                        EntityMachine currentEntityMachine = 
-                                gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent<ItemMachine>();
-                        EntityItemLoad.InviteEntity(currentEntityMachine);
-
-                        ItemInfo itemInfo = (ItemInfo)CreateInfo(ID.ItemPrefab, worldPosition);
+                        ItemInfo itemInfo = (ItemInfo)CreateInfo(ID.ItemPrefab, cell);
                         itemInfo.item = new ItemSlot();
-                        itemInfo.item.Add(slot, slot.Stack - target);
+                        itemInfo.item.Add(slot, stack);
                         itemInfo.Velocity = velocity;
                         itemInfo.despawn = despawn;
-                        
                         itemInfo.StackOnSpawn = stackOnSpawn;
-                        currentEntityMachine.Initialize(itemInfo);
+
+                        EntityMachine machine = Acquire(itemInfo);
+                        EntityItemLoad.InviteEntity(machine);
+                        machine.Initialize(itemInfo);
                         if (Helper.IsHost())
-                            ItemSync.BroadcastSpawn(itemInfo);
+                                ItemSync.BroadcastSpawn(itemInfo);
                         spawned = itemInfo;
                 }
                 return spawned;
         }
 
-        
         public static Info Spawn(ID id, Vector3Int worldPosition)
         {
                 Entity entity = Dictionary[id];
-                GameObject gameObject = ObjectPool.GetObject(entity.PrefabName, id);
-                gameObject.transform.position = worldPosition + entity.SpawnOffset;   
-        
-                EntityMachine currentEntityMachine = (EntityMachine)
-                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
-
                 Info info = CreateInfo(id, worldPosition);
+                EntityMachine machine = Acquire(info);
+
                 if (entity.StaticLoad)
                 {
-                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
+                        EntityStaticLoad.InviteEntity(machine, entity);
                         // Persist the placed structure into its chunk so it survives
                         // reloads and shows up on the map (markers read chunk.StaticEntity).
                         World.Inst[World.GetChunkCoordinate(worldPosition)].StaticEntity.Add(info);
@@ -779,8 +775,9 @@ public class Entity
                         }
                 }
                 else
-                        EntityDynamicLoad.InviteEntity(currentEntityMachine);
-                currentEntityMachine.Initialize(info);
+                        EntityDynamicLoad.InviteEntity(machine);
+
+                machine.Initialize(info);
                 if (Helper.IsHost() && entity.StaticLoad)
                         EntitySync.BroadcastEntitySpawn(info);
                 return info;
@@ -789,71 +786,73 @@ public class Entity
         public static EntityMachine SpawnFromInfo(Info info, bool invite = false)
         {
                 Entity entity = Dictionary[info.id];
-                GameObject gameObject = entity.PrefabName == ID.ItemPrefab
-                        ? ObjectPool.GetObject(entity.PrefabName)
-                        : ObjectPool.GetObject(entity.PrefabName, info.id);
-                gameObject.transform.position = info.position;
-
-                EntityMachine currentEntityMachine = (EntityMachine)
-                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
+                EntityMachine machine = Acquire(info);
 
                 if (entity.StaticLoad)
-                        EntityStaticLoad.InviteEntity(currentEntityMachine, entity);
+                        EntityStaticLoad.InviteEntity(machine, entity);
+                else if (invite && info is ItemInfo)
+                        EntityItemLoad.InviteEntity(machine);
                 else if (invite)
-                {
-                        if (info is ItemInfo)
-                        {
-                                EntityItemLoad.InviteEntity(currentEntityMachine);
-                                currentEntityMachine.Initialize(info);
-                                if (Helper.IsHost())
-                                    ItemSync.BroadcastSpawn(info);
-                                return currentEntityMachine;
-                        }
-                        else
-                                EntityDynamicLoad.InviteEntity(currentEntityMachine);
-                }
+                        EntityDynamicLoad.InviteEntity(machine);
 
-                currentEntityMachine.Initialize(info);
-                return currentEntityMachine;
+                machine.Initialize(info);
+                if (invite && Helper.IsHost() && info is ItemInfo)
+                        ItemSync.BroadcastSpawn(info);
+                return machine;
+        }
+
+        /// <summary>Build (or reuse from the pool) the machine for <paramref name="info"/>
+        /// and place it at its spawn position — the one place machines are instantiated.</summary>
+        private static EntityMachine Acquire(Info info)
+        {
+                Entity entity = Dictionary[info.id];
+                GameObject gameObject = ObjectPool.GetObject(entity.PrefabName, info.id);
+                gameObject.transform.position = info.position;
+                return (EntityMachine)
+                        (gameObject.GetComponent<EntityMachine>() ?? gameObject.AddComponent(entity.Machine));
         }
 
         public static Info CreateInfo(ID id, Vector3 worldPosition)
         {
-                if (!Dictionary.ContainsKey(id)) //TODO
+                // Registering only prefab-backed ids means an unregistered id is a loose
+                // item: every item shares the item prefab and carries its id in the slot.
+                if (!Dictionary.TryGetValue(id, out Entity entity))
+                        return CreateItemInfo(id, worldPosition);
+
+                Info info = CreateInfoFrom(entity);
+                if (info == null)
                 {
-                        Entity entity = Dictionary[ID.ItemPrefab];
-
-                        MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
-
-                        if (method != null && method.ReturnType == typeof(Info))
-                        {
-                                ItemInfo info = (ItemInfo)method.Invoke(null, null);
-                                info.id = ID.ItemPrefab;
-                                info.item = new ItemSlot(id);
-                                info.position = worldPosition + entity.SpawnOffset;
-                                return info;
-                        }
+                        Debug.LogError("error making info: " + id);
+                        return null;
                 }
-                else
+                info.id = id;
+                info.position = worldPosition + entity.SpawnOffset;
+                return info;
+        }
+
+        private static ItemInfo CreateItemInfo(ID itemID, Vector3 worldPosition)
+        {
+                Entity entity = Dictionary[ID.ItemPrefab];
+                ItemInfo info = (ItemInfo)CreateInfoFrom(entity);
+                if (info == null)
                 {
-                        Entity entity = Dictionary[id];
+                        Debug.LogError("error making item info: " + itemID);
+                        return null;
+                }
+                info.id = ID.ItemPrefab;
+                info.item = new ItemSlot(itemID);
+                info.position = worldPosition + entity.SpawnOffset;
+                return info;
+        }
 
-                        MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
-                        Info info = entity.InfoFactory != null
-                                ? entity.InfoFactory()
-                                : method != null && method.ReturnType == typeof(Info)
-                                        ? (Info)method.Invoke(null, null)
-                                        : null;
+        /// <summary>The authored info for an entity: its explicit factory when it shares a
+        /// machine type with other ids, otherwise the machine's static CreateInfo().</summary>
+        private static Info CreateInfoFrom(Entity entity)
+        {
+                if (entity.InfoFactory != null) return entity.InfoFactory();
 
-                        if (info != null)
-                        {
-                                info.id = id;
-                                info.position = worldPosition + entity.SpawnOffset;
-                                return info;
-                        }
-                } 
-                Debug.Log("error making info");
-                return null;
+                MethodInfo method = entity.Machine.GetMethod("CreateInfo", BindingFlags.Public | BindingFlags.Static);
+                return method != null && method.ReturnType == typeof(Info) ? (Info)method.Invoke(null, null) : null;
         }
 
 }

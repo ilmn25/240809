@@ -228,7 +228,7 @@ public class PlayerInfo : MobInfo
         Audio.PlaySFX(DeathSfx);
         bool wasControlled = Main.PlayerInfo == this;
 
-        CorpseMachine.SpawnCorpse(position, CharSprite, Storage);
+        SkeletonMachine.SpawnRemains(position, Storage);
 
         PlayerSync.BroadcastPlayerUnload(this);
         EntityMachine?.Unload();

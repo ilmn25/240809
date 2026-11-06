@@ -49,18 +49,10 @@ public static class GenBlocks
         return -1;
     }
 
-    /// <summary>Adds a scatter entity to its chunk: structures go to StaticEntity
-    /// (persist + show on the map), loose items to DynamicEntity (spawn as items).</summary>
+    /// <summary>Adds a scatter entity to its chunk — see <see cref="Chunk.PlaceEntity"/>.</summary>
     public static void PlaceEntity(World world, Vector3Int cell, ID id)
     {
-        if (cell.y < 0) return; // no valid surface
-        Info info = Entity.CreateInfo(id, cell);
-        if (info == null) return;
-        Chunk chunk = ChunkAt(world, cell);
-        if (chunk == null) return;
-        if (Entity.Dictionary.ContainsKey(id))
-            chunk.StaticEntity.Add(info);
-        else
-            chunk.DynamicEntity.Add(info);
+        if (id == ID.Null || cell.y < 0) return; // nothing to place / no valid surface
+        ChunkAt(world, cell)?.PlaceEntity(id, cell);
     }
 }

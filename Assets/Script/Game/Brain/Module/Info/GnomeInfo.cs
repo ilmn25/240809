@@ -18,12 +18,7 @@ public class GnomeInfo : EnemyInfo
     /// <summary>Drop all stolen items back onto the ground.</summary>
     public void DropStolen()
     {
-        if (Stolen == null || Stolen.List == null) return;
-        foreach (ItemSlot slot in Stolen.List)
-        {
-            if (slot == null || slot.isEmpty()) continue;
-            Entity.SpawnItem(slot, Machine.transform.position, stackOnSpawn: false);
-        }
+        Stolen?.DropAll(Machine.transform.position, stackOnSpawn: false);
         Stolen = null;
     }
 }

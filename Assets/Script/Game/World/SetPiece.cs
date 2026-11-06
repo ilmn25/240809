@@ -78,10 +78,15 @@ public class SetPiece
             chunkPos = World.GetChunkCoordinate(worldPos);
             Chunk chunk = world[chunkPos];
             if (chunk == null || chunk == Chunk.Zero) continue;
+            // CreateInfo already centres the info in the cell (cell + spawn offset) and
+            // returns null for ids from older set pieces that no longer exist.
             Info info = Entity.CreateInfo(entity.id, worldPos);
-            if (info == null) info = (Info)Helper.Clone(entity);
-            if (info == null) continue;
-            info.position = worldPos + SpawnOffsetOf(entity.id);
+            if (info == null)
+            {
+                info = (Info)Helper.Clone(entity);
+                if (info == null) continue;
+                info.position = worldPos;
+            }
             chunk.StaticEntity.Add(info);
         }
 
@@ -108,10 +113,6 @@ public class SetPiece
                p.y >= 0 && p.y < world.Bounds.y &&
                p.z >= 0 && p.z < world.Bounds.z;
     }
-
-    /// <summary>The SpawnOffset for an entity id (centers its prefab in its cell), or zero.</summary>
-    private static Vector3 SpawnOffsetOf(ID id)
-        => Entity.Dictionary.TryGetValue(id, out Entity e) ? e.SpawnOffset : Vector3.zero;
 
     private static bool IsEntityInRange(Vector3Int coord, Vector3Int min, Vector3Int max)
     {

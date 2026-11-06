@@ -45,14 +45,9 @@ public class BoundNPCMachine : GroundMobMachine, IActionSecondaryInteract
         Dialogue.Show(true);
 
         Vector3 pos = transform.position;
-        PlayerInfo delver = (PlayerInfo)Entity.CreateInfo(ID.Delver, pos);
-        delver.CharSprite = Info.CharSprite;
+        // Persisted so the rescued ally survives save/load (see DelverMachine).
+        DelverMachine.Spawn(pos, Info.CharSprite);
 
-        // Register with the save's player list so the rescued ally persists across
-        // save/load (same contract as the console delver — see DelverMachine).
-        Save.Inst.players.Add(delver);
-
-        Entity.SpawnFromInfo(delver, false);
         Info.Destroy();
         Unload();
         Audio.PlaySFX(SfxID.Text);

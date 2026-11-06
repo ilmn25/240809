@@ -26,7 +26,7 @@ public class GenTaskPond : GenTaskScatter
             int surfaceY = FindSurfaceY(world, x, z);
             if (surfaceY < 0) continue;
 
-            PlaceEntity(world, new Vector3Int(x, surfaceY, z), ID.Pond);
+            GenBlocks.PlaceEntity(world, new Vector3Int(x, surfaceY, z), ID.Pond);
 
             // Ring the pond with bushes — they only grow by water.
             for (int dx = -1; dx <= 1; dx++)
@@ -40,7 +40,7 @@ public class GenTaskPond : GenTaskScatter
                     if (bx < 1 || bz < 1 || bx >= world.Bounds.x - 1 || bz >= world.Bounds.z - 1) continue;
                     int by = FindSurfaceY(world, bx, bz);
                     if (by != surfaceY) continue;
-                    PlaceEntity(world, new Vector3Int(bx, by, bz), ID.Bush);
+                    GenBlocks.PlaceEntity(world, new Vector3Int(bx, by, bz), ID.Bush);
                 }
             }
             return;

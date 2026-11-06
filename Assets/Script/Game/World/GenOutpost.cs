@@ -16,7 +16,7 @@ public class GenOutpost : GenTaskScatter
 
         Vector3Int tentSpot = FindTentSpot(world, origin.x, origin.z, rng);
         if (tentSpot.x >= 0)
-            PlaceEntity(world, tentSpot, ID.MercenaryTent);
+            GenBlocks.PlaceEntity(world, tentSpot, ID.MercenaryTent);
     }
 
     private static Vector3Int FindTentSpot(World world, int centerX, int centerZ, System.Random rng)

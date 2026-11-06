@@ -112,6 +112,22 @@ public class NavMap
     /// <summary>True if a cell is passable but pathfinding should avoid it when possible.</summary>
     public static bool IsSemiBlocking(byte value) => value == Door;
 
+    /// <summary>Snap a column to the world's surface: the highest cell that is air
+    /// directly above solid ground. X/Z are clamped into the world. Returns false when
+    /// the column has no surface to stand on.</summary>
+    public static bool TryFindSurface(ref Vector3Int pos)
+    {
+        pos.x = Mathf.Clamp(pos.x, 0, World.Inst.Bounds.x - 1);
+        pos.z = Mathf.Clamp(pos.z, 0, World.Inst.Bounds.z - 1);
+
+        for (pos.y = World.Inst.Bounds.y - 1; pos.y > 0; pos.y--)
+        {
+            if (IsAir(pos) && !IsAir(pos + Vector3Int.down))
+                return true;
+        }
+        return false;
+    }
+
     /// <summary>Nearest in-world cell the standard mob collider can stand in,
     /// searched outward from <paramref name="origin"/>. Lets an entity that spawned
     /// (or got sealed) inside solid blocks find a spot to walk back out to.</summary>
