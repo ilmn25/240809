@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class GenTaskScatter : IGenTask
@@ -21,6 +22,74 @@ public abstract class GenTaskScatter : IGenTask
         return dx * dx + dz * dz >= radius * radius;
     }
 
+    // ---- Cell queries ----
+
+    /// <summary>Surface cell (the first air block above the ground) of a grass column, or
+    /// false when the column is out of bounds, isn't grass, or has no surface.</summary>
+    protected static bool TrySurfaceCell(World world, int x, int z, out Vector3Int cell)
+    {
+        cell = default;
+        if (x < 1 || z < 1 || x >= world.Bounds.x - 1 || z >= world.Bounds.z - 1) return false;
+        if (GenHelpBiome.GetBiomeType(x, z) != BiomeType.Grass) return false;
+
+        int surfaceY = FindSurfaceY(world, x, z);
+        if (surfaceY < 0) return false;
+
+        cell = new Vector3Int(x, surfaceY, z);
+        return true;
+    }
+
+    /// <summary>True when a static entity or a loose item already fills
+    /// <paramref name="cell"/> — placed by an earlier gen task, or by an earlier pass of the
+    /// same task — so new scatter must not stack on top of it.</summary>
+    protected static bool IsOccupied(World world, Vector3Int cell)
+    {
+        Chunk chunk = GenBlocks.ChunkAt(world, cell);
+        if (chunk == null) return true;
+        return Contains(chunk.StaticEntity, cell) || Contains(chunk.DynamicEntity, cell);
+    }
+
+    private static bool Contains(List<Info> entities, Vector3Int cell)
+    {
+        foreach (Info entity in entities)
+            if (Vector3Int.FloorToInt(entity.position) == cell)
+                return true;
+        return false;
+    }
+
+    /// <summary>Calls <paramref name="action"/> for every column inside the disc of
+    /// <paramref name="radius"/> around <paramref name="center"/>.</summary>
+    protected static void ForEachColumnAround(Vector3Int center, int radius, System.Action<int, int> action)
+    {
+        int radiusSquared = radius * radius;
+        for (int dx = -radius; dx <= radius; dx++)
+            for (int dz = -radius; dz <= radius; dz++)
+            {
+                if (dx * dx + dz * dz > radiusSquared) continue;
+                action(center.x + dx, center.z + dz);
+            }
+    }
+
+    /// <summary>A random free grass surface cell within <paramref name="radius"/> of
+    /// <paramref name="center"/>, never the centre column itself, or (-1, 0, 0) when none
+    /// is found.</summary>
+    protected static Vector3Int PickFreeSurfaceCell(World world, System.Random rng, Vector3Int center,
+        int radius, int attempts = 12)
+    {
+        int radiusSquared = radius * radius;
+        for (int attempt = 0; attempt < attempts; attempt++)
+        {
+            int dx = rng.Next(-radius, radius + 1);
+            int dz = rng.Next(-radius, radius + 1);
+            if (dx * dx + dz * dz > radiusSquared) continue;
+            if (dx == 0 && dz == 0) continue; // leave the centre column clear
+            if (!TrySurfaceCell(world, center.x + dx, center.z + dz, out Vector3Int cell)) continue;
+            if (IsOccupied(world, cell)) continue;
+            return cell;
+        }
+        return new Vector3Int(-1, 0, 0);
+    }
+
     /// <summary>Rolls up to <paramref name="attempts"/> random grass columns that have a
     /// surface and clear the spawn clearing by <paramref name="spawnMargin"/> blocks,
     /// returning the first one that also satisfies <paramref name="accept"/> (y is unused),
@@ -33,8 +102,7 @@ public abstract class GenTaskScatter : IGenTask
             int x = rng.Next(2, world.Bounds.x - 2);
             int z = rng.Next(2, world.Bounds.z - 2);
             if (!IsClearOfSpawn(world.SpawnPoint, x, z, spawnMargin)) continue;
-            if (GenHelpBiome.GetBiomeType(x, z) != BiomeType.Grass) continue;
-            if (FindSurfaceY(world, x, z) < 0) continue;
+            if (!TrySurfaceCell(world, x, z, out _)) continue;
             if (accept != null && !accept(x, z)) continue;
             return new Vector3Int(x, 0, z);
         }
@@ -95,5 +163,43 @@ public abstract class GenTaskScatter : IGenTask
                 if (y > maxY) maxY = y;
             }
         return maxY - minY <= maxSpread ? minY : -1;
+    }
+
+    /// <summary>Places a skeleton remains at <paramref name="cell"/> with starter loot (crude
+    /// tools, flint) dropped on the ground beside it — the "someone died here" scatter shared
+    /// by surface generation and the spawn garden.</summary>
+    /// <param name="isFree">Optional filter for the loot cells, e.g. to keep drops off
+    /// occupied cells. Null allows any cell.</param>
+    public static void SpawnSkeletonCorpse(World world, Vector3Int cell, System.Random rng,
+        System.Func<Vector3Int, bool> isFree = null)
+    {
+        PlaceEntity(world, cell, ID.Skeleton);
+
+        int count = rng.Next(1, 3);
+        for (int i = 0; i < count; i++)
+        {
+            int x = cell.x + rng.Next(-1, 2);
+            int z = cell.z + rng.Next(-1, 2);
+            if (x < 1 || z < 1 || x >= world.Bounds.x - 1 || z >= world.Bounds.z - 1) continue;
+
+            Vector3Int lootCell = new Vector3Int(x, cell.y, z);
+            if (lootCell == cell) continue;
+            if (isFree != null && !isFree(lootCell)) continue;
+
+            // Loose items go to DynamicEntity, so they spawn as real ground drops.
+            GenBlocks.PlaceEntity(world, lootCell, PickSkeletonLoot(rng));
+        }
+    }
+
+    /// <summary>Low-tier starter loot found beside a skeleton.</summary>
+    private static ID PickSkeletonLoot(System.Random rng)
+    {
+        double roll = rng.NextDouble();
+        double chance = 0;
+        if ((chance += 0.25) > roll) return ID.CrudeHatchet;
+        if ((chance += 0.25) > roll) return ID.CrudePickaxe;
+        if ((chance += 0.2) > roll) return ID.CrudeMallet;
+        if ((chance += 0.2) > roll) return ID.Flint;
+        return ID.Sticks;
     }
 }

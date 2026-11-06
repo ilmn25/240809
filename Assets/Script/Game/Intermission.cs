@@ -10,8 +10,9 @@ public static class Intermission
 
     private static readonly string[] NewGameIntro =
     {
-        "You wake in the Abyss — a place with no name and no memory of you, though it knows your footsteps.",
-        "Beneath the dark, something breathes in time with your heartbeat... and it has been waiting a very long time."
+        "At the edge of the town, there is a large ravine.",
+        "For hundreds of years, when someone is exiled from the surface, they are sent to explore the depths of the abyss.",
+        "You are MARI, you have been exiled from the surface into the world below."
     };
 
     public static void Start(bool playIntro = false)
