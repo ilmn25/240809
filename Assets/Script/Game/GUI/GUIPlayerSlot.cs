@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 /// <summary>A single player entry in the player list. Shows the player's
 /// sprite and current HP, pops up the info panel on hover, and takes control
-/// of the player on click.</summary>
+/// of the player on click. Right-click releases their tree/rock job, or
+/// toggles rest when they have none.</summary>
 public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private Image _image;
@@ -41,11 +42,13 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (Player == null) return;
         Audio.PlaySFX(SfxID.Text);
         ScaleSlot(1.1f);
+        GUIPlayerList.SetHovered(Player);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         GUIMain.IsHover = false;
+        GUIPlayerList.SetHovered(null);
         if (!GUIMain.Showing || !GUIPlayerList.Showing) return;
         ScaleSlot(1f);
     }
@@ -56,7 +59,7 @@ public class GUIPlayerSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         if (Player == null) return;
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            GUIPlayerList.ToggleRest(Player);
+            GUIPlayerList.HandleRightClick(Player);
             return;
         }
         GUIPlayerList.TryControl(Player);

@@ -49,7 +49,7 @@ public partial class Item
     /// <summary>If &gt; 0, this item despawns after this many seconds on the ground.</summary>
     public float DespawnTime;
      
-    public string Name => Helper.ToDisplayName(ID, lowercase: true);
+    public string Name => Helper.ToDisplayName(ID);
     public string Description;
 
     /// <summary>Rich-text color of this item's rarity, for tooltips.</summary>

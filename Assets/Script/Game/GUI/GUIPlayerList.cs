@@ -3,15 +3,19 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>A simple player list. Builds an empty parent in code and keeps a
-/// pool of GUIPlayerSlot entries (one per player). Hovering a slot pops up the
-/// info panel with the player's sprite and HP. Clicking a free player takes
-/// control of them.</summary>
+/// pool of GUIPlayerSlot entries (one per player). Hovering a slot pops up that
+/// player's info in the same tooltip items use. Clicking a free player takes
+/// control of them; right-click releases their work order or toggles rest.</summary>
 public class GUIPlayerList : GUI
 {
     private const int PoolSize = 8;
     private const int SlotSize = 30;
     private const int Spacing = 16;
     private readonly List<GUIPlayerSlot> _slots = new List<GUIPlayerSlot>();
+
+    /// <summary>The player whose slot the cursor is over, or null — drives the info tooltip
+    /// the same way <see cref="GUIStorage.Hovered"/> drives item tooltips.</summary>
+    public static PlayerInfo Hovered { get; private set; }
 
     public new void Initialize()
     {
@@ -43,8 +47,13 @@ public class GUIPlayerList : GUI
 
     public void Update()
     {
-        if (!GUIMain.Showing || !Showing) return;
-        if (Save.Inst == null) return;
+        // Hiding the list (or losing the save) can't be relied on to fire pointer exits, so
+        // drop the hover here — otherwise reopening the inventory pops a stale tooltip.
+        if (!GUIMain.Showing || !Showing || Save.Inst == null)
+        {
+            SetHovered(null);
+            return;
+        }
 
         int count = Save.Inst.players.Count;
         for (int i = 0; i < _slots.Count; i++)
@@ -85,6 +94,24 @@ public class GUIPlayerList : GUI
         if (player == null) return;
         SetRest(player, !player.Resting);
     }
+
+    /// <summary>Right-click on a slot: release the tree/rock job the player is working on
+    /// (so an ally stops mining/cutting and goes back to following). With no such job it
+    /// toggles rest instead.</summary>
+    public void HandleRightClick(PlayerInfo player)
+    {
+        if (!player.ReleaseWork())
+        {
+            ToggleRest(player);
+            return;
+        }
+        PlayerSync.SendReleaseWork(player.uid);
+        Audio.PlaySFX(SfxID.Text);
+    }
+
+    /// <summary>Track which player's slot the cursor is over (null when it leaves) so the
+    /// HUD can show that player's info, the same way hovering a slot shows an item's.</summary>
+    public void SetHovered(PlayerInfo player) => Hovered = player;
 
     private void SetRest(PlayerInfo player, bool resting)
     {

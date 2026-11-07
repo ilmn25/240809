@@ -78,6 +78,12 @@ public struct PlayerRestMessage : NetworkMessage
     public bool resting;
 }
 
+/// <summary>Client asks the host to drop a player's structure job (tree/rock).</summary>
+public struct PlayerReleaseWorkMessage : NetworkMessage
+{
+    public string uid;
+}
+
 // Storage sync moved to StorageSyncMessage (see StorageSync.cs)
 
 public static class PlayerSync
@@ -182,6 +188,7 @@ public static class PlayerSync
         NetworkClient.ReplaceHandler<PlayerSyncMessage>(OnPlayerSyncMessageReceived, false);
         NetworkServer.ReplaceHandler<ClientToServerPlayerMessage>(OnClientToServerPlayerMessageReceived, false);
         NetworkServer.ReplaceHandler<PlayerRestMessage>(OnPlayerRestMessageReceived, false);
+        NetworkServer.ReplaceHandler<PlayerReleaseWorkMessage>(OnPlayerReleaseWorkMessageReceived, false);
         NetworkClient.ReplaceHandler<YourConnectionIdMessage>(OnYourConnectionIdReceived, false);
         if (Application.isPlaying)
         {
@@ -338,6 +345,13 @@ public static class PlayerSync
     {
         if (Helper.IsHost() || !NetworkClient.isConnected || string.IsNullOrEmpty(uid)) return;
         NetworkClient.Send(new PlayerRestMessage { uid = uid, resting = resting });
+    }
+
+    /// <summary>Client asks the host to drop a player's structure job (tree/rock).</summary>
+    public static void SendReleaseWork(string uid)
+    {
+        if (Helper.IsHost() || !NetworkClient.isConnected || string.IsNullOrEmpty(uid)) return;
+        NetworkClient.Send(new PlayerReleaseWorkMessage { uid = uid });
     }
 
     public static void SendClientPlayerBatch()
@@ -547,6 +561,13 @@ public static class PlayerSync
         if (!NetworkServer.active || Save.Inst == null) return;
         if (!Info.Dictionary.TryGetValue(msg.uid, out Info info) || info is not PlayerInfo pi) return;
         pi.Resting = msg.resting;
+    }
+
+    private static void OnPlayerReleaseWorkMessageReceived(NetworkConnectionToClient _, PlayerReleaseWorkMessage msg)
+    {
+        if (!NetworkServer.active || Save.Inst == null) return;
+        if (!Info.Dictionary.TryGetValue(msg.uid, out Info info) || info is not PlayerInfo pi) return;
+        pi.ReleaseWork();
     }
 
     /// <summary>If the host's current player is unclaimed, claim it so clients don't think it's free.</summary>

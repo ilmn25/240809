@@ -50,14 +50,14 @@ public partial class ItemRecipe
         return true;
     }
 
-    /// <summary>Ingredient list as tooltip lines: "ingredients:" followed by "name (have/need)".
+    /// <summary>Ingredient list as tooltip lines: "Ingredients:" followed by "Name (have/need)".
     /// Colored lines turn red while the player is short and a soft green once the amount
     /// is met. Empty when the recipe needs nothing.</summary>
     public string DescribeIngredients(bool colored = false)
     {
         if (Ingredients == null || Ingredients.Count == 0) return "";
 
-        StringBuilder text = new StringBuilder("ingredients:");
+        StringBuilder text = new StringBuilder("Ingredients:");
         foreach (var ingredient in Ingredients)
         {
             Item item = Item.GetItem(ingredient.Key);

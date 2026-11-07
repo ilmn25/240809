@@ -234,8 +234,9 @@ public class Control
         { 
             IActionPrimaryResource target = GetNearestInteractable<IActionPrimaryResource>();
             if (target == null) return;
-            Main.PlayerInfo.Target = ((EntityMachine)target).Info;  
-            Main.PlayerInfo.ActionType = IActionType.Hit;
+            // Same acquisition path as a swing: a structure order also becomes the player's
+            // remembered work order, so an ally keeps the job after control moves on.
+            Main.PlayerInfo.AcquireTarget(((EntityMachine)target).Info);
         }
         else if (Inst.ActionSecondaryNear.KeyDown() && !Dialogue.Showing)
         {

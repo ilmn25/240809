@@ -85,6 +85,7 @@ public static class Server
         NetworkClient.UnregisterHandler<YourConnectionIdMessage>();
         NetworkServer.UnregisterHandler<ClientToServerPlayerMessage>();
         NetworkServer.UnregisterHandler<PlayerRestMessage>();
+        NetworkServer.UnregisterHandler<PlayerReleaseWorkMessage>();
         LampSync.UnregisterHandlers();
         BarrelSync.UnregisterHandlers();
     }

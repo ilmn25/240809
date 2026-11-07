@@ -23,6 +23,11 @@ public class PlayerInfo : MobInfo
     public float Stamina; 
     [NonSerialized] public bool Resting;
 
+    /// <summary>The structure job (tree/rock/door) this player was ordered to do — set when
+    /// a human controlling them hits that structure. Kept apart from Target so a dropped or
+    /// fight-driven target doesn't erase the job; the ally picks it back up afterwards.</summary>
+    [NonSerialized] public StructureInfo WorkOrder;
+
     private const float WellFedThreshold = 0.85f;
     private const float MoveHungerInterval = 45f;
     private const float RestHealInterval = 1f;
@@ -114,10 +119,11 @@ public class PlayerInfo : MobInfo
         if (projectile.SourceInfo is not MobInfo { Machine: not null } attacker) return;
         attacker.MarkHostile();
 
-        // An AI player fights back. A human player's target is mouse-driven, and a work order
-        // is left alone so mining still runs to completion.
+        // An AI player fights back, dropping whatever structure job it was on — the job stays
+        // in WorkOrder so the ally resumes it once this fight ends. (Enemies merely standing
+        // nearby never pull an ally off a job; only being hit does.) A human player's target
+        // is mouse-driven.
         if (controllerId != -1) return;
-        if (Target is StructureInfo { Destroyed: false }) return;
 
         Target = attacker;
         ActionType = IActionType.Hit;
@@ -138,7 +144,20 @@ public class PlayerInfo : MobInfo
     public override void AcquireTarget(Info target)
     {
         if (controllerId == -1) return;
+        // Hitting a structure is an order to work on it, kept after control moves on.
+        if (target is StructureInfo job) WorkOrder = job;
         base.AcquireTarget(target);
+    }
+
+    /// <summary>Stop working: forget the remembered structure job and, when the player is
+    /// currently on a structure, drop that target too. Returns true if a structure target
+    /// was released — false when the player wasn't working on one.</summary>
+    public bool ReleaseWork()
+    {
+        WorkOrder = null;
+        if (Target is not StructureInfo) return false;
+        CancelTarget();
+        return true;
     }
 
     public bool DropHeldItem()

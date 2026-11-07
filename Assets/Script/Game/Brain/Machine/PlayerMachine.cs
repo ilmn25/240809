@@ -135,8 +135,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
      
     // ---- Ally AI (Death Road to Canada style) ----
 
-    /// <summary>Recall all allies: cancel their current target/action, so the brain
-    /// falls back to following the leader. Runs on the host (authority over ally AI).</summary>
+    /// <summary>Recall all allies: cancel their current target/action (and any remembered
+    /// structure job), so the brain falls back to following the leader. Runs on the host
+    /// (authority over ally AI).</summary>
     public static void RecallAllies()
     {
         if (Save.Inst?.players == null) return;
@@ -144,13 +145,15 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {
             if (player == Main.PlayerInfo || player.Destroyed) continue;
             if (player.Machine is not PlayerMachine ally) continue;
+            ally.Info.ReleaseWork(); // forget the job too, or a recall just resumes it
             ally.Info.CancelTarget();
         }
     }
 
     // Drives non-controlled party members. Priority order:
-    //   1. finish a fight already under way,
-    //   2. finish the structure job this ally was ordered to do,
+    //   1. finish a fight already under way (an ally only starts one when idle),
+    //   2. finish the structure job this ally was ordered to do — enemies nearby are not a
+    //      reason to stop cutting; only a hit on the ally itself starts a fight,
     //   3. roaming/targetless: pick a new fight or sweep up loot,
     //   4. otherwise trail the leader.
     // Allies never adopt the leader's target — the only way they get a structure job is by
@@ -187,9 +190,17 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Priority, highest first: fighting, then the structure job this ally was ordered to
-        // do. Only a roaming/targetless ally picks up loot.
-        if (TryEngageEnemy() || TryContinueWork() || TryAcquireLootTarget())
+        // A fight already under way — the ally was hit itself (PlayerInfo.OnHit retargets the
+        // attacker) or was already engaged when control moved on — runs to completion.
+        if (EngagedEnemy is { } engaged)
+        {
+            if (TryEngageEnemy(engaged) || TryContinueWork()) SetState<MobChaseAction>();
+            return;
+        }
+
+        // Otherwise the structure job the ally was ordered to do comes first: enemies merely
+        // nearby never pull a worker off it. Only a roaming ally starts a fight or takes loot.
+        if (TryContinueWork() || TryEngageEnemy() || TryAcquireLootTarget())
         {
             SetState<MobChaseAction>();
             return;
@@ -202,17 +213,26 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         SetState<MobChaseAction>();
     }
 
-    // Keeps the ally fighting. It stays on the enemy it already engaged — that fight may
-    // drift out to disengage range — and otherwise engages the nearest threat around the
-    // leader. Either way it needs something it can actually swing.
-    private bool TryEngageEnemy()
+    /// <summary>The enemy this ally is already trading blows with (its target, when that
+    /// target is a threat), or null.</summary>
+    private MobInfo EngagedEnemy
+    {
+        get
+        {
+            MobInfo enemy = Info.Target as MobInfo;
+            return enemy != null && !enemy.Destroyed && IsThreat(enemy) ? enemy : null;
+        }
+    }
+
+    // Keeps the ally fighting. It stays on the enemy it already engaged (passed in) — that
+    // fight may drift out to disengage range — and otherwise engages the nearest threat
+    // around the leader. Either way it needs something it can actually swing.
+    private bool TryEngageEnemy(MobInfo engaged = null)
     {
         if (Leader is not PlayerInfo leader) return false;
 
-        MobInfo enemy = Info.Target as MobInfo;
-        bool engaged = enemy != null && !enemy.Destroyed && IsThreat(enemy);
-
-        if (engaged)
+        MobInfo enemy = engaged;
+        if (enemy != null)
         {
             if (IsBeyondAlert(leader.position) ||
                 Vector3.Distance(leader.position, enemy.position) > Info.DistDisengage)
@@ -233,7 +253,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         // Draw a weapon first: an ally that just finished a job is still holding its pickaxe.
         if (!Info.Storage.SetWeapon())
         {
-            if (engaged) Info.CancelTarget();
+            if (engaged != null) Info.CancelTarget();
             return false;
         }
 
@@ -242,13 +262,24 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return true;
     }
 
-    // An ally finishes the structure job it was ordered to do — the target it kept from the
-    // last time the player controlled it and hit that structure. Runs until the structure is
-    // gone or the tool it needs breaks; nothing here ever adopts another player's target.
+    // An ally finishes the structure job it was ordered to do — the structure it kept from
+    // the last time the player controlled it and hit it, remembered in WorkOrder so a fight
+    // doesn't wipe it. Runs until the structure is gone or the tool it needs breaks; nothing
+    // here ever adopts another player's target.
     private bool TryContinueWork()
     {
-        if (Info.Target is not StructureInfo job || job.Destroyed) return false;
-        if (!EnsureToolForTarget()) return false;
+        if (Info.WorkOrder is not { Destroyed: false } job)
+        {
+            Info.WorkOrder = null;
+            return false;
+        }
+
+        Info.Target = job;
+        if (!EnsureToolForTarget())
+        {
+            Info.WorkOrder = null;
+            return false;
+        }
 
         Info.ActionType = IActionType.Hit;
         return true;

@@ -250,9 +250,22 @@ public static class GUIMain
     {
         // Hovering only counts while the inventory GUI is open and no full-screen menu is up,
         // so a closed window or an opened menu cannot leave a tooltip behind.
-        GUIStorage hovered = Showing && !GUIMenu.Showing ? GUIStorage.Hovered : null;
-        string text = hovered?.HoveredItemText ?? "";
-        string details = hovered?.HoveredItemDetails ?? "";
+        string text = "";
+        string details = "";
+        if (Showing && !GUIMenu.Showing)
+        {
+            // A hovered party member describes itself exactly like a hovered item slot does.
+            if (GUIPlayerList.Hovered is { Destroyed: false } player)
+            {
+                text = PlayerTooltip.Text(player);
+                details = PlayerTooltip.Details(player);
+            }
+            else if (GUIStorage.Hovered is { } storage)
+            {
+                text = storage.HoveredItemText;
+                details = storage.HoveredItemDetails;
+            }
+        }
 
         bool changed = text != _hoveredText || details != _hoveredDetails ||
                        _menuWasShowing != GUIMenu.Showing;
