@@ -17,6 +17,10 @@ public abstract class SpawnerStructureMachine : StructureMachine
     /// structures (owl statue, tents) keep 1; swarms override this higher.</summary>
     protected virtual int MaxUnits => 1;
 
+    /// <summary>Hostile spawners (raider tents, hives, spider nests) stay empty in
+    /// peaceful worlds; friendly ones (guide, mercenaries) still show up.</summary>
+    protected virtual bool SpawnsHostiles => false;
+
     /// <summary>The info shared by every spawner structure: chopped with an axe and
     /// never leaving rubble. Subclasses wrap this in their own CreateInfo.</summary>
     protected static StructureInfo CreateSpawnerInfo(int health, ID loot) => new()
@@ -65,6 +69,7 @@ public abstract class SpawnerStructureMachine : StructureMachine
     private void RestorePopulation()
     {
         _units.RemoveAll(u => !IsAlive(u));
+        if (SpawnsHostiles && Save.Inst?.difficulty == MobDifficulty.Peaceful) return;
         for (int i = _units.Count; i < MaxUnits; i++)
         {
             Info unit = SpawnUnit(i);

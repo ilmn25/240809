@@ -43,7 +43,7 @@ public class StructureInfo : Info
     private bool CanBreak(MobInfo attacker)
     {
         if (attacker.HitboxType == HitboxType.Enemy) return true;
-        if (attacker.targetHitboxType == HitboxType.Player || attacker.Equipment == null) return false;
+        if (attacker.IsNPC || attacker.Equipment == null) return false;
         ProjectileInfo tool = attacker.Equipment.Info.ProjectileInfo;
         return tool.OperationType == operationType && tool.Breaking >= threshold;
     }
@@ -70,9 +70,9 @@ public class StructureInfo : Info
             WarnToolTooWeak(attacker);
             return false;
         }
-        // AI-controlled players ignore this (see PlayerInfo.AcquireTarget), so their brain
-        // keeps the target it assigned instead of the structure they clipped.
-        attacker.AcquireTarget(this);
+        // PlayerInfo ignores this for AI-controlled players; mobs keep their assigned target.
+        if (attacker is PlayerInfo)
+            attacker.AcquireTarget(this);
         return true;
     }
 

@@ -13,6 +13,7 @@ public class PassiveInfo : MobInfo
         SpeedAir = 6,
         DistRoam = 3,
         IsNPC = true,
+        targetHitboxType = HitboxType.Enemy,
     };
 
     public override void Initialize()
@@ -20,7 +21,9 @@ public class PassiveInfo : MobInfo
         base.Initialize();
         Health = HealthMax;
         HitboxType = HitboxType.Passive;
-        targetHitboxType = HitboxType.Player;
+        // NPCs set Enemy in CreateNpc; docile animals default to attacking players.
+        if (targetHitboxType == HitboxType.Friendly)
+            targetHitboxType = HitboxType.Player;
         ActionType = IActionType.Hit;
     }
 

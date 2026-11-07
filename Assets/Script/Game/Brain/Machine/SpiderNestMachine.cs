@@ -3,6 +3,7 @@ using UnityEngine;
 public class SpiderNestMachine : SpawnerStructureMachine
 {
     protected override int MaxUnits => 3;
+    protected override bool SpawnsHostiles => true;
 
     public static Info CreateInfo() => CreateSpawnerInfo(120, ID.SpiderNest);
 

@@ -4,6 +4,7 @@ using Random = UnityEngine.Random;
 public class DirtyTentMachine : SpawnerStructureMachine
 {
     protected override int MaxUnits => 1;
+    protected override bool SpawnsHostiles => true;
 
     private const float GuardLeash = 2f;
 

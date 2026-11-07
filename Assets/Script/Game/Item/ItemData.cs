@@ -227,8 +227,8 @@ public partial class Item
                 Damage = 3,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = 1f,
-                Radius = 1.5f,
+                Speed = 1.65f,
+                Radius = 2f,
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
@@ -367,7 +367,7 @@ public partial class Item
             },
             durability: 100,
             description: "A burning torch that sets flammable objects alight.",
-            materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Charcoal, 1 } },
+            materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Cotton, 1 } },
             holdoutOffset: new Vector2(0.65f, 0),
             glow: true
         );

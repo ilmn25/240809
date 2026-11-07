@@ -31,8 +31,10 @@ public class PlayerInfo : MobInfo
     private const float WellFedThreshold = 0.85f;
     private const float MoveHungerInterval = 45f;
     private const float RestHealInterval = 1f;
+    private const float TorchBurnInterval = 2f; // seconds of carrying per point of durability
     private float _moveHungerAccumulator;
     private float _restHealAccumulator;
+    private float _torchBurnAccumulator;
     private static readonly StatusEffect WellFed = new StatusEffect(
         ID.WellFed, EffectType.Heal, duration: 120f, tickInterval: 40f, amountPerTick: 1, name: "Well Fed");
 
@@ -194,6 +196,8 @@ public class PlayerInfo : MobInfo
                 break;
         }
 
+        UpdateHeldBurn();
+
         if (Resting)
         {
             Direction = Vector3.zero;
@@ -333,6 +337,32 @@ public class PlayerInfo : MobInfo
         _moveHungerAccumulator = 0;
         if (Hunger > 0) Hunger--;
         GUIBar.Update();
+    }
+
+    /// <summary>A burning torch consumes itself while carried: the held item spends a
+    /// point of durability every <see cref="TorchBurnInterval"/> seconds and is used up
+    /// like any other worn-out tool. Only the side that owns this player's inventory
+    /// burns it, so a shared slot can never drain twice.</summary>
+    private void UpdateHeldBurn()
+    {
+        ItemSlot held = Equipment;
+        if (!IsOwner() || held == null || held.Durability <= 0 || held.Info is not { Glow: true })
+        {
+            _torchBurnAccumulator = 0f;
+            return;
+        }
+
+        _torchBurnAccumulator += Helper.GetDeltaTime();
+        if (_torchBurnAccumulator < TorchBurnInterval) return;
+        _torchBurnAccumulator -= TorchBurnInterval;
+
+        held.Durability--;
+        if (held.Durability <= 0)
+        {
+            held.clear();
+            SetEquipment(null);
+        }
+        Storage?.NotifyChanged();
     }
 
     private void RestHeal()

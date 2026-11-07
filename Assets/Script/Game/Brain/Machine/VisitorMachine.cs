@@ -91,6 +91,7 @@ public class VisitorMachine : GroundMobMachine
         if (_enraged) return;
         _enraged = true;
         Info.MarkHostile();
+        Info.targetHitboxType = HitboxType.Player;
         Info.Target = attacker;
         Info.ActionType = IActionType.Hit;
         Info.PathingStatus = PathingStatus.Pending;

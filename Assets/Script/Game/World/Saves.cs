@@ -71,6 +71,12 @@ public class Save
     public int seed;
     /// <summary>The phrase the player typed for the seed, if any (letters only).</summary>
     public string seedText;
+    /// <summary>How many mobs spawn and whether hostiles spawn at all.</summary>
+    public MobDifficulty difficulty = MobDifficulty.Normal;
+    /// <summary>How much scenery the generator scatters over the surface.</summary>
+    public WorldDensity density = WorldDensity.Normal;
+    /// <summary>Real-time length of a full in-game day.</summary>
+    public DayLength dayLength = DayLength.Normal;
     public QuestState quest = new();
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
@@ -83,15 +89,18 @@ public class Save
     public bool mawUnlocked;
 
     public Save(){}
-    public Save(GenType gen) : this(gen, null) {}
+    public Save(GenType gen) : this(gen, NewGameOptions.Default) {}
 
-    /// <param name="seed">Fixed world seed; null picks a random one.</param>
-    /// <param name="seedText">Phrase the player typed for the seed, shown in save listings.</param>
-    public Save(GenType gen, int? seed, string seedText = null)
+    /// <param name="gen">World type the save starts in.</param>
+    /// <param name="options">Choices made on the New Game screen.</param>
+    public Save(GenType gen, NewGameOptions options)
     {
         current = gen;
-        this.seed = seed ?? UnityEngine.Random.Range(1, 1000000);
-        this.seedText = seedText;
+        seed = options.Seed ?? UnityEngine.Random.Range(1, 1000000);
+        seedText = options.SeedText;
+        difficulty = options.Difficulty;
+        density = options.Density;
+        dayLength = options.DayLength;
 
         players = new List<PlayerInfo>();
         worlds = new Dictionary<GenType, World>()
@@ -106,12 +115,35 @@ public class Save
 
         Vector3 spawnPosition = worlds[gen].SpawnPoint;
 
-        PlayerInfo first = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        players.Add(first);
- 
-        PlayerInfo third = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
-        third.CharSprite = ID.Yuuri;
-        players.Add(third);
+        for (int i = 0; i < Mathf.Clamp(options.Delvers, 1, 3); i++)
+        {
+            PlayerInfo player = (PlayerInfo)Entity.CreateInfo(ID.Player, spawnPosition);
+            if (i == 1) player.CharSprite = ID.Yuuri; // the second delver wears the Yuuri sprite
+            players.Add(player);
+        }
     }
+}
+
+/// <summary>Everything the New Game screen lets the player choose. Kept as one value so
+/// <see cref="Save"/>'s constructor doesn't grow an ever-longer parameter list.</summary>
+public struct NewGameOptions
+{
+    /// <summary>Fixed world seed; null picks a random one.</summary>
+    public int? Seed;
+    /// <summary>Phrase the player typed for the seed, shown in save listings.</summary>
+    public string SeedText;
+    /// <summary>How many players start in this world (1-3).</summary>
+    public int Delvers;
+    public MobDifficulty Difficulty;
+    public WorldDensity Density;
+    public DayLength DayLength;
+
+    public static NewGameOptions Default => new()
+    {
+        Delvers = 2,
+        Difficulty = MobDifficulty.Normal,
+        Density = WorldDensity.Normal,
+        DayLength = DayLength.Normal,
+    };
 }
 

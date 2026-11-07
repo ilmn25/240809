@@ -90,7 +90,7 @@ public class GenTaskEntity : IGenTask
                         // tents, spider nests, hives, chests, skeletons or meteors next to spawn.
                         bool spawnClearing = !GenTaskScatter.IsClearOfSpawn(spawn, position.x, position.z);
 
-                        double roll = rng.NextDouble();
+                        double roll = WorldSettings.DensityRoll(rng);
                         bool skeletonRoll = rng.NextDouble() < SurfaceSkeletonChance;
                         if (skeletonRoll && !spawnClearing)
                         {
@@ -138,7 +138,7 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.PlaceEntity(ID.FallenTree, position);
                             }
-                            else if (rng.NextDouble() < GroundItemChance)
+                            else if (WorldSettings.DensityRoll(rng) < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
@@ -189,7 +189,7 @@ public class GenTaskEntity : IGenTask
                             {
                                 if (!spawnClearing) currentChunk.PlaceEntity(ID.Meteor, position);
                             }
-                            else if (rng.NextDouble() < GroundItemChance)
+                            else if (WorldSettings.DensityRoll(rng) < GroundItemChance)
                             {
                                 ID groundItem = PickGrassItem(rng);
                                 if (groundItem != ID.Null)
@@ -221,21 +221,21 @@ public class GenTaskEntity : IGenTask
                             {
                                 bool isRock = currentChunk[x, y, z] == Stone || currentChunk[x, y, z] == Granite;
                                 // No structure on this cell — surface items only.
-                                if (currentChunk[x, y, z] == Sand && rng.NextDouble() < GroundItemChance)
+                                if (currentChunk[x, y, z] == Sand && WorldSettings.DensityRoll(rng) < GroundItemChance)
                                 {
                                     ID groundItem = PickDesertItem(rng);
                                     if (groundItem != ID.Null)
                                         currentChunk.PlaceEntity(groundItem, position);
                                 }
-                                else if (isRock && rng.NextDouble() < SurfaceRockPileChance)
+                                else if (isRock && WorldSettings.DensityRoll(rng) < SurfaceRockPileChance)
                                 {
                                     currentChunk.PlaceEntity(ID.RockPile, position);
                                 }
-                                else if (isRock && rng.NextDouble() < SurfaceIronBoulderChance)
+                                else if (isRock && WorldSettings.DensityRoll(rng) < SurfaceIronBoulderChance)
                                 {
                                     currentChunk.PlaceEntity(ID.IronBoulder, position);
                                 }
-                                else if (isRock && rng.NextDouble() < StoneGroundItemChance)
+                                else if (isRock && WorldSettings.DensityRoll(rng) < StoneGroundItemChance)
                                 {
                                     ID groundItem = PickStoneItem(rng);
                                     if (groundItem != ID.Null)

@@ -46,6 +46,7 @@ public static class RaidEvent
     public static string GetCountdownText()
     {
         if (Save.Inst == null) return "";
+        if (Save.Inst.difficulty == MobDifficulty.Peaceful) return "No raids";
 
         int daysUntilRaid = (RaidIntervalDays - Save.Inst.day % RaidIntervalDays) % RaidIntervalDays;
         if (daysUntilRaid == 0 && Save.Inst.time >= RaidTime)
@@ -59,6 +60,8 @@ public static class RaidEvent
     private static void OnHour(int hour, int day)
     {
         if (hour != RaidHour || day % RaidIntervalDays != 0) return;
+        // Peaceful worlds never get raided.
+        if (Save.Inst?.difficulty == MobDifficulty.Peaceful) return;
 
         _activeRaidTask?.Stop();
         _activeRaidTask = new CoroutineTask(ExecuteRaid(GetRaidType(day)));

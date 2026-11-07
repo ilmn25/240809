@@ -6,25 +6,42 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Pool = System.Collections.Generic.List<(ID id, float weight)>;
 
-public class MobSpawner
+/// <summary>How dangerous a world is. Picked when a new game starts. Normal is 0 so
+/// saves written before this setting existed keep spawning as before.</summary>
+public enum MobDifficulty { Normal = 0, Peaceful = 1, Overwhelming = 2 }
+
+/// <summary>Spawns wildlife and hostiles around players. One <see cref="Rules"/> profile
+/// describes a spawn pulse (how often, how many attempts per player, how many mobs may
+/// live nearby, whether hostiles exist at all), so tuning a difficulty touches one place
+/// instead of a pile of scattered constants.</summary>
+public static class MobSpawner
 {
-    private const int SpawnInterval = 240;
-    private const int SpawnAttemptsPerTick = 5;
-    private const int MobCapPerPlayer = 18;
-    private const int EventSpawnAttemptsPerTick = 8;
-    private const int EventMobCapPerPlayer = 28;
-    private const int DungeonSpawnAttemptsPerTick = 6;
-    private const int DungeonMobCapPerPlayer = 3;
     private const float DayRoamerChance = 0.5f;
-    private const float PassiveMobRarity = 0.1f;
-    private const int PassiveMobCap = 24;
-    private const float BoundNPCSpawnChance = 0.002f;
+    private const float PassiveRarity = 0.1f;
+    private const int PassiveCap = 24;
+    private const float BoundNPCChance = 0.002f;
     private const int CrowFlockMin = 2;
     private const int CrowFlockMax = 3;
-    private const int CrowCap = 8; // crows kept alive near a player (ambience, not a swarm)
-    private const float CrowSpawnNear = 8f; // closest a flock lands to the player
+    private const int CrowCap = 8;           // crows kept alive near a player (ambience, not a swarm)
+    private const float CrowSpawnNear = 8f;  // closest a flock lands to the player
 
-    private static int _timer;
+    private enum SpawnPhase { Day, Night, Rapture }
+
+    private readonly struct Rules
+    {
+        public readonly float Interval;
+        public readonly int Attempts;
+        public readonly int CapPerPlayer;
+        public readonly bool Hostiles;
+
+        public Rules(float interval, int attempts, int capPerPlayer, bool hostiles)
+        {
+            Interval = interval;
+            Attempts = attempts;
+            CapPerPlayer = capPerPlayer;
+            Hostiles = hostiles;
+        }
+    }
 
     private static readonly Pool DayRoamers = new()
     {
@@ -45,112 +62,150 @@ public class MobSpawner
         ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin,
         ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret);
 
+    private static float _nextPulse;
+
     public static void Update()
     {
-        if (!Helper.IsHost() || Main.CreativeMode) return;
+        if (!Helper.IsHost() || Main.CreativeMode || Save.Inst == null) return;
 
-        if (++_timer < SpawnInterval) return;
-        _timer = 0;
+        Rules rules = GetRules();
+        if (Time.time < _nextPulse) return;
+        _nextPulse = Time.time + rules.Interval;
 
         bool dungeon = Save.Inst.current == GenType.Dungeon;
-        bool eventActive = !dungeon && Save.Inst.weather is EnvironmentType.Rapture or EnvironmentType.NightBright;
-        int cap = dungeon ? DungeonMobCapPerPlayer : eventActive ? EventMobCapPerPlayer : MobCapPerPlayer;
-        int attempts = dungeon ? DungeonSpawnAttemptsPerTick : eventActive ? EventSpawnAttemptsPerTick : SpawnAttemptsPerTick;
-        bool night = Save.Inst.weather is EnvironmentType.NightRainy or EnvironmentType.NightBright;
+        if (!dungeon && CountMobs() >= Save.Inst.players.Count * rules.CapPerPlayer) return;
 
-        if (!dungeon && CountMobs() >= Save.Inst.players.Count * cap) return;
-
-        foreach (var player in Save.Inst.players)
+        SpawnPhase phase = GetPhase();
+        foreach (PlayerInfo player in Save.Inst.players)
         {
             if (player.Machine == null || player.controllerId == -1) continue;
 
-            Vector3 pPos = player.Machine.transform.position;
-            if (CountMobs(near: pPos, radius: Scene.LogicDistance) >= cap) continue;
+            Vector3 playerPos = player.Machine.transform.position;
+            if (CountMobs(near: playerPos, radius: Scene.LogicDistance) >= rules.CapPerPlayer) continue;
 
-            for (int i = 0; i < attempts; i++)
+            for (int i = 0; i < rules.Attempts; i++)
             {
-                if (dungeon) TrySpawnDungeonMob(pPos);
-                else TrySpawnGroup(pPos, night);
+                if (dungeon) TrySpawnDungeonMob(playerPos, rules.Hostiles);
+                else TrySpawnAround(playerPos, rules, phase);
             }
         }
     }
 
-    private static void TrySpawnDungeonMob(Vector3 playerPos)
+    /// <summary>Difficulty sets the baseline pressure; swarms (Rapture, full moon) and
+    /// dungeons deviate from it.</summary>
+    private static Rules GetRules()
     {
-        Vector3Int pos = new(
+        Rules rules = Save.Inst.difficulty switch
+        {
+            MobDifficulty.Peaceful => new Rules(4f, 2, 6, false),
+            MobDifficulty.Overwhelming => new Rules(1.2f, 10, 20, true),
+            _ => new Rules(2.4f, 5, 10, true),
+        };
+
+        if (Save.Inst.current == GenType.Dungeon)
+            return new Rules(rules.Interval, rules.Attempts + 1, 3, rules.Hostiles);
+        if (IsSwarm())
+            return new Rules(rules.Interval * 0.5f, rules.Attempts + 3, rules.CapPerPlayer * 3, rules.Hostiles);
+        return rules;
+    }
+
+    private static SpawnPhase GetPhase() => Save.Inst.weather switch
+    {
+        EnvironmentType.Rapture => SpawnPhase.Rapture,
+        EnvironmentType.NightRainy or EnvironmentType.NightBright => SpawnPhase.Night,
+        _ => SpawnPhase.Day,
+    };
+
+    private static bool IsSwarm() =>
+        Save.Inst.weather is EnvironmentType.Rapture or EnvironmentType.NightBright;
+
+    private static void TrySpawnDungeonMob(Vector3 playerPos, bool hostiles)
+    {
+        if (!hostiles) return;
+
+        Vector3Int ground = new(
             Mathf.RoundToInt(playerPos.x + Random.Range(-Scene.RenderDistance, Scene.RenderDistance)),
             0,
             Mathf.RoundToInt(playerPos.z + Random.Range(-Scene.RenderDistance, Scene.RenderDistance)));
 
-        if (!World.IsInWorldBounds(pos) || NavMap.Get(pos) == NavMap.Air || !NavMap.IsAir(pos + Vector3Int.up))
+        if (!World.IsInWorldBounds(ground) || NavMap.IsAir(ground) || !NavMap.IsAir(ground + Vector3Int.up))
             return;
 
-        pos.y = 1;
-        Entity.Spawn(PickWeighted(DungeonMobs), pos);
+        Entity.Spawn(PickWeighted(DungeonMobs), ground + Vector3Int.up);
     }
 
-    private static void TrySpawnGroup(Vector3 playerPos, bool night)
+    private static void TrySpawnAround(Vector3 playerPos, Rules rules, SpawnPhase phase)
+    {
+        // A rare wanderer may be rescued during the day instead of a wild spawn.
+        if (phase == SpawnPhase.Day && rules.Hostiles && Random.value < BoundNPCChance &&
+            TryFindSpawnPoint(playerPos, Scene.RenderDistance + 2, Scene.LogicDistance - 2, out Vector3Int npcPos))
+        {
+            Entity.Spawn(ID.BoundNPC, npcPos);
+            return;
+        }
+
+        ID? picked = PickMob(playerPos, phase, rules.Hostiles);
+        if (picked == null) return;
+        ID id = picked.Value;
+
+        if (id == ID.Crow)
+        {
+            // Flocks have their own cap so a sky full of birds never crowds out the
+            // other daytime spawns sharing the global mob cap.
+            if (CountMobs(m => m.id == ID.Crow, near: playerPos, radius: Scene.LogicDistance) >= CrowCap) return;
+
+            // Crows land a bit closer than other spawns so flocks arrive in view.
+            for (int i = Random.Range(CrowFlockMin, CrowFlockMax + 1); i > 0; i--)
+                if (TryFindSpawnPoint(playerPos, CrowSpawnNear, Scene.RenderDistance - 2f, out Vector3Int crowPos))
+                    Entity.Spawn(ID.Crow, crowPos);
+            return;
+        }
+
+        if (!TryFindSpawnPoint(playerPos, Scene.RenderDistance + 2, Scene.LogicDistance - 2, out Vector3Int pos)) return;
+        for (int i = GroupSize(id); i > 0; i--)
+            Entity.Spawn(id, pos);
+    }
+
+    /// <summary>Rolls one mob for this phase, or null when nothing may spawn (no pool for
+    /// the biome, passive mob held back by rarity or cap, hostiles in a peaceful world).</summary>
+    private static ID? PickMob(Vector3 playerPos, SpawnPhase phase, bool hostiles)
+    {
+        BiomeType biome = GenHelpBiome.GetBiomeType(
+            Mathf.RoundToInt(playerPos.x), Mathf.RoundToInt(playerPos.z));
+
+        Pool pool = phase switch
+        {
+            SpawnPhase.Rapture => RaptureMobs,
+            SpawnPhase.Night => biome == BiomeType.Desert ? DesertNightMobs : NightMobs,
+            _ => Random.value < DayRoamerChance
+                ? DayRoamers
+                : DayByBiome.TryGetValue(biome, out Pool byBiome) ? byBiome : null,
+        };
+
+        if (pool == null || pool.Count == 0) return null;
+        if (!hostiles) pool = pool.Where(e => IsHarmless(e.id)).ToList();
+        if (pool.Count == 0) return null;
+
+        ID id = PickWeighted(pool);
+        if (IsPassiveMob(id) &&
+            (Random.value < PassiveRarity || CountMobs(m => IsPassiveMob(m.id)) >= PassiveCap))
+            return null;
+        return id;
+    }
+
+    private static bool TryFindSpawnPoint(Vector3 origin, float minDistance, float maxDistance, out Vector3Int position)
     {
         float angle = Random.Range(0f, Mathf.PI * 2f);
-        float dist = Random.Range(Scene.RenderDistance + 2, Scene.LogicDistance - 2);
-        Vector3Int pos = Vector3Int.FloorToInt(
-            playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * dist);
-
-        if (!NavMap.TryFindSurface(ref pos)) return;
-
-        if (!night && Save.Inst.weather != EnvironmentType.Rapture && Random.value < BoundNPCSpawnChance)
-        {
-            Entity.Spawn(ID.BoundNPC, pos);
-            return;
-        }
-
-        BiomeType biome = GenHelpBiome.GetBiomeType(pos.x, pos.z);
-        Pool pool;
-        if (Save.Inst.weather == EnvironmentType.Rapture) pool = RaptureMobs;
-        else if (night) pool = biome == BiomeType.Desert ? DesertNightMobs : NightMobs;
-        else if (Random.value < DayRoamerChance) pool = DayRoamers;
-        else pool = DayByBiome.TryGetValue(biome, out Pool byBiome) ? byBiome : null;
-
-        if (pool == null || pool.Count == 0) return;
-        ID mobID = PickWeighted(pool);
-
-        if (IsPassiveMob(mobID) &&
-            (Random.value < PassiveMobRarity || CountMobs(m => IsPassiveMob(m.id)) >= PassiveMobCap))
-            return;
-
-        if (mobID == ID.Crow)
-        {
-            // Crows have their own cap so a sky full of birds never crowds out the
-            // other daytime spawns sharing the global mob cap.
-            if (CountMobs(m => m.id == ID.Crow, near: playerPos, radius: Scene.LogicDistance) < CrowCap)
-                SpawnCrowFlock(playerPos);
-            return;
-        }
-
-        if (mobID != ID.Sheep)
-        {
-            Entity.Spawn(mobID, pos);
-            return;
-        }
-
-        for (int herd = Random.Range(1, 3); herd > 0; herd--)
-            Entity.Spawn(ID.Sheep, pos);
+        position = Vector3Int.FloorToInt(
+            origin + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * Random.Range(minDistance, maxDistance));
+        return NavMap.TryFindSurface(ref position);
     }
 
-    /// <summary>Crows arrive in loose flocks a bit closer than other spawns, so they
-    /// land in view instead of out past the render distance.</summary>
-    private static void SpawnCrowFlock(Vector3 playerPos)
+    private static int GroupSize(ID id) => id switch
     {
-        for (int i = Random.Range(CrowFlockMin, CrowFlockMax + 1); i > 0; i--)
-        {
-            float angle = Random.Range(0f, Mathf.PI * 2f);
-            float distance = Random.Range(CrowSpawnNear, Scene.RenderDistance - 2f);
-            Vector3Int spot = Vector3Int.FloorToInt(
-                playerPos + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * distance);
-            if (NavMap.TryFindSurface(ref spot))
-                Entity.Spawn(ID.Crow, spot);
-        }
-    }
+        ID.Sheep => Random.Range(1, 3),
+        _ => 1,
+    };
 
     public static int CountMobs(Func<MobInfo, bool> where = null, Vector3 near = default, float radius = 0f) =>
         EntityDynamicLoad.ActiveEntities.Count(em =>
@@ -158,9 +213,11 @@ public class MobSpawner
             (radius <= 0f || Vector3.Distance(em.transform.position, near) <= radius) &&
             (where == null || where(mob)));
 
-    // Crows are ambient birds, not farm animals — they skip the rarity gate so
-    // flocks show up regularly, the way they do in Don't Starve.
+    // Livestock: harmless, so they spawn in rarer, capped groups.
     private static bool IsPassiveMob(ID id) => id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick;
+
+    // Harmless wildlife that may still show up when mobs are set to peaceful.
+    private static bool IsHarmless(ID id) => IsPassiveMob(id) || id is ID.Crow or ID.Pigeon;
 
     private static Pool Uniform(params ID[] ids) => ids.Select(id => (id, 1f)).ToList();
 

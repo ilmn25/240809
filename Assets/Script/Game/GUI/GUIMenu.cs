@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, Seed, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
+    private enum MenuScreen { Main, Host, NewGame, Seed, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
     private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -22,6 +22,25 @@ public partial class GUIMenu
     private CoroutineTask _toastTask;
     private bool _dying;
     public bool Showing { get; private set; }
+
+    // New-game setup: chosen before the world is generated.
+    private static readonly string[] DelverLabels = { "one", "two", "three" };
+    private static readonly MobDifficulty[] EntityOrder =
+    {
+        MobDifficulty.Peaceful, MobDifficulty.Normal, MobDifficulty.Overwhelming,
+    };
+    private static readonly WorldDensity[] DensityOrder =
+    {
+        WorldDensity.Sparse, WorldDensity.Normal, WorldDensity.Lush,
+    };
+    private static readonly DayLength[] DayLengthOrder =
+    {
+        DayLength.Short, DayLength.Normal, DayLength.Long,
+    };
+    private int _delvers = 2;
+    private int _entityIndex = 1;
+    private int _densityIndex = 1;
+    private int _dayLengthIndex = 1;
 
     public void Show(bool isShow)
     {
@@ -174,8 +193,11 @@ public partial class GUIMenu
             case MenuScreen.Host:
                 TransitionTo(MenuScreen.Main);
                 break;
-            case MenuScreen.Seed:
+            case MenuScreen.NewGame:
                 TransitionTo(MenuScreen.Host);
+                break;
+            case MenuScreen.Seed:
+                TransitionTo(MenuScreen.NewGame);
                 break;
             case MenuScreen.Load:
                 TransitionTo(_loadReturn);
@@ -214,8 +236,14 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Host:
-                if (n == 1) { Audio.PlaySFX(SfxID.Text); _seedInput = string.Empty; TransitionTo(MenuScreen.Seed); }
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); ResetNewGame(); TransitionTo(MenuScreen.NewGame); }
                 else if (n == 2) { Audio.PlaySFX(SfxID.Text); _loadReturn = MenuScreen.Host; _loadPage = 0; TransitionTo(MenuScreen.Load); }
+                break;
+
+            case MenuScreen.NewGame:
+                if (n == 1) StartNewGame();
+                else if (n == 2) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Seed); }
+                else if (n >= 3 && n <= 6) { Audio.PlaySFX(SfxID.Text); CycleNewGameSetting(n - 3); }
                 break;
 
             case MenuScreen.Pause:
@@ -317,7 +345,8 @@ public partial class GUIMenu
         {
             MenuScreen.Main => Header("MORIMORI") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
-            MenuScreen.Seed => Header("New Game") + RenderSeed(),
+            MenuScreen.NewGame => Header("New Game") + RenderNewGame(),
+            MenuScreen.Seed => Header("Seed") + RenderSeed(),
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
             MenuScreen.Settings => Header("Settings") + RenderSettings(),
@@ -386,8 +415,8 @@ public partial class GUIMenu
         }
         done?.Invoke();
     }
-    /// <summary>Types letters into the seed field (Backspace erases); 1 (or Enter) starts a
-    /// new game with that seed, an empty field means a random seed.</summary>
+    /// <summary>Types letters into the seed field (Backspace erases); 1 (or Enter) confirms
+    /// the seed and returns to the setup screen, an empty field means a random seed.</summary>
     private void HandleSeedInput()
     {
         bool changed = false;
@@ -403,7 +432,8 @@ public partial class GUIMenu
             }
             else if (c == '\n' || c == '\r' || c == '1')
             {
-                StartNewGame(_seedInput.Length == 0 ? (int?)null : Gen.HashSeed(_seedInput), _seedInput);
+                Audio.PlaySFX(SfxID.Text);
+                TransitionTo(MenuScreen.NewGame);
                 return;
             }
             else if (char.IsLetter(c) && _seedInput.Length < MaxSeedLength)
@@ -418,16 +448,62 @@ public partial class GUIMenu
     private string RenderSeed()
     {
         string typed = _seedInput.Length == 0 ? "_" : _seedInput;
-        return $"Select Seed: {typed}\n\n1 > Skip/Confirm\nBackspace > Erase";
+        return $"Select Seed: {typed}\n\n1 > Confirm\nBackspace > Erase";
     }
 
-    private void StartNewGame(int? seed, string seedText = null)
+    private void ResetNewGame()
+    {
+        _seedInput = string.Empty;
+        _delvers = 2;
+        _entityIndex = 1;
+        _densityIndex = 1;
+        _dayLengthIndex = 1;
+    }
+
+    /// <summary>Cycles one of the four setup rows (Delvers, Entities, Density, Day Length).</summary>
+    private void CycleNewGameSetting(int index)
+    {
+        switch (index)
+        {
+            case 0: // delvers: one -> two -> three
+                _delvers = _delvers % DelverLabels.Length + 1;
+                break;
+            case 1: // entities: peaceful -> normal -> overwhelming
+                _entityIndex = (_entityIndex + 1) % EntityOrder.Length;
+                break;
+            case 2: // surface density: sparse -> normal -> lush
+                _densityIndex = (_densityIndex + 1) % DensityOrder.Length;
+                break;
+            case 3: // day length: short -> normal -> long
+                _dayLengthIndex = (_dayLengthIndex + 1) % DayLengthOrder.Length;
+                break;
+        }
+        Render();
+    }
+
+    private string RenderNewGame() =>
+        "1 > Begin\n" +
+        "2 > Seed: " + (_seedInput.Length == 0 ? "random" : _seedInput) + "\n" +
+        "3 > Delvers: " + DelverLabels[_delvers - 1] + "\n" +
+        "4 > Entities: " + EntityOrder[_entityIndex].Label() + "\n" +
+        "5 > Density: " + DensityOrder[_densityIndex].Label() + "\n" +
+        "6 > Day Length: " + DayLengthOrder[_dayLengthIndex].Label();
+
+    private void StartNewGame()
     {
         Audio.PlaySFX(SfxID.Text);
         _ = new CoroutineTask(LoadingThen(() =>
         {
             ScreenFade.FadeOut(0.3f);
-            Save.Inst = new Save(GenType.Abyss, seed, seedText);
+            Save.Inst = new Save(GenType.Abyss, new NewGameOptions
+            {
+                Seed = _seedInput.Length == 0 ? (int?)null : Gen.HashSeed(_seedInput),
+                SeedText = _seedInput,
+                Delvers = _delvers,
+                Difficulty = EntityOrder[_entityIndex],
+                Density = DensityOrder[_densityIndex],
+                DayLength = DayLengthOrder[_dayLengthIndex],
+            });
             _ = new CoroutineTask(Server.StartHost());
             ResetToNeutral();
         }));

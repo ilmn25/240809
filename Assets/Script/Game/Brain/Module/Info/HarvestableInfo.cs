@@ -19,8 +19,7 @@ public class HarvestableInfo : SpriteStructureInfo
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.SourceInfo.Equipment == null ||
-            projectile.SourceInfo.targetHitboxType == HitboxType.Player)
+        if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.Equipment == null)
             return false;
 
         HarvestableDefinition definition = HarvestableRegistry.Get(id);
