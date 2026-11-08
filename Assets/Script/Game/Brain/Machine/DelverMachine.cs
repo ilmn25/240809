@@ -37,6 +37,9 @@ public class DelverMachine : PlayerMachine
         PlayerInfo delver = (PlayerInfo)Entity.CreateInfo(ID.Delver, position);
         if (charSprite != ID.Null) delver.CharSprite = charSprite;
         if (startingWeapon != ID.Null) delver.Storage.CreateAndAddItem(startingWeapon);
+        // A contract hire is not part of the party's loot pool — anything it gathered
+        // would leave with it when the contract runs out.
+        delver.CantLoot = expireAt > 0f;
         if (persist) Save.Inst.players.Add(delver);
 
         DelverMachine machine = (DelverMachine)Entity.SpawnFromInfo(delver, false);

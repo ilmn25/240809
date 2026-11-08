@@ -15,6 +15,9 @@ public class PlayerInfo : MobInfo
     /// member but is excluded from control switching, client claims, and the
     /// death handoff.</summary>
     public bool IsDelver;
+    /// <summary>True for contracted companions (hired mercenaries, escorts): they follow
+    /// and fight, but never pick up loot — the party's share stays with the party.</summary>
+    [NonSerialized] public bool CantLoot;
     public Storage Storage;
     public float Mana;
     public float Sanity;

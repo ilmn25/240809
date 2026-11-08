@@ -319,9 +319,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     /// touching distance, so allies don't wander off chasing loot.</summary>
     private const float LootRadius = 1f;
 
-    /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.</summary>
+    /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.
+    /// Contracted companions never do: their loot would vanish with the contract.</summary>
     private bool TryAcquireLootTarget()
     {
+        if (Info.CantLoot) return false;
         if (EntityScan.FindNearest(transform.position, LootRadius, IsWantedLoot) is not ItemInfo item)
             return false;
 

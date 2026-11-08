@@ -13,7 +13,7 @@ public class StarvingStrangerMachine : RecruitableNPCMachine
     public override string Announce => "A tattered stranger stumbles up to you, half-starved...";
     protected override string Greeting => "\"Got any food? I'll pull my weight. I swear it.\"";
     protected override string Backstory => "\"My whole party is gone. Something with too many eyes took them.\"";
-    protected override string RecruitText => "\"Just until the next town. That's all I ask.\"";
+    protected override string RecruitText => "\"I'll stay as long as you'll have me. That's all I ask.\"";
     protected override ID CostItem => ID.Meat;
     protected override int CostAmount => 1;
     protected override float HealthScale => 0.8f;

@@ -128,9 +128,13 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
         Sprite portrait = Cache.LoadSprite("Sprite/" + Info.CharSprite);
         Dictionary<string, Dialogue> options = new Dictionary<string, Dialogue>();
 
+        string terms = StaySeconds > 0f
+            ? $"{Helper.FormatDuration(StaySeconds)} contract"
+            : "joins for good";
+
         if (CanAfford(payer))
         {
-            options[$"Recruit ({CostText})"] = new Dialogue
+            options[$"Recruit ({CostText}, {terms})"] = new Dialogue
             {
                 Text = RecruitText,
                 Sprite = portrait,
@@ -175,22 +179,36 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
 
         Pay(payer);
 
-        // A survivor on a contract leaves again when it runs out; one without
-        // joins for good and is persisted with the rest of the party.
-        DelverMachine delver = DelverMachine.Spawn(transform.position, Info.CharSprite,
-            persist: StaySeconds <= 0f,
-            expireAt: StaySeconds > 0f ? Time.time + StaySeconds : 0f,
-            startingWeapon: Weapon);
-
-        if (delver != null && HealthScale < 1f && delver.Info is PlayerInfo recruit)
-        {
-            int scaledMax = Mathf.Max(1, Mathf.RoundToInt(recruit.BaseHealthMax * HealthScale));
-            recruit.BaseHealthMax = scaledMax;
-            recruit.HealthMax = scaledMax;
-            recruit.Health = scaledMax;
-        }
+        if (StaySeconds > 0f)
+            HireCompanion();
+        else
+            JoinParty();
 
         Leave();
+    }
+
+    /// <summary>A short contract: a temporary ally that follows and fights but never
+    /// loots, exactly like a hired mercenary. It leaves when the contract runs out.</summary>
+    private void HireCompanion()
+    {
+        DelverMachine.Spawn(transform.position, Info.CharSprite,
+            persist: false, expireAt: Time.time + StaySeconds, startingWeapon: Weapon);
+    }
+
+    /// <summary>Joins for good as a real party member — fully controllable, selectable
+    /// when switching characters, and saved with the rest of the party.</summary>
+    private void JoinParty()
+    {
+        PlayerInfo recruit = (PlayerInfo)Entity.CreateInfo(ID.Player, transform.position);
+        recruit.CharSprite = Info.CharSprite;
+        // Slots into the same stat block the other party members start with; the
+        // weakened ones arrive frail. BaseHealthMax is taken from this on Initialize.
+        if (HealthScale < 1f)
+            recruit.HealthMax = Mathf.Max(1, Mathf.RoundToInt(recruit.HealthMax * HealthScale));
+        recruit.Storage.CreateAndAddItem(Weapon);
+
+        Save.Inst.players.Add(recruit);
+        Entity.SpawnFromInfo(recruit, false);
     }
 
     private void Decline()
