@@ -18,6 +18,7 @@ public class Control
     public static Transform MouseTarget;
     public static int MouseLayer;
     public static bool HoverInteract;
+    public static bool HoverEntity;
     private static Transform _dialogueSource;
     private static Transform _pendingInteract;
     private static PlayerInfo _proximityTeammate;
@@ -160,6 +161,7 @@ public class Control
     public static void Update()
     {
         HoverInteract = false;
+        HoverEntity = false;
 
         if (Inst.SwapChar.KeyDown())
         { 
@@ -379,6 +381,7 @@ public class Control
         if (clicked && HandleDialogueClick()) return;
 
         HoverInteract = HoveringWorld() && !Dialogue.Showing && IsHoverInteractable(MouseTarget);
+        HoverEntity = !Dialogue.Showing && IsHoverEntity(MouseTarget);
 
         if (clicked && HoveringWorld() && Main.PlayerInfo.Machine != null)
             RunInteract(MouseTarget);
@@ -484,6 +487,15 @@ public class Control
         }
 
         return action is IActionSecondaryInteract;
+    }
+
+    /// <summary>True when the cursor is over any living entity (player, NPC, animal or
+    /// enemy), so the cursor can show its target reticle instead of the default pointer.</summary>
+    private static bool IsHoverEntity(Transform target)
+    {
+        if (target == null || target.gameObject == Main.Player) return false;
+        if (target.GetComponentInParent<EntityMachine>() is not { } machine) return false;
+        return machine.Info is MobInfo;
     }
     private static void HandleRaycast()
     { 

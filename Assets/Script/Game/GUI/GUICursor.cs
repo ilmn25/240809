@@ -8,8 +8,9 @@ public class GUICursor : GUI
 
     private static TextMeshProUGUI _cursorSlotText;
     private static Image _cursorSlotImage;
-    private static Sprite _aimIcon;      // default cursor icon when nothing is held / hovered
+    private static Sprite _defaultIcon;  // plain pointer when nothing is held / hovered
     private static Sprite _interactIcon; // shown when hovering an interactable/pickupable target
+    private static Sprite _targetIcon;   // shown when the cursor is over an entity
 
     // Cached held-item sprite + id so the per-frame refresh doesn't reload it every frame.
     private static Sprite _itemSprite;
@@ -21,9 +22,10 @@ public class GUICursor : GUI
         base.Initialize();        
         _cursorSlotText = Main.GUICursorSlot.transform.Find("Text").GetComponent<TextMeshProUGUI>();
         _cursorSlotImage = Main.GUICursorSlot.transform.Find("Image").GetComponent<Image>();
-        // The slot's default image is the aim cursor; fall back to it if a resource is missing.
-        _aimIcon = Resources.Load<Sprite>("Texture/GUI/Cursor/Aim") ?? _cursorSlotImage.sprite;
-        _interactIcon = Resources.Load<Sprite>("Texture/GUI/Cursor/Interact") ?? _aimIcon;
+        // The slot's default image is the pointer; fall back to it if a resource is missing.
+        _defaultIcon = Resources.Load<Sprite>("Texture/GUI/Cursor/Default") ?? _cursorSlotImage.sprite;
+        _interactIcon = Resources.Load<Sprite>("Texture/GUI/Cursor/Interact") ?? _defaultIcon;
+        _targetIcon = Resources.Load<Sprite>("Texture/GUI/Cursor/Target") ?? _defaultIcon;
     }
 
     public void Update()
@@ -55,20 +57,28 @@ public class GUICursor : GUI
 
     public static void UpdateCursorSlot()
     { 
-        // Always show the cursor. A held item takes the icon over, otherwise swap
-        // between the aim and interact icons based on what's under the cursor: an
-        // interactable/pickupable world target, or an interactive GUI element
-        // (storage slot, button, draggable window).
+        // Always show the cursor. A held item takes the icon over, otherwise pick the
+        // target reticle over any entity, the interact icon over an
+        // interactable/pickupable world target or interactive GUI element (storage slot,
+        // button, draggable window), and the plain pointer everywhere else.
         Main.GUICursorSlot.SetActive(true);
         if (Data.Stack == 0)
         {
-            bool overGui = GUIMain.IsHover || GUIStorage.HoveringSlot;
-            SetCursorIcon(Control.HoverInteract || overGui ? _interactIcon : _aimIcon, "");
+            SetCursorIcon(NothingHeldIcon(), "");
         }
         else
         {
             SetCursorIcon(HeldItemIcon(Data.ID), Data.Stack.ToString());
         } 
+    }
+
+    /// <summary>The icon for a cursor holding nothing: target reticle over an entity,
+    /// otherwise the interact icon over anything interactive, otherwise the plain pointer.</summary>
+    private static Sprite NothingHeldIcon()
+    {
+        if (Control.HoverEntity) return _targetIcon;
+        bool overGui = GUIMain.IsHover || GUIStorage.HoveringSlot;
+        return Control.HoverInteract || overGui ? _interactIcon : _defaultIcon;
     }
 
     /// <summary>The held item's sprite, loaded once per distinct item id.</summary>

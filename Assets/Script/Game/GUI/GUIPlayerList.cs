@@ -111,7 +111,13 @@ public class GUIPlayerList : GUI
 
     /// <summary>Track which player's slot the cursor is over (null when it leaves) so the
     /// HUD can show that player's info, the same way hovering a slot shows an item's.</summary>
-    public void SetHovered(PlayerInfo player) => Hovered = player;
+    public void SetHovered(PlayerInfo player)
+    {
+        Hovered = player;
+        // Preview the hovered party member by panning the camera to them; the follow
+        // override clears as soon as the cursor leaves the slot.
+        ViewPort.SetFollowOverride(player);
+    }
 
     /// <summary>HUD hint while hovering a party member slot, matching what the clicks will
     /// actually do to that player — the player-list counterpart of the item-slot hint.</summary>

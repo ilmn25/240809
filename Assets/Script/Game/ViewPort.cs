@@ -13,6 +13,13 @@ public partial class ViewPort
     
     public static int OrbitRotation = 0;
     public static Quaternion CurrentRotation;
+
+    /// <summary>Player the camera follows instead of the controlled one — set while the
+    /// player list is hovered, so the view previews that party member.</summary>
+    public static PlayerInfo FollowOverride;
+
+    public static void SetFollowOverride(PlayerInfo player) => FollowOverride = player;
+
     public static event Action UpdateOrbitRotate;
     public static event Action OnOrbitRotate;
     
@@ -148,8 +155,14 @@ public partial class ViewPort
 
     private static void HandlePlayerFollow()
     {
+        PlayerInfo target = Main.PlayerInfo;
+        // Hovering a party slot previews that player; fall back to whoever we control as
+        // soon as the hover ends or that player is gone/unspawned.
+        if (FollowOverride != null && !FollowOverride.Destroyed && FollowOverride.Machine != null)
+            target = FollowOverride;
+
         Main.ViewPortObject.transform.position = Vector3.Lerp(Main.ViewPortObject.transform.position, 
-            Main.PlayerInfo.position, Time.deltaTime * FollowSpeed) + ScreenShake.Offset;
+            target.position, Time.deltaTime * FollowSpeed) + ScreenShake.Offset;
     }
  
 }
