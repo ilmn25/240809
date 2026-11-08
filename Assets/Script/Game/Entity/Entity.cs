@@ -593,6 +593,22 @@ public class Entity
                 AddMob<VisitorMachine>(ID.Visitor);
                 loot = new (ID.Visitor); // the visitor drops nothing
 
+                // Lone survivors met through random encounters (see EncounterEvent).
+                AddMob<WoundedDelverMachine>(ID.WoundedDelver);
+                loot = new (ID.WoundedDelver); // drops nothing
+
+                AddMob<DeserterMachine>(ID.Deserter);
+                loot = new (ID.Deserter); // drops nothing
+
+                AddMob<PilgrimMachine>(ID.Pilgrim);
+                loot = new (ID.Pilgrim); // drops nothing
+
+                AddMob<RenegadeCultistMachine>(ID.RenegadeCultist);
+                loot = new (ID.RenegadeCultist); // drops nothing
+
+                AddMob<StarvingStrangerMachine>(ID.StarvingStranger);
+                loot = new (ID.StarvingStranger); // drops nothing
+
                 AddMob<VampireMachine>(ID.Vampire);
                 loot = new (ID.Vampire);
                 loot.Add(0.3f, 1, ID.BloodBlack);

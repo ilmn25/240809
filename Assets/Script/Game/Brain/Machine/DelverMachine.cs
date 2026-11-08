@@ -51,9 +51,12 @@ public class DelverMachine : PlayerMachine
     {
         Info.position = transform.position;
 
-        // Timed companions (hired mercenaries) leave when their time runs out.
+        // Timed companions (hired mercenaries, recruited wanderers) leave when their
+        // time runs out. Persisted recruits are dropped from the party list too, so
+        // they don't come back on the next load.
         if (ExpireAt > 0f && Time.time >= ExpireAt)
         {
+            if (Save.Inst != null) Save.Inst.players.Remove(Info);
             Info.Destroy();
             Unload();
             return;

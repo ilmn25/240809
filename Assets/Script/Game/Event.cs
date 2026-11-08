@@ -15,6 +15,7 @@ public static class Event
         LeafEvent.Subscribe();
         VisitorSpawner.Subscribe();
         CaravanMachine.Subscribe();
+        EncounterEvent.Subscribe();
     }
 
     /// <summary>Random position a set distance from a center point, shared by

@@ -257,4 +257,9 @@ public enum ID
     LongBow,
     CompoundBow,
     Crossbow,
+    WoundedDelver,
+    Deserter,
+    Pilgrim,
+    RenegadeCultist,
+    StarvingStranger,
 }
