@@ -21,10 +21,10 @@ public class Inventory
 
     public static void RefreshHeldItem(MobInfo info)
     {
-        if (info == null) return;
+        if (info is not PlayerInfo player || player.Storage == null) return;
 
-        ItemSlot held = ReferenceEquals(info, Main.PlayerInfo) ? Held : info.Storage?.GetSelected();
-        info.SetEquipment(held is { Stack: > 0 } ? held : null);
+        ItemSlot held = ReferenceEquals(player, Main.PlayerInfo) ? Held : player.Storage.GetSelected();
+        player.SetEquipment(held is { Stack: > 0 } ? held : null);
     }
 
     /// <summary>Replace the hand's contents in place, so the equipment keeps pointing at the
