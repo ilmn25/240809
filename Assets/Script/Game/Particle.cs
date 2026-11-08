@@ -39,15 +39,19 @@ public class Particle
     }
 
     /// <summary>Spawn a particle that tracks the given entity for its whole lifetime,
-    /// so fire on a moving mob stays on the mob instead of being left behind.</summary>
-    public static void CreateAttached(EntityMachine anchor, Vector3 offset, Particles id, bool force)
+    /// so fire on a moving mob stays on the mob instead of being left behind.
+    /// Returns the spawned particle (null when nothing could be spawned) so callers
+    /// can wait for it to finish before emitting the next one.</summary>
+    public static GameObject CreateAttached(EntityMachine anchor, Vector3 offset, Particles id, bool force)
     {
-        if (id == Particles.None) return;
-        if (anchor == null || anchor.Info == null) return;
+        if (id == Particles.None) return null;
+        if (anchor == null || anchor.Info == null) return null;
 
         Vector3 position = anchor.transform.position + offset;
-        EffectSync.EnqueueParticle(position, id, force, anchor.Info.uid);
-        Spawn(position, anchor.transform, id, force);
+        GameObject particle = Spawn(position, anchor.transform, id, force);
+        if (particle != null)
+            EffectSync.EnqueueParticle(position, id, force, anchor.Info.uid);
+        return particle;
     }
 
     /// <summary>Client-side spawn of an already-broadcast particle. When the follow
@@ -64,26 +68,25 @@ public class Particle
         Spawn(position, follow, id, force);
     }
 
-    private static void Spawn(Vector3 position, Transform follow, Particles id, bool force)
+    private static GameObject Spawn(Vector3 position, Transform follow, Particles id, bool force)
     {
-        if (id == Particles.None) return;
+        if (id == Particles.None) return null;
 
         int max = 0;
         ParticleInfo.TryGetValue(id, out max); 
 
-        if (force || _count < PoolSize * 0.8f)
-        {
-            _particle = GetFromPool();
-            if (_particle)
-            {
-                _particle.transform.position = new Vector3(0, 0, -0.05f);
-                _particle.transform.rotation = Quaternion.identity;
-                _particle.transform.localScale = Vector3.one;
-                _particle.SetActive(true);
-                _particle.GetComponent<ParticleComponent>().Spawn(position, follow, id, max);
-                if (!force) _count++;
-            }
-        }
+        if (!force && _count >= PoolSize * 0.8f) return null;
+
+        _particle = GetFromPool();
+        if (!_particle) return null;
+
+        _particle.transform.position = new Vector3(0, 0, -0.05f);
+        _particle.transform.rotation = Quaternion.identity;
+        _particle.transform.localScale = Vector3.one;
+        _particle.SetActive(true);
+        _particle.GetComponent<ParticleComponent>().Spawn(position, follow, id, max);
+        if (!force) _count++;
+        return _particle;
     }
 
     public static GameObject GetFromPool()

@@ -17,6 +17,9 @@ public class StatusEffectModule : EntityModule
         public float Remaining;
         public float TickTimer;
         public float VisualTimer;
+        /// <summary>The visual currently playing for this effect, so the next one
+        /// only starts once it has finished (no doubled-up sprites).</summary>
+        public GameObject VisualObject;
         public int MaxHealthReduced;
     }
 
@@ -52,17 +55,19 @@ public class StatusEffectModule : EntityModule
     }
 
     /// <summary>Emit the effect's looping visual, anchored to this entity so it
-    /// tracks them instead of being left behind.</summary>
+    /// tracks them instead of being left behind. A new particle only starts once
+    /// the previous one has finished, so the flame never doubles up on itself.</summary>
     private void UpdateVisual(ActiveEffect effect, float dt)
     {
         StatusEffect definition = effect.Definition;
         if (!definition.HasVisual) return;
 
         effect.VisualTimer += dt;
-        if (effect.VisualTimer < Mathf.Max(0.05f, definition.VisualInterval)) return;
+        if (effect.VisualObject != null && effect.VisualObject.activeSelf) return;
+        if (effect.VisualTimer < definition.VisualInterval) return;
 
         effect.VisualTimer = 0f;
-        Particle.CreateAttached(EntityMachine, definition.VisualOffset, definition.Visual, false);
+        effect.VisualObject = Particle.CreateAttached(EntityMachine, definition.VisualOffset, definition.Visual, false);
     }
 
     /// <summary>Apply a status effect, refreshing the duration if it is already active.</summary>

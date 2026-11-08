@@ -25,8 +25,9 @@ public class StatusEffect
     /// <summary>Particle drawn on the affected entity while the effect is active.
     /// None means the effect has no art.</summary>
     public Particles Visual = Particles.None;
-    /// <summary>Seconds between visual emissions.</summary>
-    public float VisualInterval = 0.4f;
+    /// <summary>Minimum seconds between visual emissions; the next particle also
+    /// waits for the previous one to finish playing.</summary>
+    public float VisualInterval = 0.1f;
     /// <summary>Offset from the affected entity's origin for the visual.</summary>
     public Vector3 VisualOffset = new Vector3(0f, 0.5f, 0f);
 
@@ -59,7 +60,6 @@ public static class StatusEffects
         ID.Burn, EffectType.Damage, duration: 8f, tickInterval: 1f, amountPerTick: 1, name: "Burning")
     {
         Visual = Particles.Fire,
-        VisualInterval = 0.35f,
     };
 }
 
