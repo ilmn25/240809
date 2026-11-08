@@ -250,4 +250,6 @@ public enum ID
     Shelf,
     Crow,
     Cotton,
+    Bleed,
+    Stagger,
 }

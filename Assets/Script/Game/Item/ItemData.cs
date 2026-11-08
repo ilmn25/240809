@@ -377,6 +377,8 @@ public partial class Item
         public int LifeSpan;
         public bool Lodge;
         public bool PickUp;
+        public StatusEffect HitEffect;
+        public bool HitEffectOnCrit;
         public int StackSize = 1;
         public int Durability = 200;
         public Vector2 HoldoutOffset;
@@ -401,8 +403,8 @@ public partial class Item
             Id = ID.Rapier,
             Speed = 1.8f, Damage = 3, Knockback = 8, CritChance = 20,
             ProjectileSpeed = 1.6f, Radius = 1.5f, Breaking = 1, Operation = OperationType.Cutting,
-            Targets = 1,
-            Description = "A swift rapier. Strikes fast, but only ever one target at a time.",
+            Targets = 1, HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
+            Description = "A swift rapier. Strikes fast and its crits leave a bleeding wound, but it only ever finds one target.",
             Materials = new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 1 } },
             HoldoutOffset = new Vector2(0.6f, 0),
         },
@@ -426,7 +428,8 @@ public partial class Item
             Id = ID.Sledgehammer,
             Speed = 0.6f, Damage = 7, Knockback = 20, CritChance = 5,
             ProjectileSpeed = 1.2f, Radius = 2.8f, Breaking = 1, Operation = OperationType.Cutting,
-            Description = "A heavy sledgehammer. The slowest weapon there is, but it crushes everything in its arc.",
+            HitEffect = WeaponEffects.Stagger, HitEffectOnCrit = true,
+            Description = "A heavy sledgehammer. The slowest weapon there is, but its crits stagger everything in its arc.",
             Materials = new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
@@ -437,8 +440,9 @@ public partial class Item
             Speed = 0.8f, Damage = 6, Knockback = 12, CritChance = 15,
             ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
             LifeSpan = 10000, Lodge = true, PickUp = true,
+            HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. One target, one heavy hit — thrown slow, but it hurts.",
+            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
@@ -569,6 +573,8 @@ public partial class Item
                 Ammo = spec.Ammo,
                 Lodge = spec.Lodge,
                 PickUp = spec.PickUp,
+                HitEffect = spec.HitEffect,
+                HitEffectOnCrit = spec.HitEffectOnCrit,
             };
         }
 
@@ -582,6 +588,8 @@ public partial class Item
             Breaking = spec.Breaking,
             OperationType = spec.Operation,
             Targets = spec.Targets,
+            HitEffect = spec.HitEffect,
+            HitEffectOnCrit = spec.HitEffectOnCrit,
         };
     }
 }

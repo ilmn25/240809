@@ -135,6 +135,16 @@ public class ItemSlot
         yield return projectile.Damage + " damage";
         yield return projectile.Knockback + " knockback";
         yield return Info.Speed.ToString("0.##") + " attack speed";
+        if (projectile.CritChance > 0)
+            yield return projectile.CritChance.ToString("0.#") + "% crit";
+
+        if (projectile.HitEffect != null)
+        {
+            string effect = string.IsNullOrEmpty(projectile.HitEffect.Name)
+                ? Helper.ToDisplayName(projectile.HitEffect.EffectID, lowercase: true)
+                : projectile.HitEffect.Name.ToLower();
+            yield return (projectile.HitEffectOnCrit ? "crits cause " : "causes ") + effect;
+        }
 
         if (projectile.Breaking > 0)
         {

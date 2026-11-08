@@ -20,14 +20,22 @@ public class ProjectileInfo
     public ID Sprite;
     public ID Ammo;
     public float Scale = 1;
-    /// <summary>Status effect applied to the victim on a successful hit.</summary>
+    /// <summary>Status effect applied to the victim on a successful hit, or only on a crit
+    /// when <see cref="HitEffectOnCrit"/> is set.</summary>
     public StatusEffect HitEffect;
+    /// <summary>Land <see cref="HitEffect"/> only on a critical hit.</summary>
+    public bool HitEffectOnCrit;
 
     public virtual void AI(Projectile projectile) { }
     public virtual void OnSpawn(Projectile projectile) { }
-    public int GetDamage()
+    public int GetDamage() => GetDamage(out _);
+
+    /// <summary>Damage for one hit, doubled on a crit. <paramref name="crit"/> reports that
+    /// same roll, so on-hit effects crit with the hit instead of rolling their own dice.</summary>
+    public int GetDamage(out bool crit)
     {
-        return  Random.value < CritChance / 100 ? Damage * 2 : Damage;
+        crit = Random.value * 100f < CritChance;
+        return crit ? Damage * 2 : Damage;
     }
 
     /// <summary>Damage entities in a sphere: 0 hits everything in range, 1 hits only the

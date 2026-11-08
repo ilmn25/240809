@@ -139,7 +139,7 @@ public class DynamicInfo : Info
         }
         IframesCurrent = Iframes; 
         Audio.PlaySFX(HitSfx);
-        Health -= projectile.Info.GetDamage() - Defense;
+        Health -= projectile.Info.GetDamage(out bool crit) - Defense;
         if (!(IsNPC && Machine.IsInteracting))
             KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
         bool blackBlood = HitboxType == HitboxType.Enemy;
@@ -150,7 +150,8 @@ public class DynamicInfo : Info
         // Only a human-controlled player acquires a target from hitting something;
         // AI-controlled players keep the target their brain assigned.
         projectile.SourceInfo.AcquireTarget(this);
-        if (Helper.IsHost() && projectile.Info.HitEffect != null)
+        if (Helper.IsHost() && projectile.Info.HitEffect != null &&
+            (!projectile.Info.HitEffectOnCrit || crit))
             Machine?.GetModule<StatusEffectModule>()?.Apply(projectile.Info.HitEffect);
         OnHit(projectile);
         return true;
