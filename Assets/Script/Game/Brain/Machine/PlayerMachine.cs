@@ -367,7 +367,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
 
         // Ammo is resolved and consumed in MobAttackShoot (guns fire whatever
-        // accepted ammo the shooter carries; throwables keep their own ammo).
+        // accepted ammo the shooter carries; a wear-only throwable spends its
+        // durability below instead).
         // Consuming the last of a stack can leave the hand empty on this same frame.
         base.Attack();
 
@@ -375,8 +376,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (equipped != null && equipped.Durability != -1)
         {
             equipped.Durability--;
-            if (equipped.Durability == 0)
+            if (equipped.Durability <= 0)
             {
+                // Worn out: the weapon breaks out of the hand.
                 equipped.clear();
                 Info.SetEquipment(null);
             }

@@ -15,6 +15,10 @@ public class ItemSlot
     private void MigrateLegacyIds(StreamingContext context)
     {
         if (ID == ID.CopperChunksLegacy) ID = ID.LeadChunks;
+        // Slots saved before wear travelled with a stack carry no durability, which would
+        // break a wear-limited tool on its first use. Give them the item's authored wear.
+        if (Stack > 0 && Durability <= 0 && Info is { Durability: > 0 })
+            Durability = Info.Durability;
     }
     [NonSerialized] private Item _item;
     public Item Info
@@ -187,9 +191,10 @@ public class ItemSlot
             ID = slot.ID;
             Modifier = slot.Modifier;
             Locked = slot.Locked;
+            // Wear travels with the item, so a picked-up spear keeps the throws it has left.
+            Durability = slot.Durability;
         }
 
-        if (maxStackSize == 1) Durability = slot.Durability;
         Stack += addableAmount;
         slot.Stack -= addableAmount;
 

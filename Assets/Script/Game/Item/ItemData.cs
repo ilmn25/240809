@@ -465,11 +465,11 @@ public partial class Item
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
-            ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
-            LifeSpan = 10000, Lodge = true, PickUp = true,
+            ProjectileSpeed = 60, Radius = 0.3f, Sprite = ID.Spear, Penetration = 1,
+            LifeSpan = 10000, Lodge = true,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
-            StackSize = 20, Durability = 5, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts. Splinters after five throws.",
+            Durability = 5, ProjectileOffset = 1.016f, RotationOffset = 45,
+            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
@@ -599,7 +599,8 @@ public partial class Item
 
     private static ProjectileInfo BuildProjectile(ToolSpec spec)
     {
-        if (spec.Ammo != ID.Null)
+        // A thrown weapon is ranged even when it feeds on nothing but its own durability.
+        if (spec.Ammo != ID.Null || spec.Gesture == ItemGesture.Shoot)
         {
             return new RangedProjectileInfo
             {
