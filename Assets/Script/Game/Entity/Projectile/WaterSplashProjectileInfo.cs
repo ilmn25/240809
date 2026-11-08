@@ -18,17 +18,13 @@ public class WaterSplashProjectileInfo : SwingProjectileInfo
             ? projectile.transform.position + direction * (Radius * 0.5f)
             : projectile.transform.position;
 
-        int hitCount = Physics.OverlapSphereNonAlloc(center, Radius, HitBuffer, Main.MaskEntity);
         bool wateredAny = false;
-        for (int i = 0; i < hitCount; i++)
+        ForEachMachine(projectile, center, Radius, (machine, _) =>
         {
-            Machine machine = HitBuffer[i].GetComponent<Machine>();
-            if (machine == null || (projectile.SourceInfo != null && machine == projectile.SourceInfo.Machine)) continue;
             if (machine is PlanterMachine planter && planter.Water())
                 wateredAny = true;
-        }
+        });
 
-        // Ring of hit-dust puffs reads as water splashing onto the ground.
         for (int i = 0; i < 5; i++)
         {
             Vector3 offset = new Vector3(Random.value - 0.5f, 0.4f, Random.value - 0.5f) * Radius;
@@ -39,14 +35,9 @@ public class WaterSplashProjectileInfo : SwingProjectileInfo
         {
             Audio.PlaySFX(SfxID.Sword);
             if (projectile.SourceInfo is PlayerInfo player &&
-                player.Storage?.List != null && player.Storage.List.Count > 0)
+                player.HeldSlot is { Stack: > 0 } held && held.ID == ID.BucketOfWater)
             {
-                ItemSlot selected = player.Storage.GetSelected();
-                if (selected != null && selected.Stack > 0 && selected.ID == ID.BucketOfWater)
-                {
-                    player.Storage.List[player.Storage.Key] = new ItemSlot(ID.Bucket, 1);
-                    player.Storage.NotifyChanged();
-                }
+                Inventory.ReplaceHeld(player, ID.Bucket);
             }
         }
 

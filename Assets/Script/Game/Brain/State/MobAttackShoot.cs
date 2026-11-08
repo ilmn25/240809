@@ -13,28 +13,11 @@ public class MobAttackShoot : MobState
             return;
         }
 
-        if (Info is PlayerInfo player)
+        // Ammo may be the stack in hand rather than a spare in the bag.
+        if (Info is PlayerInfo player && !AmmoRegistry.TryTakeAmmo(player, Info.Equipment, out projectile))
         {
-            if (AmmoRegistry.IsGun(equipment.ID))
-            {
-                ID ammo = AmmoRegistry.PickFor(equipment.ID, player.Storage);
-                if (ammo == ID.Null)
-                {
-                    Machine.SetState<DefaultState>();
-                    return;
-                }
-                player.Storage.RemoveItem(ammo);
-                projectile = AmmoRegistry.GetProjectile(ammo);
-            }
-            else if (projectile.Ammo != ID.Null)
-            {
-                if (player.Storage.GetAmount(projectile.Ammo) == 0)
-                {
-                    Machine.SetState<DefaultState>();
-                    return;
-                }
-                player.Storage.RemoveItem(projectile.Ammo);
-            }
+            Machine.SetState<DefaultState>();
+            return;
         }
 
         Audio.PlaySFX(equipment.Sfx);

@@ -123,14 +123,14 @@ public abstract class PlanterMachine : StructureMachine, IActionSecondaryInterac
         if (actor.Storage.List == null || actor.Storage.List.Count == 0)
             return false;
 
-        ItemSlot selectedSlot = actor.Storage.GetSelected();
+        ItemSlot heldSlot = actor.HeldSlot;
 
-        if (selectedSlot.Stack <= 0 || !Crops.TryGetValue(selectedSlot.ID, out Crop crop))
+        if (heldSlot is not { Stack: > 0 } || !Crops.TryGetValue(heldSlot.ID, out Crop crop))
             return false;
 
-        selectedSlot.Stack--;
-        if (selectedSlot.Stack <= 0)
-            selectedSlot.clear();
+        heldSlot.Stack--;
+        if (heldSlot.Stack <= 0)
+            heldSlot.clear();
 
         Info.HarvestID = crop.Harvest;
         Info.HarvestMin = crop.Min;

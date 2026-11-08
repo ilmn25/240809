@@ -37,6 +37,9 @@ public class MobInfo : DynamicInfo
  
     [NonSerialized] public ItemSlot Equipment;
     [NonSerialized] private Light _toolGlow;
+    /// <summary>Slots mutate in place (a bucket filling, a stack refilling), so comparing the
+    /// slot reference alone can miss a changed hand.</summary>
+    [NonSerialized] private ID _renderedItem;
     
     [NonSerialized] public Info Target;
     [NonSerialized] public IActionType ActionType;
@@ -132,15 +135,19 @@ public class MobInfo : DynamicInfo
     }
     public void SetEquipment(ItemSlot target)
     {
-        if (ReferenceEquals(target, Equipment))
+        ID shown = target is { Stack: > 0 } ? target.ID : ID.Null;
+        if (ReferenceEquals(target, Equipment) && shown == _renderedItem)
             return;
 
         // SetEquipment can be called during scene/player switching before DynamicInfo.Initialize assigns tool references.
         if (SpriteTool == null || SpriteToolTrack == null || SpriteToolRenderer == null)
         {
             Equipment = target;
+            _renderedItem = shown;
             return;
         }
+
+        _renderedItem = shown;
 
         if (target == null)
         {

@@ -268,8 +268,8 @@ public class Environment
     /// light, so the spotlight should follow it.</summary>
     private static bool IsHoldingLight()
     {
-        ItemSlot held = Main.PlayerInfo.Equipment;
-        return held != null && !held.isEmpty() && held.Info != null && held.Info.Glow;
+        ItemSlot held = Inventory.Held;
+        return held is { Stack: > 0 } && held.Info != null && held.Info.Glow;
     }
 
     private static bool IsPlayerNearSpawn()

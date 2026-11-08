@@ -100,16 +100,14 @@ public class BarrelMachine : StructureMachine, IActionSecondaryInteract
     public bool TryPour(MobInfo source)
     {
         if (Info.Destroyed || Barrell == null || Barrell.Liquid != LiquidType.None) return false;
-        if (source is not PlayerInfo player ||
-            player.Storage?.List == null || player.Storage.List.Count == 0)
+        if (source is not PlayerInfo player || player.Storage == null)
             return false;
 
-        ItemSlot selected = player.Storage.GetSelected();
-        if (selected == null || selected.Stack <= 0) return false;
-        if (!LiquidRegistry.TryGetLiquidFromBucket(selected.ID, out LiquidType liquid)) return false;
+        ItemSlot held = player.HeldSlot;
+        if (held is not { Stack: > 0 }) return false;
+        if (!LiquidRegistry.TryGetLiquidFromBucket(held.ID, out LiquidType liquid)) return false;
 
-        player.Storage.List[player.Storage.Key] = new ItemSlot(ID.Bucket, 1);
-        player.Storage.NotifyChanged();
+        Inventory.ReplaceHeld(player, ID.Bucket);
         SetLiquid(liquid);
         Particle.Create(transform.position + Vector3.up * 0.5f, Particles.HitDust, false);
         return true;

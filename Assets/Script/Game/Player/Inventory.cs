@@ -15,19 +15,43 @@ public class Inventory
 
     public static event Action SlotUpdate; 
 
+    /// <summary>Cursor stack when one is held, otherwise the selected hotbar slot.</summary>
+    public static ItemSlot Held =>
+        !GUICursor.Data.isEmpty() ? GUICursor.Data : Main.PlayerInfo?.Storage?.GetSelected();
+
+    public static void RefreshHeldItem(MobInfo info)
+    {
+        if (info == null) return;
+
+        ItemSlot held = ReferenceEquals(info, Main.PlayerInfo) ? Held : info.Storage?.GetSelected();
+        info.SetEquipment(held is { Stack: > 0 } ? held : null);
+    }
+
+    /// <summary>Replace the hand's contents in place, so the equipment keeps pointing at the
+    /// same slot when an item transforms (an empty bucket filling up).</summary>
+    public static void ReplaceHeld(PlayerInfo player, ID id, int count = 1)
+    {
+        ItemSlot held = player?.HeldSlot;
+        if (held == null || player.Storage == null) return;
+
+        held.clear();
+        held.ID = id;
+        held.Stack = count;
+        held.Durability = Item.GetItem(id).Durability;
+        player.Storage.NotifyChanged();
+        GUICursor.UpdateCursorSlot();
+    }
+
     private static void SyncCurrentItemState()
     {  
-        // The cursor item is the held item whenever it isn't empty (inventory open).
-        // This single rule lets every place/use path work from the cursor with no
-        // separate handling — the cursor item simply becomes the held item.
-        ItemSlot held = !GUICursor.Data.isEmpty() ? GUICursor.Data : Main.PlayerInfo.Storage.List[Main.PlayerInfo.Storage.Key];
+        ItemSlot held = Held;
 
         if (held is { Stack: > 0 })
         {
             CurrentItem = held;
             CurrentItemData = Item.GetItem(held.ID); 
 
-            Main.PlayerInfo.SetEquipment(held);
+            RefreshHeldItem(Main.PlayerInfo);
 
             bool isMiningTool = CurrentItemData.Type == ItemType.Tool &&
                 CurrentItemData.ProjectileInfo != null &&
@@ -42,7 +66,7 @@ public class Inventory
 
         CurrentItemData = null;
         Terraform.BlockUpdate();
-        Main.PlayerInfo.SetEquipment(null);
+        RefreshHeldItem(Main.PlayerInfo);
     }
  
     

@@ -63,9 +63,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobEscape());
         AddState(new EquipSelectState());   
 
-        // Apply the selected inventory slot as the held tool so it renders in hand.
-        // The controlled player gets this via Inventory.RefreshInventory; allies need it here.
-        Info.Storage.ApplySelectedEquipment();
+        // Allies need this on start-up; the controlled player gets it via Inventory.RefreshInventory.
+        Inventory.RefreshHeldItem(Info);
     }
 
     public void OnActionSecondary(Info info)
@@ -369,14 +368,16 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         // Ammo is resolved and consumed in MobAttackShoot (guns fire whatever
         // accepted ammo the shooter carries; throwables keep their own ammo).
+        // Consuming the last of a stack can leave the hand empty on this same frame.
         base.Attack();
 
-        if (Info.Equipment.Durability != -1)
+        ItemSlot equipped = Info.Equipment;
+        if (equipped != null && equipped.Durability != -1)
         {
-            Info.Equipment.Durability--;
-            if (Info.Equipment.Durability == 0)
+            equipped.Durability--;
+            if (equipped.Durability == 0)
             {
-                Info.Equipment.clear();
+                equipped.clear();
                 Info.SetEquipment(null);
             }
             Info.Storage.NotifyChanged();

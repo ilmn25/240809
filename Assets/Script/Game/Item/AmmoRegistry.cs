@@ -60,8 +60,50 @@ public static class AmmoRegistry
     {
         if (!AcceptedByGun.TryGetValue(gun, out ID[] ammoList) || ammoList.Length == 0) return null;
         string[] names = new string[ammoList.Length];
-        for (int i = 0; i < ammoList.Length; i++)
+        for (int i = 0; i < names.Length; i++)
             names[i] = Helper.ToDisplayName(ammoList[i], lowercase: true);
         return string.Join(", ", names);
+    }
+
+    /// <summary>Whether a tool needs no ammo, is its own ammo, or has ammo carried for it.</summary>
+    public static bool CanPay(ID id, ProjectileInfo projectile, Storage storage)
+    {
+        if (projectile == null || storage == null) return false;
+        if (IsGun(id)) return PickFor(id, storage) != ID.Null;
+        if (projectile.Ammo == ID.Null) return true;
+        return id == projectile.Ammo || storage.GetAmount(projectile.Ammo) > 0;
+    }
+
+    /// <summary>The projectile a held tool fires, with its ammo charged. False when unpayable.</summary>
+    public static bool TryTakeAmmo(PlayerInfo player, ItemSlot held, out ProjectileInfo projectile)
+    {
+        projectile = held?.Info?.ProjectileInfo;
+        if (projectile == null || player?.Storage == null) return false;
+
+        if (IsGun(held.ID))
+        {
+            ID ammo = PickFor(held.ID, player.Storage);
+            ProjectileInfo fired = ammo == ID.Null ? null : GetProjectile(ammo);
+            if (fired == null) return false;
+            player.Storage.RemoveItem(ammo);
+            projectile = fired;
+            return true;
+        }
+
+        if (projectile.Ammo == ID.Null) return true;
+
+        // A throwable is its own ammo: throw the stack in hand (cursor or hotbar) before
+        // falling back to a spare stack in the bag.
+        if (held.ID == projectile.Ammo && held.Stack > 0)
+        {
+            held.Stack--;
+            if (held.Stack <= 0) held.clear();
+            player.Storage.NotifyChanged();
+            return true;
+        }
+
+        if (player.Storage.GetAmount(projectile.Ammo) == 0) return false;
+        player.Storage.RemoveItem(projectile.Ammo);
+        return true;
     }
 }

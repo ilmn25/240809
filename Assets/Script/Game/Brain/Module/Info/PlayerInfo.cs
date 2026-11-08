@@ -165,11 +165,13 @@ public class PlayerInfo : MobInfo
         return true;
     }
 
+    public ItemSlot HeldSlot =>
+        ReferenceEquals(this, Main.PlayerInfo) ? Inventory.Held : Storage?.GetSelected();
+
     public bool DropHeldItem()
     {
-        if (Storage?.List == null || Storage.Key < 0 || Storage.Key >= Storage.List.Count) return false;
-        ItemSlot held = Storage.List[Storage.Key];
-        if (held == null || held.isEmpty()) return false;
+        ItemSlot held = HeldSlot;
+        if (held == null || held.isEmpty() || Storage == null) return false;
 
         DroppedItem = Inventory.DropToWorld(held, held.Stack, Storage, position);
         return true;

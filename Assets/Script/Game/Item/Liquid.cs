@@ -53,16 +53,14 @@ public static class LiquidRegistry
     public static bool TryFillBucket(MobInfo source, LiquidType liquid, Vector3 position)
     {
         if (!TryGetFilledBucket(liquid, out ID filled)) return false;
-        if (source is not PlayerInfo player ||
-            player.Storage?.List == null || player.Storage.List.Count == 0)
+        if (source is not PlayerInfo player || player.Storage == null)
             return false;
 
-        ItemSlot selected = player.Storage.GetSelected();
-        if (selected.Stack <= 0 || selected.ID != EmptyBucket)
+        ItemSlot held = player.HeldSlot;
+        if (held is not { Stack: > 0 } || held.ID != EmptyBucket)
             return false;
 
-        player.Storage.List[player.Storage.Key] = new ItemSlot(filled, 1);
-        player.Storage.NotifyChanged();
+        Inventory.ReplaceHeld(player, filled);
         Particle.Create(position + Vector3.up * 0.5f, Particles.HitDust, false);
         return true;
     }

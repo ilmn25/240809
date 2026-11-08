@@ -36,18 +36,9 @@ public class Storage
         public void NotifyChanged()
         {
                 if (!SuppressSync) OnChanged?.Invoke(this);
-                if (info is not MobInfo || List == null || List.Count == 0) return;
-                ApplySelectedEquipment();
+                if (info is not MobInfo mobInfo || List == null || List.Count == 0) return;
+                Inventory.RefreshHeldItem(mobInfo);
                 if (!SuppressRefresh) Inventory.RefreshInventory();
-        }
-
-        /// <summary>Hold whatever the selected slot contains (nothing when it is empty),
-        /// so the owner renders the right item in hand.</summary>
-        public void ApplySelectedEquipment()
-        {
-                if (info is not MobInfo mobInfo) return;
-                ItemSlot selected = GetSelected();
-                mobInfo.SetEquipment(selected is { Stack: > 0 } ? selected : null);
         }
 
         /// <summary>The currently selected (highlighted) slot, clamped to valid
@@ -96,8 +87,7 @@ public class Storage
         private bool CanUseAsWeapon(ID itemID, ProjectileInfo projectile)
         {
                 if (projectile.Damage < 1) return false;
-                if (AmmoRegistry.IsGun(itemID)) return AmmoRegistry.PickFor(itemID, this) != global::ID.Null;
-                return projectile.Ammo == global::ID.Null || GetAmount(projectile.Ammo) > 0;
+                return AmmoRegistry.CanPay(itemID, projectile, this);
         }
 
         /// <summary>Hold the carried item with the highest score. A null score means the item
