@@ -15,6 +15,9 @@ public class ScoutMachine : GroundMobMachine
     private int _ammo;
     private const int AmmoMax = 5; 
 
+    /// <summary>The ranged weapon this scout carries. Guards draw a heavier bow.</summary>
+    protected virtual ID RangedWeapon => ID.Pistol;
+
     public override void OnStart()
     {
         _ammo = AmmoMax;  
@@ -27,7 +30,7 @@ public class ScoutMachine : GroundMobMachine
         AddState(new MobAttackReload());
         AddState(new MobAttackShoot());
         AddState(new EquipSelectState()); 
-        Info.SetEquipment(new ItemSlot(ID.Pistol));
+        Info.SetEquipment(new ItemSlot(RangedWeapon));
     }
 
     public override void OnUpdate()

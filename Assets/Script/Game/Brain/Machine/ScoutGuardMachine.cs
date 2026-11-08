@@ -1,5 +1,7 @@
 public class ScoutGuardMachine : ScoutMachine
 {
+    protected override ID RangedWeapon => ID.LongBow;
+
     public static new Info CreateInfo()
     {
         return new EnemyInfo()

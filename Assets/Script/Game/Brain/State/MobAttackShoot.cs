@@ -37,9 +37,11 @@ public class MobAttackShoot : MobState
 
         if (Main.PlayerInfo == Info)
             ScreenShake.Shake(40f, 0.035f, 1f / 60f, direction);
-        
-        Entity.SpawnItem(ID.Casing, Info.position + Vector3.up * 0.5f, 1, false, 
-            (Vector3.up -direction) * 5, 15000);
+
+        // Only firearms eject brass: a thrown spear or a loosed arrow leaves nothing behind.
+        if (AmmoRegistry.IsGun(equipment.ID))
+            Entity.SpawnItem(ID.Casing, Info.position + Vector3.up * 0.5f, 1, false, 
+                (Vector3.up -direction) * 5, 15000);
     }
  
     public override void OnUpdateState()

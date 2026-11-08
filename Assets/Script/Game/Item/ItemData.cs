@@ -50,6 +50,7 @@ public partial class Item
         AddBlockDefinition(ID.OverlayBlock);
         // Materials
         AddMaterialDefinition(ID.Bullet, "High-explosive bullet rounds for guns.", materials: new Dictionary<ID, int> { { ID.Gunpowder, 1 }, { ID.Casing, 1 }}, craftStack: 5, time:1500);
+        AddMaterialDefinition(ID.Arrow, "A wooden shaft with a flint head. Ammunition for every bow.", materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Flint, 1 } }, craftStack: 6, stackSize: 40, worth: 1);
         AddMaterialDefinition(ID.Casing, "Empty shell casing for ammunition.", materials: new Dictionary<ID, int> { { ID.Lead, 2 }, { ID.Steel, 1 } });
         AddMaterialDefinition(ID.Sulphur, "Powdered explosive component.", materials: new Dictionary<ID, int> { { ID.Slag, 3 }, { ID.Charcoal, 1 } });
         AddMaterialDefinition(ID.Gunpowder, "A volatile black powder of charcoal and sulphur. Pours the fire into bullets and landmines.", materials: new Dictionary<ID, int> { { ID.Charcoal, 1 }, { ID.Sulphur, 1 } }, craftStack: 4, time: 1000);
@@ -355,6 +356,32 @@ public partial class Item
         );
     }
 
+    /// <summary>Length of the EquipShoot clip at animator speed 1. A ranged weapon's
+    /// cooldown is this divided by its <see cref="ToolSpec.Speed"/>.</summary>
+    private const float ShootClipSeconds = 1f / 6f;
+
+    private static float ShootCooldown(float seconds) => ShootClipSeconds / seconds;
+
+    /// <summary>Every bow is the same weapon with different numbers: it looses one arrow
+    /// (<paramref name="arrowSpeed"/> units a second, <paramref name="damage"/> on a hit)
+    /// once every <paramref name="drawSeconds"/>.</summary>
+    private static ToolSpec Bow(
+        ID id, float drawSeconds, int damage, float arrowSpeed,
+        float knockback, float crit, int durability, string description, Dictionary<ID, int> materials)
+    {
+        return new ToolSpec
+        {
+            Id = id,
+            Gesture = ItemGesture.Shoot, Sfx = SfxID.Pistol,
+            Speed = ShootCooldown(drawSeconds), Damage = damage, Knockback = knockback, CritChance = crit,
+            ProjectileSpeed = arrowSpeed, Radius = 0.15f, Ammo = ID.Arrow, Sprite = ID.Arrow,
+            LifeSpan = 10000, Durability = durability, ProjectileOffset = 1f,
+            Description = description,
+            Materials = materials,
+            HoldoutOffset = new Vector2(0.6f, 0),
+        };
+    }
+
     private sealed class ToolSpec
     {
         public ID Id;
@@ -437,15 +464,29 @@ public partial class Item
         new ToolSpec {
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
-            Speed = 0.8f, Damage = 6, Knockback = 12, CritChance = 15,
+            Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
             ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
             LifeSpan = 10000, Lodge = true, PickUp = true,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
-            StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts.",
+            StackSize = 20, Durability = 5, ProjectileOffset = 1.016f, RotationOffset = 45,
+            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts. Splinters after five throws.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
+
+        // Bows trade rate of fire for reach and punch.
+        Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 32, knockback: 4, crit: 10, durability: 150,
+            description: "A short, quick-drawing bow. Light arrows fly a little slow and land softly, but you can loose them as fast as you can nock them.",
+            materials: new Dictionary<ID, int> { { ID.Sticks, 4 }, { ID.Fabric, 1 } }),
+        Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 42, knockback: 7, crit: 15, durability: 200,
+            description: "A tall bow of seasoned wood. Slow to draw, but the arrow flies further and hits far harder than a shortbow's.",
+            materials: new Dictionary<ID, int> { { ID.Sticks, 8 }, { ID.Fabric, 2 } }),
+        Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 52, knockback: 9, crit: 20, durability: 250,
+            description: "Pulleys and steel limbs store the draw for you. Every arrow leaves flat, fast, and with a wicked bite.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.Plank, 2 }, { ID.Fabric, 1 } }),
+        Bow(ID.Crossbow, drawSeconds: 1.5f, damage: 10, arrowSpeed: 58, knockback: 12, crit: 25, durability: 300,
+            description: "A steel-armed crossbow. The longest reload there is, but nothing else throws an arrow as fast or as hard.",
+            materials: new Dictionary<ID, int> { { ID.Steel, 4 }, { ID.Plank, 3 }, { ID.Fabric, 1 } }),
 
         new ToolSpec {
             Id = ID.Pistol,

@@ -388,9 +388,9 @@ public class Entity
 
                 AddMob<ScoutGuardMachine>(ID.ScoutGuard);
                 loot = new (ID.ScoutGuard);
-                loot.Add(0.7f, 5, ID.Bullet);
-                loot.Add(0.4f, 2, ID.Gunpowder);
-                loot.Add(0.1f, 1, ID.Pistol);
+                loot.Add(0.7f, 5, ID.Arrow);
+                loot.Add(0.4f, 2, ID.Sticks);
+                loot.Add(0.1f, 1, ID.LongBow);
                 
                 AddMob<SheepMachine>(ID.Sheep);
                 loot = new (ID.Sheep);

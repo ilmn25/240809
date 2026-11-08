@@ -252,4 +252,9 @@ public enum ID
     Cotton,
     Bleed,
     Stagger,
+    Arrow,
+    ShortBow,
+    LongBow,
+    CompoundBow,
+    Crossbow,
 }

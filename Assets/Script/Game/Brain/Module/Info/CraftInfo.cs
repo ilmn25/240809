@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 [System.Serializable]
 public class CraftInfo : SpriteStructureInfo
 {
-private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Spear, ID.Toolbench, ID.Torch, ID.MulchBlock);
+private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe, ID.CrudeHatchet, ID.CrudeMallet, ID.Spear, ID.Toolbench, ID.Torch, ID.MulchBlock, ID.Arrow);
 
     private static readonly ID[] MaterialWants =
     {
@@ -25,16 +25,18 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
     {
         { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Sledgehammer, ID.Shelf) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap, ID.CrockPot) },
-        { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.FieldStation, ID.Scarecrow, ID.Chair) },
+        { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.FieldStation, ID.Scarecrow, ID.Chair, ID.ShortBow, ID.LongBow) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },
         { ID.Furnace, new PoolDef(0, true, ID.Slag, ID.Steel, ID.Lead) },
         { ID.Smelter, new PoolDef(0, true, ID.Glass) },
         { ID.MasonryWorkbench, new PoolDef(0, true, ID.Anvil, ID.Smelter, ID.Furnace, ID.Stonecutter, ID.OwlStatue) },
-        { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest, ID.WoodSpikeTrap) },
+        // The craft window draws nine slots, so no station pool may hold more than nine
+        // recipes or the extra ones can never be selected.
+        { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest, ID.WoodSpikeTrap, ID.Barrel, ID.OilBarrel) },
         { ID.Stonecutter, new PoolDef(0, true, ID.Brick, ID.BrickBlock) },
         { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench, ID.Sawmill) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
-        { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.OilBarrel, ID.Barrel, ID.MetalSpikeTrap) },
+        { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.MetalSpikeTrap, ID.CompoundBow, ID.Crossbow) },
         { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Sledgehammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
         { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
 

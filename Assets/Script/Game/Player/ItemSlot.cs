@@ -160,7 +160,7 @@ public class ItemSlot
         }
 
         if (projectile.Ammo != ID.Null)
-            yield return "ammo " + (AmmoRegistry.DescribeForGun(ID) ?? projectile.Ammo.ToString());
+            yield return "ammo " + (AmmoRegistry.DescribeForGun(ID) ?? Helper.ToDisplayName(projectile.Ammo, lowercase: true));
     }
 
     public void clear()
