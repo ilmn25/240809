@@ -85,6 +85,10 @@ public static class EffectSync
 
     private static void OnBatchParticleEventMessageReceived(BatchParticleEventMessage msg)
     {
+        // Host mode loops broadcasts back into the local client, and the host already
+        // spawned these particles when it enqueued them — spawning again doubles each one.
+        if (Helper.IsHost()) return;
+
         int n = msg.effectIds.Length;
         for (int i = 0; i < n; i++)
         {
