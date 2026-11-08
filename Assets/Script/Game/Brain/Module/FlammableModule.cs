@@ -1,28 +1,22 @@
 using UnityEngine;
 
-/// <summary>Makes an entity flammable. Igniting applies a Burn status effect that
-/// deals damage over time and shows "Burning" in the HUD. Fire spreads to nearby
-/// flammable entities via FireRegistry and, for structures, consumes them.</summary>
+/// <summary>Makes an entity flammable. Igniting applies the shared Burning status
+/// effect, which deals the damage over time, shows "Burning" in the HUD, and draws
+/// flames anchored to this entity (so fire follows a moving target). This module
+/// owns only the burn lifetime, smoke and spread to nearby flammables.</summary>
 public class FlammableModule : EntityModule
 {
-    /// <summary>How long (seconds) a structure burns before it is destroyed.</summary>
-    public float BurnDuration = 8f;
-    /// <summary>Damage dealt per second while burning.</summary>
-    public float BurnDamagePerSecond = 1f;
     /// <summary>Radius within which this fire can ignite other flammable entities.</summary>
     public float SpreadRadius = 2.5f;
     /// <summary>Chance per spread tick to ignite a nearby flammable entity.</summary>
     public float SpreadChance = 0.08f;
     /// <summary>Seconds between spread attempts.</summary>
     public float SpreadInterval = 4f;
-    /// <summary>Seconds between fire particle emissions.</summary>
-    public float ParticleInterval = 0.5f;
     /// <summary>Seconds between smoke particle emissions.</summary>
     public float SmokeInterval = 1.2f;
 
     private float _burnTime;
     private float _spreadTimer;
-    private float _particleTimer;
     private float _smokeTimer;
 
     private Info _info;
@@ -59,10 +53,10 @@ public class FlammableModule : EntityModule
         float dt = Helper.GetDeltaTime();
         _burnTime += dt;
 
-        // Fire lasts exactly one BurnDuration — the same span as the Burn status
-        // effect applied by Ignite. Structures are consumed by it; anything else
-        // (players, mobs) just goes out, which also stops the fire particles.
-        if (_burnTime >= BurnDuration)
+        // Fire lasts exactly one Burning effect. Structures are consumed by it;
+        // anything else (players, mobs) just goes out. The flames themselves are
+        // drawn by the effect, so they stay glued to whatever is burning.
+        if (_burnTime >= StatusEffects.Burning.Duration)
         {
             if (info is StructureInfo)
                 BurnOut(info);
@@ -74,19 +68,12 @@ public class FlammableModule : EntityModule
         info.FireLevel = Mathf.Min(1f, info.FireLevel + dt * 0.5f);
 
         _spreadTimer += dt;
-        _particleTimer += dt;
         _smokeTimer += dt;
-
-        if (_particleTimer >= ParticleInterval)
-        {
-            _particleTimer = 0f;
-            Particle.Create(info.position + new Vector3(0, 0.5f, 0), Particles.Fire, false);
-        }
 
         if (_smokeTimer >= SmokeInterval)
         {
             _smokeTimer = 0f;
-            Particle.Create(info.position + new Vector3(0, 0.8f, 0), Particles.Smoke, false);
+            Particle.CreateAttached(EntityMachine, new Vector3(0f, 0.8f, 0f), Particles.Smoke, false);
         }
 
         if (_spreadTimer >= SpreadInterval)
@@ -102,13 +89,13 @@ public class FlammableModule : EntityModule
     {
         info.FireLevel = 0f;
         ResetTimers();
+        GetModule<StatusEffectModule>()?.Remove(ID.Burn);
     }
 
     private void ResetTimers()
     {
         _burnTime = 0f;
         _spreadTimer = 0f;
-        _particleTimer = 0f;
         _smokeTimer = 0f;
     }
 
@@ -123,12 +110,9 @@ public class FlammableModule : EntityModule
         info.FireLevel = 0.15f;
         ResetTimers();
 
-        // Route the burn damage through the status effect system so it ticks
-        // uniformly (structures and living entities) and shows as "Burning".
-        GetModule<StatusEffectModule>()?.Apply(new StatusEffect(
-            ID.Burn, EffectType.Damage, BurnDuration, 1f, (int)BurnDamagePerSecond, name: "Burning"));
-
-        Particle.Create(info.position + new Vector3(0, 0.5f, 0), Particles.Fire, false);
+        // Damage, HUD text and the following flames all live in the status effect
+        // system, so burning ticks uniformly for structures and living entities.
+        GetModule<StatusEffectModule>()?.Apply(StatusEffects.Burning);
         return true;
     }
 
@@ -137,7 +121,6 @@ public class FlammableModule : EntityModule
     {
         Extinguish(info);
         FireRegistry.Unregister(this);
-        GetModule<StatusEffectModule>()?.Remove(ID.Burn);
 
         // Registered entities burn to their profile output; anything else falls
         // back to dropping its loot, converting burnable materials to charcoal.

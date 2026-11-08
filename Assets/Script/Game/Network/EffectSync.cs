@@ -9,6 +9,8 @@ public struct BatchParticleEventMessage : NetworkMessage
     public int[] effectIds;          // (int)Particles enum
     public Vector3[] positions;
     public bool[] forces;
+    /// <summary>Entity uid each particle is anchored to (null/empty = world-space).</summary>
+    public string[] followUids;
 }
 
 public static class EffectSync
@@ -20,6 +22,7 @@ public static class EffectSync
         public int effectId;
         public Vector3 position;
         public bool force;
+        public string followUid;
     }
 
     private static readonly List<PendingParticle> _pendingParticles = new List<PendingParticle>();
@@ -37,7 +40,7 @@ public static class EffectSync
 
     /// <summary>Called by Particle.Create to queue a particle for network sync.
     /// Only the host enqueues particles for broadcast; remote clients never relay.</summary>
-    public static void EnqueueParticle(Vector3 position, Particles id, bool force)
+    public static void EnqueueParticle(Vector3 position, Particles id, bool force, string followUid = null)
     {
         if (NetworkServer.active)
         {
@@ -45,7 +48,8 @@ public static class EffectSync
             {
                 effectId = (int)id,
                 position = position,
-                force = force
+                force = force,
+                followUid = followUid
             });
         }
     }
@@ -58,11 +62,13 @@ public static class EffectSync
         int[] ids = new int[n];
         Vector3[] positions = new Vector3[n];
         bool[] forces = new bool[n];
+        string[] followUids = new string[n];
         for (int i = 0; i < n; i++)
         {
             ids[i] = _pendingParticles[i].effectId;
             positions[i] = _pendingParticles[i].position;
             forces[i] = _pendingParticles[i].force;
+            followUids[i] = _pendingParticles[i].followUid;
         }
         _pendingParticles.Clear();
 
@@ -70,7 +76,8 @@ public static class EffectSync
         {
             effectIds = ids,
             positions = positions,
-            forces = forces
+            forces = forces,
+            followUids = followUids
         };
 
         NetworkServer.SendToAll(msg);
@@ -84,7 +91,12 @@ public static class EffectSync
             Particles id = (Particles)msg.effectIds[i];
             Vector3 pos = msg.positions[i];
             bool force = msg.forces[i];
-            Particle.Create(pos, id, force, sync: false);
+            string followUid = (msg.followUids != null && i < msg.followUids.Length) ? msg.followUids[i] : null;
+
+            if (string.IsNullOrEmpty(followUid))
+                Particle.Create(pos, id, force, sync: false);
+            else
+                Particle.CreateSynced(pos, id, force, followUid);
         }
     }
 

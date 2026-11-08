@@ -11,7 +11,7 @@ public class BugInfo : EnemyInfo
 
     /// <summary>Slow effect applied to the latched player.</summary>
     private static readonly StatusEffect Slow = new StatusEffect(
-        ID.SnareFlea, EffectType.Slow, duration: 999f, tickInterval: 1f, slowAmount: 0.5f, name: "Bugged");
+        ID.SnareFlea, EffectType.Slow, duration: 999f, tickInterval: 1f, speedAmount: 0.5f, name: "Bugged");
 
     /// <summary>Latch onto the given player: attach, apply slow, and remember them.</summary>
     public void Latch(PlayerInfo player)

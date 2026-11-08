@@ -26,7 +26,7 @@ public static class PlayerTooltip
     /// <summary>Secondary block: the status effects currently on the hovered player.</summary>
     public static string Details(PlayerInfo player)
     {
-        string effects = player.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText() ?? "";
+        string effects = player.Machine?.GetModule<StatusEffectModule>()?.ActiveEffectsText(showTime: true) ?? "";
         return effects.Length > 0 ? "Effects: " + effects : "";
     }
 

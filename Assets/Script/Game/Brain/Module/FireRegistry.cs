@@ -22,13 +22,23 @@ public static class FireRegistry
         _flammables.Remove(module);
     }
 
-    /// <summary>Remove any modules whose machine/info has been unloaded.</summary>
+    /// <summary>Remove any modules whose machine/info has been unloaded (destroyed
+    /// or returned to the pool), so a stale entity can never be ignited.</summary>
     public static void Prune()
     {
         for (int i = _flammables.Count - 1; i >= 0; i--)
         {
             FlammableModule module = _flammables[i];
             if (module == null || module.Machine == null || module.Info == null || module.Info.Destroyed)
+            {
+                _flammables.RemoveAt(i);
+                continue;
+            }
+
+            // A pooled machine can be handed to a different entity; only the module
+            // that matches the machine's current info still represents it.
+            EntityMachine machine = module.EntityMachine;
+            if (machine.Info != module.Info || !machine.gameObject.activeInHierarchy)
                 _flammables.RemoveAt(i);
         }
     }

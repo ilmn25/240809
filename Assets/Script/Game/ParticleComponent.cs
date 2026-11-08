@@ -6,14 +6,24 @@ public class ParticleComponent : MonoBehaviour
     private Animator _animator;
     private AnimatorStateInfo _stateInfo;
     private Light _glow;
+    private Transform _follow;
+    private Vector3 _followOffset;
 
     void Awake()
     {
         _animator = GetComponent<Animator>();
     }
 
-    public void Spawn(Vector3 position, Particles id, int max)
+    void Update()
     {
+        // World-space particles have no anchor; anchored ones ride their entity.
+        if (_follow) transform.position = _follow.position + _followOffset;
+    }
+
+    public void Spawn(Vector3 position, Transform follow, Particles id, int max)
+    {
+        _follow = follow;
+        _followOffset = follow != null ? position - follow.position : Vector3.zero;
         transform.position = position;
         transform.rotation = ViewPort.CurrentRotation;
         if (_glow == null)

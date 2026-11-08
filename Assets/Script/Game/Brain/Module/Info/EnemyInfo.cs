@@ -20,7 +20,7 @@ public class EnemyInfo : MobInfo
         base.OnUpdate(); 
         FaceTarget = Target != null;
         SpeedTarget = IsGrounded? SpeedGround : SpeedAir; 
-        SpeedTarget *= SpeedModifier;
+        SpeedTarget *= EffectiveSpeedModifier;
         if (Health <= 0)
         { 
             Killed?.Invoke(((EntityMachine)Machine).Info.id);

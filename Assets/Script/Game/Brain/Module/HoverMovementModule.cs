@@ -36,7 +36,7 @@ public class HoverMovementModule : MovementModule
         Vector3 toTarget = desired - pos;
         float distance = toTarget.magnitude;
 
-        float speed = Info.SpeedAir * Info.SpeedModifier;
+        float speed = Info.SpeedAir * Info.EffectiveSpeedModifier;
         if (speed <= 0f || distance <= StopDistance)
         {
             // Stopped (e.g., mid-swing) or overhead — bleed off speed and hover.

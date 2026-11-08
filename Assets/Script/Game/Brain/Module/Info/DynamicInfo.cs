@@ -20,6 +20,17 @@ public class DynamicInfo : Info
     public float SpeedGround = 5;
     public float SpeedAir = 10;  
     public float SpeedModifier = 1;  
+    [NonSerialized] private float _statusSpeedMultiplier;
+    /// <summary>Speed multiplier owned by StatusEffectModule (slow/haste). Kept apart
+    /// from SpeedModifier, which AI states rewrite directly while swinging/consuming.
+    /// Reads as 1 until something sets it, so unserialized instances are unaffected.</summary>
+    public float StatusSpeedMultiplier
+    {
+        get => _statusSpeedMultiplier > 0f ? _statusSpeedMultiplier : 1f;
+        set => _statusSpeedMultiplier = value;
+    }
+    /// <summary>Total speed multiplier from every source.</summary>
+    public float EffectiveSpeedModifier => SpeedModifier * StatusSpeedMultiplier;
     public float Gravity = -40f;
     public float JumpVelocity = 10f;
     public bool CanFly = false;

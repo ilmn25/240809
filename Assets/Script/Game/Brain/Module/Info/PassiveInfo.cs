@@ -32,7 +32,7 @@ public class PassiveInfo : MobInfo
         base.OnUpdate();
         FaceTarget = Target != null;
         SpeedTarget = IsGrounded ? SpeedGround : SpeedAir;
-        SpeedTarget *= SpeedModifier;
+        SpeedTarget *= EffectiveSpeedModifier;
         if (Health <= 0)
         {
             if (Machine.IsInteracting)

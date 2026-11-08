@@ -235,7 +235,7 @@ public class PlayerInfo : MobInfo
             // AI-controlled party members move 1.5x faster 
             SpeedTarget = (IsGrounded ? SpeedGround : SpeedAir) * 1.7f;
         }
-        SpeedTarget *= SpeedModifier;
+        SpeedTarget *= EffectiveSpeedModifier;
  
         
         //fall damage
@@ -285,6 +285,9 @@ public class PlayerInfo : MobInfo
     // Revive: restore health/control and refresh the local HUD.
     private void Revive()
     {
+        // A revived player starts clean: drop lingering debuffs (and their
+        // max-health penalties) instead of waking up still on fire.
+        Machine?.GetModule<StatusEffectModule>()?.RemoveAll();
         Hunger = HungerMax;
         Health = HealthMax;
         Velocity = Vector2.zero;

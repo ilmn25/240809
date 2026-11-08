@@ -2,18 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>Manages active status effects on an entity. Effects tick on the host
-/// (authoritative). Re-applying the same effect refreshes its duration instead of
-/// stacking. Slow effects apply a persistent speed multiplier while active.</summary>
+/// (authoritative) and each one can drive a looping visual anchored to the entity,
+/// so fire follows whatever is burning. Re-applying an effect refreshes its duration
+/// rather than stacking. Speed effects are pushed onto DynamicInfo.StatusSpeedMultiplier
+/// so they survive AI states rewriting SpeedModifier.</summary>
 public class StatusEffectModule : EntityModule
 {
     private readonly List<ActiveEffect> _effects = new();
-    private float _slowMultiplier = 1f;
+    private float _speedMultiplier = 1f;
 
     private class ActiveEffect
     {
         public StatusEffect Definition;
         public float Remaining;
         public float TickTimer;
+        public float VisualTimer;
         public int MaxHealthReduced;
     }
 
@@ -30,13 +33,13 @@ public class StatusEffectModule : EntityModule
             effect.Remaining -= dt;
             if (effect.Remaining <= 0f)
             {
-                RestoreMaxHealthPenalty(effect);
-                _effects.RemoveAt(i);
+                RemoveAt(i);
                 continue;
             }
 
-            if (effect.Definition.Type == EffectType.Slow ||
-                effect.Definition.Type == EffectType.MaxHealthPenalty) continue;
+            UpdateVisual(effect, dt);
+
+            if (!effect.Definition.Ticks) continue;
 
             effect.TickTimer += dt;
             if (effect.TickTimer < effect.Definition.TickInterval) continue;
@@ -45,7 +48,21 @@ public class StatusEffectModule : EntityModule
             ApplyTick(effect.Definition);
         }
 
-        UpdateSlow();
+        UpdateSpeed();
+    }
+
+    /// <summary>Emit the effect's looping visual, anchored to this entity so it
+    /// tracks them instead of being left behind.</summary>
+    private void UpdateVisual(ActiveEffect effect, float dt)
+    {
+        StatusEffect definition = effect.Definition;
+        if (!definition.HasVisual) return;
+
+        effect.VisualTimer += dt;
+        if (effect.VisualTimer < Mathf.Max(0.05f, definition.VisualInterval)) return;
+
+        effect.VisualTimer = 0f;
+        Particle.CreateAttached(EntityMachine, definition.VisualOffset, definition.Visual, false);
     }
 
     /// <summary>Apply a status effect, refreshing the duration if it is already active.</summary>
@@ -55,18 +72,18 @@ public class StatusEffectModule : EntityModule
 
         foreach (ActiveEffect effect in _effects)
         {
-            if (effect.Definition.EffectID == definition.EffectID)
-            {
-                effect.Definition = definition;
-                effect.Remaining = definition.Duration;
-                return;
-            }
+            if (effect.Definition.EffectID != definition.EffectID) continue;
+            effect.Definition = definition;
+            effect.Remaining = definition.Duration;
+            return;
         }
 
         ActiveEffect newEffect = new ActiveEffect
         {
             Definition = definition,
             Remaining = definition.Duration,
+            // Emit on the next update so the effect is visible immediately.
+            VisualTimer = definition.VisualInterval,
         };
         if (definition.Type == EffectType.MaxHealthPenalty)
             ApplyMaxHealthPenalty(newEffect);
@@ -77,13 +94,21 @@ public class StatusEffectModule : EntityModule
     public void Remove(ID effectID)
     {
         for (int i = _effects.Count - 1; i >= 0; i--)
-        {
             if (_effects[i].Definition.EffectID == effectID)
-            {
-                RestoreMaxHealthPenalty(_effects[i]);
-                _effects.RemoveAt(i);
-            }
-        }
+                RemoveAt(i);
+    }
+
+    /// <summary>Drop all effects (e.g. on death/respawn), restoring any penalties.</summary>
+    public void RemoveAll()
+    {
+        for (int i = _effects.Count - 1; i >= 0; i--)
+            RemoveAt(i);
+    }
+
+    private void RemoveAt(int index)
+    {
+        RestoreMaxHealthPenalty(_effects[index]);
+        _effects.RemoveAt(index);
     }
 
     public bool Has(ID effectID)
@@ -96,19 +121,23 @@ public class StatusEffectModule : EntityModule
 
     /// <summary>Comma-separated names of the currently active effects, or empty
     /// when none are active. Used for HUD / info-panel display.</summary>
-    public string ActiveEffectsText()
+    public string ActiveEffectsText(bool showTime = false)
     {
         if (_effects.Count == 0) return "";
 
         var names = new List<string>(_effects.Count);
         foreach (ActiveEffect effect in _effects)
         {
-            string name = effect.Definition.Name;
-            if (string.IsNullOrEmpty(name))
-                name = Helper.ToDisplayName(effect.Definition.EffectID);
-            names.Add(name);
+            string name = DisplayName(effect.Definition);
+            names.Add(showTime ? $"{name} ({Mathf.CeilToInt(effect.Remaining)}s)" : name);
         }
         return string.Join(", ", names);
+    }
+
+    private static string DisplayName(StatusEffect definition)
+    {
+        if (!string.IsNullOrEmpty(definition.Name)) return definition.Name;
+        return Helper.ToDisplayName(definition.EffectID);
     }
 
     private void ApplyTick(StatusEffect definition)
@@ -133,21 +162,32 @@ public class StatusEffectModule : EntityModule
         }
     }
 
-    private void UpdateSlow()
+    /// <summary>Combine every slow/haste into one multiplier and push it onto the
+    /// entity's status speed slot. Keeping it separate from SpeedModifier means an
+    /// AI state rewriting SpeedModifier (swing, consume, shoot) can't erase it.</summary>
+    private void UpdateSpeed()
     {
         float multiplier = 1f;
         foreach (ActiveEffect effect in _effects)
         {
-            if (effect.Definition.Type == EffectType.Slow)
-                multiplier = Mathf.Min(multiplier, 1f - effect.Definition.SlowAmount);
+            switch (effect.Definition.Type)
+            {
+                case EffectType.Slow:
+                    multiplier *= 1f - Mathf.Clamp01(effect.Definition.SpeedAmount);
+                    break;
+                case EffectType.Haste:
+                    multiplier *= 1f + Mathf.Max(0f, effect.Definition.SpeedAmount);
+                    break;
+            }
         }
 
-        if (Mathf.Approximately(multiplier, _slowMultiplier)) return;
+        multiplier = Mathf.Max(0.1f, multiplier);
+        if (Mathf.Approximately(multiplier, _speedMultiplier)) return;
 
         if (EntityMachine.Info is DynamicInfo dynamicInfo)
-            dynamicInfo.SpeedModifier = dynamicInfo.SpeedModifier / _slowMultiplier * multiplier;
+            dynamicInfo.StatusSpeedMultiplier = multiplier;
 
-        _slowMultiplier = multiplier;
+        _speedMultiplier = multiplier;
     }
 
     private void ApplyMaxHealthPenalty(ActiveEffect effect)
