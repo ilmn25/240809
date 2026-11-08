@@ -94,7 +94,7 @@ public class GenTaskEntity : IGenTask
                         bool skeletonRoll = rng.NextDouble() < SurfaceSkeletonChance;
                         if (skeletonRoll && !spawnClearing)
                         {
-                            GenTaskScatter.SpawnSkeletonCorpse(world, position, rng);
+                            GenCorpse.SpawnSkeleton(world, position, rng);
                             continue; // one structure per cell — skip the biome spawn
                         }
                         if (currentChunk[x, y, z] == Forest)

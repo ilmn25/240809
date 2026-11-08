@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public enum OperationType { Mining, Building, Cutting, None }
+public enum OperationType { Mining, Dismantling, Cutting, None }
 
 [System.Serializable]
 public class SpriteStructureInfo : StructureInfo
@@ -21,6 +21,16 @@ public class StructureInfo : Info
     public SfxID SfxDestroy;
     public ID Loot;
     public OperationType operationType;
+    /// <summary>Whether a mallet can lift this structure back into the player's hands.
+    /// Player-built structures (anything with a craft recipe) and furniture qualify;
+    /// natural and world-generated structures do not.</summary>
+    protected virtual bool IsDismantlable =>
+        Item.GetItem(id) is { Type: ItemType.Structure } && ItemRecipe.GetRecipe(id) != null;
+    /// <summary>Structures currently holding something (a loaded chest, a cooking pot,
+    /// a planted planter) refuse to come apart until emptied.</summary>
+    protected virtual bool CanDismantleNow => true;
+    /// <summary>Shown to the local player when <see cref="CanDismantleNow"/> is false.</summary>
+    protected virtual string DismantleBlockedMessage => "I should empty it first.";
     /// <summary>Whether breaking this structure leaves a charred rubble pile. Off for
     /// natural resources (trees, ores) that already yield their loot directly.</summary>
     public bool SpawnsRubble = true;
@@ -48,6 +58,27 @@ public class StructureInfo : Info
         return tool.OperationType == operationType && tool.Breaking >= threshold;
     }
 
+    /// <summary>True when the attacker is swinging a dismantling tool (a mallet).
+    /// Enemies never dismantle.</summary>
+    protected static bool IsDismantlingHit(MobInfo attacker)
+    {
+        if (attacker == null || attacker.HitboxType == HitboxType.Enemy) return false;
+        return attacker.Equipment?.Info?.ProjectileInfo?.OperationType == OperationType.Dismantling;
+    }
+
+    private bool CanDismantle(MobInfo attacker) =>
+        IsDismantlingHit(attacker) && IsDismantlable && CanDismantleNow;
+
+    private static float _lastDismantleWarnTime = -999f;
+
+    private void WarnCannotDismantle(MobInfo attacker)
+    {
+        if (attacker != Main.PlayerInfo) return;
+        if (Time.time - _lastDismantleWarnTime < 2f) return;
+        _lastDismantleWarnTime = Time.time;
+        Dialogue.ShowEvent(DismantleBlockedMessage);
+    }
+
     private static float _lastToolWarnTime = -999f;
 
     // Tell the local player when their tool is too weak for this structure, so a
@@ -65,6 +96,18 @@ public class StructureInfo : Info
     public override bool OnHitInternal(Projectile projectile)
     {
         MobInfo attacker = projectile.SourceInfo;
+        if (IsDismantlingHit(attacker) && IsDismantlable)
+        {
+            if (!CanDismantleNow)
+            {
+                WarnCannotDismantle(attacker);
+                return false;
+            }
+            // PlayerInfo ignores this for AI-controlled players; mobs keep their assigned target.
+            if (attacker is PlayerInfo)
+                attacker.AcquireTarget(this);
+            return true;
+        }
         if (!CanBreak(attacker))
         {
             WarnToolTooWeak(attacker);
@@ -79,12 +122,36 @@ public class StructureInfo : Info
     public override void AbstractHit(Projectile projectile)
     {
         MobInfo attacker = projectile.SourceInfo;
+        if (CanDismantle(attacker))
+        {
+            Dismantle(attacker);
+            return;
+        }
         if (!CanBreak(attacker)) return;
         // Hostiles bash with their own attack damage; tool-users break with Breaking.
         int damage = attacker.HitboxType == HitboxType.Enemy
             ? projectile.Info.GetDamage()
             : attacker.Equipment.Info.ProjectileInfo.Breaking;
         Damage(damage, attacker);
+    }
+
+    /// <summary>Take a player-placed structure apart intact: spill whatever it holds,
+    /// drop the structure item back out, and clear it without damaging it or leaving
+    /// rubble.</summary>
+    private void Dismantle(MobInfo attacker)
+    {
+        if (Destroyed) return;
+        Audio.PlaySFX(SfxDestroy);
+        // Teardown side effects (container contents, planter crops) run before the
+        // machine leaves the world so their positions are still valid.
+        OnDestroy(attacker);
+        Entity.SpawnItem(id, position);
+        RemoveFromChunk();
+        // Clear the attacker's target so the swing animation isn't reset by
+        // re-targeting this now-removed structure.
+        if (attacker != null && attacker.Target == this)
+            attacker.CancelTarget();
+        Destroy();
     }
 
     // Shared damage path for any attacker (tool breaking or enemy bashing).
@@ -150,7 +217,7 @@ public class StructureInfo : Info
         string action = operationType switch
         {
             OperationType.Mining => "Mining",
-            OperationType.Building => "Building",
+            OperationType.Dismantling => "Dismantling",
             OperationType.Cutting => "Cutting",
             _ => "Destroying",
         };

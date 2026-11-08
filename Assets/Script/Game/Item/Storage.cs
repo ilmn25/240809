@@ -83,7 +83,7 @@ public class Storage
         /// <summary>Hold the best carried weapon, so an ally that was working with a tool can
         /// fight. A real weapon (2+ damage) wins, but any damaging item beats an empty hand —
         /// gathering tools deal 1 damage, so an ally holding only a pickaxe still fights.
-        /// Items that can't land a hit (no ammo, 0-damage hammer) never qualify.</summary>
+        /// Items that can't land a hit (no ammo, 0-damage tool) never qualify.</summary>
         public bool SetWeapon()
         {
                 return EquipBest(item => CanUseAsWeapon(item.ID, item.ProjectileInfo)

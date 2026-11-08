@@ -3,8 +3,13 @@ using Random = UnityEngine.Random;
 
 public static class Event
 {
-    static Event()
+    private static bool _initialized;
+
+    public static void Initialize()
     {
+        if (_initialized) return;
+        _initialized = true;
+
         RaidEvent.Subscribe();
         RainEvent.Subscribe();
         LeafEvent.Subscribe();

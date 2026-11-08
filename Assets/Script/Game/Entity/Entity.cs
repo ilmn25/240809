@@ -467,7 +467,7 @@ public class Entity
 
                 AddMob<BabySlimeMachine>(ID.BabySlime);
                 loot = new (ID.BabySlime);
-                loot.Add(1, 1, ID.Cytoplasm);
+                loot.Add(0.3f, 1, ID.Cytoplasm);
                 
                 AddMob<HarpyMachine>(ID.Harpy);
                 loot = new (ID.Harpy);

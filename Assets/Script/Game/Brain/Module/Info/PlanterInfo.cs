@@ -11,4 +11,8 @@ public class PlanterInfo : SpriteStructureInfo
     public bool IsPlanted;
     public bool IsWatered;
     public bool IsGrown;
+
+    // Don't lift a planter out from under a crop that's still in it.
+    protected override bool CanDismantleNow => !IsPlanted;
+    protected override string DismantleBlockedMessage => "I should clear it out first.";
 }

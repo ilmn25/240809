@@ -6,6 +6,9 @@ public class BarrelInfo : SpriteStructureInfo
     /// <summary>The liquid currently stored in the barrel. None = empty barrel.</summary>
     public LiquidType Liquid = LiquidType.None;
 
+    // A barrel holding liquid refuses to be lifted until it's emptied.
+    protected override bool CanDismantleNow => Liquid == LiquidType.None;
+
     public override bool OnHitInternal(Projectile projectile)
     {
         if (Machine is not BarrelMachine barrel) return base.OnHitInternal(projectile);

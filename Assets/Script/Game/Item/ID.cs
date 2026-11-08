@@ -33,7 +33,7 @@ public enum ID
     StoneHatchet,
     MetalAxe,
     DiamondAxe,
-    Hammer,
+    Sledgehammer,
     Spear,
     Minigun,
     Pistol,

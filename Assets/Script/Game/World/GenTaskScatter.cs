@@ -133,42 +133,4 @@ public abstract class GenTaskScatter : IGenTask
             }
         return maxY - minY <= maxSpread ? minY : -1;
     }
-
-    /// <summary>Places a skeleton remains at <paramref name="cell"/> with starter loot (crude
-    /// tools, flint) dropped on the ground beside it — the "someone died here" scatter shared
-    /// by surface generation and the spawn garden.</summary>
-    /// <param name="isFree">Optional filter for the loot cells, e.g. to keep drops off
-    /// occupied cells. Null allows any cell.</param>
-    public static void SpawnSkeletonCorpse(World world, Vector3Int cell, System.Random rng,
-        System.Func<Vector3Int, bool> isFree = null)
-    {
-        GenBlocks.PlaceEntity(world, cell, ID.Skeleton);
-
-        int count = rng.Next(1, 3);
-        for (int i = 0; i < count; i++)
-        {
-            int x = cell.x + rng.Next(-1, 2);
-            int z = cell.z + rng.Next(-1, 2);
-            if (x < 1 || z < 1 || x >= world.Bounds.x - 1 || z >= world.Bounds.z - 1) continue;
-
-            Vector3Int lootCell = new Vector3Int(x, cell.y, z);
-            if (lootCell == cell) continue;
-            if (isFree != null && !isFree(lootCell)) continue;
-
-            // Loose items go to DynamicEntity, so they spawn as real ground drops.
-            GenBlocks.PlaceEntity(world, lootCell, PickSkeletonLoot(rng));
-        }
-    }
-
-    /// <summary>Low-tier starter loot found beside a skeleton.</summary>
-    private static ID PickSkeletonLoot(System.Random rng)
-    {
-        double roll = rng.NextDouble();
-        double chance = 0;
-        if ((chance += 0.25) > roll) return ID.CrudeHatchet;
-        if ((chance += 0.25) > roll) return ID.CrudePickaxe;
-        if ((chance += 0.2) > roll) return ID.CrudeMallet;
-        if ((chance += 0.2) > roll) return ID.Flint;
-        return ID.Sticks;
-    }
 }

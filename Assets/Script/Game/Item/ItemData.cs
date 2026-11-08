@@ -129,12 +129,12 @@ public partial class Item
         AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "A workbench to build other machines.");
         AddStructureDefinition(ID.Smelter, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.StoneBlock, 6 } }, 100, description: "A dedicated smelter used to turn sand into glass.");
         AddStructureDefinition(ID.MasonryWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.StoneBlock, 8 } }, 100, description: "A masonry bench for building advanced stonework and powering anvils.");
-        AddStructureDefinition(ID.Toolbench, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Flint, 3 } , { ID.Sticks, 3 } }, 100, description: "Crafts basic tools like spear, pickaxe and hammer.");
+        AddStructureDefinition(ID.Toolbench, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Flint, 3 } , { ID.Sticks, 3 } }, 100, description: "Crafts basic tools like spear, pickaxe and sledgehammer.");
         AddStructureDefinition(ID.CarpenterWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.Plank, 5 } }, 100, description: "Crafts beds, looms and signs.");
         AddStructureDefinition(ID.Loom, new Dictionary<ID, int> { { ID.Plank, 6 }, { ID.Sticks, 2 } }, 100, description: "Weaves wool into fabric.");
         AddStructureDefinition(ID.Bed, new Dictionary<ID, int> { { ID.Fabric, 3 }, { ID.Plank, 3 } }, 100, description: "A place to sleep through the night.", burnResult: ID.Charcoal);
         AddStructureDefinition(ID.Sign, new Dictionary<ID, int> { { ID.Plank, 2 }, { ID.Sticks, 2 } }, 100, description: "A wooden sign for labels and notes.", burnResult: ID.Charcoal);
-        AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 2 } });
+        AddBlockDefinition(ID.MulchBlock, 80, 1, SfxID.HitStone, description: "A soft ground block made from mud and sticks.", materials: new Dictionary<ID, int> { { ID.Mud, 2 }, { ID.Sticks, 1 } });
         AddBlockDefinition(ID.ForestBlock, 80, 1, SfxID.HitStone, description: "Rich forest soil, home to dense woodland.", worth: 4);
         loot = new (ID.ForestBlock);
         loot.Add(1, 3, ID.Mud);
@@ -144,7 +144,7 @@ public partial class Item
         AddStructureDefinition(ID.Sawmill, new Dictionary<ID, int> { { ID.Steel, 1 }, { ID.Slag, 6 }, { ID.Log, 5 }}, 100, description: "Transforms logs into planks and stakes for building.");
         AddStructureDefinition(ID.Campfire, new Dictionary<ID, int> { { ID.Gravel, 4 }, { ID.Flint, 1 }, { ID.Log, 15 }}, 100, description: "Cooks meat and creates charcoal while giving light.");
         AddStructureDefinition(ID.Furnace, new Dictionary<ID, int> { { ID.Log, 5 }, { ID.Gravel, 15 } }, 100, description: "Smelts metal materials into slag and steel.");
-        AddStructureDefinition(ID.Anvil, new Dictionary<ID, int> { { ID.Steel, 8 }, { ID.Hammer, 1}}, 100, description: "Forges steel weapons and tools at higher quality.");
+        AddStructureDefinition(ID.Anvil, new Dictionary<ID, int> { { ID.Steel, 8 }, { ID.Sledgehammer, 1}}, 100, description: "Forges steel weapons and tools at higher quality.");
         AddStructureDefinition(ID.BlueprintStation, new Dictionary<ID, int> { { ID.Stake, 10 }, { ID.Flint, 2 } }, 100, description: "Unlocks blueprint-based crafting options.");
         AddStructureDefinition(ID.FieldStation, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.Sticks, 4 } }, 100, description: "A lightweight station specialized for field planting tools.");
         AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Plant any seed in it to grow a crop.");
@@ -186,7 +186,7 @@ public partial class Item
             speed: 1.3f,
             range: 1,
             projectileInfo: new SwingProjectileInfo {
-                Damage = 2,
+                Damage = 3,
                 Knockback = 11,
                 CritChance = 10,
                 Speed = 1f,
@@ -202,18 +202,18 @@ public partial class Item
         AddToolDefinition(
             id: ID.Rapier,
             gesture: ItemGesture.Swing,
-            speed: 1.0f,
+            speed: 1.8f,
             range: 1,
             projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 3,
                 Knockback = 8,
-                CritChance = 15,
-                Speed = 1f,
+                CritChance = 20,
+                Speed = 1.6f,
                 Radius = 1.5f,
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
-            description: "A swift rapier that strikes a single target with precision.",
+            description: "A swift rapier. Strikes fast, but only ever one target at a time.",
             materials: new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 1 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
@@ -221,18 +221,18 @@ public partial class Item
         AddToolDefinition(
             id: ID.Femur,
             gesture: ItemGesture.Swing,
-            speed: 1.0f,
+            speed: 0.9f,
             range: 1,
-            projectileInfo: new SingleTargetSwingProjectileInfo {
-                Damage = 3,
-                Knockback = 10,
+            projectileInfo: new SwingProjectileInfo {
+                Damage = 4,
+                Knockback = 14,
                 CritChance = 10,
                 Speed = 1.65f,
-                Radius = 2f,
+                Radius = 2.6f,
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
-            description: "A crude bone club carved from a skeleton's femur.",
+            description: "A heavy leg bone from someone's remains. Slow to swing, but it sweeps through everything in front of it.",
             materials: new Dictionary<ID, int> { { ID.Stake, 1 } },
             holdoutOffset: new Vector2(0.6f, 0)
         );
@@ -246,7 +246,7 @@ public partial class Item
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = 4f,
+                Speed = 2.5f,
                 Radius = 2,
                 Breaking = 1,
                 OperationType = OperationType.Mining
@@ -285,7 +285,7 @@ public partial class Item
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = 2,
+                Speed = 2.5f,
                 Radius = 2,
                 Breaking = 1,
                 OperationType = OperationType.Cutting
@@ -324,7 +324,7 @@ public partial class Item
                 Damage = 1,
                 Knockback = 10,
                 CritChance = 10,
-                Speed = 2,
+                Speed = 2.5f,
                 Radius = 2,
                 Breaking = 2,
                 OperationType = OperationType.Cutting
@@ -365,32 +365,28 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
             },
-            durability: 100,
+            durability: 60,
             description: "A burning torch that sets flammable objects alight.",
-            materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Cotton, 1 } },
+            materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Cytoplasm, 1 } },
             holdoutOffset: new Vector2(0.65f, 0),
             glow: true
         );
 
         AddToolDefinition(
-            id: ID.Hammer,
+            id: ID.Sledgehammer,
             gesture: ItemGesture.Swing,
-            speed: 1.8f,
+            speed: 0.6f,
             range: 1,
             projectileInfo: new SwingProjectileInfo {
-                Damage = 1,
-                Knockback = 10,
-                CritChance = 10,
-                Speed = 2,
-                Radius = 2,
-                // Breaking only gates which blocks the hammer may place (block break
-                // thresholds are 1-2); how fast building goes is a fixed rate per
-                // second of swinging, so cheap blocks finish in ~5s and stronger ones
-                // take proportionally longer.
-                Breaking = 3,
-                OperationType = OperationType.Building
+                Damage = 7,
+                Knockback = 20,
+                CritChance = 5,
+                Speed = 1.2f,
+                Radius = 2.8f,
+                Breaking = 1,
+                OperationType = OperationType.Cutting
             },
-            description: "Hammer used for building and weapon crafting.",
+            description: "A heavy sledgehammer. The slowest weapon there is, but it crushes everything in its arc.",
             materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
@@ -506,10 +502,10 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
                 Breaking = 3,
-                OperationType = OperationType.Building
+                OperationType = OperationType.Dismantling
             },
             durability: 200,
-            description: "A rough mallet for basic building work.",
+            description: "A rough mallet. The only tool that takes a placed structure apart intact.",
             materials: new Dictionary<ID, int> { { ID.Flint, 1 }, { ID.Sticks, 2 } },
             holdoutOffset: new Vector2(0.65f, 0)
         );
@@ -520,9 +516,9 @@ public partial class Item
             speed: 0.8f,
             projectileInfo: new RangedProjectileInfo {
                 Sprite = ID.Spear,
-                Damage = 4,
-                Knockback = 10,
-                CritChance = 10,
+                Damage = 6,
+                Knockback = 12,
+                CritChance = 15,
                 LifeSpan = 10000,
                 Speed = 60,
                 Radius = 0.3f,
@@ -531,7 +527,7 @@ public partial class Item
                 PickUp = true,
                 Ammo = ID.Spear
             },
-            description: "A throwable spear that can pierce enemies.",
+            description: "A throwable spear. One target, one heavy hit — thrown slow, but it hurts.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 3 } },
             projectileOffset: 1.016f,
             stackSize: 20,
@@ -661,19 +657,19 @@ public partial class Item
         AddToolDefinition(
             id: ID.Dagger,
             gesture: ItemGesture.Swing,
-            speed: 0.5f,          // fast
+            speed: 2.0f,          // fastest weapon: high attack-rate multiplier
             range: 1,
-            projectileInfo: new SwingProjectileInfo {
+            projectileInfo: new SingleTargetSwingProjectileInfo {
                 Damage = 2,
                 Knockback = 6,
                 CritChance = 15,
-                Speed = 2,
+                Speed = 2f,
                 Radius = 1.2f,     // low range
                 Breaking = 1,
                 OperationType = OperationType.Cutting
             },
             durability: 150,
-            description: "A quick, short-bladed dagger for fast close-quarters strikes.",
+            description: "A quick, short-bladed dagger. The fastest strike there is, but it only ever finds one target.",
             materials: new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 1 } },
             holdoutOffset: new Vector2(0.5f, 0)
         );

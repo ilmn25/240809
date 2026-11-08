@@ -113,6 +113,16 @@ public class GUIPlayerList : GUI
     /// HUD can show that player's info, the same way hovering a slot shows an item's.</summary>
     public void SetHovered(PlayerInfo player) => Hovered = player;
 
+    /// <summary>HUD hint while hovering a party member slot, matching what the clicks will
+    /// actually do to that player — the player-list counterpart of the item-slot hint.</summary>
+    public static string HoveredShortcuts(PlayerInfo player)
+    {
+        string rightClick = player.IsWorking ? "RMB: abandon task" : "RMB: stay still";
+        return !player.IsDelver && player.controllerId == -1
+            ? "LMB: take control | " + rightClick
+            : rightClick;
+    }
+
     private void SetRest(PlayerInfo player, bool resting)
     {
         if (player == null || player.Resting == resting) return;

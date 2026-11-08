@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// A melee swing that hits only the single closest valid target, instead of
-/// every target in the swing radius. Used for precision weapons (rapier) and
-/// gathering tools (axe, pickaxe, hammer) so they don't cleave through crowds.
+/// every target in the swing radius. Used for precision weapons (rapier, dagger)
+/// so they trade crowd coverage for speed and critical chance.
 /// </summary>
 public class SingleTargetSwingProjectileInfo : ProjectileInfo
 {

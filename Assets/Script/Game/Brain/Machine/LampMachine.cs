@@ -1,5 +1,5 @@
 /// <summary>A placeable lamp. Doesn't need power: right-click toggles its switch.
-/// Furniture: placed directly, can't be broken, hammer picks it back up.</summary>
+/// Furniture: placed directly, can't be broken, mallet picks it back up.</summary>
 public class LampMachine : FurnitureMachine, IActionSecondaryInteract
 {
     public static Info CreateInfo()

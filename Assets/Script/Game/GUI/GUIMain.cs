@@ -212,6 +212,9 @@ public static class GUIMain
                     : "drop";
                 return $"Shift+LMB: {shiftLmb} | RMB: take one | Shift+RMB: split";
             }
+            // Hovering a party member slot: what the clicks do to that player.
+            if (GUIPlayerList.Hovered is { } member)
+                return GUIPlayerList.HoveredShortcuts(member);
             if (!GUICursor.Data.isEmpty())
             {
                 string action = Inventory.CurrentItem?.Info.ActionLabel ?? "";

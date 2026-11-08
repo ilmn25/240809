@@ -11,7 +11,7 @@ public class BlockInfo : StructureInfo
         Terraform.PendingBlocks.Add(Coordinate);
         bool miningBox = id == ID.MiningBox;
         Block block = miningBox ? Block.GetBlock(World.GetBlock(Coordinate)) : Block.GetBlock(id);
-        operationType = miningBox ? OperationType.Mining : OperationType.Building;
+        operationType = miningBox ? OperationType.Mining : OperationType.Dismantling;
         if (miningBox) Loot = block.StringID;
         Health = block.BreakCost;
         threshold = block.BreakThreshold;
@@ -32,9 +32,9 @@ public class BlockInfo : StructureInfo
     {
         Block underlying = id == ID.MiningBox ? Block.GetBlock(World.GetBlock(Coordinate)) : null;
         string name = underlying != null ? Helper.ToDisplayName(underlying.StringID) : Helper.ToDisplayName(id);
-        return operationType != OperationType.Building
+        return operationType != OperationType.Dismantling
             ? $"Mining {name} | HP {Health}"
-            : $"Building: {name} | {Health:0.#} Left";
+            : $"Dismantling: {name} | {Health:0.#} Left";
     }
 }
  

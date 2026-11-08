@@ -66,7 +66,7 @@ public class GenTaskSpawnGarden : GenTaskScatter
                 if (!TrySurfaceCell(world, x, z, out Vector3Int cell)) continue;
                 if (IsOccupied(world, cell)) continue;
 
-                SpawnSkeletonCorpse(world, cell, rng, lootCell => !IsOccupied(world, lootCell));
+                GenCorpse.SpawnSkeleton(world, cell, rng, lootCell => !IsOccupied(world, lootCell));
                 break;
             }
         }

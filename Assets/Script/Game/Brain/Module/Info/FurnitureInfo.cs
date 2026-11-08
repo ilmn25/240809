@@ -1,36 +1,21 @@
-using UnityEngine;
-
 /// <summary>Info for furniture: a static structure that can't be damaged or broken,
-/// placed directly (no build phase). Hitting it with a hammer (Building) drops it
-/// back to the ground as an item.</summary>
+/// placed directly (no build phase). Hitting it with a mallet lifts it back intact.</summary>
 [System.Serializable]
 public class FurnitureInfo : StructureInfo
 {
+    // Furniture can always be lifted, even when its item has no craft recipe.
+    protected override bool IsDismantlable => true;
+
     public override bool OnHitInternal(Projectile projectile)
     {
-        // Furniture ignores enemies and every tool except the hammer (Building).
-        if (projectile.SourceInfo.HitboxType == HitboxType.Enemy) return false;
-        if (projectile.SourceInfo.Equipment == null ||
-            projectile.SourceInfo.Equipment.Info.ProjectileInfo?.OperationType != OperationType.Building)
-            return false;
-        // Only a human-controlled player acquires the target here; an AI player's own
-        // hit-acquisition policy decides (PlayerInfo.AcquireTarget).
-        projectile.SourceInfo.AcquireTarget(this);
-        return true;
+        // Enemies can't touch furniture; only a mallet lifts it.
+        if (!IsDismantlingHit(projectile.SourceInfo)) return false;
+        return base.OnHitInternal(projectile);
     }
 
     public override void AbstractHit(Projectile projectile)
     {
-        MobInfo info = projectile.SourceInfo;
-        // Enemies and non-hammer tools do nothing to furniture.
-        if (info.HitboxType == HitboxType.Enemy) return;
-        if (info.Equipment == null ||
-            info.Equipment.Info.ProjectileInfo?.OperationType != OperationType.Building)
-            return;
-
-        Audio.PlaySFX(SfxDestroy);
-        Entity.SpawnItem(Loot, position);
-        RemoveFromChunk();
-        Destroy();
+        if (!IsDismantlingHit(projectile.SourceInfo)) return;
+        base.AbstractHit(projectile);
     }
 }

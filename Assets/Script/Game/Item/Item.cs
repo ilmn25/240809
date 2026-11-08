@@ -40,7 +40,7 @@ public partial class Item
     public ID BurnResult = ID.Null;
 
     /// <summary>Whether this structure places directly as furniture: no build phase,
-    /// can't be broken, and a hammer picks it back up into the player's inventory.</summary>
+    /// can't be broken, and a mallet picks it back up into the player's inventory.</summary>
     public bool Furniture;
 
     /// <summary>Whether this item can be picked up by the player. False for

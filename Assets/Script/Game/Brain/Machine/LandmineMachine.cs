@@ -3,7 +3,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>A pressure-plate mine. Once armed, any creature that steps into its
 /// block detonates it: a violent blast that damages creatures and structures,
-/// shakes the screen, and consumes the mine. Breaking it with a hammer safely
+/// shakes the screen, and consumes the mine. Breaking it with a mallet safely
 /// recovers it.</summary>
 public class LandmineMachine : StructureMachine
 {
@@ -38,7 +38,7 @@ public class LandmineMachine : StructureMachine
             Loot = ID.Landmine,
             SfxHit = SfxID.HitMetal,
             SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Building,
+            operationType = OperationType.Dismantling,
             threshold = 1,
             SpawnsRubble = false,
         };

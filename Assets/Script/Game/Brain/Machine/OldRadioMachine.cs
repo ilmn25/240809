@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>A placeable old radio — one of the key items a travelling merchant looks for.
-/// Furniture: placed directly, can't be broken, hammer picks it back up. Interacting
+/// Furniture: placed directly, can't be broken, mallet picks it back up. Interacting
 /// with it just makes the radio drowse.</summary>
 public class OldRadioMachine : FurnitureMachine, IActionSecondaryInteract
 {

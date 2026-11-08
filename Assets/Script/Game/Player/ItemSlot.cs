@@ -134,12 +134,13 @@ public class ItemSlot
 
         yield return projectile.Damage + " damage";
         yield return projectile.Knockback + " knockback";
+        yield return Info.Speed.ToString("0.##") + " attack speed";
 
         if (projectile.Breaking > 0)
         {
             string operation = projectile.OperationType switch
             {
-                OperationType.Building => "building",
+                OperationType.Dismantling => "dismantling",
                 OperationType.Mining => "mining",
                 OperationType.Cutting => "breaking",
                 _ => "",

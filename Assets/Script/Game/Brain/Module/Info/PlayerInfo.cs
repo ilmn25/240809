@@ -31,7 +31,7 @@ public class PlayerInfo : MobInfo
     private const float WellFedThreshold = 0.85f;
     private const float MoveHungerInterval = 45f;
     private const float RestHealInterval = 1f;
-    private const float TorchBurnInterval = 2f; // seconds of carrying per point of durability
+    private const float TorchBurnInterval = 1f; // seconds of carrying per point of durability
     private float _moveHungerAccumulator;
     private float _restHealAccumulator;
     private float _torchBurnAccumulator;
@@ -151,13 +151,16 @@ public class PlayerInfo : MobInfo
         base.AcquireTarget(target);
     }
 
+    /// <summary>True while the player's current target is a structure it is working on.</summary>
+    public bool IsWorking => Target is StructureInfo;
+
     /// <summary>Stop working: forget the remembered structure job and, when the player is
     /// currently on a structure, drop that target too. Returns true if a structure target
     /// was released — false when the player wasn't working on one.</summary>
     public bool ReleaseWork()
     {
         WorkOrder = null;
-        if (Target is not StructureInfo) return false;
+        if (!IsWorking) return false;
         CancelTarget();
         return true;
     }

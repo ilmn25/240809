@@ -9,6 +9,9 @@ public abstract class ConverterInfo : ContainerInfo
     protected virtual int OutputAmount(ID input) => 1;
     protected virtual int ConvertTime => 90;
 
+    /// <summary>A pot mid-conversion keeps its input; refuse to lift it until it's done.</summary>
+    protected override bool CanDismantleNow => !IsConverting();
+
     /// <summary>True when this converter takes the item. Defaults to having outputs.</summary>
     protected virtual bool Accepts(ID input) => GetOutputs(input) != null;
 

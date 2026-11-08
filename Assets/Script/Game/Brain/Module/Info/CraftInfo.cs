@@ -23,7 +23,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
-        { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Hammer, ID.Shelf) },
+        { ID.Toolbench, new PoolDef(0, true, ID.Workbench, ID.Campfire, ID.Sledgehammer, ID.Shelf) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap, ID.CrockPot) },
         { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.Lamp, ID.FieldStation, ID.Scarecrow, ID.Chair) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },
@@ -35,7 +35,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
         { ID.Workbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.MasonryWorkbench, ID.CarpenterWorkbench, ID.Sawmill) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.Rapier, ID.Bucket, ID.Sprinkler, ID.Generator, ID.OilBarrel, ID.Barrel, ID.MetalSpikeTrap) },
-        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Hammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
+        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Sledgehammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
         { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
 
         // The money changer's coin trades: clicking a coin in the exchange crafts it from a
@@ -57,6 +57,10 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
         base.Initialize();
         operationType = OperationType.Cutting;
     }
+
+    // Don't let the station be lifted away mid-craft, or the queued item is lost.
+    protected override bool CanDismantleNow => Pending.Count == 0;
+    protected override string DismantleBlockedMessage => "I should let it finish first.";
 
     public override void Update()
     {

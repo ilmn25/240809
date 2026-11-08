@@ -41,7 +41,7 @@ public class SpikeTrapMachine : StructureMachine
             Health = 30,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Building,
+            operationType = OperationType.Dismantling,
             threshold = 1,
             SpawnsRubble = false,
         };
