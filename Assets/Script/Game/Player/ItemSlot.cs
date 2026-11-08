@@ -191,7 +191,7 @@ public class ItemSlot
             ID = slot.ID;
             Modifier = slot.Modifier;
             Locked = slot.Locked;
-            // Wear travels with the item, so a picked-up spear keeps the throws it has left.
+            // Wear travels with the item, so a tool that moves slots keeps what it has left.
             Durability = slot.Durability;
         }
 

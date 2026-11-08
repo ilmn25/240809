@@ -7,10 +7,22 @@ public class RangedProjectileInfo : ProjectileInfo
     public bool Stuck = false;
     public bool Lodge = false;
     public bool PickUp = false;
+    /// <summary>Chance (0..1) that a throwable shatters where it lands instead of waiting to be
+    /// picked up again. 0 keeps every throw recoverable.</summary>
+    public float BreakChance;
 
     /// <summary>Hook called after a successful hit on an entity (before it is
     /// deleted or lodged). Subclasses add extra on-hit effects here.</summary>
     protected virtual void OnHitTarget(Projectile projectile, Machine target) { }
+
+    /// <summary>Leave the thrown item where it landed, unless the throw broke it.</summary>
+    private void DropForPickup(Vector3 position)
+    {
+        if (!PickUp || Ammo == ID.Null) return;
+        if (Random.value < BreakChance) return;
+
+        Entity.SpawnItem(Ammo, position);
+    }
 
     public override void AI(Projectile projectile)
     {
@@ -32,7 +44,7 @@ public class RangedProjectileInfo : ProjectileInfo
                 if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Main.MaskMap))
                 {
                     Audio.PlaySFX(SfxID.HitStone);
-                    if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position - projectile.Direction.normalized * 0.5f);
+                    DropForPickup(projectile.transform.position - projectile.Direction.normalized * 0.5f);
                     projectile.Delete();
                     break;  
                 } 
@@ -53,8 +65,7 @@ public class RangedProjectileInfo : ProjectileInfo
                     }
                     else
                     {
-                        if (PickUp && Ammo != ID.Null)
-                            Entity.SpawnItem(Ammo, projectile.transform.position);
+                        DropForPickup(projectile.transform.position);
                         projectile.Delete();
                     }
                     break;
@@ -68,7 +79,7 @@ public class RangedProjectileInfo : ProjectileInfo
             
             if (projectile.Target.Destroyed)
             {
-                if (PickUp) Entity.SpawnItem(Ammo, projectile.transform.position);
+                DropForPickup(projectile.transform.position);
                 projectile.Delete();    
             }
         }

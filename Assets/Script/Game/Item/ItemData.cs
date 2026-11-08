@@ -404,6 +404,8 @@ public partial class Item
         public int LifeSpan;
         public bool Lodge;
         public bool PickUp;
+        /// <summary>Chance (0..1) a thrown pickup lands broken instead of recoverable.</summary>
+        public float BreakChance;
         public StatusEffect HitEffect;
         public bool HitEffectOnCrit;
         public int StackSize = 1;
@@ -465,11 +467,11 @@ public partial class Item
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
-            ProjectileSpeed = 60, Radius = 0.3f, Sprite = ID.Spear, Penetration = 1,
-            LifeSpan = 10000, Lodge = true,
+            ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
+            LifeSpan = 10000, Lodge = true, PickUp = true, BreakChance = 0.33f,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
-            Durability = 5, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts.",
+            StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
+            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts. Go pick it back up, unless the throw splintered it.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
@@ -599,7 +601,7 @@ public partial class Item
 
     private static ProjectileInfo BuildProjectile(ToolSpec spec)
     {
-        // A thrown weapon is ranged even when it feeds on nothing but its own durability.
+        // A thrown weapon is ranged even when it needs no ammo of its own.
         if (spec.Ammo != ID.Null || spec.Gesture == ItemGesture.Shoot)
         {
             return new RangedProjectileInfo
@@ -615,6 +617,7 @@ public partial class Item
                 Ammo = spec.Ammo,
                 Lodge = spec.Lodge,
                 PickUp = spec.PickUp,
+                BreakChance = spec.BreakChance,
                 HitEffect = spec.HitEffect,
                 HitEffectOnCrit = spec.HitEffectOnCrit,
             };

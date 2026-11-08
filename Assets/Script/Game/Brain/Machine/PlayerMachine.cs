@@ -367,8 +367,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
 
         // Ammo is resolved and consumed in MobAttackShoot (guns fire whatever
-        // accepted ammo the shooter carries; a wear-only throwable spends its
-        // durability below instead).
+        // accepted ammo the shooter carries; throwables keep their own ammo).
         // Consuming the last of a stack can leave the hand empty on this same frame.
         base.Attack();
 
