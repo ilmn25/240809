@@ -4,24 +4,20 @@ public class RangedProjectileInfo : ProjectileInfo
 {
     public int LifeSpan; 
     public int Penetration; // ignored for now
-    public bool Stuck = false;
     public bool Lodge = false;
-    public bool PickUp = false;
-    /// <summary>Chance (0..1) that a throwable shatters where it lands instead of waiting to be
-    /// picked up again. 0 keeps every throw recoverable.</summary>
-    public float BreakChance;
+    /// <summary>Chance (0..1) that a thrown item lands whole and can be picked up again;
+    /// the rest of the time the throw destroys it. 0 for shots that are spent on firing.</summary>
+    public float PickUpChance;
 
     /// <summary>Hook called after a successful hit on an entity (before it is
     /// deleted or lodged). Subclasses add extra on-hit effects here.</summary>
     protected virtual void OnHitTarget(Projectile projectile, Machine target) { }
 
-    /// <summary>Leave the thrown item where it landed, unless the throw broke it.</summary>
-    private void DropForPickup(Vector3 position)
+    /// <summary>End the throw where it landed: leave the item behind if it survived the throw.</summary>
+    private void Land(Projectile projectile, Vector3 position)
     {
-        if (!PickUp || Ammo == ID.Null) return;
-        if (Random.value < BreakChance) return;
-
-        Entity.SpawnItem(Ammo, position);
+        if (Ammo != ID.Null && Random.value < PickUpChance) Entity.SpawnItem(Ammo, position);
+        projectile.Delete();
     }
 
     public override void AI(Projectile projectile)
@@ -44,8 +40,7 @@ public class RangedProjectileInfo : ProjectileInfo
                 if (Helper.IsInLayerMask(HitBuffer[i].gameObject, Main.MaskMap))
                 {
                     Audio.PlaySFX(SfxID.HitStone);
-                    DropForPickup(projectile.transform.position - projectile.Direction.normalized * 0.5f);
-                    projectile.Delete();
+                    Land(projectile, projectile.transform.position - projectile.Direction.normalized * 0.5f);
                     break;  
                 } 
             
@@ -64,10 +59,7 @@ public class RangedProjectileInfo : ProjectileInfo
                         projectile.RelativeRotation = Quaternion.Inverse(projectile.Target.SpriteToolTrack.rotation) * projectile.transform.rotation;
                     }
                     else
-                    {
-                        DropForPickup(projectile.transform.position);
-                        projectile.Delete();
-                    }
+                        Land(projectile, projectile.transform.position);
                     break;
                 } 
             } 
@@ -78,10 +70,7 @@ public class RangedProjectileInfo : ProjectileInfo
             projectile.transform.rotation = projectile.Target.SpriteToolTrack.rotation * projectile.RelativeRotation;
             
             if (projectile.Target.Destroyed)
-            {
-                DropForPickup(projectile.transform.position);
-                projectile.Delete();    
-            }
+                Land(projectile, projectile.transform.position);
         }
     }
 }  

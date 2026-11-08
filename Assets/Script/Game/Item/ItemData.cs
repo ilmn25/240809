@@ -403,9 +403,8 @@ public partial class Item
         public int Penetration;
         public int LifeSpan;
         public bool Lodge;
-        public bool PickUp;
-        /// <summary>Chance (0..1) a thrown pickup lands broken instead of recoverable.</summary>
-        public float BreakChance;
+        /// <summary>Chance (0..1) that a thrown item survives the throw and can be picked up.</summary>
+        public float PickUpChance;
         public StatusEffect HitEffect;
         public bool HitEffectOnCrit;
         public int StackSize = 1;
@@ -468,7 +467,7 @@ public partial class Item
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
             ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
-            LifeSpan = 10000, Lodge = true, PickUp = true, BreakChance = 0.33f,
+            LifeSpan = 10000, Lodge = true, PickUpChance = 2f / 3f,   // one throw in three splinters it
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
             Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts. Go pick it back up, unless the throw splintered it.",
@@ -616,8 +615,7 @@ public partial class Item
                 Penetration = spec.Penetration,
                 Ammo = spec.Ammo,
                 Lodge = spec.Lodge,
-                PickUp = spec.PickUp,
-                BreakChance = spec.BreakChance,
+                PickUpChance = spec.PickUpChance,
                 HitEffect = spec.HitEffect,
                 HitEffectOnCrit = spec.HitEffectOnCrit,
             };
