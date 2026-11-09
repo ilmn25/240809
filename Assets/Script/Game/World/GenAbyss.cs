@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class GenAbyss : Gen
 {
-    public override Vector3Int GetSize() => new Vector3Int(25, 4, 25);
+    // 16 chunks wide = 240 blocks across; the topology and scatter radii scale off this.
+    public override Vector3Int GetSize() => new Vector3Int(16, 4, 16);
     public override Vector3Int GetSpawnPoint() => new Vector3Int(GetSize().x / 2, GetSize().y - 2, GetSize().z / 2) * World.ChunkSize;
 
     protected override IGenTask[] Tasks => new IGenTask[]

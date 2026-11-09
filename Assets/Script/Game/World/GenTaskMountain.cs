@@ -10,7 +10,7 @@ public class GenTaskMountain : IGenTask
 {
     private const int Steps = 5;               // cliff ledges up each mountain
     private const float PeakScale = 1f;        // max peak height as a multiple of chunk size
-    private const float RadiusScale = 3f;      // footprint radius as a multiple of chunk size
+    private const float RadiusScale = 2f;      // footprint radius as a multiple of chunk size (kept at the same share of the map)
     private const int DirtCap = 2;             // grassy top thickness in blocks
     private const float NoiseStrength = 4f;
     private const float NoiseScale = 0.02f;

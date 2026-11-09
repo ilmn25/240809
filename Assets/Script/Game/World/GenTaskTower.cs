@@ -7,7 +7,7 @@ using UnityEngine;
 public class GenTaskTower : GenTaskScatter
 {
     private const int TowerCount = 3;       // how many towers to place
-    private const int MinSeparation = 60;   // keep towers from overlapping each other
+    private const int MinSeparation = 40;   // keep towers from overlapping each other
     private const int DepthOffset = 6;      // how far below the surface the base sits (half as deep as before, matching the smaller tower)
 
     private static readonly Chunk Tower = SetPiece.LoadSetPieceFile("Tower");

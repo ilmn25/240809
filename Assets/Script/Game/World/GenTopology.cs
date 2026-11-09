@@ -30,6 +30,12 @@ public static class GenTopology
     private const float VoronoiNoise = 24f;
     private const float VoronoiScale = 0.045f;
 
+    /// <summary>Map width the block-sized constants above were tuned for (25 chunks = 375
+    /// blocks). Smaller maps shrink their lengths and stretch their noise frequency by the
+    /// same factor, so plates, branches and the coastline keep their proportions instead of
+    /// crowding the rim.</summary>
+    private const float ReferenceMinDim = 375f;
+
     private static readonly BiomeType[] BiomePool =
     {
         BiomeType.Forest, BiomeType.Forest, BiomeType.Desert, BiomeType.Desert,
@@ -40,6 +46,7 @@ public static class GenTopology
     private static bool _generated;
     private static int _genSeed;
     private static Vector3Int _genBounds;
+    private static float _scale = 1f; // map width / ReferenceMinDim
     private static float _coastOffset, _voronoiOffset, _branchWindingOffset;
     private static List<Node> _nodes;
     private static Vector3Int[] _nodeWorld;
@@ -53,6 +60,7 @@ public static class GenTopology
         _generated = true;
         _genSeed = Save.Inst.seed;
         _genBounds = bounds;
+        _scale = Mathf.Min(bounds.x, bounds.z) / ReferenceMinDim;
         _coastOffset = Gen.GetDeterministicOffset("TopologyCoast");
         _voronoiOffset = Gen.GetDeterministicOffset("TopologyVoronoi");
         _branchWindingOffset = Gen.GetDeterministicOffset("TopologyBranch");
@@ -78,7 +86,11 @@ public static class GenTopology
     }
 
     private static float CoastlineNoise(int x, int z)
-        => 0.92f + 0.16f * Mathf.PerlinNoise(x * CoastScale + _coastOffset, z * CoastScale + _coastOffset);
+    {
+        // Frequency rises as the map shrinks, keeping the same number of inlets.
+        float scale = CoastScale / _scale;
+        return 0.92f + 0.16f * Mathf.PerlinNoise(x * scale + _coastOffset, z * scale + _coastOffset);
+    }
 
     private static void Pass1_BuildGraph(System.Random rng)
     {
@@ -164,7 +176,7 @@ public static class GenTopology
             {
                 if (inMst.Contains(v)) continue;
                 float d = Dist(_nodes[u].X, _nodes[u].Z, _nodes[v].X, _nodes[v].Z);
-                if (d <= ConnectRadius && d < minDist[v]) { minDist[v] = d; minEdge[v] = u; }
+                if (d <= ConnectRadius * _scale && d < minDist[v]) { minDist[v] = d; minEdge[v] = u; }
             }
         }
     }
@@ -183,10 +195,10 @@ public static class GenTopology
             float nx = dx / d, nz = dz / d;
 
             float wob = (Mathf.PerlinNoise(
-                _nodes[i].X * 0.02f + _branchWindingOffset,
-                _nodes[i].Z * 0.02f + _branchWindingOffset) - 0.5f) * 2f * BranchWinding;
+                _nodes[i].X * 0.02f / _scale + _branchWindingOffset,
+                _nodes[i].Z * 0.02f / _scale + _branchWindingOffset) - 0.5f) * 2f * BranchWinding * _scale;
 
-            float length = BranchLength * _nodes[i].Size;
+            float length = BranchLength * _nodes[i].Size * _scale;
             _nodes[i].X = _nodes[parent].X + nx * length - nz * wob;
             _nodes[i].Z = _nodes[parent].Z + nz * length + nx * wob;
 
@@ -338,9 +350,12 @@ public static class GenTopology
 
     private static float JitteredDistance(int x, int z, int nodeIdx)
     {
+        // Shrink the jitter's amplitude and stretch its frequency with the map, so plate
+        // seams keep their shape instead of turning into coarse noise.
+        float scale = VoronoiScale / _scale;
         float jitter = (Mathf.PerlinNoise(
-            x * VoronoiScale + _voronoiOffset + nodeIdx * 0.37f,
-            z * VoronoiScale + _voronoiOffset) - 0.5f) * 2f * VoronoiNoise;
+            x * scale + _voronoiOffset + nodeIdx * 0.37f,
+            z * scale + _voronoiOffset) - 0.5f) * 2f * VoronoiNoise * _scale;
         return Dist(x, z, _nodeWorld[nodeIdx].x, _nodeWorld[nodeIdx].z) + jitter;
     }
 
