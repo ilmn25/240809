@@ -58,6 +58,9 @@ public static class MobSpawner
     private static readonly Pool DesertNightMobs = Uniform(ID.SnareFlea);
     private static readonly Pool RaptureMobs = Uniform(ID.Lich);
     private static readonly Pool DungeonMobs = Uniform(ID.Sawblade, ID.Ballista, ID.Turret);
+    /// <summary>Deeper dungeon floors: the traps stay, and the restless dead join them.</summary>
+    private static readonly Pool DeepDungeonMobs = Uniform(ID.Sawblade, ID.Ballista, ID.Turret,
+        ID.Skeleton, ID.Rat, ID.Spider, ID.Vampire);
     private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Raider, ID.Scavenger,
         ID.ScavengerArcher, ID.Congregant,
         ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin,
@@ -104,7 +107,11 @@ public static class MobSpawner
         };
 
         if (Save.Inst.current == GenType.Dungeon)
-            return new Rules(rules.Interval, rules.Attempts + 1, 3, rules.Hostiles);
+        {
+            // Deeper floors press harder: more spawn attempts per pulse.
+            int deeper = Mathf.Min(Save.Inst.DungeonDepth - 1, 4);
+            return new Rules(rules.Interval, rules.Attempts + 1 + deeper, 3, rules.Hostiles);
+        }
         if (IsSwarm())
             return new Rules(rules.Interval * 0.5f, rules.Attempts + 3, rules.CapPerPlayer * 3, rules.Hostiles);
         return rules;
@@ -132,7 +139,8 @@ public static class MobSpawner
         if (!World.IsInWorldBounds(ground) || NavMap.IsAir(ground) || !NavMap.IsAir(ground + Vector3Int.up))
             return;
 
-        Entity.Spawn(PickWeighted(DungeonMobs), ground + Vector3Int.up);
+        Entity.Spawn(PickWeighted(Save.Inst.DungeonDepth > 2 ? DeepDungeonMobs : DungeonMobs),
+                     ground + Vector3Int.up);
     }
 
     private static void TrySpawnAround(Vector3 playerPos, Rules rules, SpawnPhase phase)

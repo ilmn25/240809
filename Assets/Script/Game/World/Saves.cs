@@ -81,6 +81,12 @@ public class Save
     public List<PlayerInfo> players = new();
     public Dictionary<GenType, World> worlds = new();
 
+    /// <summary>Which floor of the dungeon the current run is on (1 = first floor below
+    /// the surface). Reset whenever a run starts from the surface.</summary>
+    public int dungeonDepth = 1;
+    /// <summary>Clamped floor number: saves written before floors existed read back as 0.</summary>
+    public int DungeonDepth => dungeonDepth < 1 ? 1 : dungeonDepth;
+
     // The Maw's daily coin quota state (see MawQuota).
     public int mawQuota = MawQuota.BaseQuota;
     public int mawPaid;

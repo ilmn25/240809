@@ -15,6 +15,10 @@ public class World
     private Chunk[] _chunks; 
     public readonly Vector3Int Size;
     public readonly Vector3Int Bounds;
+    /// <summary>Per-instance noise for worlds rebuilt on every visit (the dungeon), so each
+    /// visit draws a different layout. Zero for worlds generated once from the save seed,
+    /// which leaves their layout seed-derived and reproducible.</summary>
+    public int LayoutNonce;
     /// <summary>Per-world 2D map state (explored fog, markers, texture).</summary>
     public WorldMap Map;
 
@@ -26,6 +30,8 @@ public class World
         Size = Gen.Dictionary[genType].GetSize();
         Bounds = new Vector3Int(Size.x * ChunkSize, Size.y * ChunkSize, Size.z * ChunkSize);
         SpawnPoint = Gen.Dictionary[genType].GetSpawnPoint();
+        if (Gen.Dictionary[genType].RegenerateOnVisit)
+            LayoutNonce = System.Guid.NewGuid().GetHashCode();
         _chunks = new Chunk[Size.x * Size.y * Size.z];
         Map = new WorldMap { Explored = new byte[Bounds.x * Bounds.z] };
     }

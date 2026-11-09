@@ -58,7 +58,9 @@ public abstract class GenSocketRooms : Gen
     {
         LayoutWidth = world.Size.x * World.ChunkSize;
         LayoutDepth = world.Size.z * World.ChunkSize;
-        LayoutSeed = (int)GetDeterministicOffset(LayoutSalt);
+        // The salt keeps a world's layout stable for its save; the nonce is what makes a
+        // world rebuilt on every visit (the dungeon) draw a fresh layout each time.
+        LayoutSeed = unchecked((int)GetDeterministicOffset(LayoutSalt) ^ world.LayoutNonce);
         Plan = DungeonLayout.Generate(LayoutWidth, LayoutDepth, MaxRooms, LayoutSeed,
                                       RoomPieces, AnchorPiece);
         DungeonLayout.Render(world, Plan);

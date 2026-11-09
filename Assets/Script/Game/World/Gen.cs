@@ -32,6 +32,10 @@ public abstract class Gen
         foreach (IGenTask task in Tasks) task.RunWorld(world);
     }
 
+    /// <summary>True when the world is thrown away and generated again every time it is
+    /// entered, so each visit is a new run (the dungeon).</summary>
+    public virtual bool RegenerateOnVisit => false;
+
     public virtual Vector3Int GetSize() => Vector3Int.one;
     public virtual Vector3Int GetSpawnPoint() => Vector3Int.zero;
     

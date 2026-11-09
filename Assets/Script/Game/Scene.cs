@@ -23,8 +23,6 @@ public class Scene
         if (Busy) return;
         Busy = true;
         ScreenFade.FadeOut(0.3f);
-        if (spawnPoint.HasValue)
-            Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
         // The player machine survives the switch (Quit(false)), but its transform
         // stays at the old world's coordinates until the new world finishes loading
         // — where that column may be void/high and lethal. Grant spawn protection
@@ -34,6 +32,12 @@ public class Scene
                 player?.GrantWorldSwitchProtection();
         new CoroutineTask(Quit(false)).Finished += _ => {
             Save.Inst.current = genType;
+            // Worlds that are rebuilt on every visit (the dungeon) are thrown away here,
+            // after the old one has unloaded, so this visit generates a fresh one.
+            if (Gen.Dictionary[genType].RegenerateOnVisit)
+                Save.Inst.worlds[genType] = new World(genType);
+            if (spawnPoint.HasValue)
+                Save.Inst.worlds[genType].SpawnPoint = spawnPoint.Value;
             Start(false);
         };
     }
