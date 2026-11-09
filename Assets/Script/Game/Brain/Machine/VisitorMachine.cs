@@ -101,7 +101,7 @@ public class VisitorMachine : GroundMobMachine
     /// <summary>Removes the visitor and lets the spawner know it's gone.</summary>
     private void Leave()
     {
-        VisitorSpawner.MarkLeft();
+        EncounterDirector.MarkLeft(EncounterDirector.Kind.Visitor);
         Info.Destroy();
         Unload();
     }

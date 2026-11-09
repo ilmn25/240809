@@ -593,7 +593,7 @@ public class Entity
                 AddMob<VisitorMachine>(ID.Visitor);
                 loot = new (ID.Visitor); // the visitor drops nothing
 
-                // Lone survivors met through random encounters (see EncounterEvent).
+                // Lone survivors met through random encounters (see EncounterDirector).
                 AddMob<WoundedDelverMachine>(ID.WoundedDelver);
                 loot = new (ID.WoundedDelver); // drops nothing
 
@@ -608,6 +608,19 @@ public class Entity
 
                 AddMob<StarvingStrangerMachine>(ID.StarvingStranger);
                 loot = new (ID.StarvingStranger); // drops nothing
+
+                // Travellers who ask for goods and pay for them (see RequestNPCMachine).
+                AddMob<FamishedBeggarMachine>(ID.FamishedBeggar);
+                loot = new (ID.FamishedBeggar); // drops nothing
+
+                AddMob<ScrapTinkerMachine>(ID.ScrapTinker);
+                loot = new (ID.ScrapTinker); // drops nothing
+
+                AddMob<ShrineHermitMachine>(ID.ShrineHermit);
+                loot = new (ID.ShrineHermit); // drops nothing
+
+                AddMob<HunterMachine>(ID.Hunter);
+                loot = new (ID.Hunter); // drops nothing
 
                 AddMob<VampireMachine>(ID.Vampire);
                 loot = new (ID.Vampire);

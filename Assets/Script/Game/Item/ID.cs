@@ -262,4 +262,8 @@ public enum ID
     Pilgrim,
     RenegadeCultist,
     StarvingStranger,
+    FamishedBeggar,
+    ScrapTinker,
+    ShrineHermit,
+    Hunter,
 }

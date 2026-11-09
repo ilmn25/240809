@@ -13,9 +13,7 @@ public static class Event
         RaidEvent.Subscribe();
         RainEvent.Subscribe();
         LeafEvent.Subscribe();
-        VisitorSpawner.Subscribe();
-        CaravanMachine.Subscribe();
-        EncounterEvent.Subscribe();
+        EncounterDirector.Subscribe();
     }
 
     /// <summary>Random position a set distance from a center point, shared by

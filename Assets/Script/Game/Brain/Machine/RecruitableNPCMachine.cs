@@ -1,24 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>Shared behaviour for the lone survivors met through a random encounter
-/// (see <see cref="EncounterEvent"/>). Each survivor is its own entity — subclasses only
-/// fill in how they look, what they say and what they ask for. They wait where they
-/// appear and open a recruitment dialogue when spoken to; anything hostile that comes
-/// close is fought off. Refused, or ignored for long enough, they walk away and the road
-/// offers someone else another day.</summary>
-public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondaryInteract
+/// <summary>A lone survivor met through a random encounter (see
+/// <see cref="EncounterDirector"/>). Subclasses only fill in how they look, what they say
+/// and what they ask for; recruiting them adds a real party member or a temporary
+/// companion.</summary>
+public abstract class RecruitableNPCMachine : TravellerNPCMachine
 {
-    /// <summary>Real seconds they wait before moving on.</summary>
-    private const float LeaveAfter = 90f;
-    /// <summary>Distance they run to before despawning when they walk away.</summary>
-    private const float LeaveDistance = 30f;
-    /// <summary>Longest they spend walking off, in case the player follows them.</summary>
-    private const float FleeFallback = 12f;
-
-    /// <summary>One-line notice shown when the encounter spawns.</summary>
-    public abstract string Announce { get; }
-    protected abstract string Greeting { get; }
     protected abstract string Backstory { get; }
     /// <summary>Spoken as they agree to join.</summary>
     protected abstract string RecruitText { get; }
@@ -35,11 +23,10 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
     protected virtual float StaySeconds => 0f;
     protected virtual ID Weapon => ID.SteelSword;
 
-    private float _leaveAt;
+    protected override EncounterDirector.Kind EncounterKind => EncounterDirector.Kind.Survivor;
 
     private bool IsFree => CostItem == ID.Null && CostCoins <= 0;
 
-    /// <summary>What they ask for, phrased for a dialogue line.</summary>
     private string CostText =>
         CostCoins > 0 ? Trade.Format(CostCoins)
         : CostItem != ID.Null ? $"{CostAmount} {Helper.ToDisplayName(CostItem)}"
@@ -66,109 +53,39 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
     {
         base.OnStart();
 
-        int baseHealth = Info.HealthMax;
-        if (HealthScale < 1f)
-        {
-            Info.HealthMax = Mathf.Max(1, Mathf.RoundToInt(baseHealth * HealthScale));
-            Info.Health = Info.HealthMax;
-        }
-        _leaveAt = Time.time + LeaveAfter;
-
-        AddState(new MobFleeDespawn(LeaveDistance));
+        if (HealthScale >= 1f) return;
+        Info.HealthMax = Mathf.Max(1, Mathf.RoundToInt(Info.HealthMax * HealthScale));
+        Info.Health = Info.HealthMax;
     }
 
-    public override void OnUpdate()
+    protected override void ShowMenu(PlayerInfo payer)
     {
-        // Keep the offer open while the player reads the dialogue.
-        if (IsInteracting)
-        {
-            _leaveAt = Time.time + LeaveAfter;
-            return;
-        }
-
-        if (IsCurrentState<MobHit>() || IsCurrentState<MobAttackSwing>()) return;
-
-        if (IsCurrentState<MobFleeDespawn>())
-        {
-            // The player may chase them; don't let the walk-off last forever.
-            if (Time.time >= _leaveAt) Leave();
-            return;
-        }
-
-        // Defend the party from anything that wanders close.
-        if (UpdateThreat()) return;
-
-        PlayerInfo player = Main.PlayerInfo;
-        if (player == null || player.Destroyed)
-        {
-            Leave();
-            return;
-        }
-
-        bool playerGone = Helper.SquaredDistance(player.position, transform.position) >
-                          LeaveDistance * LeaveDistance;
-        if (playerGone || Time.time >= _leaveAt)
-        {
-            WalkAway(player);
-            return;
-        }
-
-        if (!IsCurrentState<DefaultState>()) return;
-        SetState<MobIdle>(); // waits where they appeared, ready to be talked to
-    }
-
-    public void OnActionSecondary(Info info)
-    {
-        BeginInteraction();
-        ShowMenu(info as PlayerInfo ?? Main.PlayerInfo);
-    }
-
-    private void ShowMenu(PlayerInfo payer)
-    {
-        Sprite portrait = Cache.LoadSprite("Sprite/" + Info.CharSprite);
         Dictionary<string, Dialogue> options = new Dictionary<string, Dialogue>();
-
-        string terms = StaySeconds > 0f
-            ? $"{Helper.FormatDuration(StaySeconds)} contract"
-            : "joins for good";
+        string terms = StaySeconds > 0f ? $"{Helper.FormatDuration(StaySeconds)} contract" : "joins for good";
 
         if (CanAfford(payer))
         {
             options[$"Recruit ({CostText}, {terms})"] = new Dialogue
             {
                 Text = RecruitText,
-                Sprite = portrait,
+                Sprite = Portrait,
                 OnOpen = () => Recruit(payer),
             };
         }
         else
         {
-            options["Recruit"] = new Dialogue
-            {
-                Text = $"\"{CostText}, friend. And you don't have it.\"",
-                Sprite = portrait,
-            };
+            options["Recruit"] = Line($"\"{CostText}, friend. And you don't have it.\"");
         }
 
-        options["Ask who they are"] = new Dialogue
-        {
-            Text = Backstory,
-            Sprite = portrait,
-        };
-
+        options["Ask who they are"] = Line(Backstory);
         options["Send them on their way"] = new Dialogue
         {
             Text = "\"Suit yourself. Safe travels.\"",
-            Sprite = portrait,
-            OnOpen = Decline,
+            Sprite = Portrait,
+            OnOpen = Depart,
         };
 
-        ShowDialogue(new Dialogue
-        {
-            Text = Greeting,
-            Sprite = portrait,
-            Next = options,
-        });
+        ShowRoot(options);
     }
 
     /// <summary>Takes the asking price and adds them to the party.</summary>
@@ -184,7 +101,7 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
         else
             JoinParty();
 
-        Leave();
+        Depart();
     }
 
     /// <summary>A short contract: a temporary ally that follows and fights but never
@@ -209,29 +126,5 @@ public abstract class RecruitableNPCMachine : PassiveNPCMachine, IActionSecondar
 
         Save.Inst.players.Add(recruit);
         Entity.SpawnFromInfo(recruit, false);
-    }
-
-    private void Decline()
-    {
-        EncounterEvent.MarkLeft();
-        Info.Destroy();
-        Unload();
-    }
-
-    /// <summary>Runs away from the player and despawns once far enough.</summary>
-    private void WalkAway(PlayerInfo player)
-    {
-        _leaveAt = Time.time + FleeFallback;
-        Info.SpeedGround = 6f;
-        Info.Target = player;
-        Info.PathingStatus = PathingStatus.Pending;
-        SetState<MobFleeDespawn>();
-    }
-
-    private void Leave()
-    {
-        EncounterEvent.MarkLeft();
-        Info.Destroy();
-        Unload();
     }
 }

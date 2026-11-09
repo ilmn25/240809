@@ -7,9 +7,6 @@ using UnityEngine;
 /// despawns; the followers leave with it.</summary>
 public class CaravanMachine : GroundMobMachine
 {
-    private const int VisitInterval = 3;   // visit every 3rd day
-    private const int ArriveHour = 8;      // morning arrival
-    private const float SpawnDistance = 10f;
     private const float FleeDistance = 30f;
     private const float FleeSpeed = 6f;
     private const float FollowerSpread = 2f;
@@ -17,17 +14,6 @@ public class CaravanMachine : GroundMobMachine
     private const int CowCount = 2;        // cattle that trail the wagon
     private const float VisitDuration = 300f; // seconds before the wagon leaves
     private bool _fleeing;
-
-    public static void Subscribe() => Environment.HourlyTriggered += OnHour;
-
-    private static void OnHour(int hour, int day)
-    {
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
-        if (hour != ArriveHour || day % VisitInterval != 0) return;
-
-        Entity.Spawn(ID.Caravan, Event.SpawnPointAroundPlayer(SpawnDistance));
-        Dialogue.ShowEvent("A band of nomads sets up camp nearby...");
-    }
 
     public static Info CreateInfo()
     {
