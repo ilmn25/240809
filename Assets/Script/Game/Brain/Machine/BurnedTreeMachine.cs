@@ -6,7 +6,7 @@ public class BurnedTreeMachine : StructureMachine
         return new SpriteStructureInfo()
         {
             Health = 30,
-            Loot = ID.Charcoal,
+            Loot = ID.BurnedTree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
             operationType = OperationType.Cutting,

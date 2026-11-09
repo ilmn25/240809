@@ -157,6 +157,26 @@ public class Entity
                 AddStructure<SpikeTrapMachine>(ID.MetalSpikeTrap, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<LandmineMachine>(ID.Landmine, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
 
+                loot = new (ID.Pond);
+                loot.Add(1, 2, ID.StoneBlock);
+                loot.Add(0.5f, 1, ID.SandBlock);
+
+                loot = new (ID.Sprinkler);
+                loot.Add(1, 2, ID.Lead);
+                loot.Add(0.5f, 1, ID.Steel);
+
+                loot = new (ID.LightningRod);
+                loot.Add(1, 2, ID.Lead);
+                loot.Add(0.5f, 1, ID.Steel);
+
+                loot = new (ID.MawPit);
+                loot.Add(1, 3, ID.StoneBlock);
+                loot.Add(0.5f, 1, ID.Brick);
+
+                loot = new (ID.Landmine);
+                loot.Add(1, 1, ID.Steel);
+                loot.Add(0.5f, 1, ID.Gunpowder);
+
                 loot = new (ID.Workbench);
                 loot.Add(1, 3, ID.Log);
                 loot.Add(0.5f, 4, ID.Log);
@@ -289,6 +309,9 @@ public class Entity
                 AddStructure<HarvestableMachine>(ID.Table, Vector3Int.one, Main.IndexCollide);
                 // Burn results — spawned when flammable objects burn out.
                 AddStructure<BurnedTreeMachine>(ID.BurnedTree, new Vector3Int(1, 2, 1), Main.IndexCollide);
+                loot = new (ID.BurnedTree);
+                loot.Add(1, 3, ID.Charcoal);
+                loot.Add(0.5f, 2, ID.Charcoal);
                 AddStructure<RubbleMachine>(ID.Rubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<CharredRubbleMachine>(ID.CharredRubble, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.Rubble);
