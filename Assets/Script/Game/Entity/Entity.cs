@@ -240,15 +240,16 @@ public class Entity
                 loot.Add(1, 1, ID.Spear, ID.StoneHatchet); 
                 loot.Add(0.35f, 1, ID.OldRadio); 
 
-                AddStructure<RaiderCampChestMachine>(ID.RaiderCampChest, Vector3Int.one, Main.IndexCollide);
-                loot = new (ID.RaiderCampChest);
-                loot.Add(1, 1, ID.MetalChunks);
-                loot.Add(0.6f, 2, ID.Steel);
-                loot.Add(0.6f, 2, ID.Copper);
-                loot.Add(1, 3, ID.Brick);
-                loot.Add(0.7f, 1, ID.Charcoal, ID.Flint);
-                loot.Add(1, 1, ID.Spear, ID.StoneHatchet);
-                loot.Add(0.35f, 1, ID.OldRadio);
+                // A scavenger camp's stash: scrap and improvised gear, not a raider warband's kit.
+                AddStructure<ScavCampChestMachine>(ID.ScavCampChest, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.ScavCampChest);
+                loot.Add(1, 3, ID.Sticks);
+                loot.Add(0.8f, 2, ID.Flint);
+                loot.Add(0.6f, 1, ID.Charcoal);
+                loot.Add(0.5f, 1, ID.Copper);
+                loot.Add(0.4f, 1, ID.MetalChunks);
+                loot.Add(0.6f, 3, ID.Arrow);
+                loot.Add(0.4f, 1, ID.ShortBow, ID.StoneHatchet);
 
                 AddStructure<DungeonChestMachine>(ID.DungeonChest, Vector3Int.one, Main.IndexCollide);
                 loot = new (ID.DungeonChest);
@@ -333,8 +334,8 @@ public class Entity
                 loot = new (ID.Hive);
                 loot.Add(1, 2, ID.BucketOfHoney);
 
-                AddStructure<DirtyTentMachine>(ID.DirtyTent, Vector3Int.one, Main.IndexCollide);
-                loot = new (ID.DirtyTent);
+                AddStructure<ScavTentMachine>(ID.ScavTent, Vector3Int.one, Main.IndexCollide);
+                loot = new (ID.ScavTent);
                 loot.Add(1, 2, ID.Fabric);
                 loot.Add(0.5f, 1, ID.Fabric);
 
@@ -461,6 +462,25 @@ public class Entity
                         new MeleeEnemy { Weapon = ID.SteelSword, EvadeChance = 0.1f });
                 loot = new (ID.RaiderGuard);
                 loot.Add(0.1f, 1, ID.SteelSword, ID.DiamondAxe); 
+
+                // Scavengers: raiders' weaker kin — half the health, crude tools and a shortbow.
+                AddMob<HostileMeleeMachine>(ID.Scavenger,
+                        () => new EnemyInfo
+                        {
+                                HealthMax = 8, DistRoam = 7, DistAlert = 10, DistDisengage = 15,
+                                CharSprite = ID.Raider,
+                        },
+                        new MeleeEnemy { Weapon = ID.StoneHatchet });
+                loot = new (ID.Scavenger);
+                loot.Add(0.4f, 1, ID.StoneHatchet);
+                loot.Add(0.5f, 2, ID.Sticks);
+                loot.Add(0.3f, 1, ID.Flint);
+
+                AddMob<ScavengerArcherMachine>(ID.ScavengerArcher);
+                loot = new (ID.ScavengerArcher);
+                loot.Add(0.3f, 1, ID.ShortBow);
+                loot.Add(0.6f, 3, ID.Arrow);
+                loot.Add(0.3f, 1, ID.Sticks);
                 
                 AddMob<SlimeMachine>(ID.Slime);
                 loot = new (ID.Slime); // the slime drops nothing; its split babies carry the cytoplasm

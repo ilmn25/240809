@@ -35,7 +35,7 @@ public class GenTaskEntity : IGenTask
     private const double ForestOysterShroomChance = 0.004;
     private const double ForestToadstoolChance = 0.002;
     private const double FlowerCHance = 0.009;
-    private const double DirtTentChance = 0.0004;
+    private const double DirtScavTentChance = 0.0004;
     private const double DirtFallenTreeChance = 0.004;
     private const double DirtMudPileChance = 0.006;
     private const double DirtToadstoolChance = 0.003;
@@ -161,9 +161,9 @@ public class GenTaskEntity : IGenTask
                             {
                                 currentChunk.PlaceEntity(PickMeadowFlower(rng), position);
                             }
-                            else if (roll <= (chance += DirtTentChance))
+                            else if (roll <= (chance += DirtScavTentChance))
                             {
-                                if (!spawnClearing) currentChunk.PlaceEntity(ID.DirtyTent, position);
+                                if (!spawnClearing) currentChunk.PlaceEntity(ID.ScavTent, position);
                             }
                             else if (roll <= (chance += DirtFallenTreeChance))
                             {

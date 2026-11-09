@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class GenTaskRaiderCamp : GenTaskScatter
+/// <summary>Scatters a few small scavenger camps across the world: a stash chest ringed by
+/// scav tents and a lamp. Replaces the old raider camps — the same ground, held by far
+/// weaker squatters.</summary>
+public class GenTaskScavCamp : GenTaskScatter
 {
     private const int CampCount = 2;
     private const int MinTents = 2;
@@ -11,7 +14,7 @@ public class GenTaskRaiderCamp : GenTaskScatter
 
     public override void RunWorld(World world)
     {
-        System.Random rng = Gen.CreateWorldRandom("RaiderCamp");
+        System.Random rng = Gen.CreateWorldRandom("ScavCamp");
 
         for (int i = 0; i < CampCount; i++)
         {
@@ -33,14 +36,14 @@ public class GenTaskRaiderCamp : GenTaskScatter
 
     private static void PlaceCamp(World world, Vector3Int center, System.Random rng)
     {
-        GenBlocks.PlaceEntity(world, center, ID.RaiderCampChest);
+        GenBlocks.PlaceEntity(world, center, ID.ScavCampChest);
 
         int tentCount = rng.Next(MinTents, MaxTents + 1);
         for (int i = 0; i < tentCount; i++)
         {
             Vector3Int spot = ScatterAround(world, center, rng, ClusterRadius);
             if (spot.x < 0) continue;
-            GenBlocks.PlaceEntity(world, spot, ID.DirtyTent);
+            GenBlocks.PlaceEntity(world, spot, ID.ScavTent);
         }
 
         Vector3Int lampSpot = ScatterAround(world, center, rng, ClusterRadius);

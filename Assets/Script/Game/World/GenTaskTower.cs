@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>Places a few circular brick towers (Set/Tower.json) in the grass
 /// biome, partially buried below the surface (like the dungeon entrance). Runs
-/// once per world, after chunk generation (like the outpost and raider camp).</summary>
+/// once per world, after chunk generation (like the outpost and scav camp).</summary>
 public class GenTaskTower : GenTaskScatter
 {
     private const int TowerCount = 3;       // how many towers to place

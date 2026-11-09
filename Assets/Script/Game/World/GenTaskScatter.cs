@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class GenTaskScatter : IGenTask
 {
     /// <summary>Radius (blocks) around the world spawn — the centre of the map — that is
-    /// kept free of scattered structures, so raider camps, outposts, towers and the like
+    /// kept free of scattered structures, so scav camps, outposts, towers and the like
     /// never crowd the player's starting area. A little larger than one logic ring
     /// (<see cref="Scene.LogicDistance"/> = 45).</summary>
     public const int SpawnClearRadius = 48;

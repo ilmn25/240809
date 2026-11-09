@@ -17,7 +17,7 @@ public class GenAbyss : Gen
         new GenDungeonEntrance(), new GenMawEntrance(), new GenTaskSpawnStatue(),
         new GenTaskSpawnGarden(),
         new GenTaskGraveyard(),
-        new GenTaskBeehiveArea(), new GenTaskRaiderCamp(), new GenTaskPond(),
+        new GenTaskBeehiveArea(), new GenTaskScavCamp(), new GenTaskPond(),
         new GenOutpost(), new GenTaskTower(), new GenTaskEntity(),
     };
 }

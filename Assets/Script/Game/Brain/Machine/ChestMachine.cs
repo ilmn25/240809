@@ -43,9 +43,9 @@ public abstract class LootChestMachine : ChestMachine
     }
 }
 
-public class RaiderCampChestMachine : LootChestMachine
+public class ScavCampChestMachine : LootChestMachine
 {
-    public static Info CreateInfo() => CreateLootContainer(ID.RaiderCampChest);
+    public static Info CreateInfo() => CreateLootContainer(ID.ScavCampChest);
 }
 
 public class DungeonChestMachine : LootChestMachine

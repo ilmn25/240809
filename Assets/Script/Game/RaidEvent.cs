@@ -35,7 +35,8 @@ public static class RaidEvent
     {
         new(ID.SnareFlea, "You hear skittering in the dark...", 2, 2),
         new(ID.Harpy, "Wings beat overhead...", 2, 2),
-        new(ID.SnareFlea, "The swarm is coming...", 3, 4),
+        new(ID.Scavenger, "Desperate shapes creep out of the dark...", 2, 3),
+        new(ID.ScavengerArcher, "You hear bowstrings drawn in the dark...", 3, 4),
         new(ID.Harpy, "Something is circling above...", 4, 6),
         new(ID.Raider, "A terrible presence gathers...", 5, 7),
         new(ID.Raider, "A great dread is nearly here...", 7, 10),
@@ -83,10 +84,11 @@ public static class RaidEvent
     {
         if (day <= 8) return RaidTypes[0];
         if (day <= 10) return RaidTypes[1];
-        if (day <= 25) return RaidTypes[2];
-        if (day <= 50) return RaidTypes[3];
-        if (day <= 100) return RaidTypes[4];
-        return RaidTypes[5];
+        if (day <= 18) return RaidTypes[2];
+        if (day <= 25) return RaidTypes[3];
+        if (day <= 50) return RaidTypes[4];
+        if (day <= 100) return RaidTypes[5];
+        return RaidTypes[6];
     }
 
     private static void SpawnRaidEnemy(ID enemyID)

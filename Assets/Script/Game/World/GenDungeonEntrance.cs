@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>Places a brick stairwell descending to an underground dungeon door
 /// (Set/DungeonEntrance.json) in the grass biome. Runs once per world, after
-/// chunk generation (like the outpost and raider camp).</summary>
+/// chunk generation (like the outpost and scav camp).</summary>
 public class GenDungeonEntrance : GenTaskScatter
 {
     /// <summary>How far below the surface the stairwell floor and door sit.</summary>

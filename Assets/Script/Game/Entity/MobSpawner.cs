@@ -58,7 +58,8 @@ public static class MobSpawner
     private static readonly Pool DesertNightMobs = Uniform(ID.SnareFlea);
     private static readonly Pool RaptureMobs = Uniform(ID.Lich);
     private static readonly Pool DungeonMobs = Uniform(ID.Sawblade, ID.Ballista, ID.Turret);
-    private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Raider, ID.Congregant,
+    private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Raider, ID.Scavenger,
+        ID.ScavengerArcher, ID.Congregant,
         ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin,
         ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret);
 
