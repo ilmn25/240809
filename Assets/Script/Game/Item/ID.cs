@@ -268,4 +268,5 @@ public enum ID
     Hunter,
     Scavenger,
     ScavengerArcher,
+    Pet,
 }

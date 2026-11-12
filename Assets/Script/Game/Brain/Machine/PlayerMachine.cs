@@ -69,6 +69,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     public void OnActionSecondary(Info info)
     {
+        // A pet carries nothing, so there is no bag to open.
+        if (!Info.HasInventory) return;
         // A bag is UI, not a state of its owner: opening it here would stall the ally's
         // brain (which only runs in Default/MobChaseAction) for as long as it is looked at.
         ContainerWindow.Toggle(Info);
@@ -250,7 +252,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
 
         // Draw a weapon first: an ally that just finished a job is still holding its pickaxe.
-        if (!Info.Storage.SetWeapon())
+        // A companion with no bag (a pet) fights with its natural attack instead.
+        if (Info.HasInventory && !Info.Storage.SetWeapon())
         {
             if (engaged != null) Info.CancelTarget();
             return false;

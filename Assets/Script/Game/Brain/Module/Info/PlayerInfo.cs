@@ -15,6 +15,13 @@ public class PlayerInfo : MobInfo
     /// member but is excluded from control switching, client claims, and the
     /// death handoff.</summary>
     public bool IsDelver;
+    /// <summary>True for a pet: a player-like companion that can be taken over like any
+    /// party member but carries nothing of its own (its Storage has no slots). It never
+    /// counts as the last human standing, and it never starves.</summary>
+    public bool IsPet;
+    /// <summary>False for a pet (and anything else with a slot-less Storage): there is no
+    /// bag to open or fill, so drops go to the cursor instead.</summary>
+    public bool HasInventory => Storage?.List != null && Storage.List.Count > 0;
     /// <summary>True for contracted companions (hired mercenaries, escorts): they follow
     /// and fight, but never pick up loot — the party's share stays with the party.</summary>
     [NonSerialized] public bool CantLoot;
@@ -95,6 +102,8 @@ public class PlayerInfo : MobInfo
             while (!Destroyed)
             {
                 yield return new WaitForSeconds(120);
+                // A pet has no rations and no bag: it never goes hungry.
+                if (IsPet) continue;
                 if (Hunger <= 0)  
                 {
                     Health--;
@@ -272,7 +281,7 @@ public class PlayerInfo : MobInfo
         // Hand control to the next surviving party member. Covers both the normal
         // case (this was the controlled player) and a dangling Main.PlayerInfo that
         // still points at this removed player.
-        bool humansAlive = Save.Inst.players.Exists(p => !p.IsDelver && !p.Destroyed && p.Machine != null);
+        bool humansAlive = Save.Inst.players.Exists(p => !p.IsDelver && !p.IsPet && !p.Destroyed && p.Machine != null);
         if (wasControlled || Main.PlayerInfo == this || Main.PlayerInfo?.Machine == null)
         {
             if (!humansAlive)
@@ -317,7 +326,7 @@ public class PlayerInfo : MobInfo
 
     private void UpdateHungerStage()
     {
-        if (!Helper.IsHost()) return;
+        if (IsPet || !Helper.IsHost()) return;
 
         HungerStage stage = CurrentHungerStage;
         if (stage == HungerStage.V)
@@ -341,7 +350,7 @@ public class PlayerInfo : MobInfo
 
     private void UpdateMovementHunger()
     {
-        if (!Helper.IsHost() || Resting) { _moveHungerAccumulator = 0; return; }
+        if (IsPet || !Helper.IsHost() || Resting) { _moveHungerAccumulator = 0; return; }
         if (Direction == Vector3.zero) { _moveHungerAccumulator = 0; return; }
         _moveHungerAccumulator += Helper.GetDeltaTime();
         if (_moveHungerAccumulator < MoveHungerInterval) return;

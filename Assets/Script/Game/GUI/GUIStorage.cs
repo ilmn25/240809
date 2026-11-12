@@ -111,6 +111,14 @@ public abstract class GUIStorage : GUI
             storage.List.Add(new ItemSlot());
     }
 
+    /// <summary>Show or hide the panel itself — a player with no bag (a pet) has no slots
+    /// to draw.</summary>
+    public void SetVisible(bool visible)
+    {
+        if (GameObject != null && GameObject.activeSelf != visible)
+            GameObject.SetActive(visible);
+    }
+
     protected virtual void ActionPrimaryDown() {}
     protected virtual void ActionSecondaryDown() {} 
     protected virtual void ActionSecondaryKey() {} 

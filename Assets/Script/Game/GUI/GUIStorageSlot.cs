@@ -24,7 +24,14 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnRefreshSlot(object sender, EventArgs e)
     {
-        if (GUIStorage.Storage == null) return;
+        if (_image == null) return;
+        if (GUIStorage.Storage?.List == null || slotNumber >= GUIStorage.Storage.List.Count)
+        {
+            // A storage with no slots (a pet's empty bag) has nothing to draw here.
+            _image.color = Color.clear;
+            _text.text = "";
+            return;
+        }
         ItemSlot slot = GUIStorage.Storage.List[slotNumber];
         if (slot.Stack != 0)
         {
@@ -55,6 +62,8 @@ public class GUIStorageSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (!GUIMain.Showing || !GUIStorage.Showing) return;
         if (GUIStorage.ScaleTask is { Running: true }) return;
         if (GUIStorage.IsDrag) return;
+        // Slots past the storage's end (a pet's empty bag) aren't real slots.
+        if (GUIStorage.Storage?.List == null || slotNumber >= GUIStorage.Storage.List.Count) return;
         if (GUIStorage.Storage.List[slotNumber].Stack != 0)
             Audio.PlaySFX(SfxID.Text);
         GUIStorage.SetHoveredSlot(slotNumber);

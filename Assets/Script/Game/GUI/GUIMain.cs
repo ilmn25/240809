@@ -130,8 +130,8 @@ public static class GUIMain
 
         foreach (PlayerInfo player in Save.Inst.players)
         {
-            // Delvers are AI-only — they can't "carry" the run, so only humans count.
-            if (player == null || player.IsDelver) continue;
+            // Delvers are AI-only and pets carry nothing — neither can "carry" the run.
+            if (player == null || player.IsDelver || player.IsPet) continue;
             if (player.PlayerStatus != PlayerStatus.Incapacitated)
                 return;
         }

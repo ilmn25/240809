@@ -90,6 +90,8 @@ public class Control
         Main.PlayerInfo = global::Save.Inst.players[i];
         Main.PlayerInfo.PathingStatus = PathingStatus.Stuck;
         GUIMain.StorageInv.Storage = Main.PlayerInfo.Storage;
+        // A pet carries nothing: leave the hotbar panel out entirely.
+        GUIMain.StorageInv.SetVisible(Main.PlayerInfo.HasInventory);
         Inventory.RefreshInventory();
         GUIBar.Update();
         GUIMain.SyncHudVisibility();

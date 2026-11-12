@@ -29,7 +29,8 @@ public static class ContainerWindow
 
     public static void Open(PlayerInfo owner)
     {
-        if (owner?.Storage == null || Main.PlayerInfo == null) return;
+        // A pet carries nothing, so there is no bag to show.
+        if (owner == null || !owner.HasInventory || Main.PlayerInfo == null) return;
 
         Audio.PlaySFX(SfxID.Text);
         if (owner.Storage != Main.PlayerInfo.Storage)

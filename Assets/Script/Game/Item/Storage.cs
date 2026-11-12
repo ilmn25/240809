@@ -36,8 +36,11 @@ public class Storage
         public void NotifyChanged()
         {
                 if (!SuppressSync) OnChanged?.Invoke(this);
-                if (info is not MobInfo mobInfo || List == null || List.Count == 0) return;
+                if (info is not MobInfo mobInfo) return;
+                // Refresh the hand even for a slot-less storage (a pet): its held item lives
+                // on the cursor, and dropping it must clear what the machine is holding.
                 Inventory.RefreshHeldItem(mobInfo);
+                if (List == null || List.Count == 0) return;
                 if (!SuppressRefresh) Inventory.RefreshInventory();
         }
 
@@ -135,6 +138,9 @@ public class Storage
         public virtual int RemoveItem(ID stringID, int quantity = 1, int priority = 0)
         {
                 int remaining = quantity;
+                // A storage with no slots has nothing to give.
+                if (List == null || List.Count == 0) return remaining;
+                if (priority < 0 || priority >= List.Count) priority = 0;
                 
                 // Prioritize current slot
                 if (List[priority].ID == stringID)
@@ -192,6 +198,21 @@ public class Storage
 
         public virtual void AddItem(ItemSlot newItemSlot, int priority = 0)
         {
+                // A storage with no slots (a pet's bag) can't hold anything: the item falls
+                // to the ground where its owner stands instead of vanishing.
+                if (List == null || List.Count == 0)
+                {
+                        if (!newItemSlot.isEmpty() && Helper.IsHost())
+                        {
+                                Entity.SpawnItem(newItemSlot, info?.position ?? Vector3.zero);
+                                newItemSlot.clear();
+                        }
+                        NotifyChanged();
+                        return;
+                }
+
+                if (priority < 0 || priority >= List.Count) priority = 0;
+
                 if (List[priority].isSame(newItemSlot))
                 {
                         List[priority].Add(newItemSlot);
@@ -234,6 +255,7 @@ public class Storage
         public int GetAmount(ID stringID)
         {
                 int count = 0;
+                if (List == null) return 0;
                 foreach (var slot in List)
                 {
                         if (slot.ID == stringID)

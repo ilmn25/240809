@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-/// <summary>Melee attack: telegraph, swing, cooldown. Mobs either swing the weapon they
-/// have equipped (its projectile is spawned through ProjectileSync) or, when handed a
-/// fixed projectile, attack with that and plant their feet while doing it.</summary>
+/// <summary>Melee attack: telegraph, swing, cooldown. Mobs swing the weapon they have
+/// equipped (its projectile is spawned through ProjectileSync) or, when handed a natural
+/// weapon and nothing usable is in hand, attack with that and plant their feet while doing
+/// it.</summary>
 class MobAttackSwing : MobState {
 
     public MobAttackSwing() { updateMode = global::Module.UpdateMode.Everyone; }
@@ -11,12 +12,20 @@ class MobAttackSwing : MobState {
     /// <summary>For mobs that attack with a natural weapon instead of an equipped item.</summary>
     public MobAttackSwing(ProjectileInfo naturalWeapon) : this()
     {
-        _naturalWeapon = naturalWeapon;
+        NaturalWeapon = naturalWeapon;
     }
 
+    /// <summary>Natural weapon this mob attacks with (a beast's bite). Used only when
+    /// nothing usable is in hand, so a controlled pet that picked a tool up on the cursor
+    /// still swings it.</summary>
+    public ProjectileInfo NaturalWeapon { get; set; }
+
     private Item _equipment;
-    private readonly ProjectileInfo _naturalWeapon;
     private CoroutineTask _task;
+
+    /// <summary>True when this swing uses the mob's own body: it was handed a natural
+    /// weapon and has no item with a swing of its own equipped.</summary>
+    private bool UsesNaturalWeapon => NaturalWeapon != null && Info.Equipment?.Info.ProjectileInfo == null;
 
     private const float TelegraphTime = 0.1f;
     private const float SwingTime = 0.167f;
@@ -24,10 +33,10 @@ class MobAttackSwing : MobState {
 
     private void Attack()
     {
-        if (_naturalWeapon != null)
+        if (UsesNaturalWeapon)
         {
             Projectile.Spawn(Info.SpriteToolTrack.position, Info.AimPosition,
-                _naturalWeapon, Info.targetHitboxType, Info);
+                NaturalWeapon, Info.targetHitboxType, Info);
             return;
         }
 
@@ -50,7 +59,7 @@ class MobAttackSwing : MobState {
         if (_equipment != null)
             Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
         // Armed mobs keep creeping in; natural attackers freeze until the swing is done.
-        Info.SpeedModifier = _naturalWeapon != null ? 0f : 0.25f;
+        Info.SpeedModifier = UsesNaturalWeapon ? 0f : 0.25f;
         Info.Animator.Play("EquipSwingTelegraph", 0, 0f);
         if (Helper.IsHost() || Info.IsOwner())
             _task = new CoroutineTask(SwingRoutine());
@@ -66,7 +75,7 @@ class MobAttackSwing : MobState {
         yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
         Audio.PlaySFX(_equipment?.Sfx ?? SfxID.HitMob);
         Info.Animator.speed = Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f);
-        Info.SpeedModifier = _naturalWeapon != null ? 0f : 0.8f;
+        Info.SpeedModifier = UsesNaturalWeapon ? 0f : 0.8f;
         Info.Animator.Play("EquipSwingCooldown", 0, 0f);
 
         yield return new WaitForSeconds(CooldownTime / Info.Animator.speed);

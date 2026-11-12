@@ -65,8 +65,30 @@ public class Inventory
         }
 
         CurrentItemData = null;
+        CurrentItem = null;
         Terraform.BlockUpdate();
         RefreshHeldItem(Main.PlayerInfo);
+    }
+
+    /// <summary>Hand a picked-up drop to the cursor when the owner's bag can't take it.
+    /// Only the locally controlled player has a cursor, so everyone else (AI allies, remote
+    /// players) keeps the old drop-to-the-ground behavior.</summary>
+    public static bool TryPickUpToCursor(PlayerInfo owner, ItemSlot item)
+    {
+        if (owner == null || !ReferenceEquals(owner, Main.PlayerInfo)) return false;
+        if (item == null || item.isEmpty()) return false;
+        // The bag takes it when it can; the cursor is only the overflow.
+        if (owner.Storage != null && owner.Storage.CanFit(item)) return false;
+        // The cursor can only take the drop if it is empty or already holds the same item.
+        if (!GUICursor.Data.isEmpty() && !(GUICursor.Data.isSame(item) && !GUICursor.Data.isFull()))
+            return false;
+
+        GUICursor.Data.Add(item);
+        GUICursor.UpdateCursorSlot();
+        RefreshInventory();
+        // Anything that didn't fit on the cursor falls back to the usual ground drop.
+        if (!item.isEmpty()) owner.Storage?.AddItem(item);
+        return true;
     }
  
     
@@ -111,7 +133,7 @@ public class Inventory
             !PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid))
             return;
 
-        if (Control.Inst.Drop.KeyDown() && CurrentItem.Stack != 0)
+        if (Control.Inst.Drop.KeyDown() && CurrentItem is { Stack: > 0 })
         {
             int dropAmount = Input.GetKey(KeyCode.LeftControl) ? CurrentItem.Stack : 1;
             DropToWorld(CurrentItem, dropAmount, Main.PlayerInfo.Storage, Main.Player.transform.position);

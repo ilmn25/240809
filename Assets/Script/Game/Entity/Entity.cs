@@ -397,6 +397,9 @@ public class Entity
                 // Delvers are player-like AI-only entities (never human-controlled),
                 // persisted in the save's player list via PlayerInfo.IsDelver.
                 AddMob<DelverMachine>(ID.Delver);
+                // Pets are player-like companions with no inventory; controllable like a
+                // party member, AI bites like a bear, persisted via PlayerInfo.IsPet.
+                AddMob<PetMachine>(ID.Pet);
 
                 AddMob<ScoutMachine>(ID.Chito); 
                 loot = new (ID.Chito);

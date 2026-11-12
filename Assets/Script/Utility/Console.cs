@@ -276,6 +276,9 @@ public class Console : MonoBehaviour
             case "delver":
                 SpawnDelver();
                 break;
+            case "pet":
+                SpawnPet();
+                break;
             case "j":
                 _ = new CoroutineTask(Server.StartClient(_command.Length > 1 ? _command[1] : null));
                 break;
@@ -399,6 +402,21 @@ public class Console : MonoBehaviour
         Vector3 pos = Main.PlayerInfo.position + Vector3.right * 1.5f;
         DelverMachine.Spawn(pos);
         Print("Delver joined the world (AI-only, persisted on save).");
+    }
+
+    /// <summary>Spawns a pet (a player-like companion with no inventory) near the current
+    /// player and persists it in the save's player list, so it survives save/load and can be
+    /// taken over with the party-switch key.</summary>
+    private static void SpawnPet()
+    {
+        if (Save.Inst == null || Main.PlayerInfo == null)
+        {
+            Print("No active game.");
+            return;
+        }
+        Vector3 pos = Main.PlayerInfo.position + Vector3.left * 1.5f;
+        PetMachine.Spawn(pos);
+        Print("Pet joined the party (no inventory, bites; persisted on save).");
     }
 
     private static void Teleport()
