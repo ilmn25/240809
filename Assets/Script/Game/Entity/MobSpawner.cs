@@ -41,7 +41,7 @@ public static class MobSpawner
     private static readonly Pool DayRoamers = new()
     {
         (ID.Slime, 2.1f), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
-        (ID.Thrall, 0.2f), (ID.Bear, 0.15f),
+        (ID.Thrall, 1f), (ID.Bear, 0.15f),
     };
 
     private static readonly Dictionary<BiomeType, Pool> DayByBiome = new()

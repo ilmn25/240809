@@ -118,6 +118,7 @@ public class Main : MonoBehaviour
 
     private void OnGUI()
     {
+        ViewPort.OnGUI();
         ScreenFade.OnGUI();
         ScreenDamageFlash.OnGUI();
     }
