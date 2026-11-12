@@ -145,6 +145,14 @@ public class Control
         }
         SetPlayer(i);
 
+        // A station or trader window belongs to the character that opened it. Otherwise the
+        // new character keeps the old one's station menu and can craft from anywhere.
+        if (GUIMain.GUICraft != null && GUIMain.GUICraft.ActiveCraftInfo != null)
+        {
+            GUIMain.GUICraft.UseDefaultStorage();
+            GUIMain.RefreshStorage();
+        }
+
         if (!Helper.IsHost())
         {
             PlayerSync.SendClientPlayerBatch();

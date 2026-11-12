@@ -18,7 +18,7 @@ public class InCraftState : State
 
     public override void OnUpdateState()
     {
-        if (!GUIMain.Showing ||
+        if (!GUIMain.Showing || Main.Player == null ||
             Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 36)
         {
             Machine.SetState<DefaultState>();

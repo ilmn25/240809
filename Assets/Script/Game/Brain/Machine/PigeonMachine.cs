@@ -62,6 +62,11 @@ public class PigeonMachine : GroundMobMachine
         AddState(new MobFleeDespawn(FleeDistance));
         AddState(new EquipSelectState());
 
+        // Machines are pooled per id, so a pigeon respawned on a GameObject that already
+        // left would otherwise stay flagged as leaving and never update again.
+        _leaving = false;
+        _departTimer = 0;
+
         // The spawn point is on the ground — lift it high into the sky so the pigeon
         // flies down into view instead of popping in at hover height already.
         Vector3 pos = transform.position;

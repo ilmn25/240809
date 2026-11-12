@@ -38,6 +38,10 @@ public class CrowMachine : GroundMobMachine
         AddState(new MobRoam());
         AddState(new MobTakeOff(FlightHeight, FleeDistance));
 
+        // Machines are pooled per id, so a bird respawned on a GameObject that already
+        // fled would otherwise stay flagged as fleeing and never update again.
+        _fleeing = false;
+        _airborneTimer = 0;
         _groundTimer = Random.Range(GroundTimeMin, GroundTimeMax);
     }
 

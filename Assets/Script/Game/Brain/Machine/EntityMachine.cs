@@ -39,6 +39,13 @@ public abstract class EntityMachine : Machine, IInfoProvider
       
     public void Unload()
     { 
+        // Update stops once the object is parked in the pool, so a state that owns an open
+        // menu has to release it now — otherwise the window stays bound to this entity
+        // (e.g. a station's crafting menu still usable from across the map).
+        StateCurrent?.OnExitState();
+        StateCurrent = State.DefaultState;
+        StatePrevious = State.DefaultState;
+
         Info.Dictionary.Remove(Info.uid);
         Info.Machine = null;
         if (Entity.StaticLoad)

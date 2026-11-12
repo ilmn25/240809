@@ -470,17 +470,17 @@ public partial class Item
             LifeSpan = 10000, Lodge = true, PickUpChance = 2f / 3f,   // one throw in three splinters it
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. One target, and its crits leave a deep bleeding wound — thrown slow, but it hurts. Go pick it back up, unless the throw splintered it.",
+            Description = "A throwable weapon.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
 
         // Bows trade rate of fire for reach and punch.
         Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 32, knockback: 4, crit: 10, durability: 150,
-            description: "A short, quick-drawing bow. Light arrows fly a little slow and land softly, but you can loose them as fast as you can nock them.",
+            description: "A short, quick-drawing bow. Light arrows fly a little slow and land softly.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 4 }, { ID.Fabric, 1 } }),
         Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 42, knockback: 7, crit: 15, durability: 200,
-            description: "A tall bow of seasoned wood. Slow to draw, but the arrow flies further and hits far harder than a shortbow's.",
+            description: "A tall bow of seasoned wood. Slow to draw, but the arrow flies further and hits far harder.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 8 }, { ID.Fabric, 2 } }),
         Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 52, knockback: 9, crit: 20, durability: 250,
             description: "Pulleys and steel limbs store the draw for you. Every arrow leaves flat, fast, and with a wicked bite.",

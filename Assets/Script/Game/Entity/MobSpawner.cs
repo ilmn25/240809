@@ -46,6 +46,9 @@ public static class MobSpawner
     private static readonly Pool DayRoamers = new()
     {
         (ID.Slime, 2.1f), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
+        // A lone shambling thrall — the weakest, most zombie-like enemy — sometimes
+        // wanders into the daylight instead of only being raised by a night cultist.
+        (ID.Thrall, 0.2f),
     };
 
     // Crow weights are per flock (each flock is 2-3 birds), not per bird.
