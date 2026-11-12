@@ -733,8 +733,8 @@ public class Entity
                 AddMob<HostileMeleeMachine>(ID.Thrall,
                         () => new EnemyInfo
                         {
-                                HealthMax = 8, DistAlert = 14, DistDisengage = 18, DistRoam = 5,
-                                SpeedGround = 4, SpeedAir = 5, PathJump = 1, PathAir = 3,
+                                HealthMax = 8, DistAttack = 1, DistAlert = 64, DistDisengage = 96,
+                                DistRoam = 5, SpeedGround = 4, SpeedAir = 5, PathJump = 1, PathAir = 3,
                         },
                         new MeleeEnemy
                         {

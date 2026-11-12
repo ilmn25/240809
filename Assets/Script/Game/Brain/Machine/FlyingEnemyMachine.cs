@@ -21,17 +21,7 @@ public abstract class FlyingEnemyMachine : MobMachine
     {
         if (!IsCurrentState<DefaultState>()) return;
 
-        Info nearest = EntityScan.FindNearest(transform.position, Info.DistAlert, IsThreat);
-        if (nearest != null && nearest != Info.Target)
-        {
-            Info.Target = nearest;
-            Info.PathingStatus = PathingStatus.Pending;
-        }
-        else if (nearest == null && Info.Target != null &&
-                 Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
-        {
-            Info.CancelTarget();
-        }
+        UpdateThreat(IsThreat);
 
         if (Info.Target != null &&
             Vector3.Distance(Info.Target.position, transform.position) < Info.DistAttack)

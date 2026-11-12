@@ -62,8 +62,6 @@ public class PigeonMachine : GroundMobMachine
         AddState(new MobFleeDespawn(FleeDistance));
         AddState(new EquipSelectState());
 
-        // Machines are pooled per id, so a pigeon respawned on a GameObject that already
-        // left would otherwise stay flagged as leaving and never update again.
         _leaving = false;
         _departTimer = 0;
 

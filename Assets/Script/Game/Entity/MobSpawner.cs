@@ -19,11 +19,6 @@ public static class MobSpawner
     private const float DayRoamerChance = 0.5f;
     private const float PassiveRarity = 0.1f;
     private const int PassiveCap = 24;
-    private const float BoundNPCChance = 0.002f;
-    private const int CrowFlockMin = 2;
-    private const int CrowFlockMax = 3;
-    private const int CrowCap = 8;           // crows kept alive near a player (ambience, not a swarm)
-    private const float CrowSpawnNear = 8f;  // closest a flock lands to the player
 
     private enum SpawnPhase { Day, Night, Rapture }
 
@@ -46,12 +41,9 @@ public static class MobSpawner
     private static readonly Pool DayRoamers = new()
     {
         (ID.Slime, 2.1f), (ID.Crow, 0.25f), (ID.Pigeon, 0.2f), (ID.Gnome, 0.1f),
-        // A lone shambling thrall — the weakest, most zombie-like enemy — sometimes
-        // wanders into the daylight instead of only being raised by a night cultist.
-        (ID.Thrall, 0.2f),
+        (ID.Thrall, 0.2f), (ID.Bear, 0.15f),
     };
 
-    // Crow weights are per flock (each flock is 2-3 birds), not per bird.
     private static readonly Dictionary<BiomeType, Pool> DayByBiome = new()
     {
         [BiomeType.Grass] = new Pool { (ID.Sheep, 1f), (ID.Crow, 0.25f) },
@@ -64,10 +56,10 @@ public static class MobSpawner
     /// <summary>Deeper dungeon floors: the traps stay, and the restless dead join them.</summary>
     private static readonly Pool DeepDungeonMobs = Uniform(ID.Sawblade, ID.Ballista, ID.Turret,
         ID.Skeleton, ID.Rat, ID.Spider, ID.Vampire);
-    private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Raider, ID.Scavenger,
+    private static readonly Pool NightMobs = Uniform(ID.SnareFlea, ID.Scavenger,
         ID.ScavengerArcher, ID.Congregant,
         ID.Acolyte, ID.Heretic, ID.Cultist, ID.Bear, ID.Watchdog, ID.TreeMimic, ID.Mannequin,
-        ID.Vampire, ID.Sawblade, ID.Ballista, ID.Turret);
+        ID.Vampire);
 
     private static float _nextPulse;
 
@@ -93,7 +85,7 @@ public static class MobSpawner
             for (int i = 0; i < rules.Attempts; i++)
             {
                 if (dungeon) TrySpawnDungeonMob(playerPos, rules.Hostiles);
-                else TrySpawnAround(playerPos, rules, phase);
+                else TrySpawnAround(playerPos, phase, rules.Hostiles);
             }
         }
     }
@@ -146,36 +138,14 @@ public static class MobSpawner
                      ground + Vector3Int.up);
     }
 
-    private static void TrySpawnAround(Vector3 playerPos, Rules rules, SpawnPhase phase)
+    private static void TrySpawnAround(Vector3 playerPos, SpawnPhase phase, bool hostiles)
     {
-        // A rare wanderer may be rescued during the day instead of a wild spawn.
-        if (phase == SpawnPhase.Day && rules.Hostiles && Random.value < BoundNPCChance &&
-            TryFindSpawnPoint(playerPos, Scene.RenderDistance + 2, Scene.LogicDistance - 2, out Vector3Int npcPos))
-        {
-            Entity.Spawn(ID.BoundNPC, npcPos);
-            return;
-        }
-
-        ID? picked = PickMob(playerPos, phase, rules.Hostiles);
+        ID? picked = PickMob(playerPos, phase, hostiles);
         if (picked == null) return;
-        ID id = picked.Value;
-
-        if (id == ID.Crow)
-        {
-            // Flocks have their own cap so a sky full of birds never crowds out the
-            // other daytime spawns sharing the global mob cap.
-            if (CountMobs(m => m.id == ID.Crow, near: playerPos, radius: Scene.LogicDistance) >= CrowCap) return;
-
-            // Crows land a bit closer than other spawns so flocks arrive in view.
-            for (int i = Random.Range(CrowFlockMin, CrowFlockMax + 1); i > 0; i--)
-                if (TryFindSpawnPoint(playerPos, CrowSpawnNear, Scene.RenderDistance - 2f, out Vector3Int crowPos))
-                    Entity.Spawn(ID.Crow, crowPos);
-            return;
-        }
 
         if (!TryFindSpawnPoint(playerPos, Scene.RenderDistance + 2, Scene.LogicDistance - 2, out Vector3Int pos)) return;
-        for (int i = GroupSize(id); i > 0; i--)
-            Entity.Spawn(id, pos);
+        for (int i = GroupSize(picked.Value); i > 0; i--)
+            Entity.Spawn(picked.Value, pos);
     }
 
     /// <summary>Rolls one mob for this phase, or null when nothing may spawn (no pool for
@@ -216,6 +186,7 @@ public static class MobSpawner
     private static int GroupSize(ID id) => id switch
     {
         ID.Sheep => Random.Range(1, 3),
+        ID.Crow => Random.Range(2, 4),
         _ => 1,
     };
 
@@ -225,10 +196,8 @@ public static class MobSpawner
             (radius <= 0f || Vector3.Distance(em.transform.position, near) <= radius) &&
             (where == null || where(mob)));
 
-    // Livestock: harmless, so they spawn in rarer, capped groups.
     private static bool IsPassiveMob(ID id) => id is ID.Sheep or ID.Hen or ID.Rooster or ID.Chick;
 
-    // Harmless wildlife that may still show up when mobs are set to peaceful.
     private static bool IsHarmless(ID id) => IsPassiveMob(id) || id is ID.Crow or ID.Pigeon;
 
     private static Pool Uniform(params ID[] ids) => ids.Select(id => (id, 1f)).ToList();

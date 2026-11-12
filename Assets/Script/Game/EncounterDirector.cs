@@ -60,6 +60,7 @@ public static class EncounterDirector
     private static readonly ID[] Survivors =
     {
         ID.WoundedDelver, ID.Deserter, ID.Pilgrim, ID.RenegadeCultist, ID.StarvingStranger,
+        ID.BoundNPC,
     };
 
     private static readonly Encounter Visitor = new(

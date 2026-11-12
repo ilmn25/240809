@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+
+using Random = UnityEngine.Random;
 
 public class MobMachine : EntityMachine, IActionPrimaryAttack
 {
@@ -77,6 +80,21 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
         }
         else if (!inRange && Info.Target == player &&
                  Vector3.Distance(player.position, transform.position) > Info.DistDisengage)
+            Info.CancelTarget();
+    }
+
+    /// <summary>Lock onto the nearest entity matching <paramref name="isThreat"/> within
+    /// alert range; release it once it retreats past disengage range.</summary>
+    protected void UpdateThreat(Func<Info, bool> isThreat)
+    {
+        Info nearest = EntityScan.FindNearest(transform.position, Info.DistAlert, isThreat);
+        if (nearest != null && nearest != Info.Target)
+        {
+            Info.Target = nearest;
+            Info.PathingStatus = PathingStatus.Pending;
+        }
+        else if (nearest == null && Info.Target != null &&
+                 Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
             Info.CancelTarget();
     }
 
