@@ -8,6 +8,8 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public MercenaryTentMachine Tent;
 
+    protected override ID DefensiveWeapon => ID.CrudeHatchet;
+
     public static Info CreateInfo()
     {
         PassiveInfo info = PassiveInfo.CreateNpc();
@@ -47,7 +49,7 @@ public class MercenaryMachine : PassiveNPCMachine, IActionSecondaryInteract
         if (!Trade.TrySpend(payer.Storage, HireCost)) return;
 
         DelverMachine.Spawn(transform.position, ID.Raider, persist: false,
-            expireAt: Time.time + CompanionDuration, startingWeapon: ID.SteelSword);
+            expireAt: Time.time + CompanionDuration, startingWeapon: ID.CrudeHatchet);
 
         Tent?.Consume();
 

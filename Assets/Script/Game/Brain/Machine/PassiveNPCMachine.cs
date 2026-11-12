@@ -4,6 +4,9 @@ using UnityEngine;
 /// defend themselves against nearby enemies.</summary>
 public abstract class PassiveNPCMachine : GroundMobMachine
 {
+    /// <summary>Blade this NPC carries to defend itself when attacked.</summary>
+    protected virtual ID DefensiveWeapon => ID.SteelSword;
+
     /// <summary>The wagon this NPC belongs to, set by CaravanMachine when it
     /// spawns its camp. While set, the NPC clusters around the wagon and leaves
     /// when the wagon flees or despawns.</summary>
@@ -21,7 +24,7 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         AddState(new EquipSelectState());
 
         // Carries a blade to defend itself if attacked.
-        Info.SetEquipment(new ItemSlot(ID.SteelSword));
+        Info.SetEquipment(new ItemSlot(DefensiveWeapon));
     }
 
     public override void OnUpdate()

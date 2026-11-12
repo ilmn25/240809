@@ -18,7 +18,11 @@ public static class MobSpawner
 {
     private const float DayRoamerChance = 0.5f;
     private const float PassiveRarity = 0.1f;
-    private const int PassiveCap = 24;
+    /// <summary>Absolute ceiling on harmless wildlife, and its own per-player share of the
+    /// mob budget. Harmless mobs are counted separately from hostiles so a field full of
+    /// sheep can never eat the budget that enemies spawn from.</summary>
+    private const int FriendlyCap = 24;
+    private const int FriendlyCapPerPlayer = 3;
 
     private enum SpawnPhase { Day, Night, Rapture }
 
@@ -72,7 +76,7 @@ public static class MobSpawner
         _nextPulse = Time.time + rules.Interval;
 
         bool dungeon = Save.Inst.current == GenType.Dungeon;
-        if (!dungeon && CountMobs() >= Save.Inst.players.Count * rules.CapPerPlayer) return;
+        if (!dungeon && CountMobs(m => !IsHarmless(m.id)) >= Save.Inst.players.Count * rules.CapPerPlayer) return;
 
         SpawnPhase phase = GetPhase();
         foreach (PlayerInfo player in Save.Inst.players)
@@ -80,7 +84,7 @@ public static class MobSpawner
             if (player.Machine == null || player.controllerId == -1) continue;
 
             Vector3 playerPos = player.Machine.transform.position;
-            if (CountMobs(near: playerPos, radius: Scene.LogicDistance) >= rules.CapPerPlayer) continue;
+            if (CountMobs(m => !IsHarmless(m.id), playerPos, Scene.LogicDistance) >= rules.CapPerPlayer) continue;
 
             for (int i = 0; i < rules.Attempts; i++)
             {
@@ -149,7 +153,8 @@ public static class MobSpawner
     }
 
     /// <summary>Rolls one mob for this phase, or null when nothing may spawn (no pool for
-    /// the biome, passive mob held back by rarity or cap, hostiles in a peaceful world).</summary>
+    /// the biome, harmless wildlife held back by rarity or its own budget, hostiles in a
+    /// peaceful world).</summary>
     private static ID? PickMob(Vector3 playerPos, SpawnPhase phase, bool hostiles)
     {
         BiomeType biome = GenHelpBiome.GetBiomeType(
@@ -169,10 +174,18 @@ public static class MobSpawner
         if (pool.Count == 0) return null;
 
         ID id = PickWeighted(pool);
-        if (IsPassiveMob(id) &&
-            (Random.value < PassiveRarity || CountMobs(m => IsPassiveMob(m.id)) >= PassiveCap))
-            return null;
+        if (IsPassiveMob(id) && Random.value < PassiveRarity) return null;
+        if (IsHarmless(id) && FriendlyBudgetSpent(playerPos)) return null;
         return id;
+    }
+
+    /// <summary>Harmless mobs draw from their own small budget so they never crowd out
+    /// hostiles; the check is both local (per player) and global.</summary>
+    private static bool FriendlyBudgetSpent(Vector3 playerPos)
+    {
+        if (CountMobs(m => IsHarmless(m.id), playerPos, Scene.LogicDistance) >= FriendlyCapPerPlayer) return true;
+        int globalCap = Mathf.Min(FriendlyCap, Mathf.Max(1, Save.Inst.players.Count) * FriendlyCapPerPlayer);
+        return CountMobs(m => IsHarmless(m.id)) >= globalCap;
     }
 
     private static bool TryFindSpawnPoint(Vector3 origin, float minDistance, float maxDistance, out Vector3Int position)

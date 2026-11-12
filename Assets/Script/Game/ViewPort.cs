@@ -5,8 +5,7 @@ public partial class ViewPort
 {
     public const float Distance = 26;
 
-    /// <summary>Aspect ratio the world is always framed at. Any window with a different
-    /// shape gets black bars instead of extra/less visible world.</summary>
+    /// <summary>Window aspect ratio the game always keeps in windowed mode.</summary>
     public const float TargetAspect = 16f / 9f;
 
     private const float TiltDegreeX = 0.15f;
@@ -15,6 +14,7 @@ public partial class ViewPort
     private const float TiltSpeed = 1f;
     private const float FollowSpeed = 10f;  
     private const int FOVChangeSpeed = 32; 
+    private const float AspectApplyInterval = 0.1f;
     
     public static int OrbitRotation = 0;
     public static Quaternion CurrentRotation;
@@ -28,8 +28,11 @@ public partial class ViewPort
     public static event Action UpdateOrbitRotate;
     public static event Action OnOrbitRotate;
     
-    private static Rect _viewRect = new Rect(0f, 0f, 1f, 1f);
-    private static Texture2D _barTexture;
+    private static float _screenWidth;
+    private static float _screenHeight; 
+    private static int _lastWindowWidth;
+    private static int _lastWindowHeight;
+    private static float _lastAspectApplyTime = float.NegativeInfinity;
     private static float _targetFOV = 24;
     private static float _sinAngle = 0;
     private static float _cosAngle = 0;
@@ -40,15 +43,16 @@ public partial class ViewPort
     public static void Initialize()
     {  
         Main.Camera.transparencySortMode = TransparencySortMode.CustomAxis; 
-        UpdateViewRect();
+        _screenWidth = Screen.width;
+        _screenHeight = Screen.height;
+        _lastWindowWidth = Screen.width;
+        _lastWindowHeight = Screen.height;
 
         UpdateOrbit();
     }
 
     public static void Update()
     {   
-        UpdateViewRect();
-
         Main.Camera.fieldOfView = Mathf.Lerp(Main.Camera.fieldOfView, _targetFOV, Time.deltaTime * 5);
 
         ScreenShake.Update();
@@ -144,11 +148,11 @@ public partial class ViewPort
 
     private static void HandleCameraSway()
     {
-        Rect view = Main.Camera.pixelRect;
-        Vector3 mouse = Input.mousePosition;
-
-        float angleX = Mathf.Clamp((mouse.x - view.xMin) / view.width * 2f - 1f, -1f, 1f);
-        float angleY = Mathf.Clamp((mouse.y - view.yMin) / view.height * 2f - 1f, -1f, 1f);
+        float mouseX = Input.mousePosition.x;
+        float mouseY = Input.mousePosition.y;
+        
+        float angleX = mouseX / _screenWidth * 2 - 1; // Normalize to range [-1, 1]
+        float angleY = mouseY / _screenHeight * 2 - 1; // Normalize to range [-1, 1]
 
         float newRotationY =  angleX * TiltDegreeY;
         float newRotationX =  angleY * TiltDegreeX;
@@ -171,70 +175,69 @@ public partial class ViewPort
             target.position, Time.deltaTime * FollowSpeed) + ScreenShake.Offset;
     }
 
-    /// <summary>Letterbox the cameras to <see cref="TargetAspect"/>, so the rendered
-    /// world keeps the same framing whatever shape the window is.</summary>
-    private static void UpdateViewRect()
+    /// <summary>Keep the game window itself at <see cref="TargetAspect"/>. When the player
+    /// drags an edge the window is re-sized along the other axis so the ratio can never
+    /// drift; fullscreen is left to the monitor.</summary>
+    public static void UpdateWindowAspect()
     {
-        if (Main.Camera == null) return;
+        int width = Screen.width;
+        int height = Screen.height;
+        if (width <= 0 || height <= 0) return;
+        if (width == _lastWindowWidth && height == _lastWindowHeight) return;
 
-        float windowAspect = (float)Screen.width / Mathf.Max(1, Screen.height);
-        float scaleHeight = windowAspect / TargetAspect;
-
-        Rect rect;
-        if (scaleHeight < 1f)
+        if (Screen.fullScreen)
         {
-            // Window is taller than the target: bars on top and bottom.
-            rect = new Rect(0f, (1f - scaleHeight) * 0.5f, 1f, scaleHeight);
+            // The OS owns the resolution in fullscreen.
+            _lastWindowWidth = width;
+            _lastWindowHeight = height;
+            return;
         }
+
+        int prevWidth = _lastWindowWidth;
+        int prevHeight = _lastWindowHeight;
+        if (prevWidth <= 0 || prevHeight <= 0)
+        {
+            _lastWindowWidth = width;   // first sample; Settings.Apply owns startup
+            _lastWindowHeight = height;
+            return;
+        }
+
+        if (Mathf.Abs((float)width / height - TargetAspect) < 0.005f)
+        {
+            _lastWindowWidth = width;
+            _lastWindowHeight = height;
+            return;
+        }
+
+        // Dragging fires a lot of size changes; throttle so the window does not fight
+        // the mouse. Leave the sample unrecorded so the final size is still corrected
+        // once the drag ends.
+        if (Time.unscaledTime - _lastAspectApplyTime < AspectApplyInterval) return;
+        _lastAspectApplyTime = Time.unscaledTime;
+        _lastWindowWidth = width;
+        _lastWindowHeight = height;
+
+        // Follow whichever axis the player dragged and derive the other from the ratio.
+        int newWidth = width;
+        int newHeight = height;
+        bool widthChanged = width != prevWidth;
+        bool heightChanged = height != prevHeight;
+        if (widthChanged && !heightChanged)
+            newHeight = Mathf.RoundToInt(width / TargetAspect);
+        else if (heightChanged && !widthChanged)
+            newWidth = Mathf.RoundToInt(height * TargetAspect);
+        else if (heightChanged)
+            newHeight = Mathf.RoundToInt(width / TargetAspect);
         else
-        {
-            // Window is wider than the target: bars on the left and right.
-            float scaleWidth = 1f / scaleHeight;
-            rect = new Rect((1f - scaleWidth) * 0.5f, 0f, scaleWidth, 1f);
-        }
+            return;
 
-        if (rect == _viewRect) return;
-        _viewRect = rect;
+        newWidth = Mathf.Max(newWidth, 320);
+        newHeight = Mathf.Max(newHeight, 180);
+        if (newWidth == width && newHeight == height) return;
 
-        Main.Camera.rect = rect;
-        // The HUD camera is a URP overlay stacked on the world camera, so it inherits the
-        // same viewport; assigning it keeps both in sync if the stack ever changes.
-        if (Main.GUICamera != null) Main.GUICamera.rect = rect;
-    }
-
-    /// <summary>Call from Main.OnGUI() to paint the black bars outside the fixed-ratio view.</summary>
-    public static void OnGUI()
-    {
-        UpdateViewRect();
-
-        Rect view = Main.Camera.pixelRect;
-        if (view.width <= 0f || view.height <= 0f) return;
-        if (view.width >= Screen.width - 0.5f && view.height >= Screen.height - 0.5f) return;
-
-        if (_barTexture == null)
-        {
-            _barTexture = new Texture2D(1, 1);
-            _barTexture.SetPixel(0, 0, Color.black);
-            _barTexture.Apply();
-        }
-
-        // Round outwards so no unpainted (stale) border is left by viewport rounding.
-        float left = Mathf.Floor(view.xMin);
-        float right = Screen.width - Mathf.Ceil(view.xMax);
-        float bottom = Mathf.Floor(view.yMin);
-        float top = Screen.height - Mathf.Ceil(view.yMax);
-
-        Color prevColor = UnityEngine.GUI.color;
-        UnityEngine.GUI.color = Color.black;
-
-        // IMGUI's Y axis points down while Camera.pixelRect's points up, so the bottom
-        // bar is drawn from the bottom edge of the screen.
-        if (left > 0f) UnityEngine.GUI.DrawTexture(new Rect(0f, 0f, left, Screen.height), _barTexture);
-        if (right > 0f) UnityEngine.GUI.DrawTexture(new Rect(Screen.width - right, 0f, right, Screen.height), _barTexture);
-        if (bottom > 0f) UnityEngine.GUI.DrawTexture(new Rect(0f, Screen.height - bottom, Screen.width, bottom), _barTexture);
-        if (top > 0f) UnityEngine.GUI.DrawTexture(new Rect(0f, 0f, Screen.width, top), _barTexture);
-
-        UnityEngine.GUI.color = prevColor;
+        Screen.SetResolution(newWidth, newHeight, false);
+        _lastWindowWidth = newWidth;
+        _lastWindowHeight = newHeight;
     }
  
 }

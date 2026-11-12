@@ -21,7 +21,7 @@ public abstract class RecruitableNPCMachine : TravellerNPCMachine
     protected virtual float HealthScale => 1f;
     /// <summary>Contract length in real seconds; 0 means they join the party for good.</summary>
     protected virtual float StaySeconds => 0f;
-    protected virtual ID Weapon => ID.SteelSword;
+    protected virtual ID Weapon => ID.CrudeHatchet;
 
     protected override EncounterDirector.Kind EncounterKind => EncounterDirector.Kind.Survivor;
 

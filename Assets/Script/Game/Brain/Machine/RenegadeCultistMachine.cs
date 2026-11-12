@@ -17,5 +17,5 @@ public class RenegadeCultistMachine : RecruitableNPCMachine
     protected override string RecruitText => "\"I know their rites. I can be useful. Please.\"";
     protected override float HealthScale => 0.7f;
     protected override float StaySeconds => 180f;
-    protected override ID Weapon => ID.Dagger;
+    protected override ID Weapon => ID.CrudeHatchet;
 }

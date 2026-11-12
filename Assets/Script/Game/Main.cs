@@ -89,6 +89,7 @@ public class Main : MonoBehaviour
     } 
     private void Update()
     {   
+        ViewPort.UpdateWindowAspect();
         GUIMain.UpdateMenu();
         ScreenFade.Update();
         ScreenDamageFlash.Update();
@@ -118,7 +119,6 @@ public class Main : MonoBehaviour
 
     private void OnGUI()
     {
-        ViewPort.OnGUI();
         ScreenFade.OnGUI();
         ScreenDamageFlash.OnGUI();
     }

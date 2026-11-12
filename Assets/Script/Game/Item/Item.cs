@@ -181,7 +181,7 @@ public partial class Item
         float speed = 1,
         float range = 1,
         ProjectileInfo projectileInfo = null,
-        int durability = 200,
+        int durability = 400,
         StatusEffect statusEffect = null,
         Vector2 holdoutOffset = new Vector2(),
         int rotationOffset = 0,

@@ -17,5 +17,5 @@ public class StarvingStrangerMachine : RecruitableNPCMachine
     protected override ID CostItem => ID.Meat;
     protected override int CostAmount => 1;
     protected override float HealthScale => 0.8f;
-    protected override ID Weapon => ID.StoneHatchet;
+    protected override ID Weapon => ID.CrudeHatchet;
 }

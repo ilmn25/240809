@@ -11,6 +11,8 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
 
     public static Info CreateInfo() => PassiveInfo.CreateNpc();
 
+    protected override ID DefensiveWeapon => ID.CrudeHatchet;
+
     public void OnActionSecondary(Info info)
     {
         BeginInteraction();
@@ -74,7 +76,7 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
             payer.Storage.RemoveItem(flower, FlowerCost);
 
         DelverMachine.Spawn(transform.position, ID.Guide, persist: false,
-            expireAt: Time.time + CompanionDuration, startingWeapon: ID.SteelSword);
+            expireAt: Time.time + CompanionDuration, startingWeapon: ID.CrudeHatchet);
 
         Info.Destroy();
         Unload();

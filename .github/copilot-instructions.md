@@ -7,6 +7,6 @@ Unity 2022.3 project; gameplay code lives in `Assets/Script`.
 - Instead, **tell the user to recompile** and stop. They report any `error CS` output.
 - No build, lint, or test tooling here.
 
-Don't add comments unless absolutely necessary, remove any existing comments you find that isn't so.
+Don't add comments, remove any existing comments you find.
 Attempt to deduplicate code, remove obsolete fallback, and pointless checks.
 Keep the final report back to me short and concise.

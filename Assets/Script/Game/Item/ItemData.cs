@@ -196,7 +196,7 @@ public partial class Item
                 Speed = 2,
                 Radius = 2,
             },
-            durability: 60,
+            durability: 120,
             description: "A burning torch that sets flammable objects alight.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 1 }, { ID.Cytoplasm, 1 } },
             holdoutOffset: new Vector2(0.65f, 0),
@@ -408,7 +408,7 @@ public partial class Item
         public StatusEffect HitEffect;
         public bool HitEffectOnCrit;
         public int StackSize = 1;
-        public int Durability = 200;
+        public int Durability = 400;
         public Vector2 HoldoutOffset;
         public int RotationOffset;
         public float ProjectileOffset;
@@ -422,7 +422,7 @@ public partial class Item
             Id = ID.Dagger,
             Speed = 2.0f, Damage = 2, Knockback = 6, CritChance = 15,
             ProjectileSpeed = 2, Radius = 1.2f, Breaking = 1, Operation = OperationType.Cutting,
-            Targets = 1, Durability = 150,
+            Targets = 1, Durability = 300,
             Description = "A quick, short-bladed dagger. The fastest strike there is, but it only ever finds one target.",
             Materials = new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 1 } },
             HoldoutOffset = new Vector2(0.5f, 0),
@@ -476,16 +476,16 @@ public partial class Item
         },
 
         // Bows trade rate of fire for reach and punch.
-        Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 32, knockback: 4, crit: 10, durability: 150,
+        Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 32, knockback: 4, crit: 10, durability: 300,
             description: "A short, quick-drawing bow. Light arrows fly a little slow and land softly.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 4 }, { ID.Fabric, 1 } }),
-        Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 42, knockback: 7, crit: 15, durability: 200,
+        Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 42, knockback: 7, crit: 15, durability: 400,
             description: "A tall bow of seasoned wood. Slow to draw, but the arrow flies further and hits far harder.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 8 }, { ID.Fabric, 2 } }),
-        Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 52, knockback: 9, crit: 20, durability: 250,
+        Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 52, knockback: 9, crit: 20, durability: 500,
             description: "Pulleys and steel limbs store the draw for you. Every arrow leaves flat, fast, and with a wicked bite.",
             materials: new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.Plank, 2 }, { ID.Fabric, 1 } }),
-        Bow(ID.Crossbow, drawSeconds: 1.5f, damage: 10, arrowSpeed: 58, knockback: 12, crit: 25, durability: 300,
+        Bow(ID.Crossbow, drawSeconds: 1.5f, damage: 10, arrowSpeed: 58, knockback: 12, crit: 25, durability: 600,
             description: "A steel-armed crossbow. The longest reload there is, but nothing else throws an arrow as fast or as hard.",
             materials: new Dictionary<ID, int> { { ID.Steel, 4 }, { ID.Plank, 3 }, { ID.Fabric, 1 } }),
 
@@ -524,7 +524,7 @@ public partial class Item
             Id = ID.CrudePickaxe,
             Speed = 2.4f, Damage = 1, Knockback = 10, CritChance = 10,
             ProjectileSpeed = 4, Radius = 2, Breaking = 1, Operation = OperationType.Mining,
-            Durability = 100,
+            Durability = 200,
             Description = "A rough pickaxe for early mining.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
