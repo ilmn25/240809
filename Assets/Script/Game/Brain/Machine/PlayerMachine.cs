@@ -186,6 +186,29 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
+        // Exhausted: no swinging until stamina climbs back over the recovery threshold. An
+        // ally keeps fighting with a gun if it carries one, otherwise it backs off from the
+        // fight; a structure job is simply dropped (WorkOrder is kept, so it resumes later).
+        if (Info.IsTired)
+        {
+            if (EngagedEnemy is { } threat)
+            {
+                Info.Target = threat;
+                if (Info.Storage.SetRangedWeapon())
+                {
+                    Info.ActionType = IActionType.Hit;
+                    SetState<MobChaseAction>();
+                }
+                else SetState<MobEscape>();
+                return;
+            }
+
+            if (Info.Target is StructureInfo)
+                Info.CancelTarget();
+            else FollowLeader();
+            return;
+        }
+
         // A fight already under way — the ally was hit itself (PlayerInfo.OnHit retargets the
         // attacker) or was already engaged when control moved on — runs to completion.
         if (EngagedEnemy is { } engaged)
@@ -202,6 +225,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
+        FollowLeader();
+    }
+
+    private void FollowLeader()
+    {
         if (!IsCurrentState<DefaultState>()) return;
         if (Leader is not PlayerInfo leader) return;
         Info.Target = leader;

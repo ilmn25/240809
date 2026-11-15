@@ -14,6 +14,8 @@ public class DynamicInfo : Info
     public SfxID HitSfx = SfxID.HitMob;
     public SfxID DeathSfx = SfxID.DeathPlayer; 
     public float KnockBackResistance = 1;
+    public virtual float KnockbackDealt => 1f;
+    public virtual float AttackCooldownMultiplier => 1f;
      
     public float SpeedLogic = 5;
     public float SpeedGround = 5;
@@ -156,7 +158,7 @@ public class DynamicInfo : Info
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage(out bool crit) - Defense;
         if (!(IsNPC && Machine.IsInteracting))
-            KnockBack(projectile.transform.position, projectile.Info.Knockback * KnockBackResistance, true);
+            KnockBack(projectile.transform.position, projectile.Info.Knockback * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
         bool blackBlood = HitboxType == HitboxType.Enemy;
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), blackBlood ? Particles.BloodBlack : Particles.BloodRed, false);
         // Leave a non-pickupable blood pool on the ground that despawns offscreen.

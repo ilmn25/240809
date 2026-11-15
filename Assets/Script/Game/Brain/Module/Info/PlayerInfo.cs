@@ -37,15 +37,28 @@ public class PlayerInfo : MobInfo
     [NonSerialized] public bool Resting;
 
     public const float StaminaMax = 100f;
-    private const float StaminaRegenPerSecond = 4f;
+    private const float StaminaRegenPerSecond = 14f;
     private const float StarvingStaminaRegenScale = 0.25f;
-    private const float SwingStaminaCost = 12f;
-    private const float TiredStaminaThreshold = 25f;
+    private const float SwingStaminaCost = 20f;
+    private const float SwingRegenDelay = 0.75f;
+    private const float TiredRecoverStamina = 25f;
+    private const float TiredWarningStamina = 30f;
+    private const float TiredKnockbackScale = 0.5f;
+    private const float TiredCooldownMultiplier = 1.6f;
+    private const float TiredBlinkRateFast = 3f;
+    private const float TiredBlinkRateSlow = 0.8f;
+    private static readonly Color TiredTint = new Color(1f, 0.35f, 0.35f);
     private static readonly StatusEffect Tired = new StatusEffect(
         ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
-    [NonSerialized] private UnityEngine.Sprite _statusSprite;
+    [NonSerialized] private float _staminaRegenBlockedUntil;
+    [NonSerialized] private float _tiredBlinkPhase;
+    [NonSerialized] public bool IsTired;
 
-    public bool IsTired => Stamina <= TiredStaminaThreshold;
+    public override float KnockbackDealt => Mathf.Lerp(1f, TiredKnockbackScale, Tiredness);
+
+    public override float AttackCooldownMultiplier => Mathf.Lerp(1f, TiredCooldownMultiplier, Tiredness);
+
+    private float Tiredness => Mathf.InverseLerp(TiredWarningStamina, 0f, Stamina);
 
     /// <summary>The structure job (tree/rock/door) this player was ordered to do — set when
     /// a human controlling them hits that structure. Kept apart from Target so a dropped or
@@ -206,7 +219,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        UpdateStatusIcon();
+        UpdateStatusVisuals();
         UpdateMovementHunger();
 
         switch (PlayerStatus)
@@ -317,6 +330,8 @@ public class PlayerInfo : MobInfo
         Machine?.GetModule<StatusEffectModule>()?.RemoveAll();
         Hunger = HungerMax;
         Health = HealthMax;
+        Stamina = StaminaMax;
+        IsTired = false;
         Velocity = Vector2.zero;
         PlayerStatus = PlayerStatus.Active;
         if (Main.PlayerInfo == this)
@@ -332,14 +347,21 @@ public class PlayerInfo : MobInfo
     {
         if (!Helper.IsHost()) return;
 
-        float hungerScale = HungerMax > 0
-            ? Mathf.Lerp(StarvingStaminaRegenScale, 1f, (float)Hunger / HungerMax)
-            : 1f;
-        Stamina = Mathf.Min(StaminaMax, Stamina + StaminaRegenPerSecond * hungerScale * Helper.GetDeltaTime());
+        if (Time.time >= _staminaRegenBlockedUntil)
+        {
+            float hungerScale = HungerMax > 0
+                ? Mathf.Lerp(StarvingStaminaRegenScale, 1f, (float)Hunger / HungerMax)
+                : 1f;
+            Stamina = Mathf.Min(StaminaMax, Stamina + StaminaRegenPerSecond * hungerScale * Helper.GetDeltaTime());
+        }
 
-        StatusEffectModule module = Machine?.GetModule<StatusEffectModule>();
-        if (module == null) return;
+        if (IsTired)
+        {
+            if (Stamina >= TiredRecoverStamina) IsTired = false;
+        }
+        else if (Stamina <= 0f) IsTired = true;
 
+        StatusEffectModule module = Machine.GetModule<StatusEffectModule>();
         SetEffect(module, WellFed, HungerMax > 0 && Hunger >= HungerMax * WellFedThreshold);
         SetEffect(module, Tired, IsTired);
     }
@@ -354,19 +376,26 @@ public class PlayerInfo : MobInfo
     {
         if (!Helper.IsHost()) return;
         Stamina = Mathf.Max(0f, Stamina - SwingStaminaCost);
+        _staminaRegenBlockedUntil = Time.time + SwingRegenDelay;
+        if (Stamina <= 0f) IsTired = true;
     }
 
-    private void UpdateStatusIcon()
+    private void UpdateStatusVisuals()
     {
-        bool tired = IsTired;
-        bool show = PlayerStatus == PlayerStatus.Active && (tired || IsWorking);
-        if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);
-        if (!show) return;
+        bool active = PlayerStatus == PlayerStatus.Active;
+        float tiredness = Tiredness;
 
-        UnityEngine.Sprite sprite = Cache.LoadSprite(tired ? "GUI/StatusTired" : "GUI/StatusWorking");
-        if (sprite == _statusSprite) return;
-        _statusSprite = sprite;
-        SpriteStatusRenderer.sprite = sprite;
+        float pulse = 0f;
+        if (active && tiredness > 0f)
+        {
+            _tiredBlinkPhase += Time.deltaTime * Mathf.Lerp(TiredBlinkRateFast, TiredBlinkRateSlow, tiredness) * Mathf.PI * 2f;
+            pulse = 0.5f - 0.5f * Mathf.Cos(_tiredBlinkPhase);
+        }
+        else _tiredBlinkPhase = 0f;
+        SpriteCharRenderer.color = Color.Lerp(Color.white, TiredTint, tiredness * pulse);
+
+        bool show = active && IsWorking;
+        if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);
     }
 
     private void UpdateHungerStage()

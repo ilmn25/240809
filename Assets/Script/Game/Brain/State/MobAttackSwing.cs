@@ -76,7 +76,7 @@ class MobAttackSwing : MobState {
 
         yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
         Audio.PlaySFX(_equipment?.Sfx ?? SfxID.HitMob);
-        Info.Animator.speed = Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f);
+        Info.Animator.speed = (Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f)) / Info.AttackCooldownMultiplier;
         Info.SpeedModifier = UsesNaturalWeapon ? 0f : 0.8f;
         Info.Animator.Play("EquipSwingCooldown", 0, 0f);
 

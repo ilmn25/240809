@@ -85,6 +85,15 @@ public class Storage
                         : null);
         }
 
+        /// <summary>Hold the best carried ranged weapon, so an ally that is out of melee
+        /// stamina can keep fighting while it recovers. False when the bag has no loaded gun.</summary>
+        public bool SetRangedWeapon()
+        {
+                return EquipBest(item => item.Gesture == ItemGesture.Shoot && CanUseAsWeapon(item.ID, item.ProjectileInfo)
+                        ? item.ProjectileInfo.Damage
+                        : null);
+        }
+
         /// <summary>Whether this item can actually land a hit: it deals damage and, if it
         /// needs ammo, the owner is carrying some.</summary>
         private bool CanUseAsWeapon(ID itemID, ProjectileInfo projectile)

@@ -29,6 +29,7 @@ public struct PlayerSyncMessage : NetworkMessage
     public float stamina;
     public int playerStatus;
     public bool resting;
+    public bool tired;
 
     public Vector3 direction;
     public bool isGrounded;
@@ -271,6 +272,7 @@ public static class PlayerSync
             hunger = player.Hunger, hungerMax = player.HungerMax,
             stamina = player.Stamina, playerStatus = (int)player.PlayerStatus,
             resting = player.Resting,
+            tired = player.IsTired,
             direction = player.Direction, isGrounded = player.IsGrounded,
             speedCurrent = player.SpeedCurrent, speedTarget = player.SpeedTarget,
             faceTarget = player.FaceTarget, targetScreenDir = ScreenToWorldAligned(player.TargetScreenDir),
@@ -474,6 +476,7 @@ public static class PlayerSync
             pi.Stamina = msg.stamina;
             pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
             pi.Resting = msg.resting;
+            pi.IsTired = msg.tired;
             pi.CharSprite = (ID)msg.charSprite;
         }
         else
@@ -664,6 +667,7 @@ public static class PlayerSync
         pi.Stamina = msg.stamina;
         pi.PlayerStatus = (PlayerStatus)msg.playerStatus;
         pi.Resting = msg.resting;
+        pi.IsTired = msg.tired;
         pi.Direction = msg.direction; pi.IsGrounded = msg.isGrounded;
         pi.SpeedCurrent = msg.speedCurrent; pi.SpeedTarget = msg.speedTarget;
         pi.FaceTarget = msg.faceTarget; pi.TargetScreenDir = WorldAlignedToScreen(msg.targetScreenDir);
