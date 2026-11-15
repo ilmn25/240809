@@ -226,7 +226,7 @@ public class Control
         UpdateProximityInventory();
 
         if (Inst.ActionPrimary.KeyDown() && !GUIMain.IsHover && !GUIMain.CursorActive &&
-            Main.PlayerInfo?.Equipment?.Info.Type == ItemType.Tool &&
+            Main.PlayerInfo?.CanAttack == true &&
             Main.PlayerInfo.Machine is EntityMachine em &&
             (Helper.IsHost() || PlayerSync.CanLocalClientControl(Main.PlayerInfo.uid)))
         {

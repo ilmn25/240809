@@ -49,6 +49,8 @@ public class DynamicInfo : Info
     [NonSerialized] public Animator Animator;
     [NonSerialized] public Transform SpriteChar;
     [NonSerialized] public SpriteRenderer SpriteCharRenderer;
+    [NonSerialized] public Transform SpriteStatus;
+    [NonSerialized] public SpriteRenderer SpriteStatusRenderer;
     [NonSerialized] public Transform SpriteToolTrack;
     [NonSerialized] public Transform SpriteToolEffect;
     [NonSerialized] public Transform SpriteTool;
@@ -116,6 +118,9 @@ public class DynamicInfo : Info
         Animator = Sprite.GetComponent<Animator>();
         SpriteChar = Sprite.Find("Char");
         SpriteCharRenderer = SpriteChar.GetComponent<SpriteRenderer>();
+        SpriteStatus = Sprite.Find("Status");
+        SpriteStatusRenderer = SpriteStatus.GetComponent<SpriteRenderer>();
+        SpriteStatus.gameObject.SetActive(false);
         SpriteToolTrack = Sprite.transform.Find("ToolTrack");
         SpriteToolEffect = SpriteToolTrack.Find("ToolEffect");
         SpriteTool = SpriteToolTrack.Find("Tool").Find("ToolOffset");

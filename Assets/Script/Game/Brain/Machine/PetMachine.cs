@@ -58,7 +58,8 @@ public class PetMachine : PlayerMachine
     {
         if (Main.PlayerInfo == Info)
         {
-            base.Attack();
+            if (Info.Equipment?.Info.Type == ItemType.Tool) base.Attack();
+            else SetState<MobAttackSwing>();
             return;
         }
 

@@ -22,6 +22,9 @@ public class PlayerInfo : MobInfo
     /// <summary>False for a pet (and anything else with a slot-less Storage): there is no
     /// bag to open or fill, so drops go to the cursor instead.</summary>
     public bool HasInventory => Storage?.List != null && Storage.List.Count > 0;
+    /// <summary>True when left click can swing something: a tool in hand, or a pet's own
+    /// natural attack (it has no bag to draw a weapon from).</summary>
+    public bool CanAttack => IsPet || Equipment?.Info.Type == ItemType.Tool;
     /// <summary>True for contracted companions (hired mercenaries, escorts): they follow
     /// and fight, but never pick up loot — the party's share stays with the party.</summary>
     [NonSerialized] public bool CantLoot;
@@ -192,6 +195,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        SpriteStatus.gameObject.SetActive(PlayerStatus == PlayerStatus.Active && IsWorking);
         UpdateMovementHunger();
 
         switch (PlayerStatus)

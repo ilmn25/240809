@@ -7,6 +7,7 @@ public class MobSpriteCullModule : SpriteCullModule
     {
         Sprites.Add(Info.SpriteCharRenderer);
         Sprites.Add(Info.SpriteToolRenderer);
+        Sprites.Add(Info.SpriteStatusRenderer);
         MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull(); 
     }

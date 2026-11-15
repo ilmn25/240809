@@ -124,6 +124,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 case ItemType.Tool when Control.Inst.ActionPrimary.Key() && !IsBugged():
                     Attack();
                     break;
+                case null when Info.IsPet && Control.Inst.ActionPrimary.Key() && !IsBugged():
+                    Attack();
+                    break;
                 case ItemType.Consumable when Control.Inst.ActionPrimary.KeyDown():
                     SetState<MobConsume>();
                     break;
