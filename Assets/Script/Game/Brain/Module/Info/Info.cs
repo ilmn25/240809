@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public class Info : EntityModule

@@ -33,8 +33,19 @@ public class PlayerInfo : MobInfo
     public float Sanity;
     public int Hunger;
     public int HungerMax = 20;
-    public float Stamina; 
+    public float Stamina;
     [NonSerialized] public bool Resting;
+
+    public const float StaminaMax = 100f;
+    private const float StaminaRegenPerSecond = 4f;
+    private const float StarvingStaminaRegenScale = 0.25f;
+    private const float SwingStaminaCost = 12f;
+    private const float TiredStaminaThreshold = 25f;
+    private static readonly StatusEffect Tired = new StatusEffect(
+        ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
+    [NonSerialized] private UnityEngine.Sprite _statusSprite;
+
+    public bool IsTired => Stamina <= TiredStaminaThreshold;
 
     /// <summary>The structure job (tree/rock/door) this player was ordered to do — set when
     /// a human controlling them hits that structure. Kept apart from Target so a dropped or
@@ -195,7 +206,7 @@ public class PlayerInfo : MobInfo
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        SpriteStatus.gameObject.SetActive(PlayerStatus == PlayerStatus.Active && IsWorking);
+        UpdateStatusIcon();
         UpdateMovementHunger();
 
         switch (PlayerStatus)
@@ -226,7 +237,7 @@ public class PlayerInfo : MobInfo
             RestHeal();
         }
 
-        UpdateWellFed();
+        UpdateStatusEffects();
         UpdateHungerStage();
 
         FaceTarget = Equipment != null || Target != null;
@@ -317,15 +328,45 @@ public class PlayerInfo : MobInfo
         Machine.SetState<DefaultState>();
     }
 
-    private void UpdateWellFed()
+    private void UpdateStatusEffects()
     {
         if (!Helper.IsHost()) return;
+
+        float hungerScale = HungerMax > 0
+            ? Mathf.Lerp(StarvingStaminaRegenScale, 1f, (float)Hunger / HungerMax)
+            : 1f;
+        Stamina = Mathf.Min(StaminaMax, Stamina + StaminaRegenPerSecond * hungerScale * Helper.GetDeltaTime());
+
         StatusEffectModule module = Machine?.GetModule<StatusEffectModule>();
         if (module == null) return;
 
-        bool wellFed = HungerMax > 0 && Hunger >= HungerMax * WellFedThreshold;
-        if (wellFed) module.Apply(WellFed);
-        else module.Remove(ID.WellFed);
+        SetEffect(module, WellFed, HungerMax > 0 && Hunger >= HungerMax * WellFedThreshold);
+        SetEffect(module, Tired, IsTired);
+    }
+
+    private static void SetEffect(StatusEffectModule module, StatusEffect effect, bool active)
+    {
+        if (active) module.Apply(effect);
+        else module.Remove(effect.EffectID);
+    }
+
+    public void SpendSwingStamina()
+    {
+        if (!Helper.IsHost()) return;
+        Stamina = Mathf.Max(0f, Stamina - SwingStaminaCost);
+    }
+
+    private void UpdateStatusIcon()
+    {
+        bool tired = IsTired;
+        bool show = PlayerStatus == PlayerStatus.Active && (tired || IsWorking);
+        if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);
+        if (!show) return;
+
+        UnityEngine.Sprite sprite = Cache.LoadSprite(tired ? "GUI/StatusTired" : "GUI/StatusWorking");
+        if (sprite == _statusSprite) return;
+        _statusSprite = sprite;
+        SpriteStatusRenderer.sprite = sprite;
     }
 
     private void UpdateHungerStage()
@@ -407,7 +448,7 @@ public class PlayerInfo : MobInfo
         }
         else
         {
-            _coyoteTimer -= Helper.GetDeltaTime();; // Decrease coyote timer when not grounded
+            _coyoteTimer -= Helper.GetDeltaTime(); // Decrease coyote timer when not grounded
         }
 
         if (Control.Inst.Jump.KeyDown())
@@ -419,13 +460,12 @@ public class PlayerInfo : MobInfo
         }
         else
         {
-            _jumpGraceTimer -= Helper.GetDeltaTime();; // Decrease jump grace timer
+            _jumpGraceTimer -= Helper.GetDeltaTime(); // Decrease jump grace timer
         }
 
         if ((IsGrounded || _coyoteTimer > 0) && _jumpGraceTimer > 0)
         {
             Velocity.y = JumpVelocity;
-            //  _isGrounded = false;
             _jumpGraceTimer = 0; // Reset jump grace timer after jumping
         }
         IsGrounded = Velocity.y == 0;

@@ -269,4 +269,5 @@ public enum ID
     Scavenger,
     ScavengerArcher,
     Pet,
+    Tired,
 }

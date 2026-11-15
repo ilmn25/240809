@@ -101,10 +101,13 @@ public static class Helper
     {
         string path = SavePath + filePath + fileformat;
         CreateDirectory(path);
-        using (FileStream file = File.Create(path))
+        string tempPath = path + ".tmp";
+        using (FileStream file = File.Create(tempPath))
         {
             BinaryFormatter.Serialize(file, data);
         }
+        if (File.Exists(path)) File.Delete(path);
+        File.Move(tempPath, path);
     }
 
     private static void CreateDirectory(string path)
@@ -118,16 +121,18 @@ public static class Helper
     public static T FileLoad<T>(string filePath, string fileformat = SaveFormat)
     {
         string path = SavePath + filePath + fileformat;
-        CreateDirectory(path);
-        if (File.Exists(path))
+        if (!File.Exists(path)) return default;
+        try
         {
-            using (FileStream file = File.Open(SavePath + filePath + fileformat, FileMode.Open))
-            {
-                return (T)BinaryFormatter.Deserialize(file);
-            }
+            using FileStream file = File.Open(path, FileMode.Open);
+            return (T)BinaryFormatter.Deserialize(file);
         }
-        // Debug.LogWarning("File " + filePath + " does not exist");
-        return default;
+        catch (Exception exception)
+        {
+            // A save that was cut short (empty or partial) must not stop the game from starting.
+            Debug.LogWarning($"Could not read {path}: {exception.Message}");
+            return default;
+        }
     } 
 
     public static byte[] SerializeObject<T>(T value)

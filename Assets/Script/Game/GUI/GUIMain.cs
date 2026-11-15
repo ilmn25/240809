@@ -314,10 +314,6 @@ public static class GUIMain
 
                 _showTask?.Stop();
                 _showTask = new CoroutineTask(Scale(false, HideDuration, Main.GUIInv, 0));
-                // _showTask.Finished += (bool isManual) => 
-                // {
-                //     Game.GUIInv.SetActive(false);
-                // };
             }
         }
     }

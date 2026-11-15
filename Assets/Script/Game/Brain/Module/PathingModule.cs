@@ -247,7 +247,6 @@ public abstract class PathingModule : MobModule
             }
         }   
         _updateSelfPosition = true; 
-        // _selfPositionPrevious = Machine.transform.position; 
 
         _repathRoutine = false;  
     }

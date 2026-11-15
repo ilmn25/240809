@@ -634,7 +634,6 @@ public class MapLoad
                     _edgeValue += 8; // Left
                 }
 
-                // Lib.Log(x,y,z,_chunkMap[x, y + 1, z] != 0, _chunkMap[x, y, z + 1] != 0,_chunkMap[x, y - 1, z] != 0, _chunkMap[x, y, z - 1] != 0, _chunkMap[x, y + 1, z + 1] != 0, _chunkMap[x, y - 1, z + 1] != 0, _chunkMap[x, y - 1, z - 1] != 0, _chunkMap[x, y + 1, z - 1] != 0);
                 // Calculate corner values
 
                 if (((MeshLoadData[x, y + 1, z - 1] != 0)

@@ -135,7 +135,6 @@ public class MapCullComponent : MonoBehaviour
                     }
                     while (Time.frameCount < MapCull.CullSyncFrame) await Task.Yield();
                     _meshRenderer.enabled = false;
-                    // _meshFilter.mesh = _meshData;
                     return;
                 }
                 if (HandleRangeCheck()) // do cull, is in range

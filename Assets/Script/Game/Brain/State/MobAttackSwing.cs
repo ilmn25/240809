@@ -56,6 +56,8 @@ class MobAttackSwing : MobState {
         _task = null;
         Info.Animator.speed = Main.PlayerInfo == Info ? 0.7f : 0.3f;
         _equipment = Info.Equipment?.Info;
+        if (Info is PlayerInfo player && !UsesNaturalWeapon)
+            player.SpendSwingStamina();
         if (_equipment != null)
             Info.SpriteToolEffect.localPosition = new Vector3(0.8f, -0.3f, 0);
         // Armed mobs keep creeping in; natural attackers freeze until the swing is done.

@@ -6,8 +6,6 @@ using UnityEngine;
 /// bite instead of a weapon.</summary>
 public class PetMachine : PlayerMachine
 {
-    private new PlayerInfo Info => GetModule<PlayerInfo>();
-
     /// <summary>The pet's natural attack: a bear-style bite, so it needs no weapon and no
     /// bag to fight.</summary>
     private static readonly ProjectileInfo Bite = new ContactDamageProjectileInfo

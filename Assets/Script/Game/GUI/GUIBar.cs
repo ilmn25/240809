@@ -17,7 +17,6 @@ public class GUIBar
                 rectTransform.SetParent(Main.GUIInv.transform, false);
                 rectTransform.localPosition = position;
                 rectTransform.localRotation = Quaternion.Euler(-15, 0, 0);
-                // rectTransform.localScale = Vector3.one * 0.9f;
 
                 GameObject iconObj;
                 RectTransform iconRect;

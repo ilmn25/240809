@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization; 
 public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
 
 public static class ActionTypeExtensions

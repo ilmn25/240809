@@ -80,12 +80,10 @@ public class MapCull
                 }
 
                 _lastCullEnterTime = Time.time;
-                // HandleLight(true);
                 UpdateYCullDelayed(YCheck);
             }
             else if (_yCheckPrevious && !YCheck) // exit
             {
-                // HandleLight(false);
                 UpdateYCullDelayed(YCheck);
             }
             else if (YCheck)   
@@ -148,7 +146,6 @@ public class MapCull
         if (_currentCullMode == CullMode.On)
         {
             YCheck = true;
-            // YThreshold = _visionHeight;
             return;
         }
         
@@ -160,7 +157,6 @@ public class MapCull
             if (Physics.Raycast(new Ray(_playerPosition,  cameraPosition - _playerPosition), out _, Vector3.Distance(_playerPosition, cameraPosition), Main.MaskMap))
             {
                 YCheck = true;
-                // YThreshold = _visionHeight;
                 return;
             }
         }
@@ -170,7 +166,6 @@ public class MapCull
             Physics.Raycast(new Ray(_playerPosition, LeftDirection), out _, 50, Main.MaskMap) &&
             Physics.Raycast(new Ray(_playerPosition, RightDirection), out _, 50, Main.MaskMap)) {
             YCheck = true;
-            // YThreshold = _visionHeight;
             return;
         }
      

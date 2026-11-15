@@ -78,8 +78,6 @@ public class ScoutMachine : GroundMobMachine
                 Vector3 origin = transform.position + Vector3.up * 0.3f;
                 float distance = Vector3.Distance(origin, Info.Target.position);
 
-                // Debug.DrawRay(origin, direction * distance, Color.red, 0.1f); // Lasts 0.1 seconds
-
                 if (distance > Info.DistAttack) return false;
 
                 if (Physics.Raycast(origin, (Info.Target.position - origin).normalized,

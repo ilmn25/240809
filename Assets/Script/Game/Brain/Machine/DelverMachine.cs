@@ -8,8 +8,6 @@ using UnityEngine;
 /// claims, and the death handoff.</summary>
 public class DelverMachine : PlayerMachine
 {
-    private new PlayerInfo Info => GetModule<PlayerInfo>();
-
     /// <summary>Optional contract expiry (in <see cref="Time.time"/> seconds).
     /// 0 = permanent (console/bound-NPC delvers). Hired mercenaries set this so
     /// they leave once their contract runs out.</summary>

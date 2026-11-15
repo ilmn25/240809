@@ -3,7 +3,7 @@ using UnityEngine;
  
 public class PlayerMachine : MobMachine, IActionSecondaryInteract
 {
-    private new PlayerInfo Info => GetModule<PlayerInfo>();
+    protected new PlayerInfo Info => GetModule<PlayerInfo>();
 
     // Party leader the allies follow; null when there is nobody left to follow.
     private static PlayerInfo Leader => Main.PlayerInfo is PlayerInfo { Destroyed: false } leader ? leader : null;
@@ -29,7 +29,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             HealthMax = 18,
             Mana = 100,
             Sanity = 100,
-            Stamina = 100,
+            Stamina = PlayerInfo.StaminaMax,
             SpeedLogic = 5,
             SpeedGround = 6,
             SpeedAir = 6,
@@ -119,18 +119,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             }
 
             if (GUIStorage.HoveringSlot || GUIMain.Map is { IsOpen: true }) return;
-            switch (Info.Equipment?.Info.Type)
-            {
-                case ItemType.Tool when Control.Inst.ActionPrimary.Key() && !IsBugged():
-                    Attack();
-                    break;
-                case null when Info.IsPet && Control.Inst.ActionPrimary.Key() && !IsBugged():
-                    Attack();
-                    break;
-                case ItemType.Consumable when Control.Inst.ActionPrimary.KeyDown():
-                    SetState<MobConsume>();
-                    break;
-            }
+            if (Info.CanAttack && Control.Inst.ActionPrimary.Key() && !IsBugged())
+                Attack();
+            else if (Info.Equipment?.Info.Type == ItemType.Consumable && Control.Inst.ActionPrimary.KeyDown())
+                SetState<MobConsume>();
             return;
         }
 
@@ -380,7 +372,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         base.Attack();
 
         ItemSlot equipped = Info.Equipment;
-        if (equipped != null && equipped.Durability != -1)
+        if (equipped.Durability != -1)
         {
             equipped.Durability--;
             if (equipped.Durability <= 0)
