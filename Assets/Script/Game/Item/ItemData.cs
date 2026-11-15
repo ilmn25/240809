@@ -83,6 +83,7 @@ public partial class Item
         AddMaterialDefinition(ID.SpiderWeb, "Sticky silk woven by spiders.", worth: 2);
         AddMaterialDefinition(ID.BloodRed, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.BloodBlack, "A pool of black blood left behind by a creature of the dark.", pickupable: false);
+        AddMaterialDefinition(ID.Sweat, "A damp bead of sweat.", pickupable: false, despawnTime: 10f);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.", worth: 2);
         AddMaterialDefinition(ID.CornSeed, "A kernel of dried corn, ready to plant.", materials: new Dictionary<ID, int> { { ID.Corn, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.PumpkinSeed, "A seed saved from a pumpkin, ready to plant.", materials: new Dictionary<ID, int> { { ID.Pumpkin, 1 } }, craftStack: 2);

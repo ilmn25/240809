@@ -42,6 +42,11 @@ public class ItemMachine : EntityMachine, IActionSecondaryPickUp
         } 
         
         ItemInfo.SpriteRenderer.sprite = Cache.LoadSprite("Sprite/" + ItemInfo.item.ID);
+        // Cosmetic debris (blood pools, sweat) lies flat on the ground; a shadow would
+        // just paint over the map under it. Pooled item objects are shared, so reset it.
+        ItemInfo.SpriteRenderer.shadowCastingMode = ItemInfo.CanPickUp
+            ? UnityEngine.Rendering.ShadowCastingMode.On
+            : UnityEngine.Rendering.ShadowCastingMode.Off;
         AddModule(new ItemSpriteCullModule()); 
         transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0); 
         transform.localScale = Vector3.one * ItemInfo.item.Info.Scale;

@@ -27,7 +27,8 @@ public class ItemSpriteCullModule : SpriteCullModule
 {
     public override void Initialize()
     {
-        Sprites.Add(Machine.GetComponent<SpriteRenderer>());
+        // The Y-cull only toggles shadows, so debris that never casts one is left alone.
+        if (((ItemInfo)EntityMachine.Info).CanPickUp) Sprites.Add(Machine.GetComponent<SpriteRenderer>());
         MapCull.SignalUpdateSpriteYCull += HandleCull;
         HandleCull();
     }

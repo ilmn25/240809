@@ -368,6 +368,7 @@ public class PlayerInfo : MobInfo
         {
             _sweatTimer = 0f;
             Particle.Create(Machine.transform.position + new Vector3(0f, 0.9f, 0f), Particles.Sweat, true);
+            Entity.SpawnItem(ID.Sweat, Machine.transform.position, stackOnSpawn: false);
         }
 
         StatusEffectModule module = Machine.GetModule<StatusEffectModule>();

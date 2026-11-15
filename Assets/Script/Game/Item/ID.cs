@@ -270,4 +270,5 @@ public enum ID
     ScavengerArcher,
     Pet,
     Tired,
+    Sweat,
 }
