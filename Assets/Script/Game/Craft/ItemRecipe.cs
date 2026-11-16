@@ -28,40 +28,70 @@ public partial class ItemRecipe
         });
     }
 
-    /// <summary>How many of an item the player can reach: their own pool plus the storage
-    /// open beside the crafting window.</summary>
-    public static int AvailableAmount(ID item)
+    public static List<Storage> Sources()
     {
-        int available = Main.PlayerInfo?.Storage?.GetAmount(item) ?? 0;
+        List<Storage> sources = new List<Storage>();
+        AddSource(sources, Main.PlayerInfo?.Storage);
+
+        if (Main.Player != null && global::Save.Inst?.players != null)
+        {
+            float reach = ContainerWindow.ProximityRange * ContainerWindow.ProximityRange;
+            foreach (PlayerInfo player in global::Save.Inst.players)
+            {
+                if (player == null || player == Main.PlayerInfo || player.Destroyed ||
+                    player.Machine == null || player.PlayerStatus == PlayerStatus.Incapacitated ||
+                    !player.HasInventory)
+                    continue;
+                if (Helper.SquaredDistance(player.Machine.transform.position, Main.Player.transform.position) > reach)
+                    continue;
+                AddSource(sources, player.Storage);
+            }
+        }
+
         if (GUIMain.Storage is { Showing: true })
-            available += GUIMain.Storage.Storage.GetAmount(item);
-        return available;
+            AddSource(sources, GUIMain.Storage.Storage);
+
+        return sources;
     }
+
+    private static void AddSource(List<Storage> sources, Storage storage)
+    {
+        if (storage == null || sources.Contains(storage)) return;
+        sources.Add(storage);
+    }
+
+    private static int AmountIn(List<Storage> sources, ID item)
+    {
+        int amount = 0;
+        foreach (Storage storage in sources)
+            amount += storage.GetAmount(item);
+        return amount;
+    }
+
+    public static int AvailableAmount(ID item) => AmountIn(Sources(), item);
 
     public bool IsCraftable()
     {
-        // Creative mode: everything is craftable without resources.
         if (Main.CreativeMode) return true;
 
+        List<Storage> sources = Sources();
         foreach (var ingredient in Ingredients)
         {
-            if (AvailableAmount(ingredient.Key) < ingredient.Value) return false;
+            if (AmountIn(sources, ingredient.Key) < ingredient.Value) return false;
         }
         return true;
     }
 
-    /// <summary>Ingredient list as tooltip lines: "Ingredients:" followed by "Name (have/need)".
-    /// Colored lines turn red while the player is short and a soft green once the amount
-    /// is met. Empty when the recipe needs nothing.</summary>
     public string DescribeIngredients(bool colored = false)
     {
         if (Ingredients == null || Ingredients.Count == 0) return "";
 
+        List<Storage> sources = Sources();
         StringBuilder text = new StringBuilder("Ingredients:");
         foreach (var ingredient in Ingredients)
         {
             Item item = Item.GetItem(ingredient.Key);
-            int have = AvailableAmount(ingredient.Key);
+            int have = AmountIn(sources, ingredient.Key);
             string line = $"{item.Name} ({have}/{ingredient.Value})";
             text.Append('\n').Append(colored
                 ? $"<color={(have < ingredient.Value ? ShortageColor : FulfilledColor)}>{line}</color>"
@@ -70,46 +100,42 @@ public partial class ItemRecipe
         return text.ToString();
     }
     
-    public static void CraftItem(ID stringID, bool isCursor = true)
+    public static void CraftItem(ID stringID)
     {
         Tutorial.OnCraft(stringID);
         TakeIngredients(stringID);
-        GiveItem(stringID, Dictionary[stringID].Stack, isCursor);
+        GiveItem(stringID, Dictionary[stringID].Stack);
     }
 
-    public static void GiveItem(ID stringID, int stack, bool isCursor = true)
+    public static void GiveItem(ID stringID, int stack)
     {
         ItemSlot craftedItem = new ItemSlot(stringID, stack);
         
-        if (isCursor && (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem)))
+        if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem))
         {
             GUICursor.Data.Add(craftedItem);
             Audio.PlaySFX(SfxID.Item);
             GUICursor.UpdateCursorSlot();
         }
         
-        if (craftedItem.Stack > 0)
-        { 
-            Main.PlayerInfo.Storage.AddItem(craftedItem, Main.PlayerInfo.Storage.Key);
-            Inventory.RefreshInventory();
-        }  
+        if (craftedItem.Stack <= 0) return;
+
+        Main.PlayerInfo.Storage.AddItem(craftedItem, Main.PlayerInfo.Storage.Key);
     }
 
     public static void TakeIngredients(ID stringID)
     {
         Audio.PlaySFX(SfxID.Item);
-        // Creative mode: crafting is free, don't consume any resources.
         if (Main.CreativeMode) return;
 
+        List<Storage> sources = Sources();
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
-            // Try to remove from player inventory first
-            int missing = Main.PlayerInfo.Storage.RemoveItem(ingredient.Key, ingredient.Value);
-            
-            // If items are still missing, remove from the visible opened storage
-            if (missing > 0 && GUIMain.Storage != null && GUIMain.Storage.Showing)
+            int missing = ingredient.Value;
+            foreach (Storage storage in sources)
             {
-                GUIMain.Storage.Storage.RemoveItem(ingredient.Key, missing);
+                missing = storage.RemoveItem(ingredient.Key, missing);
+                if (missing <= 0) break;
             }
         }
     }

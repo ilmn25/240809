@@ -43,13 +43,14 @@ public class PlayerInfo : MobInfo
     private const float SwingRegenDelay = 0.75f;
     private const float TiredRecoverStamina = 25f;
     private const float TiredWarningStamina = 30f;
+    private const float TiredBlinkStamina = 60f;
     private const float TiredKnockbackScale = 0.5f;
     private const float TiredCooldownMultiplier = 1.6f;
     private const float TiredBlinkRateFast = 3f;
     private const float TiredBlinkRateSlow = 0.8f;
     private const float SweatInterval = 0.8f;
-    private const float SweatStaminaFraction = 0.06f;
     private static readonly Color TiredTint = new Color(1f, 0.35f, 0.35f);
+    private static readonly Color ExhaustedTint = new Color(0.9f, 0.1f, 0.1f);
     private static readonly StatusEffect Tired = new StatusEffect(
         ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
     [NonSerialized] private float _staminaRegenBlockedUntil;
@@ -63,6 +64,8 @@ public class PlayerInfo : MobInfo
     public override float AttackCooldownMultiplier => Mathf.Lerp(1f, TiredCooldownMultiplier, Tiredness);
 
     private float Tiredness => Mathf.InverseLerp(TiredWarningStamina, 0f, Stamina);
+
+    private float BlinkTiredness => Mathf.InverseLerp(TiredBlinkStamina, 0f, Stamina);
 
     /// <summary>The structure job (tree/rock/door) this player was ordered to do — set when
     /// a human controlling them hits that structure. Kept apart from Target so a dropped or
@@ -365,7 +368,7 @@ public class PlayerInfo : MobInfo
         }
         else if (Stamina <= 0f) IsTired = true;
 
-        _sweatTimer = Stamina <= StaminaMax * SweatStaminaFraction ? _sweatTimer + Helper.GetDeltaTime() : 0f;
+        _sweatTimer = IsTired ? _sweatTimer + Helper.GetDeltaTime() : 0f;
         if (_sweatTimer >= SweatInterval)
         {
             _sweatTimer = 0f;
@@ -402,9 +405,8 @@ public class PlayerInfo : MobInfo
     private void UpdateStatusVisuals()
     {
         bool active = PlayerStatus == PlayerStatus.Active;
-        float tiredness = Tiredness;
+        float ramp = Mathf.SmoothStep(0f, 1f, BlinkTiredness);
 
-        float ramp = Mathf.SmoothStep(0f, 1f, tiredness);
         float pulse = 0f;
         if (active && ramp > 0f)
         {
@@ -412,7 +414,7 @@ public class PlayerInfo : MobInfo
             pulse = 0.5f - 0.5f * Mathf.Cos(_tiredBlinkPhase);
         }
         else _tiredBlinkPhase = 0f;
-        SpriteCharRenderer.color = Color.Lerp(Color.white, TiredTint, ramp * pulse);
+        SpriteCharRenderer.color = Color.Lerp(Color.white, Color.Lerp(TiredTint, ExhaustedTint, ramp), ramp * pulse);
 
         bool show = active && IsWorking;
         if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);
