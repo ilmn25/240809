@@ -101,8 +101,8 @@ public static class MobSpawner
         Rules rules = Save.Inst.difficulty switch
         {
             MobDifficulty.Peaceful => new Rules(4f, 2, 6, false),
-            MobDifficulty.Overwhelming => new Rules(1.2f, 10, 20, true),
-            _ => new Rules(2.4f, 5, 10, true),
+            MobDifficulty.Overwhelming => new Rules(1.6f, 7, 14, true),
+            _ => new Rules(3.5f, 3, 7, true),
         };
 
         if (Save.Inst.current == GenType.Dungeon)
@@ -112,7 +112,7 @@ public static class MobSpawner
             return new Rules(rules.Interval, rules.Attempts + 1 + deeper, 3, rules.Hostiles);
         }
         if (IsSwarm())
-            return new Rules(rules.Interval * 0.5f, rules.Attempts + 3, rules.CapPerPlayer * 3, rules.Hostiles);
+            return new Rules(rules.Interval * 0.6f, rules.Attempts + 2, rules.CapPerPlayer * 2, rules.Hostiles);
         return rules;
     }
 

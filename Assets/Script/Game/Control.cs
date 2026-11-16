@@ -8,7 +8,7 @@ public class Control
     private const int InteractRange = 2;
     /// <summary>Seconds the player must stand beside a teammate before that
     /// teammate's inventory opens on its own.</summary>
-    private const float ProximityInventoryDelay = 1f;
+    private const float ProximityInventoryDelay = 0.4f;
     public static Control Inst = new Control(); 
     public static int CurrentPlayerIndex = 0;
     

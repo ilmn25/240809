@@ -144,7 +144,7 @@ public struct NewGameOptions
 
     public static NewGameOptions Default => new()
     {
-        Delvers = 2,
+        Delvers = 3,
         Difficulty = MobDifficulty.Normal,
         Density = WorldDensity.Normal,
         DayLength = DayLength.Normal,

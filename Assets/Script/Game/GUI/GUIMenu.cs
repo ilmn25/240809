@@ -37,7 +37,7 @@ public partial class GUIMenu
     {
         DayLength.Short, DayLength.Normal, DayLength.Long,
     };
-    private int _delvers = 3;
+    private int _delvers = NewGameOptions.Default.Delvers;
     private int _entityIndex = 1;
     private int _densityIndex = 1;
     private int _dayLengthIndex = 1;
@@ -454,7 +454,7 @@ public partial class GUIMenu
     private void ResetNewGame()
     {
         _seedInput = string.Empty;
-        _delvers = 2;
+        _delvers = NewGameOptions.Default.Delvers;
         _entityIndex = 1;
         _densityIndex = 1;
         _dayLengthIndex = 1;

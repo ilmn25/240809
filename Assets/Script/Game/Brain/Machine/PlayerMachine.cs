@@ -186,14 +186,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Exhausted: no swinging until stamina climbs back over the recovery threshold. An
-        // ally keeps fighting with a gun if it carries one, otherwise it backs off from the
-        // fight; a structure job is simply dropped (WorkOrder is kept, so it resumes later).
-        if (Info.IsTired)
+        if (EngagedEnemy is { } enemy)
         {
-            if (EngagedEnemy is { } threat)
+            if (Info.IsTired)
             {
-                Info.Target = threat;
                 if (Info.Storage.SetRangedWeapon())
                 {
                     Info.ActionType = IActionType.Hit;
@@ -203,23 +199,11 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
                 return;
             }
 
-            if (Info.Target is StructureInfo)
-                Info.CancelTarget();
-            else FollowLeader();
+            if (TryEngageEnemy(enemy) || TryContinueWork()) SetState<MobChaseAction>();
             return;
         }
 
-        // A fight already under way — the ally was hit itself (PlayerInfo.OnHit retargets the
-        // attacker) or was already engaged when control moved on — runs to completion.
-        if (EngagedEnemy is { } engaged)
-        {
-            if (TryEngageEnemy(engaged) || TryContinueWork()) SetState<MobChaseAction>();
-            return;
-        }
-
-        // Otherwise the structure job the ally was ordered to do comes first: enemies merely
-        // nearby never pull a worker off it. Only a roaming ally starts a fight or takes loot.
-        if (TryContinueWork() || TryEngageEnemy() || TryAcquireLootTarget())
+        if (TryContinueWork() || (!Info.IsTired && (TryEngageEnemy() || TryAcquireLootTarget())))
         {
             SetState<MobChaseAction>();
             return;
@@ -395,23 +379,19 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        // Ammo is resolved and consumed in MobAttackShoot (guns fire whatever
-        // accepted ammo the shooter carries; throwables keep their own ammo).
-        // Consuming the last of a stack can leave the hand empty on this same frame.
+        ItemSlot equipped = Info.Equipment;
+
         base.Attack();
 
-        ItemSlot equipped = Info.Equipment;
-        if (equipped.Durability != -1)
+        if (equipped.Durability == -1) return;
+
+        equipped.Durability--;
+        if (equipped.Durability <= 0)
         {
-            equipped.Durability--;
-            if (equipped.Durability <= 0)
-            {
-                // Worn out: the weapon breaks out of the hand.
-                equipped.clear();
-                Info.SetEquipment(null);
-            }
-            Info.Storage.NotifyChanged();
+            equipped.clear();
+            Info.SetEquipment(null);
         }
+        Info.Storage.NotifyChanged();
     }
     public void OnDrawGizmos()
     {

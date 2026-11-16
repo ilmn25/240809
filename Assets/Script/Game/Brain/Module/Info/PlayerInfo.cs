@@ -36,7 +36,7 @@ public class PlayerInfo : MobInfo
     public float Stamina;
     [NonSerialized] public bool Resting;
 
-    public const float StaminaMax = 100f;
+    public const float StaminaMax = 200f;
     private const float StaminaRegenPerSecond = 14f;
     private const float StarvingStaminaRegenScale = 0.25f;
     private const float SwingStaminaCost = 20f;
@@ -48,6 +48,7 @@ public class PlayerInfo : MobInfo
     private const float TiredBlinkRateFast = 3f;
     private const float TiredBlinkRateSlow = 0.8f;
     private const float SweatInterval = 0.8f;
+    private const float SweatStaminaFraction = 0.06f;
     private static readonly Color TiredTint = new Color(1f, 0.35f, 0.35f);
     private static readonly StatusEffect Tired = new StatusEffect(
         ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
@@ -364,7 +365,7 @@ public class PlayerInfo : MobInfo
         }
         else if (Stamina <= 0f) IsTired = true;
 
-        _sweatTimer = Tiredness > 0f ? _sweatTimer + Helper.GetDeltaTime() : 0f;
+        _sweatTimer = Stamina <= StaminaMax * SweatStaminaFraction ? _sweatTimer + Helper.GetDeltaTime() : 0f;
         if (_sweatTimer >= SweatInterval)
         {
             _sweatTimer = 0f;
@@ -393,7 +394,7 @@ public class PlayerInfo : MobInfo
 
     public bool CanSwingWork()
     {
-        if (Stamina >= StaminaMax) _restedForWork = true;
+        if (Stamina > SwingStaminaCost) _restedForWork = true;
         else if (IsTired) _restedForWork = false;
         return _restedForWork;
     }
@@ -403,14 +404,15 @@ public class PlayerInfo : MobInfo
         bool active = PlayerStatus == PlayerStatus.Active;
         float tiredness = Tiredness;
 
+        float ramp = Mathf.SmoothStep(0f, 1f, tiredness);
         float pulse = 0f;
-        if (active && tiredness > 0f)
+        if (active && ramp > 0f)
         {
-            _tiredBlinkPhase += Time.deltaTime * Mathf.Lerp(TiredBlinkRateFast, TiredBlinkRateSlow, tiredness) * Mathf.PI * 2f;
+            _tiredBlinkPhase += Time.deltaTime * Mathf.Lerp(TiredBlinkRateFast, TiredBlinkRateSlow, ramp) * Mathf.PI * 2f;
             pulse = 0.5f - 0.5f * Mathf.Cos(_tiredBlinkPhase);
         }
         else _tiredBlinkPhase = 0f;
-        SpriteCharRenderer.color = Color.Lerp(Color.white, TiredTint, tiredness * pulse);
+        SpriteCharRenderer.color = Color.Lerp(Color.white, TiredTint, ramp * pulse);
 
         bool show = active && IsWorking;
         if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);

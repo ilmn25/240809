@@ -141,11 +141,10 @@ public class MobInfo : DynamicInfo
         if (SpriteTool == null || SpriteToolTrack == null || SpriteToolRenderer == null)
         {
             Equipment = target;
-            _renderedItem = shown;
             return;
         }
 
-        if (shown != ID.Null && shown == _renderedItem && SpriteToolRenderer.sprite != null)
+        if (shown != ID.Null && shown == _renderedItem)
         {
             Equipment = target;
             return;
