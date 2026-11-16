@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>A quest-giver NPC. Interact to hear the current quest; when the task
 /// is done it accepts the hand-in, drops the reward, and offers the next quest.</summary>
 public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
@@ -23,11 +21,5 @@ public class QuestmasterMachine : PassiveNPCMachine, IActionSecondaryInteract
     {
         BeginInteraction();
         SetState<QuestmasterState>();
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

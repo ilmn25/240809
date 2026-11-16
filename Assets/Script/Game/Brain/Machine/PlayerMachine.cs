@@ -383,9 +383,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     public override void Attack()
     {
-        if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid) && !EnsureToolForTarget())
+        if (Main.PlayerInfo != Info && !PlayerSync.IsClaimedByRemoteClient(Info.uid))
         {
-            return;
+            if (!EnsureToolForTarget()) return;
+            if (Info.IsWorking && !Info.CanSwingWork()) return;
         }
 
         if (Info.Equipment == null)

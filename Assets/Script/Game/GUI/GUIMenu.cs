@@ -37,7 +37,7 @@ public partial class GUIMenu
     {
         DayLength.Short, DayLength.Normal, DayLength.Long,
     };
-    private int _delvers = 2;
+    private int _delvers = 3;
     private int _entityIndex = 1;
     private int _densityIndex = 1;
     private int _dayLengthIndex = 1;

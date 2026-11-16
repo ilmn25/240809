@@ -1,5 +1,3 @@
-using UnityEngine;
-
 /// <summary>A travelling merchant that lives at the Old Radio. It flees from
 /// attackers (fighting back when cornered); interact with it to open its shop
 /// (the craft UI with a fixed inventory of goods).</summary>
@@ -26,11 +24,5 @@ public class MerchantMachine : PassiveNPCMachine, IActionSecondaryInteract, ITra
     {
         BeginInteraction();
         ToggleStation<TradeState>("I've been tracking this signal for ages...");
-    }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
     }
 }

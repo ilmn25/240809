@@ -55,6 +55,7 @@ public class PlayerInfo : MobInfo
     [NonSerialized] private float _sweatTimer;
     [NonSerialized] private float _tiredBlinkPhase;
     [NonSerialized] public bool IsTired;
+    [NonSerialized] private bool _restedForWork = true;
 
     public override float KnockbackDealt => Mathf.Lerp(1f, TiredKnockbackScale, Tiredness);
 
@@ -388,6 +389,13 @@ public class PlayerInfo : MobInfo
         Stamina = Mathf.Max(0f, Stamina - SwingStaminaCost);
         _staminaRegenBlockedUntil = Time.time + SwingRegenDelay;
         if (Stamina <= 0f) IsTired = true;
+    }
+
+    public bool CanSwingWork()
+    {
+        if (Stamina >= StaminaMax) _restedForWork = true;
+        else if (IsTired) _restedForWork = false;
+        return _restedForWork;
     }
 
     private void UpdateStatusVisuals()

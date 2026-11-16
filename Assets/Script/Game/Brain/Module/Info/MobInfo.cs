@@ -138,11 +138,16 @@ public class MobInfo : DynamicInfo
         if (ReferenceEquals(target, Equipment) && shown == _renderedItem)
             return;
 
-        // SetEquipment can be called during scene/player switching before DynamicInfo.Initialize assigns tool references.
         if (SpriteTool == null || SpriteToolTrack == null || SpriteToolRenderer == null)
         {
             Equipment = target;
             _renderedItem = shown;
+            return;
+        }
+
+        if (shown != ID.Null && shown == _renderedItem && SpriteToolRenderer.sprite != null)
+        {
+            Equipment = target;
             return;
         }
 
@@ -160,8 +165,6 @@ public class MobInfo : DynamicInfo
         SpriteTool.gameObject.SetActive(true);
         SpriteTool.localPosition = new Vector3(Equipment.Info.HoldoutOffset.x, Equipment.Info.HoldoutOffset.y, 0);
         SpriteTool.localRotation = Quaternion.Euler(0, 0, Equipment.Info.RotationOffset);
-        
-        // Display Blueprint sprite for structures and the mining box
         string spriteName = Equipment.Info.ID.ToString();
         if (Equipment.ID == ID.MiningBox || Equipment.Info.Type == ItemType.Structure)
             spriteName = "Blueprint";
@@ -169,7 +172,6 @@ public class MobInfo : DynamicInfo
         SpriteToolRenderer.sprite = Cache.LoadSprite("Sprite/" + spriteName);
         SpriteToolTrack.transform.localScale = Vector3.one * Equipment.Info.Scale;
         SetToolGlow(Equipment.Info.Glow);
-        // Host processes state machine for all entities; client only for owned entities.
         if (Machine != null && Machine.IsCurrentState<DefaultState>() && (Helper.IsHost() || IsOwner()))
             Machine.SetState<EquipSelectState>();
     }

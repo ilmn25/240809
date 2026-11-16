@@ -102,10 +102,4 @@ public class GuideMachine : PassiveNPCMachine, IActionSecondaryInteract
                     tip("You can also build structures to protect yourself.",
                         tip("Good luck!")))));
     }
-
-    public void OnDrawGizmos()
-    {
-        if (Camera.current == Camera.main)
-            GetModule<GroundPathingModule>().DrawGizmos();
-    }
 }
