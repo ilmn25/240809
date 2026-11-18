@@ -192,9 +192,10 @@ public abstract class PathingModule : MobModule
         }
         else
         {
-            if (Vector3.Distance(path[nextPoint].Position, Machine.transform.position) > 0.05f)
-                Info.Direction = (path[nextPoint].Position - Machine.transform.position).normalized;
-            else Info.Direction = Vector3.zero;
+            Vector3 delta = path[nextPoint].Position - Machine.transform.position;
+            float speed = Info.SpeedCurrent;
+            float stopDistance = Mathf.Max(speed * Info.DecelerationTime, speed * Helper.GetDeltaTime(), 0.01f);
+            Info.Direction = delta.sqrMagnitude > stopDistance * stopDistance ? delta.normalized : Vector3.zero;
         }
         return nextPoint;
     }

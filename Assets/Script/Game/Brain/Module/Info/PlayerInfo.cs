@@ -48,13 +48,13 @@ public class PlayerInfo : MobInfo
     private const float TiredCooldownMultiplier = 1.6f;
     private const float TiredBlinkRateFast = 3f;
     private const float TiredBlinkRateSlow = 0.8f;
-    private const float SweatInterval = 0.8f;
+    private const float SweatInterval = 1.2f;
     private static readonly Color TiredTint = new Color(1f, 0.35f, 0.35f);
     private static readonly Color ExhaustedTint = new Color(0.9f, 0.1f, 0.1f);
     private static readonly StatusEffect Tired = new StatusEffect(
         ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
     [NonSerialized] private float _staminaRegenBlockedUntil;
-    [NonSerialized] private float _sweatTimer;
+    [NonSerialized] private float _sweatReadyTime;
     [NonSerialized] private float _tiredBlinkPhase;
     [NonSerialized] public bool IsTired;
     [NonSerialized] private bool _restedForWork = true;
@@ -368,14 +368,6 @@ public class PlayerInfo : MobInfo
         }
         else if (Stamina <= 0f) IsTired = true;
 
-        _sweatTimer = IsTired ? _sweatTimer + Helper.GetDeltaTime() : 0f;
-        if (_sweatTimer >= SweatInterval)
-        {
-            _sweatTimer = 0f;
-            Particle.Create(Machine.transform.position + new Vector3(0f, 0.9f, 0f), Particles.Sweat, true);
-            Entity.SpawnItem(ID.Sweat, Machine.transform.position, stackOnSpawn: false);
-        }
-
         StatusEffectModule module = Machine.GetModule<StatusEffectModule>();
         SetEffect(module, WellFed, HungerMax > 0 && Hunger >= HungerMax * WellFedThreshold);
         SetEffect(module, Tired, IsTired);
@@ -390,9 +382,16 @@ public class PlayerInfo : MobInfo
     public void SpendSwingStamina()
     {
         if (!Helper.IsHost()) return;
+        bool exhausted = Stamina <= SwingStaminaCost;
         Stamina = Mathf.Max(0f, Stamina - SwingStaminaCost);
         _staminaRegenBlockedUntil = Time.time + SwingRegenDelay;
         if (Stamina <= 0f) IsTired = true;
+
+        if (!exhausted || Main.PlayerInfo != this || Time.time < _sweatReadyTime) return;
+
+        _sweatReadyTime = Time.time + SweatInterval;
+        Particle.Create(Machine.transform.position + new Vector3(0f, 0.9f, 0f), Particles.Sweat, true);
+        Entity.SpawnItem(ID.Sweat, Machine.transform.position, stackOnSpawn: false);
     }
 
     public bool CanSwingWork()

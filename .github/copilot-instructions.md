@@ -10,3 +10,5 @@ Unity 2022.3 project; gameplay code lives in `Assets/Script`.
 Don't add comments, remove any existing comments you find.
 Attempt to deduplicate code, remove obsolete fallback, and pointless checks.
 Keep the final report back to me short and concise.
+
+append rtk in front of every cmd call, like "rtk git status" 
