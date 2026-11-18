@@ -327,7 +327,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     /// <summary>How close a drop must already be before an ally detours to grab it — about
     /// touching distance, so allies don't wander off chasing loot.</summary>
-    private const float LootRadius = 1f;
+    private const float LootRadius = 2f;
 
     /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.
     /// Contracted companions never do: their loot would vanish with the contract.</summary>
