@@ -271,4 +271,13 @@ public enum ID
     Pet,
     Tired,
     Sweat,
+    OrganIntestines,
+    OrganStomach,
+    OrganSkull,
+    OrganLimb,
+    OrganRibcage,
+    OrganBrain,
+    OrganBone,
+    OrganTeeth,
+    OrganLiver,
 }

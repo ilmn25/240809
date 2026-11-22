@@ -29,13 +29,14 @@ public class Saves
         IEnumerator SaveGameCoroutine()
         { 
             yield return new WaitForEndOfFrame();  
-            World.UnloadWorld();
+            Questmaster.Reset();
+            EntityItemLoad.UnloadWorld();
             Save data = Save.Inst;
             data.id = DateTime.Now.ToString("yyMMddHHmmssfff");
             Inst.List.Add(data);
             Helper.FileSave(data, data.Path + SaveDataFile);
             Helper.SaveScreenShot(data.Path + "Preview");
-            World.LoadWorld(); 
+            EntityItemLoad.OnChunkTraverse();
         }
     }
     

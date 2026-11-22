@@ -16,8 +16,6 @@ public class Projectile : MonoBehaviour
     /// thrown grenade, which adds gravity each frame). Unused by straight shots.</summary>
     public Vector3 Velocity;
     public MobInfo SourceInfo;
-    public DynamicInfo Target;
-    public Quaternion RelativeRotation;
 
     private void Update()
     {
@@ -42,7 +40,6 @@ public class Projectile : MonoBehaviour
         projectile.TargetHitBoxType = target; 
         projectile.Destination = dest;
         projectile.Direction = (dest - origin).normalized;
-        projectile.Target = null; 
         gameObject.transform.localScale = Vector3.one * info.Scale;
         
         Vector3 direction =  projectile.Direction;

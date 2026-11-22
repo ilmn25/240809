@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [System.Serializable]
@@ -6,6 +7,7 @@ public class DynamicInfo : Info
 {
     public DynamicInfo() { updateMode = UpdateMode.Everyone; Flammable = true; }
     private const int KnockbackInterval = 3;
+    private const float HitFlashTime = 0.1f;
     public HitboxType HitboxType;
     /// <summary>True for friendly NPCs (merchant, guide, bound NPC). Enemies will
     /// target and damage them, and they flee when attacked.</summary>
@@ -59,6 +61,7 @@ public class DynamicInfo : Info
     [NonSerialized] public SpriteRenderer SpriteToolRenderer;
  
     [NonSerialized] protected int IframesCurrent;
+    [NonSerialized] private CoroutineTask _hitFlash;
  
     [NonSerialized] public Vector3 Velocity = Vector3.zero;
     [NonSerialized] public bool IsGrounded = false;
@@ -69,6 +72,7 @@ public class DynamicInfo : Info
     [NonSerialized] public float SpeedTarget = 10;
 
     private static readonly Collider[] ColliderArray = new Collider[3]; 
+    private static readonly ID[] OrganDrops = { ID.OrganIntestines, ID.OrganStomach, ID.OrganSkull, ID.OrganLimb, ID.OrganRibcage, ID.OrganBrain, ID.OrganBone, ID.OrganTeeth, ID.OrganLiver };
 
     protected virtual void OnHit(Projectile projectile) { } 
     protected virtual void OnUpdate() {
@@ -128,6 +132,21 @@ public class DynamicInfo : Info
         SpriteTool = SpriteToolTrack.Find("Tool").Find("ToolOffset");
         SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>(); 
     }
+
+    private void FlashHit()
+    {
+        if (this is PlayerInfo) return;
+        _hitFlash?.Stop();
+        SpriteCharRenderer.color = Color.red;
+        _hitFlash = new CoroutineTask(HitFlashRoutine());
+    }
+
+    private IEnumerator HitFlashRoutine()
+    {
+        yield return new WaitForSeconds(HitFlashTime);
+        SpriteCharRenderer.color = Color.white;
+    }
+
     public void SetStatusIcon(string icon)
     {
         if (SpriteStatus == null || SpriteStatusRenderer == null) return;
@@ -174,13 +193,17 @@ public class DynamicInfo : Info
         IframesCurrent = Iframes; 
         Audio.PlaySFX(HitSfx);
         Health -= projectile.Info.GetDamage(out bool crit) - Defense;
+        FlashHit();
         if (!(IsNPC && Machine.IsInteracting))
             KnockBack(projectile.transform.position, projectile.Info.Knockback * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
         bool blackBlood = HitboxType == HitboxType.Enemy;
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), blackBlood ? Particles.BloodBlack : Particles.BloodRed, false);
-        // Leave a non-pickupable blood pool on the ground that despawns offscreen.
         if (Helper.IsHost())
+        {
             Entity.SpawnItem(blackBlood ? ID.BloodBlack : ID.BloodRed, Machine.transform.position, stackOnSpawn: false);
+            Vector3 organPosition = Machine.transform.position + new Vector3(UnityEngine.Random.Range(-1.5f, 1.5f), 0f, 0f);
+            Entity.SpawnItem(OrganDrops[UnityEngine.Random.Range(0, OrganDrops.Length)], organPosition, stackOnSpawn: false);
+        }
         // Only a human-controlled player acquires a target from hitting something;
         // AI-controlled players keep the target their brain assigned.
         projectile.SourceInfo.AcquireTarget(this);

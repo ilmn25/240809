@@ -84,6 +84,15 @@ public partial class Item
         AddMaterialDefinition(ID.BloodRed, "A pool of blood left behind by a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.BloodBlack, "A pool of black blood left behind by a creature of the dark.", pickupable: false);
         AddMaterialDefinition(ID.Sweat, "A damp bead of sweat.", pickupable: false, despawnTime: 10f);
+        AddMaterialDefinition(ID.OrganIntestines, "Slick intestines spilled from a wounded creature.", pickupable: false);
+        AddMaterialDefinition(ID.OrganStomach, "A torn stomach left behind by a wounded creature.", pickupable: false);
+        AddMaterialDefinition(ID.OrganSkull, "A cracked skull knocked loose from a wounded creature.", pickupable: false);
+        AddMaterialDefinition(ID.OrganLimb, "A severed limb torn from a wounded creature.", pickupable: false);
+        AddMaterialDefinition(ID.OrganRibcage, "A shattered ribcage torn open by a wound.", pickupable: false);
+        AddMaterialDefinition(ID.OrganBrain, "A pulpy brain spilling from a cracked skull.", pickupable: false);
+        AddMaterialDefinition(ID.OrganBone, "A splintered bone torn from a wounded creature.", pickupable: false);
+        AddMaterialDefinition(ID.OrganTeeth, "A scatter of teeth knocked out by a blow.", pickupable: false);
+        AddMaterialDefinition(ID.OrganLiver, "A dark liver gouged from a wounded creature.", pickupable: false);
         AddMaterialDefinition(ID.Acorn, "A tiny seed, useful for planting or crafting.", worth: 2);
         AddMaterialDefinition(ID.CornSeed, "A kernel of dried corn, ready to plant.", materials: new Dictionary<ID, int> { { ID.Corn, 1 } }, craftStack: 2);
         AddMaterialDefinition(ID.PumpkinSeed, "A seed saved from a pumpkin, ready to plant.", materials: new Dictionary<ID, int> { { ID.Pumpkin, 1 } }, craftStack: 2);
@@ -403,9 +412,6 @@ public partial class Item
         public ID Sprite;
         public int Penetration;
         public int LifeSpan;
-        public bool Lodge;
-        /// <summary>Chance (0..1) that a thrown item survives the throw and can be picked up.</summary>
-        public float PickUpChance;
         public StatusEffect HitEffect;
         public bool HitEffectOnCrit;
         public int StackSize = 1;
@@ -468,7 +474,7 @@ public partial class Item
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
             ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
-            LifeSpan = 10000, Lodge = true, PickUpChance = 2f / 3f,   // one throw in three splinters it
+            LifeSpan = 10000,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
             Description = "A throwable weapon.",
@@ -615,8 +621,6 @@ public partial class Item
                 Radius = spec.Radius,
                 Penetration = spec.Penetration,
                 Ammo = spec.Ammo,
-                Lodge = spec.Lodge,
-                PickUpChance = spec.PickUpChance,
                 HitEffect = spec.HitEffect,
                 HitEffectOnCrit = spec.HitEffectOnCrit,
             };
