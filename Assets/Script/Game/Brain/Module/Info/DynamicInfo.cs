@@ -52,6 +52,7 @@ public class DynamicInfo : Info
     [NonSerialized] public SpriteRenderer SpriteCharRenderer;
     [NonSerialized] public Transform SpriteStatus;
     [NonSerialized] public SpriteRenderer SpriteStatusRenderer;
+    [NonSerialized] public bool HasTalked;
     [NonSerialized] public Transform SpriteToolTrack;
     [NonSerialized] public Transform SpriteToolEffect;
     [NonSerialized] public Transform SpriteTool;
@@ -127,6 +128,22 @@ public class DynamicInfo : Info
         SpriteTool = SpriteToolTrack.Find("Tool").Find("ToolOffset");
         SpriteToolRenderer = SpriteTool.GetComponent<SpriteRenderer>(); 
     }
+    public void SetStatusIcon(string icon)
+    {
+        if (SpriteStatus == null || SpriteStatusRenderer == null) return;
+
+        if (string.IsNullOrEmpty(icon))
+        {
+            if (SpriteStatus.gameObject.activeSelf) SpriteStatus.gameObject.SetActive(false);
+            return;
+        }
+
+        Sprite sprite = Cache.LoadSprite(icon);
+        if (sprite != null && SpriteStatusRenderer.sprite != sprite)
+            SpriteStatusRenderer.sprite = sprite;
+        if (!SpriteStatus.gameObject.activeSelf) SpriteStatus.gameObject.SetActive(true);
+    }
+
     public override void Update()
     { 
         OnUpdate();

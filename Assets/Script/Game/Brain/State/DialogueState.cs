@@ -15,16 +15,14 @@ public class DialogueState : MobState {
         Audio.PlaySFX(SfxID.Notification);
         Info.PathingStatus = PathingStatus.Reached;
         Info.Direction = Vector3.zero;
+        Info.HasTalked = true;
         ShowDialogue();
     }
     
     public override void OnUpdateState()
     {
-        if (!global::Dialogue.Showing ||
-            Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 5 * 5)
-        {
+        if (!global::Dialogue.Showing)
             Machine.SetState<DefaultState>();
-        }
     }
      
 
@@ -37,6 +35,7 @@ public class DialogueState : MobState {
     protected void ShowDialogue()
     {
         global::Dialogue.Target = DialogueData;
+        global::Dialogue.Anchor(Machine.transform);
         if (global::Dialogue.Showing)
             global::Dialogue.Refresh();
         else

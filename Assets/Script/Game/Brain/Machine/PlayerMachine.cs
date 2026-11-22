@@ -62,6 +62,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         AddState(new MobHit());
         AddState(new MobEscape());
         AddState(new EquipSelectState());   
+        AddState(new MobCraftState());
 
         // Allies need this on start-up; the controlled player gets it via Inventory.RefreshInventory.
         Inventory.RefreshHeldItem(Info);
@@ -141,7 +142,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         {
             if (player == Main.PlayerInfo || player.Destroyed) continue;
             if (player.Machine is not PlayerMachine ally) continue;
-            ally.Info.ReleaseWork(); // forget the job too, or a recall just resumes it
+            ally.Info.ReleaseWork();
             ally.Info.CancelTarget();
         }
     }
@@ -271,15 +272,19 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return true;
     }
 
-    // An ally finishes the structure job it was ordered to do — the structure it kept from
-    // the last time the player controlled it and hit it, remembered in WorkOrder so a fight
-    // doesn't wipe it. Runs until the structure is gone or the tool it needs breaks; nothing
-    // here ever adopts another player's target.
+    private const float WorkAbandonDistance = 16f;
+
     private bool TryContinueWork()
     {
         if (Info.WorkOrder is not { Destroyed: false } job)
         {
             Info.WorkOrder = null;
+            return false;
+        }
+
+        if (Leader is PlayerInfo leader && Vector3.Distance(leader.position, job.position) > WorkAbandonDistance)
+        {
+            Info.CancelTarget();
             return false;
         }
 

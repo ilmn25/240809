@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
  
 public partial class ItemRecipe 
 {
@@ -28,30 +27,42 @@ public partial class ItemRecipe
         });
     }
 
+    private const float CraftReach = 4f;
+
     public static List<Storage> Sources()
     {
         List<Storage> sources = new List<Storage>();
         AddSource(sources, Main.PlayerInfo?.Storage);
 
-        if (Main.Player != null && global::Save.Inst?.players != null)
-        {
-            float reach = ContainerWindow.ProximityRange * ContainerWindow.ProximityRange;
-            foreach (PlayerInfo player in global::Save.Inst.players)
-            {
-                if (player == null || player == Main.PlayerInfo || player.Destroyed ||
-                    player.Machine == null || player.PlayerStatus == PlayerStatus.Incapacitated ||
-                    !player.HasInventory)
-                    continue;
-                if (Helper.SquaredDistance(player.Machine.transform.position, Main.Player.transform.position) > reach)
-                    continue;
-                AddSource(sources, player.Storage);
-            }
-        }
+        foreach (PlayerInfo player in Party())
+            AddSource(sources, player.Storage);
 
         if (GUIMain.Storage is { Showing: true })
             AddSource(sources, GUIMain.Storage.Storage);
 
         return sources;
+    }
+
+    private static IEnumerable<PlayerInfo> Party()
+    {
+        if (global::Save.Inst?.players == null) yield break;
+
+        foreach (PlayerInfo player in global::Save.Inst.players)
+        {
+            if (player == null || player == Main.PlayerInfo || player.Destroyed ||
+                player.Machine == null || player.PlayerStatus == PlayerStatus.Incapacitated ||
+                !player.HasInventory || !InReach(player))
+                continue;
+            yield return player;
+        }
+    }
+
+    private static bool InReach(PlayerInfo player)
+    {
+        if (Main.Player == null) return false;
+
+        return Helper.SquaredDistance(player.Machine.transform.position, Main.Player.transform.position) <=
+               CraftReach * CraftReach;
     }
 
     private static void AddSource(List<Storage> sources, Storage storage)
@@ -68,18 +79,21 @@ public partial class ItemRecipe
         return amount;
     }
 
+    private static bool HasIngredients(List<Storage> sources, Dictionary<ID, int> ingredients)
+    {
+        foreach (var ingredient in ingredients)
+        {
+            if (AmountIn(sources, ingredient.Key) < ingredient.Value) return false;
+        }
+        return true;
+    }
+
     public static int AvailableAmount(ID item) => AmountIn(Sources(), item);
 
     public bool IsCraftable()
     {
         if (Main.CreativeMode) return true;
-
-        List<Storage> sources = Sources();
-        foreach (var ingredient in Ingredients)
-        {
-            if (AmountIn(sources, ingredient.Key) < ingredient.Value) return false;
-        }
-        return true;
+        return HasIngredients(Sources(), Ingredients);
     }
 
     public string DescribeIngredients(bool colored = false)
@@ -100,11 +114,21 @@ public partial class ItemRecipe
         return text.ToString();
     }
     
-    public static void CraftItem(ID stringID)
+    public static bool CraftNow(ID stringID, CraftInfo station)
     {
+        if (!TakeIngredients(stringID)) return false;
+
+        ItemRecipe recipe = Dictionary[stringID];
+        if (recipe.Time > 0 && Item.GetItem(stringID).Type != ItemType.Structure && station != null)
+        {
+            station.Pending.Add(stringID);
+            StorageSync.SendCraftUpdate(station.uid, station.GetStoragePool(), station.Pending);
+            return true;
+        }
+
         Tutorial.OnCraft(stringID);
-        TakeIngredients(stringID);
-        GiveItem(stringID, Dictionary[stringID].Stack);
+        GiveItem(stringID, recipe.Stack);
+        return true;
     }
 
     public static void GiveItem(ID stringID, int stack)
@@ -123,12 +147,14 @@ public partial class ItemRecipe
         Main.PlayerInfo.Storage.AddItem(craftedItem, Main.PlayerInfo.Storage.Key);
     }
 
-    public static void TakeIngredients(ID stringID)
+    public static bool TakeIngredients(ID stringID)
     {
-        Audio.PlaySFX(SfxID.Item);
-        if (Main.CreativeMode) return;
+        if (Main.CreativeMode) return true;
 
         List<Storage> sources = Sources();
+        if (!HasIngredients(sources, Dictionary[stringID].Ingredients)) return false;
+
+        Audio.PlaySFX(SfxID.Item);
         foreach (var ingredient in Dictionary[stringID].Ingredients)
         {
             int missing = ingredient.Value;
@@ -138,5 +164,6 @@ public partial class ItemRecipe
                 if (missing <= 0) break;
             }
         }
+        return true;
     }
 }

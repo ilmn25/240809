@@ -73,19 +73,8 @@ public class GUICraft : GUIStorage
         if (!ItemRecipe.Dictionary.TryGetValue(item.ID, out ItemRecipe recipe) || !recipe.IsCraftable())
             return;
 
-        if (recipe.Time == 0 || item.Type == ItemType.Structure)
-        {
-            ItemRecipe.CraftItem(item.ID);
-            SyncCraftStorage();
-            return;
-        }
-
-        if (ActiveCraftInfo == null)
-            return;
-
-        ItemRecipe.TakeIngredients(item.ID);
-        ActiveCraftInfo.Pending.Add(item.ID);
-        SyncCraftStorage();
+        if (ItemRecipe.CraftNow(item.ID, ActiveCraftInfo))
+            Main.PlayerInfo?.Machine?.SetState<MobCraftState>();
     }
 
     private static void Buy(Item item)
@@ -105,11 +94,4 @@ public class GUICraft : GUIStorage
         Audio.PlaySFX(SfxID.Item);
         Trade.Pay(player, Trade.Worth(item.ID));
     }
-
-    protected void SyncCraftStorage()
-    {
-        if (ActiveCraftInfo == null) return;
-        StorageSync.SendCraftUpdate(ActiveCraftInfo.uid, Storage, ActiveCraftInfo.Pending);
-    }
-
 }

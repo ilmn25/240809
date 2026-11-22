@@ -127,7 +127,7 @@ public partial class Item
         AddConsumableDefinition(ID.HornOfPlenty, 0, "An ever-brimming horn of abundance. Consuming it permanently increases your max hunger.", stackSize: 5, maxHungerBonus: 4, worth: 5 * GoldWorth);
 
         // Structures
-        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Plank, 5 } }, 100, description: "A storage chest for keeping loot safe.");
+        AddStructureDefinition(ID.Chest, new Dictionary<ID, int> { { ID.Log, 10 } }, 100, description: "A storage chest for keeping loot safe.");
         AddStructureDefinition(ID.Workbench, new Dictionary<ID, int> { { ID.Log, 15 } }, 100, description: "A workbench to build other machines.");
         AddStructureDefinition(ID.Smelter, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.StoneBlock, 6 } }, 100, description: "A dedicated smelter used to turn sand into glass.");
         AddStructureDefinition(ID.MasonryWorkbench, new Dictionary<ID, int> { { ID.Log, 10 }, { ID.StoneBlock, 8 } }, 100, description: "A masonry bench for building advanced stonework and powering anvils.");

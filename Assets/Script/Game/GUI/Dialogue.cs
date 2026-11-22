@@ -7,10 +7,13 @@ public class Dialogue
     private const float EaseSpeed = 0.4f;
     private const float ShowDuration = 0.5f;
     private const float HideDuration = 0.2f;
+    private const float WalkAwayDistance = 6f;
 
     private static CoroutineTask _scrollTask;
     public static Dialogue Target;
     public static bool Showing = true;
+    public static Transform Source;
+    private static bool _anchored;
     private static CoroutineTask _scaleTask;
     private static int _frameClosedAt = -1;
     private static string _displayText;
@@ -25,6 +28,12 @@ public class Dialogue
 
     /// <summary>True while the current dialogue waits for a numbered choice.</summary>
     public static bool ChoicesActive => GetChoices(Target) != null;
+
+    public static void Anchor(Transform source)
+    {
+        Source = source;
+        _anchored = true;
+    }
 
     public static void Show(bool isShow)
     {
@@ -46,6 +55,8 @@ public class Dialogue
         }
         else
         {
+            Source = null;
+            _anchored = false;
             if (Showing)
             { 
                 Showing = false;
@@ -76,6 +87,8 @@ public class Dialogue
     public static void ShowEvent(string message, Sprite sprite = null)
     {
         Target = new Dialogue { Text = message, Sprite = sprite };
+        Source = null;
+        _anchored = false;
         Show(true);
         Audio.PlaySFX(SfxID.Notification);
     }
@@ -95,6 +108,8 @@ public class Dialogue
             };
         }
         Target = next;
+        Source = null;
+        _anchored = false;
         Show(true);
         Audio.PlaySFX(SfxID.Notification);
     }
@@ -102,6 +117,14 @@ public class Dialogue
     public static void Update()
     {
         if (!Showing) return;
+
+        if (_anchored && (!Source || Main.Player == null ||
+            Helper.SquaredDistance(Main.Player.transform.position, Source.position) >
+            WalkAwayDistance * WalkAwayDistance))
+        {
+            Show(false);
+            return;
+        }
 
         // Right clicking empty world space advances like the interact key, so
         // pages can be flipped without reaching for F.

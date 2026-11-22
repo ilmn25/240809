@@ -47,6 +47,15 @@ public abstract class PassiveNPCMachine : GroundMobMachine
         SetState<MobIdle>(); // lingers in place (long idle from OnStart)
     }
 
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+
+        if (!Helper.IsHost()) return;
+
+        Info.SetStatusIcon(Info.HasTalked ? null : "GUI/StatusAlert");
+    }
+
     protected void BeginInteraction()
     {
         if (Info.Target is EnemyInfo) Info.CancelTarget();

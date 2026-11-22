@@ -17,14 +17,13 @@ public static class Terraform
         _blockObj.SetActive(false); 
     }
     
-    public static void BlockUpdate(ID target = ID.Null)
+    public static void BlockUpdate()
     {
-        // Mining tools place the mining box directly.
-        if (Aim.IsMiningTool())
-            target = ID.MiningBox;
-
-        Target = target;
-        ConfigurePreview(_blockObj, target);
+        Item held = Inventory.CurrentItemData;
+        Target = Aim.IsMiningTool() ? ID.MiningBox
+            : held != null && held.Type is ItemType.Block or ItemType.Structure ? held.ID
+            : ID.Null;
+        ConfigurePreview(_blockObj, Target);
     }
 
     private static void ConfigurePreview(GameObject obj, ID target)
@@ -72,7 +71,7 @@ public static class Terraform
         Item held = Inventory.CurrentItemData;
         bool overMap = Helper.isLayer(Control.MouseLayer, Main.IndexMap) &&
                        Main.PlayerInfo.Machine.IsCurrentState<DefaultState>();
-        bool usable = held != null && (Aim.IsMiningTool() || held.Type is ItemType.Block or ItemType.Structure);
+        bool usable = Target != ID.Null;
 
         bool mining = Target == ID.MiningBox;
         bool aimVisible = mining ? _overlayEnabled : true;
@@ -93,7 +92,7 @@ public static class Terraform
 
         // Placing requires the cursor preview to be on. For mining that means the
         // toggle must be on; build always places.
-        bool canPlace = (mining ? _overlayEnabled : true) && Target != ID.Null && overMap && HandleCoord();
+        bool canPlace = aimVisible && usable && overMap && HandleCoord();
         if (canPlace && Control.Inst.ActionPrimary.Key())
             Place(held);
     }
@@ -138,10 +137,6 @@ public static class Terraform
                 World.SetBlock(_coordinate);
                 return;
             }
-            // Refuse to place it on empty/unregistered ground so BlockInfo.Initialize
-            // doesn't crash.
-            if (Block.GetBlock(World.GetBlock(_coordinate)) == null)
-                return;
             Entity.Spawn(ID.MiningBox, _coordinate);
             return;
         }

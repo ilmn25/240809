@@ -415,8 +415,10 @@ public class PlayerInfo : MobInfo
         else _tiredBlinkPhase = 0f;
         SpriteCharRenderer.color = Color.Lerp(Color.white, Color.Lerp(TiredTint, ExhaustedTint, ramp), ramp * pulse);
 
-        bool show = active && IsWorking;
-        if (SpriteStatus.gameObject.activeSelf != show) SpriteStatus.gameObject.SetActive(show);
+        string icon = null;
+        if (active)
+            icon = IsWorking ? "GUI/StatusWorking" : null;
+        SetStatusIcon(icon);
     }
 
     private void UpdateHungerStage()

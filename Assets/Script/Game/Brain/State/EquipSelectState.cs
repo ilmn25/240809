@@ -1,9 +1,11 @@
 public class EquipSelectState : MobState
 {
+    protected virtual string ClipName => "EquipSelect";
+
     public override void OnEnterState()
     {
         Info.Animator.speed = 1f;
-        Info.Animator.Play("EquipSelect", 0, 0f); // Play from beginning
+        Info.Animator.Play(ClipName, 0, 0f);
     }
     
     public override void OnUpdateState()
@@ -14,4 +16,9 @@ public class EquipSelectState : MobState
             Info.Animator.Play("EquipIdle", 0, 0f); 
         } 
     }
+}
+
+public class MobCraftState : EquipSelectState
+{
+    protected override string ClipName => "EquipCraft";
 }

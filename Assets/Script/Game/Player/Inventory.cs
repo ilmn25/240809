@@ -50,22 +50,13 @@ public class Inventory
         {
             CurrentItem = held;
             CurrentItemData = Item.GetItem(held.ID); 
-
-            RefreshHeldItem(Main.PlayerInfo);
-
-            bool isMiningTool = CurrentItemData.Type == ItemType.Tool &&
-                CurrentItemData.ProjectileInfo != null &&
-                CurrentItemData.ProjectileInfo.OperationType == OperationType.Mining;
-            if (isMiningTool || CurrentItem.Info.Type is ItemType.Block or ItemType.Structure)
-                Terraform.BlockUpdate(CurrentItem.ID);
-            else
-                Terraform.BlockUpdate();
-
-            return;
+        }
+        else
+        {
+            CurrentItemData = null;
+            CurrentItem = null;
         }
 
-        CurrentItemData = null;
-        CurrentItem = null;
         Terraform.BlockUpdate();
         RefreshHeldItem(Main.PlayerInfo);
     }
