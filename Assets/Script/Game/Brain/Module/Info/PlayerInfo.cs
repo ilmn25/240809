@@ -49,8 +49,9 @@ public class PlayerInfo : MobInfo
     private const float TiredBlinkRateFast = 3f;
     private const float TiredBlinkRateSlow = 0.8f;
     private const float SweatInterval = 1.2f;
+    private const float TiredBlinkStrength = 0.5f;
     private static readonly Color TiredTint = new Color(1f, 0.35f, 0.35f);
-    private static readonly Color ExhaustedTint = new Color(0.9f, 0.1f, 0.1f);
+    private static readonly Color ExhaustedTint = new Color(0.6f, 0.7f, 0.9f);
     private static readonly StatusEffect Tired = new StatusEffect(
         ID.Tired, EffectType.Slow, duration: 1f, tickInterval: 1f, speedAmount: 0.25f, name: "Tired");
     [NonSerialized] private float _staminaRegenBlockedUntil;
@@ -168,8 +169,7 @@ public class PlayerInfo : MobInfo
         attacker.MarkHostile();
 
         // An AI player fights back, dropping whatever structure job it was on — the job stays
-        // in WorkOrder so the ally resumes it once this fight ends. (Enemies merely standing
-        // nearby never pull an ally off a job; only being hit does.) A human player's target
+        // in WorkOrder so the ally resumes it once this fight ends. A human player's target
         // is mouse-driven.
         if (controllerId != -1) return;
 
@@ -413,7 +413,7 @@ public class PlayerInfo : MobInfo
             pulse = 0.5f - 0.5f * Mathf.Cos(_tiredBlinkPhase);
         }
         else _tiredBlinkPhase = 0f;
-        SpriteCharRenderer.color = Color.Lerp(Color.white, Color.Lerp(TiredTint, ExhaustedTint, ramp), ramp * pulse);
+        SpriteCharRenderer.color = Color.Lerp(Color.white, Color.Lerp(TiredTint, ExhaustedTint, ramp), ramp * pulse * TiredBlinkStrength);
 
         string icon = null;
         if (active)

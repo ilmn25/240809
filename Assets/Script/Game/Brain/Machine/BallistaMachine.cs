@@ -46,9 +46,8 @@ public class BallistaMachine : MobMachine
         _cooldown -= Time.deltaTime;
         if (_cooldown > 0f) return;
 
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return;
-        Vector3 rel = Main.PlayerInfo.position - transform.position;
-        if (rel.magnitude > TriggerRange) return;
+        if (EntityScan.FindNearestPlayer(transform.position, TriggerRange) is not { } player) return;
+        Vector3 rel = player.position - transform.position;
 
         // Loose a bolt down whichever lane the player has stepped across.
         if (Mathf.Abs(rel.z) <= AxisWidth)

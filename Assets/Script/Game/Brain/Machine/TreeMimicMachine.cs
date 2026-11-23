@@ -57,16 +57,13 @@ public class TreeMimicMachine : GroundMobMachine
         if (!IsCurrentState<DefaultState>())
             return;
 
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        float playerDist = playerAlive
-            ? Vector3.Distance(Main.PlayerInfo.position, transform.position)
-            : float.MaxValue;
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
 
-        if (playerAlive && playerDist < Info.DistAlert)
+        if (player != null)
         {
-            if (playerDist > FollowDistance)
+            if (Vector3.Distance(player.position, transform.position) > FollowDistance)
             {
-                Info.Target = Main.PlayerInfo;
+                Info.Target = player;
                 Info.PathingStatus = PathingStatus.Pending;
                 SetState<MobStalk>();
             }
@@ -85,7 +82,7 @@ public class TreeMimicMachine : GroundMobMachine
 
     public void StartFlee()
     {
-        Info.Target = Main.PlayerInfo;
+        Info.Target = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobFleeDespawn>();
     }

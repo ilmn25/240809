@@ -53,11 +53,11 @@ public class GnomeMachine : GroundMobMachine
         if (IsCurrentState<MobFleeDespawn>())
             return;
 
-        // DroppedItem always points at the latest item the player dropped; it's only
+        // DroppedItem always points at the latest item a player dropped; it's only
         // ever stale once that item is gone, so reading it fresh each frame avoids
         // caching (and chasing) a destroyed reference forever.
-        ItemInfo dropped = Main.PlayerInfo?.DroppedItem;
-        if (dropped != null && !dropped.Destroyed)
+        ItemInfo dropped = FindDroppedItem();
+        if (dropped != null)
         {
             Info.Target = dropped;
             Info.PathingStatus = PathingStatus.Pending;
@@ -68,20 +68,28 @@ public class GnomeMachine : GroundMobMachine
         if (!IsCurrentState<DefaultState>())
             return;
 
-        // Only stalk/steal from the player if they're alive and holding an item.
-        PlayerInfo player = Main.PlayerInfo;
-        float playerDist = player != null && player.CanBeRobbed
-            ? Vector3.Distance(player.position, transform.position)
-            : float.MaxValue;
+        // Only stalk/steal from a player if they're alive and holding an item.
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert, p => p.CanBeRobbed);
 
-        if (playerDist < Info.DistAlert && playerDist > FollowDistance)
+        if (player != null && Vector3.Distance(player.position, transform.position) > FollowDistance)
         {
-            Info.Target = Main.PlayerInfo;
+            Info.Target = player;
             Info.PathingStatus = PathingStatus.Pending;
             SetState<MobStalk>();
         }
         else 
             SetState<MobRoam>();
+    }
+
+    private static ItemInfo FindDroppedItem()
+    {
+        if (Save.Inst?.players == null) return null;
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == null || player.Destroyed) continue;
+            if (player.DroppedItem is { Destroyed: false } item) return item;
+        }
+        return null;
     }
 
     private void Steal(ItemInfo item)
@@ -106,7 +114,7 @@ public class GnomeMachine : GroundMobMachine
         if (_fleeing) return;
         _fleeing = true;
 
-        Info.Target = Main.PlayerInfo;
+        Info.Target = EntityScan.FindNearestPlayer(transform.position, FleeDistance);
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobFleeDespawn>();
     }

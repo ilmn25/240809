@@ -66,30 +66,23 @@ public class RatMachine : GroundMobMachine, IItemThief
             return;
         }
 
-        PlayerInfo player = Main.PlayerInfo;
-        if (player == null || !player.CanBeRobbed)
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert, p => p.CanBeRobbed);
+        if (player == null)
         {
             FollowGnome();
             return;
         }
 
-        float dist = Vector3.Distance(player.position, transform.position);
-
-        if (dist < Info.DistAttack)
+        if (Vector3.Distance(player.position, transform.position) < Info.DistAttack)
         {
-            Info.AimPosition = Main.PlayerInfo.position;
+            Info.AimPosition = player.position;
             SetState<MobAttackSwing>();
             return;
         }
 
-        if (dist < Info.DistAlert)
-        {
-            Info.Target = Main.PlayerInfo;
-            Info.PathingStatus = PathingStatus.Pending;
-            SetState<MobChase>();
-        }
-        else
-            FollowGnome();
+        Info.Target = player;
+        Info.PathingStatus = PathingStatus.Pending;
+        SetState<MobChase>();
     }
 
     /// <summary>Chase the gnome and hover near it.</summary>

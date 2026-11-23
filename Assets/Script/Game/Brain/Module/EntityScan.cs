@@ -8,6 +8,25 @@ public static class EntityScan
 {
     private static readonly Collider[] Buffer = new Collider[64];
 
+    public static PlayerInfo FindNearestPlayer(Vector3 origin, float radius, Func<PlayerInfo, bool> predicate = null)
+    {
+        if (Save.Inst?.players == null) return null;
+
+        PlayerInfo best = null;
+        float bestSqr = radius * radius;
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == null || player.Destroyed || player.Health <= 0) continue;
+            if (predicate != null && !predicate(player)) continue;
+
+            float sqr = (player.position - origin).sqrMagnitude;
+            if (sqr > bestSqr) continue;
+            bestSqr = sqr;
+            best = player;
+        }
+        return best;
+    }
+
     /// <summary>Returns the nearest entity within radius whose Info matches the
     /// predicate, or null if none match.</summary>
     public static Info FindNearest(Vector3 origin, float radius, Func<Info, bool> predicate)

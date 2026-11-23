@@ -77,7 +77,7 @@ public class CaravanMachine : GroundMobMachine
         _fleeing = true;
 
         Info.SpeedGround = FleeSpeed;
-        Info.Target = Main.PlayerInfo;
+        Info.Target = EntityScan.FindNearestPlayer(transform.position, FleeDistance);
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobFleeDespawn>();
     }

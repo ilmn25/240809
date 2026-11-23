@@ -54,9 +54,7 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     /// <summary>Nearest player or friendly NPC within alert range.</summary>
     private Info FindNearestAggroTarget()
     {
-        Info best = (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed &&
-                     Vector3.Distance(Main.PlayerInfo.position, transform.position) <= Info.DistAlert)
-            ? Main.PlayerInfo : null;
+        Info best = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
         Info npc = EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is DynamicInfo d && d.IsNPC);
         if (npc != null && (best == null ||
             (npc.position - transform.position).sqrMagnitude < (best.position - transform.position).sqrMagnitude))
@@ -69,17 +67,15 @@ public class MobMachine : EntityMachine, IActionPrimaryAttack
     /// up friendly NPCs.</summary>
     protected void UpdatePlayerAggro()
     {
-        PlayerInfo player = Main.PlayerInfo;
-        bool alive = player != null && !player.Destroyed;
-        bool inRange = alive && Vector3.Distance(player.position, transform.position) < Info.DistAlert;
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
 
-        if (inRange && Info.Target != player)
+        if (player != null && Info.Target != player)
         {
             Info.Target = player;
             Info.PathingStatus = PathingStatus.Pending;
         }
-        else if (!inRange && Info.Target == player &&
-                 Vector3.Distance(player.position, transform.position) > Info.DistDisengage)
+        else if (player == null && Info.Target is PlayerInfo &&
+                 Vector3.Distance(Info.Target.position, transform.position) > Info.DistDisengage)
             Info.CancelTarget();
     }
 

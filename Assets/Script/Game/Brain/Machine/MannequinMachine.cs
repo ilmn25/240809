@@ -50,11 +50,9 @@ public class MannequinMachine : GroundMobMachine
 
     public override void OnUpdate()
     {
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-
-        // Weeping-angel freeze: while the player looks at us, we can neither move
+        // Weeping-angel freeze: while a player looks at us, we can neither move
         // nor attack.
-        if (playerAlive && IsBeingFaced())
+        if (IsBeingFaced())
         {
             if (!IsCurrentState<MobMannequinFrozen>())
                 SetState<MobMannequinFrozen>();
@@ -75,15 +73,19 @@ public class MannequinMachine : GroundMobMachine
     /// i.e. the player is looking at the mannequin.</summary>
     private bool IsBeingFaced()
     {
-        PlayerInfo player = Main.PlayerInfo;
-        if (player == null || player.Machine == null || Camera.main == null) return false;
+        if (Camera.main == null || Save.Inst?.players == null) return false;
 
-        Vector3 screenDir = Camera.main.WorldToScreenPoint(transform.position)
-                          - Camera.main.WorldToScreenPoint(player.position);
-        screenDir.z = 0;
-        Vector2 toMe = screenDir.normalized;
-        Vector2 facing = player.TargetScreenDir;
-        return Vector2.Dot(facing, toMe) > FaceThreshold;
+        foreach (PlayerInfo player in Save.Inst.players)
+        {
+            if (player == null || player.Destroyed || player.Machine == null) continue;
+
+            Vector3 screenDir = Camera.main.WorldToScreenPoint(transform.position)
+                              - Camera.main.WorldToScreenPoint(player.position);
+            screenDir.z = 0;
+            if (Vector2.Dot(player.TargetScreenDir, screenDir.normalized) > FaceThreshold)
+                return true;
+        }
+        return false;
     }
 
     /// <summary>Stops all movement and pathing. Used while the player is looking

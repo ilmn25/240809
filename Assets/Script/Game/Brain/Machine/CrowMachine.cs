@@ -57,11 +57,9 @@ public class CrowMachine : GroundMobMachine
         }
         _airborneTimer = 0;
 
-        PlayerInfo player = Main.PlayerInfo;
-        if (player != null && !player.Destroyed &&
-            Vector3.Distance(player.position, transform.position) < ScareDistance)
+        if (EntityScan.FindNearestPlayer(transform.position, ScareDistance) is { } player)
         {
-            StartFlee();
+            StartFlee(player);
             return;
         }
 
@@ -84,7 +82,7 @@ public class CrowMachine : GroundMobMachine
         if (_fleeing) return;
         _fleeing = true;
 
-        Info.Target = threat ?? Main.PlayerInfo;
+        Info.Target = threat ?? EntityScan.FindNearestPlayer(transform.position, FleeDistance);
         Info.PathingStatus = PathingStatus.Pending;
         SetState<MobTakeOff>();
     }

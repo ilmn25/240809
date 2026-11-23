@@ -88,7 +88,8 @@ public class PigeonMachine : GroundMobMachine
         if (_leaving)
             return;
 
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed || ScarecrowNear(Main.PlayerInfo.position))
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
+        if (player == null || ScarecrowNear(player.position))
         {
             StartFlee();
             return;
@@ -98,7 +99,7 @@ public class PigeonMachine : GroundMobMachine
         if (Info.Direction.sqrMagnitude > 0.001f)
             _approachDir = Info.Direction;
 
-        Info.Target = Main.PlayerInfo;
+        Info.Target = player;
         if (_hover.IsOverhead)
             DropPoop();
     }

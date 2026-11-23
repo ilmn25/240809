@@ -34,18 +34,16 @@ public class RoosterMachine : AnimalMachine
 
     public override void OnUpdate()
     {
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        bool playerNear = playerAlive &&
-            Vector3.Distance(Main.PlayerInfo.position, transform.position) < Info.DistAlert;
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
 
-        if (playerNear)
+        if (player != null)
         {
             // Attack immediately if the player attacked us (target already set by OnHit),
             // otherwise attack if the player lingers too close for too long.
             if (Info.Target is PlayerInfo ||
                 (++_nearTimer >= AggroDelay && Info.Target is not PlayerInfo))
             {
-                Chase(Main.PlayerInfo);
+                Chase(player);
                 return;
             }
         }
@@ -53,9 +51,8 @@ public class RoosterMachine : AnimalMachine
         {
             _nearTimer = 0;
             // Player stepped away — calm down once they're well out of reach.
-            if (Info.Target is PlayerInfo &&
-                (!playerAlive ||
-                 Vector3.Distance(Main.PlayerInfo.position, transform.position) > Info.DistDisengage))
+            if (Info.Target is PlayerInfo target &&
+                Vector3.Distance(target.position, transform.position) > Info.DistDisengage)
             {
                 Info.CancelTarget();
             }

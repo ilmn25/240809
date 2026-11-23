@@ -40,10 +40,7 @@ public class SheepMachine : AnimalMachine
 
     public override void OnUpdate()
     {
-        bool playerAlive = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed;
-        float playerDist = playerAlive
-            ? Vector3.Distance(Main.PlayerInfo.position, transform.position)
-            : float.MaxValue;
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, Info.DistAttack);
 
         // Sheep are docile — they never attack on sight. They stay with the flock,
         // and only flee if the player crowds them or something scares them.
@@ -64,10 +61,10 @@ public class SheepMachine : AnimalMachine
                 AttackOrChase();
             }
         }
-        else if (playerAlive && playerDist < Info.DistAttack)
+        else if (player != null)
         {
             if (Info.Target is not PlayerInfo)
-                Info.Target = Main.PlayerInfo; // flee anchor
+                Info.Target = player; // flee anchor
             Scatter();
         }
         else if (Info.Target != null &&

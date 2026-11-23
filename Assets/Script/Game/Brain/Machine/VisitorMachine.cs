@@ -69,10 +69,10 @@ public class VisitorMachine : GroundMobMachine
             return;
         }
 
-        // Passive: follow the player. If left alone long enough, wander off.
-        if (Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed)
+        // Passive: follow the nearest player. If left alone long enough, wander off.
+        if (EntityScan.FindNearestPlayer(transform.position, Info.DistAlert) is { } player)
         {
-            Info.Target = Main.PlayerInfo;
+            Info.Target = player;
             Info.ActionType = IActionType.Follow;
             SetState<MobChaseAction>();
             _leaveTimer = 0;

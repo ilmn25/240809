@@ -149,8 +149,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // Drives non-controlled party members. Priority order:
     //   1. finish a fight already under way (an ally only starts one when idle),
-    //   2. finish the structure job this ally was ordered to do — enemies nearby are not a
-    //      reason to stop cutting; only a hit on the ally itself starts a fight,
+    //   2. finish the structure job this ally was ordered to do, unless a threat closes on
+    //      the ally — then it drops the job (kept in WorkOrder) and fights,
     //   3. roaming/targetless: pick a new fight or sweep up loot,
     //   4. otherwise trail the leader.
     // Allies never adopt the leader's target — the only way they get a structure job is by
@@ -189,6 +189,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         if (EngagedEnemy is { } enemy)
         {
+            if (IsBeyondPartyRange(transform.position) || IsBeyondPartyRange(enemy.position))
+            {
+                Info.CancelTarget();
+                FollowLeader();
+                return;
+            }
+
             if (Info.IsTired)
             {
                 if (Info.Storage.SetRangedWeapon())
@@ -201,6 +208,14 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             }
 
             if (TryEngageEnemy(enemy) || TryContinueWork()) SetState<MobChaseAction>();
+            return;
+        }
+
+        if (Info.WorkOrder != null && !IsBeyondPartyRange(transform.position) &&
+            FindNearestThreat() is { } assailant && !IsBeyondPartyRange(assailant.position) &&
+            TryDefendSelf(assailant))
+        {
+            SetState<MobChaseAction>();
             return;
         }
 
@@ -233,46 +248,41 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
     }
 
-    // Keeps the ally fighting. It stays on the enemy it already engaged (passed in) — that
-    // fight may drift out to disengage range — and otherwise engages the nearest threat
-    // around the leader. Either way it needs something it can actually swing.
+    // Keeps the ally fighting. It stays on the enemy it already engaged (passed in) until the
+    // party moves out of range, and otherwise engages the nearest threat around the leader.
+    // Either way it needs something it can actually swing.
     private bool TryEngageEnemy(MobInfo engaged = null)
     {
-        if (Leader is not PlayerInfo leader) return false;
-
         MobInfo enemy = engaged;
-        if (enemy != null)
+        if (enemy == null)
         {
-            if (IsBeyondAlert(leader.position) ||
-                Vector3.Distance(leader.position, enemy.position) > Info.DistDisengage)
-            {
-                Info.CancelTarget();
-                return false;
-            }
-        }
-        else
-        {
-            // Don't start new fights while away from the leader — head back first.
-            if (IsBeyondAlert(leader.position)) return false;
+            if (Leader is not PlayerInfo leader || IsBeyondPartyRange(transform.position)) return false;
 
             enemy = FindNearestThreat();
-            if (enemy == null || Vector3.Distance(leader.position, enemy.position) > Info.DistAlert) return false;
+            if (enemy == null || IsBeyondPartyRange(enemy.position) ||
+                Vector3.Distance(leader.position, enemy.position) > Info.DistAlert) return false;
         }
 
-        // Draw a weapon first: an ally that just finished a job is still holding its pickaxe.
-        // A companion with no bag (a pet) fights with its natural attack instead.
-        if (Info.HasInventory && !Info.Storage.SetWeapon())
+        if (!TryDefendSelf(enemy))
         {
             if (engaged != null) Info.CancelTarget();
             return false;
         }
+        return true;
+    }
 
-        Info.Target = enemy;
+    private bool TryDefendSelf(MobInfo threat)
+    {
+        if (Info.HasInventory && !Info.Storage.SetWeapon()) return false;
+        Info.Target = threat;
         Info.ActionType = IActionType.Hit;
         return true;
     }
 
-    private const float WorkAbandonDistance = 16f;
+    private const float PartyRange = 8f;
+
+    private bool IsBeyondPartyRange(Vector3 point) =>
+        Leader is PlayerInfo leader && Vector3.Distance(leader.position, point) > PartyRange;
 
     private bool TryContinueWork()
     {
@@ -282,9 +292,9 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return false;
         }
 
-        if (Leader is PlayerInfo leader && Vector3.Distance(leader.position, job.position) > WorkAbandonDistance)
+        if (IsBeyondPartyRange(job.position))
         {
-            Info.CancelTarget();
+            if (Info.IsWorking) Info.CancelTarget();
             return false;
         }
 
@@ -298,9 +308,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         Info.ActionType = IActionType.Hit;
         return true;
     }
-
-    // True when the ally has strayed past its alert radius from the given point.
-    private bool IsBeyondAlert(Vector3 from) => Vector3.Distance(from, transform.position) > Info.DistAlert;
 
     // Flees from the nearest nearby hostile (used when low on health).
     private bool TryFleeEnemy()

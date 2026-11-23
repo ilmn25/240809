@@ -57,9 +57,7 @@ public class TurretMachine : MobMachine
 
     private void UpdateTarget()
     {
-        bool inAlert = Main.PlayerInfo != null && !Main.PlayerInfo.Destroyed &&
-                       Vector3.Distance(Main.PlayerInfo.position, transform.position) <= Info.DistAlert;
-        Info.Target = inAlert ? Main.PlayerInfo : null;
+        Info.Target = EntityScan.FindNearestPlayer(transform.position, Info.DistAlert);
     }
 
     private bool InRangeAndVisible()

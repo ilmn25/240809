@@ -29,16 +29,11 @@ public class SpiderWebMachine : HarvestableMachine
         if (++_timer < CheckInterval) return;
         _timer = 0;
 
-        bool playerOnWeb = PlayerOnWeb();
+        PlayerInfo player = EntityScan.FindNearestPlayer(transform.position, WebRadius);
+        bool playerOnWeb = player != null;
         if (playerOnWeb && !_playerOnWeb)
-            AlertSpiders(Main.PlayerInfo);
+            AlertSpiders(player);
         _playerOnWeb = playerOnWeb;
-    }
-
-    private bool PlayerOnWeb()
-    {
-        if (Main.PlayerInfo == null || Main.PlayerInfo.Destroyed) return false;
-        return Vector3.Distance(Main.PlayerInfo.position, transform.position) < WebRadius;
     }
 
     public void AlertSpiders(Info target)
