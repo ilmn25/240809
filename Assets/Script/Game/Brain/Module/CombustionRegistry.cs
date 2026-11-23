@@ -51,9 +51,10 @@ public static class CombustionRegistry
         BurnStructure(ID.ImprovisedPlanter);
         BurnStructure(ID.Bed);
         BurnStructure(ID.Sign);
-        BurnStructure(ID.Table);
         BurnStructure(ID.WoodSpikeTrap);
-        BurnStructure(ID.FallenTree);
+
+        BurnDebris(ID.Table);
+        BurnDebris(ID.FallenTree);
 
         // Plants and decor all smolder down to ash.
         Ash(ID.Bush, ID.Grass, ID.Deathcap, ID.Orchids, ID.Tulips, ID.Daisies);
@@ -71,6 +72,9 @@ public static class CombustionRegistry
     /// burnable wood converting to charcoal.</summary>
     private static void BurnStructure(ID id) =>
         Register(id, new CombustionProfile(true) { Spawns = ID.CharredRubble, DropsLoot = id });
+
+    private static void BurnDebris(ID id) =>
+        Register(id, new CombustionProfile(true) { DropsLoot = id });
 
     /// <summary>Register several flammable entities that all burn down to ash.</summary>
     private static void Ash(params ID[] ids)

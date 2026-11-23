@@ -234,7 +234,7 @@ public class ImprovisedPlanterMachine : PlanterMachine
             Loot = ID.ImprovisedPlanter,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Cutting,
+            operationType = OperationType.Chopping,
             threshold = 1,
         };
     }

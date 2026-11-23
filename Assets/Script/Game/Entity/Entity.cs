@@ -109,12 +109,6 @@ public class Entity
                 loot.Add(0.1f, 1, ID.Geode);
 
                 AddStructure<RockPileMachine>(ID.RockPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
-                loot = new (ID.RockPile);
-                loot.Add(1, 2, ID.Gravel);
-                loot.Add(0.7f, 1, ID.Gravel);
-                loot.Add(0.5f, 1, ID.Flint);
-                loot.Add(0.3f, 1, ID.MetalChunks);
-                loot.Add(0.1f, 1, ID.Geode);
 
                 AddStructure<IronBoulderMachine>(ID.IronBoulder, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 loot = new (ID.IronBoulder);
@@ -124,7 +118,6 @@ public class Entity
                 loot.Add(0.3f, 1, ID.Flint);
                 loot.Add(0.1f, 1, ID.Geode);
 
-                // Harvestable natural debris — chopped/digged by hand, drops via HarvestableRegistry.
                 AddStructure<HarvestableMachine>(ID.FallenTree, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 AddStructure<HarvestableMachine>(ID.MudPile, Vector3Int.one, Main.IndexSemiCollide, NavMap.Semi);
                 

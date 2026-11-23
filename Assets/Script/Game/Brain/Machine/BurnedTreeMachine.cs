@@ -9,7 +9,7 @@ public class BurnedTreeMachine : StructureMachine
             Loot = ID.BurnedTree,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Cutting,
+            operationType = OperationType.Chopping,
             SpawnsRubble = false,
         };
     }

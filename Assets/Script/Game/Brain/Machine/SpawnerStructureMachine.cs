@@ -29,7 +29,7 @@ public abstract class SpawnerStructureMachine : StructureMachine
         Loot = loot,
         SfxHit = SfxID.HitStone,
         SfxDestroy = SfxID.HitStone,
-        operationType = OperationType.Cutting,
+        operationType = OperationType.Chopping,
         threshold = 1,
         SpawnsRubble = false,
     };

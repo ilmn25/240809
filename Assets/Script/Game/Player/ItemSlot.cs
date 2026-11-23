@@ -157,6 +157,7 @@ public class ItemSlot
                 OperationType.Dismantling => "dismantling",
                 OperationType.Mining => "mining",
                 OperationType.Cutting => "breaking",
+                OperationType.Chopping => "chopping",
                 _ => "",
             };
             if (operation.Length > 0)
@@ -175,6 +176,16 @@ public class ItemSlot
         Locked = false;
     }
  
+    /// <summary>Copy every field of <paramref name="slot"/> into this one.</summary>
+    public void CopyFrom(ItemSlot slot)
+    {
+        ID = slot.ID;
+        Stack = slot.Stack;
+        Durability = slot.Durability;
+        Modifier = slot.Modifier;
+        Locked = slot.Locked;
+    }
+
     public void Add(ItemSlot slot, int amountToAdd = 0)
     { 
         if (slot.isEmpty()) return; 

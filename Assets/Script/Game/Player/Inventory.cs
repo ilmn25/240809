@@ -131,74 +131,81 @@ public class Inventory
             RefreshInventory();
         }
 
-        // While a dialogue choice menu is open the number keys pick the option,
-        // so don't also swap the selected hotbar slot.
         if (!Dialogue.ChoicesActive)
         {
-            if (Control.Inst.Hotbar1.KeyDown())
+            int hotbar = PressedHotbarSlot();
+            if (hotbar != -1 && !PlaceHeldInSlot(hotbar))
             {
-                _buffer = 0;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar2.KeyDown())
-            {
-                _buffer = 1;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar3.KeyDown())
-            {
-                _buffer = 2;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar4.KeyDown())
-            {
-                _buffer = 3;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar5.KeyDown())
-            {
-                _buffer = 4;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar6.KeyDown())
-            {
-                _buffer = 5;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar7.KeyDown())
-            {
-                _buffer = 6;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar8.KeyDown())
-            {
-                _buffer = 7;
-                RefreshInventory();
-            }
-            else if (Control.Inst.Hotbar9.KeyDown())
-            {
-                _buffer = 8;
+                _buffer = hotbar;
                 RefreshInventory();
             }
         }
 
-        if (Main.PlayerInfo.Machine && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>())
+        if (Main.PlayerInfo.Machine && Main.PlayerInfo.Machine.IsCurrentState<DefaultState>() &&
+            _buffer != -1)
         {
-            if (_buffer != -1)
-            {
-                Audio.PlaySFX(SfxID.Text);
-                Main.PlayerInfo.Storage.Key = _buffer;
-                _buffer = -1;
-                SyncCurrentItemState();
-                RefreshInventory();
-            }
+            Audio.PlaySFX(SfxID.Text);
+            Main.PlayerInfo.Storage.Key = _buffer;
+            _buffer = -1;
+            SyncCurrentItemState();
+            RefreshInventory();
         }
+    }
+
+    private static int PressedHotbarSlot()
+    {
+        Control control = Control.Inst;
+        if (control.Hotbar1.KeyDown()) return 0;
+        if (control.Hotbar2.KeyDown()) return 1;
+        if (control.Hotbar3.KeyDown()) return 2;
+        if (control.Hotbar4.KeyDown()) return 3;
+        if (control.Hotbar5.KeyDown()) return 4;
+        if (control.Hotbar6.KeyDown()) return 5;
+        if (control.Hotbar7.KeyDown()) return 6;
+        if (control.Hotbar8.KeyDown()) return 7;
+        if (control.Hotbar9.KeyDown()) return 8;
+        return -1;
+    }
+
+    /// <summary>Move the item held on the cursor into a hotbar slot and select that slot.
+    /// An item already in the slot is dropped on the floor. False when the cursor is
+    /// empty or the slot holds a full stack of the same item.</summary>
+    public static bool PlaceHeldInSlot(int index)
+    {
+        Storage storage = Main.PlayerInfo?.Storage;
+        if (storage?.List == null || GUICursor.Data.isEmpty()) return false;
+        if (index < 0 || index >= storage.List.Count) return false;
+
+        ItemSlot target = storage.List[index];
+        if (target.isEmpty() || target.isSame(GUICursor.Data) && !target.isFull())
+        {
+            target.Add(GUICursor.Data);
+        }
+        else if (target.isSame(GUICursor.Data))
+        {
+            return false;
+        }
+        else
+        {
+            DropToWorld(target, target.Stack, storage, Main.Player.transform.position);
+            target.CopyFrom(GUICursor.Data);
+            GUICursor.Data.clear();
+        }
+
+        _buffer = -1;
+        storage.Key = index;
+        GUICursor.UpdateCursorSlot();
+        storage.NotifyChanged();
+        return true;
     }
 
     public static void HandleScrollInput(float input)
     {
         int step = (int)Mathf.Sign(input);
-        _buffer = (int)Mathf.Repeat(Main.PlayerInfo.Storage.Key - step, InventorySlotAmount);
+        int slot = (int)Mathf.Repeat(Main.PlayerInfo.Storage.Key - step, InventorySlotAmount);
+        if (PlaceHeldInSlot(slot)) return;
+
+        _buffer = slot;
         RefreshInventory();
     }
 

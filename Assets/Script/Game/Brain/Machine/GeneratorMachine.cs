@@ -17,7 +17,7 @@ public class GeneratorMachine : StructureMachine
         Loot = ID.Generator,
         SfxHit = SfxID.HitStone,
         SfxDestroy = SfxID.HitStone,
-        operationType = OperationType.Cutting,
+        operationType = OperationType.Chopping,
         GlowOn = true,
     };
 

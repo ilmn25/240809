@@ -10,10 +10,9 @@ public class InContainerState : State
         _playerIndex = Control.CurrentPlayerIndex;
         if (Storage != Main.PlayerInfo.Storage)
             Tutorial.OnTeammateInventory();
-        GUIMain.Storage.Storage = Storage;
-        GUIMain.RefreshStorage(); 
         GUIMain.Show(true);
-        GUIMain.Storage.Show(Storage != Main.PlayerInfo.Storage, !GUIMain.Showing);
+        GUIMain.Storage.ShowStorage(Storage, Storage != Main.PlayerInfo.Storage);
+        GUIMain.RefreshStorage(); 
     }
 
     public override void OnUpdateState()

@@ -13,7 +13,7 @@ public class ThresholdPortalMachine : StructureMachine, IActionSecondaryInteract
         {
             Health = PortalHealth,
             threshold = 1,
-            operationType = OperationType.Cutting,
+            operationType = OperationType.Chopping,
             Loot = ID.Null,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,

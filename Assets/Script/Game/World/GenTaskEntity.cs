@@ -38,6 +38,7 @@ public class GenTaskEntity : IGenTask
     private const double DirtScavTentChance = 0.0004;
     private const double DirtFallenTreeChance = 0.004;
     private const double DirtMudPileChance = 0.006;
+    private const double DirtRockPileChance = 0.006;
     private const double DirtToadstoolChance = 0.003;
     private const double DirtCottonChance = 0.004;
     private static readonly float PathOffset = Gen.GetDeterministicOffset("ForestPath");
@@ -172,6 +173,10 @@ public class GenTaskEntity : IGenTask
                             else if (roll <= (chance += DirtMudPileChance))
                             {
                                 currentChunk.PlaceEntity(ID.MudPile, position);
+                            }
+                            else if (roll <= (chance += DirtRockPileChance))
+                            {
+                                currentChunk.PlaceEntity(ID.RockPile, position);
                             }
                             else if (roll <= (chance += DirtToadstoolChance))
                             {

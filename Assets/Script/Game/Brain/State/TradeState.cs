@@ -16,11 +16,11 @@ public class TradeState : State
         _menu = trader.Menu;
 
         GUIMain.GUICraft.FitSlots(_menu.GetStoragePool());
+
+        GUIMain.Show(true);
         GUIMain.GUICraft.Use(_menu, trader.Mode);
 
         GUIMain.RefreshStorage();
-        GUIMain.Show(true);
-        GUIMain.GUICraft.Show(true, !GUIMain.Showing);
     }
 
     public override void OnUpdateState()

@@ -219,8 +219,8 @@ public static class GUIMain
             {
                 string action = Inventory.CurrentItem?.Info.ActionLabel ?? "";
                 return action.Length > 0
-                    ? $"LMB: {action} | RMB: drop"
-                    : "RMB: drop";
+                    ? $"LMB: {action} | RMB: drop | 1-9: store in slot"
+                    : "RMB: drop | 1-9: store in slot";
             }
             return "";
         }

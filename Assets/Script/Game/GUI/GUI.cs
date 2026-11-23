@@ -55,7 +55,7 @@ public class GUI
             }
         }
     }  
-    public void Show(bool isShow, bool instant = false)
+    public virtual void Show(bool isShow, bool instant = false)
     {
         if (isShow)
         { 

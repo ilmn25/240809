@@ -1,15 +1,12 @@
-public class RockPileMachine : StructureMachine
+public class RockPileMachine : HarvestableMachine
 {
-    public static Info CreateInfo()
+    public static new Info CreateInfo()
     {
-        return new SpriteStructureInfo()
+        return new HarvestableInfo()
         {
             Health = 40,
-            Loot = ID.RockPile,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,
-            operationType = OperationType.Mining,
-            SpawnsRubble = false,
         };
     }
 }

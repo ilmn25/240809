@@ -14,7 +14,7 @@ public class DoorMachine : StructureMachine, IActionSecondaryInteract
         {
             Health = DoorHealth,
             threshold = 1,
-            operationType = OperationType.Cutting, // hit it with an axe, like other wooden structures
+            operationType = OperationType.Chopping,
             Loot = ID.Door,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,

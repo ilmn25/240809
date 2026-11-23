@@ -15,20 +15,27 @@ public class HarvestableDefinition
     /// <summary>Seconds before a non-destroyed harvestable regrows and can be
     /// harvested again (0 = always harvestable). Prevents infinite farming.</summary>
     public float RegrowTime = 0f;
+    public OperationType RequiredTool = OperationType.None;
 
-    public HarvestableDefinition(bool destroyOnHarvest = true, float regrowTime = 0f)
+    public HarvestableDefinition(bool destroyOnHarvest = true, float regrowTime = 0f, OperationType requiredTool = OperationType.None)
     {
         DestroyOnHarvest = destroyOnHarvest;
         RegrowTime = regrowTime;
+        RequiredTool = requiredTool;
     }
 
     /// <summary>Convenience: create a definition with a drop table.</summary>
-    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, float regrowTime = 0f)
+    public HarvestableDefinition(Loot drops, bool destroyOnHarvest = true, float regrowTime = 0f, OperationType requiredTool = OperationType.None)
     {
         Drops = drops;
         DestroyOnHarvest = destroyOnHarvest;
         RegrowTime = regrowTime;
+        RequiredTool = requiredTool;
     }
+
+    public bool CanHarvestWith(ProjectileInfo tool) =>
+        RequiredTool == OperationType.None ||
+        tool != null && tool.OperationType == RequiredTool;
 }
 
 /// <summary>
@@ -108,14 +115,22 @@ public static class HarvestableRegistry
         fallenTree.Add(0.5f, 1, ID.Log);
         fallenTree.Add(0.7f, 2, ID.Sticks);
         fallenTree.Add(0.25f, 1, ID.Acorn);
-        Register(ID.FallenTree, new HarvestableDefinition(fallenTree));
+        Register(ID.FallenTree, new HarvestableDefinition(fallenTree, requiredTool: OperationType.Chopping));
 
         Loot mudPile = new Loot(ID.MudPile);
         mudPile.Add(1f, 3, ID.Mud);
         mudPile.Add(0.5f, 2, ID.Sticks);
         mudPile.Add(0.2f, 1, ID.Flint);
         mudPile.Add(0.2f, 1, ID.Gravel);
-        Register(ID.MudPile, new HarvestableDefinition(mudPile));
+        Register(ID.MudPile, new HarvestableDefinition(mudPile, requiredTool: OperationType.Mining));
+
+        Loot rockPile = new Loot(ID.RockPile);
+        rockPile.Add(1f, 2, ID.Gravel);
+        rockPile.Add(0.7f, 1, ID.Gravel);
+        rockPile.Add(0.5f, 1, ID.Flint);
+        rockPile.Add(0.3f, 1, ID.MetalChunks);
+        rockPile.Add(0.1f, 1, ID.Geode);
+        Register(ID.RockPile, new HarvestableDefinition(rockPile, requiredTool: OperationType.Mining));
     }
 
     /// <summary>Register (or override) a harvestable definition.</summary>

@@ -17,7 +17,7 @@ public class DungeonDoorMachine : StructureMachine, IActionSecondaryInteract
         {
             Health = DoorHealth,
             threshold = 1,
-            operationType = OperationType.Cutting,
+            operationType = OperationType.Chopping,
             Loot = ID.Null,
             SfxHit = SfxID.HitStone,
             SfxDestroy = SfxID.HitStone,

@@ -36,10 +36,9 @@ public static class ContainerWindow
         if (owner.Storage != Main.PlayerInfo.Storage)
             Tutorial.OnTeammateInventory();
 
-        GUIMain.Storage.Storage = owner.Storage;
-        GUIMain.RefreshStorage();
         GUIMain.Show(true);
-        GUIMain.Storage.Show(true);
+        GUIMain.Storage.ShowStorage(owner.Storage);
+        GUIMain.RefreshStorage();
 
         Owner = owner;
         _viewerIndex = Control.CurrentPlayerIndex;

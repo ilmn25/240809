@@ -160,7 +160,7 @@ public partial class Item
         AddStructureDefinition(ID.FieldStation, new Dictionary<ID, int> { { ID.Log, 8 }, { ID.Sticks, 4 } }, 100, description: "A lightweight station specialized for field planting tools.");
         AddStructureDefinition(ID.ImprovisedPlanter, new Dictionary<ID, int> { { ID.Log, 3 }, { ID.Sticks, 2 } }, 100, description: "A basic planter. Plant any seed in it to grow a crop.");
         AddStructureDefinition(ID.CrockPot, new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.StoneBlock, 4 }, { ID.Sticks, 2 } }, 150, description: "A crock pot that cooks food. Add raw ingredients and it cooks them.");
-        AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> { { ID.Glass, 2 }, { ID.Plank, 3 }, { ID.Stake, 2 } }, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
+        AddStructureDefinition(ID.Lamp, new Dictionary<ID, int> {{ ID.Stake, 2 }, { ID.Cytoplasm, 2 }}, 100, description: "A placeable lamp. Right-click to toggle the light on and off.", furniture: true);
         AddStructureDefinition(ID.Generator, new Dictionary<ID, int> { { ID.Lead, 3 }, { ID.Stake, 4 }, { ID.Glass, 2 } }, 200, description: "Powers structures within a 9-block radius.");
         AddStructureDefinition(ID.OwlStatue, new Dictionary<ID, int> { { ID.StoneBlock, 6 } }, 100, description: "A stone owl statue that serves as the Guide's home — the Guide lives and respawns here.");
         AddStructureDefinition(ID.BulletinBoard, null, 100, furniture: true, description: "A wooden bulletin board that serves as the Questmaster's home — the quest-giver lives and respawns here.");
@@ -465,7 +465,7 @@ public partial class Item
             ProjectileSpeed = 1.2f, Radius = 2.8f, Breaking = 1, Operation = OperationType.Cutting,
             HitEffect = WeaponEffects.Stagger, HitEffectOnCrit = true,
             Description = "A heavy sledgehammer. The slowest weapon there is, but its crits stagger everything in its arc.",
-            Materials = new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Sticks, 2 } },
+            Materials = new Dictionary<ID, int> { { ID.Flint, 2 }, { ID.Stake, 2 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
 
@@ -547,7 +547,7 @@ public partial class Item
         new ToolSpec {
             Id = ID.CrudeHatchet,
             Speed = 2.4f, Damage = 1, Knockback = 10, CritChance = 10,
-            ProjectileSpeed = 2, Radius = 2, Breaking = 1, Operation = OperationType.Cutting,
+            ProjectileSpeed = 2, Radius = 2, Breaking = 1, Operation = OperationType.Chopping,
             Description = "A rough hatchet for early woodcutting.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 2 } },
             HoldoutOffset = new Vector2(0.65f, 0),
@@ -555,7 +555,7 @@ public partial class Item
         new ToolSpec {
             Id = ID.StoneHatchet,
             Speed = 1.4f, Damage = 1, Knockback = 10, CritChance = 10,
-            ProjectileSpeed = 2.5f, Radius = 2, Breaking = 1, Operation = OperationType.Cutting,
+            ProjectileSpeed = 2.5f, Radius = 2, Breaking = 1, Operation = OperationType.Chopping,
             Description = "Stone hatchet for chopping wood.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
@@ -563,7 +563,7 @@ public partial class Item
         new ToolSpec {
             Id = ID.MetalAxe,
             Speed = 1.4f, Damage = 1, Knockback = 10, CritChance = 10,
-            ProjectileSpeed = 2.5f, Radius = 2, Breaking = 2, Operation = OperationType.Cutting,
+            ProjectileSpeed = 2.5f, Radius = 2, Breaking = 2, Operation = OperationType.Chopping,
             Description = "Axe forged from metal for tougher timber.",
             Materials = new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 5 } },
             HoldoutOffset = new Vector2(0.65f, 0),
@@ -571,7 +571,7 @@ public partial class Item
         new ToolSpec {
             Id = ID.DiamondAxe,
             Speed = 1.4f, Damage = 1, Knockback = 10, CritChance = 10,
-            ProjectileSpeed = 2, Radius = 2, Breaking = 4, Operation = OperationType.Cutting,
+            ProjectileSpeed = 2, Radius = 2, Breaking = 4, Operation = OperationType.Chopping,
             Description = "A premium diamond axe for efficient cutting.",
             Materials = new Dictionary<ID, int> { { ID.Brick, 1 }, { ID.Stake, 2 } },
             HoldoutOffset = new Vector2(0.65f, 0),

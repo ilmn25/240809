@@ -1,44 +1,54 @@
 using UnityEngine;
 
-/// <summary>Info for harvestable plants/decor. Can be harvested by attacking with
-/// any tool — no OperationType/Breaking requirement. Behavior is data-driven via
-/// HarvestableRegistry: each harvestable ID defines its drops and whether it is
-/// destroyed on harvest.</summary>
 [System.Serializable]
 public class HarvestableInfo : SpriteStructureInfo
 {
+    private static float _lastToolWarnTime = -999f;
+
     /// <summary>Seconds until this harvestable regrows after being picked
     /// (bush cooldown). Persisted so the picked state survives save/load.</summary>
     public float RegrowTimer;
 
     public HarvestableInfo()
     {
-        // Harvestables are natural decor; if a hostile bashes one it must not leave rubble.
         SpawnsRubble = false;
     }
 
     public override bool OnHitInternal(Projectile projectile)
     {
-        if (projectile.SourceInfo is not PlayerInfo || projectile.SourceInfo.Equipment == null)
+        if (projectile.SourceInfo is not PlayerInfo player || player.Equipment == null)
             return false;
 
         HarvestableDefinition definition = HarvestableRegistry.Get(id);
         if (definition == null)
             return false;
 
-        // Harvest directly here without setting the attacker's target, so the
-        // swing animation isn't reset by re-targeting this destroyed harvestable.
-        Particle.Create(position, Particles.HitDust, false);
-
-        // Picked and regrowing — no drops yet.
         if (RegrowTimer > 0f)
             return true;
 
-        // Defer the actual harvest (drops/destroy/regrow) to a virtual hook so
-        // subclasses can add bespoke behavior (e.g. the old pot popping a viper).
+        if (!definition.CanHarvestWith(player.Equipment.Info.ProjectileInfo))
+        {
+            if (player == Main.PlayerInfo)
+                WarnMissingTool(definition.RequiredTool);
+            return false;
+        }
+
+        Particle.Create(position, Particles.HitDust, false);
         OnHarvest(definition);
 
         return true;
+    }
+
+    private static void WarnMissingTool(OperationType required)
+    {
+        if (Time.time - _lastToolWarnTime < 2f) return;
+        _lastToolWarnTime = Time.time;
+        Dialogue.ShowEvent(required switch
+        {
+            OperationType.Chopping => "I need an axe to chop this.",
+            OperationType.Mining => "I need a pickaxe to dig this.",
+            _ => "I need a better tool...",
+        });
     }
 
     /// <summary>What happens when this harvestable is harvested. Default rolls

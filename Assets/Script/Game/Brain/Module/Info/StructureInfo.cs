@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum OperationType { Mining, Dismantling, Cutting, None }
+public enum OperationType { Mining, Dismantling, Cutting, None, Chopping }
 
 [System.Serializable]
 public class SpriteStructureInfo : StructureInfo
@@ -218,6 +218,7 @@ public class StructureInfo : Info
             OperationType.Mining => "Mining",
             OperationType.Dismantling => "Dismantling",
             OperationType.Cutting => "Cutting",
+            OperationType.Chopping => "Chopping",
             _ => "Destroying",
         };
         return $"{action}: {Helper.ToDisplayName(id)} | HP {Health}";

@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>Harvestable plants and decor. Can be harvested by attacking with any
-/// tool (primary action) — no specific tool type required. Behavior is
-/// data-driven via HarvestableRegistry.</summary>
 public class HarvestableMachine : StructureMachine
 {
     public static Info CreateInfo()

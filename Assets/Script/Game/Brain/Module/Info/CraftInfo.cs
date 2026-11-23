@@ -23,7 +23,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
-        { ID.Toolbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet,  ID.Rapier, ID.Sledgehammer, ID.Workbench, ID.Chest, ID.Furnace, ID.Lamp) },
+        { ID.Toolbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.Stake, ID.Rapier, ID.Sledgehammer, ID.Workbench, ID.Chest, ID.Furnace, ID.Lamp) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap) },
         { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.FieldStation, ID.Scarecrow, ID.Chair) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },
@@ -31,7 +31,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
         { ID.CrockPot, new PoolDef(0, true, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap) },
         { ID.Smelter, new PoolDef(0, true, ID.Glass, ID.Steel) },
         { ID.MasonryWorkbench, new PoolDef(0, true, ID.Smelter, ID.Stonecutter, ID.OwlStatue) },
-        { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Stake, ID.Chest, ID.WoodSpikeTrap, ID.Barrel, ID.OilBarrel) },
+        { ID.Sawmill, new PoolDef(0, true, ID.Plank, ID.Chest, ID.WoodSpikeTrap, ID.Barrel, ID.OilBarrel) },
         { ID.Stonecutter, new PoolDef(0, true, ID.Brick, ID.BrickBlock) },
         { ID.Workbench, new PoolDef(0, true,   ID.Arrow, ID.ShortBow, ID.Anvil, ID.MasonryWorkbench, ID.CarpenterWorkbench, ID.Sawmill, ID.CrockPot) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
@@ -51,7 +51,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
     public override void Initialize()
     {
         base.Initialize();
-        operationType = OperationType.Cutting;
+        operationType = OperationType.Chopping;
     }
 
     // Don't let the station be lifted away mid-craft, or the queued item is lost.

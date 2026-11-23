@@ -9,11 +9,10 @@ public class InCraftState : State
         _craftInfo = (CraftInfo)Info;
         GUIMain.GUICraft.FitSlots(_craftInfo.GetStoragePool());
 
+        GUIMain.Show(true);
         GUIMain.GUICraft.Use(_craftInfo, TradeMode.Craft);
 
         GUIMain.RefreshStorage(); 
-        GUIMain.Show(true);
-        GUIMain.GUICraft.Show(true, !GUIMain.Showing);
     }
 
     public override void OnUpdateState()

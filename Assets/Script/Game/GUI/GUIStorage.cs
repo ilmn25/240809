@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,8 @@ public abstract class GUIStorage : GUI
     private readonly Vector2 _margin = new Vector2(10, 10);
     private int _cooldown;
     private int _cooldownSpeed = 40;    
+    private int _reopenToken;
+    private CoroutineTask _reopenTask;
     
     public Storage Storage; 
     public int RowAmount = 1;
@@ -109,6 +112,41 @@ public abstract class GUIStorage : GUI
 
         while (storage.List.Count < count)
             storage.List.Add(new ItemSlot());
+    }
+
+    public void ShowStorage(Storage storage, bool visible = true)
+    {
+        bool switching = visible && Showing && Storage != null && Storage != storage;
+        Storage = storage;
+
+        if (switching)
+            Reopen();
+        else
+            Show(visible);
+    }
+
+    public override void Show(bool isShow, bool instant = false)
+    {
+        if (!isShow) _reopenToken++;
+        base.Show(isShow, instant);
+    }
+
+    protected void Reopen()
+    {
+        _reopenToken++;
+        ScaleTask?.Stop();
+        _reopenTask?.Stop();
+        _reopenTask = new CoroutineTask(ReopenRoutine());
+    }
+
+    private IEnumerator ReopenRoutine()
+    {
+        int token = _reopenToken;
+        base.Show(false);
+        yield return new WaitForSeconds(HideSpeed);
+        yield return null;
+        if (token != _reopenToken) yield break;
+        base.Show(true);
     }
 
     /// <summary>Show or hide the panel itself — a player with no bag (a pet) has no slots
