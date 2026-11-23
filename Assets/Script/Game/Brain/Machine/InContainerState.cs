@@ -30,7 +30,7 @@ public class InContainerState : State
             return;
         }
 
-        if (!GUIMain.Showing || GUIMain.Storage.Storage != Storage ||
+        if (!GUIMain.Showing || GUIMain.Storage.TargetStorage != Storage ||
             Helper.SquaredDistance(Main.Player.transform.position, Machine.transform.position) > 5*5) { //walk away from npc
             Machine.SetState<DefaultState>();
         }
@@ -38,7 +38,7 @@ public class InContainerState : State
 
     public override void OnExitState()
     {
-        if (GUIMain.Storage.Storage == Storage)
+        if (GUIMain.Storage.TargetStorage == Storage)
             GUIMain.Storage.Show(false);
     }
 }

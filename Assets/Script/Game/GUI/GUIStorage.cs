@@ -14,6 +14,7 @@ public abstract class GUIStorage : GUI
     private int _cooldownSpeed = 40;    
     private int _reopenToken;
     private CoroutineTask _reopenTask;
+    private Storage _pendingStorage;
     
     public Storage Storage; 
     public int RowAmount = 1;
@@ -116,22 +117,32 @@ public abstract class GUIStorage : GUI
 
     public void ShowStorage(Storage storage, bool visible = true)
     {
-        bool switching = visible && Showing && Storage != null && Storage != storage;
-        Storage = storage;
-
-        if (switching)
-            Reopen();
-        else
+        bool switching = visible && GUIMain.Showing && Showing && Storage != null && Storage != storage;
+        if (!switching)
+        {
+            Storage = storage;
             Show(visible);
+            return;
+        }
+
+        _pendingStorage = storage;
+        Reopen();
     }
+
+    public Storage TargetStorage => _pendingStorage ?? Storage;
 
     public override void Show(bool isShow, bool instant = false)
     {
-        if (!isShow) _reopenToken++;
+        if (!isShow)
+        {
+            _reopenToken++;
+            _pendingStorage = null;
+        }
+
         base.Show(isShow, instant);
     }
 
-    protected void Reopen()
+    private void Reopen()
     {
         _reopenToken++;
         ScaleTask?.Stop();
@@ -146,6 +157,10 @@ public abstract class GUIStorage : GUI
         yield return new WaitForSeconds(HideSpeed);
         yield return null;
         if (token != _reopenToken) yield break;
+
+        Storage = _pendingStorage;
+        _pendingStorage = null;
+        GUIMain.RefreshStorage();
         base.Show(true);
     }
 

@@ -36,21 +36,15 @@ public class GUICraft : GUIStorage
     {
         ActiveCraftInfo = null;
         Mode = TradeMode.Craft;
-        Storage = DefaultStorage;
+        ShowStorage(DefaultStorage);
     }
 
     /// <summary>Shows a menu in the given mode: its slots then do whatever that mode says.</summary>
     public void Use(CraftInfo menu, TradeMode mode)
     {
-        bool switching = Showing && Storage != menu.GetStoragePool();
         ActiveCraftInfo = menu;
         Mode = mode;
-        Storage = menu.GetStoragePool();
-
-        if (switching)
-            Reopen();
-        else
-            Show(true);
+        ShowStorage(menu.GetStoragePool());
     }
 
     protected override void ActionPrimaryDown() => QueueOrCraftItem();

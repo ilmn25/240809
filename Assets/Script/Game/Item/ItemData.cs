@@ -322,8 +322,9 @@ public partial class Item
                 Damage = 0,
                 Knockback = 0,
                 CritChance = 0,
-                LifeSpan = 132,          // ~2.2s fuse at 60fps
+                LifeSpan = 132,
                 Speed = 16,
+                Gravity = -24f,
                 Radius = 0.3f,
                 Ammo = ID.Grenade,
                 Blast = new ExplosionProjectileInfo {
@@ -382,10 +383,10 @@ public partial class Item
         return new ToolSpec
         {
             Id = id,
-            Gesture = ItemGesture.Shoot, Sfx = SfxID.Pistol,
+            Gesture = ItemGesture.Shoot, Sfx = SfxID.Sword,
             Speed = ShootCooldown(drawSeconds), Damage = damage, Knockback = knockback, CritChance = crit,
             ProjectileSpeed = arrowSpeed, Radius = 0.15f, Ammo = ID.Arrow, Sprite = ID.Arrow,
-            LifeSpan = 10000, Durability = durability, ProjectileOffset = 1f,
+            LifeSpan = 10000, Durability = durability, ProjectileOffset = 1f, Gravity = -18f,
             Description = description,
             Materials = materials,
             HoldoutOffset = new Vector2(0.6f, 0),
@@ -403,6 +404,7 @@ public partial class Item
         public float Knockback;
         public float CritChance;
         public float ProjectileSpeed = 1;
+        public float Gravity;
         public float Radius;
         public int Breaking;
         public OperationType Operation = OperationType.None;
@@ -473,8 +475,8 @@ public partial class Item
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
-            ProjectileSpeed = 60, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
-            LifeSpan = 10000,
+            ProjectileSpeed = 20, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
+            LifeSpan = 10000, Gravity = -22f,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
             Description = "A throwable weapon.",
@@ -483,16 +485,16 @@ public partial class Item
         },
 
         // Bows trade rate of fire for reach and punch.
-        Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 32, knockback: 4, crit: 10, durability: 300,
+        Bow(ID.ShortBow, drawSeconds: 0.45f, damage: 3, arrowSpeed: 24, knockback: 4, crit: 10, durability: 300,
             description: "A short, quick-drawing bow. Light arrows fly a little slow and land softly.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 4 }, { ID.Fabric, 1 } }),
-        Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 42, knockback: 7, crit: 15, durability: 400,
+        Bow(ID.LongBow, drawSeconds: 0.85f, damage: 6, arrowSpeed: 30, knockback: 7, crit: 15, durability: 400,
             description: "A tall bow of seasoned wood. Slow to draw, but the arrow flies further and hits far harder.",
             materials: new Dictionary<ID, int> { { ID.Sticks, 8 }, { ID.Fabric, 2 } }),
-        Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 52, knockback: 9, crit: 20, durability: 500,
+        Bow(ID.CompoundBow, drawSeconds: 1.15f, damage: 8, arrowSpeed: 36, knockback: 9, crit: 20, durability: 500,
             description: "Pulleys and steel limbs store the draw for you. Every arrow leaves flat, fast, and with a wicked bite.",
             materials: new Dictionary<ID, int> { { ID.Steel, 3 }, { ID.Plank, 2 }, { ID.Fabric, 1 } }),
-        Bow(ID.Crossbow, drawSeconds: 1.5f, damage: 10, arrowSpeed: 58, knockback: 12, crit: 25, durability: 600,
+        Bow(ID.Crossbow, drawSeconds: 1.5f, damage: 10, arrowSpeed: 42, knockback: 12, crit: 25, durability: 600,
             description: "A steel-armed crossbow. The longest reload there is, but nothing else throws an arrow as fast or as hard.",
             materials: new Dictionary<ID, int> { { ID.Steel, 4 }, { ID.Plank, 3 }, { ID.Fabric, 1 } }),
 
@@ -618,6 +620,7 @@ public partial class Item
                 CritChance = spec.CritChance,
                 LifeSpan = spec.LifeSpan,
                 Speed = spec.ProjectileSpeed,
+                Gravity = spec.Gravity,
                 Radius = spec.Radius,
                 Penetration = spec.Penetration,
                 Ammo = spec.Ammo,

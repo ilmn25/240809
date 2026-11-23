@@ -34,7 +34,7 @@ public partial class ItemRecipe
         List<Storage> sources = new List<Storage>();
         AddSource(sources, Main.PlayerInfo?.Storage);
 
-        foreach (PlayerInfo player in Party())
+        foreach (PlayerInfo player in Party(true))
             AddSource(sources, player.Storage);
 
         if (GUIMain.Storage is { Showing: true })
@@ -43,7 +43,15 @@ public partial class ItemRecipe
         return sources;
     }
 
-    private static IEnumerable<PlayerInfo> Party()
+    private static List<Storage> FarSources()
+    {
+        List<Storage> sources = new List<Storage>();
+        foreach (PlayerInfo player in Party(false))
+            AddSource(sources, player.Storage);
+        return sources;
+    }
+
+    private static IEnumerable<PlayerInfo> Party(bool inReach)
     {
         if (global::Save.Inst?.players == null) yield break;
 
@@ -51,7 +59,7 @@ public partial class ItemRecipe
         {
             if (player == null || player == Main.PlayerInfo || player.Destroyed ||
                 player.Machine == null || player.PlayerStatus == PlayerStatus.Incapacitated ||
-                !player.HasInventory || !InReach(player))
+                !player.HasInventory || InReach(player) != inReach)
                 continue;
             yield return player;
         }
@@ -101,12 +109,16 @@ public partial class ItemRecipe
         if (Ingredients == null || Ingredients.Count == 0) return "";
 
         List<Storage> sources = Sources();
+        List<Storage> farSources = FarSources();
         StringBuilder text = new StringBuilder("Ingredients:");
         foreach (var ingredient in Ingredients)
         {
             Item item = Item.GetItem(ingredient.Key);
             int have = AmountIn(sources, ingredient.Key);
-            string line = $"{item.Name} ({have}/{ingredient.Value})";
+            int far = AmountIn(farSources, ingredient.Key);
+            string line = far > 0
+                ? $"{item.Name} x {ingredient.Value} ({have} + {far} out of range)"
+                : $"{item.Name} x {ingredient.Value} ({have})";
             text.Append('\n').Append(colored
                 ? $"<color={(have < ingredient.Value ? ShortageColor : FulfilledColor)}>{line}</color>"
                 : line);

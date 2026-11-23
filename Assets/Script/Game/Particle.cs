@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum Particles {Smoke, Dust,
-    HitDust, Fire, BloodRed, BloodBlack, Lightning, Sweat, None
+    HitDust, Fire, BloodRed, BloodBlack, Lightning, Sweat, Spark, None
 }
 public class Particle
 {
@@ -14,6 +14,7 @@ public class Particle
         [Particles.Fire] = 0,
         [Particles.BloodRed] = 0,
         [Particles.BloodBlack] = 0,
+        [Particles.Spark] = 0,
         [Particles.Lightning] = 0,
     };
 

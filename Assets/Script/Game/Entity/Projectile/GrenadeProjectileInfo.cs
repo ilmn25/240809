@@ -7,8 +7,6 @@ using UnityEngine;
 /// the shared weapon info instance is safe for several grenades in flight.</summary>
 public class GrenadeProjectileInfo : RangedProjectileInfo
 {
-    /// <summary>Downward acceleration for the throw arc.</summary>
-    public float Gravity = -24f;
     /// <summary>Frames of ignored collision at spawn so the grenade can leave the
     /// thrower's hand before it starts checking the floor.</summary>
     public int SpawnGraceFrames = 3;

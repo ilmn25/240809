@@ -1,21 +1,26 @@
 using UnityEngine;
 
-/// <summary>A stationary area-of-effect blast. On spawn it damages every entity
-/// within Radius (via OnHitInternal, so it respects target hitbox rules), then
-/// removes itself.</summary>
 public class ExplosionProjectileInfo : ProjectileInfo
 {
-    /// <summary>Whether the blast spares its source (used for a thrown grenade so
-    /// a point-blank throw can't blow the thrower up).</summary>
     public bool SkipSource;
+    public float ShakeSpeed = 80f;
+    public float ShakeStrength = 0.4f;
+    public float ShakeDuration = 0.5f;
 
     public override void OnSpawn(Projectile projectile)
     {
-        // Local buffer (not the shared static HitBuffer): explosions can trigger
-        // nested explosions (landmine/grenade chain reactions), and a nested blast
-        // must not clobber this loop's results mid-iteration.
+        Vector3 position = projectile.transform.position;
+        Audio.PlaySFX(SfxID.Thunder);
+        if (Helper.IsHost())
+        {
+            Particle.Create(position, Particles.Fire, false);
+            Particle.Create(position, Particles.Smoke, false);
+            Particle.Create(position, Particles.HitDust, false);
+        }
+        ScreenShake.Shake(ShakeSpeed, ShakeStrength, ShakeDuration);
+
         Collider[] buffer = new Collider[50];
-        int hitCount = Physics.OverlapSphereNonAlloc(projectile.transform.position, Radius, buffer);
+        int hitCount = Physics.OverlapSphereNonAlloc(position, Radius, buffer);
         for (int i = 0; i < hitCount; i++)
         {
             if (SkipSource && projectile.SourceInfo != null && projectile.SourceInfo.Machine != null &&

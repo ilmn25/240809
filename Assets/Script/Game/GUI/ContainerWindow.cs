@@ -17,7 +17,7 @@ public static class ContainerWindow
 
     public static bool IsShowing(PlayerInfo owner) =>
         owner != null && Owner == owner && GUIMain.Storage.Showing &&
-        GUIMain.Storage.Storage == owner.Storage;
+        GUIMain.Storage.TargetStorage == owner.Storage;
 
     public static void Toggle(PlayerInfo owner)
     {
@@ -46,7 +46,7 @@ public static class ContainerWindow
 
     public static void Close()
     {
-        if (Owner != null && GUIMain.Storage.Showing && GUIMain.Storage.Storage == Owner.Storage)
+        if (Owner != null && GUIMain.Storage.Showing && GUIMain.Storage.TargetStorage == Owner.Storage)
             GUIMain.Storage.Show(false);
         Owner = null;
     }
@@ -59,7 +59,7 @@ public static class ContainerWindow
         // Hidden by the player, covered by a full-screen menu, or taken over by another
         // window (a chest, a shop, a crafting station).
         if (!GUIMain.Showing || !GUIMain.Storage.Showing ||
-            GUIMain.Storage.Storage != Owner.Storage || GUIMain.GUIMenu.Showing)
+            GUIMain.Storage.TargetStorage != Owner.Storage || GUIMain.GUIMenu.Showing)
         {
             Close();
             return;
