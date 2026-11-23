@@ -57,7 +57,6 @@ public class Inventory
             CurrentItem = null;
         }
 
-        Terraform.BlockUpdate();
         RefreshHeldItem(Main.PlayerInfo);
     }
 

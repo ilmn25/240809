@@ -1,10 +1,6 @@
-using UnityEngine;
-
 [System.Serializable]
 public class HarvestableInfo : SpriteStructureInfo
 {
-    private static float _lastToolWarnTime = -999f;
-
     /// <summary>Seconds until this harvestable regrows after being picked
     /// (bush cooldown). Persisted so the picked state survives save/load.</summary>
     public float RegrowTimer;
@@ -27,28 +23,12 @@ public class HarvestableInfo : SpriteStructureInfo
             return true;
 
         if (!definition.CanHarvestWith(player.Equipment.Info.ProjectileInfo))
-        {
-            if (player == Main.PlayerInfo)
-                WarnMissingTool(definition.RequiredTool);
             return false;
-        }
 
         Particle.Create(position, Particles.HitDust, false);
         OnHarvest(definition);
 
         return true;
-    }
-
-    private static void WarnMissingTool(OperationType required)
-    {
-        if (Time.time - _lastToolWarnTime < 2f) return;
-        _lastToolWarnTime = Time.time;
-        Dialogue.ShowEvent(required switch
-        {
-            OperationType.Chopping => "I need an axe to chop this.",
-            OperationType.Mining => "I need a pickaxe to dig this.",
-            _ => "I need a better tool...",
-        });
     }
 
     /// <summary>What happens when this harvestable is harvested. Default rolls

@@ -126,8 +126,8 @@ public static class HarvestableRegistry
 
         Loot rockPile = new Loot(ID.RockPile);
         rockPile.Add(1f, 2, ID.Gravel);
-        rockPile.Add(0.7f, 1, ID.Gravel);
-        rockPile.Add(0.5f, 1, ID.Flint);
+        rockPile.Add(0.5f, 1, ID.Gravel);
+        rockPile.Add(0.8f, 1, ID.Flint);
         rockPile.Add(0.3f, 1, ID.MetalChunks);
         rockPile.Add(0.1f, 1, ID.Geode);
         Register(ID.RockPile, new HarvestableDefinition(rockPile, requiredTool: OperationType.Mining));

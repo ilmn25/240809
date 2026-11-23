@@ -10,7 +10,8 @@ public class DynamicInfo : Info
     private const float HitFlashTime = 0.1f;
     public HitboxType HitboxType;
     /// <summary>True for friendly NPCs (merchant, guide, bound NPC). Enemies will
-    /// target and damage them, and they flee when attacked.</summary>
+    /// target and damage them, and they flee when attacked; a friendly attack only
+    /// shoves them.</summary>
     public bool IsNPC;
     public ID CharSprite = ID.Null;
     public SfxID HitSfx = SfxID.HitMob;
@@ -192,10 +193,15 @@ public class DynamicInfo : Info
         }
         IframesCurrent = Iframes; 
         Audio.PlaySFX(HitSfx);
+        if (IgnoresFriendlyHit(projectile.SourceInfo))
+        {
+            Shove(projectile);
+            OnHit(projectile);
+            return true;
+        }
         Health -= projectile.Info.GetDamage(out bool crit) - Defense;
         FlashHit();
-        if (!(IsNPC && Machine.IsInteracting))
-            KnockBack(projectile.transform.position, projectile.Info.Knockback * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
+        Shove(projectile);
         bool blackBlood = HitboxType == HitboxType.Enemy;
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), blackBlood ? Particles.BloodBlack : Particles.BloodRed, false);
         if (Helper.IsHost())
@@ -217,6 +223,20 @@ public class DynamicInfo : Info
     {
         position.y = Machine.transform.position.y;
         Velocity += (isAway? Machine.transform.position - position : Machine.transform.position + position).normalized * force;
+    }
+
+    /// <summary>True when a friendly attack cannot harm this entity: a friendly NPC is
+    /// only shoved back by one, never damaged, bled, ignited or statused. Enemy attacks
+    /// still hurt it.</summary>
+    public bool IgnoresFriendlyHit(MobInfo attacker) =>
+        IsNPC && attacker.HitboxType != HitboxType.Enemy;
+
+    /// <summary>Pushes the entity away from the hit. A friendly NPC in the middle of a
+    /// conversation stays put.</summary>
+    private void Shove(Projectile projectile)
+    {
+        if (IsNPC && Machine.IsInteracting) return;
+        KnockBack(projectile.transform.position, projectile.Info.Knockback * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
     }
 
     public override string ToString()

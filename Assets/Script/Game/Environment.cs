@@ -124,7 +124,7 @@ public class Environment
     }       
      
     public const int Length = 60 * 24;
-    private const float BaseSecondsPerGameMinute = 0.24f;
+    private const float BaseSecondsPerGameMinute = 1f;
     /// <summary>Real seconds per in-game minute, stretched by the world's day-length setting.</summary>
     public static float SecondsPerGameMinute =>
         BaseSecondsPerGameMinute * (Save.Inst != null ? Save.Inst.dayLength.Scale() : 1f);

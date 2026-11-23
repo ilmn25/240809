@@ -3,113 +3,96 @@ using UnityEngine;
 
 public static class Terraform
 {
-    private const int PreviewSpeed = 10; 
+    private const int PreviewSpeed = 17;
+    private const float Reach = 3f;
 
     public static readonly List<Vector3Int> PendingBlocks = new ();
     private static GameObject _blockObj;
     private static bool _overlayEnabled;
-    private static Vector3Int _coordinate;
-    public static ID Target; 
+    private static ID _previewTarget;
+    private static ID Target; 
 
     public static void Initialize()
     {
         _blockObj = ObjectPool.GetObject(ID.BlockPrefab);
-        _blockObj.SetActive(false); 
+        _blockObj.SetActive(false);
+        _previewTarget = ID.Null;
     }
     
-    public static void BlockUpdate()
+    private static void ConfigurePreview(Item held)
     {
-        Item held = Inventory.CurrentItemData;
-        Target = Aim.IsMiningTool() ? ID.MiningBox
-            : held != null && held.Type is ItemType.Block or ItemType.Structure ? held.ID
-            : ID.Null;
-        ConfigurePreview(_blockObj, Target);
-    }
+        if (Target == ID.Null || _previewTarget == Target) return;
+        _previewTarget = Target;
 
-    private static void ConfigurePreview(GameObject obj, ID target)
-    {
-        Item held = Inventory.CurrentItemData;
-        if (held == null)
-        {
-            obj.SetActive(false);
-            return;
-        }
-
-        bool mining = target == ID.MiningBox;
-        ID blockID;
-        float scale;
-        bool overlay;
-        if (mining) { blockID = ID.OverlayBlock; scale = 1.04f; overlay = true; }
-        else if (held.Type == ItemType.Structure) { blockID = ID.OverlayBlock; scale = 1f; overlay = true; }
-        else if (held.Type == ItemType.Block) { blockID = held.ID; scale = 1f; overlay = false; }
-        else { obj.SetActive(false); return; }
-
-        string key = overlay ? "overlay" : held.ID.ToString();
-        if (obj.name != key)
-        {
-            obj.name = key;
-            BlockPreview.Apply(obj, blockID, scale);
-        }
-        // The aim toggle only gates the mining overlay; build previews always show.
-        obj.SetActive(mining ? _overlayEnabled : true);
+        if (Target == ID.MiningBox) BlockPreview.Apply(_blockObj, ID.OverlayBlock, 1.04f);
+        else if (held.Type == ItemType.Structure) BlockPreview.Apply(_blockObj, ID.OverlayBlock, 1f);
+        else if (held.Type == ItemType.Block) BlockPreview.Apply(_blockObj, Target, 1f);
     }
     
     public static void Update()
     {
-        // Placing is skipped while hovering a slot so inventory management
-        // (pick up/swap) takes priority — the preview hides too.
         if (GUIStorage.HoveringSlot)
         {
             _blockObj.SetActive(false);
             return;
         }
 
-        // B-key toggles the mining aim overlay. Build previews are always shown.
         if (Control.Inst.terraform.KeyDown())
             _overlayEnabled = !_overlayEnabled;
 
         Item held = Inventory.CurrentItemData;
+        Target = Aim.IsMiningTool() ? ID.MiningBox
+            : held != null && held.Type is ItemType.Block or ItemType.Structure ? held.ID
+            : ID.Null;
+        ConfigurePreview(held);
+
+        Vector3Int cell = Aim.Cell();
+        bool aimVisible = Target != ID.MiningBox || _overlayEnabled;
+        bool cellValid = Target != ID.Null && Control.MouseLayer != -1 &&
+                         World.IsInWorldBounds(cell) && Scene.InPlayerBlockRange(cell, Reach) &&
+                         IsCellPlaceable(cell);
+
+        _blockObj.SetActive(aimVisible && cellValid);
+        if (aimVisible && cellValid)
+            Position(_blockObj, cell);
+
         bool overMap = Helper.isLayer(Control.MouseLayer, Main.IndexMap) &&
                        Main.PlayerInfo.Machine.IsCurrentState<DefaultState>();
-        bool usable = Target != ID.Null;
-
-        bool mining = Target == ID.MiningBox;
-        bool aimVisible = mining ? _overlayEnabled : true;
-
-        // The preview object snaps to the targeted cell whenever visible, a usable item
-        // is held, and the cursor is over the world (map or a structure). It stays
-        // visible during swings too (no DefaultState requirement).
-        Vector3Int cell = Aim.Cell();
-        if (aimVisible && usable && Control.MouseLayer != -1 && World.IsInWorldBounds(cell) && IsCellPlaceable(cell))
-        {
-            _blockObj.SetActive(true);
-            Position(_blockObj, cell);
-        }
-        else
-        {
-            _blockObj.SetActive(false);
-        }
-
-        // Placing requires the cursor preview to be on. For mining that means the
-        // toggle must be on; build always places.
-        bool canPlace = aimVisible && usable && overMap && HandleCoord();
-        if (canPlace && Control.Inst.ActionPrimary.Key())
-            Place(held);
+        if (aimVisible && cellValid && overMap && !PendingBlocks.Contains(cell) &&
+            Control.Inst.ActionPrimary.Key())
+            Place(held, cell);
     }
 
-    private static void Place(Item held)
+    private static void Place(Item held, Vector3Int cell)
     {
         if (Target == ID.MiningBox)
         {
-            // Placing a mining box is a marker drop, not a swing — mining happens
-            // with the follow-up swing.
-            SpawnBlock(false);
+            if (Main.CreativeMode) World.SetBlock(cell);
+            else Entity.Spawn(ID.MiningBox, cell);
             return;
         }
 
         Main.PlayerInfo.Machine.SetState<MobAttackSwing>();
         Audio.PlaySFX(held.Sfx);
-        SpawnBlock(held.Type == ItemType.Structure);
+
+        if (held.Type == ItemType.Structure)
+        {
+            Entity.Spawn(Target, cell);
+            Tutorial.OnPlaced(Target);
+            RemoveHeldItem();
+            return;
+        }
+
+        if (Main.CreativeMode)
+        {
+            Main.PlayerInfo.Storage.CreateAndAddItem(Target);
+            World.SetBlock(cell, Block.ConvertID(Target));
+            return;
+        }
+
+        Tutorial.OnBlockPlaced();
+        World.SetBlock(cell, Block.ConvertID(Target));
+        RemoveHeldItem();
     }
 
     private static void Position(GameObject obj, Vector3Int cell)
@@ -118,68 +101,17 @@ public static class Terraform
             cell + new Vector3(0.5f, 0, 0.5f), Time.deltaTime * PreviewSpeed);
     }
   
-    public static void SpawnBlock(bool isStructure)
-    {
-        if (isStructure)
-        {
-            // Structures place directly — no build phase.
-            Entity.Spawn(Target, _coordinate);
-            Tutorial.OnPlaced(Target);
-            RemoveHeldItem();
-            return;
-        }
-
-        // The mining box is an overlay marker on an existing block, not terrain.
-        if (Target == ID.MiningBox)
-        {
-            if (Main.CreativeMode)
-            {
-                World.SetBlock(_coordinate);
-                return;
-            }
-            Entity.Spawn(ID.MiningBox, _coordinate);
-            return;
-        }
-
-        // Blocks are terrain: writing one in places it outright, no build phase.
-        if (Main.CreativeMode)
-        {
-            Main.PlayerInfo.Storage.CreateAndAddItem(Target);
-            World.SetBlock(_coordinate, Block.ConvertID(Target));
-            return;
-        }
-
-        Tutorial.OnBlockPlaced();
-        World.SetBlock(_coordinate, Block.ConvertID(Target));
-        RemoveHeldItem();
-    }
-
-    /// <summary>Consume one placed item from the held slot (cursor or hotbar).</summary>
     private static void RemoveHeldItem()
     {
         Inventory.CurrentItem.Stack--;
         if (Inventory.CurrentItem.Stack <= 0) Inventory.CurrentItem.clear();
         Inventory.RefreshInventory();
     }
-     
-    
-    /// <summary>Whether the aimed cell accepts a placement: the mining box is an
-    /// overlay on an existing block, everything else needs an empty cell so placing
-    /// can never silently overwrite terrain (or waste blocks on a filled cell).</summary>
+
     private static bool IsCellPlaceable(Vector3Int cell)
     {
         return Target == ID.MiningBox
             ? Block.GetBlock(World.GetBlock(cell)) != null
             : World.GetBlock(cell) == 0;
     }
-
-    private static bool HandleCoord()
-    {
-        Vector3Int adjustedPoint = Aim.Cell();
-        if (PendingBlocks.Contains(adjustedPoint) || !Scene.InPlayerBlockRange(adjustedPoint, 3) ||
-            !World.IsInWorldBounds(adjustedPoint) || !IsCellPlaceable(adjustedPoint)) return false; 
-        _coordinate = adjustedPoint;
-        return true;
-    } 
 }
-    

@@ -559,7 +559,7 @@ public partial class Item
             Speed = 1.4f, Damage = 1, Knockback = 10, CritChance = 10,
             ProjectileSpeed = 2.5f, Radius = 2, Breaking = 1, Operation = OperationType.Chopping,
             Description = "Stone hatchet for chopping wood.",
-            Materials = new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 3 } },
+            Materials = new Dictionary<ID, int> { { ID.Sticks, 2 }, { ID.Flint, 2 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
         new ToolSpec {
