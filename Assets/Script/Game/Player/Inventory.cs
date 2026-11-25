@@ -166,9 +166,6 @@ public class Inventory
         return -1;
     }
 
-    /// <summary>Move the item held on the cursor into a hotbar slot and select that slot.
-    /// An item already in the slot is dropped on the floor. False when the cursor is
-    /// empty or the slot holds a full stack of the same item.</summary>
     public static bool PlaceHeldInSlot(int index)
     {
         Storage storage = Main.PlayerInfo?.Storage;
@@ -186,9 +183,7 @@ public class Inventory
         }
         else
         {
-            DropToWorld(target, target.Stack, storage, Main.Player.transform.position);
-            target.CopyFrom(GUICursor.Data);
-            GUICursor.Data.clear();
+            DropToWorld(GUICursor.Data, GUICursor.Data.Stack, storage, Main.Player.transform.position);
         }
 
         _buffer = -1;
