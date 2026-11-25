@@ -117,7 +117,7 @@ public partial class ItemRecipe
             int have = AmountIn(sources, ingredient.Key);
             int far = AmountIn(farSources, ingredient.Key);
             string line = far > 0
-                ? $"{item.Name} x {ingredient.Value} ({have} + {far} out of range)"
+                ? $"{item.Name} x {ingredient.Value} ({have} + {far} too far)"
                 : $"{item.Name} x {ingredient.Value} ({have})";
             text.Append('\n').Append(colored
                 ? $"<color={(have < ingredient.Value ? ShortageColor : FulfilledColor)}>{line}</color>"

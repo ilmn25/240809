@@ -84,8 +84,6 @@ public static class Trade
 
     public static string TierColor(ID id) => TierColor(Tier(id));
 
-    public static string TierName(ID id) => Tier(id).ToString();
-
     public static bool IsCoin(ID id) => System.Array.IndexOf(Tiers, id) >= 0;
 
     /// <summary>The coins that make up the given copper amount, as item stacks.</summary>

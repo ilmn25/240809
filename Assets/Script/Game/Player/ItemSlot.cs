@@ -96,7 +96,7 @@ public class ItemSlot
 
         int worth = Trade.Worth(ID);
         if (worth > 0)
-            yield return $"<color={Trade.TierColor(ID)}>{Trade.TierName(ID)} | worth {Trade.Format(worth)}</color>";
+            yield return "worth " + Trade.Format(worth);
     }
 
     /// <summary>How much punishment a placed block takes, and how strong a tool must be

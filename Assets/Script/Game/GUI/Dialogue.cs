@@ -55,6 +55,7 @@ public class Dialogue
         }
         else
         {
+            Target = null;
             Source = null;
             _anchored = false;
             if (Showing)

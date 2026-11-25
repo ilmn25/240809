@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GUIMenu
 {
-    private enum MenuScreen { Main, Host, NewGame, Seed, Pause, Settings, Keybinds, Keybind, Load, Confirm, Death }
+    private enum MenuScreen { Main, Host, NewGame, Seed, Pause, Settings, Display, Audio, Gameplay, Keybinds, Keybind, Load, Confirm, Death }
     private enum ConfirmAction { None, Save, Load, Keybind }
     private MenuScreen _screen = MenuScreen.Main;
     private int _loadPage;
@@ -211,6 +211,9 @@ public partial class GUIMenu
             case MenuScreen.Settings:
                 TransitionTo(_settingsReturn);
                 break;
+            case MenuScreen.Display:
+            case MenuScreen.Audio:
+            case MenuScreen.Gameplay:
             case MenuScreen.Keybinds:
                 TransitionTo(MenuScreen.Settings);
                 break;
@@ -259,8 +262,22 @@ public partial class GUIMenu
                 break;
 
             case MenuScreen.Settings:
-                if (n >= 1 && n <= 9) { Audio.PlaySFX(SfxID.Text); CycleSetting(n - 1); }
-                else if (n == 0) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); }
+                if (n == 1) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Display); }
+                else if (n == 2) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Audio); }
+                else if (n == 3) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Gameplay); }
+                else if (n == 4) { Audio.PlaySFX(SfxID.Text); TransitionTo(MenuScreen.Keybinds); }
+                break;
+
+            case MenuScreen.Display:
+                if (n >= 1 && n <= 5) { Audio.PlaySFX(SfxID.Text); CycleDisplay(n - 1); }
+                break;
+
+            case MenuScreen.Audio:
+                if (n >= 1 && n <= 3) { Audio.PlaySFX(SfxID.Text); CycleAudio(n - 1); }
+                break;
+
+            case MenuScreen.Gameplay:
+                if (n >= 1 && n <= 2) { Audio.PlaySFX(SfxID.Text); CycleGameplay(n - 1); }
                 break;
 
             case MenuScreen.Keybinds:
@@ -350,6 +367,9 @@ public partial class GUIMenu
             MenuScreen.Pause => Header("Pause") + "1 > Save\n2 > Load\n3 > Settings\n4 > Quit to Menu",
             MenuScreen.Death => Header("Game Over") + "1 > Load\n2 > Main Menu",
             MenuScreen.Settings => Header("Settings") + RenderSettings(),
+            MenuScreen.Display => Header("Display") + RenderDisplay(),
+            MenuScreen.Audio => Header("Audio") + RenderAudio(),
+            MenuScreen.Gameplay => Header("Gameplay") + RenderGameplay(),
             MenuScreen.Keybinds => Header("Keybinds") + RenderKeybinds(),
             MenuScreen.Keybind => Header(KeybindList[_keybindIndex].Label) + RenderKeybind(),
             MenuScreen.Load => Header("Load") + RenderLoad(),

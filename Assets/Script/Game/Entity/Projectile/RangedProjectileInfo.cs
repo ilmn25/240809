@@ -32,7 +32,7 @@ public class RangedProjectileInfo : ProjectileInfo
 
     private void Land(Projectile projectile, Vector3 position)
     {
-        if (Ammo != ID.Null) Entity.SpawnItem(Ammo, position);
+        if (Helper.IsHost() && Ammo != ID.Null) Entity.SpawnItem(Ammo, position);
         projectile.Delete();
     }
 
