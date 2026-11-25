@@ -261,6 +261,34 @@ public class Storage
                 NotifyChanged();
         }
 
+        /// <summary>Move whatever fits of <paramref name="slot"/> into this storage and leave
+        /// the remainder in the source slot. Unlike <see cref="AddItem"/>, a partial fit never
+        /// spills the rest on the ground, which is what a bulk deposit wants.</summary>
+        public bool TryStore(ItemSlot slot)
+        {
+                if (List == null || List.Count == 0 || slot == null || slot.isEmpty()) return false;
+
+                bool moved = false;
+                foreach (ItemSlot owned in List)
+                {
+                        if (owned == null || owned.isEmpty() || !owned.isSame(slot) || owned.isFull()) continue;
+                        owned.Add(slot);
+                        moved = true;
+                        if (slot.isEmpty()) break;
+                }
+
+                while (!slot.isEmpty())
+                {
+                        int index = GetEmptySlot();
+                        if (index == -1) break;
+                        List[index].Add(slot);
+                        moved = true;
+                }
+
+                if (moved) NotifyChanged();
+                return moved;
+        }
+
         public int GetAmount(ID stringID)
         {
                 int count = 0;

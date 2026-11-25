@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>Terraria-style value tiers. An item's tier comes from what it is worth, so
+/// expensive loot reads as rare without a hand-authored label on every item.</summary>
+public enum WorthTier { Common, Uncommon, Rare, Epic, Legendary }
+
 /// <summary>Item worth and the copper/silver/gold coin economy. Worth is a property of
 /// the item (Item.Worth) and falls back to a raw-material value or the craft recipe.</summary>
 public static class Trade
@@ -8,6 +12,16 @@ public static class Trade
     public const int CopperPerSilver = 20;
     public const int SilverPerGold = 20;
     public const int CopperPerGold = CopperPerSilver * SilverPerGold;
+
+    /// <summary>Lowest copper value in each tier, in <see cref="WorthTier"/> order.</summary>
+    private static readonly int[] TierMinimums =
+    {
+        0,                      // Common: under a silver
+        CopperPerSilver,        // Uncommon: 1 silver
+        5 * CopperPerSilver,    // Rare: 5 silver
+        CopperPerGold,          // Epic: 1 gold
+        5 * CopperPerGold,      // Legendary: 5 gold
+    };
 
     private static readonly ID[] Tiers = { ID.Gold, ID.Silver, ID.Copper };
 
@@ -47,6 +61,30 @@ public static class Trade
     }
 
     public static int SellPrice(ID id) => Mathf.Max(1, Worth(id) / 2);
+
+    /// <summary>Worth tier for a copper value.</summary>
+    public static WorthTier TierOf(int copper)
+    {
+        for (int i = TierMinimums.Length - 1; i > 0; i--)
+            if (copper >= TierMinimums[i]) return (WorthTier)i;
+        return WorthTier.Common;
+    }
+
+    public static WorthTier Tier(ID id) => TierOf(Worth(id));
+
+    /// <summary>Tooltip color for a tier, in the order Terraria colors its rarities.</summary>
+    public static string TierColor(WorthTier tier) => tier switch
+    {
+        WorthTier.Uncommon => "#9696FF",
+        WorthTier.Rare => "#96FF96",
+        WorthTier.Epic => "#FFB060",
+        WorthTier.Legendary => "#FF8080",
+        _ => "#FFFFFF",
+    };
+
+    public static string TierColor(ID id) => TierColor(Tier(id));
+
+    public static string TierName(ID id) => Tier(id).ToString();
 
     public static bool IsCoin(ID id) => System.Array.IndexOf(Tiers, id) >= 0;
 

@@ -132,6 +132,34 @@ public class MobInfo : DynamicInfo
         direction.Normalize();
         return direction;
     }
+
+    /// <summary>Height above an entity's feet that an AI aims a projectile at — the body,
+    /// not the ground it stands on. Aiming at the feet lands the shot in the floor.</summary>
+    public const float AimBodyHeight = 0.55f;
+
+    /// <summary>The point an AI should aim at to hit its current target with the given
+    /// projectile: the target's body, led by how far it will move before the shot arrives.
+    /// Two passes sharpen the flight time, because the time depends on the aim point.</summary>
+    public Vector3 GetAimPoint(Vector3 origin, ProjectileInfo projectile)
+    {
+        if (Target == null) return AimPosition;
+
+        Vector3 body = Target.position + Vector3.up * AimBodyHeight;
+        float speed = projectile?.Speed ?? 0f;
+        if (speed <= 0f) return body;
+
+        // Walkers move their transform directly, so Velocity only holds knockback and air
+        // drift; the walked motion is Direction scaled by the current speed.
+        Vector3 velocity = Target is DynamicInfo moving
+            ? moving.Direction * moving.SpeedCurrent + moving.Velocity
+            : Vector3.zero;
+        velocity.y = 0f;
+
+        Vector3 aim = body;
+        for (int i = 0; i < 2; i++)
+            aim = body + velocity * (Vector3.Distance(origin, aim) / speed);
+        return aim;
+    }
     public void SetEquipment(ItemSlot target)
     {
         ID shown = target is { Stack: > 0 } ? target.ID : ID.Null;

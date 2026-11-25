@@ -219,6 +219,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
+        StoreLootInNearbyShelf();
+
         if (TryContinueWork() || (!Info.IsTired && (TryEngageEnemy() || TryAcquireLootTarget())))
         {
             SetState<MobChaseAction>();
@@ -337,25 +339,90 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // ---- Loot pickup ----
 
-    /// <summary>How close a drop must already be before an ally detours to grab it — about
-    /// touching distance, so allies don't wander off chasing loot.</summary>
+    /// <summary>How close an ordinary drop must already be before an ally detours to grab
+    /// it — about touching distance, so allies don't wander off chasing junk.</summary>
     private const float LootRadius = 2f;
 
-    /// <summary>Claim the nearest drop the ally can actually collect and fit in their bag.
-    /// Contracted companions never do: their loot would vanish with the contract.</summary>
+    /// <summary>Extra reach per worth tier above common: an ally walks further for loot
+    /// that is actually worth carrying.</summary>
+    private const float LootReachPerTier = 2f;
+
+    /// <summary>Claim the most valuable drop the ally can reach and fit in their bag.
+    /// Worth beats distance, so an ally walks past gravel for a relic; between drops of
+    /// equal worth the closer one wins. Contracted companions never loot: their loot would
+    /// vanish with the contract.</summary>
     private bool TryAcquireLootTarget()
     {
         if (Info.CantLoot) return false;
-        if (EntityScan.FindNearest(transform.position, LootRadius, IsWantedLoot) is not ItemInfo item)
-            return false;
 
-        Info.Target = item;
+        ItemInfo best = null;
+        float bestScore = float.MinValue;
+
+        EntityScan.ForEach(transform.position, MaxLootRadius(), IsWantedLoot, info =>
+        {
+            ItemInfo item = (ItemInfo)info;
+            int worth = Trade.Worth(item.item.ID) * item.item.Stack;
+            float distance = Vector3.Distance(transform.position, item.position);
+            if (distance > LootRadius + (int)Trade.TierOf(worth) * LootReachPerTier) return;
+
+            float score = worth - distance;
+            if (score <= bestScore) return;
+            bestScore = score;
+            best = item;
+        });
+
+        if (best == null) return false;
+
+        Info.Target = best;
         Info.ActionType = IActionType.PickUp;
         // Fresh action, not reached yet. Repathing itself is automatic: the pathing module
         // rebuilds whenever Info.Target stops matching the path it holds.
         Info.PathingStatus = PathingStatus.Pending;
         return true;
     }
+
+    /// <summary>Farthest any drop can pull an ally, matching the per-tier reach above.</summary>
+    private static float MaxLootRadius() =>
+        LootRadius + (int)WorthTier.Legendary * LootReachPerTier;
+
+    // ---- Storing loot ----
+
+    /// <summary>How close a shelf must be before an ally stows its loot in it.</summary>
+    private const float ShelfRange = 2.5f;
+
+    /// <summary>Seconds between shelf scans, so an ally standing next to a full shelf doesn't
+    /// run a physics query every frame.</summary>
+    private const float ShelfScanInterval = 0.5f;
+
+    private float _nextShelfScan;
+
+    /// <summary>Put gathered loot on a nearby shelf. Tools, food and coins stay in the bag;
+    /// raw materials and blocks go on the shelf so looting doesn't fill the ally's hands.</summary>
+    private void StoreLootInNearbyShelf()
+    {
+        if (!Helper.IsHost() || !Info.HasInventory || Info.Storage?.List == null) return;
+        if (Time.time < _nextShelfScan) return;
+        _nextShelfScan = Time.time + ShelfScanInterval;
+
+        if (!Info.Storage.List.Exists(HasStorableLoot)) return;
+
+        if (EntityScan.FindNearest(transform.position, ShelfRange,
+                i => i is ContainerInfo { Destroyed: false, Storage: not null } container && container.id == ID.Shelf)
+            is not ContainerInfo shelf)
+            return;
+
+        bool moved = false;
+        foreach (ItemSlot slot in Info.Storage.List)
+        {
+            if (!HasStorableLoot(slot) || ReferenceEquals(slot, Info.Equipment)) continue;
+            if (shelf.Storage.TryStore(slot)) moved = true;
+        }
+        if (moved) Info.Storage.NotifyChanged();
+    }
+
+    private static bool HasStorableLoot(ItemSlot slot) =>
+        slot is { Stack: > 0 } && slot.Info != null && !Trade.IsCoin(slot.ID) &&
+        slot.Info.Type is ItemType.Material or ItemType.Block;
 
     private bool IsWantedLoot(Info info)
     {

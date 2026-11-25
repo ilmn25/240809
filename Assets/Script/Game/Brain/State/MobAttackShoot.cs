@@ -28,11 +28,13 @@ public class MobAttackShoot : MobState
         Info.SpeedModifier = 0.3f;
 
         Vector3 direction = Info.GetDirection();
-        
-        ProjectileSync.SpawnProjectile(Info,
-            Info.SpriteToolTrack.position + direction * equipment.ProjectileOffset,
-            Info.AimPosition,
-            projectile,
+        Vector3 origin = Info.SpriteToolTrack.position + direction * equipment.ProjectileOffset;
+
+        // The controlled player aims with the mouse. An AI aims at the target's body and
+        // leads a moving target, so a thrown spear lands where the target will be.
+        Vector3 aim = Main.PlayerInfo == Info ? Info.AimPosition : Info.GetAimPoint(origin, projectile);
+
+        ProjectileSync.SpawnProjectile(Info, origin, aim, projectile,
             Info.targetHitboxType, equipment.ID);
 
         if (Main.PlayerInfo == Info)

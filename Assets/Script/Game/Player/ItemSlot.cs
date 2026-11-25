@@ -58,11 +58,13 @@ public class ItemSlot
         return description.Length == 0 ? stats : description + "\n\n" + stats;
     }
 
-    /// <summary>Full tooltip: the title, then <see cref="Describe"/> directly beneath it.</summary>
+    /// <summary>Full tooltip: the title, then <see cref="Describe"/> directly beneath it.
+    /// The title is tinted by worth tier, Terraria-style.</summary>
     public string Tooltip()
     {
         string body = Describe();
-        return body.Length == 0 ? Title : Title + "\n" + body;
+        string title = Stack > 0 ? $"<color={Trade.TierColor(ID)}>{Title}</color>" : Title;
+        return body.Length == 0 ? title : title + "\n" + body;
     }
 
     /// <summary>Every stat this item type has, in a fixed order so the same information always
@@ -91,6 +93,10 @@ public class ItemSlot
                     yield return line;
                 break;
         }
+
+        int worth = Trade.Worth(ID);
+        if (worth > 0)
+            yield return $"<color={Trade.TierColor(ID)}>{Trade.TierName(ID)} | worth {Trade.Format(worth)}</color>";
     }
 
     /// <summary>How much punishment a placed block takes, and how strong a tool must be
