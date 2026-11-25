@@ -17,3 +17,4 @@ public class WoundedDelverMachine : RecruitableNPCMachine
     protected override string RecruitText => "\"I owe you one. Point me at something and I'll swing.\"";
     protected override float HealthScale => 0.5f;
 }
+    

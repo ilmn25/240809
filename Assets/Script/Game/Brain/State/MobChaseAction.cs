@@ -56,6 +56,11 @@ class MobChaseAction : MobState {
                 Machine.SetState<EquipSelectState>();
                 break;
             }
+            case IActionType.Store when !Info.Target.Destroyed && Info.Target is ContainerInfo container && Machine is PlayerMachine player:
+                player.StoreLoot(container.Storage);
+                Info.CancelTarget();
+                Machine.SetState<EquipSelectState>();
+                break;
             case IActionType.Hit or IActionType.Dig when !Info.Target.Destroyed:
                 ((EntityMachine)Machine).Attack();
                 break;
@@ -70,7 +75,7 @@ class MobChaseAction : MobState {
     private float GetEngageRange()
     {
         if (Info.ActionType == IActionType.Follow) return Info.DistFollow;
-        if (Info.Equipment != null && Info.Equipment.Info.Gesture == ItemGesture.Shoot) return Info.DistRanged;
+        if (Info.ActionType != IActionType.Store && Info.Equipment != null && Info.Equipment.Info.Gesture == ItemGesture.Shoot) return Info.DistRanged;
         return Info.DistAttack;
     }
 }

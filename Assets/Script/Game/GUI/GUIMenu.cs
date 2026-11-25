@@ -360,7 +360,7 @@ public partial class GUIMenu
     {
         return _screen switch
         {
-            MenuScreen.Main => Header("MORIMORI") + "1 > Host\n2 > Join\n3 > Settings\n4 > Quit Game",
+            MenuScreen.Main => Header("MORIMORI") + "1 > Begin\n2 > Join\n3 > Settings\n4 > Quit Game",
             MenuScreen.Host => Header("Host") + "1 > New\n2 > Load",
             MenuScreen.NewGame => Header("New Game") + RenderNewGame(),
             MenuScreen.Seed => Header("Seed") + RenderSeed(),

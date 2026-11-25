@@ -1,13 +1,11 @@
 using System;
 using UnityEngine;
-public enum IActionType {Follow, Interact, Hit, Dig, PickUp}
+public enum IActionType {Follow, Interact, Hit, Dig, PickUp, Store}
 
 public static class ActionTypeExtensions
 {
-    /// <summary>Pick-up and interaction targets are held until they complete or the carrier
-    /// moves, so every "is this a pending interaction?" test goes through here.</summary>
     public static bool IsPickUpOrInteract(this IActionType actionType)
-        => actionType is IActionType.PickUp or IActionType.Interact;
+        => actionType is IActionType.PickUp or IActionType.Interact or IActionType.Store;
 }
  
 [System.Serializable]

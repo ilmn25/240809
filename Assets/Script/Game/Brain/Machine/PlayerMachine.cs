@@ -168,7 +168,6 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         if (Info.PlayerStatus == PlayerStatus.Incapacitated) return;
         if (!IsCurrentState<DefaultState>() && !IsCurrentState<MobChaseAction>()) return;
 
-        // A pending pickup/interaction owns the brain until it completes or gets dropped.
         if (Info.ActionType.IsPickUpOrInteract())
         {
             if (Info.Target != null) return;
@@ -219,9 +218,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
             return;
         }
 
-        StoreLootInNearbyShelf();
-
-        if (TryContinueWork() || (!Info.IsTired && (TryEngageEnemy() || TryAcquireLootTarget())))
+        if (TryContinueWork() || (!Info.IsTired && (TryEngageEnemy() || TryAcquireLootTarget())) ||
+            TryStoreLootInShelf())
         {
             SetState<MobChaseAction>();
             return;
@@ -339,18 +337,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     // ---- Loot pickup ----
 
-    /// <summary>How close an ordinary drop must already be before an ally detours to grab
-    /// it — about touching distance, so allies don't wander off chasing junk.</summary>
-    private const float LootRadius = 2f;
+    private const float LootRadius = 3f;
 
-    /// <summary>Extra reach per worth tier above common: an ally walks further for loot
-    /// that is actually worth carrying.</summary>
     private const float LootReachPerTier = 2f;
 
-    /// <summary>Claim the most valuable drop the ally can reach and fit in their bag.
-    /// Worth beats distance, so an ally walks past gravel for a relic; between drops of
-    /// equal worth the closer one wins. Contracted companions never loot: their loot would
-    /// vanish with the contract.</summary>
     private bool TryAcquireLootTarget()
     {
         if (Info.CantLoot) return false;
@@ -375,47 +365,54 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         Info.Target = best;
         Info.ActionType = IActionType.PickUp;
-        // Fresh action, not reached yet. Repathing itself is automatic: the pathing module
-        // rebuilds whenever Info.Target stops matching the path it holds.
         Info.PathingStatus = PathingStatus.Pending;
         return true;
     }
 
-    /// <summary>Farthest any drop can pull an ally, matching the per-tier reach above.</summary>
     private static float MaxLootRadius() =>
         LootRadius + (int)WorthTier.Legendary * LootReachPerTier;
 
-    // ---- Storing loot ----
+    private const float ShelfRange = 6f;
 
-    /// <summary>How close a shelf must be before an ally stows its loot in it.</summary>
-    private const float ShelfRange = 2.5f;
-
-    /// <summary>Seconds between shelf scans, so an ally standing next to a full shelf doesn't
-    /// run a physics query every frame.</summary>
     private const float ShelfScanInterval = 0.5f;
 
     private float _nextShelfScan;
 
-    /// <summary>Put gathered loot on a nearby shelf. Tools, food and coins stay in the bag;
-    /// raw materials and blocks go on the shelf so looting doesn't fill the ally's hands.</summary>
-    private void StoreLootInNearbyShelf()
+    private bool TryStoreLootInShelf()
     {
-        if (!Helper.IsHost() || !Info.HasInventory || Info.Storage?.List == null) return;
-        if (Time.time < _nextShelfScan) return;
+        if (!Helper.IsHost() || !Info.HasInventory) return false;
+        if (Time.time < _nextShelfScan) return false;
         _nextShelfScan = Time.time + ShelfScanInterval;
 
-        if (!Info.Storage.List.Exists(HasStorableLoot)) return;
+        if (!Info.Storage.List.Exists(IsStorableCarried)) return false;
 
         if (EntityScan.FindNearest(transform.position, ShelfRange,
-                i => i is ContainerInfo { Destroyed: false, Storage: not null } container && container.id == ID.Shelf)
+                i => i is ContainerInfo { Destroyed: false, Storage: not null } candidate &&
+                     candidate.id == ID.Shelf && CanDepositTo(candidate.Storage))
             is not ContainerInfo shelf)
-            return;
+            return false;
+
+        Info.Target = shelf;
+        Info.ActionType = IActionType.Store;
+        Info.PathingStatus = PathingStatus.Pending;
+        return true;
+    }
+
+    private bool CanDepositTo(Storage shelf) =>
+        Info.Storage.List.Exists(slot => IsStorableCarried(slot) && shelf.CanFit(slot));
+
+    private bool IsStorableCarried(ItemSlot slot) =>
+        HasStorableLoot(slot) && !ReferenceEquals(slot, Info.Equipment);
+
+    public void StoreLoot(Storage shelf)
+    {
+        if (shelf == null) return;
 
         bool moved = false;
         foreach (ItemSlot slot in Info.Storage.List)
         {
-            if (!HasStorableLoot(slot) || ReferenceEquals(slot, Info.Equipment)) continue;
-            if (shelf.Storage.TryStore(slot)) moved = true;
+            if (!IsStorableCarried(slot)) continue;
+            if (shelf.TryStore(slot)) moved = true;
         }
         if (moved) Info.Storage.NotifyChanged();
     }
@@ -432,13 +429,13 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return !IsLootClaimed(item);
     }
 
-    // Leave it for whoever is already walking to it (the leader, or another ally).
     private static bool IsLootClaimed(ItemInfo item)
     {
         if (Save.Inst?.players == null) return false;
         foreach (PlayerInfo player in Save.Inst.players)
         {
-            if (player == null || player.Destroyed) continue;
+            if (player == null || player.Destroyed || player.Machine == null) continue;
+            if (player.Resting || player.PlayerStatus == PlayerStatus.Incapacitated) continue;
             if (player.Target == item && player.ActionType.IsPickUpOrInteract()) return true;
         }
         return false;

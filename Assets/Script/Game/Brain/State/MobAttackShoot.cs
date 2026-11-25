@@ -39,13 +39,13 @@ public class MobAttackShoot : MobState
         aim = SpreadAim(origin, aim, weapon.Spread);
 
         if (Helper.IsHost() || Info.IsOwner())
-            Info.KnockBack(Info.position + direction, weapon.Recoil, true);
+            Info.KnockBack(Info.position + direction * (equipment.ID == ID.Spear ? -1f : 1f), weapon.Recoil, true);
 
         ProjectileSync.SpawnProjectile(Info, origin, aim, projectile,
             Info.targetHitboxType, equipment.ID);
 
         if (Main.PlayerInfo == Info)
-            ScreenShake.Shake(40f, 0.03f + weapon.Recoil * 0.008f, 1f / 60f, direction);
+            ScreenShake.Shake(60f, 0.1f + weapon.Recoil * 0.02f, 0.18f, direction);
 
         // Only firearms eject brass: a thrown spear or a loosed arrow leaves nothing behind.
         if (AmmoRegistry.IsGun(equipment.ID))

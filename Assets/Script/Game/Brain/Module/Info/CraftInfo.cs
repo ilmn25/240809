@@ -23,7 +23,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
     private static readonly Dictionary<ID, PoolDef> PoolDefs = new Dictionary<ID, PoolDef>
     {
-        { ID.Toolbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.Stake, ID.Rapier, ID.Sledgehammer, ID.Workbench, ID.Chest, ID.Furnace, ID.Lamp) },
+        { ID.Toolbench, new PoolDef(0, true, ID.StonePickaxe, ID.StoneHatchet, ID.Stake, ID.Rapier, ID.Sledgehammer, ID.Workbench, ID.Shelf, ID.Furnace, ID.Lamp) },
         { ID.Campfire, new PoolDef(0, true, ID.Charcoal, ID.CookedMeat, ID.CookedChicken, ID.CookedDeathcap) },
         { ID.CarpenterWorkbench, new PoolDef(0, true, ID.Bed, ID.Loom, ID.Sign, ID.FieldStation, ID.Scarecrow, ID.Chair) },
         { ID.Loom, new PoolDef(0, true, ID.Fabric, ID.Bandages) },

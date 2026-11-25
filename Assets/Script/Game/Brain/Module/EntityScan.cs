@@ -6,7 +6,19 @@ using UnityEngine;
 /// machines (threat scans, herd scans, grouping, aggro, etc.).</summary>
 public static class EntityScan
 {
-    private static readonly Collider[] Buffer = new Collider[64];
+    private const int BufferSize = 256;
+
+    private static readonly Collider[] Buffer = new Collider[BufferSize];
+
+    private static Collider[] Overlap(Vector3 origin, float radius, out int count)
+    {
+        count = Physics.OverlapSphereNonAlloc(origin, radius, Buffer, Main.MaskEntity);
+        if (count < BufferSize) return Buffer;
+
+        Collider[] overflow = Physics.OverlapSphere(origin, radius, Main.MaskEntity);
+        count = overflow.Length;
+        return overflow;
+    }
 
     public static PlayerInfo FindNearestPlayer(Vector3 origin, float radius, Func<PlayerInfo, bool> predicate = null)
     {
@@ -31,12 +43,12 @@ public static class EntityScan
     /// predicate, or null if none match.</summary>
     public static Info FindNearest(Vector3 origin, float radius, Func<Info, bool> predicate)
     {
-        int count = Physics.OverlapSphereNonAlloc(origin, radius, Buffer, Main.MaskEntity);
+        Collider[] hits = Overlap(origin, radius, out int count);
         Info best = null;
         float bestSqr = float.MaxValue;
         for (int i = 0; i < count; i++)
         {
-            if (!Buffer[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
+            if (!hits[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
             Info info = em.Info;
             if (!predicate(info)) continue;
             float sqr = (info.position - origin).sqrMagnitude;
@@ -48,11 +60,11 @@ public static class EntityScan
     /// <summary>Counts entities within radius whose Info matches the predicate.</summary>
     public static int Count(Vector3 origin, float radius, Func<Info, bool> predicate)
     {
-        int count = Physics.OverlapSphereNonAlloc(origin, radius, Buffer, Main.MaskEntity);
+        Collider[] hits = Overlap(origin, radius, out int count);
         int matches = 0;
         for (int i = 0; i < count; i++)
         {
-            if (!Buffer[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
+            if (!hits[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
             if (predicate(em.Info)) matches++;
         }
         return matches;
@@ -62,10 +74,10 @@ public static class EntityScan
     /// the predicate.</summary>
     public static void ForEach(Vector3 origin, float radius, Func<Info, bool> predicate, Action<Info> action)
     {
-        int count = Physics.OverlapSphereNonAlloc(origin, radius, Buffer, Main.MaskEntity);
+        Collider[] hits = Overlap(origin, radius, out int count);
         for (int i = 0; i < count; i++)
         {
-            if (!Buffer[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
+            if (!hits[i].TryGetComponent(out EntityMachine em) || em.Info == null) continue;
             if (predicate(em.Info)) action(em.Info);
         }
     }

@@ -198,7 +198,7 @@ public class PlayerInfo : MobInfo
     }
 
     /// <summary>True while the player's current target is a structure it is working on.</summary>
-    public bool IsWorking => Target is StructureInfo;
+    public bool IsWorking => Target is StructureInfo && ActionType != IActionType.Store;
 
     /// <summary>Stop working: forget the remembered structure job and, when the player is
     /// currently on a structure, drop that target too. Returns true if a structure target
@@ -417,9 +417,11 @@ public class PlayerInfo : MobInfo
 
         string icon = null;
         if (active)
-            icon = IsWorking ? "GUI/StatusWorking" : null;
+            icon = IsStoring ? "GUI/StatusShelf" : IsWorking ? "GUI/StatusWorking" : null;
         SetStatusIcon(icon);
     }
+
+    private bool IsStoring => ActionType == IActionType.Store;
 
     private void UpdateHungerStage()
     {
