@@ -170,7 +170,10 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
         if (Info.ActionType.IsPickUpOrInteract())
         {
-            if (Info.Target != null) return;
+            bool keep = Info.Target != null &&
+                        (Info.ActionType == IActionType.Interact || CanSweepLoot());
+            if (keep) return;
+            Info.CancelTarget();
             Info.ActionType = IActionType.Follow;
         }
 
@@ -211,8 +214,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         }
 
         if (Info.WorkOrder != null && !IsBeyondPartyRange(transform.position) &&
-            FindNearestThreat() is { } assailant && !IsBeyondPartyRange(assailant.position) &&
-            TryDefendSelf(assailant))
+            FindNearbyThreat() is { } assailant && TryDefendSelf(assailant))
         {
             SetState<MobChaseAction>();
             return;
@@ -335,6 +337,17 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         return EntityScan.FindNearest(transform.position, Info.DistAlert, i => i is MobInfo m && IsThreat(m)) as MobInfo;
     }
 
+    private MobInfo FindNearbyThreat()
+    {
+        MobInfo threat = FindNearestThreat();
+        return threat != null && !IsBeyondPartyRange(threat.position) ? threat : null;
+    }
+
+    private bool InCombat =>
+        FindNearbyThreat() != null || Leader is { Target: MobInfo mob } && IsThreat(mob);
+
+    private bool CanSweepLoot() => !IsBeyondPartyRange(transform.position) && !InCombat;
+
     // ---- Loot pickup ----
 
     private const float LootRadius = 3f;
@@ -343,7 +356,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
 
     private bool TryAcquireLootTarget()
     {
-        if (Info.CantLoot) return false;
+        if (Info.CantLoot || !CanSweepLoot()) return false;
 
         ItemInfo best = null;
         float bestScore = float.MinValue;
@@ -351,6 +364,8 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
         EntityScan.ForEach(transform.position, MaxLootRadius(), IsWantedLoot, info =>
         {
             ItemInfo item = (ItemInfo)info;
+            if (IsBeyondPartyRange(item.position)) return;
+
             int worth = Trade.Worth(item.item.ID) * item.item.Stack;
             float distance = Vector3.Distance(transform.position, item.position);
             if (distance > LootRadius + (int)Trade.TierOf(worth) * LootReachPerTier) return;
@@ -381,6 +396,7 @@ public class PlayerMachine : MobMachine, IActionSecondaryInteract
     private bool TryStoreLootInShelf()
     {
         if (!Helper.IsHost() || !Info.HasInventory) return false;
+        if (!CanSweepLoot()) return false;
         if (Time.time < _nextShelfScan) return false;
         _nextShelfScan = Time.time + ShelfScanInterval;
 
