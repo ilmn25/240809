@@ -147,6 +147,10 @@ public class ItemSlot
         yield return Info.Speed.ToString("0.##") + " attack speed";
         if (projectile.CritChance > 0)
             yield return projectile.CritChance.ToString("0.#") + "% crit";
+        if (projectile.Spread > 0)
+            yield return projectile.Spread.ToString("0.#") + " spread";
+        if (projectile.Recoil > 0)
+            yield return projectile.Recoil.ToString("0.#") + " recoil";
 
         if (projectile.HitEffect != null)
         {

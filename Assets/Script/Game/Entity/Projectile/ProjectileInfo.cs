@@ -11,6 +11,8 @@ public class ProjectileInfo
     public int Damage;
     public float Knockback;
     public float CritChance;
+    public float Spread;
+    public float Recoil;
     public float Radius;  
     public float Speed;
     public int Breaking = 0;

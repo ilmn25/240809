@@ -1,4 +1,5 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MobAttackShoot : MobState
 { 
@@ -34,11 +35,17 @@ public class MobAttackShoot : MobState
         // leads a moving target, so a thrown spear lands where the target will be.
         Vector3 aim = Main.PlayerInfo == Info ? Info.AimPosition : Info.GetAimPoint(origin, projectile);
 
+        ProjectileInfo weapon = equipment.ProjectileInfo;
+        aim = SpreadAim(origin, aim, weapon.Spread);
+
+        if (Helper.IsHost() || Info.IsOwner())
+            Info.KnockBack(Info.position + direction, weapon.Recoil, true);
+
         ProjectileSync.SpawnProjectile(Info, origin, aim, projectile,
             Info.targetHitboxType, equipment.ID);
 
         if (Main.PlayerInfo == Info)
-            ScreenShake.Shake(40f, 0.035f, 1f / 60f, direction);
+            ScreenShake.Shake(40f, 0.03f + weapon.Recoil * 0.008f, 1f / 60f, direction);
 
         // Only firearms eject brass: a thrown spear or a loosed arrow leaves nothing behind.
         if (AmmoRegistry.IsGun(equipment.ID))
@@ -46,6 +53,13 @@ public class MobAttackShoot : MobState
                 (Vector3.up -direction) * 5, 15000);
     }
  
+    private static Vector3 SpreadAim(Vector3 origin, Vector3 aim, float spread)
+    {
+        if (spread <= 0f) return aim;
+        Vector3 offset = aim - origin;
+        return origin + Quaternion.Euler(0f, Random.Range(-spread, spread), 0f) * offset;
+    }
+
     public override void OnUpdateState()
     {
         if (Info.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)

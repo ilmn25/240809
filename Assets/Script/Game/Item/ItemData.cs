@@ -322,6 +322,7 @@ public partial class Item
                 Damage = 0,
                 Knockback = 0,
                 CritChance = 0,
+                Spread = 2f, Recoil = 4f,
                 LifeSpan = 132,
                 Speed = 16,
                 Gravity = -24f,
@@ -354,6 +355,7 @@ public partial class Item
                 Damage = 2,
                 Knockback = 5,
                 CritChance = 10,
+                Spread = 1.5f, Recoil = 4f,
                 LifeSpan = 10000,
                 Speed = 60,
                 Radius = 0.1f,
@@ -385,6 +387,7 @@ public partial class Item
             Id = id,
             Gesture = ItemGesture.Shoot, Sfx = SfxID.Sword,
             Speed = ShootCooldown(drawSeconds), Damage = damage, Knockback = knockback, CritChance = crit,
+            Spread = 0.6f, Recoil = 3f,
             ProjectileSpeed = arrowSpeed, Radius = 0.15f, Ammo = ID.Arrow, Sprite = ID.Arrow,
             LifeSpan = 10000, Durability = durability, ProjectileOffset = 1f, Gravity = -18f,
             Description = description,
@@ -403,6 +406,8 @@ public partial class Item
         public int Damage;
         public float Knockback;
         public float CritChance;
+        public float Spread;
+        public float Recoil;
         public float ProjectileSpeed = 1;
         public float Gravity;
         public float Radius;
@@ -475,6 +480,7 @@ public partial class Item
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 12, CritChance = 15,
+            Spread = 1.5f, Recoil = 3f,
             ProjectileSpeed = 20, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
             LifeSpan = 10000, Gravity = -22f,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
@@ -502,6 +508,7 @@ public partial class Item
             Id = ID.Pistol,
             Gesture = ItemGesture.Shoot, Sfx = SfxID.Pistol,
             Speed = 0.6f, Damage = 5, Knockback = 6, CritChance = 10,
+            Spread = 1.2f, Recoil = 4f,
             ProjectileSpeed = 60, Radius = 0.1f, Ammo = ID.Bullet, Sprite = ID.BulletProjectile,
             Penetration = 1, LifeSpan = 10000, ProjectileOffset = 1.016f,
             Description = "Compact pistol, quick draw and moderate damage.",
@@ -512,6 +519,7 @@ public partial class Item
             Id = ID.Shotgun,
             Gesture = ItemGesture.Shoot, Sfx = SfxID.Pistol,
             Speed = 0.7f, Damage = 3, Knockback = 4, CritChance = 5,
+            Recoil = 8f,
             ProjectileSpeed = 60, Radius = 0.1f, Ammo = ID.ShotgunRound, Sprite = ID.BulletProjectile,
             LifeSpan = 10000, ProjectileOffset = 1.4f,
             Description = "A pump-action shotgun that looses a spread of shells.",
@@ -522,6 +530,7 @@ public partial class Item
             Id = ID.Minigun,
             Gesture = ItemGesture.Shoot, Sfx = SfxID.Minigun,
             Speed = 2f, Damage = 3, Knockback = 5, CritChance = 10,
+            Spread = 2.5f, Recoil = 2.5f,
             ProjectileSpeed = 60, Radius = 0.1f, Ammo = ID.Bullet, Sprite = ID.BulletProjectile,
             Penetration = 1, LifeSpan = 10000, ProjectileOffset = 1.4f, Durability = -1,
             Description = "Squad-fire minigun, unleashes a hail of bullets.",
@@ -618,6 +627,8 @@ public partial class Item
                 Damage = spec.Damage,
                 Knockback = spec.Knockback,
                 CritChance = spec.CritChance,
+                Spread = spec.Spread,
+                Recoil = spec.Recoil,
                 LifeSpan = spec.LifeSpan,
                 Speed = spec.ProjectileSpeed,
                 Gravity = spec.Gravity,
