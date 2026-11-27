@@ -741,6 +741,12 @@ public class Entity
                         });
                 loot = new (ID.Thrall); // the thrall drops nothing
                   
+                AddMob<BaelMachine>(ID.Bael);
+                loot = new (ID.Bael);
+                loot.Add(1, 2, ID.Gold);
+                loot.Add(0.5f, 1, ID.CradleOfBlood);
+                loot.Add(0.7f, 1, ID.Steel);
+
                 Dictionary.Add(ID.ItemPrefab, new Entity
                 {
                         Bounds = Vector3Int.zero,
