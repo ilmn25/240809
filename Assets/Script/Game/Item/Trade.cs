@@ -144,6 +144,12 @@ public static class Trade
             storage.CreateAndAddItem(coin.Key, coin.Value);
     }
 
+    public static void SpawnCoins(Vector3 position, int copper)
+    {
+        foreach (KeyValuePair<ID, int> coin in Split(copper))
+            Entity.SpawnItem(coin.Key, position, coin.Value, stackOnSpawn: false);
+    }
+
     /// <summary>Splits a copper amount into coin stacks, largest tier first.</summary>
     public static IEnumerable<KeyValuePair<ID, int>> Split(int copper)
     {

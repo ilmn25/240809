@@ -1,8 +1,13 @@
 using System;
+using UnityEngine;
 
 [System.Serializable]
 public class EnemyInfo : MobInfo
 {
+    private const float CoinDropChance = 0.5f;
+    private const float CoinValueMinMultiplier = 0.5f;
+    private const float CoinValueMaxMultiplier = 2f;
+
     /// <summary>Raised when an enemy dies, with the killed enemy's id.</summary>
     public static event System.Action<ID> Killed;
 
@@ -23,11 +28,22 @@ public class EnemyInfo : MobInfo
         SpeedTarget *= EffectiveSpeedModifier;
         if (Health <= 0)
         { 
-            Killed?.Invoke(((EntityMachine)Machine).Info.id);
-            Loot.Gettable(((EntityMachine)Machine).Info.id).Spawn(Machine.transform.position);
+            ID id = ((EntityMachine)Machine).Info.id;
+            Vector3 position = Machine.transform.position;
+            Killed?.Invoke(id);
+            Loot.Gettable(id).Spawn(position);
+            DropCoins(position);
             Destroy();
             Audio.PlaySFX(DeathSfx);
         }
+    }
+
+    private void DropCoins(Vector3 position)
+    {
+        if (UnityEngine.Random.value > CoinDropChance) return;
+
+        int copper = Mathf.Max(1, (int)(HealthMax * UnityEngine.Random.Range(CoinValueMinMultiplier, CoinValueMaxMultiplier)));
+        Trade.SpawnCoins(position, copper);
     }
 
     protected override void OnHit(Projectile projectile)
