@@ -12,7 +12,7 @@ public class VampireMachine : GroundMobMachine
     private static readonly ProjectileInfo BiteProjectile = new ContactDamageProjectileInfo {
         Damage = 4,
         Knockback = 10,
-        CritChance = 0.15f,
+        CritChance = 15,
         Radius = 0.9f,
     };
 

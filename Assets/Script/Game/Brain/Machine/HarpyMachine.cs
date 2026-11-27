@@ -15,7 +15,7 @@ public class HarpyMachine : GroundMobMachine
     private static readonly ProjectileInfo TalonProjectile = new ContactDamageProjectileInfo {
         Damage = 3,
         Knockback = 9,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.8f,
     };
 

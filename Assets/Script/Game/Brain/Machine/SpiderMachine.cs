@@ -10,7 +10,7 @@ public class SpiderMachine : GroundMobMachine
     private readonly ProjectileInfo _biteProjectile = new ContactDamageProjectileInfo {
         Damage = 2,
         Knockback = 8,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.7f,
     };
 

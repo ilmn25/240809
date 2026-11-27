@@ -22,6 +22,7 @@ public class MerchantMachine : PassiveNPCMachine, IActionSecondaryInteract, ITra
 
     public void OnActionSecondary(Info info)
     {
+        Menu.RefreshDaily();
         BeginInteraction();
         ToggleStation<TradeState>("I've been tracking this signal for ages...");
     }

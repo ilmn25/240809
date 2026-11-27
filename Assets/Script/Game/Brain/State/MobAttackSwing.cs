@@ -47,7 +47,10 @@ class MobAttackSwing : MobState {
             Info.SpriteToolTrack.position + direction * _equipment.ProjectileOffset,
             Info.AimPosition,
             _equipment.ProjectileInfo,
-            Info.targetHitboxType, Info.Equipment.ID);
+            Info.targetHitboxType, Info.Equipment.ID, Info.Equipment.Modifier);
+
+        if (_equipment.ProjectileInfo.Lunge > 0f)
+            Info.KnockBack(Info.position - direction, _equipment.ProjectileInfo.Lunge, true);
     }
 
     public override void OnEnterState()
@@ -76,7 +79,7 @@ class MobAttackSwing : MobState {
 
         yield return new WaitForSeconds(SwingTime / Info.Animator.speed);
         Audio.PlaySFX(_equipment?.Sfx ?? SfxID.HitMob);
-        Info.Animator.speed = (Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f)) / Info.AttackCooldownMultiplier;
+        Info.Animator.speed = (Main.CreativeMode ? 70f : (_equipment?.Speed ?? 1f) * ItemAffixes.SpeedOf(Info.Equipment?.Modifier)) / Info.AttackCooldownMultiplier;
         Info.SpeedModifier = UsesNaturalWeapon ? 0f : 0.8f;
         Info.Animator.Play("EquipSwingCooldown", 0, 0f);
 

@@ -31,7 +31,7 @@ public class EnemyInfo : MobInfo
             ID id = ((EntityMachine)Machine).Info.id;
             Vector3 position = Machine.transform.position;
             Killed?.Invoke(id);
-            Loot.Gettable(id).Spawn(position);
+            Loot.Gettable(id).Spawn(position, lucky: true);
             DropCoins(position);
             Destroy();
             Audio.PlaySFX(DeathSfx);

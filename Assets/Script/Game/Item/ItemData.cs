@@ -408,6 +408,7 @@ public partial class Item
         public float CritChance;
         public float Spread;
         public float Recoil;
+        public float Lunge;
         public float ProjectileSpeed = 1;
         public float Gravity;
         public float Radius;
@@ -445,8 +446,8 @@ public partial class Item
             Id = ID.Rapier,
             Speed = 1.8f, Damage = 3, Knockback = 8, CritChance = 20,
             ProjectileSpeed = 1.6f, Radius = 1.5f, Breaking = 1, Operation = OperationType.Cutting,
-            Targets = 1, HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
-            Description = "A swift rapier. Strikes fast and its crits leave a bleeding wound, but it only ever finds one target.",
+            Targets = 1, Lunge = 10f, HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
+            Description = "A swift rapier. Its strikes lunge you forward, and its crits leave a bleeding wound, but it only ever finds one target.",
             Materials = new Dictionary<ID, int> { { ID.Steel, 2 }, { ID.Stake, 1 } },
             HoldoutOffset = new Vector2(0.6f, 0),
         },
@@ -480,12 +481,12 @@ public partial class Item
             Id = ID.Spear,
             Gesture = ItemGesture.Shoot,
             Speed = 0.8f, Damage = 5, Knockback = 20, CritChance = 15,
-            Spread = 1.5f, Recoil = 14f,
+            Spread = 1.5f,
             ProjectileSpeed = 20, Radius = 0.3f, Ammo = ID.Spear, Sprite = ID.Spear, Penetration = 1,
             LifeSpan = 10000, Gravity = -22f,
             HitEffect = WeaponEffects.Bleeding, HitEffectOnCrit = true,
             StackSize = 20, Durability = -1, ProjectileOffset = 1.016f, RotationOffset = 45,
-            Description = "A throwable spear. Its throw drags you forward in a lunge behind it.",
+            Description = "A throwable spear. It flies straight and true, without dragging the thrower along.",
             Materials = new Dictionary<ID, int> { { ID.Sticks, 3 } },
             HoldoutOffset = new Vector2(0.65f, 0),
         },
@@ -650,6 +651,7 @@ public partial class Item
             Breaking = spec.Breaking,
             OperationType = spec.Operation,
             Targets = spec.Targets,
+            Lunge = spec.Lunge,
             HitEffect = spec.HitEffect,
             HitEffectOnCrit = spec.HitEffectOnCrit,
         };

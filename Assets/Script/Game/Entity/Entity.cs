@@ -523,7 +523,7 @@ public class Entity
                         {
                                 Projectile = new ContactDamageProjectileInfo
                                 {
-                                        Damage = 3, Knockback = 14, CritChance = 0.1f, Radius = 0.9f,
+                                        Damage = 3, Knockback = 14, CritChance = 10, Radius = 0.9f,
                                 },
                         });
                 loot = new (ID.Bear);
@@ -541,7 +541,7 @@ public class Entity
                         {
                                 Projectile = new ContactDamageProjectileInfo
                                 {
-                                        Damage = 2, Knockback = 12, CritChance = 0.1f, Radius = 0.9f,
+                                        Damage = 2, Knockback = 12, CritChance = 10, Radius = 0.9f,
                                 },
                                 // Predicts melee swings and dodges back out of range.
                                 Setup = mob => mob.AddModule(new MeleeDodgeModule()),
@@ -587,7 +587,7 @@ public class Entity
                         {
                                 Projectile = new ContactDamageProjectileInfo
                                 {
-                                        Damage = 10, Knockback = 30, CritChance = 0.1f, Radius = 1.2f,
+                                        Damage = 10, Knockback = 30, CritChance = 10, Radius = 1.2f,
                                 },
                         });
                 loot = new (ID.Lich);
@@ -606,7 +606,7 @@ public class Entity
                         {
                                 Projectile = new ContactDamageProjectileInfo
                                 {
-                                        Damage = 12, Knockback = 40, CritChance = 0.1f, Radius = 1.4f,
+                                        Damage = 12, Knockback = 40, CritChance = 10, Radius = 1.4f,
                                 },
                         });
                 loot = new (ID.Cyclops);
@@ -736,7 +736,7 @@ public class Entity
                         {
                                 Projectile = new ContactDamageProjectileInfo
                                 {
-                                        Damage = 1, Knockback = 6, CritChance = 0.05f, Radius = 0.7f,
+                                        Damage = 1, Knockback = 6, CritChance = 5, Radius = 0.7f,
                                 },
                         });
                 loot = new (ID.Thrall); // the thrall drops nothing

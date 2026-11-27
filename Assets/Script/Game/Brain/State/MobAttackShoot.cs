@@ -23,7 +23,7 @@ public class MobAttackShoot : MobState
 
         Audio.PlaySFX(equipment.Sfx);
         Info.SpriteToolEffect.localPosition = Vector3.right * equipment.ProjectileOffset;
-        Info.Animator.speed = equipment.Speed; 
+        Info.Animator.speed = equipment.Speed * ItemAffixes.SpeedOf(Info.Equipment?.Modifier); 
         Info.Animator.Play("EquipShoot", 0, 0f);
          
         Info.SpeedModifier = 0.3f;
@@ -39,10 +39,10 @@ public class MobAttackShoot : MobState
         aim = SpreadAim(origin, aim, weapon.Spread);
 
         if (Helper.IsHost() || Info.IsOwner())
-            Info.KnockBack(Info.position + direction * (equipment.ID == ID.Spear ? -1f : 1f), weapon.Recoil, true);
+            Info.KnockBack(Info.position + direction, weapon.Recoil, true);
 
         ProjectileSync.SpawnProjectile(Info, origin, aim, projectile,
-            Info.targetHitboxType, equipment.ID);
+            Info.targetHitboxType, equipment.ID, Info.Equipment.Modifier);
 
         if (Main.PlayerInfo == Info)
             ScreenShake.Shake(60f, 0.1f + weapon.Recoil * 0.02f, 0.18f, direction);

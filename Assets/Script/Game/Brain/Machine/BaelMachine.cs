@@ -12,7 +12,7 @@ public class BaelMachine : GroundMobMachine
     {
         Damage = 8,
         Knockback = 28,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 1.1f,
     };
 

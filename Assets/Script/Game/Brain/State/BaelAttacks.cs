@@ -12,7 +12,7 @@ class BaelHellfire : MobState
     {
         Damage = 4,
         Knockback = 8,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.3f,
         Speed = 16f,
         LifeSpan = 240,
@@ -84,7 +84,7 @@ class BaelCharge : MobState
     {
         Damage = 6,
         Knockback = 24,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.9f,
     };
 
@@ -160,7 +160,7 @@ class BaelNova : MobState
     {
         Damage = 9,
         Knockback = 30,
-        CritChance = 0.05f,
+        CritChance = 5,
         Radius = 3.2f,
     };
 

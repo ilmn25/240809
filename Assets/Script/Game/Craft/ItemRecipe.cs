@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
  
 public partial class ItemRecipe 
 {
     private const string ShortageColor = "#FF5555";
     private const string FulfilledColor = "#8FE38F";
+    private const float BonusCraftChance = 0.12f;
 
     public static readonly Dictionary<ID, ItemRecipe> Dictionary = new Dictionary<ID, ItemRecipe>();
 
@@ -139,13 +141,27 @@ public partial class ItemRecipe
         }
 
         Tutorial.OnCraft(stringID);
-        GiveItem(stringID, recipe.Stack);
+        GiveItem(stringID, RollCraftStack(stringID));
         return true;
+    }
+
+    private static int RollCraftStack(ID itemID)
+    {
+        int stack = GetRecipe(itemID)?.Stack ?? 1;
+        return UnityEngine.Random.value < BonusCraftChance ? stack * 2 : stack;
+    }
+
+    public static ItemSlot CreateCraftedSlot(ID itemID)
+    {
+        ItemSlot slot = new ItemSlot(itemID, RollCraftStack(itemID));
+        ItemAffixes.ApplyCraft(slot);
+        return slot;
     }
 
     public static void GiveItem(ID stringID, int stack)
     {
         ItemSlot craftedItem = new ItemSlot(stringID, stack);
+        ItemAffixes.ApplyCraft(craftedItem);
         
         if (GUICursor.Data.isEmpty() || GUICursor.Data.isSame(craftedItem))
         {

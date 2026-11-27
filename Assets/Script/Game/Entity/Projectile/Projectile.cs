@@ -14,6 +14,7 @@ public class Projectile : MonoBehaviour
     public Vector3 Direction;
     public Vector3 Velocity;
     public MobInfo SourceInfo;
+    public string Modifier;
 
     private void Update()
     {
@@ -25,14 +26,25 @@ public class Projectile : MonoBehaviour
         LifeSpan = 0;
         ObjectPool.ReturnObject(gameObject);
     } 
-    
-    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target, MobInfo sourceInfo)
+
+    public int GetDamage(out bool crit)
+    {
+        ItemAffix affix = ItemAffixes.Get(Modifier);
+        crit = Random.value * 100f < Info.CritChance + (affix?.Crit ?? 0f);
+        int damage = Mathf.RoundToInt(Info.Damage * (affix?.Damage ?? 1f));
+        return crit ? damage * 2 : damage;
+    }
+
+    public float GetKnockback() => Info.Knockback * (ItemAffixes.Get(Modifier)?.Knockback ?? 1f);
+
+    public static void Spawn(Vector3 origin, Vector3 dest, ProjectileInfo info, HitboxType target, MobInfo sourceInfo, string modifier = null)
     {
         GameObject gameObject = ObjectPool.GetObject(ID.ProjectilePrefab);
         Projectile projectile = gameObject.GetComponent<Projectile>();
         if (!projectile.spriteRenderer)
             projectile.spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         projectile.SourceInfo = sourceInfo;
+        projectile.Modifier = modifier;
         projectile.transform.position = origin; 
         projectile.Info = info; 
         projectile.TargetHitBoxType = target; 

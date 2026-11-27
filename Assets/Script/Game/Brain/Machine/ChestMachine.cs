@@ -2,6 +2,10 @@ using UnityEngine;
 
 public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract, IActionPrimaryResource
 { 
+    private bool _mimicTriggered;
+
+    protected virtual float MimicChance => 0f;
+
     public override void OnStart()
     { 
         base.OnStart();
@@ -19,19 +23,44 @@ public abstract class ChestMachine : StructureMachine, IActionSecondaryInteract,
 
     public virtual void OnActionSecondary(Info info)
     {
+        if (TryTriggerMimic()) return;
+
         if (IsCurrentState<DefaultState>())
             SetState<InContainerState>();
         else 
             SetState<DefaultState>();
     }
+
+    private bool TryTriggerMimic()
+    {
+        if (_mimicTriggered || MimicChance <= 0f || !Helper.IsHost()) return false;
+        if (UnityEngine.Random.value > MimicChance) return false;
+
+        _mimicTriggered = true;
+        if (Info is ContainerInfo container)
+            container.Storage.List?.Clear();
+
+        Entity.Spawn(ID.TreeMimic, Vector3Int.FloorToInt(transform.position));
+        Audio.PlaySFX(SfxID.Noise);
+        Dialogue.ShowEvent("The chest lunges — it's a mimic!");
+        Info.Destroy();
+        return true;
+    }
 }
 
 public abstract class LootChestMachine : ChestMachine
 {
+    private const float BonusLootChance = 0.5f;
+
+    protected override float MimicChance => 0.06f;
+
     protected static ContainerInfo CreateLootContainer(ID lootID)
     {
         Storage storage = new Storage(9);
         Loot.Gettable(lootID).AddToContainer(storage);
+        if (UnityEngine.Random.value < BonusLootChance)
+            Loot.Gettable(ID.Chest).AddOneRandom(storage);
+
         return new ContainerInfo()
         {
             Health = 500,

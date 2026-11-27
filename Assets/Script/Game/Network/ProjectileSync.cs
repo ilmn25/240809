@@ -5,6 +5,7 @@ public struct SpawnProjectileMessage : NetworkMessage
 {
     public string sourceUid;
     public ID itemId;
+    public string modifier;
     public Vector3 origin;
     public Vector3 aimPosition;
 }
@@ -12,19 +13,20 @@ public struct SpawnProjectileMessage : NetworkMessage
 public static class ProjectileSync
 {
     public static void SpawnProjectile(MobInfo source, Vector3 origin, Vector3 aim,
-        ProjectileInfo info, HitboxType target, ID itemId)
+        ProjectileInfo info, HitboxType target, ID itemId, string modifier = null)
     {
         var msg = new SpawnProjectileMessage
         {
             sourceUid = source.uid,
             itemId = itemId,
+            modifier = modifier,
             origin = origin,
             aimPosition = aim
         };
 
         if (NetworkServer.active)
         {
-            Projectile.Spawn(origin, aim, info, target, source);
+            Projectile.Spawn(origin, aim, info, target, source, modifier);
             foreach (var kv in NetworkServer.connections)
                 if (kv.Value.connectionId != 0)
                     kv.Value.Send(msg);
@@ -47,7 +49,7 @@ public static class ProjectileSync
         {
             ProjectileInfo projInfo = Item.GetItem(msg.itemId)?.ProjectileInfo;
             if (projInfo != null)
-                Projectile.Spawn(msg.origin, msg.aimPosition, projInfo, sourceInfo.targetHitboxType, sourceInfo);
+                Projectile.Spawn(msg.origin, msg.aimPosition, projInfo, sourceInfo.targetHitboxType, sourceInfo, msg.modifier);
         }
 
         foreach (var kv in NetworkServer.connections)
@@ -63,7 +65,7 @@ public static class ProjectileSync
         {
             ProjectileInfo projInfo = Item.GetItem(msg.itemId)?.ProjectileInfo;
             if (projInfo != null)
-                Projectile.Spawn(msg.origin, msg.aimPosition, projInfo, sourceInfo.targetHitboxType, sourceInfo);
+                Projectile.Spawn(msg.origin, msg.aimPosition, projInfo, sourceInfo.targetHitboxType, sourceInfo, msg.modifier);
         }
     }
 }

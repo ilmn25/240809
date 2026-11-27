@@ -6,7 +6,7 @@ public class HornetMachine : GroundMobMachine
     private static readonly ProjectileInfo StingProjectile = new SwingProjectileInfo {
         Damage = 1,
         Knockback = 5,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 1f,
     };
 

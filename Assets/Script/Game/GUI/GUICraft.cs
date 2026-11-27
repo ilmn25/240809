@@ -24,7 +24,7 @@ public class GUICraft : GUIStorage
             if (CurrentSlot is not { Stack: > 0 } slot) return "";
             return Mode switch
             {
-                TradeMode.Shop => $"price: {Trade.Format(Trade.Worth(slot.ID))}",
+                TradeMode.Shop => $"price: {Trade.Format(ActiveCraftInfo?.PriceOf(slot.ID) ?? Trade.Worth(slot.ID))}",
                 TradeMode.Sell =>
                     $"sells for {Trade.Format(Trade.Worth(slot.ID))} (you have {Main.PlayerInfo?.Storage?.GetAmount(slot.ID) ?? 0})",
                 _ => ItemRecipe.GetRecipe(slot.ID)?.DescribeIngredients(colored: true) ?? "",
@@ -77,9 +77,10 @@ public class GUICraft : GUIStorage
             Main.PlayerInfo?.Machine?.SetState<MobCraftState>();
     }
 
-    private static void Buy(Item item)
+    private void Buy(Item item)
     {
-        if (!Trade.TrySpend(Main.PlayerInfo?.Storage, Trade.Worth(item.ID))) return;
+        int price = ActiveCraftInfo?.PriceOf(item.ID) ?? Trade.Worth(item.ID);
+        if (!Trade.TrySpend(Main.PlayerInfo?.Storage, price)) return;
 
         ItemRecipe.GiveItem(item.ID, ItemRecipe.GetRecipe(item.ID)?.Stack ?? 1);
     }

@@ -14,7 +14,7 @@ public class MannequinMachine : GroundMobMachine
     private static readonly ProjectileInfo StrikeProjectile = new ContactDamageProjectileInfo {
         Damage = 3,
         Knockback = 6,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.7f,
     };
 

@@ -11,7 +11,7 @@ public class VisitorMachine : GroundMobMachine
     private static readonly ProjectileInfo ClawProjectile = new ContactDamageProjectileInfo {
         Damage = 8,          // very strong — kills most players in a couple hits
         Knockback = 16,
-        CritChance = 0.2f,
+        CritChance = 20,
         Radius = 1.0f,
     };
 

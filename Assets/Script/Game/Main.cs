@@ -93,6 +93,7 @@ public class Main : MonoBehaviour
         GUIMain.UpdateMenu();
         ScreenFade.Update();
         ScreenDamageFlash.Update();
+        DamageText.Update();
         Environment.Update();
         if (SceneMode != SceneMode.Game) return;
         if (Intermission.Active)
@@ -121,6 +122,7 @@ public class Main : MonoBehaviour
     {
         ScreenFade.OnGUI();
         ScreenDamageFlash.OnGUI();
+        DamageText.OnGUI();
     }
 
     private void OnApplicationQuit()

@@ -36,7 +36,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
         { ID.Workbench, new PoolDef(0, true,   ID.Arrow, ID.ShortBow, ID.Anvil, ID.MasonryWorkbench, ID.CarpenterWorkbench, ID.Sawmill, ID.CrockPot) },
         { ID.FieldStation, new PoolDef(0, true, ID.ImprovisedPlanter, ID.CornSeed, ID.PumpkinSeed) },
         { ID.Anvil, new PoolDef(0, true, ID.SteelSword, ID.MetalAxe, ID.LongBow, ID.Bucket, ID.Sprinkler, ID.Generator, ID.MetalSpikeTrap, ID.CompoundBow, ID.Crossbow) },
-        { ID.Merchant, new PoolDef(0, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Sledgehammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
+        { ID.Merchant, new PoolDef(5, false, MaterialWants, ID.StonePickaxe, ID.StoneHatchet, ID.Sledgehammer, ID.Spear, ID.SteelSword, ID.MetalAxe, ID.DiamondAxe, ID.Bed, ID.Lamp) },
         { ID.Nomad, new PoolDef(4, false, RelicWants, ID.DiamondAxe, ID.Rapier, ID.MetalAxe, ID.Spear, ID.Dagger, ID.Bandages, ID.Sulphur, ID.Casing, ID.Paper) },
 
         { ID.Exchanger, new PoolDef(0, false, ID.Silver, ID.Gold) },
@@ -47,6 +47,21 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
     [NonSerialized] private int _counter;
     [NonSerialized] private Storage _pool;
+    [NonSerialized] private int _builtDay = -1;
+
+    [NonSerialized] public float PriceMultiplier = 1f;
+
+    public void RefreshDaily()
+    {
+        int day = Save.Inst?.day ?? 0;
+        if (_builtDay == day) return;
+
+        _builtDay = day;
+        _pool = null;
+        PriceMultiplier = Random.Range(0.8f, 1.2f);
+    }
+
+    public int PriceOf(ID itemID) => Mathf.Max(1, Mathf.RoundToInt(Trade.Worth(itemID) * PriceMultiplier));
 
     public override void Initialize()
     {
@@ -73,7 +88,7 @@ private static readonly Storage PlayerPool = CreateNoRefreshPool(ID.CrudePickaxe
 
         if (_counter == recipe.Time)
         {
-            Entity.SpawnItem(Pending[0], Machine.transform.position + OutputOffset(), stackOnSpawn: false);
+            Entity.SpawnItem(ItemRecipe.CreateCraftedSlot(Pending[0]), Machine.transform.position + OutputOffset(), stackOnSpawn: false);
             Tutorial.OnCraft(Pending[0]);
             Pending.RemoveAt(0);
             _counter = 0;

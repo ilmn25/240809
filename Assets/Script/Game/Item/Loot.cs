@@ -16,13 +16,18 @@ public class LootEntry
 
 public class Loot
 { 
+    private const float JackpotChance = 1f / 400f;
+
+    private static readonly ID[] Jackpots =
+    {
+        ID.DiamondAxe, ID.Pistol, ID.LongBow, ID.StarCompass, ID.UnheardBell,
+        ID.SunSphere, ID.CradleOfBlood, ID.HornOfPlenty, ID.PetrifiedDelver, ID.ThousandMenWedge,
+    };
+
     private static readonly Dictionary<ID, Loot> Dictionary = new Dictionary<ID, Loot>();
     private readonly List<LootEntry> _table = new List<LootEntry>(); 
     public Loot(ID id)
     {
-        // One table per id: break/burn/mob/harvest paths all look loot up by
-        // id, so each entity registers its single table exactly once. Adding a
-        // second table for the same id throws here on purpose to catch mistakes.
         Dictionary.Add(id, this);
     }
 
@@ -41,8 +46,6 @@ public class Loot
         _table.Add(new LootEntry(chance, amount, itemIDs));
     }
 
-    /// <summary>Roll the whole table, yielding one item id per successful chance roll.
-    /// The single place loot is rolled — every drop path consumes this.</summary>
     private IEnumerable<ID> Roll()
     {
         foreach (LootEntry entry in _table)
@@ -55,10 +58,20 @@ public class Loot
         }
     }
 
-    public void Spawn(Vector3 position)
+    private static ItemSlot CreateDrop(ID itemID, bool lucky)
+    {
+        if (lucky && Random.value < JackpotChance)
+            itemID = Jackpots[Random.Range(0, Jackpots.Length)];
+
+        ItemSlot slot = new ItemSlot(itemID);
+        ItemAffixes.ApplyLoot(slot);
+        return slot;
+    }
+
+    public void Spawn(Vector3 position, bool lucky = false)
     {
         foreach (ID itemID in Roll())
-            Entity.SpawnItem(itemID, position, stackOnSpawn: false);
+            Entity.SpawnItem(CreateDrop(itemID, lucky), position, stackOnSpawn: false);
     }
 
     public void SpawnOneRandom(Vector3 position)
@@ -67,11 +80,9 @@ public class Loot
 
         LootEntry entry = _table[Random.Range(0, _table.Count)];
         ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
-        Entity.SpawnItem(itemID, position, stackOnSpawn: false);
+        Entity.SpawnItem(CreateDrop(itemID, false), position, stackOnSpawn: false);
     }
 
-    /// <summary>Roll the loot table at the burn site, converting any burnable
-    /// item (wood, plants) to its burn result (e.g. charcoal).</summary>
     public void SpawnBurned(Vector3 position)
     {
         foreach (ID itemID in Roll())
@@ -81,6 +92,15 @@ public class Loot
     public void AddToContainer(Storage storage)
     {
         foreach (ID itemID in Roll())
-            storage.CreateAndAddItem(itemID);
+            storage.AddItem(CreateDrop(itemID, true));
+    }
+
+    public void AddOneRandom(Storage storage)
+    {
+        if (_table.Count == 0) return;
+
+        LootEntry entry = _table[Random.Range(0, _table.Count)];
+        ID itemID = entry.ItemIDs[Random.Range(0, entry.ItemIDs.Count)];
+        storage.AddItem(CreateDrop(itemID, true));
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using UnityEngine;
 
 [System.Serializable]
 public class ItemSlot
@@ -43,8 +44,9 @@ public class ItemSlot
     {
         get
         {
+            string name = Modifier == null ? Info.Name : Modifier + " " + Info.Name;
             bool stacks = Info.Type is ItemType.Block or ItemType.Material or ItemType.Consumable;
-            return stacks ? $"{Info.Name} x {Stack}" : Info.Name;
+            return stacks ? $"{name} x {Stack}" : name;
         }
     }
 
@@ -142,11 +144,17 @@ public class ItemSlot
         ProjectileInfo projectile = Info.ProjectileInfo;
         if (projectile == null) yield break;
 
-        yield return projectile.Damage + " damage";
-        yield return projectile.Knockback + " knockback";
-        yield return Info.Speed.ToString("0.##") + " attack speed";
-        if (projectile.CritChance > 0)
-            yield return projectile.CritChance.ToString("0.#") + "% crit";
+        ItemAffix affix = ItemAffixes.Get(Modifier);
+        float damageMultiplier = affix?.Damage ?? 1f;
+        float knockbackMultiplier = affix?.Knockback ?? 1f;
+        float speedMultiplier = affix?.Speed ?? 1f;
+        float critBonus = affix?.Crit ?? 0f;
+
+        yield return Mathf.RoundToInt(projectile.Damage * damageMultiplier) + " damage";
+        yield return Mathf.RoundToInt(projectile.Knockback * knockbackMultiplier) + " knockback";
+        yield return (Info.Speed * speedMultiplier).ToString("0.##") + " attack speed";
+        if (projectile.CritChance + critBonus > 0)
+            yield return (projectile.CritChance + critBonus).ToString("0.#") + "% crit";
         if (projectile.Spread > 0)
             yield return projectile.Spread.ToString("0.#") + " spread";
         if (projectile.Recoil > 0)

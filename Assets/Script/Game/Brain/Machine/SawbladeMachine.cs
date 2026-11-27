@@ -13,7 +13,7 @@ public class SawbladeMachine : MobMachine
     private static readonly ContactDamageProjectileInfo Blade = new ContactDamageProjectileInfo {
         Damage = 4,
         Knockback = 10,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.7f,
     };
 

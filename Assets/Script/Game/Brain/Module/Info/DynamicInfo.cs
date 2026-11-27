@@ -199,9 +199,20 @@ public class DynamicInfo : Info
             OnHit(projectile);
             return true;
         }
-        Health -= projectile.Info.GetDamage(out bool crit) - Defense;
+        int damage = projectile.GetDamage(out bool crit) - Defense;
+        Health -= damage;
         FlashHit();
         Shove(projectile);
+        if (damage > 0)
+        {
+            DamageText.Show(Machine.transform.position + new Vector3(0, 0.9f, 0), damage, crit, this is PlayerInfo);
+            if (crit)
+            {
+                Particle.Create(Machine.transform.position + new Vector3(0, 0.6f, 0), Particles.Spark, true);
+                if (Main.PlayerInfo != null && projectile.SourceInfo == Main.PlayerInfo)
+                    ScreenShake.Shake(80f, 0.1f, 0.12f);
+            }
+        }
         bool blackBlood = HitboxType == HitboxType.Enemy;
         Particle.Create(Machine.transform.position + new Vector3(0, 0.5f, 0), blackBlood ? Particles.BloodBlack : Particles.BloodRed, false);
         if (Helper.IsHost())
@@ -236,7 +247,7 @@ public class DynamicInfo : Info
     private void Shove(Projectile projectile)
     {
         if (IsNPC && Machine.IsInteracting) return;
-        KnockBack(projectile.transform.position, projectile.Info.Knockback * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
+        KnockBack(projectile.transform.position, projectile.GetKnockback() * projectile.SourceInfo.KnockbackDealt * KnockBackResistance, true);
     }
 
     public override string ToString()

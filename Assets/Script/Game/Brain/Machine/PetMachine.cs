@@ -12,7 +12,7 @@ public class PetMachine : PlayerMachine
     {
         Damage = 2,
         Knockback = 12,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.9f,
     };
 

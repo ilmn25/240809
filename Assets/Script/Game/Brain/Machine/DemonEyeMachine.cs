@@ -6,7 +6,7 @@ public class DemonEyeMachine : FlyingEnemyMachine
     private static readonly ProjectileInfo TouchProjectile = new ContactDamageProjectileInfo {
         Damage = 3,
         Knockback = 8,
-        CritChance = 0.1f,
+        CritChance = 10,
         Radius = 0.8f,
     };
 

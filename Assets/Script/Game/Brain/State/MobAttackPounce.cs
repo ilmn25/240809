@@ -6,7 +6,7 @@ public class MobAttackPounce : MobState
     private readonly ProjectileInfo _projectileInfo = new ContactDamageProjectileInfo {
             Damage = 1,
             Knockback = 10,
-            CritChance = 0.1f,
+            CritChance = 10,
             Radius = 0.3f,
         };
 
